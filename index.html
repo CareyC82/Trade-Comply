@@ -927,11 +927,15 @@
          * Match tags by HS code
          */
         function matchByHSCode(hsCode, tags) {
-            return tags.filter(tag => {
-                const tagHS = tag.hs_code || '';
-                return tagHS.startsWith(hsCode) || hsCode.startsWith(tagHS);
-            });
-        }
+    const normalizedInput = hsCode.trim().replace(/\./g, '');
+    return tags.filter(tag => {
+        if (!tag.related_hs_codes || tag.related_hs_codes.length === 0) return false;
+        return tag.related_hs_codes.some(code => {
+            const normalizedCode = code.replace(/\./g, '');
+            return normalizedCode.startsWith(normalizedInput) || normalizedInput.startsWith(normalizedCode);
+        });
+    });
+}
 
         /**
          * Match tags by product name keywords
