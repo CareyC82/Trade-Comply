@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>China Comply</title>
+    <title>Trade Comply</title>
     <style>
-        /* === CSS Variables === */
+        /* CSS Variables */
         :root {
             --color-primary: #1A3A5C;
             --color-accent: #E8A817;
@@ -17,11 +17,9 @@
             --color-check: #9E9E9E;
             --color-card-shadow: rgba(0,0,0,0.08);
             --color-border: #E0E0E0;
-            --spacing-mobile: 16px;
-            --spacing-desktop: 24px;
         }
 
-        /* === Base Styles === */
+        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -29,120 +27,137 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: var(--color-bg-secondary);
             color: var(--color-text);
-            line-height: 1.5;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 80px;
         }
 
-        /* === View Containers === */
+        /* View Containers */
         .view-container {
             display: none;
+            padding: 0 16px;
             min-height: 100vh;
-            padding: var(--spacing-mobile);
         }
 
         .view-container.active {
             display: block;
         }
 
-        /* === Header Styles === */
-        .page-header {
-            margin-bottom: 24px;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 44px;
-            min-height: 44px;
-            padding: 8px 16px;
-            color: var(--color-primary);
-            text-decoration: none;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: background-color 0.2s;
-        }
-
-        .back-btn:hover {
-            background-color: rgba(26, 58, 92, 0.1);
-        }
-
-        /* === Home View Styles === */
-        #home-view {
-            padding-top: 48px;
+        /* Header Styles */
+        .home-header {
             text-align: center;
+            padding: 40px 0 20px;
         }
 
         .home-title {
-            font-size: 2.5rem;
-            font-weight: 700;
             color: var(--color-primary);
+            font-size: 1.8rem;
             margin-bottom: 8px;
         }
 
         .home-subtitle {
-            font-size: 1rem;
             color: var(--color-text-secondary);
-            margin-bottom: 32px;
+            font-size: 0.95rem;
         }
 
-        /* === Search Bar === */
+        /* Direction Toggle */
+        .direction-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .direction-btn {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: var(--color-bg);
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 44px;
+        }
+
+        .direction-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .direction-btn.active {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+
+        /* Search Container */
         .search-container {
             display: flex;
             gap: 8px;
-            margin-bottom: 32px;
+            margin-bottom: 16px;
         }
 
         .search-input {
             flex: 1;
-            min-height: 44px;
-            padding: 0 16px;
-            border: 1px solid var(--color-border);
+            padding: 12px 16px;
+            border: 2px solid var(--color-border);
             border-radius: 8px;
             font-size: 1rem;
-            background-color: var(--color-bg);
+            outline: none;
+            transition: border-color 0.2s;
         }
 
         .search-input:focus {
-            outline: none;
             border-color: var(--color-primary);
         }
 
         .search-btn {
-            min-width: 44px;
-            min-height: 44px;
-            padding: 0 24px;
-            background-color: var(--color-accent);
+            padding: 12px 24px;
+            background-color: var(--color-primary);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: opacity 0.2s;
+            min-width: 80px;
         }
 
         .search-btn:hover {
-            background-color: #d4950e;
+            opacity: 0.9;
         }
 
-        /* === Quick Actions Grid === */
+        /* Latest Update Bar */
+        .latest-update-bar {
+            background-color: var(--color-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* Quick Actions Grid */
         .quick-actions-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .quick-action-card {
             background-color: var(--color-bg);
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px;
             box-shadow: 0 2px 8px var(--color-card-shadow);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            text-align: left;
         }
 
         .quick-action-card:hover {
@@ -151,167 +166,165 @@
         }
 
         .quick-action-icon {
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin-bottom: 8px;
         }
 
         .quick-action-label {
-            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--color-text);
+            color: var(--color-primary);
+            margin-bottom: 4px;
         }
 
         .quick-action-hs {
-            font-size: 0.75rem;
-            color: var(--color-text-secondary);
-            margin-top: 4px;
-        }
-
-        /* === Result View Styles === */
-        #result-view {
-            padding-top: 24px;
-        }
-
-        /* Warning Banner */
-        .warning-banner {
-            background-color: #FFF8E1;
-            border: 1px solid var(--color-accent);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
-        }
-
-        .warning-banner p {
-            color: #E65100;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        /* Compliance Tags Section */
-        .compliance-section {
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--color-primary);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 20px;
-            background-color: var(--color-accent);
-            border-radius: 2px;
-        }
-
-        /* Compliance Cards */
-        .compliance-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .compliance-card {
-            background-color: var(--color-bg);
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 8px var(--color-card-shadow);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .status-dot.matched {
-            background-color: var(--color-matched);
-        }
-
-        .status-dot.check {
-            background-color: transparent;
-            border: 2px solid var(--color-check);
-        }
-
-        .tag-short-name {
-            font-weight: 600;
-            color: var(--color-primary);
-        }
-
-        .tag-description {
-            font-size: 0.9rem;
-            color: var(--color-text);
-            margin-bottom: 8px;
-        }
-
-        .tag-source {
             font-size: 0.8rem;
             color: var(--color-text-secondary);
         }
 
-        .tag-source a {
-            color: var(--color-primary);
-            text-decoration: none;
-        }
-
-        .tag-source a:hover {
-            text-decoration: underline;
-        }
-
-        /* Result Card Styles */
-        .result-card {
-            background-color: var(--color-bg);
+        /* Disclaimer Bar */
+        .disclaimer-bar {
+            background-color: rgba(232, 168, 23, 0.1);
+            padding: 12px 16px;
             border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 8px var(--color-card-shadow);
+            margin-bottom: 16px;
+            font-size: 0.8rem;
+            color: #8B6914;
+            text-align: center;
         }
 
-        .tag-name {
+        /* Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background-color: transparent;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(26, 58, 92, 0.05);
+        }
+
+        /* Warning Banner */
+        .warning-banner {
+            background-color: rgba(239, 68, 68, 0.1);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid #EF4444;
+        }
+
+        .warning-banner p {
+            font-size: 0.85rem;
+            color: #DC2626;
+        }
+
+        /* Result Summary */
+        .result-summary {
+            margin-bottom: 20px;
+        }
+
+        .result-summary p {
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .result-summary span {
             font-weight: 600;
             color: var(--color-primary);
         }
 
-        .tag-desc {
-            font-size: 0.9rem;
-            color: var(--color-text);
-            margin-bottom: 8px;
-            margin-top: 8px;
+        /* Result Cards Container */
+        #result-cards-container {
+            margin-bottom: 24px;
         }
 
-        /* Cases Section Styles */
-        .cases-section {
+        /* Compliance Card */
+        .compliance-card {
+            background-color: var(--color-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px var(--color-card-shadow);
+        }
+
+        .compliance-card.matched {
+            border-left: 4px solid var(--color-matched);
+        }
+
+        .compliance-card.check {
+            border-left: 4px solid var(--color-check);
+        }
+
+        .compliance-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .compliance-tag.matched {
+            background-color: rgba(46, 125, 50, 0.1);
+            color: var(--color-matched);
+        }
+
+        .compliance-tag.check {
+            background-color: rgba(158, 158, 158, 0.1);
+            color: var(--color-check);
+        }
+
+        .compliance-title {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        .compliance-desc {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .compliance-hs {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .compliance-hs strong {
+            color: var(--color-text);
+        }
+
+        /* Cases Container */
+        #cases-container {
             margin-top: 24px;
         }
 
-        .cases-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .cases-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 12px;
         }
 
-        .case-item {
+        /* Case Card */
+        .case-card {
             background-color: var(--color-bg);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 16px;
+            margin-bottom: 12px;
             box-shadow: 0 2px 8px var(--color-card-shadow);
         }
 
         .case-title {
-            font-size: 1rem;
             font-weight: 600;
             color: var(--color-primary);
             margin-bottom: 4px;
@@ -325,61 +338,81 @@
 
         .case-summary {
             font-size: 0.9rem;
-            color: var(--color-text);
+            color: var(--color-text-secondary);
             margin-bottom: 8px;
         }
 
-        /* === Knowledge Base View Styles === */
-        #kb-view {
-            padding-top: 24px;
+        .case-link {
+            font-size: 0.85rem;
+            color: var(--color-primary);
+            text-decoration: none;
         }
 
+        .case-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Knowledge Base View */
         .kb-search {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        /* Knowledge Base Category Styles */
+        #kb-categories-container {
+            margin-top: 16px;
+        }
+
+        /* KB Category */
         .kb-category {
             background-color: var(--color-bg);
             border-radius: 8px;
-            box-shadow: 0 2px 8px var(--color-card-shadow);
             margin-bottom: 8px;
             overflow: hidden;
+            box-shadow: 0 2px 8px var(--color-card-shadow);
         }
 
         .kb-category-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             padding: 16px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
         .kb-category-header:hover {
-            background-color: var(--color-bg-secondary);
+            background-color: rgba(26, 58, 92, 0.05);
         }
 
-        .category-title {
+        .kb-category-title {
             font-weight: 600;
             color: var(--color-primary);
-            font-size: 1rem;
         }
 
-        .toggle-icon {
-            font-size: 0.8rem;
+        .kb-category-count {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            background-color: var(--color-bg-secondary);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .kb-category-toggle {
+            font-size: 1.2rem;
             color: var(--color-text-secondary);
             transition: transform 0.2s;
         }
 
+        .kb-category-toggle.open {
+            transform: rotate(180deg);
+        }
+
         .kb-category-content {
+            display: none;
             padding: 0 16px 16px;
         }
 
-        .kb-items-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .kb-category-content.open {
+            display: block;
         }
 
         .kb-item {
@@ -391,141 +424,203 @@
             border-bottom: none;
         }
 
-        .item-title {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--color-primary);
-            margin: 0 0 4px 0;
-        }
-
-        .item-description {
-            font-size: 0.85rem;
-            color: var(--color-text);
-            margin: 0 0 8px 0;
-        }
-
-        .item-source {
-            font-size: 0.8rem;
-            color: var(--color-primary);
-            text-decoration: none;
-        }
-
-        .item-source:hover {
-            text-decoration: underline;
-        }
-
-        /* Case Library Button */
-        .case-library-btn {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 24px;
-        }
-
-        .case-library-btn:hover {
-            opacity: 0.9;
-        }
-
-        /* Legacy Category List Styles */
-        .category-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .category-item {
-            background-color: var(--color-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 8px var(--color-card-shadow);
-            overflow: hidden;
-        }
-
-        .category-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .category-header:hover {
-            background-color: rgba(26, 58, 92, 0.05);
-        }
-
-        .category-label {
-            font-weight: 600;
-            color: var(--color-primary);
-        }
-
-        .category-arrow {
-            width: 0;
-            height: 0;
-            border-left: 6px solid var(--color-primary);
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-            transition: transform 0.2s;
-        }
-
-        .category-arrow.expanded {
-            transform: rotate(90deg);
-        }
-
-        .category-content {
-            display: none;
-            padding: 0 16px 16px;
-        }
-
-        .category-content.expanded {
-            display: block;
-        }
-
-        /* Knowledge Items */
-        .kb-items {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .kb-item {
-            padding: 12px;
-            background-color: var(--color-bg-secondary);
-            border-radius: 6px;
-        }
-
         .kb-item-title {
-            font-weight: 500;
+            font-size: 0.95rem;
             color: var(--color-primary);
             margin-bottom: 4px;
         }
 
-        .kb-item-desc {
-            font-size: 0.85rem;
+        .kb-item-url {
+            font-size: 0.8rem;
             color: var(--color-text-secondary);
-            margin-bottom: 6px;
+            word-break: break-all;
         }
 
-        .kb-item-url {
-            font-size: 0.75rem;
-            color: var(--color-accent);
+        .kb-item-url a {
+            color: var(--color-primary);
             text-decoration: none;
         }
 
-        .kb-item-url:hover {
+        .kb-item-url a:hover {
             text-decoration: underline;
         }
 
-        /* === Desktop Responsive === */
+        /* Categories Page */
+        .categories-summary {
+            padding: 12px 16px;
+            background: #F5F7FA;
+            border-bottom: 1px solid #E0E0E0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .categories-grid {
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .category-group {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .category-group-header {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: #FAFBFC;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid #F0F0F0;
+            font-weight: 600;
+            font-size: 15px;
+            color: #1A3A5C;
+        }
+
+        .category-group-header .group-icon {
+            font-size: 20px;
+            margin-right: 10px;
+            width: 28px;
+            text-align: center;
+        }
+
+        .category-group-header .group-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: #999;
+            font-weight: normal;
+        }
+
+        .category-group-header .arrow {
+            margin-left: 6px;
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+
+        .category-group-header.open .arrow {
+            transform: rotate(90deg);
+        }
+
+        .category-group-items {
+            display: none;
+            padding: 8px 16px 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .category-group.open .category-group-items {
+            display: flex;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 8px 14px;
+            background: #F5F7FA;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #1A3A5C;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+
+        .category-tag:hover, .category-tag:active {
+            background: #1A3A5C;
+            color: #fff;
+            border-color: #1A3A5C;
+        }
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #E0E0E0;
+            padding: 8px 0 12px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 13px;
+            color: #999;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+
+        .nav-btn.active {
+            color: #1A3A5C;
+            font-weight: 600;
+            background: #F0F3F7;
+        }
+
+        /* Case Library Button */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background-color: var(--color-bg);
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+            padding: 8px;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 12px;
+            background-color: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            min-height: 44px;
+        }
+
+        .nav-btn.active {
+            background-color: rgba(26, 58, 92, 0.1);
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        /* Case Library Button */
+        .case-library-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-primary);
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .case-library-btn:hover {
+            background-color: rgba(26, 58, 92, 0.05);
+        }
+
+        /* Responsive Design */
         @media (min-width: 768px) {
             .view-container {
-                padding: var(--spacing-desktop);
-                max-width: 900px;
+                padding: 0 24px;
+                max-width: 800px;
                 margin: 0 auto;
             }
 
@@ -534,24 +629,22 @@
             }
 
             .home-title {
-                font-size: 3.5rem;
+                font-size: 2.5rem;
             }
 
             .home-subtitle {
-                font-size: 1.125rem;
+                font-size: 1.1rem;
             }
 
             .quick-actions-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
 
-            .compliance-cards {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-
-            .compliance-card {
-                width: calc(50% - 6px);
+            .bottom-nav {
+                max-width: 800px;
+                left: auto;
+                right: auto;
+                border-radius: 12px 12px 0 0;
             }
         }
     </style>
@@ -559,13 +652,19 @@
 <body>
     <!-- Home View -->
     <div id="home-view" class="view-container active">
-        <div class="logo-section">
-            <h1 class="home-title">China Comply</h1>
+        <div class="home-header">
+            <h1 class="home-title">Trade Comply</h1>
             <p class="home-subtitle">Understand China's trade rules for electronics. Facts only.</p>
         </div>
 
+        <!-- Direction Toggle -->
+        <div class="direction-toggle">
+            <button id="direction-export" class="direction-btn active">Export from China</button>
+            <button id="direction-import" class="direction-btn">Import into China</button>
+        </div>
+
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="Enter product name or HS Code" id="search-input">
+            <input type="text" class="search-input" placeholder="Enter product name or HS Code" id="search-input" />
             <button class="search-btn" id="search-btn">GO</button>
         </div>
 
@@ -581,11 +680,7 @@
             <span>This tool provides official regulatory citations only. Not legal advice.</span>
         </div>
 
-        <nav class="bottom-nav">
-            <button id="nav-home" class="nav-btn active">Home</button>
-            <button id="nav-kb" class="nav-btn">Knowledge Base</button>
-            <button id="nav-about" class="nav-btn">About</button>
-        </nav>
+        <button id="view-cases-btn" class="case-library-btn">View Case Library</button>
     </div>
 
     <!-- Result View -->
@@ -614,29 +709,50 @@
         <button id="back-to-home-from-kb" class="back-btn">&lt; Back</button>
 
         <div class="kb-search">
-            <input type="text" class="search-input" placeholder="Search regulations..." id="kb-search-input">
+            <input type="text" class="search-input" placeholder="Search regulations..." id="kb-search-input" />
         </div>
 
         <div id="kb-categories-container">
             <!-- Categories will be populated by JS -->
         </div>
+    </div>
 
-        <button id="view-cases-btn" class="case-library-btn">View Case Library</button>
+    <!-- Categories Page -->
+    <div id="categories-view" style="display: none;">
+        <div class="header-bar">
+            <button id="back-to-home-from-cat" class="back-btn">&larr; Back</button>
+            <h2>Product Categories</h2>
+        </div>
+
+        <div class="categories-summary">📋 <strong>60 categories</strong> across <strong>12 groups</strong>. Tap any category to search instantly.</div>
+
+        <div id="categories-container" class="categories-grid">
+            <!-- JS动态生成 -->
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button id="nav-home" class="nav-btn active">🏠 Home</button>
+        <button id="nav-kb" class="nav-btn">📚 Knowledge Base</button>
+        <button id="nav-categories" class="nav-btn">📋 Categories</button>
     </div>
 
     <script>
         // === Global data storage ===
         window.appData = {
-            tags: [],           // Compliance tags from tags.json
-            cases: [],          // Penalty cases from cases.json
-            quickActions: [],   // Quick action buttons from quick-actions.json
-            knowledgeBase: {}   // Knowledge base from knowledge-base.json
+            tags: [],
+            cases: [],
+            quickActions: [],
+            knowledgeBase: {},
+            categories: []
         };
+
+        // === Global direction setting ===
+        window.currentDirection = 'export';
 
         /**
          * Load JSON data from a file
-         * @param {string} url - Path to the JSON file
-         * @returns {Promise} - Promise resolving to parsed JSON data
          */
         async function loadJSON(url) {
             const response = await fetch(url);
@@ -647,44 +763,25 @@
         }
 
         /**
-         * Initialize data loading when DOM is ready
-         * Uses Promise.all to load all JSON files concurrently
+         * Initialize data loading
          */
-        async function initData() {
-            try {
-                // Load all JSON files concurrently using Promise.all
-                const [tagsData, casesData, quickActionsData, kbData] = await Promise.all([
-                    loadJSON('data/tags.json'),
-                    loadJSON('data/cases.json'),
-                    loadJSON('data/quick-actions.json'),
-                    loadJSON('data/knowledge-base.json')
-                ]);
-
-                // Store loaded data in global appData object
-                window.appData.tags = tagsData;
-                window.appData.cases = casesData;
-                window.appData.quickActions = quickActionsData;
-                window.appData.knowledgeBase = kbData;
-
-                console.log('✅ All data loaded successfully');
-                console.log('Tags:', window.appData.tags.length, 'items');
-                console.log('Cases:', window.appData.cases.length, 'items');
-                console.log('Quick Actions:', window.appData.quickActions.length, 'items');
-                console.log('Knowledge Base categories:', window.appData.knowledgeBase.categories?.length || 0);
-
-                // Render UI components after data is loaded
+        function initData() {
+            Promise.all([
+                fetch('data/tags.json').then(r => r.json()),
+                fetch('data/cases.json').then(r => r.json()),
+                fetch('data/quick-actions.json').then(r => r.json()),
+                fetch('data/knowledge-base.json').then(r => r.json()),
+                fetch('data/categories.json').then(r => r.json())   // 新增
+            ]).then(([tags, cases, quickActions, kb, categories]) => {
+                window.appData = { tags, cases, quickActions, knowledgeBase: kb, categories };
                 renderQuickActions();
                 renderKnowledgeBase();
-
-            } catch (error) {
-                // Log error if any file fails to load
-                console.error('❌ Failed to load data:', error);
-            }
+                renderCategories();
+            }).catch(err => console.error('Data load failed:', err));
         }
 
         /**
-         * Render quick action cards in the home page
-         * Cards are created dynamically from quickActions data
+         * Render quick action cards
          */
         function renderQuickActions() {
             const container = document.getElementById('quick-actions-container');
@@ -693,49 +790,36 @@
                 return;
             }
 
-            // Clear existing content
+            const actions = window.appData.quickActions || [];
+            console.log(`🔹 renderQuickActions: ${actions.length} actions loaded`);
+            
             container.innerHTML = '';
 
-            // Get quick actions data from global appData
-            const quickActions = window.appData.quickActions || [];
+            // Sort by order field
+            const sortedActions = [...actions].sort((a, b) => (a.order || 999) - (b.order || 999));
+            
+            console.log(`🔹 Rendering ${sortedActions.length} actions`);
 
-            if (quickActions.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No quick actions available</p>';
-                return;
-            }
-
-            // Create a card for each quick action
-            quickActions.forEach(action => {
+            sortedActions.forEach(action => {
                 const card = document.createElement('div');
                 card.className = 'quick-action-card';
-                
-                // Set card content with icon, label, and HS code
                 card.innerHTML = `
                     <div class="quick-action-icon">${action.icon}</div>
                     <div class="quick-action-label">${action.label}</div>
-                    <div class="quick-action-hs">HS: ${action.hs_code}</div>
+                    <div class="quick-action-hs">${action.hs_code}</div>
                 `;
-
-                // Add click event: fill search input and trigger search
+                
                 card.addEventListener('click', () => {
-                    const searchInput = document.getElementById('search-input');
-                    if (searchInput) {
-                        searchInput.value = action.query_text;
-                        // Trigger search by calling searchProducts function
-                        searchProducts(action.query_text);
-                    }
+                    document.getElementById('search-input').value = action.query_text;
+                    searchProducts(action.query_text);
                 });
 
                 container.appendChild(card);
             });
-
-            console.log('✅ Quick actions rendered:', quickActions.length, 'cards');
         }
 
         /**
-         * Render knowledge base categories in the KB page
-         * Categories are created dynamically from knowledgeBase data
-         * Features collapsible sections for each category
+         * Render knowledge base categories
          */
         function renderKnowledgeBase() {
             const container = document.getElementById('kb-categories-container');
@@ -744,109 +828,96 @@
                 return;
             }
 
-            // Clear existing content
+            const categories = window.appData.knowledgeBase.categories || [];
             container.innerHTML = '';
 
-            // Get knowledge base data from global appData
-            const knowledgeBase = window.appData.knowledgeBase || {};
-            const categories = knowledgeBase.categories || [];
-
-            if (categories.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No categories available</p>';
-                return;
-            }
-
-            // Create a collapsible section for each category
             categories.forEach(category => {
-                // Create category container
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'kb-category';
-
-                // Create header (clickable for toggle)
-                const header = document.createElement('div');
-                header.className = 'kb-category-header';
-                header.innerHTML = `
-                    <span class="category-title">${category.label}</span>
-                    <span class="toggle-icon">▼</span>
+                categoryDiv.innerHTML = `
+                    <div class="kb-category-header">
+                        <span class="kb-category-title">${category.label}</span>
+                        <span class="kb-category-count">${category.items.length}</span>
+                        <span class="kb-category-toggle">▼</span>
+                    </div>
+                    <div class="kb-category-content">
+                        ${category.items.map(item => `
+                            <div class="kb-item">
+                                <div class="kb-item-title">${item.title}</div>
+                                <div class="kb-item-url"><a href="${item.source_url}" target="_blank">${item.source_url}</a></div>
+                            </div>
+                        `).join('')}
+                    </div>
                 `;
 
-                // Create content area (initially hidden)
-                const content = document.createElement('div');
-                content.className = 'kb-category-content';
-                content.style.display = 'none'; // Start collapsed
+                const header = categoryDiv.querySelector('.kb-category-header');
+                const toggle = categoryDiv.querySelector('.kb-category-toggle');
+                const content = categoryDiv.querySelector('.kb-category-content');
 
-                // Create items list
-                const itemsList = document.createElement('ul');
-                itemsList.className = 'kb-items-list';
-
-                // Add each item to the list
-                category.items.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'kb-item';
-                    listItem.innerHTML = `
-                        <h4 class="item-title">${item.title}</h4>
-                        <p class="item-description">${item.description}</p>
-                        <a href="${item.source_url}" target="_blank" class="item-source">Source ↗</a>
-                    `;
-                    itemsList.appendChild(listItem);
-                });
-
-                content.appendChild(itemsList);
-                categoryDiv.appendChild(header);
-                categoryDiv.appendChild(content);
-
-                // Add click event for toggle
                 header.addEventListener('click', () => {
-                    const isExpanded = content.style.display === 'block';
-                    content.style.display = isExpanded ? 'none' : 'block';
-                    
-                    // Update toggle icon
-                    const icon = header.querySelector('.toggle-icon');
-                    if (icon) {
-                        icon.textContent = isExpanded ? '▼' : '▲';
-                    }
+                    toggle.classList.toggle('open');
+                    content.classList.toggle('open');
                 });
 
                 container.appendChild(categoryDiv);
             });
-
-            // Bind case library button click
-            const caseLibraryBtn = document.querySelector('.case-library-btn');
-            if (caseLibraryBtn) {
-                caseLibraryBtn.addEventListener('click', () => {
-                    // Get all cases
-                    const allCases = window.appData.cases || [];
-                    
-                    // Update result view with empty tags but all cases
-                    document.getElementById('search-term').textContent = 'All Cases';
-                    document.getElementById('result-count').textContent = '0';
-                    
-                    // Clear compliance cards container
-                    const cardsContainer = document.getElementById('result-cards-container');
-                    if (cardsContainer) {
-                        cardsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">Viewing case library only.</p>';
-                    }
-                    
-                    // Render all cases
-                    renderCases(allCases);
-                    
-                    // Switch to result view
-                    showView('result');
-                });
-            }
-
-            console.log('✅ Knowledge base rendered:', categories.length, 'categories');
         }
 
         /**
-         * Detect if input is HS code or product name
-         * @param {string} input - User input text
-         * @returns {string} - "hs_code" or "product_name"
+         * Render product categories
+         */
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            if (!container || !window.appData.categories) return;
+
+            container.innerHTML = '';
+
+            window.appData.categories.forEach(group => {
+                const groupEl = document.createElement('div');
+                groupEl.className = 'category-group';
+                groupEl.innerHTML = `
+                    <div class="category-group-header" onclick="toggleCategoryGroup(this)">
+                        <span class="group-icon">${group.group_icon}</span>
+                        <span>${group.group_name}</span>
+                        <span class="group-count">${group.items.length}</span>
+                        <span class="arrow">▶</span>
+                    </div>
+                    <div class="category-group-items">
+                        ${group.items.map(item => `
+                            <span class="category-tag" onclick="searchFromCategory('${item.query.replace(/'/g, "\\'")}', '${item.hs_code}')">
+                                ${item.name}
+                            </span>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(groupEl);
+            });
+        }
+
+        /**
+         * Toggle category group expansion
+         */
+        window.toggleCategoryGroup = function(header) {
+            const group = header.parentElement;
+            group.classList.toggle('open');
+        }
+
+        /**
+         * Search from category page
+         */
+        window.searchFromCategory = function(query, hsCode) {
+            document.getElementById('search-input').value = query;
+            const result = search(query);
+            renderResults(query, result.tags, result.cases);
+            showView('result');
+        }
+
+        /**
+         * Detect input type (HS code or product name)
          */
         function detectInputType(input) {
-            // Match pure number or number.number pattern (e.g., "8517", "8517.12")
-            const hsCodePattern = /^(\d{2,6})(\.\d{2})?$/;
-            if (hsCodePattern.test(input.trim())) {
+            const trimmed = input.trim();
+            if (/^\d{4,6}$/.test(trimmed)) {
                 return 'hs_code';
             }
             return 'product_name';
@@ -854,68 +925,58 @@
 
         /**
          * Match tags by HS code
-         * Compares input HS code with related_hs_codes array using prefix matching
-         * @param {string} hsCode - Input HS code
-         * @param {Array} tags - Array of tag objects
-         * @returns {Array} - Matching tags
          */
         function matchByHSCode(hsCode, tags) {
-            // Remove dots from input for prefix matching
-            const inputClean = hsCode.replace(/\./g, '');
-            
             return tags.filter(tag => {
-                const hsCodes = tag.related_hs_codes || [];
-                return hsCodes.some(code => {
-                    // Remove dots from tag's HS code for comparison
-                    const codeClean = code.replace(/\./g, '');
-                    // Check if input is a prefix of tag's HS code
-                    return codeClean.startsWith(inputClean) || inputClean.startsWith(codeClean);
-                });
+                const tagHS = tag.hs_code || '';
+                return tagHS.startsWith(hsCode) || hsCode.startsWith(tagHS);
             });
         }
 
         /**
-         * Match tags by product name/keywords
-         * Compares query with related_keywords array
-         * @param {string} query - User search query
-         * @param {Array} tags - Array of tag objects
-         * @returns {Array} - Matching tags
+         * Match tags by product name keywords
          */
         function matchByProductName(query, tags) {
-            const queryLower = query.toLowerCase().trim();
-            
+            const queryLower = query.toLowerCase();
             return tags.filter(tag => {
                 const keywords = tag.related_keywords || [];
-                return keywords.some(keyword => {
-                    const keywordLower = keyword.toLowerCase();
-                    // Check bidirectional matching
-                    return queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
-                });
+                return keywords.some(keyword => 
+                    queryLower.includes(keyword.toLowerCase())
+                );
             });
         }
 
         /**
-         * Main search function
-         * @param {string} query - User search query
-         * @returns {Object} - { tags: [...], cases: [...] }
+         * Search for products
          */
         function search(query) {
             const tags = window.appData.tags || [];
             const cases = window.appData.cases || [];
             
-            // Detect input type and match tags
-            const inputType = detectInputType(query);
             let matchedTags = [];
             
-            if (inputType === 'hs_code') {
-                matchedTags = matchByHSCode(query, tags);
+            if (!query || !query.trim()) {
+                // If empty query, return all tags
+                matchedTags = [...tags];
             } else {
-                matchedTags = matchByProductName(query, tags);
+                const inputType = detectInputType(query);
+                
+                if (inputType === 'hs_code') {
+                    matchedTags = matchByHSCode(query, tags);
+                } else {
+                    matchedTags = matchByProductName(query, tags);
+                }
             }
 
-            // Sort results: MATCHED before CHECK_REQUIRED, then by display_order
+            // Filter tags by direction
+            const currentDirection = window.currentDirection || 'export';
+            matchedTags = matchedTags.filter(tag => {
+                const tagDirection = tag.direction || 'both';
+                return tagDirection === 'both' || tagDirection === currentDirection;
+            });
+
+            // Sort results
             matchedTags.sort((a, b) => {
-                // MATCHED (1) comes before CHECK_REQUIRED (0)
                 const typeOrderA = a.tag_type === 'MATCHED' ? 1 : 0;
                 const typeOrderB = b.tag_type === 'MATCHED' ? 1 : 0;
                 
@@ -923,12 +984,21 @@
                     return typeOrderB - typeOrderA;
                 }
                 
-                // Then sort by display_order
                 return (a.display_order || 999) - (b.display_order || 999);
             });
 
-            // Search related cases by keywords
+            // Search cases by keywords and direction
             const matchedCases = cases.filter(caseItem => {
+                const caseDirection = caseItem.direction || 'both';
+                if (caseDirection !== 'both' && caseDirection !== currentDirection) {
+                    return false;
+                }
+                
+                // If empty query, return all cases matching direction
+                if (!query || !query.trim()) {
+                    return true;
+                }
+                
                 const caseKeywords = caseItem.related_keywords || [];
                 const queryLower = query.toLowerCase();
                 
@@ -938,52 +1008,32 @@
                 });
             });
 
-            console.log(`✅ Search completed: ${matchedTags.length} tags, ${matchedCases.length} cases`);
-            
-            return {
-                tags: matchedTags,
-                cases: matchedCases
-            };
+            return { tags: matchedTags, cases: matchedCases };
         }
 
         /**
          * Search products and display results
-         * @param {string} query - Search query
          */
         function searchProducts(query) {
-            if (!query || !query.trim()) {
-                console.warn('⚠️ Empty search query');
-                return;
-            }
-
-            // Perform search
-            const results = search(query.trim());
+            const trimmedQuery = query ? query.trim() : '';
             
-            // Render results using unified function
-            renderResults(query.trim(), results.tags, results.cases);
+            const results = search(trimmedQuery);
+            renderResults(trimmedQuery || 'All Products', results.tags, results.cases);
         }
 
         /**
-         * Render search results to the result view
-         * @param {string} query - Original search query
-         * @param {Array} tags - Array of matched tag objects
-         * @param {Array} cases - Array of related case objects
+         * Render search results
          */
         function renderResults(query, tags, cases) {
-            // 1. Switch to result view (hide home-view, show result-view)
             showView('result');
 
-            // 2. Update result summary: "Found X regulations for 'query'"
-            const resultCount = document.getElementById('result-count');
-            const searchTerm = document.getElementById('search-term');
-            if (resultCount) {
-                resultCount.textContent = tags.length;
-            }
-            if (searchTerm) {
-                searchTerm.textContent = query;
+            const directionText = window.currentDirection === 'export' ? 'Export from China' : 'Import into China';
+            
+            const resultSummary = document.querySelector('.result-summary p');
+            if (resultSummary) {
+                resultSummary.innerHTML = `${directionText}: Found <span id="result-count">${tags.length}</span> regulations for '<span id="search-term">${query}</span>'`;
             }
 
-            // 3. Render compliance tags grouped by category
             const cardsContainer = document.getElementById('result-cards-container');
             if (!cardsContainer) {
                 console.error('❌ result-cards-container not found');
@@ -992,14 +1042,15 @@
 
             cardsContainer.innerHTML = '';
 
+            console.log(`🔍 renderResults called with ${tags.length} tags, ${cases.length} cases`);
+
             if (tags.length === 0) {
                 cardsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No compliance requirements found for this product.</p>';
             } else {
-                // Group tags by category
                 const groupedTags = tags.reduce((acc, tag) => {
                     if (!acc[tag.category]) {
                         acc[tag.category] = {
-                            label: tag.category_label,
+                            category: tag.category,
                             tags: []
                         };
                     }
@@ -1007,219 +1058,100 @@
                     return acc;
                 }, {});
 
-                // Render each category group
+                console.log(`📊 Grouped tags into ${Object.keys(groupedTags).length} categories:`, Object.keys(groupedTags));
+
                 Object.values(groupedTags).forEach(group => {
-                    // Create category section
-                    const section = document.createElement('div');
-                    section.className = 'compliance-section';
-                    
-                    // Add category title
-                    const title = document.createElement('h2');
-                    title.className = 'section-title';
-                    title.textContent = group.label;
-                    section.appendChild(title);
+                    const categoryHeader = document.createElement('h3');
+                    categoryHeader.style = 'margin: 20px 0 12px; color: var(--color-primary); font-size: 1.1rem;';
+                    categoryHeader.textContent = group.category;
+                    cardsContainer.appendChild(categoryHeader);
 
-                    // Create cards container
-                    const cardsDiv = document.createElement('div');
-                    cardsDiv.className = 'compliance-cards';
-
-                    // Create individual result cards
                     group.tags.forEach(tag => {
                         const card = document.createElement('div');
-                        card.className = 'result-card';
-
-                        // Determine status dot style (MATCHED = green solid, CHECK_REQUIRED = gray hollow)
-                        const statusClass = tag.tag_type === 'MATCHED' ? 'status-dot matched' : 'status-dot check';
-                        
+                        card.className = `compliance-card ${tag.tag_type.toLowerCase()}`;
+                        const hsCodes = tag.related_hs_codes ? tag.related_hs_codes.join(', ') : 'Not specified';
                         card.innerHTML = `
-                            <div class="card-header">
-                                <span class="${statusClass}"></span>
-                                <span class="tag-name">${tag.short_name}</span>
-                            </div>
-                            <p class="tag-desc">${tag.description}</p>
-                            <p class="tag-source">Source: ${tag.source_citation} <a href="${tag.source_url}" target="_blank">↗</a></p>
+                            <span class="compliance-tag ${tag.tag_type.toLowerCase()}">${tag.tag_type}</span>
+                            <div class="compliance-title">${tag.tag_id}: ${tag.description}</div>
+                            <div class="compliance-desc">${tag.short_description || tag.description || 'No details available'}</div>
+                            <div class="compliance-hs"><strong>HS Code:</strong> ${hsCodes}</div>
                         `;
-
-                        cardsDiv.appendChild(card);
+                        cardsContainer.appendChild(card);
                     });
-
-                    section.appendChild(cardsDiv);
-                    cardsContainer.appendChild(section);
                 });
             }
 
-            // 4. Render related cases
             const casesContainer = document.getElementById('cases-container');
             if (!casesContainer) {
                 console.error('❌ cases-container not found');
                 return;
             }
 
-            casesContainer.innerHTML = '';
-
             if (cases.length === 0) {
-                // Display message when no cases found
-                const noCasesMsg = document.createElement('p');
-                noCasesMsg.style.cssText = 'text-align: center; color: var(--color-text-secondary); padding: 20px;';
-                noCasesMsg.textContent = 'No related enforcement cases found.';
-                casesContainer.appendChild(noCasesMsg);
+                casesContainer.innerHTML = '';
             } else {
-                // Create cases section
-                const section = document.createElement('div');
-                section.className = 'cases-section';
-                
-                // Add section title
-                const title = document.createElement('h2');
-                title.className = 'section-title';
-                title.textContent = 'Related Penalty Cases';
-                section.appendChild(title);
-
-                // Create cases list
-                const casesList = document.createElement('div');
-                casesList.className = 'cases-list';
-
-                // Render each case
-                cases.forEach(caseItem => {
-                    const caseDiv = document.createElement('div');
-                    caseDiv.className = 'case-item';
-                    caseDiv.innerHTML = `
-                        <h3 class="case-title">${caseItem.title}</h3>
-                        <p class="case-date">${caseItem.date}</p>
-                        <p class="case-summary">${caseItem.summary}</p>
-                        <p class="case-source"><a href="${caseItem.source_url}" target="_blank">Source ↗</a></p>
-                    `;
-                    casesList.appendChild(caseDiv);
-                });
-
-                section.appendChild(casesList);
-                casesContainer.appendChild(section);
-            }
-
-            console.log(`✅ Results rendered: ${tags.length} tags, ${cases.length} cases`);
-        }
-
-        /**
-         * Render compliance result cards (legacy function kept for compatibility)
-         * @param {Array} tags - Array of tag objects to render
-         */
-        function renderResultCards(tags) {
-            const container = document.getElementById('result-cards-container');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            if (tags.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No compliance requirements found for this product.</p>';
-                return;
-            }
-
-            // Group tags by category
-            const groupedTags = tags.reduce((acc, tag) => {
-                if (!acc[tag.category]) {
-                    acc[tag.category] = {
-                        label: tag.category_label,
-                        tags: []
-                    };
-                }
-                acc[tag.category].tags.push(tag);
-                return acc;
-            }, {});
-
-            // Create sections for each category
-            Object.values(groupedTags).forEach(group => {
-                const section = document.createElement('div');
-                section.className = 'compliance-section';
-                section.innerHTML = `
-                    <h2 class="section-title">${group.label}</h2>
-                    <div class="compliance-cards">
-                        ${group.tags.map(tag => `
-                            <div class="compliance-card">
-                                <div class="card-header">
-                                    <span class="status-dot ${tag.tag_type === 'MATCHED' ? 'matched' : 'check'}"></span>
-                                    <span class="tag-short-name">${tag.short_name}</span>
-                                </div>
-                                <p class="tag-description">${tag.description}</p>
-                                <div class="tag-source">Source: <a href="${tag.source_url}" target="_blank">${tag.source_citation}</a></div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                container.appendChild(section);
-            });
-        }
-
-        /**
-         * Render related cases
-         * @param {Array} cases - Array of case objects to render
-         */
-        function renderCases(cases) {
-            const container = document.getElementById('cases-container');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            if (cases.length === 0) {
-                return;
-            }
-
-            // Create cases section
-            const section = document.createElement('div');
-            section.className = 'cases-section';
-            section.innerHTML = `
-                <h2 class="section-title">Related Penalty Cases</h2>
-                <div class="cases-list">
+                casesContainer.innerHTML = `
+                    <div class="cases-header">Related Penalty Cases</div>
                     ${cases.map(caseItem => `
-                        <div class="case-item">
-                            <h3 class="case-title">${caseItem.title}</h3>
-                            <p class="case-date">${caseItem.date}</p>
-                            <p class="case-summary">${caseItem.summary}</p>
+                        <div class="case-card">
+                            <div class="case-title">${caseItem.title}</div>
+                            <div class="case-date">${caseItem.date}</div>
+                            <div class="case-summary">${caseItem.summary}</div>
+                            <a href="${caseItem.source_url}" target="_blank" class="case-link">Source: ${caseItem.source_url}</a>
                         </div>
                     `).join('')}
-                </div>
-            `;
-            container.appendChild(section);
+                `;
+            }
         }
 
         /**
-         * Show specific view and hide others
-         * @param {string} viewName - Name of the view to show: "home", "result", or "kb"
+         * Set current direction
          */
-        function showView(viewName) {
-            // Map view name to actual view container ID
-            const viewIdMap = {
-                'home': 'home-view',
-                'result': 'result-view',
-                'kb': 'kb-view'
-            };
+        function setDirection(direction) {
+            window.currentDirection = direction;
             
-            const viewId = viewIdMap[viewName];
-            if (!viewId) {
-                console.warn('⚠️ Invalid view name:', viewName);
-                return;
+            const exportBtn = document.getElementById('direction-export');
+            const importBtn = document.getElementById('direction-import');
+            
+            if (exportBtn && importBtn) {
+                exportBtn.classList.toggle('active', direction === 'export');
+                importBtn.classList.toggle('active', direction === 'import');
             }
+        }
 
-            // Hide all views
-            const allViews = document.querySelectorAll('.view-container');
-            if (allViews.length > 0) {
-                allViews.forEach(view => {
-                    view.classList.remove('active');
-                });
-            }
-
-            // Show the requested view
-            const targetView = document.getElementById(viewId);
-            if (targetView) {
-                targetView.classList.add('active');
-            } else {
-                console.error('❌ View container not found:', viewId);
-            }
+        /**
+         * Show a specific view
+         */
+        function showView(view) {
+            document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
+            document.getElementById('result-view').style.display = view === 'result' ? 'block' : 'none';
+            document.getElementById('kb-view').style.display = view === 'kb' ? 'block' : 'none';
+            document.getElementById('categories-view').style.display = view === 'categories' ? 'block' : 'none';
+            
+            // Navigation highlight
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            if (view === 'home') document.getElementById('nav-home').classList.add('active');
+            if (view === 'kb') document.getElementById('nav-kb').classList.add('active');
+            if (view === 'categories') document.getElementById('nav-categories').classList.add('active');
         }
 
         /**
          * Bind event listeners
          */
         function bindEvents() {
-            // Search button click event
+            // Direction toggle buttons
+            const exportBtn = document.getElementById('direction-export');
+            const importBtn = document.getElementById('direction-import');
+
+            if (exportBtn) {
+                exportBtn.addEventListener('click', () => setDirection('export'));
+            }
+
+            if (importBtn) {
+                importBtn.addEventListener('click', () => setDirection('import'));
+            }
+
+            // Search button
             const searchBtn = document.getElementById('search-btn');
             if (searchBtn) {
                 searchBtn.addEventListener('click', () => {
@@ -1228,61 +1160,59 @@
                 });
             }
 
-            // Search input Enter key event
+            // Search input Enter key
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
                 searchInput.addEventListener('keyup', (e) => {
                     if (e.key === 'Enter') {
-                        const query = e.target.value;
-                        searchProducts(query);
+                        searchProducts(e.target.value);
                     }
                 });
             }
 
-            // Back to home button (result view)
+            // Back buttons
             const backToHomeBtn = document.getElementById('back-to-home');
             if (backToHomeBtn) {
-                backToHomeBtn.addEventListener('click', () => {
-                    showView('home');
-                });
+                backToHomeBtn.addEventListener('click', () => showView('home'));
             }
 
-            // Back to home button (KB view)
             const backToHomeFromKbBtn = document.getElementById('back-to-home-from-kb');
             if (backToHomeFromKbBtn) {
-                backToHomeFromKbBtn.addEventListener('click', () => {
-                    showView('home');
-                });
+                backToHomeFromKbBtn.addEventListener('click', () => showView('home'));
             }
 
             // Navigation buttons
             const navHome = document.getElementById('nav-home');
             const navKb = document.getElementById('nav-kb');
-            
-            if (navHome) {
-                navHome.addEventListener('click', () => {
-                    showView('home');
-                    updateNavActive('nav-home');
-                });
-            }
-            
-            if (navKb) {
-                navKb.addEventListener('click', () => {
-                    showView('kb');
-                    updateNavActive('nav-kb');
-                });
-            }
-        }
+            const navCategories = document.getElementById('nav-categories');
 
-        /**
-         * Update navigation active state
-         * @param {string} activeId - ID of the active nav button
-         */
-        function updateNavActive(activeId) {
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(activeId)?.classList.add('active');
+            if (navHome) {
+                navHome.addEventListener('click', () => showView('home'));
+            }
+
+            if (navKb) {
+                navKb.addEventListener('click', () => showView('kb'));
+            }
+
+            if (navCategories) {
+                navCategories.addEventListener('click', () => showView('categories'));
+            }
+
+            // Categories back button
+            const backToHomeFromCatBtn = document.getElementById('back-to-home-from-cat');
+            if (backToHomeFromCatBtn) {
+                backToHomeFromCatBtn.addEventListener('click', () => showView('home'));
+            }
+
+            // View cases button
+            const viewCasesBtn = document.getElementById('view-cases-btn');
+            if (viewCasesBtn) {
+                viewCasesBtn.addEventListener('click', () => {
+                    document.getElementById('search-input').value = '';
+                    const results = search('');
+                    renderResults('All Cases', [], results.cases);
+                });
+            }
         }
 
         /**
@@ -1293,7 +1223,6 @@
             bindEvents();
         }
 
-        // Initialize when DOM content is fully loaded
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
