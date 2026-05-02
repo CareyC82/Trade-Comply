@@ -917,7 +917,7 @@
          */
         function detectInputType(input) {
             const trimmed = input.trim();
-            if (/^\d{4,6}$/.test(trimmed)) {
+            if (/^\d{4,6}(\.\d{1,4})?$/.test(trimmed)) {
                 return 'hs_code';
             }
             return 'product_name';
@@ -959,25 +959,33 @@
             
             let matchedTags = [];
             
+            console.log('🔍 Search query:', query);
+            console.log('🔍 Current direction:', window.currentDirection);
+            console.log('📦 Tags loaded:', tags.length);
+            
             if (!query || !query.trim()) {
-                // If empty query, return all tags
                 matchedTags = [...tags];
+                console.log('📋 Empty query, returning all tags:', matchedTags.length);
             } else {
                 const inputType = detectInputType(query);
+                console.log('🔍 Input type:', inputType);
                 
                 if (inputType === 'hs_code') {
                     matchedTags = matchByHSCode(query, tags);
+                    console.log('🎯 HS code match results:', matchedTags.length, matchedTags.map(t => t.tag_id));
                 } else {
                     matchedTags = matchByProductName(query, tags);
+                    console.log('📝 Keyword match results:', matchedTags.length);
                 }
             }
 
-            // Filter tags by direction
             const currentDirection = window.currentDirection || 'export';
+            console.log('🔍 Filtering by direction:', currentDirection);
             matchedTags = matchedTags.filter(tag => {
                 const tagDirection = tag.direction || 'both';
                 return tagDirection === 'both' || tagDirection === currentDirection;
             });
+            console.log('✅ Final matched tags:', matchedTags.length, matchedTags.map(t => t.tag_id));
 
             // Sort results
             matchedTags.sort((a, b) => {
