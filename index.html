@@ -917,7 +917,7 @@
          */
         function detectInputType(input) {
             const trimmed = input.trim();
-            if (/^\d{4,6}(\.\d{1,4})?$/.test(trimmed)) {
+            if (/^\d{4,6}$/.test(trimmed)) {
                 return 'hs_code';
             }
             return 'product_name';
@@ -927,11 +927,15 @@
          * Match tags by HS code
          */
         function matchByHSCode(hsCode, tags) {
-            return tags.filter(tag => {
-                const relatedHS = tag.related_hs_codes || [];
-                return relatedHS.some(hs => hs && (hs.startsWith(hsCode) || hsCode.startsWith(hs)));
-            });
-        }
+    const normalizedInput = hsCode.trim().replace(/\./g, '');
+    return tags.filter(tag => {
+        if (!tag.related_hs_codes || tag.related_hs_codes.length === 0) return false;
+        return tag.related_hs_codes.some(code => {
+            const normalizedCode = code.replace(/\./g, '');
+            return normalizedCode.startsWith(normalizedInput) || normalizedInput.startsWith(normalizedCode);
+        });
+    });
+}
 
         /**
          * Match tags by product name keywords
@@ -1013,11 +1017,14 @@
                 const isHSCode = /^\d{4,6}(\.\d{1,4})?$/.test(query);
                 let hsMatch = false;
                 if (isHSCode) {
+                    const normalizedInput = query.replace(/\./g, '');
                     hsMatch = relatedTags.some(tagId => {
                         const tag = tags.find(t => t.tag_id === tagId);
-                        if (!tag) return false;
-                        const tagRelatedHS = tag.related_hs_codes || [];
-                        return tagRelatedHS.some(hs => hs && (hs.startsWith(query) || query.startsWith(hs)));
+                        if (!tag || !tag.related_hs_codes) return false;
+                        return tag.related_hs_codes.some(code => {
+                            const normalizedCode = code.replace(/\./g, '');
+                            return normalizedCode.startsWith(normalizedInput) || normalizedInput.startsWith(normalizedCode);
+                        });
                     });
                 }
                 
