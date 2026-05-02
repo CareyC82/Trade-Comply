@@ -917,7 +917,7 @@
          */
         function detectInputType(input) {
             const trimmed = input.trim();
-            if (/^\d{4,6}$/.test(trimmed)) {
+            if (/^\d{4,6}(\.\d{1,4})?$/.test(trimmed)) {
                 return 'hs_code';
             }
             return 'product_name';
@@ -928,8 +928,8 @@
          */
         function matchByHSCode(hsCode, tags) {
             return tags.filter(tag => {
-                const tagHS = tag.hs_code || '';
-                return tagHS.startsWith(hsCode) || hsCode.startsWith(tagHS);
+                const relatedHS = tag.related_hs_codes || [];
+                return relatedHS.some(hs => hs && (hs.startsWith(hsCode) || hsCode.startsWith(hs)));
             });
         }
 
@@ -987,7 +987,7 @@
                 return (a.display_order || 999) - (b.display_order || 999);
             });
 
-            // Search cases by keywords and direction
+            // Search cases by keywords, HS codes, and related tags
             const matchedCases = cases.filter(caseItem => {
                 const caseDirection = caseItem.direction || 'both';
                 if (caseDirection !== 'both' && caseDirection !== currentDirection) {
@@ -999,13 +999,33 @@
                     return true;
                 }
                 
-                const caseKeywords = caseItem.related_keywords || [];
                 const queryLower = query.toLowerCase();
+                const caseKeywords = caseItem.related_keywords || [];
+                const relatedTags = caseItem.related_tags || [];
                 
-                return caseKeywords.some(keyword => {
+                // Check if query matches keywords
+                const keywordMatch = caseKeywords.some(keyword => {
                     const keywordLower = keyword.toLowerCase();
                     return queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
                 });
+                
+                // Check if query is HS code and matches related_tags' HS codes
+                const isHSCode = /^\d{4,6}(\.\d{1,4})?$/.test(query);
+                let hsMatch = false;
+                if (isHSCode) {
+                    hsMatch = relatedTags.some(tagId => {
+                        const tag = tags.find(t => t.tag_id === tagId);
+                        if (!tag) return false;
+                        const tagRelatedHS = tag.related_hs_codes || [];
+                        return tagRelatedHS.some(hs => hs && (hs.startsWith(query) || query.startsWith(hs)));
+                    });
+                }
+                
+                // Check summary for HS code match
+                const summaryLower = (caseItem.summary || '').toLowerCase();
+                const summaryMatch = isHSCode && summaryLower.includes(queryLower);
+                
+                return keywordMatch || hsMatch || summaryMatch;
             });
 
             return { tags: matchedTags, cases: matchedCases };
