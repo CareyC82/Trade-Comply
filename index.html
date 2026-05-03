@@ -1212,7 +1212,7 @@
                 if (isHSCode) {
                     const normalizedInput = query.replace(/\./g, '');
                     hsMatch = relatedTags.some(tagId => {
-                        const tag = tags.find(t => t.tag_id === tagId);
+                        const tag = tags.find(t => t.tag_id.toLowerCase() === tagId.toLowerCase());
                         if (!tag || !tag.related_hs_codes) return false;
                         return tag.related_hs_codes.some(code => {
                             const normalizedCode = code.replace(/\./g, '');
