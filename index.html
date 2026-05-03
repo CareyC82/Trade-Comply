@@ -303,6 +303,21 @@
             color: var(--color-text);
         }
 
+        .compliance-source {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-top: 8px;
+        }
+
+        .compliance-source a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .compliance-source a:hover {
+            text-decoration: underline;
+        }
+
         /* Cases Container */
         #cases-container {
             margin-top: 24px;
@@ -427,7 +442,14 @@
         .kb-item-title {
             font-size: 0.95rem;
             color: var(--color-primary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        .kb-item-description {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 8px;
         }
 
         .kb-item-url {
@@ -844,6 +866,7 @@
                         ${category.items.map(item => `
                             <div class="kb-item">
                                 <div class="kb-item-title">${item.title}</div>
+                                <div class="kb-item-description">${item.description || ''}</div>
                                 <div class="kb-item-url"><a href="${item.source_url}" target="_blank">${item.source_url}</a></div>
                             </div>
                         `).join('')}
@@ -1105,11 +1128,13 @@
                         const card = document.createElement('div');
                         card.className = `compliance-card ${tag.tag_type.toLowerCase()}`;
                         const hsCodes = tag.related_hs_codes ? tag.related_hs_codes.join(', ') : 'Not specified';
+                        const shortTagId = tag.tag_id.replace(/^CL-|-[0-9]+$/g, '');
                         card.innerHTML = `
                             <span class="compliance-tag ${tag.tag_type.toLowerCase()}">${tag.tag_type}</span>
-                            <div class="compliance-title">${tag.tag_id}: ${tag.description}</div>
+                            <div class="compliance-title">${shortTagId}: ${tag.description}</div>
                             <div class="compliance-desc">${tag.short_description || tag.description || 'No details available'}</div>
                             <div class="compliance-hs"><strong>HS Code:</strong> ${hsCodes}</div>
+                            ${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${tag.source_url}" target="_blank">${tag.source_url}</a></div>` : ''}
                         `;
                         cardsContainer.appendChild(card);
                     });
