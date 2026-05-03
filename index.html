@@ -669,6 +669,134 @@
                 border-radius: 12px 12px 0 0;
             }
         }
+
+        /* Feedback Button */
+        .feedback-section {
+            text-align: center;
+            padding: 20px 16px 30px;
+            margin-top: 20px;
+        }
+
+        .feedback-link {
+            display: inline-block;
+            padding: 10px 24px;
+            background-color: var(--color-bg);
+            border: 2px solid var(--color-primary);
+            border-radius: 8px;
+            color: var(--color-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .feedback-link:hover {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        /* Feedback Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-box h3 {
+            color: var(--color-primary);
+            margin-bottom: 16px;
+        }
+
+        .modal-box label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 4px;
+            margin-top: 12px;
+        }
+
+        .modal-box input,
+        .modal-box textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .modal-box textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-submit {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal-cancel {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .feedback-thanks {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: var(--color-matched);
+            font-weight: 600;
+        }
+
+        .feedback-thanks.show {
+            display: block;
+        }
+
+        .feedback-form.hide {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -703,6 +831,10 @@
         </div>
 
         <button id="view-cases-btn" class="case-library-btn">View Case Library</button>
+
+        <div class="feedback-section">
+            <a href="#" class="feedback-link" id="feedback-trigger">💬 Can't find your product? Tell us</a>
+        </div>
     </div>
 
     <!-- Result View -->
@@ -750,6 +882,36 @@
 
         <div id="categories-container" class="categories-grid">
             <!-- JS动态生成 -->
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal-box">
+            <div class="feedback-thanks" id="feedback-thanks">
+                ✅ Thanks for your feedback! We'll review it and update the database.
+            </div>
+            <div class="feedback-form" id="feedback-form">
+                <h3>Help Us Improve</h3>
+                <p style="font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:12px;">
+                    Have a product or HS Code you needed that isn't covered? Share it below and we'll research it.
+                </p>
+                <form id="user-feedback-form" action="https://formspree.io/f/xbdwdzly" method="POST">
+                    <label for="fb-product">Product or HS Code you searched</label>
+                    <input type="text" id="fb-product" name="product" placeholder="e.g. smart ring, 8517.62" required>
+                    
+                    <label for="fb-message">What regulation were you looking for?</label>
+                    <textarea id="fb-message" name="message" placeholder="Tell us what compliance info you needed..."></textarea>
+                    
+                    <label for="fb-email">Your email (optional, for follow-up)</label>
+                    <input type="email" id="fb-email" name="email" placeholder="you@company.com">
+                    
+                    <div class="modal-buttons">
+                        <button type="button" class="modal-cancel" id="modal-cancel">Cancel</button>
+                        <button type="submit" class="modal-submit">Send Feedback</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -1271,6 +1433,57 @@
                     document.getElementById('search-input').value = '';
                     const results = search('');
                     renderResults('All Cases', [], results.cases);
+                });
+            }
+
+            // Feedback modal
+            const feedbackTrigger = document.getElementById('feedback-trigger');
+            const feedbackModal = document.getElementById('feedback-modal');
+            const modalCancel = document.getElementById('modal-cancel');
+            const feedbackForm = document.getElementById('user-feedback-form');
+            const feedbackThanks = document.getElementById('feedback-thanks');
+            const feedbackFormDiv = document.getElementById('feedback-form');
+
+            if (feedbackTrigger && feedbackModal) {
+                feedbackTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    feedbackModal.classList.add('open');
+                });
+            }
+
+            if (modalCancel && feedbackModal) {
+                modalCancel.addEventListener('click', () => {
+                    feedbackModal.classList.remove('open');
+                });
+            }
+
+            if (feedbackModal) {
+                feedbackModal.addEventListener('click', (e) => {
+                    if (e.target === feedbackModal) {
+                        feedbackModal.classList.remove('open');
+                    }
+                });
+            }
+
+            if (feedbackForm && feedbackThanks && feedbackFormDiv) {
+                feedbackForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    fetch(feedbackForm.action, {
+                        method: 'POST',
+                        body: new FormData(feedbackForm),
+                        headers: { 'Accept': 'application/json' }
+                    }).then(() => {
+                        feedbackFormDiv.classList.add('hide');
+                        feedbackThanks.classList.add('show');
+                        setTimeout(() => {
+                            feedbackModal.classList.remove('open');
+                            feedbackFormDiv.classList.remove('hide');
+                            feedbackThanks.classList.remove('show');
+                            feedbackForm.reset();
+                        }, 2500);
+                    }).catch(() => {
+                        alert('Failed to send. Please try again.');
+                    });
                 });
             }
         }
