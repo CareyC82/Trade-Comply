@@ -828,8 +828,8 @@
             <button class="search-btn" id="search-btn">GO</button>
         </div>
 
-        <div class="latest-update-bar">
-            <span>Latest Update: May 2026 - Added solar energy products compliance info (PV low-carbon standard, tax rebate changes, dual-use clarifications).</span>
+        <div id="latest-update-bar" class="latest-update-bar">
+            <span>Latest Update: Loading...</span>
         </div>
 
         <div class="quick-actions-grid" id="quick-actions-container">
@@ -892,7 +892,7 @@
             <h2>Product Categories</h2>
         </div>
 
-        <div class="categories-summary">📋 <strong>60 categories</strong> across <strong>12 groups</strong>. Tap any category to search instantly.</div>
+        <div id="categories-summary" class="categories-summary">📋 <strong>0 categories</strong> across <strong>0 groups</strong>. Tap any category to search instantly.</div>
 
         <div id="categories-container" class="categories-grid">
             <!-- JS动态生成 -->
@@ -969,13 +969,26 @@
                 fetch('data/cases.json').then(r => r.json()),
                 fetch('data/quick-actions.json').then(r => r.json()),
                 fetch('data/knowledge-base.json').then(r => r.json()),
-                fetch('data/categories.json').then(r => r.json())   // 新增
-            ]).then(([tags, cases, quickActions, kb, categories]) => {
-                window.appData = { tags, cases, quickActions, knowledgeBase: kb, categories };
+                fetch('data/categories.json').then(r => r.json()),
+                fetch('data/updates.json').then(r => r.json())
+            ]).then(([tags, cases, quickActions, kb, categories, updates]) => {
+                window.appData = { tags, cases, quickActions, knowledgeBase: kb, categories, updates };
                 renderQuickActions();
                 renderKnowledgeBase();
                 renderCategories();
+                renderLatestUpdate();
             }).catch(err => console.error('Data load failed:', err));
+        }
+
+        /**
+         * Render latest update bar
+         */
+        function renderLatestUpdate() {
+            const bar = document.getElementById('latest-update-bar');
+            if (!bar || !window.appData.updates || window.appData.updates.length === 0) return;
+
+            const latest = window.appData.updates[0];
+            bar.innerHTML = `<span>Latest Update: ${latest.date} - ${latest.text}</span>`;
         }
 
         /**
@@ -1070,6 +1083,19 @@
             if (!container || !window.appData.categories) return;
 
             container.innerHTML = '';
+
+            // 动态计算总品类数和组数
+            const totalGroups = window.appData.categories.length;
+            let totalItems = 0;
+            window.appData.categories.forEach(group => {
+                totalItems += group.items.length;
+            });
+
+            // 更新 summary 文字
+            const summaryEl = document.getElementById('categories-summary');
+            if (summaryEl) {
+                summaryEl.innerHTML = `📋 <strong>${totalItems} categories</strong> across <strong>${totalGroups} groups</strong>. Tap any category to search instantly.`;
+            }
 
             window.appData.categories.forEach(group => {
                 const groupEl = document.createElement('div');
