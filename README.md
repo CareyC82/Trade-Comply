@@ -1,6 +1,6 @@
 # Trade Comply
 
-Understand China's trade rules for electronics. Facts only.
+Understand China's trade rules. Facts only.
 
 A free, front-end-only lookup tool that helps foreign compliance officers, supply chain managers, and importers quickly check China’s import/export regulations for consumer electronics. It only cites official regulatory sources — no advice, no interpretation, just facts.
 
