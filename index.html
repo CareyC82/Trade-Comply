@@ -1437,7 +1437,7 @@
                         // 检查是否是服务状态消息（不应显示）
                         const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
                         
-                        // 只有当有有效回答时才显示AI框
+                        // 如果有有效回答，显示AI框
                         if (data.response && data.response.trim()) {
                             // 1. 先清空原来的搜索结果区域
                             document.getElementById('result-cards-container').innerHTML = '';
@@ -1477,7 +1477,24 @@
                                                <p>${data.message}</p>`;
                             document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                         }
-                        // API 返回空、服务状态消息或没有期望的字段，使用本地搜索
+                        // API 返回服务状态消息，但仍显示AI框提示用户提问
+                        else if (isStatusMessage) {
+                            // 先执行本地搜索
+                            searchProducts(query.trim());
+                            
+                            // 在本地搜索结果上方显示AI提示框
+                            const aiBox = document.createElement('div');
+                            aiBox.style = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin: 20px 0; color: white;';
+                            aiBox.innerHTML = `<h3 style="margin-top: 0;">🤖 AI Assistant</h3>
+                                               <p style="opacity: 0.9;">我是您的贸易合规助手！您可以问我任何关于出口合规的问题，例如：
+                                               <ul style="margin: 10px 0 0 20px;">
+                                                 <li>"锂电池出口需要什么认证？"</li>
+                                                 <li>"智能音箱出口美国需要FCC认证吗？"</li>
+                                                 <li>"如何查询产品的HS编码？"</li>
+                                               </ul></p>`;
+                            document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
+                        }
+                        // API 返回空或没有期望的字段，使用本地搜索
                         else {
                             searchProducts(query.trim());
                         }
@@ -1513,7 +1530,7 @@
                             // 检查是否是服务状态消息（不应显示）
                             const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
                             
-                            // 只有当有有效回答时才显示AI框
+                            // 如果有有效回答，显示AI框
                             if (data.response && data.response.trim()) {
                                 // 1. 先清空原来的搜索结果区域
                                 document.getElementById('result-cards-container').innerHTML = '';
@@ -1553,7 +1570,24 @@
                                                    <p>${data.message}</p>`;
                                 document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                             }
-                            // API 返回空、服务状态消息或没有期望的字段，使用本地搜索
+                            // API 返回服务状态消息，但仍显示AI框提示用户提问
+                            else if (isStatusMessage) {
+                                // 先执行本地搜索
+                                searchProducts(query.trim());
+                                
+                                // 在本地搜索结果上方显示AI提示框
+                                const aiBox = document.createElement('div');
+                                aiBox.style = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin: 20px 0; color: white;';
+                                aiBox.innerHTML = `<h3 style="margin-top: 0;">🤖 AI Assistant</h3>
+                                                   <p style="opacity: 0.9;">我是您的贸易合规助手！您可以问我任何关于出口合规的问题，例如：
+                                                   <ul style="margin: 10px 0 0 20px;">
+                                                     <li>"锂电池出口需要什么认证？"</li>
+                                                     <li>"智能音箱出口美国需要FCC认证吗？"</li>
+                                                     <li>"如何查询产品的HS编码？"</li>
+                                                   </ul></p>`;
+                                document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
+                            }
+                            // API 返回空或没有期望的字段，使用本地搜索
                             else {
                                 searchProducts(query.trim());
                             }
