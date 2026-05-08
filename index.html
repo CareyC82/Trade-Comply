@@ -1434,8 +1434,11 @@
                         
                         const data = await response.json();
                         
-                        // 优先显示 data.response
-                        if (data.response) {
+                        // 检查是否是服务状态消息（不应显示）
+                        const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
+                        
+                        // 只有当有有效回答时才显示AI框
+                        if (data.response && data.response.trim()) {
                             // 1. 先清空原来的搜索结果区域
                             document.getElementById('result-cards-container').innerHTML = '';
                             document.getElementById('cases-container').innerHTML = '';
@@ -1463,8 +1466,8 @@
                             // 插入到页面中间
                             document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                         } 
-                        // 如果有 message 字段，但排除服务状态提示消息
-                        else if (data.message && !data.message.includes('Service is online') && !data.message.includes('Please send a query')) {
+                        // 如果有有效 message（非状态消息），也显示出来
+                        else if (data.message && data.message.trim() && !isStatusMessage) {
                             document.getElementById('result-cards-container').innerHTML = '';
                             document.getElementById('cases-container').innerHTML = '';
                             
@@ -1507,8 +1510,11 @@
                             
                             const data = await response.json();
                             
-                            // 优先显示 data.response
-                            if (data.response) {
+                            // 检查是否是服务状态消息（不应显示）
+                            const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
+                            
+                            // 只有当有有效回答时才显示AI框
+                            if (data.response && data.response.trim()) {
                                 // 1. 先清空原来的搜索结果区域
                                 document.getElementById('result-cards-container').innerHTML = '';
                                 document.getElementById('cases-container').innerHTML = '';
@@ -1536,8 +1542,8 @@
                                 // 插入到页面中间
                                 document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                             } 
-                            // 如果有 message 字段，但排除服务状态提示消息
-                            else if (data.message && !data.message.includes('Service is online') && !data.message.includes('Please send a query')) {
+                            // 如果有有效 message（非状态消息），也显示出来
+                            else if (data.message && data.message.trim() && !isStatusMessage) {
                                 document.getElementById('result-cards-container').innerHTML = '';
                                 document.getElementById('cases-container').innerHTML = '';
                                 
