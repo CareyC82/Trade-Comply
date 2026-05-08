@@ -1437,6 +1437,12 @@
                         // 检查是否是服务状态消息（不应显示）
                         const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
                         
+                        // 先清除之前的AI框
+                        const existingAiBox = document.querySelector('.ai-assistant-box');
+                        if (existingAiBox) {
+                            existingAiBox.remove();
+                        }
+                        
                         // 如果有有效回答，显示AI框
                         if (data.response && data.response.trim()) {
                             // 1. 先清空原来的搜索结果区域
@@ -1459,8 +1465,9 @@
 
                             // 3. 在页面中间弹出一个漂亮的回答框
                             const aiBox = document.createElement('div');
+                            aiBox.className = 'ai-assistant-box';
                             aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">AI Assistant</h3>
+                            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
                                                <p>${data.response}</p>${sourcesHtml}`;
                             
                             // 插入到页面中间
@@ -1472,8 +1479,9 @@
                             document.getElementById('cases-container').innerHTML = '';
                             
                             const aiBox = document.createElement('div');
+                            aiBox.className = 'ai-assistant-box';
                             aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">AI Assistant</h3>
+                            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
                                                <p>${data.message}</p>`;
                             document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                         }
@@ -1484,6 +1492,7 @@
                             
                             // 在本地搜索结果上方显示AI提示框
                             const aiBox = document.createElement('div');
+                            aiBox.className = 'ai-assistant-box';
                             aiBox.style = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin: 20px 0; color: white;';
                             aiBox.innerHTML = `<h3 style="margin-top: 0;">🤖 AI Assistant</h3>
                                                <p style="opacity: 0.9;">我是您的贸易合规助手！您可以问我任何关于出口合规的问题，例如：
@@ -1530,6 +1539,12 @@
                             // 检查是否是服务状态消息（不应显示）
                             const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
                             
+                            // 先清除之前的AI框
+                            const existingAiBox = document.querySelector('.ai-assistant-box');
+                            if (existingAiBox) {
+                                existingAiBox.remove();
+                            }
+                            
                             // 如果有有效回答，显示AI框
                             if (data.response && data.response.trim()) {
                                 // 1. 先清空原来的搜索结果区域
@@ -1552,8 +1567,9 @@
 
                                 // 3. 在页面中间弹出一个漂亮的回答框
                                 const aiBox = document.createElement('div');
+                                aiBox.className = 'ai-assistant-box';
                                 aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">AI Assistant</h3>
+                                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
                                                    <p>${data.response}</p>${sourcesHtml}`;
                                 
                                 // 插入到页面中间
@@ -1565,8 +1581,9 @@
                                 document.getElementById('cases-container').innerHTML = '';
                                 
                                 const aiBox = document.createElement('div');
+                                aiBox.className = 'ai-assistant-box';
                                 aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">AI Assistant</h3>
+                                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
                                                    <p>${data.message}</p>`;
                                 document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                             }
@@ -1577,6 +1594,7 @@
                                 
                                 // 在本地搜索结果上方显示AI提示框
                                 const aiBox = document.createElement('div');
+                                aiBox.className = 'ai-assistant-box';
                                 aiBox.style = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin: 20px 0; color: white;';
                                 aiBox.innerHTML = `<h3 style="margin-top: 0;">🤖 AI Assistant</h3>
                                                    <p style="opacity: 0.9;">我是您的贸易合规助手！您可以问我任何关于出口合规的问题，例如：
