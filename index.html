@@ -1463,8 +1463,8 @@
                             // 插入到页面中间
                             document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                         } 
-                        // 如果有 message 字段，也显示出来
-                        else if (data.message) {
+                        // 如果有 message 字段，但排除服务状态提示消息
+                        else if (data.message && !data.message.includes('Service is online') && !data.message.includes('Please send a query')) {
                             document.getElementById('result-cards-container').innerHTML = '';
                             document.getElementById('cases-container').innerHTML = '';
                             
@@ -1474,7 +1474,7 @@
                                                <p>${data.message}</p>`;
                             document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                         }
-                        // API 返回空或没有期望的字段，使用本地搜索
+                        // API 返回空、服务状态消息或没有期望的字段，使用本地搜索
                         else {
                             searchProducts(query.trim());
                         }
@@ -1536,8 +1536,8 @@
                                 // 插入到页面中间
                                 document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                             } 
-                            // 如果有 message 字段，也显示出来
-                            else if (data.message) {
+                            // 如果有 message 字段，但排除服务状态提示消息
+                            else if (data.message && !data.message.includes('Service is online') && !data.message.includes('Please send a query')) {
                                 document.getElementById('result-cards-container').innerHTML = '';
                                 document.getElementById('cases-container').innerHTML = '';
                                 
@@ -1547,7 +1547,7 @@
                                                    <p>${data.message}</p>`;
                                 document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
                             }
-                            // API 返回空或没有期望的字段，使用本地搜索
+                            // API 返回空、服务状态消息或没有期望的字段，使用本地搜索
                             else {
                                 searchProducts(query.trim());
                             }
