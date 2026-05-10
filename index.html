@@ -1618,25 +1618,18 @@
                 // 添加AI助手按钮点击事件
                 const aiBtn = document.getElementById('ai-assistant-btn');
                 const aiInput = document.getElementById('ai-query-input');
-                console.log('AI Button found:', aiBtn);
-                console.log('AI Input found:', aiInput);
                 
                 if (aiBtn && aiInput) {
                     aiBtn.addEventListener('click', (e) => {
-                        console.log('AI Button clicked');
                         const userQuery = aiInput.value.trim();
                         if (userQuery) {
-                            console.log('Calling AI with query:', userQuery);
                             callAiAssistant(userQuery);
-                        } else {
-                            console.log('No query entered');
                         }
                     });
                     
                     // 添加回车键事件
                     aiInput.addEventListener('keyup', (e) => {
                         if (e.key === 'Enter') {
-                            console.log('Enter key pressed');
                             aiBtn.click();
                         }
                     });
@@ -1724,9 +1717,7 @@
          * Call AI Assistant
          */
         async function callAiAssistant(query) {
-            console.log('callAiAssistant called with query:', query);
             if (!query.trim()) {
-                console.log('Query is empty, returning');
                 return;
             }
             
@@ -1739,12 +1730,10 @@
                     query: query.trim(),
                     language: AppState.currentLanguage 
                 });
-                console.log('Sending request:', requestBody); // 调试日志
                 
                 // 更新按钮状态
                 updateAiButtonState(true);
                 
-                console.log('Fetching from:', 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run');
                 const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1752,13 +1741,11 @@
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);
-                console.log('Response status:', response.status); // 调试日志
                 const data = await response.json();
-                console.log('API Response:', data); // 调试日志
                 handleAiResponse(data);
             } catch (error) {
                 clearTimeout(timeoutId);
-                console.error('API Error:', error); // 调试日志
+                console.error('API Error:', error);
                 // 显示错误信息
                 removeAiBox();
                 createAiBox(t('aiError'), '');

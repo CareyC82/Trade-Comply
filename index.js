@@ -162,83 +162,63 @@ exports.handler = async (event) => {
         return { statusCode: 500, headers, body: JSON.stringify({ error: "API Key missing" }) };
     }
 
-    // 解析请求 body - 兼容多种触发器格式（包括 Buffer）
+    // 解析请求 body - 简化版本
     let body = {};
     try {
         console.log('=== Debug Info ===');
-        console.log('event instanceof Buffer:', event instanceof Buffer);
-        console.log('Buffer.isBuffer(event):', Buffer.isBuffer(event));
+        console.log('Event:', JSON.stringify(event, null, 2));
         
-        // 处理 Buffer 类型的 event
         let rawBody = null;
         
-        // 情况1: event 本身是 Buffer
-        if (Buffer.isBuffer(event)) {
-            console.log('Event is a Buffer');
-            rawBody = event.toString('utf-8');
-            console.log('Buffer converted to string:', rawBody.slice(0, 200));
+        // 1. 优先检查 event.body（API Gateway 格式）
+        if (event?.body) {
+            if (typeof event.body === 'string') {
+                rawBody = event.body;
+            } else if (Buffer.isBuffer(event.body)) {
+                rawBody = event.body.toString('utf-8');
+            } else if (typeof event.body === 'object') {
+                body = event.body;
+            }
         }
-        // 情况2: event 是类 Buffer 对象（{type: 'Buffer', data: [...]}）
-        else if (event?.type === 'Buffer' && Array.isArray(event?.data)) {
-            console.log('Event is a Buffer-like object');
-            const buffer = Buffer.from(event.data);
-            rawBody = buffer.toString('utf-8');
-            console.log('Buffer converted to string:', rawBody.slice(0, 200));
-        }
-        // 情况3: event.body 是 Buffer
-        else if (Buffer.isBuffer(event?.body)) {
-            console.log('Body is a Buffer');
-            rawBody = event.body.toString('utf-8');
-            console.log('Body buffer converted:', rawBody.slice(0, 200));
-        }
-        // 情况4: event.body 是类 Buffer 对象
-        else if (event?.body?.type === 'Buffer' && Array.isArray(event?.body?.data)) {
-            console.log('Body is a Buffer-like object');
-            const buffer = Buffer.from(event.body.data);
-            rawBody = buffer.toString('utf-8');
-            console.log('Body buffer converted:', rawBody.slice(0, 200));
-        }
-        // 情况5: event.body 是普通对象
-        else if (typeof event?.body === 'object' && event?.body !== null) {
-            console.log('Body is already an object');
-            body = event.body;
-        }
-        // 情况6: event.body 是字符串
-        else if (typeof event?.body === 'string') {
-            rawBody = event.body;
-        }
-        // 情况7: event.data 是 Buffer
-        else if (Buffer.isBuffer(event?.data)) {
-            console.log('Data is a Buffer');
-            rawBody = event.data.toString('utf-8');
-        }
-        // 情况8: event.data 是类 Buffer 对象
-        else if (event?.data?.type === 'Buffer' && Array.isArray(event?.data?.data)) {
-            console.log('Data is a Buffer-like object');
-            const buffer = Buffer.from(event.data.data);
-            rawBody = buffer.toString('utf-8');
-        }
-        // 情况9: event.data 是字符串或对象
+        // 2. 检查 event.data（其他触发器格式）
         else if (event?.data) {
             if (typeof event.data === 'string') {
                 rawBody = event.data;
+            } else if (Buffer.isBuffer(event.data)) {
+                rawBody = event.data.toString('utf-8');
             } else if (typeof event.data === 'object') {
                 body = event.data;
             }
         }
+        // 3. 检查 event 本身是否是 Buffer 或类 Buffer 对象
+        else if (event?.type === 'Buffer' && Array.isArray(event?.data)) {
+            const buffer = Buffer.from(event.data);
+            rawBody = buffer.toString('utf-8');
+        }
+        else if (Buffer.isBuffer(event)) {
+            rawBody = event.toString('utf-8');
+        }
+        // 4. 如果 event 本身看起来像 JSON 字符串
+        else if (typeof event === 'string' && event.trim().startsWith('{')) {
+            rawBody = event;
+        }
         
-        // 如果 rawBody 是字符串，解析为 JSON
+        // 解析 JSON
         if (typeof rawBody === 'string' && rawBody.trim()) {
+            console.log('Raw body:', rawBody.slice(0, 500));
             body = JSON.parse(rawBody);
-            console.log('Parsed JSON from string');
+            console.log('Parsed body:', body);
             
-            // 额外处理：如果 body.body 是字符串，说明需要再次解析
-            if (typeof body.body === 'string') {
+            // 处理嵌套的 body.body
+            if (body?.body && typeof body.body === 'string') {
                 try {
-                    body = JSON.parse(body.body);
-                    console.log('Re-parsed nested body:', body);
+                    const nested = JSON.parse(body.body);
+                    if (nested?.query) {
+                        body = nested;
+                        console.log('Nested body parsed:', body);
+                    }
                 } catch (e) {
-                    console.log('Nested body is not JSON, keeping as is');
+                    // 忽略
                 }
             }
         }
@@ -246,6 +226,7 @@ exports.handler = async (event) => {
         console.log('Final body:', body);
     } catch (e) {
         console.error('Parse error:', e.message);
+        console.error('Stack:', e.stack);
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON: " + e.message }) };
     }
 
