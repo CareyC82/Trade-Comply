@@ -1670,7 +1670,14 @@
             
             // Navigation highlight
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            if (view === 'home') document.getElementById('nav-home').classList.add('active');
+            if (view === 'home') {
+                document.getElementById('nav-home').classList.add('active');
+                // 清空搜索栏
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+            }
             if (view === 'kb') document.getElementById('nav-kb').classList.add('active');
             if (view === 'categories') document.getElementById('nav-categories').classList.add('active');
             
