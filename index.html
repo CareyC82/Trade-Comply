@@ -982,6 +982,7 @@
                 noResults: "No compliance requirements found for this product.",
                 aiAssistant: "🤖 AI Assistant",
                 askAiAssistant: "Ask AI Assistant",
+                askAiPlaceholder: "Enter your question...",
                 aiError: "AI assistant temporarily unavailable, please try again later.",
                 source: "Source",
                 referenceSources: "Reference Sources:",
@@ -1029,6 +1030,7 @@
                 noResults: "未找到该产品的合规要求。",
                 aiAssistant: "🤖 AI助手",
                 askAiAssistant: "向AI助手咨询",
+                askAiPlaceholder: "请输入您想咨询的内容...",
                 aiError: "AI助手暂时无法连接，请稍后重试。",
                 source: "来源：",
                 referenceSources: "参考来源：",
@@ -1601,22 +1603,36 @@
                 resultSummary.innerHTML = `${directionText}: ${t('foundRegulations')} <span id="result-count">${tags.length}</span> ${t('regulationsFor')} '<span id="search-term">${escapeHtml(query)}</span>'`;
             }
 
-            // 显示AI助手查询按钮
+            // 显示AI助手查询输入框和按钮
             const aiQuerySection = document.getElementById('ai-query-section');
             if (aiQuerySection) {
                 aiQuerySection.innerHTML = `
-                    <button id="ai-assistant-btn" class="ai-assistant-btn" style="margin: 15px 0; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s;">
-                        🤖 ${t('askAiAssistant')}
-                    </button>
+                    <div style="display: flex; gap: 10px; margin: 15px 0; align-items: center;">
+                        <input type="text" id="ai-query-input" style="flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="${t('askAiPlaceholder') || '请输入您想咨询的内容...'}" value="${escapeHtml(query)}">
+                        <button id="ai-assistant-btn" class="ai-assistant-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;">
+                            🤖 ${t('askAiAssistant')}
+                        </button>
+                    </div>
                 `;
                 
                 // 添加AI助手按钮点击事件
                 const aiBtn = document.getElementById('ai-assistant-btn');
-                if (aiBtn) {
+                const aiInput = document.getElementById('ai-query-input');
+                if (aiBtn && aiInput) {
                     aiBtn.addEventListener('click', () => {
-                        aiBtn.disabled = true;
-                        aiBtn.innerHTML = '⏳ ' + t('searching');
-                        callAiAssistant(query);
+                        const userQuery = aiInput.value.trim();
+                        if (userQuery) {
+                            aiBtn.disabled = true;
+                            aiBtn.innerHTML = '⏳ ' + t('searching');
+                            callAiAssistant(userQuery);
+                        }
+                    });
+                    
+                    // 添加回车键事件
+                    aiInput.addEventListener('keyup', (e) => {
+                        if (e.key === 'Enter') {
+                            aiBtn.click();
+                        }
                     });
                 }
             }
