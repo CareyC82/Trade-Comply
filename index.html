@@ -1075,10 +1075,13 @@
             // 更新页面文本
             updatePageText();
             
-            // 如果当前在结果页面，重新搜索并刷新结果
+            // 检查当前是否在结果页面（通过检查home-view是否隐藏来判断）
+            const homeView = document.getElementById('home-view');
             const resultView = document.getElementById('result-view');
             const searchInput = document.getElementById('search-input');
-            if (resultView && resultView.style.display === 'block' && searchInput) {
+            
+            // 只有当主页隐藏且结果页面显示时，才重新搜索
+            if (homeView && resultView && homeView.style.display !== 'block' && resultView.style.display === 'block' && searchInput) {
                 const currentQuery = searchInput.value;
                 const results = search(currentQuery);
                 renderResults(currentQuery || t('allProducts'), results.tags, results.cases);
