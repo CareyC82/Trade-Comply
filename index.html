@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Comply</title>
     <style>
-        /* CSS Variables */
+        /* CSS Variables - 集中管理颜色以便后续扩展 */
         :root {
             --color-primary: #1A3A5C;
             --color-accent: #E8A817;
@@ -17,6 +17,12 @@
             --color-check: #9E9E9E;
             --color-card-shadow: rgba(0,0,0,0.08);
             --color-border: #E0E0E0;
+            /* 新增警告类颜色变量 */
+            --color-warning-bg: rgba(232, 168, 23, 0.1);
+            --color-warning-text: #8B6914;
+            --color-danger-bg: rgba(239, 68, 68, 0.1);
+            --color-danger-border: #EF4444;
+            --color-danger-text: #DC2626;
         }
 
         /* Base Styles */
@@ -183,12 +189,12 @@
 
         /* Disclaimer Bar */
         .disclaimer-bar {
-            background-color: rgba(232, 168, 23, 0.1);
+            background-color: var(--color-warning-bg);
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 16px;
             font-size: 0.8rem;
-            color: #8B6914;
+            color: var(--color-warning-text);
             text-align: center;
         }
 
@@ -224,16 +230,16 @@
 
         /* Warning Banner */
         .warning-banner {
-            background-color: rgba(239, 68, 68, 0.1);
+            background-color: var(--color-danger-bg);
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 16px;
-            border-left: 4px solid #EF4444;
+            border-left: 4px solid var(--color-danger-border);
         }
 
         .warning-banner p {
             font-size: 0.85rem;
-            color: #DC2626;
+            color: var(--color-danger-text);
         }
 
         /* Result Summary */
@@ -480,10 +486,10 @@
         /* Categories Page */
         .categories-summary {
             padding: 12px 16px;
-            background: #F5F7FA;
-            border-bottom: 1px solid #E0E0E0;
+            background: var(--color-bg-secondary);
+            border-bottom: 1px solid var(--color-border);
             font-size: 14px;
-            color: #666;
+            color: var(--color-text-secondary);
         }
 
         .categories-grid {
@@ -494,9 +500,9 @@
         }
 
         .category-group {
-            background: #fff;
+            background: var(--color-bg);
             border-radius: 10px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 4px var(--color-card-shadow);
             overflow: hidden;
         }
 
@@ -510,7 +516,7 @@
             border-bottom: 1px solid #F0F0F0;
             font-weight: 600;
             font-size: 15px;
-            color: #1A3A5C;
+            color: var(--color-primary);
         }
 
         .category-group-header .group-icon {
@@ -551,20 +557,20 @@
         .category-tag {
             display: inline-block;
             padding: 8px 14px;
-            background: #F5F7FA;
-            border: 1px solid #E0E0E0;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
             border-radius: 20px;
             font-size: 13px;
-            color: #1A3A5C;
+            color: var(--color-primary);
             cursor: pointer;
             transition: all 0.15s;
             text-decoration: none;
         }
 
         .category-tag:hover, .category-tag:active {
-            background: #1A3A5C;
+            background: var(--color-primary);
             color: #fff;
-            border-color: #1A3A5C;
+            border-color: var(--color-primary);
         }
 
         .bottom-nav {
@@ -575,8 +581,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #fff;
-            border-top: 1px solid #E0E0E0;
+            background: var(--color-bg);
+            border-top: 1px solid var(--color-border);
             padding: 8px 0 12px;
             z-index: 100;
             gap: 8px;
@@ -783,14 +789,12 @@
     </style>
 </head>
 <body>
-    <!-- Home View -->
     <div id="home-view" class="view-container active">
         <div class="home-header">
             <h1 class="home-title">Trade Comply</h1>
             <p class="home-subtitle">Understand China's trade rules. Facts only.</p>
         </div>
 
-        <!-- Direction Toggle -->
         <div class="direction-toggle">
             <button id="direction-export" class="direction-btn active">Export from China</button>
             <button id="direction-import" class="direction-btn">Import into China</button>
@@ -806,8 +810,7 @@
         </div>
 
         <div class="quick-actions-grid" id="quick-actions-container">
-            <!-- Quick action cards will be populated by JS -->
-        </div>
+            </div>
 
         <div class="disclaimer-bar">
             <span>This tool provides official regulatory citations only. Not legal advice.</span>
@@ -824,7 +827,6 @@
         </div>
     </div>
 
-    <!-- Result View -->
     <div id="result-view" class="view-container">
         <button id="back-to-home" class="back-btn">&lt; Back</button>
 
@@ -837,15 +839,12 @@
         </div>
 
         <div id="result-cards-container">
-            <!-- Compliance cards will be populated by JS -->
-        </div>
+            </div>
 
         <div id="cases-container">
-            <!-- Related cases will be populated by JS -->
-        </div>
+            </div>
     </div>
 
-    <!-- Knowledge Base View -->
     <div id="kb-view" class="view-container">
         <button id="back-to-home-from-kb" class="back-btn">&lt; Back</button>
 
@@ -854,25 +853,21 @@
         </div>
 
         <div id="kb-categories-container">
-            <!-- Categories will be populated by JS -->
-        </div>
+            </div>
     </div>
 
-    <!-- Categories Page -->
     <div id="categories-view" style="display: none;">
-        <div class="header-bar">
-            <button id="back-to-home-from-cat" class="back-btn">&larr; Back</button>
-            <h2>Product Categories</h2>
+        <div class="header-bar" style="display:flex; align-items:center; gap: 16px; margin: 20px 0;">
+            <button id="back-to-home-from-cat" class="back-btn" style="margin:0;">&larr; Back</button>
+            <h2 style="color: var(--color-primary); font-size: 1.5rem;">Product Categories</h2>
         </div>
 
         <div id="categories-summary" class="categories-summary">📋 <strong>0 categories</strong> across <strong>0 groups</strong>. Tap any category to search instantly.</div>
 
         <div id="categories-container" class="categories-grid">
-            <!-- JS动态生成 -->
-        </div>
+            </div>
     </div>
 
-    <!-- Feedback Modal -->
     <div class="modal-overlay" id="feedback-modal">
         <div class="modal-box">
             <div class="feedback-thanks" id="feedback-thanks">
@@ -902,7 +897,6 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
     <div class="bottom-nav">
         <button id="nav-home" class="nav-btn active">🏠 Home</button>
         <button id="nav-kb" class="nav-btn">📚 Knowledge Base</button>
@@ -910,72 +904,90 @@
     </div>
 
     <script>
-        // === Global data storage ===
-        window.appData = {
-            tags: [],
-            cases: [],
-            quickActions: [],
-            knowledgeBase: {},
-            categories: []
+        // === 避免污染全局变量，放入统一命名空间 ===
+        const AppState = {
+            data: {
+                tags: [],
+                cases: [],
+                quickActions: [],
+                knowledgeBase: {},
+                categories: [],
+                updates: []
+            },
+            currentDirection: 'export'
         };
-
-        // === Global direction setting ===
-        window.currentDirection = 'export';
         
         // === XSS防护：转义HTML特殊字符 ===
         function escapeHtml(text) {
-            if (!text) return '';
+            if (text === null || text === undefined) return '';
             const div = document.createElement('div');
-            div.textContent = text;
+            div.textContent = String(text);
             return div.innerHTML;
+        }
+
+        // === XSS防护：净化 URL，防止 javascript: 伪协议 ===
+        function sanitizeUrl(url) {
+            if (!url) return '#';
+            const lowerUrl = url.toLowerCase().trim();
+            if (lowerUrl.startsWith('javascript:') || lowerUrl.startsWith('data:') || lowerUrl.startsWith('vbscript:')) {
+                return '#'; // 拦截恶意协议
+            }
+            return escapeHtml(url);
         }
         
         /**
-         * Load JSON data from a file
+         * 具有降级能力的 JSON 加载器，防止单个文件失败导致应用崩溃
          */
-        async function loadJSON(url) {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to load ${url}: ${response.status}`);
+        async function fetchJsonSafe(url, fallbackValue = []) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Status: ${response.status}`);
+                return await response.json();
+            } catch (err) {
+                console.warn(`⚠️ Failed to load ${url}, using fallback value. Error:`, err);
+                return fallbackValue;
             }
-            return await response.json();
         }
 
         /**
          * Initialize data loading
          */
-        function initData() {
+        async function initData() {
             // 显示加载提示
             const loadingHtml = `<div style="text-align: center; padding: 40px; color: #666;">
                 <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
                 <div>Loading data...</div>
             </div>`;
             document.getElementById('quick-actions-container').innerHTML = loadingHtml;
-            document.getElementById('knowledge-base-container').innerHTML = loadingHtml;
+            const kbContainer = document.getElementById('kb-categories-container');
+            if (kbContainer) kbContainer.innerHTML = loadingHtml;
             
-            Promise.all([
-                fetch('data/tags.json').then(r => { if (!r.ok) throw new Error('tags.json'); return r.json(); }),
-                fetch('data/cases.json').then(r => { if (!r.ok) throw new Error('cases.json'); return r.json(); }),
-                fetch('data/quick-actions.json').then(r => { if (!r.ok) throw new Error('quick-actions.json'); return r.json(); }),
-                fetch('data/knowledge-base.json').then(r => { if (!r.ok) throw new Error('knowledge-base.json'); return r.json(); }),
-                fetch('data/categories.json').then(r => { if (!r.ok) throw new Error('categories.json'); return r.json(); }),
-                fetch('data/updates.json').then(r => { if (!r.ok) throw new Error('updates.json'); return r.json(); })
-            ]).then(([tags, cases, quickActions, kb, categories, updates]) => {
-                window.appData = { tags, cases, quickActions, knowledgeBase: kb, categories, updates };
+            // 使用独立 Catch 提高容错性
+            try {
+                const [tags, cases, quickActions, kb, categories, updates] = await Promise.all([
+                    fetchJsonSafe('data/tags.json', []),
+                    fetchJsonSafe('data/cases.json', []),
+                    fetchJsonSafe('data/quick-actions.json', []),
+                    fetchJsonSafe('data/knowledge-base.json', { categories: [] }),
+                    fetchJsonSafe('data/categories.json', []),
+                    fetchJsonSafe('data/updates.json', [])
+                ]);
+
+                AppState.data = { tags, cases, quickActions, knowledgeBase: kb, categories, updates };
+                
                 renderQuickActions();
                 renderKnowledgeBase();
                 renderCategories();
                 renderLatestUpdate();
-            }).catch(err => {
-                console.error('Data load failed:', err);
+            } catch (err) {
+                // 这个 catch 现在主要是防患未然（极少触发）
+                console.error('Critical data load error:', err);
                 const errorHtml = `<div style="text-align: center; padding: 40px; color: #e74c3c;">
                     <div style="font-size: 24px; margin-bottom: 10px;">⚠️</div>
-                    <div>Failed to load data. Please refresh the page.</div>
-                    <div style="font-size: 12px; color: #999; margin-top: 5px;">${err.message}</div>
+                    <div>Application error. Please refresh the page.</div>
                 </div>`;
                 document.getElementById('quick-actions-container').innerHTML = errorHtml;
-                document.getElementById('knowledge-base-container').innerHTML = errorHtml;
-            });
+            }
         }
 
         /**
@@ -983,41 +995,35 @@
          */
         function renderLatestUpdate() {
             const bar = document.getElementById('latest-update-bar');
-            if (!bar || !window.appData.updates || window.appData.updates.length === 0) return;
+            if (!bar || !AppState.data.updates || AppState.data.updates.length === 0) return;
 
-            const latest = window.appData.updates[0];
+            const latest = AppState.data.updates[0];
             const safeDate = escapeHtml(latest.date);
             const safeText = escapeHtml(latest.text);
             bar.innerHTML = `<span>Latest Update: ${safeDate} - ${safeText}</span>`;
         }
 
         /**
-         * Render quick action cards
+         * Render quick action cards (利用 DocumentFragment 提升性能)
          */
         function renderQuickActions() {
             const container = document.getElementById('quick-actions-container');
-            if (!container) {
-                console.error('❌ quick-actions-container not found');
-                return;
-            }
+            if (!container) return;
 
-            const actions = window.appData.quickActions || [];
-            console.log(`🔹 renderQuickActions: ${actions.length} actions loaded`);
-            
+            const actions = AppState.data.quickActions || [];
             container.innerHTML = '';
 
-            // Sort by order field
             const sortedActions = [...actions].sort((a, b) => (a.order || 999) - (b.order || 999));
-            
-            console.log(`🔹 Rendering ${sortedActions.length} actions`);
+            const fragment = document.createDocumentFragment();
 
             sortedActions.forEach(action => {
                 const card = document.createElement('div');
                 card.className = 'quick-action-card';
+                // 必须转义避免XSS
                 card.innerHTML = `
-                    <div class="quick-action-icon">${action.icon}</div>
-                    <div class="quick-action-label">${action.label}</div>
-                    <div class="quick-action-hs">${action.hs_code}</div>
+                    <div class="quick-action-icon">${escapeHtml(action.icon)}</div>
+                    <div class="quick-action-label">${escapeHtml(action.label)}</div>
+                    <div class="quick-action-hs">${escapeHtml(action.hs_code)}</div>
                 `;
                 
                 card.addEventListener('click', () => {
@@ -1025,8 +1031,10 @@
                     searchProducts(action.query_text);
                 });
 
-                container.appendChild(card);
+                fragment.appendChild(card);
             });
+            
+            container.appendChild(fragment);
         }
 
         /**
@@ -1034,29 +1042,27 @@
          */
         function renderKnowledgeBase() {
             const container = document.getElementById('kb-categories-container');
-            if (!container) {
-                console.error('❌ kb-categories-container not found');
-                return;
-            }
+            if (!container) return;
 
-            const categories = window.appData.knowledgeBase.categories || [];
+            const categories = AppState.data.knowledgeBase.categories || [];
             container.innerHTML = '';
+            const fragment = document.createDocumentFragment();
 
             categories.forEach(category => {
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'kb-category';
                 categoryDiv.innerHTML = `
                     <div class="kb-category-header">
-                        <span class="kb-category-title">${category.label}</span>
+                        <span class="kb-category-title">${escapeHtml(category.label)}</span>
                         <span class="kb-category-count">${category.items.length}</span>
                         <span class="kb-category-toggle">▼</span>
                     </div>
                     <div class="kb-category-content">
                         ${category.items.map(item => `
                             <div class="kb-item">
-                                <div class="kb-item-title">${item.title}</div>
-                                <div class="kb-item-description">${item.description || ''}</div>
-                                <div class="kb-item-url"><a href="${item.source_url}" target="_blank">${item.source_url}</a></div>
+                                <div class="kb-item-title">${escapeHtml(item.title)}</div>
+                                <div class="kb-item-description">${escapeHtml(item.description || '')}</div>
+                                <div class="kb-item-url"><a href="${sanitizeUrl(item.source_url)}" target="_blank">${escapeHtml(item.source_url)}</a></div>
                             </div>
                         `).join('')}
                     </div>
@@ -1071,8 +1077,9 @@
                     content.classList.toggle('open');
                 });
 
-                container.appendChild(categoryDiv);
+                fragment.appendChild(categoryDiv);
             });
+            container.appendChild(fragment);
         }
 
         /**
@@ -1080,57 +1087,53 @@
          */
         function renderCategories() {
             const container = document.getElementById('categories-container');
-            if (!container || !window.appData.categories) return;
+            if (!container || !AppState.data.categories) return;
 
             container.innerHTML = '';
-
-            // 动态计算总品类数和组数
-            const totalGroups = window.appData.categories.length;
+            
+            const totalGroups = AppState.data.categories.length;
             let totalItems = 0;
-            window.appData.categories.forEach(group => {
+            AppState.data.categories.forEach(group => {
                 totalItems += group.items.length;
             });
 
-            // 更新 summary 文字
             const summaryEl = document.getElementById('categories-summary');
             if (summaryEl) {
-                summaryEl.innerHTML = `📋 <strong>${totalItems} categories</strong> across <strong>${totalGroups} groups</strong>. Tap any category to search instantly.`;
+                summaryEl.innerHTML = `📋 <strong>${totalItems}</strong> categories across <strong>${totalGroups}</strong> groups. Tap any category to search instantly.`;
             }
 
-            window.appData.categories.forEach(group => {
+            const fragment = document.createDocumentFragment();
+
+            AppState.data.categories.forEach(group => {
                 const groupEl = document.createElement('div');
                 groupEl.className = 'category-group';
+                
+                // 去除了内联 onclick
                 groupEl.innerHTML = `
-                    <div class="category-group-header" onclick="toggleCategoryGroup(this)">
-                        <span class="group-icon">${group.group_icon}</span>
-                        <span>${group.group_name}</span>
+                    <div class="category-group-header">
+                        <span class="group-icon">${escapeHtml(group.group_icon)}</span>
+                        <span>${escapeHtml(group.group_name)}</span>
                         <span class="group-count">${group.items.length}</span>
                         <span class="arrow">▶</span>
                     </div>
                     <div class="category-group-items">
                         ${group.items.map(item => `
-                            <span class="category-tag" onclick="searchFromCategory('${item.query.replace(/'/g, "\\'")}', '${item.hs_code}')">
-                                ${item.name}
+                            <span class="category-tag" data-query="${escapeHtml(item.query)}" data-hscode="${escapeHtml(item.hs_code || '')}">
+                                ${escapeHtml(item.name)}
                             </span>
                         `).join('')}
                     </div>
                 `;
-                container.appendChild(groupEl);
+                fragment.appendChild(groupEl);
             });
+            
+            container.appendChild(fragment);
         }
 
         /**
-         * Toggle category group expansion
+         * Search from category page (供事件委托使用)
          */
-        window.toggleCategoryGroup = function(header) {
-            const group = header.parentElement;
-            group.classList.toggle('open');
-        }
-
-        /**
-         * Search from category page
-         */
-        window.searchFromCategory = function(query, hsCode) {
+        function searchFromCategory(query, hsCode) {
             document.getElementById('search-input').value = query;
             const result = search(query);
             renderResults(query, result.tags, result.cases);
@@ -1152,15 +1155,15 @@
          * Match tags by HS code
          */
         function matchByHSCode(hsCode, tags) {
-    const normalizedInput = hsCode.trim().replace(/\./g, '');
-    return tags.filter(tag => {
-        if (!tag.related_hs_codes || tag.related_hs_codes.length === 0) return false;
-        return tag.related_hs_codes.some(code => {
-            const normalizedCode = code.replace(/\./g, '');
-            return normalizedCode.startsWith(normalizedInput) || normalizedInput.startsWith(normalizedCode);
-        });
-    });
-}
+            const normalizedInput = hsCode.trim().replace(/\./g, '');
+            return tags.filter(tag => {
+                if (!tag.related_hs_codes || tag.related_hs_codes.length === 0) return false;
+                return tag.related_hs_codes.some(code => {
+                    const normalizedCode = code.replace(/\./g, '');
+                    return normalizedCode.startsWith(normalizedInput) || normalizedInput.startsWith(normalizedCode);
+                });
+            });
+        }
 
         /**
          * Match tags by product name keywords
@@ -1176,51 +1179,35 @@
         }
 
         /**
-         * Search for products
+         * Search logic core
          */
         function search(query) {
-            const tags = window.appData.tags || [];
-            const cases = window.appData.cases || [];
-            
+            const tags = AppState.data.tags || [];
+            const cases = AppState.data.cases || [];
             let matchedTags = [];
-            
-            console.log('🔍 Search query:', query);
-            console.log('🔍 Current direction:', window.currentDirection);
-            console.log('📦 Tags loaded:', tags.length);
             
             if (!query || !query.trim()) {
                 matchedTags = [...tags];
-                console.log('📋 Empty query, returning all tags:', matchedTags.length);
             } else {
                 const inputType = detectInputType(query);
-                console.log('🔍 Input type:', inputType);
-                
                 if (inputType === 'hs_code') {
                     matchedTags = matchByHSCode(query, tags);
-                    console.log('🎯 HS code match results:', matchedTags.length, matchedTags.map(t => t.tag_id));
                 } else {
                     matchedTags = matchByProductName(query, tags);
-                    console.log('📝 Keyword match results:', matchedTags.length);
                 }
             }
 
-            const currentDirection = window.currentDirection || 'export';
-            console.log('🔍 Filtering by direction:', currentDirection);
+            const currentDirection = AppState.currentDirection || 'export';
             matchedTags = matchedTags.filter(tag => {
                 const tagDirection = tag.direction || 'both';
                 return tagDirection === 'both' || tagDirection === currentDirection;
             });
-            console.log('✅ Final matched tags:', matchedTags.length, matchedTags.map(t => t.tag_id));
 
             // Sort results
             matchedTags.sort((a, b) => {
                 const typeOrderA = a.tag_type === 'MATCHED' ? 1 : 0;
                 const typeOrderB = b.tag_type === 'MATCHED' ? 1 : 0;
-                
-                if (typeOrderB !== typeOrderA) {
-                    return typeOrderB - typeOrderA;
-                }
-                
+                if (typeOrderB !== typeOrderA) return typeOrderB - typeOrderA;
                 return (a.display_order || 999) - (b.display_order || 999);
             });
 
@@ -1230,23 +1217,17 @@
                 if (caseDirection !== 'both' && caseDirection !== currentDirection) {
                     return false;
                 }
-                
-                // If empty query, return all cases matching direction
-                if (!query || !query.trim()) {
-                    return true;
-                }
+                if (!query || !query.trim()) return true;
                 
                 const queryLower = query.toLowerCase();
                 const caseKeywords = caseItem.related_keywords || [];
                 const relatedTags = caseItem.related_tags || [];
                 
-                // Check if query matches keywords
                 const keywordMatch = caseKeywords.some(keyword => {
                     const keywordLower = keyword.toLowerCase();
                     return queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
                 });
                 
-                // Check if query is HS code and matches related_tags' HS codes
                 const isHSCode = /^\d{4,6}(\.\d{1,4})?$/.test(query);
                 let hsMatch = false;
                 if (isHSCode) {
@@ -1261,7 +1242,6 @@
                     });
                 }
                 
-                // Check summary for HS code match
                 const summaryLower = (caseItem.summary || '').toLowerCase();
                 const summaryMatch = isHSCode && summaryLower.includes(queryLower);
                 
@@ -1272,11 +1252,10 @@
         }
 
         /**
-         * Search products and display results
+         * Search products wrapper
          */
         function searchProducts(query) {
             const trimmedQuery = query ? query.trim() : '';
-            
             const results = search(trimmedQuery);
             renderResults(trimmedQuery || 'All Products', results.tags, results.cases);
         }
@@ -1287,67 +1266,61 @@
         function renderResults(query, tags, cases) {
             showView('result');
 
-            const directionText = window.currentDirection === 'export' ? 'Export from China' : 'Import into China';
-            
+            const directionText = AppState.currentDirection === 'export' ? 'Export from China' : 'Import into China';
             const resultSummary = document.querySelector('.result-summary p');
             if (resultSummary) {
-                resultSummary.innerHTML = `${directionText}: Found <span id="result-count">${tags.length}</span> regulations for '<span id="search-term">${query}</span>'`;
+                // XSS 修复：过滤查询词
+                resultSummary.innerHTML = `${directionText}: Found <span id="result-count">${tags.length}</span> regulations for '<span id="search-term">${escapeHtml(query)}</span>'`;
             }
 
             const cardsContainer = document.getElementById('result-cards-container');
-            if (!cardsContainer) {
-                console.error('❌ result-cards-container not found');
-                return;
-            }
-
+            if (!cardsContainer) return;
             cardsContainer.innerHTML = '';
-
-            console.log(`🔍 renderResults called with ${tags.length} tags, ${cases.length} cases`);
 
             if (tags.length === 0) {
                 cardsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No compliance requirements found for this product.</p>';
             } else {
                 const groupedTags = tags.reduce((acc, tag) => {
                     if (!acc[tag.category]) {
-                        acc[tag.category] = {
-                            category: tag.category,
-                            tags: []
-                        };
+                        acc[tag.category] = { category: tag.category, tags: [] };
                     }
                     acc[tag.category].tags.push(tag);
                     return acc;
                 }, {});
 
-                console.log(`📊 Grouped tags into ${Object.keys(groupedTags).length} categories:`, Object.keys(groupedTags));
+                const fragment = document.createDocumentFragment();
 
                 Object.values(groupedTags).forEach(group => {
                     const categoryHeader = document.createElement('h3');
                     categoryHeader.style = 'margin: 20px 0 12px; color: var(--color-primary); font-size: 1.1rem;';
-                    categoryHeader.textContent = group.category;
-                    cardsContainer.appendChild(categoryHeader);
+                    categoryHeader.textContent = group.category; // textContent自带转义
+                    fragment.appendChild(categoryHeader);
 
                     group.tags.forEach(tag => {
                         const card = document.createElement('div');
-                        card.className = `compliance-card ${tag.tag_type.toLowerCase()}`;
-                        const hsCodes = tag.related_hs_codes ? tag.related_hs_codes.join(', ') : 'Not specified';
-                        const shortTagId = tag.tag_id.replace(/^CL-|-[0-9]+$/g, '');
+                        const safeTagType = escapeHtml(tag.tag_type || 'Unknown');
+                        card.className = `compliance-card ${safeTagType.toLowerCase()}`;
+                        
+                        const hsCodes = tag.related_hs_codes ? escapeHtml(tag.related_hs_codes.join(', ')) : 'Not specified';
+                        const shortTagId = tag.tag_id ? escapeHtml(tag.tag_id.replace(/^CL-|-[0-9]+$/g, '')) : '';
+                        
+                        // 全部使用 escapeHtml，且处理 source URL
                         card.innerHTML = `
-                            <span class="compliance-tag ${tag.tag_type.toLowerCase()}">${tag.tag_type}</span>
-                            <div class="compliance-title">${shortTagId}: ${tag.description}</div>
-                            <div class="compliance-desc">${tag.short_description || tag.description || 'No details available'}</div>
+                            <span class="compliance-tag ${safeTagType.toLowerCase()}">${safeTagType}</span>
+                            <div class="compliance-title">${shortTagId}: ${escapeHtml(tag.description)}</div>
+                            <div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || 'No details available')}</div>
                             <div class="compliance-hs"><strong>HS Code:</strong> ${hsCodes}</div>
-                            ${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${tag.source_url}" target="_blank">${tag.source_url}</a></div>` : ''}
+                            ${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_url)}</a></div>` : ''}
                         `;
-                        cardsContainer.appendChild(card);
+                        fragment.appendChild(card);
                     });
                 });
+                
+                cardsContainer.appendChild(fragment);
             }
 
             const casesContainer = document.getElementById('cases-container');
-            if (!casesContainer) {
-                console.error('❌ cases-container not found');
-                return;
-            }
+            if (!casesContainer) return;
 
             if (cases.length === 0) {
                 casesContainer.innerHTML = '';
@@ -1356,10 +1329,10 @@
                     <div class="cases-header">Related Penalty Cases</div>
                     ${cases.map(caseItem => `
                         <div class="case-card">
-                            <div class="case-title">${caseItem.title}</div>
-                            <div class="case-date">${caseItem.date}</div>
-                            <div class="case-summary">${caseItem.summary}</div>
-                            <a href="${caseItem.source_url}" target="_blank" class="case-link">Source: ${caseItem.source_url}</a>
+                            <div class="case-title">${escapeHtml(caseItem.title)}</div>
+                            <div class="case-date">${escapeHtml(caseItem.date)}</div>
+                            <div class="case-summary">${escapeHtml(caseItem.summary)}</div>
+                            <a href="${sanitizeUrl(caseItem.source_url)}" target="_blank" class="case-link">Source: ${escapeHtml(caseItem.source_url)}</a>
                         </div>
                     `).join('')}
                 `;
@@ -1370,8 +1343,7 @@
          * Set current direction
          */
         function setDirection(direction) {
-            window.currentDirection = direction;
-            
+            AppState.currentDirection = direction;
             const exportBtn = document.getElementById('direction-export');
             const importBtn = document.getElementById('direction-import');
             
@@ -1395,48 +1367,58 @@
             if (view === 'home') document.getElementById('nav-home').classList.add('active');
             if (view === 'kb') document.getElementById('nav-kb').classList.add('active');
             if (view === 'categories') document.getElementById('nav-categories').classList.add('active');
+            
+            window.scrollTo(0, 0);
         }
 
         /**
          * Bind event listeners
          */
         function bindEvents() {
-            // Direction toggle buttons
+            // Categories 事件委托 (替代内联 onclick)
+            const categoriesContainer = document.getElementById('categories-container');
+            if (categoriesContainer) {
+                categoriesContainer.addEventListener('click', (e) => {
+                    const header = e.target.closest('.category-group-header');
+                    if (header) {
+                        header.parentElement.classList.toggle('open');
+                        return;
+                    }
+                    
+                    const tag = e.target.closest('.category-tag');
+                    if (tag) {
+                        const query = tag.dataset.query;
+                        const hsCode = tag.dataset.hscode;
+                        searchFromCategory(query, hsCode);
+                    }
+                });
+            }
+
+            // Direction toggle
             const exportBtn = document.getElementById('direction-export');
+            if (exportBtn) exportBtn.addEventListener('click', () => setDirection('export'));
             const importBtn = document.getElementById('direction-import');
+            if (importBtn) importBtn.addEventListener('click', () => setDirection('import'));
 
-            if (exportBtn) {
-                exportBtn.addEventListener('click', () => setDirection('export'));
-            }
-
-            if (importBtn) {
-                importBtn.addEventListener('click', () => setDirection('import'));
-            }
-
-            // 统一搜索函数 - 遵循 DRY 原则
             async function performSearch(query) {
                 if (!query.trim()) return;
                 
-                // 显示结果页面
                 showView('result');
-                
-                // 更新搜索摘要
                 const resultSummary = document.querySelector('.result-summary p');
                 if (resultSummary) {
-                    resultSummary.innerHTML = `AI Search: '<span id="search-term">${query.trim()}</span>'`;
+                    resultSummary.innerHTML = `AI Search: '<span id="search-term">${escapeHtml(query.trim())}</span>'`;
                 }
                 
-                // 显示Loading状态，禁用搜索按钮
                 const searchBtn = document.getElementById('search-btn');
                 const searchInput = document.getElementById('search-input');
                 const originalBtnText = searchBtn ? searchBtn.innerHTML : '';
+                
                 if (searchBtn) {
                     searchBtn.disabled = true;
                     searchBtn.innerHTML = '⏳ Searching...';
                 }
                 if (searchInput) searchInput.disabled = true;
                 
-                // 清除之前的结果
                 removeAiBox();
                 document.getElementById('result-cards-container').innerHTML = `<div style="text-align: center; padding: 40px; color: #666;">
                     <div style="font-size: 24px; margin-bottom: 10px;">🔍</div>
@@ -1450,14 +1432,11 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ query: query.trim() })
                     });
-                    
                     const data = await response.json();
                     handleApiResponse(data, query.trim());
                 } catch (error) {
-                    // API失败，回退到本地搜索
-                    searchProducts(query.trim());
+                    searchProducts(query.trim()); // 降级处理
                 } finally {
-                    // 恢复搜索按钮
                     if (searchBtn) {
                         searchBtn.disabled = false;
                         searchBtn.innerHTML = originalBtnText;
@@ -1466,7 +1445,6 @@
                 }
             }
             
-            // 处理API响应
             function handleApiResponse(data, query) {
                 const isStatusMessage = data.message && 
                     (data.message.includes('Service is online') || data.message.includes('Please send a query'));
@@ -1482,7 +1460,7 @@
                             <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">参考来源:</h4>
                             <ul style="margin: 0; padding-left: 20px;">`;
                         data.sources.forEach(source => {
-                            const safeUrl = escapeHtml(source.url);
+                            const safeUrl = sanitizeUrl(source.url);
                             const safeTitle = escapeHtml(source.title || source.url);
                             sourcesHtml += `<li style="margin-bottom: 4px;">
                                 <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); text-decoration: none;">${safeTitle}</a>
@@ -1503,23 +1481,23 @@
                 }
             }
             
-            // 移除AI框
             function removeAiBox() {
                 const existingAiBox = document.querySelector('.ai-assistant-box');
                 if (existingAiBox) existingAiBox.remove();
             }
             
-            // 创建AI回答框
             function createAiBox(content, sourcesHtml) {
                 const aiBox = document.createElement('div');
                 aiBox.className = 'ai-assistant-box';
                 aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
                 aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
                                    <p>${escapeHtml(content)}</p>${sourcesHtml}`;
-                document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
+                const resultSummary = document.querySelector('.result-summary');
+                if(resultSummary && resultSummary.nextSibling) {
+                    document.getElementById('result-view').insertBefore(aiBox, resultSummary.nextSibling);
+                }
             }
 
-            // Search button - call backend API
             const searchBtn = document.getElementById('search-btn');
             if (searchBtn) {
                 searchBtn.addEventListener('click', async () => {
@@ -1528,7 +1506,6 @@
                 });
             }
 
-            // Search input Enter key - call backend API
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
                 searchInput.addEventListener('keyup', async (e) => {
@@ -1538,41 +1515,19 @@
                 });
             }
 
-            // Back buttons
-            const backToHomeBtn = document.getElementById('back-to-home');
-            if (backToHomeBtn) {
-                backToHomeBtn.addEventListener('click', () => showView('home'));
-            }
+            // Navigation Actions
+            const addNavEvent = (id, targetView) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', () => showView(targetView));
+            };
 
-            const backToHomeFromKbBtn = document.getElementById('back-to-home-from-kb');
-            if (backToHomeFromKbBtn) {
-                backToHomeFromKbBtn.addEventListener('click', () => showView('home'));
-            }
+            addNavEvent('back-to-home', 'home');
+            addNavEvent('back-to-home-from-kb', 'home');
+            addNavEvent('back-to-home-from-cat', 'home');
+            addNavEvent('nav-home', 'home');
+            addNavEvent('nav-kb', 'kb');
+            addNavEvent('nav-categories', 'categories');
 
-            // Navigation buttons
-            const navHome = document.getElementById('nav-home');
-            const navKb = document.getElementById('nav-kb');
-            const navCategories = document.getElementById('nav-categories');
-
-            if (navHome) {
-                navHome.addEventListener('click', () => showView('home'));
-            }
-
-            if (navKb) {
-                navKb.addEventListener('click', () => showView('kb'));
-            }
-
-            if (navCategories) {
-                navCategories.addEventListener('click', () => showView('categories'));
-            }
-
-            // Categories back button
-            const backToHomeFromCatBtn = document.getElementById('back-to-home-from-cat');
-            if (backToHomeFromCatBtn) {
-                backToHomeFromCatBtn.addEventListener('click', () => showView('home'));
-            }
-
-            // View cases button
             const viewCasesBtn = document.getElementById('view-cases-btn');
             if (viewCasesBtn) {
                 viewCasesBtn.addEventListener('click', () => {
@@ -1634,15 +1589,10 @@
             }
         }
 
-        /**
-         * Initialize application
-         */
-        async function initApp() {
+        document.addEventListener('DOMContentLoaded', async () => {
             await initData();
             bindEvents();
-        }
-
-        document.addEventListener('DOMContentLoaded', initApp);
+        });
     </script>
 </body>
 </html>
