@@ -1075,6 +1075,9 @@
             // 更新页面文本
             updatePageText();
             
+            // 刷新最新更新信息
+            renderLatestUpdate();
+            
             // 检查当前是否在结果页面（通过检查home-view是否隐藏来判断）
             const homeView = document.getElementById('home-view');
             const resultView = document.getElementById('result-view');
@@ -1246,7 +1249,7 @@
             
             // 使用独立 Catch 提高容错性
             try {
-                const [tagsEn, casesEn, quickActions, kb, categoriesEn, updates, tagsZh, casesZh, categoriesZh] = await Promise.all([
+                const [tagsEn, casesEn, quickActions, kb, categoriesEn, updatesEn, tagsZh, casesZh, categoriesZh, updatesZh] = await Promise.all([
                     fetchJsonSafe('data/tags.json', []),
                     fetchJsonSafe('data/cases.json', []),
                     fetchJsonSafe('data/quick-actions.json', []),
@@ -1255,7 +1258,8 @@
                     fetchJsonSafe('data/updates.json', []),
                     fetchJsonSafe('data/tags_zh.json', []),
                     fetchJsonSafe('data/cases_zh.json', []),
-                    fetchJsonSafe('data/categories_zh.json', [])
+                    fetchJsonSafe('data/categories_zh.json', []),
+                    fetchJsonSafe('data/updates_zh.json', [])
                 ]);
 
                 AppState.data = { 
@@ -1265,9 +1269,10 @@
                     casesZh: casesZh,
                     categories: categoriesEn,
                     categoriesZh: categoriesZh,
+                    updates: updatesEn,
+                    updatesZh: updatesZh,
                     quickActions, 
-                    knowledgeBase: kb, 
-                    updates 
+                    knowledgeBase: kb 
                 };
                 
                 renderQuickActions();
@@ -1290,12 +1295,17 @@
          */
         function renderLatestUpdate() {
             const bar = document.getElementById('latest-update-bar');
-            if (!bar || !AppState.data.updates || AppState.data.updates.length === 0) return;
+            if (!bar) return;
 
-            const latest = AppState.data.updates[0];
+            const lang = AppState.currentLanguage || 'en';
+            const updates = lang === 'zh' ? AppState.data.updatesZh : AppState.data.updates;
+            
+            if (!updates || updates.length === 0) return;
+
+            const latest = updates[0];
             const safeDate = escapeHtml(latest.date);
             const safeText = escapeHtml(latest.text);
-            bar.innerHTML = `<span>Latest Update: ${safeDate} - ${safeText}</span>`;
+            bar.innerHTML = `<span>${t('latestUpdate')} ${safeDate} - ${safeText}</span>`;
         }
 
         /**
