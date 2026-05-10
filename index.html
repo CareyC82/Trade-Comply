@@ -1447,7 +1447,7 @@
             
             function handleApiResponse(data, query) {
                 const isStatusMessage = data.message && 
-                    (data.message.includes('Service is online') || data.message.includes('Please send a query'));
+                    (data.message.includes('Service Online') || data.message.includes('Service is online') || data.message.includes('Please send a query'));
                 
                 if (data.response && data.response.trim()) {
                     removeAiBox();
