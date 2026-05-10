@@ -879,6 +879,10 @@
 
         <div id="cases-container">
             </div>
+
+        <div id="result-feedback-section" class="feedback-section" style="display: none;">
+            <a href="#" class="feedback-link" id="result-feedback-trigger">💬 Can't find your product? Tell us</a>
+        </div>
     </div>
 
     <div id="kb-view" class="view-container">
@@ -1594,7 +1598,17 @@
 
             if (tags.length === 0) {
                 cardsContainer.innerHTML = `<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">${t('noResults')}</p>`;
+                // 显示反馈链接
+                const resultFeedbackSection = document.getElementById('result-feedback-section');
+                if (resultFeedbackSection) {
+                    resultFeedbackSection.style.display = 'block';
+                }
             } else {
+                // 隐藏反馈链接
+                const resultFeedbackSection = document.getElementById('result-feedback-section');
+                if (resultFeedbackSection) {
+                    resultFeedbackSection.style.display = 'none';
+                }
                 const groupedTags = tags.reduce((acc, tag) => {
                     const categoryLabel = tag.category_label || tag.category;
                     if (!acc[categoryLabel]) {
@@ -1887,6 +1901,15 @@
 
             if (feedbackTrigger && feedbackModal) {
                 feedbackTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    feedbackModal.classList.add('open');
+                });
+            }
+
+            // 结果页面的反馈链接
+            const resultFeedbackTrigger = document.getElementById('result-feedback-trigger');
+            if (resultFeedbackTrigger && feedbackModal) {
+                resultFeedbackTrigger.addEventListener('click', (e) => {
                     e.preventDefault();
                     feedbackModal.classList.add('open');
                 });
