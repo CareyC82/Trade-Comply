@@ -974,7 +974,7 @@
                 searchResults: "Search Results",
                 noResults: "No compliance requirements found for this product.",
                 aiAssistant: "🤖 AI Assistant",
-                source: "Source:",
+                source: "Source",
                 referenceSources: "Reference Sources:",
                 searching: "Searching...",
                 aiSearch: "AI Search:",
@@ -984,7 +984,8 @@
                 categoriesSummary: "📋 <strong>{total}</strong> categories across <strong>{groups}</strong> groups. Tap any category to search instantly.",
                 kbSearchPlaceholder: "Search regulations...",
                 exportTitle: "Export from China",
-                importTitle: "Import into China"
+                importTitle: "Import into China",
+                hsCode: "HS Code"
             },
             zh: {
                 title: "贸易合规助手",
@@ -1028,7 +1029,8 @@
                 categoriesSummary: "📋 <strong>{total}</strong> 个分类，共 <strong>{groups}</strong> 个组别。点击任意分类即可搜索。",
                 kbSearchPlaceholder: "搜索法规...",
                 exportTitle: "从中国出口",
-                importTitle: "进口到中国"
+                importTitle: "进口到中国",
+                hsCode: "HS编码"
             }
         };
 
@@ -1072,6 +1074,14 @@
             
             // 更新页面文本
             updatePageText();
+            
+            // 如果当前在结果页面，重新搜索并刷新结果
+            const searchInput = document.getElementById('search-input');
+            if (searchInput && document.querySelector('.result-summary')) {
+                const currentQuery = searchInput.value;
+                const results = search(currentQuery);
+                renderResults(currentQuery || t('allProducts'), results.tags, results.cases);
+            }
         }
 
         // === 更新页面文本 ===
@@ -1226,16 +1236,27 @@
             
             // 使用独立 Catch 提高容错性
             try {
-                const [tags, cases, quickActions, kb, categories, updates] = await Promise.all([
+                const [tagsEn, casesEn, quickActions, kb, categories, updates, tagsZh, casesZh] = await Promise.all([
                     fetchJsonSafe('data/tags.json', []),
                     fetchJsonSafe('data/cases.json', []),
                     fetchJsonSafe('data/quick-actions.json', []),
                     fetchJsonSafe('data/knowledge-base.json', { categories: [] }),
                     fetchJsonSafe('data/categories.json', []),
-                    fetchJsonSafe('data/updates.json', [])
+                    fetchJsonSafe('data/updates.json', []),
+                    fetchJsonSafe('data/tags_zh.json', []),
+                    fetchJsonSafe('data/cases_zh.json', [])
                 ]);
 
-                AppState.data = { tags, cases, quickActions, knowledgeBase: kb, categories, updates };
+                AppState.data = { 
+                    tags: tagsEn, 
+                    cases: casesEn, 
+                    tagsZh: tagsZh,
+                    casesZh: casesZh,
+                    quickActions, 
+                    knowledgeBase: kb, 
+                    categories, 
+                    updates 
+                };
                 
                 renderQuickActions();
                 renderKnowledgeBase();
@@ -1444,8 +1465,9 @@
          * Search logic core
          */
         function search(query) {
-            const tags = AppState.data.tags || [];
-            const cases = AppState.data.cases || [];
+            const lang = AppState.currentLanguage || 'en';
+            const tags = lang === 'zh' ? (AppState.data.tagsZh || []) : (AppState.data.tags || []);
+            const cases = lang === 'zh' ? (AppState.data.casesZh || []) : (AppState.data.cases || []);
             let matchedTags = [];
             
             if (!query || !query.trim()) {
@@ -1543,10 +1565,11 @@
                 cardsContainer.innerHTML = `<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">${t('noResults')}</p>`;
             } else {
                 const groupedTags = tags.reduce((acc, tag) => {
-                    if (!acc[tag.category]) {
-                        acc[tag.category] = { category: tag.category, tags: [] };
+                    const categoryLabel = tag.category_label || tag.category;
+                    if (!acc[categoryLabel]) {
+                        acc[categoryLabel] = { category: categoryLabel, tags: [] };
                     }
-                    acc[tag.category].tags.push(tag);
+                    acc[categoryLabel].tags.push(tag);
                     return acc;
                 }, {});
 
@@ -1571,8 +1594,8 @@
                             <span class="compliance-tag ${safeTagType.toLowerCase()}">${safeTagType}</span>
                             <div class="compliance-title">${shortTagId}: ${escapeHtml(tag.description)}</div>
                             <div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || 'No details available')}</div>
-                            <div class="compliance-hs"><strong>HS Code:</strong> ${hsCodes}</div>
-                            ${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_url)}</a></div>` : ''}
+                            <div class="compliance-hs"><strong>${t('hsCode')}:</strong> ${hsCodes}</div>
+                            ${tag.source_citation ? `<div class="compliance-source"><strong>${t('source')}:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_citation)}</a></div>` : ''}
                         `;
                         fragment.appendChild(card);
                     });
