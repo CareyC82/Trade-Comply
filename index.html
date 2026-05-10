@@ -1832,7 +1832,16 @@
             // Navigation Actions
             const addNavEvent = (id, targetView) => {
                 const el = document.getElementById(id);
-                if (el) el.addEventListener('click', () => showView(targetView));
+                if (el) el.addEventListener('click', () => {
+                    // 如果返回主页，清空搜索栏
+                    if (targetView === 'home') {
+                        const searchInput = document.getElementById('search-input');
+                        if (searchInput) {
+                            searchInput.value = '';
+                        }
+                    }
+                    showView(targetView);
+                });
             };
 
             addNavEvent('back-to-home', 'home');
