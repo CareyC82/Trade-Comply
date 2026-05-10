@@ -1076,16 +1076,17 @@
             updatePageText();
             
             // 如果当前在结果页面，重新搜索并刷新结果
+            const resultView = document.getElementById('result-view');
             const searchInput = document.getElementById('search-input');
-            if (searchInput && document.querySelector('.result-summary')) {
+            if (resultView && resultView.style.display === 'block' && searchInput) {
                 const currentQuery = searchInput.value;
                 const results = search(currentQuery);
                 renderResults(currentQuery || t('allProducts'), results.tags, results.cases);
             }
             
             // 如果当前在分类页面，刷新分类
-            const categoriesContainer = document.getElementById('categories-container');
-            if (categoriesContainer && categoriesContainer.style.display !== 'none') {
+            const categoriesView = document.getElementById('categories-view');
+            if (categoriesView && categoriesView.style.display === 'block') {
                 renderCategories();
             }
         }
