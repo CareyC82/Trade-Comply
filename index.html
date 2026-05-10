@@ -874,6 +874,9 @@
             <p>Found <span id="result-count">0</span> regulations for '<span id="search-term"></span>'</p>
         </div>
 
+        <div id="ai-query-section" style="margin-top: 15px;">
+        </div>
+
         <div id="result-cards-container">
             </div>
 
@@ -978,6 +981,7 @@
                 searchResults: "Search Results",
                 noResults: "No compliance requirements found for this product.",
                 aiAssistant: "🤖 AI Assistant",
+                askAiAssistant: "Ask AI Assistant",
                 source: "Source",
                 referenceSources: "Reference Sources:",
                 searching: "Searching...",
@@ -1023,6 +1027,7 @@
                 searchResults: "搜索结果",
                 noResults: "未找到该产品的合规要求。",
                 aiAssistant: "🤖 AI助手",
+                askAiAssistant: "向AI助手咨询",
                 source: "来源：",
                 referenceSources: "参考来源：",
                 searching: "搜索中...",
@@ -1594,6 +1599,26 @@
                 resultSummary.innerHTML = `${directionText}: ${t('foundRegulations')} <span id="result-count">${tags.length}</span> ${t('regulationsFor')} '<span id="search-term">${escapeHtml(query)}</span>'`;
             }
 
+            // 显示AI助手查询按钮
+            const aiQuerySection = document.getElementById('ai-query-section');
+            if (aiQuerySection) {
+                aiQuerySection.innerHTML = `
+                    <button id="ai-assistant-btn" class="ai-assistant-btn" style="margin: 15px 0; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s;">
+                        🤖 ${t('askAiAssistant')}
+                    </button>
+                `;
+                
+                // 添加AI助手按钮点击事件
+                const aiBtn = document.getElementById('ai-assistant-btn');
+                if (aiBtn) {
+                    aiBtn.addEventListener('click', () => {
+                        aiBtn.disabled = true;
+                        aiBtn.innerHTML = '⏳ ' + t('searching');
+                        callAiAssistant(query);
+                    });
+                }
+            }
+
             const cardsContainer = document.getElementById('result-cards-container');
             if (!cardsContainer) return;
             cardsContainer.innerHTML = '';
@@ -1745,31 +1770,8 @@
             const langZhBtn = document.getElementById('lang-zh');
             if (langZhBtn) langZhBtn.addEventListener('click', () => setLanguage('zh'));
 
-            async function performSearch(query) {
+            async function callAiAssistant(query) {
                 if (!query.trim()) return;
-                
-                showView('result');
-                const resultSummary = document.querySelector('.result-summary p');
-                if (resultSummary) {
-                    resultSummary.innerHTML = `${t('aiSearch')} '<span id="search-term">${escapeHtml(query.trim())}</span>'`;
-                }
-                
-                const searchBtn = document.getElementById('search-btn');
-                const searchInput = document.getElementById('search-input');
-                const originalBtnText = searchBtn ? searchBtn.innerHTML : '';
-                
-                if (searchBtn) {
-                    searchBtn.disabled = true;
-                    searchBtn.innerHTML = '⏳ ' + t('searching');
-                }
-                if (searchInput) searchInput.disabled = true;
-                
-                removeAiBox();
-                document.getElementById('result-cards-container').innerHTML = `<div style="text-align: center; padding: 40px; color: #666;">
-                    <div style="font-size: 24px; margin-bottom: 10px;">🔍</div>
-                    <div>${t('searching')}</div>
-                </div>`;
-                document.getElementById('cases-container').innerHTML = '';
                 
                 try {
                     const requestBody = JSON.stringify({ 
@@ -1785,46 +1787,31 @@
                     console.log('Response status:', response.status); // 调试日志
                     const data = await response.json();
                     console.log('API Response:', data); // 调试日志
-                    handleApiResponse(data, query.trim());
+                    handleAiResponse(data);
                 } catch (error) {
                     console.error('API Error:', error); // 调试日志
-                    searchProducts(query.trim()); // 降级处理
-                } finally {
-                    if (searchBtn) {
-                        searchBtn.disabled = false;
-                        searchBtn.innerHTML = originalBtnText;
+                    // 显示错误信息
+                    createAiBox(t('aiError'), '');
+                    const aiBtn = document.getElementById('ai-assistant-btn');
+                    if (aiBtn) {
+                        aiBtn.disabled = false;
+                        aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
                     }
-                    if (searchInput) searchInput.disabled = false;
                 }
             }
             
-            function handleApiResponse(data, query) {
+            function handleAiResponse(data) {
+                // 更新AI按钮状态
+                const aiBtn = document.getElementById('ai-assistant-btn');
+                if (aiBtn) {
+                    aiBtn.disabled = false;
+                    aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
+                }
+                
                 // Check if we actually received an AI response
                 if (data.response && data.response.trim()) {
-                    removeAiBox();
-                    document.getElementById('result-cards-container').innerHTML = '';
-                    document.getElementById('cases-container').innerHTML = '';
-                    
-                    let sourcesHtml = '';
-                    if (data.sources && data.sources.length > 0) {
-                        sourcesHtml = `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                            <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">${t('referenceSources')}</h4>
-                            <ul style="margin: 0; padding-left: 20px;">`;
-                        data.sources.forEach(source => {
-                            const safeUrl = sanitizeUrl(source.url);
-                            const safeTitle = escapeHtml(source.title || source.url);
-                            sourcesHtml += `<li style="margin-bottom: 4px;">
-                                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); text-decoration: none;">${safeTitle}</a>
-                            </li>`;
-                        });
-                        sourcesHtml += `</ul></div>`;
-                    }
-                    createAiBox(data.response, sourcesHtml);
-                    searchProducts(query);
-                } else {
-                    // If no AI response is found, just do a local search
-                    removeAiBox();
-                    searchProducts(query);
+                    // 显示AI回答，保留现有搜索结果
+                    createAiBox(data.response, '');
                 }
             }
             
@@ -1847,17 +1834,17 @@
 
             const searchBtn = document.getElementById('search-btn');
             if (searchBtn) {
-                searchBtn.addEventListener('click', async () => {
+                searchBtn.addEventListener('click', () => {
                     const query = document.getElementById('search-input')?.value;
-                    await performSearch(query);
+                    searchProducts(query);
                 });
             }
 
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
-                searchInput.addEventListener('keyup', async (e) => {
+                searchInput.addEventListener('keyup', (e) => {
                     if (e.key === 'Enter') {
-                        await performSearch(e.target.value);
+                        searchProducts(e.target.value);
                     }
                 });
             }
