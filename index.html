@@ -982,6 +982,7 @@
                 noResults: "No compliance requirements found for this product.",
                 aiAssistant: "🤖 AI Assistant",
                 askAiAssistant: "Ask AI Assistant",
+                aiError: "AI assistant temporarily unavailable, please try again later.",
                 source: "Source",
                 referenceSources: "Reference Sources:",
                 searching: "Searching...",
@@ -1028,6 +1029,7 @@
                 noResults: "未找到该产品的合规要求。",
                 aiAssistant: "🤖 AI助手",
                 askAiAssistant: "向AI助手咨询",
+                aiError: "AI助手暂时无法连接，请稍后重试。",
                 source: "来源：",
                 referenceSources: "参考来源：",
                 searching: "搜索中...",
@@ -1773,6 +1775,17 @@
             async function callAiAssistant(query) {
                 if (!query.trim()) return;
                 
+                // 获取AI按钮并更新状态
+                const aiBtn = document.getElementById('ai-assistant-btn');
+                if (aiBtn) {
+                    aiBtn.disabled = true;
+                    aiBtn.innerHTML = '⏳ ' + t('searching');
+                }
+                
+                // 设置超时
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
+                
                 try {
                     const requestBody = JSON.stringify({ 
                         query: query.trim(),
@@ -1782,17 +1795,20 @@
                     const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: requestBody
+                        body: requestBody,
+                        signal: controller.signal
                     });
+                    clearTimeout(timeoutId);
                     console.log('Response status:', response.status); // 调试日志
                     const data = await response.json();
                     console.log('API Response:', data); // 调试日志
                     handleAiResponse(data);
                 } catch (error) {
+                    clearTimeout(timeoutId);
                     console.error('API Error:', error); // 调试日志
                     // 显示错误信息
+                    removeAiBox();
                     createAiBox(t('aiError'), '');
-                    const aiBtn = document.getElementById('ai-assistant-btn');
                     if (aiBtn) {
                         aiBtn.disabled = false;
                         aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
@@ -1808,10 +1824,14 @@
                     aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
                 }
                 
-                // Check if we actually received an AI response
+                // 检查是否收到响应
                 if (data.response && data.response.trim()) {
-                    // 显示AI回答，保留现有搜索结果
+                    removeAiBox();
                     createAiBox(data.response, '');
+                } else {
+                    // 如果没有响应，显示错误信息
+                    removeAiBox();
+                    createAiBox(t('aiError'), '');
                 }
             }
             
