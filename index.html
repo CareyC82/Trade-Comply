@@ -1622,8 +1622,6 @@
                     aiBtn.addEventListener('click', () => {
                         const userQuery = aiInput.value.trim();
                         if (userQuery) {
-                            aiBtn.disabled = true;
-                            aiBtn.innerHTML = '⏳ ' + t('searching');
                             callAiAssistant(userQuery);
                         }
                     });
@@ -1791,13 +1789,6 @@
             async function callAiAssistant(query) {
                 if (!query.trim()) return;
                 
-                // 获取AI按钮并更新状态
-                const aiBtn = document.getElementById('ai-assistant-btn');
-                if (aiBtn) {
-                    aiBtn.disabled = true;
-                    aiBtn.innerHTML = '⏳ ' + t('searching');
-                }
-                
                 // 设置超时
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
@@ -1808,6 +1799,10 @@
                         language: AppState.currentLanguage 
                     });
                     console.log('Sending request:', requestBody); // 调试日志
+                    
+                    // 更新按钮状态
+                    updateAiButtonState(true);
+                    
                     const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1825,7 +1820,17 @@
                     // 显示错误信息
                     removeAiBox();
                     createAiBox(t('aiError'), '');
-                    if (aiBtn) {
+                    updateAiButtonState(false);
+                }
+            }
+            
+            function updateAiButtonState(isLoading) {
+                const aiBtn = document.getElementById('ai-assistant-btn');
+                if (aiBtn) {
+                    if (isLoading) {
+                        aiBtn.disabled = true;
+                        aiBtn.innerHTML = '⏳ ' + t('searching');
+                    } else {
                         aiBtn.disabled = false;
                         aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
                     }
@@ -1834,11 +1839,7 @@
             
             function handleAiResponse(data) {
                 // 更新AI按钮状态
-                const aiBtn = document.getElementById('ai-assistant-btn');
-                if (aiBtn) {
-                    aiBtn.disabled = false;
-                    aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
-                }
+                updateAiButtonState(false);
                 
                 // 检查是否收到响应
                 if (data.response && data.response.trim()) {
