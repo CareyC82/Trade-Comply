@@ -1490,9 +1490,11 @@
             const queryLower = query.toLowerCase();
             return tags.filter(tag => {
                 const keywords = tag.related_keywords || [];
-                return keywords.some(keyword => 
-                    queryLower.includes(keyword.toLowerCase())
-                );
+                return keywords.some(keyword => {
+                    const keywordLower = keyword.toLowerCase();
+                    // 支持双向匹配：查询包含关键词 或 关键词包含查询
+                    return queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
+                });
             });
         }
 
