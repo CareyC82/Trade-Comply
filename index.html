@@ -1413,91 +1413,89 @@
                 importBtn.addEventListener('click', () => setDirection('import'));
             }
 
+            // 统一搜索函数 - 遵循 DRY 原则
+            async function performSearch(query) {
+                if (!query.trim()) return;
+                
+                // 显示结果页面
+                showView('result');
+                
+                // 更新搜索摘要
+                const resultSummary = document.querySelector('.result-summary p');
+                if (resultSummary) {
+                    resultSummary.innerHTML = `AI Search: '<span id="search-term">${query.trim()}</span>'`;
+                }
+                
+                try {
+                    const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query: query.trim() })
+                    });
+                    
+                    const data = await response.json();
+                    handleApiResponse(data, query.trim());
+                } catch (error) {
+                    // API失败，回退到本地搜索
+                    searchProducts(query.trim());
+                }
+            }
+            
+            // 处理API响应
+            function handleApiResponse(data, query) {
+                const isStatusMessage = data.message && 
+                    (data.message.includes('Service is online') || data.message.includes('Please send a query'));
+                
+                if (data.response && data.response.trim()) {
+                    removeAiBox();
+                    document.getElementById('result-cards-container').innerHTML = '';
+                    document.getElementById('cases-container').innerHTML = '';
+                    
+                    let sourcesHtml = '';
+                    if (data.sources && data.sources.length > 0) {
+                        sourcesHtml = `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">参考来源:</h4>
+                            <ul style="margin: 0; padding-left: 20px;">`;
+                        data.sources.forEach(source => {
+                            sourcesHtml += `<li style="margin-bottom: 4px;">
+                                <a href="${source.url}" target="_blank" style="color: var(--color-primary); text-decoration: none;">${source.title || source.url}</a>
+                            </li>`;
+                        });
+                        sourcesHtml += `</ul></div>`;
+                    }
+                    createAiBox(data.response, sourcesHtml);
+                } else if (data.message && data.message.trim() && !isStatusMessage) {
+                    removeAiBox();
+                    document.getElementById('result-cards-container').innerHTML = '';
+                    document.getElementById('cases-container').innerHTML = '';
+                    createAiBox(data.message, '');
+                } else {
+                    searchProducts(query);
+                }
+            }
+            
+            // 移除AI框
+            function removeAiBox() {
+                const existingAiBox = document.querySelector('.ai-assistant-box');
+                if (existingAiBox) existingAiBox.remove();
+            }
+            
+            // 创建AI回答框
+            function createAiBox(content, sourcesHtml) {
+                const aiBox = document.createElement('div');
+                aiBox.className = 'ai-assistant-box';
+                aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
+                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
+                                   <p>${content}</p>${sourcesHtml}`;
+                document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
+            }
+
             // Search button - call backend API
             const searchBtn = document.getElementById('search-btn');
             if (searchBtn) {
                 searchBtn.addEventListener('click', async () => {
                     const query = document.getElementById('search-input')?.value;
-                    if (!query.trim()) return;
-                    
-                    // 先显示结果页面
-                    showView('result');
-                    
-                    // 更新搜索摘要
-                    const resultSummary = document.querySelector('.result-summary p');
-                    if (resultSummary) {
-                        resultSummary.innerHTML = `AI Search: '<span id="search-term">${query.trim()}</span>'`;
-                    }
-                    
-                    try {
-                        const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ query: query.trim() })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        // 检查是否是服务状态消息
-                        const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
-                        
-                        // 如果有有效回答(data.response)，显示AI框
-                        if (data.response && data.response.trim()) {
-                            // 先清除之前的AI框
-                            const existingAiBox = document.querySelector('.ai-assistant-box');
-                            if (existingAiBox) existingAiBox.remove();
-                            
-                            // 清空原来的搜索结果区域
-                            document.getElementById('result-cards-container').innerHTML = '';
-                            document.getElementById('cases-container').innerHTML = '';
-
-                            // 构建来源链接HTML
-                            let sourcesHtml = '';
-                            if (data.sources && data.sources.length > 0) {
-                                sourcesHtml = `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                                    <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">参考来源:</h4>
-                                    <ul style="margin: 0; padding-left: 20px;">`;
-                                data.sources.forEach(source => {
-                                    sourcesHtml += `<li style="margin-bottom: 4px;">
-                                        <a href="${source.url}" target="_blank" style="color: var(--color-primary); text-decoration: none;">${source.title || source.url}</a>
-                                    </li>`;
-                                });
-                                sourcesHtml += `</ul></div>`;
-                            }
-
-                            // 显示AI回答框
-                            const aiBox = document.createElement('div');
-                            aiBox.className = 'ai-assistant-box';
-                            aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
-                                               <p>${data.response}</p>${sourcesHtml}`;
-                            document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
-                        } 
-                        // 如果有有效 message（非状态消息）
-                        else if (data.message && data.message.trim() && !isStatusMessage) {
-                            const existingAiBox = document.querySelector('.ai-assistant-box');
-                            if (existingAiBox) existingAiBox.remove();
-                            
-                            document.getElementById('result-cards-container').innerHTML = '';
-                            document.getElementById('cases-container').innerHTML = '';
-                            
-                            const aiBox = document.createElement('div');
-                            aiBox.className = 'ai-assistant-box';
-                            aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
-                                               <p>${data.message}</p>`;
-                            document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
-                        }
-                        // API没有返回有效回答，回退到本地搜索
-                        else {
-                            searchProducts(query.trim());
-                        }
-                    } catch (error) {
-                        // API失败，回退到本地搜索
-                        searchProducts(query.trim());
-                    }
+                    await performSearch(query);
                 });
             }
 
@@ -1506,87 +1504,7 @@
             if (searchInput) {
                 searchInput.addEventListener('keyup', async (e) => {
                     if (e.key === 'Enter') {
-                        const query = e.target.value;
-                        if (!query.trim()) return;
-                        
-                        // 先显示结果页面
-                        showView('result');
-                        
-                        // 更新搜索摘要
-                        const resultSummary = document.querySelector('.result-summary p');
-                        if (resultSummary) {
-                            resultSummary.innerHTML = `AI Search: '<span id="search-term">${query.trim()}</span>'`;
-                        }
-                        
-                        try {
-                            const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ query: query.trim() })
-                            });
-                            
-                            const data = await response.json();
-                            
-                            // 检查是否是服务状态消息
-                            const isStatusMessage = data.message && (data.message.includes('Service is online') || data.message.includes('Please send a query'));
-                            
-                            // 如果有有效回答(data.response)，显示AI框
-                            if (data.response && data.response.trim()) {
-                                // 先清除之前的AI框
-                                const existingAiBox = document.querySelector('.ai-assistant-box');
-                                if (existingAiBox) existingAiBox.remove();
-                                
-                                // 清空原来的搜索结果区域
-                                document.getElementById('result-cards-container').innerHTML = '';
-                                document.getElementById('cases-container').innerHTML = '';
-
-                                // 构建来源链接HTML
-                                let sourcesHtml = '';
-                                if (data.sources && data.sources.length > 0) {
-                                    sourcesHtml = `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                                        <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">参考来源:</h4>
-                                        <ul style="margin: 0; padding-left: 20px;">`;
-                                    data.sources.forEach(source => {
-                                        sourcesHtml += `<li style="margin-bottom: 4px;">
-                                            <a href="${source.url}" target="_blank" style="color: var(--color-primary); text-decoration: none;">${source.title || source.url}</a>
-                                        </li>`;
-                                    });
-                                    sourcesHtml += `</ul></div>`;
-                                }
-
-                                // 显示AI回答框
-                                const aiBox = document.createElement('div');
-                                aiBox.className = 'ai-assistant-box';
-                                aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
-                                                   <p>${data.response}</p>${sourcesHtml}`;
-                                document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
-                            } 
-                            // 如果有有效 message（非状态消息）
-                            else if (data.message && data.message.trim() && !isStatusMessage) {
-                                const existingAiBox = document.querySelector('.ai-assistant-box');
-                                if (existingAiBox) existingAiBox.remove();
-                                
-                                document.getElementById('result-cards-container').innerHTML = '';
-                                document.getElementById('cases-container').innerHTML = '';
-                                
-                                const aiBox = document.createElement('div');
-                                aiBox.className = 'ai-assistant-box';
-                                aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
-                                                   <p>${data.message}</p>`;
-                                document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
-                            }
-                            // API没有返回有效回答，回退到本地搜索
-                            else {
-                                searchProducts(query.trim());
-                            }
-                        } catch (error) {
-                            // API失败，回退到本地搜索
-                            searchProducts(query.trim());
-                        }
+                        await performSearch(e.target.value);
                     }
                 });
             }
