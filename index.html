@@ -1433,8 +1433,10 @@
                         body: JSON.stringify({ query: query.trim() })
                     });
                     const data = await response.json();
+                    console.log('API Response:', data); // 调试日志
                     handleApiResponse(data, query.trim());
                 } catch (error) {
+                    console.error('API Error:', error); // 调试日志
                     searchProducts(query.trim()); // 降级处理
                 } finally {
                     if (searchBtn) {
