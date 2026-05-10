@@ -1446,9 +1446,7 @@
             }
             
             function handleApiResponse(data, query) {
-                const isStatusMessage = data.message && 
-                    (data.message.includes('Service Online') || data.message.includes('Service is online') || data.message.includes('Please send a query'));
-                
+                // Check if we actually received an AI response
                 if (data.response && data.response.trim()) {
                     removeAiBox();
                     document.getElementById('result-cards-container').innerHTML = '';
@@ -1470,13 +1468,9 @@
                     }
                     createAiBox(data.response, sourcesHtml);
                     searchProducts(query);
-                } else if (data.message && data.message.trim() && !isStatusMessage) {
-                    removeAiBox();
-                    document.getElementById('result-cards-container').innerHTML = '';
-                    document.getElementById('cases-container').innerHTML = '';
-                    createAiBox(data.message, '');
-                    searchProducts(query);
                 } else {
+                    // If no AI response is found, just do a local search
+                    removeAiBox();
                     searchProducts(query);
                 }
             }
