@@ -1721,6 +1721,109 @@
         }
 
         /**
+         * Call AI Assistant
+         */
+        async function callAiAssistant(query) {
+            console.log('callAiAssistant called with query:', query);
+            if (!query.trim()) {
+                console.log('Query is empty, returning');
+                return;
+            }
+            
+            // 设置超时
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
+            
+            try {
+                const requestBody = JSON.stringify({ 
+                    query: query.trim(),
+                    language: AppState.currentLanguage 
+                });
+                console.log('Sending request:', requestBody); // 调试日志
+                
+                // 更新按钮状态
+                updateAiButtonState(true);
+                
+                console.log('Fetching from:', 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run');
+                const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: requestBody,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                console.log('Response status:', response.status); // 调试日志
+                const data = await response.json();
+                console.log('API Response:', data); // 调试日志
+                handleAiResponse(data);
+            } catch (error) {
+                clearTimeout(timeoutId);
+                console.error('API Error:', error); // 调试日志
+                // 显示错误信息
+                removeAiBox();
+                createAiBox(t('aiError'), '');
+                updateAiButtonState(false);
+            }
+        }
+        
+        /**
+         * Update AI button state
+         */
+        function updateAiButtonState(isLoading) {
+            const aiBtn = document.getElementById('ai-assistant-btn');
+            if (aiBtn) {
+                if (isLoading) {
+                    aiBtn.disabled = true;
+                    aiBtn.innerHTML = '⏳ ' + t('searching');
+                } else {
+                    aiBtn.disabled = false;
+                    aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
+                }
+            }
+        }
+        
+        /**
+         * Handle AI response
+         */
+        function handleAiResponse(data) {
+            // 更新AI按钮状态
+            updateAiButtonState(false);
+            
+            // 检查是否收到响应
+            if (data.response && data.response.trim()) {
+                removeAiBox();
+                createAiBox(data.response, '');
+            } else {
+                // 如果没有响应，显示错误信息
+                removeAiBox();
+                createAiBox(t('aiError'), '');
+            }
+        }
+        
+        /**
+         * Remove AI box
+         */
+        function removeAiBox() {
+            const existingAiBox = document.querySelector('.ai-assistant-box');
+            if (existingAiBox) existingAiBox.remove();
+        }
+        
+        /**
+         * Create AI box
+         */
+        function createAiBox(content, sourcesHtml) {
+            const aiBox = document.createElement('div');
+            aiBox.className = 'ai-assistant-box';
+            aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
+            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">${t('aiAssistant')}</h3>
+                               <p>${escapeHtml(content)}</p>${sourcesHtml}`;
+            const resultSummary = document.querySelector('.result-summary');
+            if(resultSummary && resultSummary.nextSibling) {
+                document.getElementById('result-view').insertBefore(aiBox, resultSummary.nextSibling);
+            }
+        }
+
+        /**
          * Set current direction
          */
         function setDirection(direction) {
@@ -1793,94 +1896,6 @@
             if (langEnBtn) langEnBtn.addEventListener('click', () => setLanguage('en'));
             const langZhBtn = document.getElementById('lang-zh');
             if (langZhBtn) langZhBtn.addEventListener('click', () => setLanguage('zh'));
-
-            async function callAiAssistant(query) {
-                console.log('callAiAssistant called with query:', query);
-                if (!query.trim()) {
-                    console.log('Query is empty, returning');
-                    return;
-                }
-                
-                // 设置超时
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
-                
-                try {
-                    const requestBody = JSON.stringify({ 
-                        query: query.trim(),
-                        language: AppState.currentLanguage 
-                    });
-                    console.log('Sending request:', requestBody); // 调试日志
-                    
-                    // 更新按钮状态
-                    updateAiButtonState(true);
-                    
-                    console.log('Fetching from:', 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run');
-                    const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: requestBody,
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-                    console.log('Response status:', response.status); // 调试日志
-                    const data = await response.json();
-                    console.log('API Response:', data); // 调试日志
-                    handleAiResponse(data);
-                } catch (error) {
-                    clearTimeout(timeoutId);
-                    console.error('API Error:', error); // 调试日志
-                    // 显示错误信息
-                    removeAiBox();
-                    createAiBox(t('aiError'), '');
-                    updateAiButtonState(false);
-                }
-            }
-            
-            function updateAiButtonState(isLoading) {
-                const aiBtn = document.getElementById('ai-assistant-btn');
-                if (aiBtn) {
-                    if (isLoading) {
-                        aiBtn.disabled = true;
-                        aiBtn.innerHTML = '⏳ ' + t('searching');
-                    } else {
-                        aiBtn.disabled = false;
-                        aiBtn.innerHTML = '🤖 ' + t('askAiAssistant');
-                    }
-                }
-            }
-            
-            function handleAiResponse(data) {
-                // 更新AI按钮状态
-                updateAiButtonState(false);
-                
-                // 检查是否收到响应
-                if (data.response && data.response.trim()) {
-                    removeAiBox();
-                    createAiBox(data.response, '');
-                } else {
-                    // 如果没有响应，显示错误信息
-                    removeAiBox();
-                    createAiBox(t('aiError'), '');
-                }
-            }
-            
-            function removeAiBox() {
-                const existingAiBox = document.querySelector('.ai-assistant-box');
-                if (existingAiBox) existingAiBox.remove();
-            }
-            
-            function createAiBox(content, sourcesHtml) {
-                const aiBox = document.createElement('div');
-                aiBox.className = 'ai-assistant-box';
-                aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">${t('aiAssistant')}</h3>
-                                   <p>${escapeHtml(content)}</p>${sourcesHtml}`;
-                const resultSummary = document.querySelector('.result-summary');
-                if(resultSummary && resultSummary.nextSibling) {
-                    document.getElementById('result-view').insertBefore(aiBox, resultSummary.nextSibling);
-                }
-            }
 
             const searchBtn = document.getElementById('search-btn');
             if (searchBtn) {
