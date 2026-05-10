@@ -250,17 +250,20 @@ exports.handler = async (event) => {
 
     // 检查查询是否在允许的搜索范围内
     const isInRange = checkSearchRange(query);
-    if (!isInRange) {
-        return { 
-            statusCode: 200, 
-            headers, 
-            body: JSON.stringify({ 
-                response: langConfig.outOfRange,
-                sources: [],
-                outOfRange: true
-            }) 
-        };
-    }
+    console.log('isInRange:', isInRange, 'query:', query);
+    
+    // 临时：暂时禁用范围检查，让所有查询都通过
+    // if (!isInRange) {
+    //     return { 
+    //         statusCode: 200, 
+    //         headers, 
+    //         body: JSON.stringify({ 
+    //             response: langConfig.outOfRange,
+    //             sources: [],
+    //             outOfRange: true
+    //         }) 
+    //     };
+    // }
 
     // 调用 DeepSeek API
     try {
