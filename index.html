@@ -921,7 +921,15 @@
 
         // === Global direction setting ===
         window.currentDirection = 'export';
-
+        
+        // === XSS防护：转义HTML特殊字符 ===
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
         /**
          * Load JSON data from a file
          */
@@ -978,7 +986,9 @@
             if (!bar || !window.appData.updates || window.appData.updates.length === 0) return;
 
             const latest = window.appData.updates[0];
-            bar.innerHTML = `<span>Latest Update: ${latest.date} - ${latest.text}</span>`;
+            const safeDate = escapeHtml(latest.date);
+            const safeText = escapeHtml(latest.text);
+            bar.innerHTML = `<span>Latest Update: ${safeDate} - ${safeText}</span>`;
         }
 
         /**
@@ -1491,14 +1501,6 @@
                 } else {
                     searchProducts(query);
                 }
-            }
-            
-            // XSS防护：转义HTML特殊字符
-            function escapeHtml(text) {
-                if (!text) return '';
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
             }
             
             // 移除AI框
