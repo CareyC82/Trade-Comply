@@ -113,6 +113,23 @@ function checkSearchRange(query) {
     return false;
 }
 
+// 多语言配置
+const messages = {
+    en: {
+        outOfRange: "Your query is outside the scope of this website's trade compliance information search.\n\nThis website mainly provides trade compliance information for the following categories:\n• Electronics (mobile phones, computers, headphones, etc.) CCC certification\n• Wireless communication devices (Bluetooth, WiFi, drones, etc.) SRRC certification\n• Battery safety and transportation regulations\n• Solar product import/export compliance\n• Industrial robot compliance requirements\n• Energy storage system safety standards\n• Export controls and dual-use items\n• VAT refund policies\n\nIf you have other needs or specific product compliance questions, please leave a message with details about the product.",
+        systemPrompt: "You are a professional English-Chinese trade compliance expert. Reply in English."
+    },
+    zh: {
+        outOfRange: "您的查询不在本网站的贸易合规信息搜索范围内。\n\n本网站主要提供以下类别的贸易合规信息：\n• 电子产品（手机、电脑、耳机等）CCC认证\n• 无线通信设备（蓝牙、WiFi、无人机等）SRRC认证\n• 电池安全与运输规定\n• 太阳能产品进出口合规\n• 工业机器人合规要求\n• 储能系统安全标准\n• 出口管制与两用物项\n• 增值税退税政策\n\n如果您有其他需求或特定产品的合规问题，请留言说明具体产品信息。",
+        systemPrompt: "You are a professional Chinese trade compliance expert. Reply in Chinese."
+    }
+};
+
+// 获取语言配置
+function getLangConfig(language) {
+    return messages[language] || messages.en;
+}
+
 exports.handler = async (event) => {
     const headers = {
         "Content-Type": "application/json",
@@ -220,7 +237,12 @@ exports.handler = async (event) => {
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
+    const language = typeof body.language === 'string' ? body.language.trim().toLowerCase() : 'en';
     console.log('Final query:', query || '(empty)');
+    console.log('Language:', language);
+
+    // 获取语言配置
+    const langConfig = getLangConfig(language);
 
     // 空查询
     if (!query) {
@@ -239,7 +261,7 @@ exports.handler = async (event) => {
             statusCode: 200, 
             headers, 
             body: JSON.stringify({ 
-                response: "您的查询不在本网站的贸易合规信息搜索范围内。\n\n本网站主要提供以下类别的贸易合规信息：\n• 电子产品（手机、电脑、耳机等）CCC认证\n• 无线通信设备（蓝牙、WiFi、无人机等）SRRC认证\n• 电池安全与运输规定\n• 太阳能产品进出口合规\n• 工业机器人合规要求\n• 储能系统安全标准\n• 出口管制与两用物项\n• 增值税退税政策\n\n如果您有其他需求或特定产品的合规问题，请留言说明具体产品信息。",
+                response: langConfig.outOfRange,
                 sources: [],
                 outOfRange: true
             }) 
@@ -260,7 +282,7 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 model: "deepseek-chat",
                 messages: [
-                    { role: "system", content: "You are a Chinese trade compliance expert. Reply in the same language as the user query." },
+                    { role: "system", content: langConfig.systemPrompt },
                     { role: "user", content: query }
                 ]
             }),
