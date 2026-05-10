@@ -25,6 +25,37 @@
             --color-danger-text: #DC2626;
         }
 
+        /* Language Toggle */
+        .language-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 4px;
+            background: white;
+            border-radius: 20px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+            background: transparent;
+        }
+
+        .lang-btn.active {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
         /* Base Styles */
         * {
             margin: 0;
@@ -789,10 +820,15 @@
     </style>
 </head>
 <body>
+    <div class="language-toggle">
+        <button id="lang-en" class="lang-btn active">EN</button>
+        <button id="lang-zh" class="lang-btn">中文</button>
+    </div>
+
     <div id="home-view" class="view-container active">
         <div class="home-header">
-            <h1 class="home-title">Trade Comply</h1>
-            <p class="home-subtitle">Understand China's trade rules. Facts only.</p>
+            <h1 class="home-title" data-lang-key="title">Trade Comply</h1>
+            <p class="home-subtitle" data-lang-key="subtitle">Understand China's trade rules. Facts only.</p>
         </div>
 
         <div class="direction-toggle">
@@ -904,6 +940,98 @@
     </div>
 
     <script>
+        // === 多语言翻译数据 ===
+        const translations = {
+            en: {
+                title: "Trade Comply",
+                subtitle: "Understand China's trade rules. Facts only.",
+                export: "Export from China",
+                import: "Import into China",
+                searchPlaceholder: "Enter product name or HS Code",
+                searchBtn: "GO",
+                latestUpdate: "Latest Update:",
+                disclaimer: "This tool provides official regulatory citations only. Not legal advice.",
+                viewCases: "View Case Library",
+                feedback: "💬 Can't find your product? Tell us",
+                home: "🏠 Home",
+                knowledgeBase: "📚 Knowledge Base",
+                categories: "📋 Categories",
+                back: "< Back",
+                backArrow: "← Back",
+                warningBanner: "The following are official regulatory citations only. NOT compliance advice.",
+                foundRegulations: "Found",
+                regulationsFor: "regulations for",
+                relatedCases: "Related Penalty Cases",
+                helpImprove: "Help Us Improve",
+                feedbackMessage: "Have a product or HS Code you needed that isn't covered? Share it below and we'll research it.",
+                productPlaceholder: "e.g. smart ring, 8517.62",
+                feedbackProduct: "Product or HS Code you searched",
+                feedbackRegulation: "What regulation were you looking for?",
+                feedbackEmail: "Your email (optional, for follow-up)",
+                cancel: "Cancel",
+                sendFeedback: "Send Feedback",
+                thanksFeedback: "✅ Thanks for your feedback! We'll review it and update the database.",
+                searchResults: "Search Results",
+                noResults: "No compliance requirements found for this product.",
+                aiAssistant: "🤖 AI Assistant",
+                source: "Source:",
+                referenceSources: "Reference Sources:",
+                searching: "Searching...",
+                aiSearch: "AI Search:",
+                allCases: "All Cases",
+                allProducts: "All Products",
+                categoriesTitle: "Product Categories",
+                categoriesSummary: "📋 <strong>{total}</strong> categories across <strong>{groups}</strong> groups. Tap any category to search instantly.",
+                kbSearchPlaceholder: "Search regulations...",
+                exportTitle: "Export from China",
+                importTitle: "Import into China"
+            },
+            zh: {
+                title: "贸易合规助手",
+                subtitle: "了解中国贸易法规，只提供事实依据",
+                export: "从中国出口",
+                import: "进口到中国",
+                searchPlaceholder: "输入产品名称或HS编码",
+                searchBtn: "搜索",
+                latestUpdate: "最新更新：",
+                disclaimer: "本工具仅提供官方法规引用，不构成法律建议。",
+                viewCases: "查看案例库",
+                feedback: "💬 找不到您的产品？告诉我们",
+                home: "🏠 首页",
+                knowledgeBase: "📚 知识库",
+                categories: "📋 产品分类",
+                back: "< 返回",
+                backArrow: "← 返回",
+                warningBanner: "以下仅为官方法规引用，不构成合规建议。",
+                foundRegulations: "找到",
+                regulationsFor: "项法规适用于",
+                relatedCases: "相关处罚案例",
+                helpImprove: "帮助我们改进",
+                feedbackMessage: "您需要的产品或HS编码未被覆盖？请在下方分享，我们会进行研究。",
+                productPlaceholder: "例如：智能戒指, 8517.62",
+                feedbackProduct: "您搜索的产品或HS编码",
+                feedbackRegulation: "您在寻找什么法规？",
+                feedbackEmail: "您的邮箱（可选，用于跟进）",
+                cancel: "取消",
+                sendFeedback: "发送反馈",
+                thanksFeedback: "✅ 感谢您的反馈！我们会审核并更新数据库。",
+                searchResults: "搜索结果",
+                noResults: "未找到该产品的合规要求。",
+                aiAssistant: "🤖 AI助手",
+                source: "来源：",
+                referenceSources: "参考来源：",
+                searching: "搜索中...",
+                aiSearch: "AI搜索：",
+                allCases: "所有案例",
+                allProducts: "全部产品",
+                categoriesTitle: "产品分类",
+                categoriesSummary: "📋 <strong>{total}</strong> 个分类，共 <strong>{groups}</strong> 个组别。点击任意分类即可搜索。",
+                kbSearchPlaceholder: "搜索法规...",
+                exportTitle: "从中国出口",
+                importTitle: "进口到中国"
+            }
+        };
+
         // === 避免污染全局变量，放入统一命名空间 ===
         const AppState = {
             data: {
@@ -914,9 +1042,143 @@
                 categories: [],
                 updates: []
             },
-            currentDirection: 'export'
+            currentDirection: 'export',
+            currentLanguage: 'en'
         };
         
+        // === 翻译函数 ===
+        function t(key, params = {}) {
+            const lang = AppState.currentLanguage || 'en';
+            const translation = translations[lang] && translations[lang][key] 
+                ? translations[lang][key] 
+                : translations.en[key];
+            if (!translation) return key;
+            
+            // 替换参数 {param}
+            let result = translation;
+            for (const [paramKey, paramValue] of Object.entries(params)) {
+                result = result.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), paramValue);
+            }
+            return result;
+        }
+
+        // === 设置语言 ===
+        function setLanguage(lang) {
+            AppState.currentLanguage = lang;
+            
+            // 更新语言按钮状态
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.getElementById('lang-zh').classList.toggle('active', lang === 'zh');
+            
+            // 更新页面文本
+            updatePageText();
+        }
+
+        // === 更新页面文本 ===
+        function updatePageText() {
+            // 更新标题和副标题
+            updateElementText('home-title', t('title'));
+            updateElementText('home-subtitle', t('subtitle'));
+            
+            // 更新方向切换按钮
+            updateElementText('direction-export', t('export'));
+            updateElementText('direction-import', t('import'));
+            
+            // 更新搜索框和按钮
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.placeholder = t('searchPlaceholder');
+            
+            const searchBtn = document.getElementById('search-btn');
+            if (searchBtn) searchBtn.innerHTML = t('searchBtn');
+            
+            // 更新免责声明
+            const disclaimer = document.querySelector('.disclaimer-bar span');
+            if (disclaimer) disclaimer.textContent = t('disclaimer');
+            
+            // 更新案例库按钮
+            updateElementText('view-cases-btn', t('viewCases'));
+            
+            // 更新反馈链接
+            updateElementText('feedback-trigger', t('feedback'));
+            
+            // 更新导航按钮
+            updateElementText('nav-home', t('home'));
+            updateElementText('nav-kb', t('knowledgeBase'));
+            updateElementText('nav-categories', t('categories'));
+            
+            // 更新返回按钮
+            const backBtns = document.querySelectorAll('.back-btn');
+            backBtns.forEach(btn => {
+                if (btn.id === 'back-to-home-from-cat') {
+                    btn.innerHTML = t('backArrow');
+                } else {
+                    btn.innerHTML = t('back');
+                }
+            });
+            
+            // 更新警告横幅
+            const warningBanner = document.querySelector('.warning-banner p');
+            if (warningBanner) warningBanner.textContent = t('warningBanner');
+            
+            // 更新分类页面标题
+            const catTitle = document.querySelector('#categories-view h2');
+            if (catTitle) catTitle.textContent = t('categoriesTitle');
+            
+            // 更新分类页面摘要
+            updateCategoriesSummary();
+            
+            // 更新知识库搜索框
+            const kbSearch = document.getElementById('kb-search-input');
+            if (kbSearch) kbSearch.placeholder = t('kbSearchPlaceholder');
+            
+            // 更新反馈弹窗
+            updateElementText('feedback-thanks', t('thanksFeedback'));
+            const feedbackH3 = document.querySelector('.modal-box h3');
+            if (feedbackH3) feedbackH3.textContent = t('helpImprove');
+            const feedbackP = document.querySelector('.modal-box p');
+            if (feedbackP) feedbackP.textContent = t('feedbackMessage');
+            
+            const fbProductLabel = document.querySelector('label[for="fb-product"]');
+            if (fbProductLabel) fbProductLabel.textContent = t('feedbackProduct');
+            const fbMessageLabel = document.querySelector('label[for="fb-message"]');
+            if (fbMessageLabel) fbMessageLabel.textContent = t('feedbackRegulation');
+            const fbEmailLabel = document.querySelector('label[for="fb-email"]');
+            if (fbEmailLabel) fbEmailLabel.textContent = t('feedbackEmail');
+            
+            const modalCancel = document.getElementById('modal-cancel');
+            if (modalCancel) modalCancel.textContent = t('cancel');
+            const modalSubmit = document.querySelector('.modal-submit');
+            if (modalSubmit) modalSubmit.textContent = t('sendFeedback');
+            
+            // 更新输入框占位符
+            const fbProductInput = document.getElementById('fb-product');
+            if (fbProductInput) fbProductInput.placeholder = t('productPlaceholder');
+            const fbMessageTextarea = document.getElementById('fb-message');
+            if (fbMessageTextarea) fbMessageTextarea.placeholder = t('feedbackRegulation');
+            const fbEmailInput = document.getElementById('fb-email');
+            if (fbEmailInput) fbEmailInput.placeholder = 'you@company.com';
+        }
+
+        // === 更新元素文本 ===
+        function updateElementText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        // === 更新分类页面摘要 ===
+        function updateCategoriesSummary() {
+            const summaryEl = document.getElementById('categories-summary');
+            if (!summaryEl || !AppState.data.categories) return;
+            
+            const totalGroups = AppState.data.categories.length;
+            let totalItems = 0;
+            AppState.data.categories.forEach(group => {
+                totalItems += group.items.length;
+            });
+            
+            summaryEl.innerHTML = t('categoriesSummary', { total: totalItems, groups: totalGroups });
+        }
+
         // === XSS防护：转义HTML特殊字符 ===
         function escapeHtml(text) {
             if (text === null || text === undefined) return '';
@@ -1257,7 +1519,7 @@
         function searchProducts(query) {
             const trimmedQuery = query ? query.trim() : '';
             const results = search(trimmedQuery);
-            renderResults(trimmedQuery || 'All Products', results.tags, results.cases);
+            renderResults(trimmedQuery || t('allProducts'), results.tags, results.cases);
         }
 
         /**
@@ -1266,11 +1528,11 @@
         function renderResults(query, tags, cases) {
             showView('result');
 
-            const directionText = AppState.currentDirection === 'export' ? 'Export from China' : 'Import into China';
+            const directionText = AppState.currentDirection === 'export' ? t('exportTitle') : t('importTitle');
             const resultSummary = document.querySelector('.result-summary p');
             if (resultSummary) {
                 // XSS 修复：过滤查询词
-                resultSummary.innerHTML = `${directionText}: Found <span id="result-count">${tags.length}</span> regulations for '<span id="search-term">${escapeHtml(query)}</span>'`;
+                resultSummary.innerHTML = `${directionText}: ${t('foundRegulations')} <span id="result-count">${tags.length}</span> ${t('regulationsFor')} '<span id="search-term">${escapeHtml(query)}</span>'`;
             }
 
             const cardsContainer = document.getElementById('result-cards-container');
@@ -1278,7 +1540,7 @@
             cardsContainer.innerHTML = '';
 
             if (tags.length === 0) {
-                cardsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No compliance requirements found for this product.</p>';
+                cardsContainer.innerHTML = `<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">${t('noResults')}</p>`;
             } else {
                 const groupedTags = tags.reduce((acc, tag) => {
                     if (!acc[tag.category]) {
@@ -1326,13 +1588,13 @@
                 casesContainer.innerHTML = '';
             } else {
                 casesContainer.innerHTML = `
-                    <div class="cases-header">Related Penalty Cases</div>
+                    <div class="cases-header">${t('relatedCases')}</div>
                     ${cases.map(caseItem => `
                         <div class="case-card">
                             <div class="case-title">${escapeHtml(caseItem.title)}</div>
                             <div class="case-date">${escapeHtml(caseItem.date)}</div>
                             <div class="case-summary">${escapeHtml(caseItem.summary)}</div>
-                            <a href="${sanitizeUrl(caseItem.source_url)}" target="_blank" class="case-link">Source: ${escapeHtml(caseItem.source_url)}</a>
+                            <a href="${sanitizeUrl(caseItem.source_url)}" target="_blank" class="case-link">${t('source')} ${escapeHtml(caseItem.source_url)}</a>
                         </div>
                     `).join('')}
                 `;
@@ -1400,13 +1662,19 @@
             const importBtn = document.getElementById('direction-import');
             if (importBtn) importBtn.addEventListener('click', () => setDirection('import'));
 
+            // Language toggle
+            const langEnBtn = document.getElementById('lang-en');
+            if (langEnBtn) langEnBtn.addEventListener('click', () => setLanguage('en'));
+            const langZhBtn = document.getElementById('lang-zh');
+            if (langZhBtn) langZhBtn.addEventListener('click', () => setLanguage('zh'));
+
             async function performSearch(query) {
                 if (!query.trim()) return;
                 
                 showView('result');
                 const resultSummary = document.querySelector('.result-summary p');
                 if (resultSummary) {
-                    resultSummary.innerHTML = `AI Search: '<span id="search-term">${escapeHtml(query.trim())}</span>'`;
+                    resultSummary.innerHTML = `${t('aiSearch')} '<span id="search-term">${escapeHtml(query.trim())}</span>'`;
                 }
                 
                 const searchBtn = document.getElementById('search-btn');
@@ -1415,14 +1683,14 @@
                 
                 if (searchBtn) {
                     searchBtn.disabled = true;
-                    searchBtn.innerHTML = '⏳ Searching...';
+                    searchBtn.innerHTML = '⏳ ' + t('searching');
                 }
                 if (searchInput) searchInput.disabled = true;
                 
                 removeAiBox();
                 document.getElementById('result-cards-container').innerHTML = `<div style="text-align: center; padding: 40px; color: #666;">
                     <div style="font-size: 24px; margin-bottom: 10px;">🔍</div>
-                    <div>Searching...</div>
+                    <div>${t('searching')}</div>
                 </div>`;
                 document.getElementById('cases-container').innerHTML = '';
                 
@@ -1460,7 +1728,7 @@
                     let sourcesHtml = '';
                     if (data.sources && data.sources.length > 0) {
                         sourcesHtml = `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                            <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">参考来源:</h4>
+                            <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">${t('referenceSources')}</h4>
                             <ul style="margin: 0; padding-left: 20px;">`;
                         data.sources.forEach(source => {
                             const safeUrl = sanitizeUrl(source.url);
@@ -1489,7 +1757,7 @@
                 const aiBox = document.createElement('div');
                 aiBox.className = 'ai-assistant-box';
                 aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
+                aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">${t('aiAssistant')}</h3>
                                    <p>${escapeHtml(content)}</p>${sourcesHtml}`;
                 const resultSummary = document.querySelector('.result-summary');
                 if(resultSummary && resultSummary.nextSibling) {
@@ -1532,7 +1800,7 @@
                 viewCasesBtn.addEventListener('click', () => {
                     document.getElementById('search-input').value = '';
                     const results = search('');
-                    renderResults('All Cases', [], results.cases);
+                    renderResults(t('allCases'), [], results.cases);
                 });
             }
 
@@ -1591,6 +1859,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await initData();
             bindEvents();
+            // 初始化页面文本
+            updatePageText();
         });
     </script>
 </body>
