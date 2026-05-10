@@ -1499,8 +1499,10 @@
                             <h4 style="color: #666; font-size: 14px; margin-bottom: 8px;">参考来源:</h4>
                             <ul style="margin: 0; padding-left: 20px;">`;
                         data.sources.forEach(source => {
+                            const safeUrl = escapeHtml(source.url);
+                            const safeTitle = escapeHtml(source.title || source.url);
                             sourcesHtml += `<li style="margin-bottom: 4px;">
-                                <a href="${source.url}" target="_blank" style="color: var(--color-primary); text-decoration: none;">${source.title || source.url}</a>
+                                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); text-decoration: none;">${safeTitle}</a>
                             </li>`;
                         });
                         sourcesHtml += `</ul></div>`;
@@ -1518,6 +1520,14 @@
                 }
             }
             
+            // XSS防护：转义HTML特殊字符
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
             // 移除AI框
             function removeAiBox() {
                 const existingAiBox = document.querySelector('.ai-assistant-box');
@@ -1530,7 +1540,7 @@
                 aiBox.className = 'ai-assistant-box';
                 aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
                 aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">🤖 AI Assistant</h3>
-                                   <p>${content}</p>${sourcesHtml}`;
+                                   <p>${escapeHtml(content)}</p>${sourcesHtml}`;
                 document.getElementById('result-view').insertBefore(aiBox, document.querySelector('.result-summary').nextSibling);
             }
 
