@@ -1082,6 +1082,12 @@
                 const results = search(currentQuery);
                 renderResults(currentQuery || t('allProducts'), results.tags, results.cases);
             }
+            
+            // 如果当前在分类页面，刷新分类
+            const categoriesContainer = document.getElementById('categories-container');
+            if (categoriesContainer && categoriesContainer.style.display !== 'none') {
+                renderCategories();
+            }
         }
 
         // === 更新页面文本 ===
@@ -1236,7 +1242,7 @@
             
             // 使用独立 Catch 提高容错性
             try {
-                const [tagsEn, casesEn, quickActions, kb, categories, updates, tagsZh, casesZh] = await Promise.all([
+                const [tagsEn, casesEn, quickActions, kb, categoriesEn, updates, tagsZh, casesZh, categoriesZh] = await Promise.all([
                     fetchJsonSafe('data/tags.json', []),
                     fetchJsonSafe('data/cases.json', []),
                     fetchJsonSafe('data/quick-actions.json', []),
@@ -1244,7 +1250,8 @@
                     fetchJsonSafe('data/categories.json', []),
                     fetchJsonSafe('data/updates.json', []),
                     fetchJsonSafe('data/tags_zh.json', []),
-                    fetchJsonSafe('data/cases_zh.json', [])
+                    fetchJsonSafe('data/cases_zh.json', []),
+                    fetchJsonSafe('data/categories_zh.json', [])
                 ]);
 
                 AppState.data = { 
@@ -1252,9 +1259,10 @@
                     cases: casesEn, 
                     tagsZh: tagsZh,
                     casesZh: casesZh,
+                    categories: categoriesEn,
+                    categoriesZh: categoriesZh,
                     quickActions, 
                     knowledgeBase: kb, 
-                    categories, 
                     updates 
                 };
                 
@@ -1370,24 +1378,33 @@
          */
         function renderCategories() {
             const container = document.getElementById('categories-container');
-            if (!container || !AppState.data.categories) return;
+            if (!container) return;
+
+            const lang = AppState.currentLanguage || 'en';
+            const categories = lang === 'zh' ? AppState.data.categoriesZh : AppState.data.categories;
+            
+            if (!categories) return;
 
             container.innerHTML = '';
             
-            const totalGroups = AppState.data.categories.length;
+            const totalGroups = categories.length;
             let totalItems = 0;
-            AppState.data.categories.forEach(group => {
+            categories.forEach(group => {
                 totalItems += group.items.length;
             });
 
             const summaryEl = document.getElementById('categories-summary');
             if (summaryEl) {
-                summaryEl.innerHTML = `📋 <strong>${totalItems}</strong> categories across <strong>${totalGroups}</strong> groups. Tap any category to search instantly.`;
+                if (lang === 'zh') {
+                    summaryEl.innerHTML = `📋 <strong>${totalItems}</strong> 个产品类别，分为 <strong>${totalGroups}</strong> 组。点击任意类别即可搜索。`;
+                } else {
+                    summaryEl.innerHTML = `📋 <strong>${totalItems}</strong> categories across <strong>${totalGroups}</strong> groups. Tap any category to search instantly.`;
+                }
             }
 
             const fragment = document.createDocumentFragment();
 
-            AppState.data.categories.forEach(group => {
+            categories.forEach(group => {
                 const groupEl = document.createElement('div');
                 groupEl.className = 'category-group';
                 
