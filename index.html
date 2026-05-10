@@ -1464,11 +1464,13 @@
                         sourcesHtml += `</ul></div>`;
                     }
                     createAiBox(data.response, sourcesHtml);
+                    searchProducts(query);
                 } else if (data.message && data.message.trim() && !isStatusMessage) {
                     removeAiBox();
                     document.getElementById('result-cards-container').innerHTML = '';
                     document.getElementById('cases-container').innerHTML = '';
                     createAiBox(data.message, '');
+                    searchProducts(query);
                 } else {
                     searchProducts(query);
                 }
