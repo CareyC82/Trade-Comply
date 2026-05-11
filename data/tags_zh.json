@@ -23,16 +23,7 @@
       "headphones",
       "audio",
       "video player",
-      "amplifier",
-      "tws earbuds",
-      "真无线耳机",
-      "蓝牙耳机",
-      "智能音箱",
-      "音响",
-      "音箱",
-      "earphones",
-      "audio player",
-      "音频播放器"
+      "amplifier"
     ],
     "display_order": 1,
     "direction": "both",
@@ -65,16 +56,7 @@
       "server",
       "router",
       "switch",
-      "monitor",
-      "desktop computer",
-      "台式机",
-      "台式电脑",
-      "服务器",
-      "显示器",
-      "keyboard",
-      "mouse",
-      "键盘",
-      "鼠标"
+      "monitor"
     ],
     "display_order": 1,
     "direction": "both",
@@ -114,6 +96,174 @@
     "display_order": 2,
     "direction": "both",
     "related_cases": []
+  },
+  {
+    "tag_id": "CL-SRRC-001",
+    "category": "COMPULSORY_CERT",
+    "category_label": "强制性认证",
+    "tag_type": "MATCHED",
+    "short_name": "[SRRC]",
+    "short_description": "需要无线电发射设备型号核准",
+    "description": "具有无线通信功能的产品需要获得国家无线电管理机构颁发的型号核准证。",
+    "source_citation": "中华人民共和国无线电管理条例",
+    "source_url": "https://www.srrc.org.cn/",
+    "effective_date": "2016-12-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [],
+    "related_keywords": [
+      "wifi",
+      "bluetooth",
+      "wireless",
+      "radio",
+      "zigbee",
+      "nfc",
+      "rfid",
+      "smart speaker",
+      "earbuds",
+      "wireless headphones",
+      "drone",
+      "ip camera",
+      "smartphone"
+    ],
+    "display_order": 2,
+    "direction": "both",
+    "related_cases": [
+      "CASE-011",
+      "CASE-014",
+      "CASE-022"
+    ]
+  },
+  {
+    "tag_id": "CL-ENCR-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "出口管制",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[Encryption]",
+    "short_description": "检查加密产品出口许可",
+    "description": "含有加密功能的产品可能属于中国密码产品出口管制范围。请核实具体产品规格。",
+    "source_citation": "商用密码管理条例",
+    "source_url": "https://www.sca.gov.cn/",
+    "effective_date": "2023-07-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [],
+    "related_keywords": [
+      "encryption",
+      "encrypted",
+      "crypto",
+      "security",
+      "password",
+      "vpn",
+      "smartphone",
+      "router",
+      "ip camera",
+      "laptop"
+    ],
+    "display_order": 4,
+    "direction": "export",
+    "related_cases": [
+      "CASE-002",
+      "CASE-007",
+      "CASE-017",
+      "CASE-027"
+    ]
+  },
+  {
+    "tag_id": "CL-DU-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "出口管制",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[两用物项]",
+    "short_description": "检查两用物项管制清单",
+    "description": "某些无人机、摄像头和特定性能的传感器可能属于中国两用物项出口管制清单。请对照清单中的完整技术规格进行核实。",
+    "source_citation": "商务部、海关总署等关于两用物项出口管制清单的公告，自2024年12月1日起生效",
+    "source_url": "https://www.mofcom.gov.cn/",
+    "effective_date": "2024-12-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8525.80",
+      "8525.89",
+      "8806",
+      "8807"
+    ],
+    "related_keywords": [
+      "drone",
+      "uav",
+      "camera",
+      "sensor",
+      "infrared",
+      "night vision",
+      "thermal camera"
+    ],
+    "display_order": 5,
+    "direction": "export",
+    "related_cases": [
+      "CASE-002",
+      "CASE-004",
+      "CASE-020"
+    ]
+  },
+  {
+    "tag_id": "CL-DU-002",
+    "category": "EXPORT_CTRL",
+    "category_label": "出口管制",
+    "tag_type": "MATCHED",
+    "short_name": "[两用物项-无人机]",
+    "short_description": "适用无人机临时出口管制",
+    "description": "某些无人机（UAV）及相关设备受临时出口管制。如果已知无人机用于军事目的，无论规格如何，均禁止出口。",
+    "source_citation": "商务部关于无人机临时出口管制的公告（2023年、2024年）",
+    "source_url": "https://www.mofcom.gov.cn/",
+    "effective_date": "2023-09-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8525.80",
+      "8806"
+    ],
+    "related_keywords": [
+      "drone",
+      "uav",
+      "quadcopter",
+      "unmanned aerial",
+      "multi-rotor"
+    ],
+    "display_order": 6,
+    "direction": "export",
+    "related_cases": [
+      "CASE-004"
+    ]
+  },
+  {
+    "tag_id": "CL-BATT-001",
+    "category": "OTHER",
+    "category_label": "其他要求",
+    "tag_type": "MATCHED",
+    "short_name": "[电池安全]",
+    "short_description": "适用锂电池运输规定",
+    "description": "随产品运输的锂电池必须符合中国危险品运输规定，包括UN38.3测试和\"一书一签\"要求。",
+    "source_citation": "中国民用航空局锂电池运输规定",
+    "source_url": "https://www.caac.gov.cn/",
+    "effective_date": "2022-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8507"
+    ],
+    "related_keywords": [
+      "battery",
+      "lithium",
+      "li-ion",
+      "power bank",
+      "charger",
+      "smartphone",
+      "laptop",
+      "drone"
+    ],
+    "display_order": 7,
+    "direction": "both",
+    "related_cases": [
+      "CASE-003",
+      "CASE-021",
+      "CASE-030",
+      "CASE-SOL02"
+    ]
   },
   {
     "tag_id": "CL-CCC-004",
@@ -175,20 +325,7 @@
       "alarm",
       "sensor",
       "home automation",
-      "smart lock",
-      "智能家居",
-      "智能插座",
-      "智能灯泡",
-      "智能门锁",
-      "智能门铃",
-      "智能传感器",
-      "烟雾报警器",
-      "smart door lock",
-      "smart doorbell",
-      "smart sensor",
-      "smoke detector alarm",
-      "smart home hub",
-      "智能家庭"
+      "smart lock"
     ],
     "display_order": 2,
     "direction": "both",
@@ -297,17 +434,7 @@
       "massager",
       "medical",
       "health device",
-      "health monitor",
-      "血压计",
-      "体温计",
-      "血氧仪",
-      "血糖仪",
-      "雾化器",
-      "按摩仪",
-      "医疗设备",
-      "健康监测设备",
-      "blood pressure",
-      "pulse oximeter"
+      "health monitor"
     ],
     "display_order": 5,
     "direction": "both",
@@ -391,8 +518,8 @@
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
     "related_hs_codes": [
-      "8523.51",
       "8471.70",
+      "8523.51",
       "8471.80"
     ],
     "related_keywords": [
@@ -424,10 +551,8 @@
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
     "related_hs_codes": [
-      "8528.52",
-      "8528.59",
-      "9004.90",
-      "8543.70"
+      "8471.60",
+      "8471.80"
     ],
     "related_keywords": [
       "keyboard",
@@ -442,497 +567,6 @@
     "display_order": 9,
     "direction": "both",
     "related_cases": []
-  },
-  {
-    "tag_id": "CL-SRRC-001",
-    "category": "COMPULSORY_CERT",
-    "category_label": "强制性认证",
-    "tag_type": "MATCHED",
-    "short_name": "[SRRC]",
-    "short_description": "需要无线电发射设备型号核准",
-    "description": "具有无线通信功能的产品需要获得国家无线电管理机构颁发的型号核准证。",
-    "source_citation": "中华人民共和国无线电管理条例",
-    "source_url": "https://www.srrc.org.cn/",
-    "effective_date": "2016-12-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8517",
-      "8525",
-      "8528"
-    ],
-    "related_keywords": [
-      "wifi",
-      "bluetooth",
-      "wireless",
-      "radio",
-      "zigbee",
-      "nfc",
-      "rfid",
-      "smart speaker",
-      "drone",
-      "ip camera",
-      "智能音箱",
-      "无人机",
-      "摄像头",
-      "action camera",
-      "运动相机",
-      "digital camera",
-      "数码相机",
-      "dash cam",
-      "行车记录仪",
-      "webcam",
-      "网络摄像头",
-      "gimbal camera",
-      "云台相机",
-      "video transmitter fpv",
-      "图传",
-      "thermal camera payload",
-      "热成像相机负载"
-    ],
-    "display_order": 2,
-    "direction": "both",
-    "related_cases": [
-      "CASE-011",
-      "CASE-014",
-      "CASE-022"
-    ]
-  },
-  {
-    "tag_id": "CL-ENCR-001",
-    "category": "EXPORT_CTRL",
-    "category_label": "出口管制",
-    "tag_type": "CHECK_REQUIRED",
-    "short_name": "[Encryption]",
-    "short_description": "检查加密产品出口许可",
-    "description": "含有加密功能的产品可能属于中国密码产品出口管制范围。请核实具体产品规格。",
-    "source_citation": "商用密码管理条例",
-    "source_url": "https://www.sca.gov.cn/",
-    "effective_date": "2023-07-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8471",
-      "8517",
-      "8525",
-      "8528"
-    ],
-    "related_keywords": [
-      "encryption",
-      "encrypted",
-      "crypto",
-      "security",
-      "password",
-      "vpn",
-      "router",
-      "smartwatch",
-      "smartphone",
-      "laptop",
-      "加密",
-      "密码",
-      "安全",
-      "智能手表",
-      "智能手机",
-      "笔记本电脑"
-    ],
-    "display_order": 4,
-    "direction": "export",
-    "related_cases": [
-      "CASE-002",
-      "CASE-007",
-      "CASE-017",
-      "CASE-027"
-    ]
-  },
-  {
-    "tag_id": "CL-DU-001",
-    "category": "EXPORT_CTRL",
-    "category_label": "出口管制",
-    "tag_type": "CHECK_REQUIRED",
-    "short_name": "[两用物项]",
-    "short_description": "检查两用物项管制清单",
-    "description": "某些无人机、摄像头和特定性能的传感器可能属于中国两用物项出口管制清单。请对照清单中的完整技术规格进行核实。",
-    "source_citation": "商务部、海关总署等关于两用物项出口管制清单的公告，自2024年12月1日起生效",
-    "source_url": "https://www.mofcom.gov.cn/",
-    "effective_date": "2024-12-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8525.80",
-      "8525.89",
-      "8806",
-      "8807"
-    ],
-    "related_keywords": [
-      "drone",
-      "uav",
-      "camera",
-      "sensor",
-      "infrared",
-      "night vision",
-      "thermal camera",
-      "无人机",
-      "摄像头",
-      "传感器",
-      "红外",
-      "夜视",
-      "热成像",
-      "drone gimbal camera",
-      "gimbal camera",
-      "云台相机",
-      "video transmitter fpv",
-      "图传",
-      "FPV",
-      "first person view",
-      "thermal camera payload",
-      "热成像负载",
-      "drone accessories",
-      "无人机配件"
-    ],
-    "display_order": 5,
-    "direction": "export",
-    "related_cases": [
-      "CASE-002",
-      "CASE-004",
-      "CASE-020"
-    ]
-  },
-  {
-    "tag_id": "CL-DU-002",
-    "category": "EXPORT_CTRL",
-    "category_label": "出口管制",
-    "tag_type": "MATCHED",
-    "short_name": "[两用物项-无人机]",
-    "short_description": "适用无人机临时出口管制",
-    "description": "某些无人机（UAV）及相关设备受临时出口管制。如果已知无人机用于军事目的，无论规格如何，均禁止出口。",
-    "source_citation": "商务部关于无人机临时出口管制的公告（2023年、2024年）",
-    "source_url": "https://www.mofcom.gov.cn/",
-    "effective_date": "2023-09-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8525.80",
-      "8806"
-    ],
-    "related_keywords": [
-      "drone",
-      "uav",
-      "quadcopter",
-      "unmanned aerial",
-      "multi-rotor"
-    ],
-    "display_order": 6,
-    "direction": "export",
-    "related_cases": [
-      "CASE-004"
-    ]
-  },
-  {
-    "tag_id": "CL-BATT-001",
-    "category": "OTHER",
-    "category_label": "其他要求",
-    "tag_type": "MATCHED",
-    "short_name": "[电池安全]",
-    "short_description": "适用锂电池运输规定",
-    "description": "随产品运输的锂电池必须符合中国危险品运输规定，包括UN38.3测试和\"一书一签\"要求。",
-    "source_citation": "中国民用航空局锂电池运输规定",
-    "source_url": "https://www.caac.gov.cn/",
-    "effective_date": "2022-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8507"
-    ],
-    "related_keywords": [
-      "battery",
-      "lithium",
-      "li-ion",
-      "power bank",
-      "charger",
-      "smartphone",
-      "laptop",
-      "drone"
-    ],
-    "display_order": 7,
-    "direction": "both",
-    "related_cases": [
-      "CASE-003",
-      "CASE-021",
-      "CASE-030",
-      "CASE-SOL02"
-    ]
-  },
-  {
-    "tag_id": "CL-BATT-002",
-    "category": "OTHER",
-    "category_label": "其他要求",
-    "tag_type": "CHECK_REQUIRED",
-    "short_name": "[电池安全]",
-    "short_description": "检查电动交通工具电池要求",
-    "description": "电动滑板车、电动自行车等个人出行设备的电池可能需要符合额外的安全标准和认证要求。",
-    "source_citation": "电动自行车安全技术规范（GB 17761-2018）",
-    "source_url": "https://www.sac.gov.cn/",
-    "effective_date": "2019-04-15",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8711",
-      "9503"
-    ],
-    "related_keywords": [
-      "electric scooter",
-      "e-scooter",
-      "hoverboard",
-      "self-balancing scooter",
-      "electric skateboard",
-      "e-bike",
-      "electric bicycle",
-      "electric unicycle",
-      "segway",
-      "balance board",
-      "personal mobility"
-    ],
-    "display_order": 8,
-    "direction": "both",
-    "related_cases": [
-      "CASE-031"
-    ]
-  },
-  {
-    "tag_id": "CL-ROBOT-001",
-    "category": "ENVIRONMENT",
-    "category_label": "环境合规",
-    "tag_type": "MATCHED",
-    "short_name": "[ROHS-机器人]",
-    "short_description": "工业机器人RoHS合规",
-    "description": "工业机器人必须符合RoHS指令（有害物质限制）。这包括机械臂、控制器和协作机器人。",
-    "source_citation": "EU RoHS Directive",
-    "source_url": "https://ec.europa.eu/growth/tools-databases/rohs/",
-    "effective_date": "2023-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8479.50",
-      "8428.90",
-      "8537.10"
-    ],
-    "related_keywords": [
-      "industrial robot",
-      "collaborative robot",
-      "cobot",
-      "robot arm",
-      "robot controller",
-      "工业机器人",
-      "协作机器人",
-      "机械臂",
-      "机器人控制器",
-      "rohs",
-      "有害物质限制"
-    ],
-    "display_order": 2,
-    "direction": "both",
-    "related_cases": [
-      "CASE-ROBOT02"
-    ]
-  },
-  {
-    "tag_id": "CL-ROBOT-002",
-    "category": "COMPULSORY_CERT",
-    "category_label": "强制性认证",
-    "tag_type": "MATCHED",
-    "short_name": "[CE-机器人]",
-    "short_description": "工业机器人CE认证",
-    "description": "出口欧盟的工业机器人必须带有CE标志，表示符合欧盟安全标准，包括机械指令2006/42/EC。",
-    "source_citation": "EU Machinery Directive",
-    "source_url": "https://ec.europa.eu/growth/tools-databases/nando/index.cfm?fuseaction=directive.notification&dir_id=20",
-    "effective_date": "2023-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8479.50",
-      "8428.90"
-    ],
-    "related_keywords": [
-      "industrial robot",
-      "robot arm",
-      "welding robot",
-      "material handling",
-      "工业机器人",
-      "机械臂",
-      "焊接机器人",
-      "物料搬运",
-      "CE认证",
-      "欧盟认证"
-    ],
-    "display_order": 3,
-    "direction": "export",
-    "related_cases": [
-      "CASE-ROBOT01"
-    ]
-  },
-  {
-    "tag_id": "CL-OPTICAL-001",
-    "category": "COMPULSORY_CERT",
-    "category_label": "强制性认证",
-    "tag_type": "MATCHED",
-    "short_name": "[FCC]",
-    "short_description": "光收发器FCC认证",
-    "description": "出口美国的光收发器模块需要符合FCC Part 15规定。",
-    "source_citation": "FCC Part 15 Regulations",
-    "source_url": "https://www.fcc.gov/",
-    "effective_date": "2023-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8517.70",
-      "8517.62"
-    ],
-    "related_keywords": [
-      "optical transceiver",
-      "optical module",
-      "光模块",
-      "光收发器",
-      "sfp",
-      "sfp+",
-      "qsfp",
-      "qsfp+",
-      "fiber optic",
-      "光纤模块"
-    ],
-    "display_order": 13,
-    "direction": "export",
-    "related_cases": [
-      "CASE-OPTICAL01"
-    ]
-  },
-  {
-    "tag_id": "CL-OPTICAL-002",
-    "category": "SAFETY_STANDARD",
-    "category_label": "安全标准",
-    "tag_type": "MATCHED",
-    "short_name": "[激光安全]",
-    "short_description": "光模块激光安全标签",
-    "description": "带有激光发射器的光收发器模块必须符合IEC 60825激光安全标准，并显示适当的警告标签。",
-    "source_citation": "IEC 60825 Laser Safety Standard",
-    "source_url": "https://www.iec.ch/",
-    "effective_date": "2023-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8517.70"
-    ],
-    "related_keywords": [
-      "optical transceiver",
-      "laser module",
-      "光模块",
-      "光收发器",
-      "sfp+",
-      "qsfp",
-      "cfp",
-      "cfp2",
-      "激光模块"
-    ],
-    "display_order": 14,
-    "direction": "both",
-    "related_cases": [
-      "CASE-OPTICAL02"
-    ]
-  },
-  {
-    "tag_id": "CL-STORAGE-001",
-    "category": "SAFETY_STANDARD",
-    "category_label": "安全标准",
-    "tag_type": "MATCHED",
-    "short_name": "[BMS-储能]",
-    "short_description": "储能系统需要认证的BMS",
-    "description": "储能系统必须配备经过认证的电池管理系统（BMS），确保安全运行、热管理和防止过充/过放保护。",
-    "source_citation": "IEEE标准",
-    "source_url": "https://www.ieee.org/",
-    "effective_date": "2023-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8507.60",
-      "8504.40"
-    ],
-    "related_keywords": [
-      "energy storage",
-      "battery system",
-      "powerwall",
-      "storage inverter",
-      "pcs",
-      "储能",
-      "储能系统",
-      "电池管理系统",
-      "BMS",
-      "锂电池",
-      "储能电池"
-    ],
-    "display_order": 15,
-    "direction": "both",
-    "related_cases": [
-      "CASE-STORAGE02"
-    ]
-  },
-  {
-    "tag_id": "CL-STORAGE-002",
-    "category": "EXPORT_REG",
-    "category_label": "出口管制",
-    "tag_type": "MATCHED",
-    "short_name": "[UN3480]",
-    "short_description": "锂电池需要UN3480危险品文件",
-    "description": "锂离子电池和电池供电的储能系统需要UN3480危险品分类和适当的文件用于空运和海运。",
-    "source_citation": "IATA规定",
-    "source_url": "https://www.iata.org/",
-    "effective_date": "2023-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8507.60"
-    ],
-    "related_keywords": [
-      "lithium battery",
-      "energy storage",
-      "battery pack",
-      "storage system",
-      "锂电池",
-      "储能",
-      "锂离子电池",
-      "电池组",
-      "UN3480",
-      "危险品运输"
-    ],
-    "display_order": 16,
-    "direction": "export",
-    "related_cases": [
-      "CASE-STORAGE01"
-    ]
-  },
-  {
-    "tag_id": "CL-BATT-003",
-    "category": "OTHER",
-    "category_label": "其他要求",
-    "tag_type": "MATCHED",
-    "short_name": "[电池安全]",
-    "short_description": "电动滑板车和电动自行车电池运输安全",
-    "description": "电动滑板车、电动自行车、自平衡平衡车和类似的大型锂电池个人出行设备受严格的危险品运输法规约束（UN3171）。由于火灾风险，许多设备在某些运输方式中受到限制或禁止。",
-    "source_citation": "交通运输部关于危险品运输的公告；IATA危险品规定；IMDG规则",
-    "source_url": "https://www.mot.gov.cn/",
-    "effective_date": "2025-01-01",
-    "status": "ACTIVE",
-    "related_hs_codes": [
-      "8711.60",
-      "8711.90",
-      "9503.00"
-    ],
-    "related_keywords": [
-      "electric scooter",
-      "e-scooter",
-      "hoverboard",
-      "self-balancing scooter",
-      "electric skateboard",
-      "e-bike",
-      "electric bicycle",
-      "电动滑板车",
-      "电动自行车",
-      "平衡车",
-      "电动滑板",
-      "个人出行设备"
-    ],
-    "display_order": 13,
-    "direction": "both",
-    "related_cases": [
-      "CASE-021",
-      "CASE-032"
-    ]
   },
   {
     "tag_id": "CL-SRRC-002",
@@ -956,10 +590,11 @@
       "fitbit",
       "apple watch",
       "galaxy watch",
-      "智能手表",
-      "智能手环",
-      "健身追踪器",
-      "可穿戴设备"
+      "garmin",
+      "activity tracker",
+      "health tracker",
+      "ring",
+      "smart ring"
     ],
     "display_order": 3,
     "direction": "both",
@@ -994,11 +629,10 @@
       "home automation",
       "smart sensor",
       "motion sensor",
-      "智能家居",
-      "智能插座",
-      "智能灯泡",
-      "智能门锁",
-      "智能门铃"
+      "door sensor",
+      "temperature sensor",
+      "humidity sensor",
+      "smart thermostat"
     ],
     "display_order": 4,
     "direction": "both",
@@ -1028,10 +662,7 @@
       "joystick",
       "gaming controller",
       "bluetooth controller",
-      "游戏控制器",
-      "无线控制器",
-      "游戏手柄",
-      "操纵杆"
+      "wireless gamepad"
     ],
     "display_order": 5,
     "direction": "both",
@@ -1058,10 +689,7 @@
       "bluetooth keyboard",
       "bluetooth mouse",
       "wireless trackpad",
-      "无线键盘",
-      "无线鼠标",
-      "蓝牙键盘",
-      "蓝牙鼠标"
+      "wireless presenter"
     ],
     "display_order": 6,
     "direction": "both",
@@ -1091,12 +719,7 @@
       "nebulizer",
       "medical",
       "surgical",
-      "diagnostic",
-      "医疗器械",
-      "血压计",
-      "体温计",
-      "血氧仪",
-      "血糖仪"
+      "diagnostic"
     ],
     "display_order": 10,
     "direction": "import",
@@ -1125,16 +748,41 @@
       "power supply",
       "ac adapter",
       "wall charger",
-      "fast charger",
-      "电源适配器",
-      "充电器",
-      "电源供应器",
-      "快充"
+      "fast charger"
     ],
     "display_order": 11,
     "direction": "both",
     "related_cases": [
       "CASE-009"
+    ]
+  },
+  {
+    "tag_id": "CL-BATT-002",
+    "category": "OTHER",
+    "category_label": "其他要求",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[电池安全]",
+    "short_description": "检查电动交通工具电池要求",
+    "description": "电动滑板车、电动自行车等个人出行设备的电池可能需要符合额外的安全标准和认证要求。",
+    "source_citation": "电动自行车安全技术规范（GB 17761-2018）",
+    "source_url": "https://www.sac.gov.cn/",
+    "effective_date": "2019-04-15",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8507.60"
+    ],
+    "related_keywords": [
+      "power bank",
+      "portable charger",
+      "external battery",
+      "mobile power",
+      "powerbank",
+      "battery pack"
+    ],
+    "display_order": 8,
+    "direction": "both",
+    "related_cases": [
+      "CASE-031"
     ]
   },
   {
@@ -1166,12 +814,7 @@
       "ar headset",
       "apple vision",
       "meta quest",
-      "vr device",
-      "VR头显",
-      "AR眼镜",
-      "智能眼镜",
-      "虚拟现实",
-      "增强现实"
+      "vr device"
     ],
     "display_order": 10,
     "direction": "both",
@@ -1204,11 +847,7 @@
       "meta quest",
       "apple vision",
       "vr device",
-      "wearable display",
-      "VR头显",
-      "AR眼镜",
-      "智能眼镜",
-      "虚拟现实设备"
+      "wearable display"
     ],
     "display_order": 7,
     "direction": "both",
@@ -1228,7 +867,10 @@
     "source_url": "https://www.cnca.gov.cn/",
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
-    "related_hs_codes": [],
+    "related_hs_codes": [
+      "8543.70",
+      "3824.99"
+    ],
     "related_keywords": [
       "vape",
       "e-cigarette",
@@ -1240,16 +882,90 @@
       "vape cartridge",
       "e-liquid",
       "vape juice",
-      "vaporizer",
-      "电子烟",
-      "雾化器",
-      "电子雾化设备"
+      "vaporizer"
     ],
     "display_order": 15,
     "direction": "both",
     "related_cases": [
       "CASE-012",
       "CASE-013"
+    ]
+  },
+  {
+    "tag_id": "CL-DU-003",
+    "category": "EXPORT_CTRL",
+    "category_label": "出口管制",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[无人机配件]",
+    "short_description": "检查无人机配件出口管制",
+    "description": "某些无人机部件——包括高精度云台、热成像/红外相机载荷、具有远程数据链路的视频传输模块和特定飞控——可能属于中国两用物项出口管制清单或无人机临时出口管制。请对照清单中的完整技术规格进行核实。",
+    "source_citation": "商务部关于两用物项出口管制清单的公告（2024）和无人机临时出口管制（2023，2024）",
+    "source_url": "https://www.mofcom.gov.cn/",
+    "effective_date": "2023-09-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8525.80",
+      "8529.90",
+      "8807.30",
+      "8526.92"
+    ],
+    "related_keywords": [
+      "drone camera",
+      "drone gimbal",
+      "thermal camera drone",
+      "drone payload",
+      "drone parts",
+      "uav parts",
+      "video transmitter",
+      "video transmission",
+      "drone accessories",
+      "fpv",
+      "first person view",
+      "drone flight controller",
+      "drone motor",
+      "drone frame"
+    ],
+    "display_order": 1,
+    "direction": "export",
+    "related_cases": [
+      "CASE-020"
+    ]
+  },
+  {
+    "tag_id": "CL-BATT-003",
+    "category": "OTHER",
+    "category_label": "其他要求",
+    "tag_type": "MATCHED",
+    "short_name": "[电池安全]",
+    "short_description": "电动滑板车和电动自行车电池运输安全",
+    "description": "电动滑板车、电动自行车、自平衡平衡车和类似的大型锂电池个人出行设备受严格的危险品运输法规约束（UN3171）。由于火灾风险，许多设备在某些运输方式中受到限制或禁止。",
+    "source_citation": "交通运输部关于危险品运输的公告；IATA危险品规定；IMDG规则",
+    "source_url": "https://www.mot.gov.cn/",
+    "effective_date": "2025-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8711.60",
+      "8711.90",
+      "9503.00"
+    ],
+    "related_keywords": [
+      "electric scooter",
+      "e-scooter",
+      "hoverboard",
+      "self-balancing scooter",
+      "electric skateboard",
+      "e-bike",
+      "electric bicycle",
+      "electric unicycle",
+      "segway",
+      "balance board",
+      "personal mobility"
+    ],
+    "display_order": 13,
+    "direction": "both",
+    "related_cases": [
+      "CASE-021",
+      "CASE-032"
     ]
   },
   {
@@ -1280,11 +996,7 @@
       "3d printing machine",
       "filament printer",
       "metal 3d printer",
-      "industrial 3d printer",
-      "3D打印机",
-      "增材制造",
-      "FDM打印机",
-      "树脂打印机"
+      "industrial 3d printer"
     ],
     "display_order": 12,
     "direction": "both",
@@ -1293,43 +1005,39 @@
     ]
   },
   {
-    "tag_id": "CL-DU-003",
-    "category": "EXPORT_CTRL",
-    "category_label": "出口管制",
-    "tag_type": "CHECK_REQUIRED",
-    "short_name": "[无人机配件]",
-    "short_description": "检查无人机配件出口管制",
-    "description": "某些无人机部件——包括高精度云台、热成像/红外相机载荷、具有远程数据链路的视频传输模块和特定飞控——可能属于中国两用物项出口管制清单或无人机临时出口管制。请对照清单中的完整技术规格进行核实。",
-    "source_citation": "商务部关于两用物项出口管制清单的公告（2024）和无人机临时出口管制（2023，2024）",
-    "source_url": "https://www.mofcom.gov.cn/",
-    "effective_date": "2023-09-01",
+    "tag_id": "CL-SRRC-007",
+    "category": "WIRELESS_TELECOM",
+    "category_label": "无线通信",
+    "tag_type": "MATCHED",
+    "short_name": "[SRRC]",
+    "short_description": "对讲机频率核准",
+    "description": "对讲机和无线电台需要SRRC型号核准，且使用的频率必须在批准范围内。超出批准频率范围可能导致处罚。",
+    "source_citation": "工业和信息化部无线电发射设备型号核准规定（2019）",
+    "source_url": "https://www.miit.gov.cn/",
+    "effective_date": "2019-03-01",
     "status": "ACTIVE",
-    "related_hs_codes": [],
-    "related_keywords": [
-      "drone",
-      "uav",
-      "video transmitter",
-      "video transmission",
-      "drone accessories",
-      "fpv",
-      "first person view",
-      "drone flight controller",
-      "drone motor",
-      "drone frame",
-      "drone gimbal",
-      "drone payload",
-      "drone parts",
-      "uav parts",
-      "无人机",
-      "无人机配件",
-      "飞控",
-      "云台",
-      "图传"
+    "related_hs_codes": [
+      "8525.60",
+      "8517.62"
     ],
-    "display_order": 1,
-    "direction": "export",
+    "related_keywords": [
+      "walkie talkie",
+      "two way radio",
+      "walkie-talkie",
+      "two-way radio",
+      "handheld radio",
+      "uhf radio",
+      "vhf radio",
+      "pmr radio",
+      "dmr radio",
+      "poe radio",
+      "intercom",
+      "long range radio"
+    ],
+    "display_order": 8,
+    "direction": "both",
     "related_cases": [
-      "CASE-020"
+      "CASE-033"
     ]
   },
   {
@@ -1344,15 +1052,26 @@
     "source_url": "https://www.chinatax.gov.cn/",
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
-    "related_hs_codes": [],
+    "related_hs_codes": [
+      "85",
+      "84",
+      "90",
+      "95"
+    ],
     "related_keywords": [
-      "tax rebate",
-      "export tax",
+      "tax refund",
       "VAT refund",
-      "export drawback",
-      "出口退税",
-      "增值税退税",
-      "出口退税合规"
+      "drawback",
+      "tax rebate",
+      "cost saving",
+      "tax incentive",
+      "export tax",
+      "tax benefit",
+      "tax exemption",
+      "duty refund",
+      "customs clearance finance",
+      "fiscal incentive",
+      "export benefit"
     ],
     "display_order": 18,
     "direction": "export",
@@ -1373,17 +1092,17 @@
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
     "related_hs_codes": [
-      "8541.43",
-      "8504.40"
+      "8504.40",
+      "8541.40",
+      "8541.43"
     ],
     "related_keywords": [
       "solar panel",
-      "pv module",
-      "photovoltaic",
       "solar inverter",
-      "太阳能板",
-      "光伏组件",
-      "太阳能逆变器"
+      "photovoltaic module",
+      "solar cell",
+      "photovoltaic",
+      "solar energy"
     ],
     "display_order": 10,
     "direction": "both",
@@ -1404,16 +1123,19 @@
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
     "related_hs_codes": [
-      "8504.40"
+      "8541.40",
+      "8541.43",
+      "8504.40",
+      "8507.60"
     ],
     "related_keywords": [
+      "solar panel",
       "solar inverter",
-      "grid-tie inverter",
-      "pv inverter",
+      "solar battery",
       "solar energy",
-      "太阳能逆变器",
-      "并网逆变器",
-      "光伏逆变器"
+      "photovoltaic",
+      "photovoltaic module",
+      "solar storage"
     ],
     "display_order": 11,
     "direction": "export",
@@ -1434,16 +1156,18 @@
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
     "related_hs_codes": [
+      "8541.40",
+      "8541.43",
+      "8504.40",
       "8507.60"
     ],
     "related_keywords": [
-      "solar battery",
-      "energy storage",
-      "lithium battery",
+      "solar panel",
       "solar inverter",
-      "太阳能电池",
-      "储能电池",
-      "锂电池"
+      "solar battery",
+      "photovoltaic",
+      "solar energy",
+      "solar charger"
     ],
     "display_order": 12,
     "direction": "both",
@@ -1465,17 +1189,15 @@
     "effective_date": "2024-01-01",
     "status": "ACTIVE",
     "related_hs_codes": [
-      "8541.43",
-      "8504.40"
+      "8541.40",
+      "8541.43"
     ],
     "related_keywords": [
       "solar panel",
-      "pv module",
-      "solar inverter",
-      "safety standard",
-      "太阳能板",
-      "光伏组件",
-      "安全标准"
+      "photovoltaic module",
+      "photovoltaic",
+      "solar module",
+      "solar cell"
     ],
     "display_order": 13,
     "direction": "both",
@@ -1484,34 +1206,172 @@
     ]
   },
   {
-    "tag_id": "CL-SRRC-007",
-    "category": "WIRELESS_TELECOM",
-    "category_label": "无线通信",
+    "tag_id": "CL-ROBOT-001",
+    "category": "ENVIRONMENT",
+    "category_label": "环境合规",
     "tag_type": "MATCHED",
-    "short_name": "[SRRC]",
-    "short_description": "对讲机频率核准",
-    "description": "对讲机和无线电台需要SRRC型号核准，且使用的频率必须在批准范围内。超出批准频率范围可能导致处罚。",
-    "source_citation": "工业和信息化部无线电发射设备型号核准规定（2019）",
-    "source_url": "https://www.miit.gov.cn/",
-    "effective_date": "2019-03-01",
+    "short_name": "[ROHS-机器人]",
+    "short_description": "工业机器人RoHS合规",
+    "description": "工业机器人必须符合RoHS指令（有害物质限制）。这包括机械臂、控制器和协作机器人。",
+    "source_citation": "EU RoHS Directive",
+    "source_url": "https://ec.europa.eu/growth/tools-databases/rohs/",
+    "effective_date": "2023-01-01",
     "status": "ACTIVE",
-    "related_hs_codes": [],
-    "related_keywords": [
-      "walkie talkie",
-      "two way radio",
-      "dmr radio",
-      "uhf radio",
-      "handheld radio",
-      "walkie-talkie",
-      "long range radio",
-      "对讲机",
-      "无线电台",
-      "手持对讲机"
+    "related_hs_codes": [
+      "8479.50",
+      "8428.90",
+      "8537.10"
     ],
-    "display_order": 8,
+    "related_keywords": [
+      "industrial robot",
+      "collaborative robot",
+      "cobot",
+      "robot arm",
+      "robot controller"
+    ],
+    "display_order": 2,
     "direction": "both",
     "related_cases": [
-      "CASE-033"
+      "CASE-ROBOT02"
+    ]
+  },
+  {
+    "tag_id": "CL-ROBOT-002",
+    "category": "COMPULSORY_CERT",
+    "category_label": "强制性认证",
+    "tag_type": "MATCHED",
+    "short_name": "[CE-机器人]",
+    "short_description": "工业机器人CE认证",
+    "description": "出口欧盟的工业机器人必须带有CE标志，表示符合欧盟安全标准，包括机械指令2006/42/EC。",
+    "source_citation": "EU Machinery Directive",
+    "source_url": "https://ec.europa.eu/growth/tools-databases/nando/index.cfm?fuseaction=directive.notification&dir_id=20",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8479.50",
+      "8428.90"
+    ],
+    "related_keywords": [
+      "industrial robot",
+      "robot arm",
+      "welding robot",
+      "material handling"
+    ],
+    "display_order": 3,
+    "direction": "export",
+    "related_cases": [
+      "CASE-ROBOT01"
+    ]
+  },
+  {
+    "tag_id": "CL-STORAGE-001",
+    "category": "SAFETY_STANDARD",
+    "category_label": "安全标准",
+    "tag_type": "MATCHED",
+    "short_name": "[BMS-储能]",
+    "short_description": "储能系统需要认证的BMS",
+    "description": "储能系统必须配备经过认证的电池管理系统（BMS），确保安全运行、热管理和防止过充/过放保护。",
+    "source_citation": "IEEE标准",
+    "source_url": "https://www.ieee.org/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8507.60",
+      "8504.40"
+    ],
+    "related_keywords": [
+      "energy storage",
+      "battery system",
+      "powerwall",
+      "storage inverter",
+      "pcs"
+    ],
+    "display_order": 15,
+    "direction": "both",
+    "related_cases": [
+      "CASE-STORAGE02"
+    ]
+  },
+  {
+    "tag_id": "CL-STORAGE-002",
+    "category": "EXPORT_REG",
+    "category_label": "出口管制",
+    "tag_type": "MATCHED",
+    "short_name": "[UN3480]",
+    "short_description": "锂电池需要UN3480危险品文件",
+    "description": "锂离子电池和电池供电的储能系统需要UN3480危险品分类和适当的文件用于空运和海运。",
+    "source_citation": "IATA规定",
+    "source_url": "https://www.iata.org/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8507.60"
+    ],
+    "related_keywords": [
+      "lithium battery",
+      "energy storage",
+      "battery pack",
+      "storage system"
+    ],
+    "display_order": 16,
+    "direction": "export",
+    "related_cases": [
+      "CASE-STORAGE01"
+    ]
+  },
+  {
+    "tag_id": "CL-OPTICAL-001",
+    "category": "COMPULSORY_CERT",
+    "category_label": "强制性认证",
+    "tag_type": "MATCHED",
+    "short_name": "[FCC]",
+    "short_description": "光收发器FCC认证",
+    "description": "出口美国的光收发器模块需要符合FCC Part 15规定。",
+    "source_citation": "FCC Part 15 Regulations",
+    "source_url": "https://www.fcc.gov/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8517.70",
+      "8517.62"
+    ],
+    "related_keywords": [
+      "optical transceiver",
+      "optical module",
+      "sfp",
+      "fiber optic"
+    ],
+    "display_order": 13,
+    "direction": "export",
+    "related_cases": [
+      "CASE-OPTICAL01"
+    ]
+  },
+  {
+    "tag_id": "CL-OPTICAL-002",
+    "category": "SAFETY_STANDARD",
+    "category_label": "安全标准",
+    "tag_type": "MATCHED",
+    "short_name": "[激光安全]",
+    "short_description": "光模块激光安全标签",
+    "description": "带有激光发射器的光收发器模块必须符合IEC 60825激光安全标准，并显示适当的警告标签。",
+    "source_citation": "IEC 60825 Laser Safety Standard",
+    "source_url": "https://www.iec.ch/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8517.70"
+    ],
+    "related_keywords": [
+      "optical transceiver",
+      "laser module",
+      "sfp+",
+      "qsfp"
+    ],
+    "display_order": 14,
+    "direction": "both",
+    "related_cases": [
+      "CASE-OPTICAL02"
     ]
   }
 ]
