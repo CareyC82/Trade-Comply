@@ -1631,12 +1631,24 @@
                 
                 // Calculate match count
                 let matchCount = 0;
+                let exactPhraseMatch = false;
                 const hasMatch = keywords.some(keyword => {
                     const keywordLower = keyword.toLowerCase();
                     const isMatch = queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
-                    if (isMatch) matchCount++;
+                    if (isMatch) {
+                        matchCount++;
+                        // Check if this is an exact phrase match
+                        if (keywordLower === queryLower) {
+                            exactPhraseMatch = true;
+                        }
+                    }
                     return isMatch;
                 });
+                
+                // If there's an exact phrase match, accept immediately
+                if (exactPhraseMatch) {
+                    return true;
+                }
                 
                 // For multi-word queries, require better matching
                 if (queryWords.length > 1 && hasMatch && matchCount === 1) {
@@ -1689,7 +1701,9 @@
                 const typeOrderA = a.tag_type === 'MATCHED' ? 1 : 0;
                 const typeOrderB = b.tag_type === 'MATCHED' ? 1 : 0;
                 if (typeOrderB !== typeOrderA) return typeOrderB - typeOrderA;
-                return (a.display_order || 999) - (b.display_order || 999);
+                const orderA = a.display_order || a.order || 999;
+                const orderB = b.display_order || b.order || 999;
+                return orderA - orderB;
             });
 
             // Search cases by keywords, HS codes, and related tags
@@ -1707,12 +1721,24 @@
                 
                 // Calculate keyword match score
                 let matchCount = 0;
+                let exactPhraseMatch = false;
                 const keywordMatch = caseKeywords.some(keyword => {
                     const keywordLower = keyword.toLowerCase();
                     const isMatch = queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
-                    if (isMatch) matchCount++;
+                    if (isMatch) {
+                        matchCount++;
+                        // Check if this is an exact phrase match
+                        if (keywordLower === queryLower) {
+                            exactPhraseMatch = true;
+                        }
+                    }
                     return isMatch;
                 });
+                
+                // If there's an exact phrase match, accept immediately
+                if (exactPhraseMatch) {
+                    return true;
+                }
                 
                 // For multi-word queries, require at least 2 matching keywords or high match ratio
                 if (queryWords.length > 1 && matchCount === 1) {
