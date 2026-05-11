@@ -1595,6 +1595,8 @@
          */
         function renderResults(query, tags, cases) {
             showView('result');
+            // 清空旧的 AI 结果
+            removeAiBox();
 
             const directionText = AppState.currentDirection === 'export' ? t('exportTitle') : t('importTitle');
             const resultSummary = document.querySelector('.result-summary p');
