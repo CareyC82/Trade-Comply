@@ -134,7 +134,7 @@ const messages = {
         outOfRange: "Your query is outside the scope of this website's trade compliance information search.\n\nThis website mainly provides trade compliance information for the following categories:\n• Electronics (mobile phones, computers, headphones, etc.) CCC certification\n• Wireless communication devices (Bluetooth, WiFi, drones, etc.) SRRC certification\n• Battery safety and transportation regulations\n• Solar product import/export compliance\n• Industrial robot compliance requirements\n• Energy storage system safety standards\n• Export controls and dual-use items\n• VAT refund policies\n\nIf you have other needs or specific product compliance questions, please leave a message with details about the product.",
         systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. When uncertain, recommend consulting an official source or lawyer. Always reply in English.
 
-FORMAT REQUIREMENT: Always format your response with clear numbered sections (1., 2., 3., 4., etc.) and use line breaks between each numbered section for better readability.
+FORMAT REQUIREMENT: Always format your response with clear numbered sections. Each numbered item (1., 2., 3., 4., etc.) MUST start on a new line and be separated by a blank line from the next item. Use "\n\n" between sections.
 
 CRITICAL - Scope and Boundaries:
 You ONLY answer questions about:
@@ -161,7 +161,7 @@ REJECTION RULES:
         outOfRange: "您的查询不在本网站的贸易合规信息搜索范围内。\n\n本网站主要提供以下类别的贸易合规信息：\n• 电子产品（手机、电脑、耳机等）CCC认证\n• 无线通信设备（蓝牙、WiFi、无人机等）SRRC认证\n• 电池安全与运输规定\n• 太阳能产品进出口合规\n• 工业机器人合规要求\n• 储能系统安全标准\n• 出口管制与两用物项\n• 增值税退税政策\n\n如果您有其他需求或特定产品的合规问题，请留言说明具体产品信息。",
         systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. When uncertain, recommend consulting an official source or lawyer. Always reply in English.
 
-FORMAT REQUIREMENT: Always format your response with clear numbered sections (1., 2., 3., 4., etc.) and use line breaks between each numbered section for better readability.
+FORMAT REQUIREMENT: Always format your response with clear numbered sections. Each numbered item (1., 2., 3., 4., etc.) MUST start on a new line and be separated by a blank line from the next item. Use "\n\n" between sections.
 
 CRITICAL - Scope and Boundaries:
 You ONLY answer questions about:
