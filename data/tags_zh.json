@@ -556,5 +556,41 @@
     "display_order": 12,
     "direction": "both",
     "related_cases": []
+  },
+  {
+    "tag_id": "CL-OPTICAL-001",
+    "category": "COMPULSORY_CERT",
+    "category_label": "强制性认证",
+    "tag_type": "MATCHED",
+    "short_name": "[FCC]",
+    "short_description": "光收发器FCC认证",
+    "description": "出口美国的光收发器模块需要符合FCC Part 15规定。",
+    "source_citation": "FCC Part 15 Regulations",
+    "source_url": "https://www.fcc.gov/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": ["8517.70", "8517.62"],
+    "related_keywords": ["optical transceiver", "optical module", "光模块", "光收发器", "sfp", "sfp+", "qsfp", "qsfp+", "fiber optic", "光纤模块"],
+    "display_order": 13,
+    "direction": "export",
+    "related_cases": ["CASE-OPTICAL01"]
+  },
+  {
+    "tag_id": "CL-OPTICAL-002",
+    "category": "SAFETY_STANDARD",
+    "category_label": "安全标准",
+    "tag_type": "MATCHED",
+    "short_name": "[激光安全]",
+    "short_description": "光模块激光安全标签",
+    "description": "带有激光发射器的光收发器模块必须符合IEC 60825激光安全标准，并显示适当的警告标签。",
+    "source_citation": "IEC 60825 Laser Safety Standard",
+    "source_url": "https://www.iec.ch/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": ["8517.70"],
+    "related_keywords": ["optical transceiver", "laser module", "光模块", "光收发器", "sfp+", "qsfp", "cfp", "cfp2", "激光模块"],
+    "display_order": 14,
+    "direction": "both",
+    "related_cases": ["CASE-OPTICAL02"]
   }
 ]
