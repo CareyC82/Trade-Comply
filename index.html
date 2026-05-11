@@ -1624,13 +1624,37 @@
          */
         function matchByProductName(query, tags) {
             const queryLower = query.toLowerCase();
+            const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
+            
             return tags.filter(tag => {
                 const keywords = tag.related_keywords || [];
-                return keywords.some(keyword => {
+                
+                // Calculate match count
+                let matchCount = 0;
+                const hasMatch = keywords.some(keyword => {
                     const keywordLower = keyword.toLowerCase();
-                    // 支持双向匹配：查询包含关键词 或 关键词包含查询
-                    return queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
+                    const isMatch = queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
+                    if (isMatch) matchCount++;
+                    return isMatch;
                 });
+                
+                // For multi-word queries, require better matching
+                if (queryWords.length > 1 && hasMatch && matchCount === 1) {
+                    const keywordsLower = keywords.map(k => k.toLowerCase());
+                    const exactWordMatch = keywordsLower.some(k => queryWords.includes(k));
+                    if (!exactWordMatch) {
+                        // Check if the single matched keyword is one of the query words
+                        const matchedKeyword = keywords.find(k => {
+                            const kl = k.toLowerCase();
+                            return queryLower.includes(kl) || kl.includes(queryLower);
+                        });
+                        if (matchedKeyword && !queryWords.includes(matchedKeyword.toLowerCase())) {
+                            return false; // Reject if only a minor keyword matched
+                        }
+                    }
+                }
+                
+                return hasMatch;
             });
         }
 
@@ -1677,13 +1701,35 @@
                 if (!query || !query.trim()) return true;
                 
                 const queryLower = query.toLowerCase();
+                const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
                 const caseKeywords = caseItem.related_keywords || [];
                 const relatedTags = caseItem.related_tags || [];
                 
+                // Calculate keyword match score
+                let matchCount = 0;
                 const keywordMatch = caseKeywords.some(keyword => {
                     const keywordLower = keyword.toLowerCase();
-                    return queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
+                    const isMatch = queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
+                    if (isMatch) matchCount++;
+                    return isMatch;
                 });
+                
+                // For multi-word queries, require at least 2 matching keywords or high match ratio
+                if (queryWords.length > 1 && matchCount === 1) {
+                    // Only allow single keyword match if it's a significant part of the query
+                    const caseKeywordsLower = caseKeywords.map(k => k.toLowerCase());
+                    const exactMatch = caseKeywordsLower.some(k => queryWords.includes(k));
+                    if (!exactMatch) {
+                        // Check if the single matched keyword is one of the main query words
+                        const matchedKeyword = caseKeywords.find(k => {
+                            const kl = k.toLowerCase();
+                            return queryLower.includes(kl) || kl.includes(queryLower);
+                        });
+                        if (matchedKeyword && !queryWords.includes(matchedKeyword.toLowerCase())) {
+                            return false; // Reject if only a minor keyword matched
+                        }
+                    }
+                }
                 
                 const isHSCode = /^\d{4,6}(\.\d{1,4})?$/.test(query);
                 let hsMatch = false;
