@@ -1659,7 +1659,7 @@
                 });
                 
                 // For multi-word queries, filter out low-scoring matches
-                if (queryWords.length > 1 && score > 0 && score < 3) {
+                if (queryWords.length > 1 && score > 0 && score < 2) {
                     score = 0; // Reject if only minor partial matches
                 }
                 
@@ -1750,7 +1750,7 @@
                 });
                 
                 // For multi-word queries, filter out low-scoring matches
-                if (queryWords.length > 1 && score > 0 && score < 3) {
+                if (queryWords.length > 1 && score > 0 && score < 2) {
                     score = 0; // Reject if only minor partial matches
                 }
                 
