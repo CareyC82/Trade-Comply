@@ -170,7 +170,7 @@ REJECTION RULES:
     },
     zh: {
         outOfRange: "您的查询不在本网站的贸易合规信息搜索范围内。\n\n本网站主要提供以下类别的贸易合规信息：\n• 电子产品（手机、电脑、耳机等）CCC认证\n• 无线通信设备（蓝牙、WiFi、无人机等）SRRC认证\n• 电池安全与运输规定\n• 太阳能产品进出口合规\n• 工业机器人合规要求\n• 储能系统安全标准\n• 出口管制与两用物项\n• 增值税退税政策\n\n如果您有其他需求或特定产品的合规问题，请留言说明具体产品信息。",
-        systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. When uncertain, recommend consulting an official source or lawyer. Always reply in English.
+        systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. When uncertain, recommend consulting an official source or lawyer. Always reply in Chinese.
 
 FORMAT REQUIREMENT: Format your response with proper line breaks:
 - After the introductory sentence, start a new line.
