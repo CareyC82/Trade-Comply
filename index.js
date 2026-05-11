@@ -106,14 +106,12 @@ function checkSearchRange(query) {
     
     const lowerQuery = query.toLowerCase();
     
-    // 检查是否包含任何允许的关键词
     for (const keyword of ALLOWED_KEYWORDS) {
         if (lowerQuery.includes(keyword.toLowerCase())) {
             return true;
         }
     }
     
-    // 检查是否包含常见的合规相关词汇
     const complianceKeywords = [
         "ccc", "srrc", "认证", "合规", "出口", "进口", "关税", 
         "退税", "管制", "标准", "安全", "电池", "hs", "编码",
@@ -134,11 +132,36 @@ function checkSearchRange(query) {
 const messages = {
     en: {
         outOfRange: "Your query is outside the scope of this website's trade compliance information search.\n\nThis website mainly provides trade compliance information for the following categories:\n• Electronics (mobile phones, computers, headphones, etc.) CCC certification\n• Wireless communication devices (Bluetooth, WiFi, drones, etc.) SRRC certification\n• Battery safety and transportation regulations\n• Solar product import/export compliance\n• Industrial robot compliance requirements\n• Energy storage system safety standards\n• Export controls and dual-use items\n• VAT refund policies\n\nIf you have other needs or specific product compliance questions, please leave a message with details about the product.",
-        systemPrompt: "You are a professional English-Chinese trade compliance expert. Reply in English."
+        systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. When uncertain, recommend consulting an official source or lawyer. Always reply in English.
+
+FORMAT REQUIREMENT: Always format your response with clear numbered sections (1., 2., 3., 4., etc.) and use line breaks between each numbered section for better readability.
+
+CRITICAL - Scope and Boundaries:
+You ONLY answer questions about:
+- China's export controls (dual-use items, military end-users, sanctions lists)
+- China Compulsory Certification (CCC)
+- SRRC radio type approval for wireless devices
+- Commercial encryption import/export controls
+- Battery safety and dangerous goods transport
+- Export VAT rebate policies and procedures
+- China Customs enforcement cases and penalties
+
+You DO NOT answer questions about:
+- Other countries' regulations (FCC, CE, FDA, RoHS, WEEE, UL, etc.)
+- Product quality or safety standards unrelated to China trade
+- General business or legal advice
+- Questions outside China trade compliance
+
+REJECTION RULES:
+- If asked about non-China regulations (e.g., FCC, CE, FDA), respond: "Sorry, I only cover China's trade compliance regulations. For [FCC/CE/FDA], please consult the relevant country's official guidelines."
+- If asked about topics outside China trade compliance, respond: "I'm specialized in China's import/export compliance. Please ask questions about CCC, SRRC, dual-use controls, encryption controls, battery transport, or export tax policies."
+- Keep rejections short and professional. Never provide information outside your scope.`
     },
     zh: {
         outOfRange: "您的查询不在本网站的贸易合规信息搜索范围内。\n\n本网站主要提供以下类别的贸易合规信息：\n• 电子产品（手机、电脑、耳机等）CCC认证\n• 无线通信设备（蓝牙、WiFi、无人机等）SRRC认证\n• 电池安全与运输规定\n• 太阳能产品进出口合规\n• 工业机器人合规要求\n• 储能系统安全标准\n• 出口管制与两用物项\n• 增值税退税政策\n\n如果您有其他需求或特定产品的合规问题，请留言说明具体产品信息。",
         systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. When uncertain, recommend consulting an official source or lawyer. Always reply in English.
+
+FORMAT REQUIREMENT: Always format your response with clear numbered sections (1., 2., 3., 4., etc.) and use line breaks between each numbered section for better readability.
 
 CRITICAL - Scope and Boundaries:
 You ONLY answer questions about:
@@ -187,7 +210,7 @@ exports.handler = async (event) => {
         return { statusCode: 500, headers, body: JSON.stringify({ error: "API Key missing" }) };
     }
 
-    // 解析请求 body - 简化版本
+    // 解析请求 body
     let body = {};
     try {
         console.log('=== Debug Info ===');
@@ -195,7 +218,6 @@ exports.handler = async (event) => {
         
         let rawBody = null;
         
-        // 1. 优先检查 event.body（API Gateway 格式）
         if (event?.body) {
             if (typeof event.body === 'string') {
                 rawBody = event.body;
@@ -205,7 +227,6 @@ exports.handler = async (event) => {
                 body = event.body;
             }
         }
-        // 2. 检查 event.data（其他触发器格式）
         else if (event?.data) {
             if (typeof event.data === 'string') {
                 rawBody = event.data;
@@ -215,7 +236,6 @@ exports.handler = async (event) => {
                 body = event.data;
             }
         }
-        // 3. 检查 event 本身是否是 Buffer 或类 Buffer 对象
         else if (event?.type === 'Buffer' && Array.isArray(event?.data)) {
             const buffer = Buffer.from(event.data);
             rawBody = buffer.toString('utf-8');
@@ -223,18 +243,15 @@ exports.handler = async (event) => {
         else if (Buffer.isBuffer(event)) {
             rawBody = event.toString('utf-8');
         }
-        // 4. 如果 event 本身看起来像 JSON 字符串
         else if (typeof event === 'string' && event.trim().startsWith('{')) {
             rawBody = event;
         }
         
-        // 解析 JSON
         if (typeof rawBody === 'string' && rawBody.trim()) {
             console.log('Raw body:', rawBody.slice(0, 500));
             body = JSON.parse(rawBody);
             console.log('Parsed body:', body);
             
-            // 处理嵌套的 body.body
             if (body?.body && typeof body.body === 'string') {
                 try {
                     const nested = JSON.parse(body.body);
@@ -260,37 +277,24 @@ exports.handler = async (event) => {
     console.log('Final query:', query || '(empty)');
     console.log('Language:', language);
 
-    // 获取语言配置
     const langConfig = getLangConfig(language);
 
-    // 空查询
     if (!query) {
         return { statusCode: 200, headers, body: JSON.stringify({ message: "Service Online" }) };
     }
 
-    // 超长查询
     if (query.length > MAX_QUERY_LENGTH) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Query too long" }) };
     }
 
-    // 检查查询是否在允许的搜索范围内
     const isInRange = checkSearchRange(query);
     console.log('isInRange:', isInRange, 'query:', query);
     
-    // 临时：暂时禁用范围检查，让所有查询都通过
+    // 临时：暂时禁用范围检查
     // if (!isInRange) {
-    //     return { 
-    //         statusCode: 200, 
-    //         headers, 
-    //         body: JSON.stringify({ 
-    //             response: langConfig.outOfRange,
-    //             sources: [],
-    //             outOfRange: true
-    //         }) 
-    //     };
+    //     return { ... }
     // }
 
-    // 调用 DeepSeek API
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
