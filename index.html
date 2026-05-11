@@ -2017,8 +2017,10 @@
             const aiBox = document.createElement('div');
             aiBox.className = 'ai-assistant-box';
             aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
+            // 将换行符转换为 <br> 标签，实现分段显示
+            const formattedContent = escapeHtml(content).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
             aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">${t('aiAssistant')}</h3>
-                               <p>${escapeHtml(content)}</p>${sourcesHtml}`;
+                               <p>${formattedContent}</p>${sourcesHtml}`;
             const resultSummary = document.querySelector('.result-summary');
             if(resultSummary && resultSummary.nextSibling) {
                 document.getElementById('result-view').insertBefore(aiBox, resultSummary.nextSibling);
