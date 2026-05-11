@@ -592,5 +592,41 @@
     "display_order": 14,
     "direction": "both",
     "related_cases": ["CASE-OPTICAL02"]
+  },
+  {
+    "tag_id": "CL-STORAGE-001",
+    "category": "SAFETY_STANDARD",
+    "category_label": "安全标准",
+    "tag_type": "MATCHED",
+    "short_name": "[BMS-储能]",
+    "short_description": "储能系统需要认证的BMS",
+    "description": "储能系统必须配备经过认证的电池管理系统（BMS），确保安全运行、热管理和防止过充/过放保护。",
+    "source_citation": "IEEE标准",
+    "source_url": "https://www.ieee.org/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": ["8507.60", "8504.40"],
+    "related_keywords": ["energy storage", "battery system", "powerwall", "storage inverter", "pcs", "储能", "储能系统", "电池管理系统", "BMS", "锂电池", "储能电池"],
+    "display_order": 15,
+    "direction": "both",
+    "related_cases": ["CASE-STORAGE02"]
+  },
+  {
+    "tag_id": "CL-STORAGE-002",
+    "category": "EXPORT_REG",
+    "category_label": "出口管制",
+    "tag_type": "MATCHED",
+    "short_name": "[UN3480]",
+    "short_description": "锂电池需要UN3480危险品文件",
+    "description": "锂离子电池和电池供电的储能系统需要UN3480危险品分类和适当的文件用于空运和海运。",
+    "source_citation": "IATA规定",
+    "source_url": "https://www.iata.org/",
+    "effective_date": "2023-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": ["8507.60"],
+    "related_keywords": ["lithium battery", "energy storage", "battery pack", "storage system", "锂电池", "储能", "锂离子电池", "电池组", "UN3480", "危险品运输"],
+    "display_order": 16,
+    "direction": "export",
+    "related_cases": ["CASE-STORAGE01"]
   }
 ]
