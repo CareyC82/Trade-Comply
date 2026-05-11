@@ -1642,13 +1642,24 @@
                         // Exact word match
                         score += 5;
                     } else if (queryLower.includes(keywordLower) || keywordLower.includes(queryLower)) {
-                        // Partial match
-                        score += 1;
+                        // Partial match - check if query words are in keyword
+                        let wordMatches = 0;
+                        queryWords.forEach(word => {
+                            if (keywordLower.includes(word)) {
+                                wordMatches++;
+                            }
+                        });
+                        // Give more points for multiple word matches in a keyword
+                        if (wordMatches > 0) {
+                            score += wordMatches * 2; // 2 points per matching word
+                        } else {
+                            score += 1; // At least 1 point for partial match
+                        }
                     }
                 });
                 
                 // For multi-word queries, filter out low-scoring matches
-                if (queryWords.length > 1 && score > 0 && score < 5) {
+                if (queryWords.length > 1 && score > 0 && score < 3) {
                     score = 0; // Reject if only minor partial matches
                 }
                 
@@ -1722,13 +1733,24 @@
                         // Exact word match
                         score += 5;
                     } else if (queryLower.includes(keywordLower) || keywordLower.includes(queryLower)) {
-                        // Partial match
-                        score += 1;
+                        // Partial match - check if query words are in keyword
+                        let wordMatches = 0;
+                        queryWords.forEach(word => {
+                            if (keywordLower.includes(word)) {
+                                wordMatches++;
+                            }
+                        });
+                        // Give more points for multiple word matches in a keyword
+                        if (wordMatches > 0) {
+                            score += wordMatches * 2; // 2 points per matching word
+                        } else {
+                            score += 1; // At least 1 point for partial match
+                        }
                     }
                 });
                 
                 // For multi-word queries, filter out low-scoring matches
-                if (queryWords.length > 1 && score > 0 && score < 5) {
+                if (queryWords.length > 1 && score > 0 && score < 3) {
                     score = 0; // Reject if only minor partial matches
                 }
                 
