@@ -1626,48 +1626,36 @@
             const queryLower = query.toLowerCase();
             const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
             
-            return tags.filter(tag => {
+            let scoredTags = tags.map(tag => {
                 const keywords = tag.related_keywords || [];
                 
-                // Calculate match count
-                let matchCount = 0;
+                // Calculate match score
+                let score = 0;
                 let exactPhraseMatch = false;
-                const hasMatch = keywords.some(keyword => {
+                keywords.forEach(keyword => {
                     const keywordLower = keyword.toLowerCase();
-                    const isMatch = queryLower.includes(keywordLower) || keywordLower.includes(queryLower);
-                    if (isMatch) {
-                        matchCount++;
-                        // Check if this is an exact phrase match
-                        if (keywordLower === queryLower) {
-                            exactPhraseMatch = true;
-                        }
+                    if (keywordLower === queryLower) {
+                        // Exact phrase match - highest score
+                        score += 10;
+                        exactPhraseMatch = true;
+                    } else if (queryWords.includes(keywordLower)) {
+                        // Exact word match
+                        score += 5;
+                    } else if (queryLower.includes(keywordLower) || keywordLower.includes(queryLower)) {
+                        // Partial match
+                        score += 1;
                     }
-                    return isMatch;
                 });
                 
-                // If there's an exact phrase match, accept immediately
-                if (exactPhraseMatch) {
-                    return true;
+                // For multi-word queries, filter out low-scoring matches
+                if (queryWords.length > 1 && score > 0 && score < 5) {
+                    score = 0; // Reject if only minor partial matches
                 }
                 
-                // For multi-word queries, require better matching
-                if (queryWords.length > 1 && hasMatch && matchCount === 1) {
-                    const keywordsLower = keywords.map(k => k.toLowerCase());
-                    const exactWordMatch = keywordsLower.some(k => queryWords.includes(k));
-                    if (!exactWordMatch) {
-                        // Check if the single matched keyword is one of the query words
-                        const matchedKeyword = keywords.find(k => {
-                            const kl = k.toLowerCase();
-                            return queryLower.includes(kl) || kl.includes(queryLower);
-                        });
-                        if (matchedKeyword && !queryWords.includes(matchedKeyword.toLowerCase())) {
-                            return false; // Reject if only a minor keyword matched
-                        }
-                    }
-                }
-                
-                return hasMatch;
-            });
+                return { tag, score };
+            }).filter(item => item.score > 0).sort((a, b) => b.score - a.score).map(item => item.tag);
+            
+            return scoredTags;
         }
 
         /**
