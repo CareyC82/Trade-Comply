@@ -394,6 +394,17 @@
             font-weight: 600;
         }
 
+        .ai-section-title {
+            display: block;
+            background-color: var(--color-primary);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 16px 0 12px;
+            font-size: 0.95rem;
+        }
+
         /* Cases Container */
         #cases-container {
             margin-top: 24px;
@@ -1929,6 +1940,8 @@
             let formattedContent = escapeHtml(content);
             // 处理 **加粗** 语法
             formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // 处理标题行（如 "1. REGULATORY REQUIREMENTS"）
+            formattedContent = formattedContent.replace(/^(\d+\.\s+.+)$/gm, '<span class="ai-section-title">$1</span>');
             // 处理换行
             formattedContent = formattedContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
             
