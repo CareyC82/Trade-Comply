@@ -1961,14 +1961,20 @@
          * Show a specific view
          */
         function showView(view) {
-            // 移除所有视图的active类
-            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
-            
-            // 为目标视图添加active类
-            if (view === 'home') document.getElementById('home-view').classList.add('active');
-            if (view === 'result') document.getElementById('result-view').classList.add('active');
-            if (view === 'kb') document.getElementById('kb-view').classList.add('active');
-            if (view === 'categories') document.getElementById('categories-view').classList.add('active');
+            // 同时使用两种方式确保兼容性：active类和style.display
+            const views = ['home', 'result', 'kb', 'categories'];
+            views.forEach(v => {
+                const el = document.getElementById(`${v}-view`);
+                if (el) {
+                    if (v === view) {
+                        el.classList.add('active');
+                        el.style.display = 'block';
+                    } else {
+                        el.classList.remove('active');
+                        el.style.display = 'none';
+                    }
+                }
+            });
             
             // Navigation highlight
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
