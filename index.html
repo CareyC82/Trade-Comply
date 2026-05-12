@@ -1911,10 +1911,14 @@
          * Show a specific view
          */
         function showView(view) {
-            document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
-            document.getElementById('result-view').style.display = view === 'result' ? 'block' : 'none';
-            document.getElementById('kb-view').style.display = view === 'kb' ? 'block' : 'none';
-            document.getElementById('categories-view').style.display = view === 'categories' ? 'block' : 'none';
+            // 移除所有视图的active类
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            
+            // 为目标视图添加active类
+            if (view === 'home') document.getElementById('home-view').classList.add('active');
+            if (view === 'result') document.getElementById('result-view').classList.add('active');
+            if (view === 'kb') document.getElementById('kb-view').classList.add('active');
+            if (view === 'categories') document.getElementById('categories-view').classList.add('active');
             
             // Navigation highlight
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
