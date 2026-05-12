@@ -25,37 +25,6 @@
             --color-danger-text: #DC2626;
         }
 
-        /* Language Toggle */
-        .language-toggle {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            display: flex;
-            gap: 4px;
-            background: white;
-            border-radius: 20px;
-            padding: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-
-        .lang-btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 16px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #666;
-            background: transparent;
-        }
-
-        .lang-btn.active {
-            background-color: var(--color-primary);
-            color: white;
-        }
-
         /* Base Styles */
         * {
             margin: 0;
@@ -838,10 +807,7 @@
     </style>
 </head>
 <body>
-    <div class="language-toggle">
-        <button id="lang-en" class="lang-btn active">EN</button>
-        <button id="lang-zh" class="lang-btn">中文</button>
-    </div>
+
 
     <div id="home-view" class="view-container active">
         <div class="home-header">
@@ -967,104 +933,53 @@
     <script>
         // === 多语言翻译数据 ===
         const translations = {
-            en: {
-                title: "Trade Comply",
-                subtitle: "Understand China's trade rules. Facts only.",
-                export: "Export from China",
-                import: "Import into China",
-                searchPlaceholder: "Enter product name or HS Code",
-                searchBtn: "GO",
-                latestUpdate: "Latest Update:",
-                disclaimer: "This tool provides official regulatory citations only. Not legal advice.",
-                viewCases: "View Case Library",
-                feedback: "💬 Can't find your product? Tell us",
-                home: "🏠 Home",
-                knowledgeBase: "📚 Knowledge Base",
-                categories: "📋 Categories",
-                back: "< Back",
-                backArrow: "← Back",
-                warningBanner: "The following are official regulatory citations only. NOT compliance advice.",
-                foundRegulations: "Found",
-                regulationsFor: "regulations for",
-                relatedCases: "Related Penalty Cases",
-                helpImprove: "Help Us Improve",
-                feedbackMessage: "Have a product or HS Code you needed that isn't covered? Share it below and we'll research it.",
-                productPlaceholder: "e.g. smart ring, 8517.62",
-                feedbackProduct: "Product or HS Code you searched",
-                feedbackRegulation: "What regulation were you looking for?",
-                feedbackEmail: "Your email (optional, for follow-up)",
-                cancel: "Cancel",
-                sendFeedback: "Send Feedback",
-                thanksFeedback: "✅ Thanks for your feedback! We'll review it and update the database.",
-                searchResults: "Search Results",
-                noResults: "No compliance requirements found for this product.",
-                outOfRange: "Your query is outside the scope of this website's trade compliance information search. This website mainly provides trade compliance information for electronics, wireless devices, batteries, solar products, industrial robots, energy storage systems, export controls, and VAT refund policies.",
-                aiAssistant: "🤖 AI Assistant",
-                askAiAssistant: "Ask AI Assistant",
-                askAiPlaceholder: "Enter your question...",
-                aiError: "AI assistant temporarily unavailable, please try again later.",
-                source: "Source",
-                referenceSources: "Reference Sources:",
-                searching: "Searching...",
-                aiSearch: "AI Search:",
-                allCases: "All Cases",
-                allProducts: "All Products",
-                categoriesTitle: "Product Categories",
-                categoriesSummary: "📋 <strong>{total}</strong> categories across <strong>{groups}</strong> groups. Tap any category to search instantly.",
-                kbSearchPlaceholder: "Search regulations...",
-                exportTitle: "Export from China",
-                importTitle: "Import into China",
-                hsCode: "HS Code"
-            },
-            zh: {
-                title: "贸易合规助手",
-                subtitle: "了解中国贸易法规，只提供事实依据",
-                export: "从中国出口",
-                import: "进口到中国",
-                searchPlaceholder: "输入产品名称或HS编码",
-                searchBtn: "搜索",
-                latestUpdate: "最新更新：",
-                disclaimer: "本工具仅提供官方法规引用，不构成法律建议。",
-                viewCases: "查看案例库",
-                feedback: "💬 找不到您的产品？告诉我们",
-                home: "🏠 首页",
-                knowledgeBase: "📚 知识库",
-                categories: "📋 产品分类",
-                back: "< 返回",
-                backArrow: "← 返回",
-                warningBanner: "以下仅为官方法规引用，不构成合规建议。",
-                foundRegulations: "找到",
-                regulationsFor: "项法规适用于",
-                relatedCases: "相关处罚案例",
-                helpImprove: "帮助我们改进",
-                feedbackMessage: "您需要的产品或HS编码未被覆盖？请在下方分享，我们会进行研究。",
-                productPlaceholder: "例如：智能戒指, 8517.62",
-                feedbackProduct: "您搜索的产品或HS编码",
-                feedbackRegulation: "您在寻找什么法规？",
-                feedbackEmail: "您的邮箱（可选，用于跟进）",
-                cancel: "取消",
-                sendFeedback: "发送反馈",
-                thanksFeedback: "✅ 感谢您的反馈！我们会审核并更新数据库。",
-                searchResults: "搜索结果",
-                noResults: "未找到该产品的合规要求。",
-                outOfRange: "您的查询不在本网站贸易合规信息搜索范围内。本网站主要提供电子产品、无线设备、电池、太阳能产品、工业机器人、储能系统、出口管制和增值税退税政策的贸易合规信息。",
-                aiAssistant: "🤖 AI助手",
-                askAiAssistant: "向AI助手咨询",
-                askAiPlaceholder: "请输入您想咨询的内容...",
-                aiError: "AI助手暂时无法连接，请稍后重试。",
-                source: "来源：",
-                referenceSources: "参考来源：",
-                searching: "搜索中...",
-                aiSearch: "AI搜索：",
-                allCases: "所有案例",
-                allProducts: "全部产品",
-                categoriesTitle: "产品分类",
-                categoriesSummary: "📋 <strong>{total}</strong> 个分类，共 <strong>{groups}</strong> 个组别。点击任意分类即可搜索。",
-                kbSearchPlaceholder: "搜索法规...",
-                exportTitle: "从中国出口",
-                importTitle: "进口到中国",
-                hsCode: "HS编码"
-            }
+            title: "Trade Comply",
+            subtitle: "Understand China's trade rules. Facts only.",
+            export: "Export from China",
+            import: "Import into China",
+            searchPlaceholder: "Enter product name or HS Code",
+            searchBtn: "GO",
+            latestUpdate: "Latest Update:",
+            disclaimer: "This tool provides official regulatory citations only. Not legal advice.",
+            viewCases: "View Case Library",
+            feedback: "💬 Can't find your product? Tell us",
+            home: "🏠 Home",
+            knowledgeBase: "📚 Knowledge Base",
+            categories: "📋 Categories",
+            back: "< Back",
+            backArrow: "← Back",
+            warningBanner: "The following are official regulatory citations only. NOT compliance advice.",
+            foundRegulations: "Found",
+            regulationsFor: "regulations for",
+            relatedCases: "Related Penalty Cases",
+            helpImprove: "Help Us Improve",
+            feedbackMessage: "Have a product or HS Code you needed that isn't covered? Share it below and we'll research it.",
+            productPlaceholder: "e.g. smart ring, 8517.62",
+            feedbackProduct: "Product or HS Code you searched",
+            feedbackRegulation: "What regulation were you looking for?",
+            feedbackEmail: "Your email (optional, for follow-up)",
+            cancel: "Cancel",
+            sendFeedback: "Send Feedback",
+            thanksFeedback: "✅ Thanks for your feedback! We'll review it and update the database.",
+            searchResults: "Search Results",
+            noResults: "No compliance requirements found for this product.",
+            outOfRange: "Your query is outside the scope of this website's trade compliance information search. This website mainly provides trade compliance information for electronics, wireless devices, batteries, solar products, industrial robots, energy storage systems, export controls, and VAT refund policies.",
+            aiAssistant: "🤖 AI Assistant",
+            askAiAssistant: "Ask AI Assistant",
+            askAiPlaceholder: "Enter your question...",
+            aiError: "AI assistant temporarily unavailable, please try again later.",
+            source: "Source",
+            referenceSources: "Reference Sources:",
+            searching: "Searching...",
+            aiSearch: "AI Search:",
+            allCases: "All Cases",
+            allProducts: "All Products",
+            categoriesTitle: "Product Categories",
+            categoriesSummary: "📋 <strong>{total}</strong> categories across <strong>{groups}</strong> groups. Tap any category to search instantly.",
+            kbSearchPlaceholder: "Search regulations...",
+            exportTitle: "Export from China",
+            importTitle: "Import into China",
+            hsCode: "HS Code"
         };
 
         // === 允许搜索的关键词范围 ===
@@ -1141,23 +1056,7 @@
             "8523.51", "8471.80", "8528.52", "8528.59", "9004.90", "8543.70", "3824.99",
             "8529.90", "8807.30", "8711.60", "8711.90", "9503.00", "8485.20", "8477.80",
             "8485.30", "8525.60", "8541.40", "8541.43", "8479.50", "8428.90", "8537.10",
-            
-            // 中文关键词
-            "手机", "智能手机", "电脑", "笔记本", "平板", "耳机", "耳塞", "蓝牙",
-            "音箱", "音响", "电视", "显示器", "投影仪", "游戏机", "充电器", "适配器",
-            "智能家居", "智能灯泡", "空气净化器", "吸尘器", "VR", "AR", "虚拟现实",
-            "增强现实", "电子烟", "3D打印机", "无人机", "摄像头", "监控",
-            "智能手表", "智能手环", "智能戒指", "可穿戴设备", "运动手环", "健康追踪器",
-            "智能音箱", "加密", "密码", "安全", "路由器", "对讲机", "无线键盘", "无线鼠标",
-            "传感器", "温湿度传感器", "智能恒温器", "红外", "夜视仪", "热成像",
-            "四轴飞行器", "无人机配件", "图传", "飞控", "电机", "机架", "电池", "锂电池",
-            "电动滑板车", "平衡车", "电动自行车", "独轮车", "个人代步", "太阳能", "光伏",
-            "逆变器", "太阳能板", "储能", "工业机器人", "协作机器人", "机械臂", "焊接机器人",
-            "储能系统", "储能逆变器", "退税", "增值税", "关税", "出口退税", "税收优惠",
-            // 光通信相关
-            "光模块", "光收发器", "光纤模块", "sfp", "sfp+", "qsfp", "qsfp+", "cfp", "cfp2",
             "optical transceiver", "transceiver", "fiber optic", "fiber module", "optical module",
-            "光通信", "光纤通信", "数据中心", "数据通信", "高速传输", "通信设备"
         ];
         
         // 检查查询是否在允许的搜索范围内
@@ -1202,16 +1101,12 @@
                 categories: [],
                 updates: []
             },
-            currentDirection: 'export',
-            currentLanguage: 'en'
+            currentDirection: 'export'
         };
         
         // === 翻译函数 ===
         function t(key, params = {}) {
-            const lang = AppState.currentLanguage || 'en';
-            const translation = translations[lang] && translations[lang][key] 
-                ? translations[lang][key] 
-                : translations.en[key];
+            const translation = translations[key];
             if (!translation) return key;
             
             // 替换参数 {param}
@@ -1220,39 +1115,6 @@
                 result = result.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), paramValue);
             }
             return result;
-        }
-
-        // === 设置语言 ===
-        function setLanguage(lang) {
-            AppState.currentLanguage = lang;
-            
-            // 更新语言按钮状态
-            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-            document.getElementById('lang-zh').classList.toggle('active', lang === 'zh');
-            
-            // 更新页面文本
-            updatePageText();
-            
-            // 刷新最新更新信息
-            renderLatestUpdate();
-            
-            // 检查当前是否在结果页面（通过检查home-view是否隐藏来判断）
-            const homeView = document.getElementById('home-view');
-            const resultView = document.getElementById('result-view');
-            const searchInput = document.getElementById('search-input');
-            
-            // 只有当主页隐藏且结果页面显示时，才重新搜索
-            if (homeView && resultView && homeView.style.display !== 'block' && resultView.style.display === 'block' && searchInput) {
-                const currentQuery = searchInput.value;
-                const results = search(currentQuery);
-                renderResults(currentQuery || t('allProducts'), results.tags, results.cases);
-            }
-            
-            // 如果当前在分类页面，刷新分类
-            const categoriesView = document.getElementById('categories-view');
-            if (categoriesView && categoriesView.style.display === 'block') {
-                renderCategories();
-            }
         }
 
         // === 更新页面文本 ===
@@ -1407,28 +1269,20 @@
             
             // 使用独立 Catch 提高容错性
             try {
-                const [tagsEn, casesEn, quickActions, kb, categoriesEn, updatesEn, tagsZh, casesZh, categoriesZh, updatesZh] = await Promise.all([
+                const [tags, cases, quickActions, kb, categories, updates] = await Promise.all([
                     fetchJsonSafe('data/tags.json', []),
                     fetchJsonSafe('data/cases.json', []),
                     fetchJsonSafe('data/quick-actions.json', []),
                     fetchJsonSafe('data/knowledge-base.json', { categories: [] }),
                     fetchJsonSafe('data/categories.json', []),
-                    fetchJsonSafe('data/updates.json', []),
-                    fetchJsonSafe('data/tags_zh.json', []),
-                    fetchJsonSafe('data/cases_zh.json', []),
-                    fetchJsonSafe('data/categories_zh.json', []),
-                    fetchJsonSafe('data/updates_zh.json', [])
+                    fetchJsonSafe('data/updates.json', [])
                 ]);
 
                 AppState.data = { 
-                    tags: tagsEn, 
-                    cases: casesEn, 
-                    tagsZh: tagsZh,
-                    casesZh: casesZh,
-                    categories: categoriesEn,
-                    categoriesZh: categoriesZh,
-                    updates: updatesEn,
-                    updatesZh: updatesZh,
+                    tags, 
+                    cases, 
+                    categories,
+                    updates,
                     quickActions, 
                     knowledgeBase: kb 
                 };
@@ -1455,8 +1309,7 @@
             const bar = document.getElementById('latest-update-bar');
             if (!bar) return;
 
-            const lang = AppState.currentLanguage || 'en';
-            const updates = lang === 'zh' ? AppState.data.updatesZh : AppState.data.updates;
+            const updates = AppState.data.updates;
             
             if (!updates || updates.length === 0) return;
 
@@ -1552,8 +1405,7 @@
             const container = document.getElementById('categories-container');
             if (!container) return;
 
-            const lang = AppState.currentLanguage || 'en';
-            const categories = lang === 'zh' ? AppState.data.categoriesZh : AppState.data.categories;
+            const categories = AppState.data.categories;
             
             if (!categories) return;
 
@@ -1567,11 +1419,7 @@
 
             const summaryEl = document.getElementById('categories-summary');
             if (summaryEl) {
-                if (lang === 'zh') {
-                    summaryEl.innerHTML = `📋 <strong>${totalItems}</strong> 个产品类别，分为 <strong>${totalGroups}</strong> 组。点击任意类别即可搜索。`;
-                } else {
-                    summaryEl.innerHTML = `📋 <strong>${totalItems}</strong> categories across <strong>${totalGroups}</strong> groups. Tap any category to search instantly.`;
-                }
+                summaryEl.innerHTML = `📋 <strong>${totalItems}</strong> categories across <strong>${totalGroups}</strong> groups. Tap any category to search instantly.`;
             }
 
             const fragment = document.createDocumentFragment();
@@ -1691,9 +1539,8 @@
          * Search logic core
          */
         function search(query) {
-            const lang = AppState.currentLanguage || 'en';
-            const tags = lang === 'zh' ? (AppState.data.tagsZh || []) : (AppState.data.tags || []);
-            const cases = lang === 'zh' ? (AppState.data.casesZh || []) : (AppState.data.cases || []);
+            const tags = AppState.data.tags || [];
+            const cases = AppState.data.cases || [];
             let matchedTags = [];
             
             if (!query || !query.trim()) {
@@ -1962,8 +1809,7 @@
             
             try {
                 const requestBody = JSON.stringify({ 
-                    query: query.trim(),
-                    language: AppState.currentLanguage 
+                    query: query.trim()
                 });
                 
                 // 更新按钮状态
@@ -2115,13 +1961,8 @@
             const importBtn = document.getElementById('direction-import');
             if (importBtn) importBtn.addEventListener('click', () => setDirection('import'));
 
-            // Language toggle
-            const langEnBtn = document.getElementById('lang-en');
-            if (langEnBtn) langEnBtn.addEventListener('click', () => setLanguage('en'));
-            const langZhBtn = document.getElementById('lang-zh');
-            if (langZhBtn) langZhBtn.addEventListener('click', () => setLanguage('zh'));
 
-            const searchBtn = document.getElementById('search-btn');
+
             if (searchBtn) {
                 searchBtn.addEventListener('click', () => {
                     const query = document.getElementById('search-input')?.value;
