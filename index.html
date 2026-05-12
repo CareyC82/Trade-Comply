@@ -352,6 +352,48 @@
             text-decoration: underline;
         }
 
+        /* AI Assistant Box */
+        .ai-assistant-box {
+            background-color: var(--color-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px var(--color-card-shadow);
+        }
+
+        .ai-assistant-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+        }
+
+        .ai-assistant-title {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .ai-assistant-content {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        .ai-assistant-content p {
+            margin-bottom: 12px;
+        }
+
+        .ai-assistant-content strong {
+            color: var(--color-text);
+            font-weight: 600;
+        }
+
         /* Cases Container */
         #cases-container {
             margin-top: 24px;
@@ -1882,11 +1924,19 @@
         function createAiBox(content, sourcesHtml) {
             const aiBox = document.createElement('div');
             aiBox.className = 'ai-assistant-box';
-            aiBox.style = 'background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 20px 0;';
-            // 将换行符转换为 <br> 标签，实现分段显示
-            const formattedContent = escapeHtml(content).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-            aiBox.innerHTML = `<h3 style="color: var(--color-primary); margin-top: 0;">${t('aiAssistant')}</h3>
-                               <p>${formattedContent}</p>${sourcesHtml}`;
+            
+            // 格式化内容：处理加粗、换行等
+            let formattedContent = escapeHtml(content);
+            // 处理 **加粗** 语法
+            formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // 处理换行
+            formattedContent = formattedContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+            
+            aiBox.innerHTML = `<span class="ai-assistant-tag">🤖 AI Assistant</span>
+                               <div class="ai-assistant-content">
+                                 <p>${formattedContent}</p>
+                               </div>
+                               ${sourcesHtml}`;
             const resultSummary = document.querySelector('.result-summary');
             if(resultSummary && resultSummary.nextSibling) {
                 document.getElementById('result-view').insertBefore(aiBox, resultSummary.nextSibling);
