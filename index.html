@@ -407,6 +407,68 @@
             font-size: 0.9rem;
         }
 
+        /* Hub Cards */
+        .hub-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 0 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hub-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .hub-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            border-color: var(--color-primary);
+        }
+
+        .hub-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .hub-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .hub-card-desc {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .hub-card-stats {
+            font-size: 0.8rem;
+            color: var(--color-accent);
+            font-weight: 500;
+        }
+
+        .hub-card-coming {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .hub-card-coming:hover {
+            transform: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border-color: transparent;
+        }
+
         /* Cases Container */
         #cases-container {
             margin-top: 24px;
@@ -866,6 +928,48 @@
 
     <div id="home-view" class="view-container active">
         <div class="home-header">
+            <h1 class="home-title">Trade Comply</h1>
+            <p class="home-subtitle">Your China Trade Compliance Hub</p>
+        </div>
+
+        <div class="hub-cards">
+            <div class="hub-card" id="hub-electronics">
+                <div class="hub-card-icon">📱</div>
+                <div class="hub-card-title">Electronics & Consumer Goods</div>
+                <div class="hub-card-desc">Check CCC, SRRC, dual-use controls, encryption rules, and more for consumer electronics.</div>
+                <div class="hub-card-stats">75+ categories · 41 compliance tags · 49 real cases</div>
+            </div>
+
+            <div class="hub-card" id="hub-incoterm">
+                <div class="hub-card-icon">📦</div>
+                <div class="hub-card-title">Incoterm Compliance Check</div>
+                <div class="hub-card-desc">Find the right Incoterm for your shipment, calculate customs values, and avoid declaration errors.</div>
+                <div class="hub-card-stats">11 Incoterms · Decision Tree · Compliance Calculator</div>
+            </div>
+
+            <div class="hub-card hub-card-coming" id="hub-semiconductor">
+                <div class="hub-card-icon">🧠</div>
+                <div class="hub-card-title">Semiconductors & Advanced Manufacturing</div>
+                <div class="hub-card-desc">Export controls for chips, optical modules, industrial robots, and energy storage systems.</div>
+                <div class="hub-card-stats">Coming soon · Data being prepared</div>
+            </div>
+        </div>
+
+        <div class="disclaimer-bar">
+            <span>This tool provides official regulatory citations only. Not legal advice.</span>
+        </div>
+
+        <div class="visitor-counter">
+            <img src="https://visitor-badge.laobi.icu/badge?page_id=careyc82.trade-comply" alt="visitor count" />
+        </div>
+    </div>
+
+    <div id="electronics-view" class="view-container">
+        <div style="text-align:left;padding:12px 0;">
+            <a href="#" id="back-to-hub" style="color:var(--color-primary);text-decoration:none;font-size:0.9rem;">&larr; Back to Hub</a>
+        </div>
+
+        <div class="home-header">
             <h1 class="home-title" data-lang-key="title">Trade Comply</h1>
             <p class="home-subtitle" data-lang-key="subtitle">Understand China's trade rules. Facts only.</p>
         </div>
@@ -886,16 +990,6 @@
 
         <div class="quick-actions-grid" id="quick-actions-container">
             </div>
-
-        <div class="disclaimer-bar">
-            <span>This tool provides official regulatory citations only. Not legal advice.</span>
-        </div>
-
-        <div class="visitor-counter">
-            <img src="https://visitor-badge.laobi.icu/badge?page_id=careyc82.trade-comply" alt="visitor count" />
-        </div>
-
-        <button id="view-cases-btn" class="case-library-btn">View Case Library</button>
 
         <div class="feedback-section">
             <a href="#" class="feedback-link" id="feedback-trigger">💬 Can't find your product? Tell us</a>
@@ -1977,7 +2071,7 @@
          */
         function showView(view) {
             // 同时使用两种方式确保兼容性：active类和style.display
-            const views = ['home', 'result', 'kb', 'categories'];
+            const views = ['home', 'electronics', 'result', 'kb', 'categories'];
             views.forEach(v => {
                 const el = document.getElementById(`${v}-view`);
                 if (el) {
@@ -1996,6 +2090,13 @@
             if (view === 'home') {
                 document.getElementById('nav-home').classList.add('active');
                 // 清空搜索栏
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+            }
+            if (view === 'electronics') {
+                document.getElementById('nav-home').classList.add('active');
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) {
                     searchInput.value = '';
@@ -2076,6 +2177,14 @@
             addNavEvent('nav-home', 'home');
             addNavEvent('nav-kb', 'kb');
             addNavEvent('nav-categories', 'categories');
+
+            // Hub Card Events
+            document.getElementById('hub-electronics')?.addEventListener('click', () => showView('electronics'));
+            document.getElementById('hub-incoterm')?.addEventListener('click', () => showView('incoterm'));
+            document.getElementById('back-to-hub')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showView('home');
+            });
 
             const viewCasesBtn = document.getElementById('view-cases-btn');
             if (viewCasesBtn) {
