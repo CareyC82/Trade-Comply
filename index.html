@@ -412,6 +412,173 @@
             margin-top: 24px;
         }
 
+        /* Incoterm Tabs */
+        .incoterm-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: var(--color-bg-secondary);
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .incoterm-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            transition: all 0.2s;
+        }
+
+        .incoterm-tab.active {
+            background: white;
+            color: var(--color-primary);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        /* Decision Tree */
+        .decision-tree {
+            padding: 0 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .decision-question {
+            display: flex;
+            gap: 12px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .decision-number {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .decision-content {
+            flex: 1;
+        }
+
+        .decision-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .decision-option {
+            padding: 10px 14px;
+            background: var(--color-bg-secondary);
+            border: none;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .decision-option:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        /* Calculator */
+        .calc-section {
+            padding: 0 16px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .calc-section h3 {
+            color: var(--color-primary);
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+
+        .calc-form {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .calc-row {
+            margin-bottom: 14px;
+        }
+
+        .calc-row label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .calc-row input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .calc-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .calc-result-box {
+            margin-top: 16px;
+            background: rgba(46, 125, 50, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-matched);
+            margin-bottom: 12px;
+        }
+
+        .result-breakdown {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
         .cases-header {
             font-size: 1.1rem;
             font-weight: 600;
@@ -964,6 +1131,28 @@
 
         <div id="kb-categories-container">
             </div>
+    </div>
+
+    <div id="incoterm-view" class="view-container" style="display:none;">
+        <div style="padding:12px 0;">
+            <a href="#" id="back-to-hub-from-incoterm" style="color:var(--color-primary);text-decoration:none;font-size:0.9rem;">&larr; Back to Hub</a>
+        </div>
+        <div class="home-header">
+            <h1 class="home-title">📦 Incoterm Compliance Check</h1>
+            <p class="home-subtitle">Find the right Incoterm and verify your customs values.</p>
+        </div>
+
+        <div class="incoterm-tabs">
+            <button id="tab-find" class="incoterm-tab active">🔍 Find My Incoterm</button>
+            <button id="tab-calc" class="incoterm-tab">🧮 Compliance Calculator</button>
+        </div>
+
+        <div id="incoterm-find-panel"></div>
+        <div id="incoterm-calc-panel" style="display:none;"></div>
+
+        <div class="disclaimer-bar" style="margin-top:24px;">
+            <span>This tool provides guidance based on Incoterms 2020 rules. Not legal advice. Always confirm with your customs broker.</span>
+        </div>
     </div>
 
     <div id="categories-view" class="view-container">
@@ -2014,6 +2203,111 @@
         }
 
         /**
+         * Switch Incoterm tab
+         */
+        function switchIncotermTab(tab) {
+            document.getElementById('tab-find').classList.toggle('active', tab === 'find');
+            document.getElementById('tab-calc').classList.toggle('active', tab === 'calc');
+            document.getElementById('incoterm-find-panel').style.display = tab === 'find' ? 'block' : 'none';
+            document.getElementById('incoterm-calc-panel').style.display = tab === 'calc' ? 'block' : 'none';
+            
+            if (tab === 'find') {
+                renderIncotermDecisionTree();
+            } else {
+                renderIncotermCalculator();
+            }
+        }
+
+        /**
+         * Render Incoterm Decision Tree
+         */
+        function renderIncotermDecisionTree() {
+            const panel = document.getElementById('incoterm-find-panel');
+            if (!panel) return;
+            
+            fetch('data/incoterms.json')
+                .then(response => response.json())
+                .then(data => {
+                    const questions = data.decision_tree || [];
+                    let html = '<div class="decision-tree">';
+                    questions.forEach((q, idx) => {
+                        html += `
+                            <div class="decision-question">
+                                <div class="decision-number">${idx + 1}</div>
+                                <div class="decision-content">
+                                    <strong>${q.question}</strong>
+                                    <div class="decision-options">
+                                        ${q.options.map(opt => `
+                                            <button class="decision-option" data-next="${opt.next}">${opt.label}</button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    panel.innerHTML = html;
+                })
+                .catch(() => {
+                    panel.innerHTML = '<p style="text-align:center;color:var(--color-text-secondary);">Failed to load decision tree data.</p>';
+                });
+        }
+
+        /**
+         * Render Incoterm Calculator
+         */
+        function renderIncotermCalculator() {
+            const panel = document.getElementById('incoterm-calc-panel');
+            if (!panel) return;
+            
+            panel.innerHTML = `
+                <div class="calc-section">
+                    <h3>📊 Customs Value Calculator</h3>
+                    <div class="calc-form">
+                        <div class="calc-row">
+                            <label>FOB Value (USD)</label>
+                            <input type="number" id="calc-fob" placeholder="Enter FOB value">
+                        </div>
+                        <div class="calc-row">
+                            <label>Freight Cost (USD)</label>
+                            <input type="number" id="calc-freight" placeholder="Enter freight cost">
+                        </div>
+                        <div class="calc-row">
+                            <label>Insurance Cost (USD)</label>
+                            <input type="number" id="calc-insurance" placeholder="Enter insurance cost">
+                        </div>
+                        <button id="calc-submit" class="calc-submit">Calculate CIF Value</button>
+                    </div>
+                    <div id="calc-result"></div>
+                </div>
+            `;
+            
+            document.getElementById('calc-submit')?.addEventListener('click', calculateCIF);
+        }
+
+        /**
+         * Calculate CIF Value
+         */
+        function calculateCIF() {
+            const fob = parseFloat(document.getElementById('calc-fob')?.value) || 0;
+            const freight = parseFloat(document.getElementById('calc-freight')?.value) || 0;
+            const insurance = parseFloat(document.getElementById('calc-insurance')?.value) || 0;
+            const cif = fob + freight + insurance;
+            
+            document.getElementById('calc-result').innerHTML = `
+                <div class="calc-result-box">
+                    <div class="result-label">CIF Value (USD)</div>
+                    <div class="result-value">$${cif.toFixed(2)}</div>
+                    <div class="result-breakdown">
+                        <div>FOB: $${fob.toFixed(2)}</div>
+                        <div>Freight: $${freight.toFixed(2)}</div>
+                        <div>Insurance: $${insurance.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
          * Bind event listeners
          */
         function bindEvents() {
@@ -2087,6 +2381,14 @@
             document.getElementById('hub-electronics')?.addEventListener('click', () => showView('electronics'));
             document.getElementById('hub-incoterm')?.addEventListener('click', () => showView('incoterm'));
             document.getElementById('back-to-hub')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showView('home');
+            });
+
+            // Incoterm Events
+            document.getElementById('tab-find')?.addEventListener('click', () => switchIncotermTab('find'));
+            document.getElementById('tab-calc')?.addEventListener('click', () => switchIncotermTab('calc'));
+            document.getElementById('back-to-hub-from-incoterm')?.addEventListener('click', (e) => {
                 e.preventDefault();
                 showView('home');
             });

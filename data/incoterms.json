@@ -1,0 +1,61 @@
+{
+    "decision_tree": [
+        {
+            "question": "Who will arrange transportation?",
+            "options": [
+                {"label": "Seller arranges", "next": 1},
+                {"label": "Buyer arranges", "next": 2}
+            ]
+        },
+        {
+            "question": "Who pays for transportation?",
+            "options": [
+                {"label": "Seller pays", "next": 3},
+                {"label": "Buyer pays", "next": 4}
+            ]
+        },
+        {
+            "question": "Who is responsible at destination?",
+            "options": [
+                {"label": "Seller responsible", "next": 5},
+                {"label": "Buyer responsible", "next": 6}
+            ]
+        },
+        {
+            "question": "Final Incoterm Recommendation",
+            "options": [
+                {"label": "DDP - Delivered Duty Paid", "next": "result"},
+                {"label": "DAP - Delivered at Place", "next": "result"}
+            ]
+        },
+        {
+            "question": "Final Incoterm Recommendation",
+            "options": [
+                {"label": "CIF - Cost Insurance Freight", "next": "result"},
+                {"label": "CFR - Cost and Freight", "next": "result"}
+            ]
+        },
+        {
+            "question": "Final Incoterm Recommendation",
+            "options": [
+                {"label": "DDP - Delivered Duty Paid", "next": "result"},
+                {"label": "DAP - Delivered at Place", "next": "result"}
+            ]
+        },
+        {
+            "question": "Final Incoterm Recommendation",
+            "options": [
+                {"label": "FOB - Free on Board", "next": "result"},
+                {"label": "EXW - Ex Works", "next": "result"}
+            ]
+        }
+    ],
+    "incoterms": [
+        {"code": "EXW", "name": "Ex Works", "description": "Seller makes goods available at their premises"},
+        {"code": "FOB", "name": "Free on Board", "description": "Risk passes when goods are loaded on vessel"},
+        {"code": "CFR", "name": "Cost and Freight", "description": "Seller pays for freight to destination port"},
+        {"code": "CIF", "name": "Cost Insurance Freight", "description": "CFR plus insurance"},
+        {"code": "DAP", "name": "Delivered at Place", "description": "Goods delivered to named place"},
+        {"code": "DDP", "name": "Delivered Duty Paid", "description": "Seller pays all costs including duties"}
+    ]
+}
