@@ -1,61 +1,131 @@
 {
-    "decision_tree": [
-        {
-            "question": "Who will arrange transportation?",
-            "options": [
-                {"label": "Seller arranges", "next": 1},
-                {"label": "Buyer arranges", "next": 2}
+    "decisionTree": {
+        "description": "Answer a few simple questions to find the right Incoterm for your shipment. Based on Incoterms 2020 rules.",
+        "questions": [
+            {
+                "id": "transport",
+                "text": "Who will arrange transportation?",
+                "options": [
+                    {"label": "Seller arranges", "value": "seller"},
+                    {"label": "Buyer arranges", "value": "buyer"}
+                ]
+            },
+            {
+                "id": "responsibility",
+                "text": "Who takes responsibility at destination?",
+                "options": [
+                    {"label": "Seller responsible", "value": "seller"},
+                    {"label": "Buyer responsible", "value": "buyer"}
+                ]
+            },
+            {
+                "id": "customs",
+                "text": "Who handles import customs clearance?",
+                "options": [
+                    {"label": "Seller handles", "value": "seller"},
+                    {"label": "Buyer handles", "value": "buyer"}
+                ]
+            }
+        ],
+        "rules": {
+            "seller_seller_seller": "DDP",
+            "seller_seller_buyer": "DAP",
+            "seller_buyer_buyer": "CIF",
+            "seller_buyer_seller": "CIP",
+            "buyer_buyer_buyer": "FOB",
+            "buyer_buyer_seller": "FCA",
+            "buyer_seller_buyer": "EXW",
+            "buyer_seller_seller": "FAS"
+        }
+    },
+    "terms": {
+        "EXW": {
+            "name": "Ex Works",
+            "description": "The seller makes the goods available at their premises. The buyer bears all costs and risks from that point.",
+            "complianceRisks": [
+                "Buyer is responsible for export clearance in seller's country",
+                "Buyer must arrange all transport"
             ]
         },
-        {
-            "question": "Who pays for transportation?",
-            "options": [
-                {"label": "Seller pays", "next": 3},
-                {"label": "Buyer pays", "next": 4}
+        "FOB": {
+            "name": "Free on Board",
+            "description": "Risk passes when goods are loaded on the vessel at the port of shipment. Seller handles export clearance.",
+            "complianceRisks": [
+                "Buyer responsible for main carriage",
+                "Risk transfers at port of loading"
             ]
         },
-        {
-            "question": "Who is responsible at destination?",
-            "options": [
-                {"label": "Seller responsible", "next": 5},
-                {"label": "Buyer responsible", "next": 6}
+        "CFR": {
+            "name": "Cost and Freight",
+            "description": "Seller pays for freight to destination port. Risk passes at port of loading.",
+            "complianceRisks": [
+                "Buyer responsible for insurance",
+                "Risk transfers before arrival"
             ]
         },
-        {
-            "question": "Final Incoterm Recommendation",
-            "options": [
-                {"label": "DDP - Delivered Duty Paid", "next": "result"},
-                {"label": "DAP - Delivered at Place", "next": "result"}
+        "CIF": {
+            "name": "Cost Insurance Freight",
+            "description": "CFR plus insurance. Seller pays freight and insurance to destination port.",
+            "complianceRisks": [
+                "Minimum insurance coverage required",
+                "Risk still transfers at loading port"
             ]
         },
-        {
-            "question": "Final Incoterm Recommendation",
-            "options": [
-                {"label": "CIF - Cost Insurance Freight", "next": "result"},
-                {"label": "CFR - Cost and Freight", "next": "result"}
+        "FCA": {
+            "name": "Free Carrier",
+            "description": "Seller delivers goods to carrier at named place. Used for all transport modes.",
+            "complianceRisks": [
+                "Carrier must be named in contract",
+                "Risk transfers upon delivery to carrier"
             ]
         },
-        {
-            "question": "Final Incoterm Recommendation",
-            "options": [
-                {"label": "DDP - Delivered Duty Paid", "next": "result"},
-                {"label": "DAP - Delivered at Place", "next": "result"}
+        "FAS": {
+            "name": "Free Alongside Ship",
+            "description": "Seller delivers goods alongside the vessel at port of shipment.",
+            "complianceRisks": [
+                "Buyer responsible for loading onto vessel",
+                "Limited usage in modern trade"
             ]
         },
-        {
-            "question": "Final Incoterm Recommendation",
-            "options": [
-                {"label": "FOB - Free on Board", "next": "result"},
-                {"label": "EXW - Ex Works", "next": "result"}
+        "CPT": {
+            "name": "Carriage Paid To",
+            "description": "Seller pays for carriage to destination. Risk passes to buyer when goods handed to carrier.",
+            "complianceRisks": [
+                "Buyer responsible for insurance",
+                "Used for all transport modes"
+            ]
+        },
+        "CIP": {
+            "name": "Carriage and Insurance Paid To",
+            "description": "CPT plus insurance. Seller pays for carriage and insurance to destination.",
+            "complianceRisks": [
+                "Minimum 110% CIF value insurance required",
+                "Used for all transport modes"
+            ]
+        },
+        "DAP": {
+            "name": "Delivered at Place",
+            "description": "Seller delivers goods to named place of destination, ready for unloading.",
+            "complianceRisks": [
+                "Buyer responsible for import clearance and duties",
+                "Seller responsible for all transport"
+            ]
+        },
+        "DPU": {
+            "name": "Delivered at Place Unloaded",
+            "description": "Seller delivers goods unloaded at named place of destination.",
+            "complianceRisks": [
+                "Seller responsible for unloading at destination",
+                "Buyer handles import clearance"
+            ]
+        },
+        "DDP": {
+            "name": "Delivered Duty Paid",
+            "description": "Seller delivers goods to buyer's premises, paying all costs including duties and taxes.",
+            "complianceRisks": [
+                "Seller assumes maximum responsibility",
+                "Requires seller to handle import clearance in buyer's country"
             ]
         }
-    ],
-    "incoterms": [
-        {"code": "EXW", "name": "Ex Works", "description": "Seller makes goods available at their premises"},
-        {"code": "FOB", "name": "Free on Board", "description": "Risk passes when goods are loaded on vessel"},
-        {"code": "CFR", "name": "Cost and Freight", "description": "Seller pays for freight to destination port"},
-        {"code": "CIF", "name": "Cost Insurance Freight", "description": "CFR plus insurance"},
-        {"code": "DAP", "name": "Delivered at Place", "description": "Goods delivered to named place"},
-        {"code": "DDP", "name": "Delivered Duty Paid", "description": "Seller pays all costs including duties"}
-    ]
+    }
 }

@@ -152,7 +152,7 @@
         /* Quick Actions Grid */
         .quick-actions-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin-bottom: 24px;
         }
@@ -2248,111 +2248,6 @@
         }
 
         /**
-         * Switch Incoterm tab
-         */
-        function switchIncotermTab(tab) {
-            document.getElementById('tab-find').classList.toggle('active', tab === 'find');
-            document.getElementById('tab-calc').classList.toggle('active', tab === 'calc');
-            document.getElementById('incoterm-find-panel').style.display = tab === 'find' ? 'block' : 'none';
-            document.getElementById('incoterm-calc-panel').style.display = tab === 'calc' ? 'block' : 'none';
-            
-            if (tab === 'find') {
-                renderIncotermDecisionTree();
-            } else {
-                renderIncotermCalculator();
-            }
-        }
-
-        /**
-         * Render Incoterm Decision Tree
-         */
-        function renderIncotermDecisionTree() {
-            const panel = document.getElementById('incoterm-find-panel');
-            if (!panel) return;
-            
-            fetch('data/incoterms.json')
-                .then(response => response.json())
-                .then(data => {
-                    const questions = data.decision_tree || [];
-                    let html = '<div class="decision-tree">';
-                    questions.forEach((q, idx) => {
-                        html += `
-                            <div class="decision-question">
-                                <div class="decision-number">${idx + 1}</div>
-                                <div class="decision-content">
-                                    <strong>${q.question}</strong>
-                                    <div class="decision-options">
-                                        ${q.options.map(opt => `
-                                            <button class="decision-option" data-next="${opt.next}">${opt.label}</button>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                    panel.innerHTML = html;
-                })
-                .catch(() => {
-                    panel.innerHTML = '<p style="text-align:center;color:var(--color-text-secondary);">Failed to load decision tree data.</p>';
-                });
-        }
-
-        /**
-         * Render Incoterm Calculator
-         */
-        function renderIncotermCalculator() {
-            const panel = document.getElementById('incoterm-calc-panel');
-            if (!panel) return;
-            
-            panel.innerHTML = `
-                <div class="calc-section">
-                    <h3>📊 Customs Value Calculator</h3>
-                    <div class="calc-form">
-                        <div class="calc-row">
-                            <label>FOB Value (USD)</label>
-                            <input type="number" id="calc-fob" placeholder="Enter FOB value">
-                        </div>
-                        <div class="calc-row">
-                            <label>Freight Cost (USD)</label>
-                            <input type="number" id="calc-freight" placeholder="Enter freight cost">
-                        </div>
-                        <div class="calc-row">
-                            <label>Insurance Cost (USD)</label>
-                            <input type="number" id="calc-insurance" placeholder="Enter insurance cost">
-                        </div>
-                        <button id="calc-submit" class="calc-submit">Calculate CIF Value</button>
-                    </div>
-                    <div id="calc-result"></div>
-                </div>
-            `;
-            
-            document.getElementById('calc-submit')?.addEventListener('click', calculateCIF);
-        }
-
-        /**
-         * Calculate CIF Value
-         */
-        function calculateCIF() {
-            const fob = parseFloat(document.getElementById('calc-fob')?.value) || 0;
-            const freight = parseFloat(document.getElementById('calc-freight')?.value) || 0;
-            const insurance = parseFloat(document.getElementById('calc-insurance')?.value) || 0;
-            const cif = fob + freight + insurance;
-            
-            document.getElementById('calc-result').innerHTML = `
-                <div class="calc-result-box">
-                    <div class="result-label">CIF Value (USD)</div>
-                    <div class="result-value">$${cif.toFixed(2)}</div>
-                    <div class="result-breakdown">
-                        <div>FOB: $${fob.toFixed(2)}</div>
-                        <div>Freight: $${freight.toFixed(2)}</div>
-                        <div>Insurance: $${insurance.toFixed(2)}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        /**
          * Bind event listeners
          */
         function bindEvents() {
@@ -2507,6 +2402,154 @@
                 });
             }
         }
+
+        // ==================== Incoterm 模块 ====================
+        let incotermData = null;
+        let incotermAnswers = {};
+
+        async function loadIncotermData() {
+            try {
+                const res = await fetch('data/incoterms.json');
+                incotermData = await res.json();
+                renderFindPanel();
+                renderCalcPanel();
+            } catch (err) {
+                console.error('Failed to load incoterms.json:', err);
+            }
+        }
+
+        function switchIncotermTab(tab) {
+            document.getElementById('tab-find').classList.toggle('active', tab === 'find');
+            document.getElementById('tab-calc').classList.toggle('active', tab === 'calc');
+            document.getElementById('incoterm-find-panel').style.display = tab === 'find' ? 'block' : 'none';
+            document.getElementById('incoterm-calc-panel').style.display = tab === 'calc' ? 'block' : 'none';
+        }
+
+        function renderFindPanel() {
+            const panel = document.getElementById('incoterm-find-panel');
+            if (!panel || !incotermData) return;
+            const tree = incotermData.decisionTree;
+            incotermAnswers = {};
+            panel.innerHTML = `<p style="margin-bottom:16px;color:var(--color-text-secondary);">${tree.description}</p>
+                <div id="decision-questions"></div>
+                <div id="decision-result" style="display:none;"></div>`;
+            renderDecisionQuestions();
+        }
+
+        function renderDecisionQuestions() {
+            const container = document.getElementById('decision-questions');
+            if (!container || !incotermData) return;
+            const tree = incotermData.decisionTree;
+            let html = '';
+            tree.questions.forEach((q, index) => {
+                const answered = incotermAnswers[q.id] !== undefined;
+                html += `<div style="background:white;border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                    <div style="font-weight:600;color:var(--color-primary);margin-bottom:10px;">${index + 1}. ${q.text}</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;">`;
+                q.options.forEach(opt => {
+                    const selected = incotermAnswers[q.id] === opt.value;
+                    html += `<button class="decision-option" data-question="${q.id}" data-value="${opt.value}"
+                        style="padding:8px 14px;border:2px solid ${selected ? 'var(--color-primary)' : 'var(--color-border)'};
+                        border-radius:20px;background:${selected ? 'var(--color-primary)' : 'white'};
+                        color:${selected ? 'white' : 'var(--color-text-secondary)'};
+                        font-size:0.85rem;cursor:pointer;transition:all 0.15s;">
+                        ${opt.label}</button>`;
+                });
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
+            container.querySelectorAll('.decision-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    incotermAnswers[btn.dataset.question] = btn.dataset.value;
+                    renderDecisionQuestions();
+                    checkAllAnswered();
+                });
+            });
+        }
+
+        function checkAllAnswered() {
+            const tree = incotermData.decisionTree;
+            if (tree.questions.every(q => incotermAnswers[q.id] !== undefined)) {
+                showDecisionResult();
+            }
+        }
+
+        function showDecisionResult() {
+            const container = document.getElementById('decision-result');
+            if (!container) return;
+            const tree = incotermData.decisionTree;
+            const key = `${incotermAnswers.transport}_${incotermAnswers.responsibility}_${incotermAnswers.customs}`;
+            const ruleKey = Object.keys(tree.rules).find(k => k.startsWith(key)) || Object.keys(tree.rules)[0];
+            const incotermCode = tree.rules[ruleKey] || 'FOB';
+            const termData = incotermData.terms[incotermCode];
+            if (!termData) return;
+            container.style.display = 'block';
+            container.innerHTML = `<div style="background:#f0faf0;border:2px solid var(--color-matched);border-radius:12px;padding:20px;margin-top:16px;">
+                <div style="font-size:1.3rem;font-weight:700;color:var(--color-matched);margin-bottom:8px;">✅ Recommended: ${incotermCode} — ${termData.name}</div>
+                <p style="color:var(--color-text-secondary);margin-bottom:16px;">${termData.description}</p>
+                ${termData.complianceRisks && termData.complianceRisks.length > 0 ? `<div style="background:#fff8f0;border-radius:8px;padding:14px;margin-bottom:16px;">
+                    <div style="font-weight:600;color:#E67E22;margin-bottom:8px;">⚠️ Compliance Risks to Watch:</div>
+                    <ul style="margin:0;padding-left:20px;color:var(--color-text-secondary);font-size:0.9rem;">
+                        ${termData.complianceRisks.map(r => `<li style="margin-bottom:4px;">${r}</li>`).join('')}</ul></div>` : ''}
+                <div style="margin-top:12px;display:flex;gap:10px;">
+                    <button onclick="resetDecisionTree()" style="padding:8px 18px;background:white;border:1px solid var(--color-border);border-radius:8px;cursor:pointer;font-size:0.85rem;">🔄 Start Over</button>
+                    <button onclick="switchIncotermTab('calc')" style="padding:8px 18px;background:var(--color-primary);color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">🧮 Go to Calculator</button></div></div>`;
+            document.getElementById('decision-questions').style.display = 'none';
+        }
+
+        function resetDecisionTree() {
+            incotermAnswers = {};
+            document.getElementById('decision-result').style.display = 'none';
+            document.getElementById('decision-questions').style.display = 'block';
+            renderDecisionQuestions();
+        }
+
+        function renderCalcPanel() {
+            const panel = document.getElementById('incoterm-calc-panel');
+            if (!panel || !incotermData) return;
+            panel.innerHTML = `
+                <div style="padding:0 16px;max-width:400px;margin:0 auto;">
+                    <div style="background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                        <h3 style="color:var(--color-primary);margin-bottom:16px;font-size:1.1rem;">📊 Customs Value Calculator</h3>
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block;font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:6px;">FOB Value (USD)</label>
+                            <input type="number" id="calc-fob" placeholder="Enter FOB value" style="width:100%;padding:10px 12px;border:1px solid var(--color-border);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+                        </div>
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block;font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:6px;">Freight Cost (USD)</label>
+                            <input type="number" id="calc-freight" placeholder="Enter freight cost" style="width:100%;padding:10px 12px;border:1px solid var(--color-border);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+                        </div>
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block;font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:6px;">Insurance Cost (USD)</label>
+                            <input type="number" id="calc-insurance" placeholder="Enter insurance cost" style="width:100%;padding:10px 12px;border:1px solid var(--color-border);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+                        </div>
+                        <button id="calc-submit" onclick="calculateCIF()" style="width:100%;padding:12px;background:var(--color-primary);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:8px;">Calculate CIF Value</button>
+                    </div>
+                    <div id="calc-result"></div>
+                </div>
+            `;
+        }
+
+        function calculateCIF() {
+            const fob = parseFloat(document.getElementById('calc-fob')?.value) || 0;
+            const freight = parseFloat(document.getElementById('calc-freight')?.value) || 0;
+            const insurance = parseFloat(document.getElementById('calc-insurance')?.value) || 0;
+            const cif = fob + freight + insurance;
+
+            document.getElementById('calc-result').innerHTML = `
+                <div style="margin-top:16px;background:rgba(46,125,50,0.1);border-radius:12px;padding:16px;text-align:center;">
+                    <div style="font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:8px;">CIF Value (USD)</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:var(--color-matched);margin-bottom:12px;">$${cif.toFixed(2)}</div>
+                    <div style="display:flex;justify-content:center;gap:16px;font-size:0.85rem;color:var(--color-text-secondary);">
+                        <div>FOB: $${fob.toFixed(2)}</div>
+                        <div>Freight: $${freight.toFixed(2)}</div>
+                        <div>Insurance: $${insurance.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        loadIncotermData();
 
         document.addEventListener('DOMContentLoaded', async () => {
             await initData();
