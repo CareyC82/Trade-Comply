@@ -407,68 +407,6 @@
             font-size: 0.9rem;
         }
 
-        /* Hub Cards */
-        .hub-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding: 0 16px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .hub-card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 2px solid transparent;
-        }
-
-        .hub-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            border-color: var(--color-primary);
-        }
-
-        .hub-card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-        }
-
-        .hub-card-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--color-primary);
-            margin-bottom: 8px;
-        }
-
-        .hub-card-desc {
-            font-size: 0.9rem;
-            color: var(--color-text-secondary);
-            line-height: 1.5;
-            margin-bottom: 12px;
-        }
-
-        .hub-card-stats {
-            font-size: 0.8rem;
-            color: var(--color-accent);
-            font-weight: 500;
-        }
-
-        .hub-card-coming {
-            opacity: 0.6;
-            cursor: default;
-        }
-
-        .hub-card-coming:hover {
-            transform: none;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            border-color: transparent;
-        }
-
         /* Cases Container */
         #cases-container {
             margin-top: 24px;
@@ -932,35 +870,31 @@
             <p class="home-subtitle">Your China Trade Compliance Hub</p>
         </div>
 
-        <div class="hub-cards">
-            <div class="hub-card" id="hub-electronics">
-                <div class="hub-card-icon">📱</div>
-                <div class="hub-card-title">Electronics & Consumer Goods</div>
-                <div class="hub-card-desc">Check CCC, SRRC, dual-use controls, encryption rules, and more for consumer electronics.</div>
-                <div class="hub-card-stats">75+ categories · 41 compliance tags · 49 real cases</div>
+        <div class="quick-actions-grid" style="grid-template-columns: repeat(1, 1fr); max-width: 500px; margin: 0 auto;">
+            <div class="quick-action-card" id="hub-electronics" style="padding: 24px;">
+                <div class="quick-action-icon" style="font-size: 2.5rem;">📱</div>
+                <div class="quick-action-label" style="font-size: 1.1rem;">Electronics & Consumer Goods</div>
+                <div class="quick-action-hs" style="font-size: 0.85rem; color: var(--color-text-secondary);">Check CCC, SRRC, dual-use controls, encryption rules, and more.</div>
+                <div class="quick-action-hs" style="margin-top: 6px; color: var(--color-accent); font-weight: 500;">75+ categories · 41 compliance tags · 49 cases</div>
             </div>
 
-            <div class="hub-card" id="hub-incoterm">
-                <div class="hub-card-icon">📦</div>
-                <div class="hub-card-title">Incoterm Compliance Check</div>
-                <div class="hub-card-desc">Find the right Incoterm for your shipment, calculate customs values, and avoid declaration errors.</div>
-                <div class="hub-card-stats">11 Incoterms · Decision Tree · Compliance Calculator</div>
+            <div class="quick-action-card" id="hub-incoterm" style="padding: 24px;">
+                <div class="quick-action-icon" style="font-size: 2.5rem;">📦</div>
+                <div class="quick-action-label" style="font-size: 1.1rem;">Incoterm Compliance Check</div>
+                <div class="quick-action-hs" style="font-size: 0.85rem; color: var(--color-text-secondary);">Find the right Incoterm for your shipment and calculate customs values.</div>
+                <div class="quick-action-hs" style="margin-top: 6px; color: var(--color-accent); font-weight: 500;">11 Incoterms · Decision Tree · Calculator</div>
             </div>
 
-            <div class="hub-card hub-card-coming" id="hub-semiconductor">
-                <div class="hub-card-icon">🧠</div>
-                <div class="hub-card-title">Semiconductors & Advanced Manufacturing</div>
-                <div class="hub-card-desc">Export controls for chips, optical modules, industrial robots, and energy storage systems.</div>
-                <div class="hub-card-stats">Coming soon · Data being prepared</div>
+            <div class="quick-action-card" id="hub-semiconductor" style="padding: 24px; opacity: 0.5;">
+                <div class="quick-action-icon" style="font-size: 2.5rem;">🧠</div>
+                <div class="quick-action-label" style="font-size: 1.1rem;">Semiconductors & Advanced Manufacturing</div>
+                <div class="quick-action-hs" style="font-size: 0.85rem; color: var(--color-text-secondary);">Export controls for chips, optical modules, industrial robots, and energy storage.</div>
+                <div class="quick-action-hs" style="margin-top: 6px; color: var(--color-text-secondary);">Coming soon</div>
             </div>
         </div>
 
-        <div class="disclaimer-bar">
+        <div class="disclaimer-bar" style="margin-top: 24px;">
             <span>This tool provides official regulatory citations only. Not legal advice.</span>
-        </div>
-
-        <div class="visitor-counter">
-            <img src="https://visitor-badge.laobi.icu/badge?page_id=careyc82.trade-comply" alt="visitor count" />
         </div>
     </div>
 
@@ -2070,41 +2004,12 @@
          * Show a specific view
          */
         function showView(view) {
-            // 同时使用两种方式确保兼容性：active类和style.display
-            const views = ['home', 'electronics', 'result', 'kb', 'categories'];
-            views.forEach(v => {
-                const el = document.getElementById(`${v}-view`);
-                if (el) {
-                    if (v === view) {
-                        el.classList.add('active');
-                        el.style.display = 'block';
-                    } else {
-                        el.classList.remove('active');
-                        el.style.display = 'none';
-                    }
-                }
-            });
-            
-            // Navigation highlight
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            if (view === 'home') {
-                document.getElementById('nav-home').classList.add('active');
-                // 清空搜索栏
-                const searchInput = document.getElementById('search-input');
-                if (searchInput) {
-                    searchInput.value = '';
-                }
-            }
-            if (view === 'electronics') {
-                document.getElementById('nav-home').classList.add('active');
-                const searchInput = document.getElementById('search-input');
-                if (searchInput) {
-                    searchInput.value = '';
-                }
-            }
-            if (view === 'kb') document.getElementById('nav-kb').classList.add('active');
-            if (view === 'categories') document.getElementById('nav-categories').classList.add('active');
-            
+            document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
+            document.getElementById('electronics-view').style.display = view === 'electronics' ? 'block' : 'none';
+            document.getElementById('incoterm-view').style.display = view === 'incoterm' ? 'block' : 'none';
+            document.getElementById('result-view').style.display = view === 'result' ? 'block' : 'none';
+            document.getElementById('kb-view').style.display = view === 'kb' ? 'block' : 'none';
+            document.getElementById('categories-view').style.display = view === 'categories' ? 'block' : 'none';
             window.scrollTo(0, 0);
         }
 
