@@ -2433,6 +2433,37 @@
             return { tags: matchedTags, cases: matchedCases };
         }
 
+        function searchSemiconductorProducts(query) {
+            const trimmedQuery = query ? query.trim() : '';
+            const results = searchSemiconductor(trimmedQuery);
+            const directionText = AppState.currentDirection === 'export' ? 'Export from China' : 'Import into China';
+            const summary = document.getElementById('semi-result-summary');
+            if (summary) { summary.style.display = 'block'; summary.innerHTML = `${directionText}: Found <span id="semi-result-count">${results.tags.length}</span> regulations for '<span id="semi-search-term">${escapeHtml(trimmedQuery || 'All Products')}</span>'`; }
+            const cardsContainer = document.getElementById('semi-result-cards-container');
+            if (!cardsContainer) return;
+            cardsContainer.innerHTML = '';
+            if (results.tags.length === 0) {
+                cardsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No compliance requirements found for this query in the semiconductor database.</p>';
+            } else {
+                const groupedTags = results.tags.reduce((acc, tag) => { if (!acc[tag.category]) acc[tag.category] = { category: tag.category, tags: [] }; acc[tag.category].tags.push(tag); return acc; }, {});
+                Object.values(groupedTags).forEach(group => {
+                    const header = document.createElement('h3'); header.style = 'margin: 20px 0 12px; color: var(--color-primary); font-size: 1.1rem;'; header.textContent = group.category; cardsContainer.appendChild(header);
+                    group.tags.forEach(tag => {
+                        const card = document.createElement('div'); card.className = `compliance-card ${(tag.tag_type || '').toLowerCase()}`;
+                        const hsCodes = tag.related_hs_codes ? tag.related_hs_codes.join(', ') : 'Not specified';
+                        card.innerHTML = `<span class="compliance-tag ${(tag.tag_type || '').toLowerCase()}">${escapeHtml(tag.tag_type || '')}</span><div class="compliance-title">${escapeHtml(tag.tag_id || '')}: ${escapeHtml(tag.description || '')}</div><div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || '')}</div><div class="compliance-hs"><strong>HS Code:</strong> ${escapeHtml(hsCodes)}</div>${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_url)}</a></div>` : ''}`;
+                        cardsContainer.appendChild(card);
+                    });
+                });
+            }
+            const casesContainer = document.getElementById('semi-cases-container');
+            if (!casesContainer) return;
+            casesContainer.innerHTML = '';
+            if (results.cases.length > 0) {
+                casesContainer.innerHTML = `<div class="cases-header">Related Penalty Cases</div>${results.cases.map(c => `<div class="case-card"><div class="case-title">${escapeHtml(c.title)}</div><div class="case-date">${escapeHtml(c.date)}</div><div class="case-summary">${escapeHtml(c.summary)}</div><a href="${sanitizeUrl(c.source_url)}" target="_blank" class="case-link">Source: ${escapeHtml(c.source_url)}</a></div>`).join('')}`;
+            }
+        }
+
         // ==================== Incoterm 模块 ====================
         let incotermData = null;
         let incotermAnswers = {};
