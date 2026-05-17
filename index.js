@@ -4,6 +4,12 @@ const MAX_QUERY_LENGTH = 500;
 const TIMEOUT_MS = 30000;
 
 const ALLOWED_KEYWORDS = [
+    // 半导体相关
+    "chip", "semiconductor", "integrated circuit", "ic", "gpu", "ai chip", "hbm", "dram", "nand",
+    "cpu", "processor", "wafer", "foundry", "lithography", "etching", "eda", "chiplet", "3d ic",
+    "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "inference accelerator",
+    "NVIDIA", "H200", "RTX Pro", "finfet", "gaa", "tape-out", "gdsii",
+    // 电子产品相关
     "phone", "mobile", "smartphone", "iphone", "android", "cellular",
     "laptop", "computer", "pc", "notebook", "tablet", "ipad",
     "headphone", "earphone", "earbud", "headset", "airpod",

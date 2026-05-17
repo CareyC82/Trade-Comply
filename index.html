@@ -2175,8 +2175,13 @@
             const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
             
             try {
+                // 检测是否为半导体相关查询，添加标识
+                const lowerQuery = query.toLowerCase();
+                const semiKeywords = ["chip", "semiconductor", "ic", "gpu", "cpu", "hbm", "dram", "nand", "wafer", "foundry", "processor"];
+                const isSemiQuery = semiKeywords.some(kw => lowerQuery.includes(kw));
+                
                 const requestBody = JSON.stringify({ 
-                    query: query.trim()
+                    query: isSemiQuery ? `[Semiconductor] ${query.trim()}` : query.trim()
                 });
                 
                 // 更新按钮状态
