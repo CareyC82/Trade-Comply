@@ -2474,6 +2474,22 @@
             }
         }
 
+        function renderSemiQuickActions() {
+            const container = document.getElementById('semi-quick-actions-container');
+            if (!container) return;
+            const categories = AppState.data.categories || [];
+            const semiGroup = categories.find(g => g.group_id === 'semiconductor');
+            if (!semiGroup || !semiGroup.items) return;
+            container.innerHTML = '';
+            semiGroup.items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'quick-action-card';
+                card.innerHTML = `<div class="quick-action-icon">🧠</div><div class="quick-action-label">${escapeHtml(item.name)}</div><div class="quick-action-hs">${escapeHtml(item.hs_code || '')}</div>`;
+                card.addEventListener('click', () => { document.getElementById('search-input-semi').value = item.query; searchSemiconductorProducts(item.query); });
+                container.appendChild(card);
+            });
+        }
+
         // ==================== Incoterm 模块 ====================
         let incotermData = null;
         let incotermAnswers = {};
