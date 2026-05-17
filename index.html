@@ -2500,7 +2500,7 @@
                 const card = document.createElement('div');
                 card.className = 'quick-action-card';
                 card.innerHTML = `<div class="quick-action-icon">${icon}</div><div class="quick-action-label">${escapeHtml(item.name)}</div><div class="quick-action-hs">${escapeHtml(item.hs_code || '')}</div>`;
-                card.addEventListener('click', () => { document.getElementById('search-input-semi').value = item.query; searchSemiconductorProducts(item.query); });
+                card.addEventListener('click', () => { document.getElementById('search-input').value = item.query; searchProducts(item.query); });
                 container.appendChild(card);
             });
         }
