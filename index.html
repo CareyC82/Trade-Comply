@@ -2482,10 +2482,24 @@
             const semiGroup = categories.find(g => g.group_id === 'semiconductor');
             if (!semiGroup || !semiGroup.items) return;
             container.innerHTML = '';
+            
+            const iconMap = {
+                'GPU / AI Accelerator': '⚡',
+                'CPU / Processor': '🖥️',
+                'Memory (DRAM / HBM)': '💾',
+                'Flash Memory (NAND)': '📦',
+                'Wafer Foundry Service': '🏭',
+                'Chip Design (Fabless)': '📐',
+                'Semiconductor Equipment': '🔧',
+                'Advanced Packaging / Chiplet': '🧩',
+                'Silicon Photonics / Optical Interconnect': '🔌'
+            };
+            
             semiGroup.items.forEach(item => {
+                const icon = iconMap[item.name] || '🧠';
                 const card = document.createElement('div');
                 card.className = 'quick-action-card';
-                card.innerHTML = `<div class="quick-action-icon">🧠</div><div class="quick-action-label">${escapeHtml(item.name)}</div><div class="quick-action-hs">${escapeHtml(item.hs_code || '')}</div>`;
+                card.innerHTML = `<div class="quick-action-icon">${icon}</div><div class="quick-action-label">${escapeHtml(item.name)}</div><div class="quick-action-hs">${escapeHtml(item.hs_code || '')}</div>`;
                 card.addEventListener('click', () => { document.getElementById('search-input-semi').value = item.query; searchSemiconductorProducts(item.query); });
                 container.appendChild(card);
             });
