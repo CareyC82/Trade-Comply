@@ -2314,11 +2314,20 @@
             // Hub Card Events
             document.getElementById('hub-electronics')?.addEventListener('click', () => showView('electronics'));
             document.getElementById('hub-incoterm')?.addEventListener('click', () => showView('incoterm'));
-            document.getElementById('hub-semiconductor')?.addEventListener('click', () => showView('electronics'));
+            document.getElementById('hub-semiconductor')?.addEventListener('click', () => showView('semiconductor'));
             document.getElementById('back-to-hub')?.addEventListener('click', (e) => {
                 e.preventDefault();
                 showView('home');
             });
+
+            // Semiconductor Events
+            document.getElementById('back-to-hub-from-semi')?.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
+            const semiExportBtn = document.getElementById('direction-export-semi');
+            const semiImportBtn = document.getElementById('direction-import-semi');
+            if (semiExportBtn) semiExportBtn.addEventListener('click', () => { AppState.currentDirection = 'export'; semiExportBtn.classList.add('active'); semiImportBtn?.classList.remove('active'); });
+            if (semiImportBtn) semiImportBtn.addEventListener('click', () => { AppState.currentDirection = 'import'; semiImportBtn.classList.add('active'); semiExportBtn?.classList.remove('active'); });
+            document.getElementById('search-btn-semi')?.addEventListener('click', () => { const q = document.getElementById('search-input-semi')?.value; searchSemiconductorProducts(q); });
+            document.getElementById('search-input-semi')?.addEventListener('keyup', (e) => { if (e.key === 'Enter') { const q = e.target.value; searchSemiconductorProducts(q); } });
 
             // Incoterm Events
             document.getElementById('tab-find')?.addEventListener('click', () => switchIncotermTab('find'));
