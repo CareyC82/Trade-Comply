@@ -2235,6 +2235,7 @@
             document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
             document.getElementById('electronics-view').style.display = view === 'electronics' ? 'block' : 'none';
             document.getElementById('semiconductor-view').style.display = view === 'semiconductor' ? 'block' : 'none';
+            if (view === 'semiconductor') { setTimeout(renderSemiQuickActions, 100); }
             document.getElementById('incoterm-view').style.display = view === 'incoterm' ? 'block' : 'none';
             document.getElementById('result-view').style.display = view === 'result' ? 'block' : 'none';
             document.getElementById('kb-view').style.display = view === 'kb' ? 'block' : 'none';
