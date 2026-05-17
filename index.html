@@ -2398,6 +2398,41 @@
             }
         }
 
+        // ==================== 半导体搜索模块 ====================
+        function searchSemiconductor(query) {
+            const allTags = AppState.data.tags || [];
+            const allCases = AppState.data.cases || [];
+            const semiKeywordGroups = [
+                ["chip", "semiconductor", "integrated circuit", "IC", "GPU", "AI chip", "HBM", "DRAM", "NAND", "FinFET", "GAA", "wafer", "foundry", "lithography", "ALD", "ALE", "etching", "EDA", "chiplet", "3D IC", "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "tape-out", "GDSII", "inference accelerator"],
+                ["industrial robot", "collaborative robot", "cobot", "robot arm", "robot controller", "welding robot", "material handling", "energy storage", "battery system", "powerwall", "storage inverter", "pcs", "solar panel", "solar inverter", "photovoltaic", "optical transceiver", "fiber optic", "optical module", "3d printer", "additive manufacturing"]
+            ];
+            const allSemiKeywords = semiKeywordGroups.flat();
+            const matchedTagIds = new Set();
+            allTags.forEach(tag => {
+                const keywords = tag.related_keywords || [];
+                if (keywords.some(kw => allSemiKeywords.includes(kw.toLowerCase()))) matchedTagIds.add(tag.tag_id);
+                const hsCodes = tag.related_hs_codes || [];
+                if (hsCodes.some(code => code.startsWith('854') || code.startsWith('8486') || code.startsWith('8479'))) matchedTagIds.add(tag.tag_id);
+            });
+            let matchedTags = allTags.filter(tag => matchedTagIds.has(tag.tag_id));
+            if (query && query.trim()) {
+                const lowerQuery = query.toLowerCase();
+                const inputType = detectInputType(query);
+                if (inputType === 'hs_code') { matchedTags = matchByHSCode(query, matchedTags); }
+                else { matchedTags = matchedTags.filter(tag => { const keywords = tag.related_keywords || []; return keywords.some(kw => lowerQuery.includes(kw.toLowerCase())); }); }
+            }
+            const currentDirection = AppState.currentDirection || 'export';
+            matchedTags = matchedTags.filter(tag => { const td = tag.direction || 'both'; return td === 'both' || td === currentDirection; });
+            matchedTags.sort((a, b) => { if (a.tag_type === b.tag_type) return (a.display_order || 999) - (b.display_order || 999); return a.tag_type === 'MATCHED' ? -1 : 1; });
+            const matchedCases = allCases.filter(caseItem => {
+                const cd = caseItem.direction || 'both'; if (cd !== 'both' && cd !== currentDirection) return false;
+                if (!query || !query.trim()) { const ck = (caseItem.related_keywords || []).map(k => k.toLowerCase()); return ck.some(kw => allSemiKeywords.includes(kw)); }
+                const lowerQuery = query.toLowerCase(); const ck = (caseItem.related_keywords || []).map(k => k.toLowerCase());
+                return ck.some(kw => lowerQuery.includes(kw) || kw.includes(lowerQuery));
+            });
+            return { tags: matchedTags, cases: matchedCases };
+        }
+
         // ==================== Incoterm 模块 ====================
         let incotermData = null;
         let incotermAnswers = {};
