@@ -60,8 +60,9 @@
 
         .home-title {
             color: var(--color-primary);
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             margin-bottom: 8px;
+            white-space: nowrap;
         }
 
         .home-subtitle {
@@ -279,6 +280,10 @@
             border-left: 4px solid var(--color-check);
         }
 
+        .compliance-card.check_required {
+            border-left: 4px solid var(--color-check);
+        }
+
         .compliance-tag {
             display: inline-block;
             padding: 4px 8px;
@@ -294,6 +299,11 @@
         }
 
         .compliance-tag.check {
+            background-color: rgba(158, 158, 158, 0.1);
+            color: var(--color-check);
+        }
+
+        .compliance-tag.check_required {
             background-color: rgba(158, 158, 158, 0.1);
             color: var(--color-check);
         }
@@ -1072,6 +1082,10 @@
                 <span style="color: white; background: #16a34a; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">294</span>
             </div>
         </div>
+
+        <div class="feedback-section">
+            <a href="#" class="feedback-link" id="home-feedback-trigger">💬 Can't find your product? Tell us</a>
+        </div>
     </div>
 
     <div id="electronics-view" class="view-container">
@@ -1080,8 +1094,8 @@
         </div>
 
         <div class="home-header">
-            <h1 class="home-title" data-lang-key="title">Trade Comply</h1>
-            <p class="home-subtitle" data-lang-key="subtitle">Understand China's trade rules. Facts only.</p>
+            <h1 class="home-title">Electronics & Consumer Goods</h1>
+            <p class="home-subtitle">Check CCC, SRRC, dual-use controls, encryption rules, and more.</p>
         </div>
 
         <div class="direction-toggle">
@@ -1147,7 +1161,7 @@
             <a href="#" id="back-to-hub-from-semi" class="back-link">&larr; Back to Hub</a>
         </div>
         <div class="home-header">
-            <h1 class="home-title">🧠 Semiconductor & Advanced Manufacturing</h1>
+            <h1 class="home-title">Semiconductor & Advanced Manufacturing</h1>
             <p class="home-subtitle">Chip export controls, foundry rules, and supply chain security. Facts only.</p>
         </div>
         <div class="direction-toggle">
@@ -1165,10 +1179,15 @@
         <div class="result-summary" style="display:none;" id="semi-result-summary">
             <p>Found <span id="semi-result-count">0</span> regulations for '<span id="semi-search-term"></span>'</p>
         </div>
+        <div id="semi-ai-query-section" style="margin-top: 15px;"></div>
         <div id="semi-result-cards-container"></div>
         <div id="semi-cases-container"></div>
         <div class="disclaimer-bar" style="margin-top:24px;">
             <span>This tool provides official regulatory citations only. Not legal advice.</span>
+        </div>
+
+        <div class="feedback-section">
+            <a href="#" class="feedback-link" id="semi-feedback-trigger">💬 Can't find your product? Tell us</a>
         </div>
     </div>
 
@@ -1191,6 +1210,10 @@
 
         <div class="disclaimer-bar" style="margin-top:24px;">
             <span>This tool provides guidance based on Incoterms 2020 rules. Not legal advice. Always confirm with your customs broker.</span>
+        </div>
+
+        <div class="feedback-section">
+            <a href="#" class="feedback-link" id="incoterm-feedback-trigger">💬 Can't find your product? Tell us</a>
         </div>
     </div>
 
@@ -1295,6 +1318,10 @@
 
         // === 允许搜索的关键词范围 ===
         const ALLOWED_KEYWORDS = [
+            // 半导体相关
+            "chip", "semiconductor", "integrated circuit", "ic", "gpu", "ai chip", "hbm", "dram", "nand",
+            "cpu", "processor", "wafer", "foundry", "lithography", "etching", "eda", "chiplet", "3d ic",
+            "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "inference accelerator",
             // CCC 认证相关
             "speaker", "earbuds", "headphones", "audio", "video player", "amplifier",
             "laptop", "tablet", "computer", "server", "router", "switch", "monitor",
@@ -1412,7 +1439,8 @@
                 categories: [],
                 updates: []
             },
-            currentDirection: 'export'
+            currentDirection: 'export',
+            viewHistory: []
         };
         
         // === 翻译函数 ===
@@ -1803,6 +1831,10 @@
             const queryLower = query.toLowerCase();
             const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
             
+            // Check if this is a semiconductor-related query
+            const semiKeywords = ["chip", "semiconductor", "gpu", "cpu", "processor", "memory", "dram", "hbm", "nand", "flash", "wafer", "foundry", "fabless", "eda", "chiplet", "3d ic", "advanced packaging", "silicon photonics"];
+            const isSemiQuery = queryWords.some(word => semiKeywords.includes(word));
+            
             let scoredTags = tags.map(tag => {
                 const keywords = tag.related_keywords || [];
                 
@@ -1835,9 +1867,19 @@
                     }
                 });
                 
+                // For semiconductor queries, ensure all semiconductor tags get at least some score based on direction
+                const currentDir = AppState.currentDirection || 'export';
+                const tagDir = tag.direction || 'both';
+                if (isSemiQuery && tag.tag_id && tag.tag_id.startsWith('CL-CHIP-')) {
+                    // Only include semiconductor tags that match current direction
+                    if ((tagDir === 'both' || tagDir === currentDir) && score === 0) {
+                        score = 1; // Give minimum score to relevant semiconductor tags
+                    }
+                }
+                
                 // For multi-word queries, filter out low-scoring matches
-                if (queryWords.length > 1 && score > 0 && score < 4) {
-                    score = 0; // Reject if only minor partial matches
+                if (queryWords.length > 1 && score > 0 && score < 4 && !(isSemiQuery && tag.tag_id && tag.tag_id.startsWith('CL-CHIP-'))) {
+                    score = 0; // Reject if only minor partial matches (except semiconductor tags)
                 }
                 
                 return { tag, score };
@@ -2058,7 +2100,21 @@
                 Object.values(groupedTags).forEach(group => {
                     const categoryHeader = document.createElement('h3');
                     categoryHeader.style = 'margin: 20px 0 12px; color: var(--color-primary); font-size: 1.1rem;';
-                    categoryHeader.textContent = group.category; // textContent自带转义
+                    // 根据当前方向调整分类标题显示
+                    let displayCategory = group.category;
+                    const currentDir = AppState.currentDirection || 'export';
+                    if (currentDir === 'import') {
+                        // 将出口相关分类标题转换为进口相关标题
+                        const categoryMapping = {
+                            'Export Control': 'Import Control & Trade Remedies',
+                            'EXPORT_CTRL': 'IMPORT_CONTROL',
+                            'Export Control & Dual-Use': 'Import Control & Trade Remedies'
+                        };
+                        if (categoryMapping[group.category]) {
+                            displayCategory = categoryMapping[group.category];
+                        }
+                    }
+                    categoryHeader.textContent = displayCategory; // textContent自带转义
                     fragment.appendChild(categoryHeader);
 
                     group.tags.forEach(tag => {
@@ -2231,7 +2287,11 @@
         /**
          * Show a specific view
          */
-        function showView(view) {
+        function showView(view, pushHistory = true) {
+            const currentView = getCurrentView();
+            if (pushHistory && currentView && currentView !== view) {
+                AppState.viewHistory.push(currentView);
+            }
             document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
             document.getElementById('electronics-view').style.display = view === 'electronics' ? 'block' : 'none';
             document.getElementById('semiconductor-view').style.display = view === 'semiconductor' ? 'block' : 'none';
@@ -2241,6 +2301,42 @@
             document.getElementById('kb-view').style.display = view === 'kb' ? 'block' : 'none';
             document.getElementById('categories-view').style.display = view === 'categories' ? 'block' : 'none';
             window.scrollTo(0, 0);
+        }
+
+        /**
+         * Get current visible view
+         */
+        function getCurrentView() {
+            const views = ['home', 'electronics', 'semiconductor', 'incoterm', 'result', 'kb', 'categories'];
+            for (const view of views) {
+                const el = document.getElementById(`${view}-view`);
+                if (el && el.style.display !== 'none') {
+                    return view;
+                }
+            }
+            return 'home';
+        }
+
+        /**
+         * Go back to previous view
+         */
+        function goBack() {
+            // 清空搜索栏内容
+            const mainSearchInput = document.getElementById('search-input');
+            if (mainSearchInput) {
+                mainSearchInput.value = '';
+            }
+            const semiSearchInput = document.getElementById('search-input-semi');
+            if (semiSearchInput) {
+                semiSearchInput.value = '';
+            }
+            
+            if (AppState.viewHistory.length > 0) {
+                const prevView = AppState.viewHistory.pop();
+                showView(prevView, false);
+            } else {
+                showView('home', false);
+            }
         }
 
         /**
@@ -2306,9 +2402,9 @@
                 });
             };
 
-            addNavEvent('back-to-home', 'home');
-            addNavEvent('back-to-home-from-kb', 'home');
-            addNavEvent('back-to-home-from-cat', 'home');
+            document.getElementById('back-to-home')?.addEventListener('click', goBack);
+            document.getElementById('back-to-home-from-kb')?.addEventListener('click', goBack);
+            document.getElementById('back-to-home-from-cat')?.addEventListener('click', goBack);
             addNavEvent('nav-home', 'home');
             addNavEvent('nav-kb', 'kb');
             addNavEvent('nav-categories', 'categories');
@@ -2372,6 +2468,33 @@
                 });
             }
 
+            // Hub 页面的反馈链接
+            const homeFeedbackTrigger = document.getElementById('home-feedback-trigger');
+            if (homeFeedbackTrigger && feedbackModal) {
+                homeFeedbackTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    feedbackModal.classList.add('open');
+                });
+            }
+
+            // 半导体页面的反馈链接
+            const semiFeedbackTrigger = document.getElementById('semi-feedback-trigger');
+            if (semiFeedbackTrigger && feedbackModal) {
+                semiFeedbackTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    feedbackModal.classList.add('open');
+                });
+            }
+
+            // Incoterm 页面的反馈链接
+            const incotermFeedbackTrigger = document.getElementById('incoterm-feedback-trigger');
+            if (incotermFeedbackTrigger && feedbackModal) {
+                incotermFeedbackTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    feedbackModal.classList.add('open');
+                });
+            }
+
             if (modalCancel && feedbackModal) {
                 modalCancel.addEventListener('click', () => {
                     feedbackModal.classList.remove('open');
@@ -2414,14 +2537,14 @@
             const allTags = AppState.data.tags || [];
             const allCases = AppState.data.cases || [];
             const semiKeywordGroups = [
-                ["chip", "semiconductor", "integrated circuit", "IC", "GPU", "AI chip", "HBM", "DRAM", "NAND", "FinFET", "GAA", "wafer", "foundry", "lithography", "ALD", "ALE", "etching", "EDA", "chiplet", "3D IC", "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "tape-out", "GDSII", "inference accelerator"],
+                ["chip", "semiconductor", "integrated circuit", "IC", "GPU", "AI chip", "HBM", "DRAM", "NAND", "FinFET", "GAA", "wafer", "foundry", "lithography", "ALD", "ALE", "etching", "EDA", "chiplet", "3D IC", "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "tape-out", "GDSII", "inference accelerator", "NVIDIA", "H200", "RTX Pro", "import ban", "anti-dumping", "analog chip", "interface IC", "gate driver IC", "chip import restriction", "MOFCOM chip", "wafer origin", "foundry origin", "chip origin rules", "supply chain security chip", "国家安全部 chip", "critical hardware", "chip supplier review"],
                 ["industrial robot", "collaborative robot", "cobot", "robot arm", "robot controller", "welding robot", "material handling", "energy storage", "battery system", "powerwall", "storage inverter", "pcs", "solar panel", "solar inverter", "photovoltaic", "optical transceiver", "fiber optic", "optical module", "3d printer", "additive manufacturing"]
             ];
             const allSemiKeywords = semiKeywordGroups.flat();
             const matchedTagIds = new Set();
             allTags.forEach(tag => {
                 const keywords = tag.related_keywords || [];
-                if (keywords.some(kw => allSemiKeywords.includes(kw.toLowerCase()))) matchedTagIds.add(tag.tag_id);
+                if (keywords.some(kw => allSemiKeywords.includes(kw))) matchedTagIds.add(tag.tag_id);
                 const hsCodes = tag.related_hs_codes || [];
                 if (hsCodes.some(code => code.startsWith('854') || code.startsWith('8486') || code.startsWith('8479'))) matchedTagIds.add(tag.tag_id);
             });
@@ -2450,8 +2573,47 @@
             const directionText = AppState.currentDirection === 'export' ? 'Export from China' : 'Import into China';
             const summary = document.getElementById('semi-result-summary');
             if (summary) { summary.style.display = 'block'; summary.innerHTML = `${directionText}: Found <span id="semi-result-count">${results.tags.length}</span> regulations for '<span id="semi-search-term">${escapeHtml(trimmedQuery || 'All Products')}</span>'`; }
+            
+            // 显示AI助手查询输入框和按钮（仅在范围内时显示）
+            const aiQuerySection = document.getElementById('semi-ai-query-section');
+            const isInRange = checkSearchRange(trimmedQuery);
+            if (aiQuerySection) {
+                if (isInRange) {
+                    aiQuerySection.innerHTML = `
+                        <div style="display: flex; gap: 10px; margin: 15px 0; align-items: center;">
+                            <input type="text" id="semi-ai-query-input" style="flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="${t('askAiPlaceholder') || '请输入您想咨询的内容...'}" value="">
+                            <button id="semi-ai-assistant-btn" class="ai-assistant-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;">
+                                🤖 ${t('askAiAssistant') || 'Ask AI Assistant'}
+                            </button>
+                        </div>
+                    `;
+                    
+                    // 添加AI助手按钮点击事件
+                    const aiBtn = document.getElementById('semi-ai-assistant-btn');
+                    const aiInput = document.getElementById('semi-ai-query-input');
+                    
+                    if (aiBtn && aiInput) {
+                        aiBtn.addEventListener('click', (e) => {
+                            const userQuery = aiInput.value.trim();
+                            if (userQuery) {
+                                callAiAssistant(userQuery);
+                            }
+                        });
+                        
+                        // 添加回车键事件
+                        aiInput.addEventListener('keyup', (e) => {
+                            if (e.key === 'Enter') {
+                                aiBtn.click();
+                            }
+                        });
+                    }
+                } else {
+                    aiQuerySection.innerHTML = '';
+                }
+            }
+            
             const cardsContainer = document.getElementById('semi-result-cards-container');
-            if (!cardsContainer) return;
+            if (!cardsContainer) { console.error('semi-result-cards-container not found'); return; }
             cardsContainer.innerHTML = '';
             if (results.tags.length === 0) {
                 cardsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No compliance requirements found for this query in the semiconductor database.</p>';
@@ -2462,7 +2624,7 @@
                     group.tags.forEach(tag => {
                         const card = document.createElement('div'); card.className = `compliance-card ${(tag.tag_type || '').toLowerCase()}`;
                         const hsCodes = tag.related_hs_codes ? tag.related_hs_codes.join(', ') : 'Not specified';
-                        card.innerHTML = `<span class="compliance-tag ${(tag.tag_type || '').toLowerCase()}">${escapeHtml(tag.tag_type || '')}</span><div class="compliance-title">${escapeHtml(tag.tag_id || '')}: ${escapeHtml(tag.description || '')}</div><div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || '')}</div><div class="compliance-hs"><strong>HS Code:</strong> ${escapeHtml(hsCodes)}</div>${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_url)}</a></div>` : ''}`;
+                        card.innerHTML = `<span class="compliance-tag ${(tag.tag_type || '').toLowerCase()}">${escapeHtml(tag.tag_type || '')}</span><div class="compliance-title">${escapeHtml(tag.tag_id || '')}: ${escapeHtml(tag.description || '')}</div><div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || '')}</div>${tag.exemptions ? `<div class="compliance-extra exemptions-row">✔️ <strong>Exemptions:</strong> ${escapeHtml(tag.exemptions)}</div>` : ''}${tag.risk_scenarios ? `<div class="compliance-extra risk-row">⚠️ <strong>Risk Scenarios:</strong> ${escapeHtml(tag.risk_scenarios)}</div>` : ''}<div class="compliance-hs"><strong>HS Code:</strong> ${escapeHtml(hsCodes)}</div>${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_url)}</a></div>` : ''}`;
                         cardsContainer.appendChild(card);
                     });
                 });
@@ -2473,6 +2635,12 @@
             if (results.cases.length > 0) {
                 casesContainer.innerHTML = `<div class="cases-header">Related Penalty Cases</div>${results.cases.map(c => `<div class="case-card"><div class="case-title">${escapeHtml(c.title)}</div><div class="case-date">${escapeHtml(c.date)}</div><div class="case-summary">${escapeHtml(c.summary)}</div><a href="${sanitizeUrl(c.source_url)}" target="_blank" class="case-link">Source: ${escapeHtml(c.source_url)}</a></div>`).join('')}`;
             }
+            setTimeout(() => {
+                const resultSummary = document.getElementById('semi-result-summary');
+                if (resultSummary) {
+                    resultSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         }
 
         function renderSemiQuickActions() {
@@ -2499,7 +2667,10 @@
                 const icon = iconMap[item.name] || '🧠';
                 const card = document.createElement('div');
                 card.className = 'quick-action-card';
-                card.innerHTML = `<div class="quick-action-icon">${icon}</div><div class="quick-action-label">${escapeHtml(item.name)}</div><div class="quick-action-hs">${escapeHtml(item.hs_code || '')}</div>`;
+                card.innerHTML = `<div class="quick-action-icon">${icon}</div>
+                    <div class="quick-action-label">${escapeHtml(item.name)}</div>
+                    <div class="quick-action-hs">${escapeHtml(item.hs_code || '')}</div>
+                    <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Export controls · Foundry rules · Supply chain security</div>`;
                 card.addEventListener('click', () => { document.getElementById('search-input').value = item.query; searchProducts(item.query); });
                 container.appendChild(card);
             });

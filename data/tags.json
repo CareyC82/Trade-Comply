@@ -182,6 +182,8 @@
       "switch",
       "monitor"
     ],
+    "exemptions": "Processors sold as standalone components (not integrated into a finished system) may not require CCC certification. Engineering samples and development boards for R&D purposes are generally exempt. Processors embedded in equipment that already has CCC certification do not need separate CCC.",
+    "risk_scenarios": "If the CPU is integrated into a server or computing system for export, the entire system may require CCC certification. High-performance processors used in AI training clusters or supercomputing systems may trigger dual-use export controls in addition to CCC requirements. Customs may require proof of end-use for processors above certain performance thresholds.",
     "display_order": 1,
     "direction": "both",
     "related_cases": [
@@ -535,6 +537,8 @@
       "memory card",
       "sd card"
     ],
+    "exemptions": "Bare NAND flash chips and raw memory components sold to system integrators are generally exempt from CCC as standalone components. Memory products embedded in CCC-certified end products do not require separate CCC certification.",
+    "risk_scenarios": "SSDs and finished storage products must have CCC certification. Enterprise-grade SSDs with encryption capabilities may trigger additional commercial encryption controls. Memory products with capacities above certain thresholds destined for data centers in sensitive regions may face enhanced end-use scrutiny.",
     "display_order": 8,
     "direction": "both",
     "related_cases": [],
@@ -776,8 +780,8 @@
       "night vision",
       "thermal camera"
     ],
-    "exemptions": "Consumer-grade cameras with resolution below certain thresholds and no infrared/night vision capability are generally exempt.",
-    "risk_scenarios": "Cameras with AI-based object recognition or tracking capabilities, even if marketed as consumer products, may be reclassified as dual-use items. Exporting to military-end-users or for military use is prohibited regardless of technical specifications. Shipments to Hong Kong and Macau are subject to the same controls as international exports.",
+    "exemptions": "Consumer-grade cameras with resolution below certain thresholds and no infrared/night vision capability are generally exempt. Chip designs at mature process nodes (28nm and above) for general commercial applications are generally exempt. Standard analog IC designs and power management IC designs typically do not trigger controls.",
+    "risk_scenarios": "Cameras with AI-based object recognition or tracking capabilities, even if marketed as consumer products, may be reclassified as dual-use items. Exporting to military-end-users or for military use is prohibited regardless of technical specifications. Shipments to Hong Kong and Macau are subject to the same controls as international exports. Exporting GDSII design files for chips at 14nm and below to overseas foundries requires a technology export license, even if the design company is fabless. Chip designs incorporating AI/ML accelerators, high-speed SerDes (112Gbps+), or HBM interfaces may be classified as controlled technology. Design files for chips intended for military or surveillance applications are prohibited from export regardless of process node.",
     "display_order": 5,
     "direction": "export",
     "related_cases": [
@@ -862,6 +866,8 @@
       "drone motor",
       "drone frame"
     ],
+    "exemptions": "Standard flip-chip packaging and wire-bond packaging at mature process nodes are generally exempt. Chiplet integration using standard interconnects (UCIe) without advanced 3D stacking may not trigger additional controls.",
+    "risk_scenarios": "3D IC stacking technologies (hybrid bonding, through-silicon via arrays) may be classified as controlled manufacturing technologies. Chiplets integrating HBM memory stacks with logic dies may trigger dual-use controls due to the combined performance exceeding individual chip thresholds. Advanced packaging technologies that enable heterogeneous integration of chips from multiple foundries may face supply chain verification requirements.",
     "display_order": 8,
     "related_cases": [
       "CASE-020"
@@ -1548,7 +1554,7 @@
     "tag_id": "CL-CHIP-001",
     "category": "EXPORT_CTRL",
     "category_label": "Export Control",
-    "tag_type": "CHECK_REQUIRED",
+    "tag_type": "MATCHED",
     "short_name": "[Chip Export Control]",
     "short_description": "Advanced chips, semiconductor equipment, and related technologies are subject to China's strictest export controls.",
     "description": "China imposes comprehensive export controls on advanced semiconductor chips, manufacturing equipment, and related technologies. Key controlled items include: (1) Advanced logic chips (FinFET/GAA at 14nm and below); (2) High-bandwidth memory (HBM) and 3D DRAM; (3) GPU/AI accelerator chips above certain performance thresholds; (4) Semiconductor manufacturing equipment including ALD, ALE, and advanced etching machines; (5) Electronic Design Automation (EDA) software for advanced process nodes; (6) Chiplet and 3D IC integration technologies. The 2026 Dual-Use Items Export License Management Catalog consolidates these controls. Exporters must verify whether their specific chip products, equipment, or technologies require export licenses.",
@@ -1559,13 +1565,15 @@
     "direction": "export",
     "related_hs_codes": ["8541.40", "8541.43", "8542.31", "8542.32", "8542.33", "8479.50", "8486.20", "8543.70"],
     "related_keywords": ["chip", "semiconductor", "integrated circuit", "IC", "GPU", "AI chip", "HBM", "DRAM", "NAND", "FinFET", "GAA", "wafer", "foundry", "lithography", "ALD", "ALE", "etching", "EDA", "chiplet", "3D IC", "advanced packaging", "silicon photonics", "optical interconnect"],
+    "exemptions": "Consumer-grade microcontrollers (MCUs) at mature process nodes (28nm and above) for general commercial use are generally exempt. Chips with transistor count below 50 billion and no AI/ML acceleration capability may not trigger high-performance controls. Legacy memory chips (DDR3, LPDDR3 and below) are typically exempt.",
+    "risk_scenarios": "Any AI training or inference chip above 4800 TOPS of FP8 performance may trigger export license requirements regardless of commercial designation. GPU/NPU chips with high-speed interconnects (NVLink, CXL 2.0+) face additional scrutiny. Chips designed for data center deployment or supercomputing clusters are classified as controlled items even if labeled as 'consumer products'. Exporting GDSII design files to overseas foundries for 14nm and below requires a separate technology export license.",
     "display_order": 39
   },
   {
     "tag_id": "CL-CHIP-002",
     "category": "EXPORT_CTRL",
     "category_label": "Export Control",
-    "tag_type": "CHECK_REQUIRED",
+    "tag_type": "MATCHED",
     "short_name": "[Wafer Foundry Declaration]",
     "short_description": "Since 2026, China Customs requires 'country of wafer fabrication (foundry location)' declaration for all ICs under HS 8542.",
     "description": "Effective January 2026, China's updated 'Standard Declaration Directory for Import & Export Goods' introduced a new mandatory declaration element for all integrated circuits classified under HS Code 8542: the 'country of wafer fabrication (foundry location)'. This requirement applies to both imports and exports. Exporters must accurately declare where the chip's wafer was manufactured, as this information is used for supply chain security assessments and may affect export control classification. Misdeclaration of foundry origin can result in customs penalties for false declaration.",
@@ -1576,13 +1584,15 @@
     "direction": "both",
     "related_hs_codes": ["8542.31", "8542.32", "8542.33", "8542.39"],
     "related_keywords": ["foundry", "wafer fabrication", "wafer fab", "TSMC", "SMIC", "GlobalFoundries", "UMC", "chip manufacturing", "origin declaration", "supply chain traceability"],
+    "exemptions": "ICs fabricated at multiple foundries where the final process step was performed in China may declare China as origin. Chips that are only packaged or tested in a country (not fabricated there) do not need to declare that country as wafer origin.",
+    "risk_scenarios": "Misdeclaring a TSMC-fabricated chip as 'SMIC-fabricated' (or vice versa) is treated as false declaration and can trigger supply chain security investigations. Chips fabricated at multiple foundries require careful documentation of which wafer fabrication step occurred at which location. Non-Chinese foundries may be subject to additional scrutiny if the chip is destined for a sensitive end-use.",
     "display_order": 40
   },
   {
     "tag_id": "CL-CHIP-003",
     "category": "SUPPLY_CHAIN",
     "category_label": "Supply Chain Security",
-    "tag_type": "CHECK_REQUIRED",
+    "tag_type": "MATCHED",
     "short_name": "[Semiconductor Supply Chain]",
     "short_description": "China's 2026 supply chain security regulations impose special restrictions on semiconductor industry supply chain data collection and audits.",
     "description": "Under China's 2026 Regulations on Industrial and Supply Chain Security, the semiconductor industry is designated as a critical industry subject to enhanced supply chain protection. Key implications: (1) Foreign entities conducting semiconductor supply chain audits or mapping within China may face restrictions on data collection; (2) Chinese semiconductor companies may be prohibited from complying with foreign government requests for supply chain information (e.g., UFLPA-related inquiries); (3) Information about advanced process node capabilities, yield rates, and customer lists may be classified as sensitive supply chain data; (4) Chinese chip designers using overseas foundries must ensure they are not violating Chinese export controls on design files (GDSII data) for advanced chips.",
@@ -1593,6 +1603,65 @@
     "direction": "both",
     "related_hs_codes": ["8541", "8542", "8486"],
     "related_keywords": ["semiconductor supply chain", "chip supply chain", "foundry audit", "wafer fab inspection", "ESG audit semiconductor", "UFLPA chip", "GDSII", "chip design export", "process node", "yield data", "customer list chip"],
+    "exemptions": "Routine commercial orders of standard commodity chips (e.g., standard DRAM, NAND flash) without access to sensitive process or yield data are generally exempt. Supply chain mapping limited to first-tier suppliers' names and locations is generally permissible.",
+    "risk_scenarios": "Foreign entities conducting detailed semiconductor supply chain audits (process node verification, yield rate data, customer lists) within China may be denied access under the 2026 Supply Chain Security Regulations. Chinese chip companies may face penalties if they comply with foreign government requests (e.g., U.S. UFLPA inquiries) to provide detailed supply chain information on Chinese semiconductor suppliers. Exporting advanced chip design files (GDSII) to overseas foundries without verifying compliance with Chinese export controls can result in both export violations and supply chain security violations.",
     "display_order": 41
+  },
+  {
+    "tag_id": "CL-DU-004",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[Optical Module Control]",
+    "short_description": "Optical transceivers and modules may be subject to dual-use export controls.",
+    "description": "China's dual-use export control regulations cover certain optical communication modules, particularly high-performance coherent optical transceivers used in data centers and telecommunications infrastructure. Exporters must verify whether their optical modules meet the technical thresholds that trigger export licensing requirements.",
+    "source_citation": "2026 Dual-Use Items and Technologies Export License Management Catalog",
+    "source_url": "https://www.mofcom.gov.cn/",
+    "effective_date": "2026-01-01",
+    "status": "ACTIVE",
+    "direction": "export",
+    "related_hs_codes": ["8517.70", "8517.62"],
+    "related_keywords": ["optical transceiver", "optical module", "SFP", "QSFP", "coherent optics", "DSP optical", "silicon photonics", "data center interconnect", "optical interconnect"],
+    "exemptions": "Standard SFP/SFP+ modules for enterprise networking (data rates below 25Gbps per channel) are generally exempt. Modules using only standard NRZ modulation without coherent detection are typically not controlled.",
+    "risk_scenarios": "Coherent optical modules above 100Gbps, optical modules with integrated DSP, and modules designed for data center interconnects exceeding 10km reach may trigger dual-use controls. Silicon photonics-based optical transceivers at 400G and above are subject to enhanced scrutiny. Exporting such modules to countries under UN arms embargo is prohibited regardless of technical specifications.",
+    "display_order": 42
+  },
+  {
+    "tag_id": "CL-CTRL-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[Japan Entity Control]",
+    "short_description": "Special export controls apply to semiconductor-related exports to certain Japanese entities.",
+    "description": "Under the 2026 Japan-specific export control measures, China has implemented enhanced scrutiny for semiconductor-related exports to designated Japanese entities. This includes advanced logic chips, EDA software, and semiconductor manufacturing equipment. Exporters must verify the end-user and end-use before shipping to Japan.",
+    "source_citation": "MOFCOM Announcements on Japan-specific Export Controls (2026)",
+    "source_url": "https://www.mofcom.gov.cn/",
+    "effective_date": "2026-04-01",
+    "status": "ACTIVE",
+    "direction": "export",
+    "related_hs_codes": ["8541", "8542", "8486"],
+    "related_keywords": ["Japan export control", "Japanese entity list", "semiconductor Japan", "EDA software export", "chip manufacturing equipment", "Japan end-user", "Japan military"],
+    "exemptions": "Standard electronic components and general-purpose chips not on the controlled items list, shipped to non-military Japanese end-users not on the classified management list, are generally exempt from Japan-specific controls.",
+    "risk_scenarios": "Under the 2026 Japan controls, 40 Japanese entities are under classified management with enhanced scrutiny for semiconductor-related exports. Exporting advanced logic chips, EDA software, or semiconductor manufacturing equipment to ANY military end-user in Japan is prohibited. Even routine chip shipments to Japanese trading companies may require end-user certification if the ultimate consignee is unknown or suspected to be a controlled entity.",
+    "display_order": 43
+  },
+  {
+    "tag_id": "CL-CHIP-005",
+    "category": "IMPORT_CONTROL",
+    "category_label": "Import Control & Trade Remedies",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[Chip Import Ban/Restriction]",
+    "short_description": "China imposes targeted import bans, anti-dumping investigations, and enhanced supply chain reviews on certain foreign chips.",
+    "description": "China has implemented multiple import restrictions on foreign semiconductors: (1) Targeted import bans on specific chips — e.g., NVIDIA H200 AI chips were banned from import in early 2026, followed by RTX Pro 6000D; (2) Anti-dumping investigations — in September 2025, MOFCOM initiated an anti-dumping investigation on imported analog chips (interface ICs, gate driver ICs) originating from the United States; (3) Supply chain security reviews —国家安全部 requires strict security reviews and traceability management for imported chips used in critical infrastructure; (4) Rules of origin for ICs — per the China Semiconductor Industry Association, the origin of an IC (whether packaged or unpackaged) is determined by the country of the wafer fabrication factory (foundry location), not the packaging/testing location. Importers must verify their chips are not subject to import bans and correctly declare the wafer fabrication origin.",
+    "source_citation": "GAC Import Bans on Specific NVIDIA Chips (2026); MOFCOM Anti-Dumping Investigation Announcement (2025); CSIA IC Origin Rules (2026); 国家安全部 Critical Hardware Supply Chain Security Requirements",
+    "source_url": "https://www.customs.gov.cn/",
+    "effective_date": "2026-01-01",
+    "status": "ACTIVE",
+    "direction": "import",
+    "related_hs_codes": ["8542.31", "8542.32", "8542.33", "8542.39", "8541.40", "8541.43"],
+    "related_keywords": ["NVIDIA", "H200", "RTX Pro", "import ban", "anti-dumping", "analog chip", "interface IC", "gate driver IC", "chip import restriction", "MOFCOM chip", "wafer origin", "foundry origin", "chip origin rules", "supply chain security chip", "国家安全部 chip", "critical hardware", "chip supplier review"],
+    "exemptions": "Standard consumer-grade chips for general commercial use that are not subject to specific import bans or anti-dumping measures are generally exempt. Chips fabricated at foundries in non-sanctioned countries and used for non-sensitive applications typically face fewer restrictions.",
+    "risk_scenarios": "Importing chips from manufacturers under specific GAC import bans (e.g., NVIDIA H200) will result in customs seizure. Misdeclaring the wafer fabrication country of origin can trigger supply chain security investigations. Chips imported for use in critical infrastructure without supplier security review may be rejected. Anti-dumping duties may apply retroactively to analog chips from the United States if the investigation results in affirmative determinations.",
+    "display_order": 44
   }
 ]
