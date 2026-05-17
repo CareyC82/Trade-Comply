@@ -1052,11 +1052,11 @@
                 <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">11 Incoterms · Decision Tree · Calculator</div>
             </div>
 
-            <div class="quick-action-card" id="hub-semiconductor" style="opacity: 0.45;">
+            <div class="quick-action-card" id="hub-semiconductor">
                 <div class="quick-action-icon">🧠</div>
                 <div class="quick-action-label">Semiconductors & Advanced Manufacturing</div>
-                <div class="quick-action-hs">Export controls for chips, optical modules, industrial robots, and energy storage systems.</div>
-                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-text-secondary);">Coming soon</div>
+                <div class="quick-action-hs">Export controls for chips, equipment, foundry services, and advanced packaging.</div>
+                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Chip controls · Foundry rules · Supply chain security</div>
             </div>
         </div>
 
@@ -1140,6 +1140,35 @@
 
         <div id="kb-categories-container">
             </div>
+    </div>
+
+    <div id="semiconductor-view" class="view-container" style="display: none;">
+        <div style="text-align:left;padding:12px 0;">
+            <a href="#" id="back-to-hub-from-semi" class="back-link">&larr; Back to Hub</a>
+        </div>
+        <div class="home-header">
+            <h1 class="home-title">🧠 Semiconductor & Advanced Manufacturing</h1>
+            <p class="home-subtitle">Chip export controls, foundry rules, and supply chain security. Facts only.</p>
+        </div>
+        <div class="direction-toggle">
+            <button id="direction-export-semi" class="direction-btn active">Export from China</button>
+            <button id="direction-import-semi" class="direction-btn">Import into China</button>
+        </div>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Enter chip name or HS Code" id="search-input-semi" />
+            <button class="search-btn" id="search-btn-semi">GO</button>
+        </div>
+        <div id="latest-update-semi" class="latest-update-bar">
+            <span>Latest Update: May 2026 - Semiconductor export controls, foundry declaration rules, and supply chain security regulations.</span>
+        </div>
+        <div class="result-summary" style="display:none;" id="semi-result-summary">
+            <p>Found <span id="semi-result-count">0</span> regulations for '<span id="semi-search-term"></span>'</p>
+        </div>
+        <div id="semi-result-cards-container"></div>
+        <div id="semi-cases-container"></div>
+        <div class="disclaimer-bar" style="margin-top:24px;">
+            <span>This tool provides official regulatory citations only. Not legal advice.</span>
+        </div>
     </div>
 
     <div id="incoterm-view" class="view-container" style="display:none;">
@@ -2204,6 +2233,7 @@
         function showView(view) {
             document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
             document.getElementById('electronics-view').style.display = view === 'electronics' ? 'block' : 'none';
+            document.getElementById('semiconductor-view').style.display = view === 'semiconductor' ? 'block' : 'none';
             document.getElementById('incoterm-view').style.display = view === 'incoterm' ? 'block' : 'none';
             document.getElementById('result-view').style.display = view === 'result' ? 'block' : 'none';
             document.getElementById('kb-view').style.display = view === 'kb' ? 'block' : 'none';
