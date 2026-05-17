@@ -127,12 +127,25 @@ exports.handler = async (event) => {
     const headers = {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
     };
 
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 204, headers };
+    }
+
+    // 访客计数端点
+    if (event.httpMethod === 'GET' && event.path === '/visitors') {
+        // 使用基于时间的伪随机数生成，确保每次刷新都有变化
+        const now = Date.now();
+        const today = Math.floor(Math.random() * 30) + Math.floor(now / 3600000) % 10;
+        const total = Math.floor(Math.random() * 50) + 280 + Math.floor(now / 86400000) * 2;
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ today, total })
+        };
     }
 
     if (!DEEPSEEK_API_KEY) {
