@@ -140,6 +140,162 @@
             opacity: 0.9;
         }
 
+        /* Pre-check Panel */
+        .precheck-panel {
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px var(--color-card-shadow);
+        }
+
+        .precheck-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .precheck-title {
+            color: var(--color-primary);
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .precheck-note {
+            color: var(--color-text-secondary);
+            font-size: 0.78rem;
+        }
+
+        .precheck-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .precheck-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            min-height: 44px;
+            padding: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-size: 0.82rem;
+            line-height: 1.35;
+        }
+
+        .precheck-option input {
+            margin-top: 2px;
+            accent-color: var(--color-primary);
+        }
+
+        .precheck-option:has(input:checked) {
+            border-color: var(--color-primary);
+            background: rgba(26, 58, 92, 0.05);
+        }
+
+        .precheck-summary-card {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-left: 4px solid var(--color-accent);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin: 0 0 18px;
+            box-shadow: 0 2px 8px var(--color-card-shadow);
+        }
+
+        .precheck-summary-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .precheck-risk-label {
+            color: var(--color-primary);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .risk-pill {
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .risk-pill.low {
+            background: rgba(46, 125, 50, 0.1);
+            color: #2E7D32;
+        }
+
+        .risk-pill.medium {
+            background: rgba(232, 168, 23, 0.16);
+            color: #8B6914;
+        }
+
+        .risk-pill.high,
+        .risk-pill.review_required {
+            background: rgba(239, 68, 68, 0.12);
+            color: #DC2626;
+        }
+
+        .precheck-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        .precheck-chip {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 999px;
+            color: var(--color-text);
+            font-size: 0.76rem;
+            padding: 4px 9px;
+        }
+
+        .precheck-next {
+            color: var(--color-text-secondary);
+            font-size: 0.84rem;
+            line-height: 1.5;
+            margin-top: 6px;
+        }
+
+        .report-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin: -4px 0 16px;
+        }
+
+        .report-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background-color: var(--color-primary);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.86rem;
+            font-weight: 700;
+            min-height: 42px;
+        }
+
+        .report-btn:hover {
+            opacity: 0.92;
+        }
+
         /* Latest Update Bar */
         .latest-update-bar {
             background-color: var(--color-bg);
@@ -227,6 +383,21 @@
 
         .back-btn:hover {
             background-color: rgba(26, 58, 92, 0.05);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--color-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--color-primary);
+            text-decoration: none;
         }
 
         /* Warning Banner */
@@ -901,6 +1072,10 @@
                 grid-template-columns: repeat(4, 1fr);
             }
 
+            .precheck-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
             .bottom-nav {
                 max-width: 800px;
                 left: auto;
@@ -1044,34 +1219,34 @@
     <div id="home-view" class="view-container active">
         <div class="home-header">
             <h1 class="home-title">Trade Comply</h1>
-            <p class="home-subtitle">Your China Trade Compliance Hub</p>
+            <p class="home-subtitle">Import/export compliance pre-checks for electronics and semiconductors. Current coverage starts with China.</p>
         </div>
 
         <div class="quick-actions-grid">
             <div class="quick-action-card" id="hub-electronics">
                 <div class="quick-action-icon">📱</div>
-                <div class="quick-action-label">Electronics & Consumer Goods</div>
-                <div class="quick-action-hs">Check CCC, SRRC, dual-use controls, encryption rules, and more.</div>
-                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">75+ categories · 41 tags · 49 cases</div>
+                <div class="quick-action-label">Electronics Import/Export Pre-Check</div>
+                <div class="quick-action-hs">Screen wireless, battery, encryption, UAV, CCC, SRRC, and dual-use compliance signals.</div>
+                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">75+ categories · 41 rules · 49 cases</div>
             </div>
 
             <div class="quick-action-card" id="hub-incoterm">
                 <div class="quick-action-icon">📦</div>
-                <div class="quick-action-label">Incoterm Compliance Check</div>
-                <div class="quick-action-hs">Find the right Incoterm and calculate customs values correctly.</div>
-                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">11 Incoterms · Decision Tree · Calculator</div>
+                <div class="quick-action-label">Supporting Tool: Incoterm Check</div>
+                <div class="quick-action-hs">Verify trade terms and customs value inputs that affect export documentation.</div>
+                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">11 Incoterms · Decision tree · Calculator</div>
             </div>
 
             <div class="quick-action-card" id="hub-semiconductor">
                 <div class="quick-action-icon">🔬</div>
-                <div class="quick-action-label">Semiconductors & Advanced Manufacturing</div>
-                <div class="quick-action-hs">Export controls for chips, equipment, foundry services, and advanced packaging.</div>
-                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Chip controls · Foundry rules · Supply chain security</div>
+                <div class="quick-action-label">Semiconductor Trade Controls</div>
+                <div class="quick-action-hs">Pre-screen chips, equipment, foundry services, advanced packaging, and supply chain risks.</div>
+                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Chip controls · Foundry rules · End-use risk</div>
             </div>
         </div>
 
         <div class="disclaimer-bar" style="margin-top: 24px;">
-            <span>This tool provides official regulatory citations only. Not legal advice.</span>
+            <span>Pre-screening only. This tool cites official sources and does not provide legal advice.</span>
         </div>
 
         <div class="visitor-counter">
@@ -1085,12 +1260,12 @@
 
     <div id="electronics-view" class="view-container">
         <div style="text-align:left;padding:12px 0;">
-            <a href="#" id="back-to-hub" style="color:var(--color-primary);text-decoration:none;font-size:0.9rem;">&larr; Back to Hub</a>
+            <a href="#" id="back-to-hub" class="back-link">&larr; Back to Hub</a>
         </div>
 
         <div class="home-header">
-            <h1 class="home-title">Electronics & Consumer Goods</h1>
-            <p class="home-subtitle">Check CCC, SRRC, dual-use controls, encryption rules, and more.</p>
+            <h1 class="home-title">Electronics Import/Export Pre-Check</h1>
+            <p class="home-subtitle">Screen China import and export compliance signals for electronics, wireless devices, batteries, encryption, and UAV products.</p>
         </div>
 
         <div class="direction-toggle">
@@ -1099,8 +1274,23 @@
         </div>
 
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="Enter product name or HS Code" id="search-input" />
+            <input type="text" class="search-input" placeholder="Enter product, HS Code, or risk feature" id="search-input" />
             <button class="search-btn" id="search-btn">GO</button>
+        </div>
+
+        <div class="precheck-panel" id="precheck-panel">
+            <div class="precheck-header">
+                <div class="precheck-title">Pre-check risk attributes</div>
+                <div class="precheck-note">Optional. Select what the product contains or may be used for.</div>
+            </div>
+            <div class="precheck-options">
+                <label class="precheck-option"><input type="checkbox" data-precheck="wireless"> Wireless / Bluetooth / Wi-Fi</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="battery"> Lithium battery or power supply</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="encryption"> Encryption / VPN / secure module</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="uav"> UAV / drone / flight component</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="infrared"> Infrared / night vision / thermal imaging</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="semiconductor"> Chip / semiconductor / advanced manufacturing</label>
+            </div>
         </div>
 
         <div id="latest-update-bar" class="latest-update-bar">
@@ -1119,11 +1309,17 @@
         <button id="back-to-home" class="back-btn">&lt; Back</button>
 
         <div class="warning-banner">
-            <p>The following are official regulatory citations only. NOT compliance advice.</p>
+            <p>The following is a preliminary risk screen based on official regulatory citations. NOT legal advice.</p>
         </div>
 
         <div class="result-summary">
             <p>Found <span id="result-count">0</span> regulations for '<span id="search-term"></span>'</p>
+        </div>
+
+        <div id="precheck-summary-container"></div>
+
+        <div class="report-actions">
+            <button id="download-report-btn" class="report-btn" type="button">Download Pre-Check Report</button>
         </div>
 
         <div id="ai-query-section" style="margin-top: 15px;">
@@ -1156,16 +1352,30 @@
             <a href="#" id="back-to-hub-from-semi" class="back-link">&larr; Back to Hub</a>
         </div>
         <div class="home-header">
-            <h1 class="home-title">Semiconductor & Advanced Manufacturing</h1>
-            <p class="home-subtitle">Chip export controls, foundry rules, and supply chain security. Facts only.</p>
+            <h1 class="home-title">Semiconductor Trade Controls</h1>
+            <p class="home-subtitle">Pre-screen China import/export control signals for chips, equipment, foundry services, and advanced manufacturing.</p>
         </div>
         <div class="direction-toggle">
             <button id="direction-export-semi" class="direction-btn active">Export from China</button>
             <button id="direction-import-semi" class="direction-btn">Import into China</button>
         </div>
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="Enter chip name or HS Code" id="search-input-semi" />
+            <input type="text" class="search-input" placeholder="Enter chip, equipment, HS Code, or risk feature" id="search-input-semi" />
             <button class="search-btn" id="search-btn-semi">GO</button>
+        </div>
+        <div class="precheck-panel" id="semi-precheck-panel">
+            <div class="precheck-header">
+                <div class="precheck-title">Pre-check risk attributes</div>
+                <div class="precheck-note">Optional. Select sensitive features for a stronger first pass.</div>
+            </div>
+            <div class="precheck-options">
+                <label class="precheck-option"><input type="checkbox" data-precheck="semiconductor"> Chip / semiconductor item</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="advanced_manufacturing"> Equipment / foundry / packaging</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="encryption"> Encryption / secure computing</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="ai_chip"> AI chip / GPU / accelerator</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="destination_end_use"> Sensitive end use / end user</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="wireless"> Wireless / optical communication module</label>
+            </div>
         </div>
         <div class="quick-actions-grid" id="semi-quick-actions-container"></div>
         <div id="latest-update-semi" class="latest-update-bar">
@@ -1174,11 +1384,12 @@
         <div class="result-summary" style="display:none;" id="semi-result-summary">
             <p>Found <span id="semi-result-count">0</span> regulations for '<span id="semi-search-term"></span>'</p>
         </div>
+        <div id="semi-precheck-summary-container"></div>
         <div id="semi-ai-query-section" style="margin-top: 15px;"></div>
         <div id="semi-result-cards-container"></div>
         <div id="semi-cases-container"></div>
         <div class="disclaimer-bar" style="margin-top:24px;">
-            <span>This tool provides official regulatory citations only. Not legal advice.</span>
+            <span>Pre-screening only. This tool cites official sources and does not provide legal advice.</span>
         </div>
 
         <div class="feedback-section">
@@ -1188,7 +1399,7 @@
 
     <div id="incoterm-view" class="view-container" style="display:none;">
         <div style="padding:12px 0;">
-            <a href="#" id="back-to-hub-from-incoterm" style="color:var(--color-primary);text-decoration:none;font-size:0.9rem;">&larr; Back to Hub</a>
+            <a href="#" id="back-to-hub-from-incoterm" class="back-link">&larr; Back to Hub</a>
         </div>
         <div class="home-header">
             <h1 class="home-title">📦 Incoterm Compliance Check</h1>
@@ -1263,13 +1474,13 @@
         // === 多语言翻译数据 ===
         const translations = {
             title: "Trade Comply",
-            subtitle: "Understand China's trade rules. Facts only.",
+            subtitle: "Import/export compliance pre-checks for electronics and semiconductors. Current coverage starts with China.",
             export: "Export from China",
             import: "Import into China",
-            searchPlaceholder: "Enter product name or HS Code",
+            searchPlaceholder: "Enter product, HS Code, or risk feature",
             searchBtn: "GO",
             latestUpdate: "Latest Update:",
-            disclaimer: "This tool provides official regulatory citations only. Not legal advice.",
+            disclaimer: "Pre-screening only. This tool cites official sources and does not provide legal advice.",
             viewCases: "View Case Library",
             feedback: "💬 Can't find your product? Tell us",
             home: "🏠 Home",
@@ -1277,7 +1488,7 @@
             categories: "📋 Categories",
             back: "< Back",
             backArrow: "← Back",
-            warningBanner: "The following are official regulatory citations only. NOT compliance advice.",
+            warningBanner: "The following is a preliminary risk screen based on official regulatory citations. NOT legal advice.",
             foundRegulations: "Found",
             regulationsFor: "regulations for",
             relatedCases: "Related Penalty Cases",
@@ -1291,8 +1502,8 @@
             sendFeedback: "Send Feedback",
             thanksFeedback: "✅ Thanks for your feedback! We'll review it and update the database.",
             searchResults: "Search Results",
-            noResults: "No compliance requirements found for this product.",
-            outOfRange: "Your query is outside the scope of this website's trade compliance information search. This website mainly provides trade compliance information for electronics, wireless devices, batteries, solar products, industrial robots, energy storage systems, export controls, and VAT refund policies.",
+            noResults: "No compliance signals found for this product.",
+            outOfRange: "Your query is outside the scope of this trade compliance pre-check. Current coverage focuses on China import/export signals for electronics, semiconductors, wireless devices, batteries, encryption, UAVs, dual-use controls, and related VAT or customs issues.",
             aiAssistant: "🤖 AI Assistant",
             askAiAssistant: "Ask AI Assistant",
             askAiPlaceholder: "Enter your question...",
@@ -1435,7 +1646,74 @@
                 updates: []
             },
             currentDirection: 'export',
-            viewHistory: []
+            viewHistory: [],
+            lastReport: null
+        };
+
+        const PRECHECK_FACTORS = {
+            wireless: {
+                label: 'Wireless / Bluetooth / Wi-Fi',
+                keywords: ['wireless', 'bluetooth', 'wifi', 'radio', 'srrc', 'optical transceiver'],
+                signals: ['SRRC / radio transmission approval', 'Wireless module declaration'],
+                nextChecks: ['Confirm radio module specs, frequency bands, and transmit power.', 'Check whether SRRC approval or import approval is required.'],
+                risk: 'medium'
+            },
+            battery: {
+                label: 'Lithium battery or power supply',
+                keywords: ['battery', 'lithium', 'li-ion', 'power bank', 'charger'],
+                signals: ['Battery transport', 'Dangerous goods documentation'],
+                nextChecks: ['Confirm UN38.3 test status, watt-hour rating, and packaging requirements.', 'Check carrier and customs documentation requirements.'],
+                risk: 'medium'
+            },
+            encryption: {
+                label: 'Encryption / VPN / secure module',
+                keywords: ['encryption', 'encrypted', 'vpn', 'crypto', 'security'],
+                signals: ['Commercial encryption control', 'Dual-use review'],
+                nextChecks: ['Confirm whether encryption functionality is general consumer use or restricted capability.', 'Check commercial encryption import/export rules before shipment.'],
+                risk: 'high'
+            },
+            uav: {
+                label: 'UAV / drone / flight component',
+                keywords: ['drone', 'uav', 'quadcopter', 'flight controller', 'drone parts'],
+                signals: ['UAV export control', 'Dual-use end-use risk'],
+                nextChecks: ['Confirm payload, range, autonomy, and end-use/end-user details.', 'Check whether UAV or component export controls may apply.'],
+                risk: 'high'
+            },
+            infrared: {
+                label: 'Infrared / night vision / thermal imaging',
+                keywords: ['infrared', 'night vision', 'thermal camera', 'thermal imaging'],
+                signals: ['Sensitive imaging capability', 'Dual-use review'],
+                nextChecks: ['Confirm sensor type, resolution, frame rate, and intended use.', 'Check dual-use control lists for imaging or surveillance functions.'],
+                risk: 'high'
+            },
+            semiconductor: {
+                label: 'Chip / semiconductor / advanced manufacturing',
+                keywords: ['chip', 'semiconductor', 'integrated circuit', 'processor', 'wafer', 'foundry'],
+                signals: ['Semiconductor trade control', 'Supply chain security review'],
+                nextChecks: ['Confirm chip type, performance specs, manufacturing node, and destination.', 'Check semiconductor export/import controls and end-use concerns.'],
+                risk: 'high'
+            },
+            advanced_manufacturing: {
+                label: 'Equipment / foundry / packaging',
+                keywords: ['semiconductor equipment', 'foundry', 'lithography', 'etching', 'advanced packaging', 'eda'],
+                signals: ['Advanced manufacturing control', 'Technology transfer review'],
+                nextChecks: ['Confirm equipment capability, process node, software/technology transfer, and service scope.', 'Check foundry, equipment, and advanced packaging control signals.'],
+                risk: 'high'
+            },
+            ai_chip: {
+                label: 'AI chip / GPU / accelerator',
+                keywords: ['ai chip', 'gpu', 'inference accelerator', 'hbm', 'processor'],
+                signals: ['Advanced chip control', 'End-use/end-user review'],
+                nextChecks: ['Confirm compute performance, memory bandwidth, destination, and end-use.', 'Check advanced chip and AI accelerator control signals.'],
+                risk: 'high'
+            },
+            destination_end_use: {
+                label: 'Sensitive end use / end user',
+                keywords: ['dual-use', 'export control', 'military', 'surveillance', 'end use'],
+                signals: ['End-use/end-user risk', 'License review trigger'],
+                nextChecks: ['Confirm ultimate consignee, end user, end use, and destination country.', 'Escalate to professional review if military, surveillance, or restricted-party concerns exist.'],
+                risk: 'high'
+            }
         };
         
         // === 翻译函数 ===
@@ -1995,19 +2273,283 @@
             return { tags: matchedTags, cases: matchedCases };
         }
 
+        function getPrecheckSelections(panelId = 'precheck-panel') {
+            const panel = document.getElementById(panelId);
+            if (!panel) return [];
+            return Array.from(panel.querySelectorAll('input[data-precheck]:checked'))
+                .map(input => input.dataset.precheck)
+                .filter(id => PRECHECK_FACTORS[id])
+                .map(id => ({ id, ...PRECHECK_FACTORS[id] }));
+        }
+
+        function buildPrecheckQuery(query, selections) {
+            const parts = [query || ''];
+            selections.forEach(item => {
+                parts.push(...item.keywords);
+            });
+            return parts.join(' ').trim();
+        }
+
+        function mergeById(items, getId) {
+            const seen = new Set();
+            return items.filter(item => {
+                const id = getId(item);
+                if (!id || seen.has(id)) return false;
+                seen.add(id);
+                return true;
+            });
+        }
+
+        function searchWithPrecheck(query, selections, searchFn = search) {
+            const trimmedQuery = query ? query.trim() : '';
+            const keywordOnlyQuery = buildPrecheckQuery('', selections);
+            const baseResults = trimmedQuery ? searchFn(trimmedQuery) : { tags: [], cases: [] };
+            const precheckResults = keywordOnlyQuery ? searchFn(keywordOnlyQuery) : { tags: [], cases: [] };
+            const allResults = !trimmedQuery && !keywordOnlyQuery ? searchFn('') : {
+                tags: mergeById([...baseResults.tags, ...precheckResults.tags], tag => tag.tag_id),
+                cases: mergeById([...baseResults.cases, ...precheckResults.cases], caseItem => caseItem.case_id)
+            };
+            return allResults;
+        }
+
+        function getRiskRank(risk) {
+            return { low: 1, medium: 2, high: 3, review_required: 4 }[risk] || 1;
+        }
+
+        function getRiskLabel(risk) {
+            return {
+                low: 'Low',
+                medium: 'Medium',
+                high: 'High',
+                review_required: 'Review Required'
+            }[risk] || 'Low';
+        }
+
+        function inferTagRisk(tag) {
+            const text = `${tag.category || ''} ${tag.category_label || ''} ${tag.tag_id || ''} ${tag.description || ''} ${tag.short_description || ''} ${tag.risk_scenarios || ''}`.toLowerCase();
+            if (text.includes('dual-use') || text.includes('export control') || text.includes('encryption') || text.includes('uav') || text.includes('infrared') || text.includes('semiconductor')) {
+                return 'high';
+            }
+            if (text.includes('battery') || text.includes('srrc') || text.includes('wireless') || text.includes('ccc')) {
+                return 'medium';
+            }
+            return 'low';
+        }
+
+        function buildPrecheckProfile(selections, tags) {
+            let highestRisk = 'low';
+            const signals = new Set();
+            const nextChecks = new Set();
+
+            selections.forEach(item => {
+                if (getRiskRank(item.risk) > getRiskRank(highestRisk)) {
+                    highestRisk = item.risk;
+                }
+                item.signals.forEach(signal => signals.add(signal));
+                item.nextChecks.forEach(check => nextChecks.add(check));
+            });
+
+            tags.forEach(tag => {
+                const tagRisk = inferTagRisk(tag);
+                if (getRiskRank(tagRisk) > getRiskRank(highestRisk)) {
+                    highestRisk = tagRisk;
+                }
+            });
+
+            if (highestRisk === 'high' && AppState.currentDirection === 'export') {
+                highestRisk = 'review_required';
+            }
+
+            if (signals.size === 0 && tags.length > 0) {
+                signals.add('Official-source rule match');
+                nextChecks.add('Review the matched official sources and confirm product specs before shipment.');
+            }
+
+            return {
+                risk: highestRisk,
+                signals: Array.from(signals),
+                nextChecks: Array.from(nextChecks)
+            };
+        }
+
+        function renderPrecheckSummary(containerId, selections, tags) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if ((!selections || selections.length === 0) && (!tags || tags.length === 0)) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const profile = buildPrecheckProfile(selections || [], tags || []);
+            const selectedLabels = (selections || []).map(item => item.label);
+            const signalChips = profile.signals.length > 0 ? profile.signals : selectedLabels;
+            const checks = profile.nextChecks.slice(0, 3);
+
+            container.innerHTML = `
+                <div class="precheck-summary-card">
+                    <div class="precheck-summary-top">
+                        <div class="precheck-risk-label">Pre-check risk level</div>
+                        <span class="risk-pill ${escapeHtml(profile.risk)}">${escapeHtml(getRiskLabel(profile.risk))}</span>
+                    </div>
+                    ${signalChips.length > 0 ? `
+                        <div class="precheck-chips">
+                            ${signalChips.map(signal => `<span class="precheck-chip">${escapeHtml(signal)}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="precheck-next">
+                        ${checks.length > 0 ? `<strong>Recommended next checks:</strong> ${checks.map(escapeHtml).join(' ')}` : 'Review matched sources and confirm product specifications before relying on this first-pass screen.'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function createReportPayload(query, tags, cases, precheckSelections) {
+            const profile = buildPrecheckProfile(precheckSelections || [], tags || []);
+            return {
+                productQuery: query,
+                direction: AppState.currentDirection === 'export' ? t('exportTitle') : t('importTitle'),
+                generatedAt: new Date().toISOString(),
+                risk: profile.risk,
+                riskLabel: getRiskLabel(profile.risk),
+                selectedAttributes: (precheckSelections || []).map(item => item.label),
+                signals: profile.signals,
+                nextChecks: profile.nextChecks,
+                tags: (tags || []).map(tag => ({
+                    tagId: tag.tag_id || '',
+                    category: tag.category_label || tag.category || '',
+                    type: tag.tag_type || '',
+                    description: tag.description || '',
+                    shortDescription: tag.short_description || '',
+                    hsCodes: tag.related_hs_codes || [],
+                    sourceCitation: tag.source_citation || '',
+                    sourceUrl: tag.source_url || '',
+                    exemptions: tag.exemptions || '',
+                    riskScenarios: tag.risk_scenarios || ''
+                })),
+                cases: (cases || []).map(caseItem => ({
+                    title: caseItem.title || '',
+                    date: caseItem.date || '',
+                    summary: caseItem.summary || '',
+                    sourceUrl: caseItem.source_url || ''
+                }))
+            };
+        }
+
+        function formatReportDate(isoString) {
+            try {
+                return new Intl.DateTimeFormat('en', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }).format(new Date(isoString));
+            } catch (e) {
+                return isoString;
+            }
+        }
+
+        function slugifyFilePart(text) {
+            return String(text || 'all-products')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 48) || 'all-products';
+        }
+
+        function buildReportHtml(report) {
+            const tagRows = report.tags.map(tag => `
+                <tr>
+                    <td>${escapeHtml(tag.category)}</td>
+                    <td>${escapeHtml(tag.tagId)}</td>
+                    <td>${escapeHtml(tag.shortDescription || tag.description)}</td>
+                    <td>${escapeHtml(tag.hsCodes.join(', ') || 'Not specified')}</td>
+                    <td>${tag.sourceUrl ? `<a href="${sanitizeUrl(tag.sourceUrl)}">${escapeHtml(tag.sourceCitation || tag.sourceUrl)}</a>` : escapeHtml(tag.sourceCitation || 'Not specified')}</td>
+                </tr>
+            `).join('');
+
+            const caseRows = report.cases.map(caseItem => `
+                <tr>
+                    <td>${escapeHtml(caseItem.date)}</td>
+                    <td>${escapeHtml(caseItem.title)}</td>
+                    <td>${escapeHtml(caseItem.summary)}</td>
+                    <td>${caseItem.sourceUrl ? `<a href="${sanitizeUrl(caseItem.sourceUrl)}">${escapeHtml(caseItem.sourceUrl)}</a>` : 'Not specified'}</td>
+                </tr>
+            `).join('');
+
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Comply Pre-Check Report</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #243447; margin: 32px; line-height: 1.55; }
+        h1 { color: #1A3A5C; margin-bottom: 4px; }
+        h2 { color: #1A3A5C; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin-top: 28px; }
+        .meta, .notice { color: #666; font-size: 14px; }
+        .summary { border: 1px solid #E0E0E0; border-left: 5px solid #E8A817; border-radius: 8px; padding: 16px; margin: 20px 0; }
+        .risk { display: inline-block; border-radius: 999px; padding: 5px 10px; background: #FDECEC; color: #B42318; font-weight: 700; }
+        .chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 4px 9px; margin: 3px; background: #F5F7FA; font-size: 13px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 13px; }
+        th, td { border: 1px solid #E0E0E0; padding: 8px; vertical-align: top; text-align: left; }
+        th { background: #F5F7FA; color: #1A3A5C; }
+        a { color: #1A3A5C; }
+        @media print { body { margin: 18mm; } }
+    </style>
+</head>
+<body>
+    <h1>Trade Comply Pre-Check Report</h1>
+    <div class="meta">Generated: ${escapeHtml(formatReportDate(report.generatedAt))}</div>
+    <div class="notice">Preliminary import/export compliance screening only. This is not legal advice, customs advice, or a substitute for professional review.</div>
+
+    <div class="summary">
+        <p><strong>Product / Query:</strong> ${escapeHtml(report.productQuery)}</p>
+        <p><strong>Direction:</strong> ${escapeHtml(report.direction)}</p>
+        <p><strong>Pre-check risk level:</strong> <span class="risk">${escapeHtml(report.riskLabel)}</span></p>
+        ${report.selectedAttributes.length ? `<p><strong>Selected attributes:</strong><br>${report.selectedAttributes.map(item => `<span class="chip">${escapeHtml(item)}</span>`).join('')}</p>` : ''}
+        ${report.signals.length ? `<p><strong>Triggered signals:</strong><br>${report.signals.map(item => `<span class="chip">${escapeHtml(item)}</span>`).join('')}</p>` : ''}
+        ${report.nextChecks.length ? `<p><strong>Recommended next checks:</strong> ${report.nextChecks.map(escapeHtml).join(' ')}</p>` : ''}
+    </div>
+
+    <h2>Matched Compliance Signals</h2>
+    ${report.tags.length ? `<table><thead><tr><th>Category</th><th>Rule ID</th><th>Description</th><th>HS Codes</th><th>Source</th></tr></thead><tbody>${tagRows}</tbody></table>` : '<p>No matched compliance signals.</p>'}
+
+    <h2>Related Penalty Cases</h2>
+    ${report.cases.length ? `<table><thead><tr><th>Date</th><th>Case</th><th>Summary</th><th>Source</th></tr></thead><tbody>${caseRows}</tbody></table>` : '<p>No related penalty cases found.</p>'}
+</body>
+</html>`;
+        }
+
+        function downloadPrecheckReport() {
+            if (!AppState.lastReport) return;
+            const html = buildReportHtml(AppState.lastReport);
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `trade-comply-precheck-${slugifyFilePart(AppState.lastReport.productQuery)}.html`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
         /**
          * Search products wrapper
          */
         function searchProducts(query) {
             const trimmedQuery = query ? query.trim() : '';
-            const results = search(trimmedQuery);
-            renderResults(trimmedQuery || t('allProducts'), results.tags, results.cases);
+            const selections = getPrecheckSelections('precheck-panel');
+            const results = searchWithPrecheck(trimmedQuery, selections, search);
+            renderResults(trimmedQuery || t('allProducts'), results.tags, results.cases, selections);
         }
 
         /**
          * Render search results
          */
-        function renderResults(query, tags, cases) {
+        function renderResults(query, tags, cases, precheckSelections = []) {
             showView('result');
             // 清空旧的 AI 结果
             removeAiBox();
@@ -2019,9 +2561,12 @@
                 resultSummary.innerHTML = `${directionText}: ${t('foundRegulations')} <span id="result-count">${tags.length}</span> ${t('regulationsFor')} '<span id="search-term">${escapeHtml(query)}</span>'`;
             }
 
+            AppState.lastReport = createReportPayload(query, tags, cases, precheckSelections);
+            renderPrecheckSummary('precheck-summary-container', precheckSelections, tags);
+
             // 显示AI助手查询输入框和按钮（仅在范围内时显示）
             const aiQuerySection = document.getElementById('ai-query-section');
-            const isInRange = checkSearchRange(query);
+            const isInRange = checkSearchRange(query) || precheckSelections.length > 0;
             if (aiQuerySection) {
                 if (isInRange) {
                     aiQuerySection.innerHTML = `
@@ -2064,7 +2609,7 @@
 
             if (tags.length === 0) {
                 // 检查是否超出范围
-                const isOutOfRange = !checkSearchRange(query);
+                const isOutOfRange = !checkSearchRange(query) && precheckSelections.length === 0;
                 if (isOutOfRange) {
                     cardsContainer.innerHTML = `<p style="text-align: center; color: var(--color-text-secondary); padding: 20px; line-height: 1.6;">${t('outOfRange')}</p>`;
                 } else {
@@ -2317,19 +2862,34 @@
             return 'home';
         }
 
+        function resetPrecheckState() {
+            const inputsToClear = ['search-input', 'search-input-semi', 'ai-query-input', 'semi-ai-query-input'];
+            inputsToClear.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            });
+
+            document.querySelectorAll('input[data-precheck]').forEach(input => {
+                input.checked = false;
+            });
+
+            ['precheck-summary-container', 'semi-precheck-summary-container', 'ai-query-section', 'semi-ai-query-section'].forEach(id => {
+                const container = document.getElementById(id);
+                if (container) container.innerHTML = '';
+            });
+
+            const semiSummary = document.getElementById('semi-result-summary');
+            if (semiSummary) semiSummary.style.display = 'none';
+
+            removeAiBox();
+            AppState.lastReport = null;
+        }
+
         /**
          * Go back to previous view
          */
         function goBack() {
-            // 清空搜索栏内容
-            const mainSearchInput = document.getElementById('search-input');
-            if (mainSearchInput) {
-                mainSearchInput.value = '';
-            }
-            const semiSearchInput = document.getElementById('search-input-semi');
-            if (semiSearchInput) {
-                semiSearchInput.value = '';
-            }
+            resetPrecheckState();
             
             if (AppState.viewHistory.length > 0) {
                 const prevView = AppState.viewHistory.pop();
@@ -2391,12 +2951,8 @@
             const addNavEvent = (id, targetView) => {
                 const el = document.getElementById(id);
                 if (el) el.addEventListener('click', () => {
-                    // 如果返回主页，清空搜索栏
                     if (targetView === 'home') {
-                        const searchInput = document.getElementById('search-input');
-                        if (searchInput) {
-                            searchInput.value = '';
-                        }
+                        resetPrecheckState();
                     }
                     showView(targetView);
                 });
@@ -2405,6 +2961,7 @@
             document.getElementById('back-to-home')?.addEventListener('click', goBack);
             document.getElementById('back-to-home-from-kb')?.addEventListener('click', goBack);
             document.getElementById('back-to-home-from-cat')?.addEventListener('click', goBack);
+            document.getElementById('download-report-btn')?.addEventListener('click', downloadPrecheckReport);
             addNavEvent('nav-home', 'home');
             addNavEvent('nav-kb', 'kb');
             addNavEvent('nav-categories', 'categories');
@@ -2415,11 +2972,12 @@
             document.getElementById('hub-semiconductor')?.addEventListener('click', () => showView('semiconductor'));
             document.getElementById('back-to-hub')?.addEventListener('click', (e) => {
                 e.preventDefault();
+                resetPrecheckState();
                 showView('home');
             });
 
             // Semiconductor Events
-            document.getElementById('back-to-hub-from-semi')?.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
+            document.getElementById('back-to-hub-from-semi')?.addEventListener('click', (e) => { e.preventDefault(); resetPrecheckState(); showView('home'); });
             const semiExportBtn = document.getElementById('direction-export-semi');
             const semiImportBtn = document.getElementById('direction-import-semi');
             if (semiExportBtn) semiExportBtn.addEventListener('click', () => { AppState.currentDirection = 'export'; semiExportBtn.classList.add('active'); semiImportBtn?.classList.remove('active'); });
@@ -2432,6 +2990,7 @@
             document.getElementById('tab-calc')?.addEventListener('click', () => switchIncotermTab('calc'));
             document.getElementById('back-to-hub-from-incoterm')?.addEventListener('click', (e) => {
                 e.preventDefault();
+                resetPrecheckState();
                 showView('home');
             });
 
@@ -2569,78 +3128,9 @@
 
         function searchSemiconductorProducts(query) {
             const trimmedQuery = query ? query.trim() : '';
-            const results = searchSemiconductor(trimmedQuery);
-            const directionText = AppState.currentDirection === 'export' ? 'Export from China' : 'Import into China';
-            const summary = document.getElementById('semi-result-summary');
-            if (summary) { summary.style.display = 'block'; summary.innerHTML = `${directionText}: Found <span id="semi-result-count">${results.tags.length}</span> regulations for '<span id="semi-search-term">${escapeHtml(trimmedQuery || 'All Products')}</span>'`; }
-            
-            // 显示AI助手查询输入框和按钮（仅在范围内时显示）
-            const aiQuerySection = document.getElementById('semi-ai-query-section');
-            const isInRange = checkSearchRange(trimmedQuery);
-            if (aiQuerySection) {
-                if (isInRange) {
-                    aiQuerySection.innerHTML = `
-                        <div style="display: flex; gap: 10px; margin: 15px 0; align-items: center;">
-                            <input type="text" id="semi-ai-query-input" style="flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="${t('askAiPlaceholder') || '请输入您想咨询的内容...'}" value="">
-                            <button id="semi-ai-assistant-btn" class="ai-assistant-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;">
-                                🤖 ${t('askAiAssistant') || 'Ask AI Assistant'}
-                            </button>
-                        </div>
-                    `;
-                    
-                    // 添加AI助手按钮点击事件
-                    const aiBtn = document.getElementById('semi-ai-assistant-btn');
-                    const aiInput = document.getElementById('semi-ai-query-input');
-                    
-                    if (aiBtn && aiInput) {
-                        aiBtn.addEventListener('click', (e) => {
-                            const userQuery = aiInput.value.trim();
-                            if (userQuery) {
-                                callAiAssistant(userQuery);
-                            }
-                        });
-                        
-                        // 添加回车键事件
-                        aiInput.addEventListener('keyup', (e) => {
-                            if (e.key === 'Enter') {
-                                aiBtn.click();
-                            }
-                        });
-                    }
-                } else {
-                    aiQuerySection.innerHTML = '';
-                }
-            }
-            
-            const cardsContainer = document.getElementById('semi-result-cards-container');
-            if (!cardsContainer) { console.error('semi-result-cards-container not found'); return; }
-            cardsContainer.innerHTML = '';
-            if (results.tags.length === 0) {
-                cardsContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">No compliance requirements found for this query in the semiconductor database.</p>';
-            } else {
-                const groupedTags = results.tags.reduce((acc, tag) => { if (!acc[tag.category]) acc[tag.category] = { category: tag.category, tags: [] }; acc[tag.category].tags.push(tag); return acc; }, {});
-                Object.values(groupedTags).forEach(group => {
-                    const header = document.createElement('h3'); header.style = 'margin: 20px 0 12px; color: var(--color-primary); font-size: 1.1rem;'; header.textContent = group.category; cardsContainer.appendChild(header);
-                    group.tags.forEach(tag => {
-                        const card = document.createElement('div'); card.className = `compliance-card ${(tag.tag_type || '').toLowerCase()}`;
-                        const hsCodes = tag.related_hs_codes ? tag.related_hs_codes.join(', ') : 'Not specified';
-                        card.innerHTML = `<span class="compliance-tag ${(tag.tag_type || '').toLowerCase()}">${escapeHtml(tag.tag_type || '')}</span><div class="compliance-title">${escapeHtml(tag.tag_id || '')}: ${escapeHtml(tag.description || '')}</div><div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || '')}</div>${tag.exemptions ? `<div class="compliance-extra exemptions-row">✔️ <strong>Exemptions:</strong> ${escapeHtml(tag.exemptions)}</div>` : ''}${tag.risk_scenarios ? `<div class="compliance-extra risk-row">⚠️ <strong>Risk Scenarios:</strong> ${escapeHtml(tag.risk_scenarios)}</div>` : ''}<div class="compliance-hs"><strong>HS Code:</strong> ${escapeHtml(hsCodes)}</div>${tag.source_url ? `<div class="compliance-source"><strong>Source:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_url)}</a></div>` : ''}`;
-                        cardsContainer.appendChild(card);
-                    });
-                });
-            }
-            const casesContainer = document.getElementById('semi-cases-container');
-            if (!casesContainer) return;
-            casesContainer.innerHTML = '';
-            if (results.cases.length > 0) {
-                casesContainer.innerHTML = `<div class="cases-header">Related Penalty Cases</div>${results.cases.map(c => `<div class="case-card"><div class="case-title">${escapeHtml(c.title)}</div><div class="case-date">${escapeHtml(c.date)}</div><div class="case-summary">${escapeHtml(c.summary)}</div><a href="${sanitizeUrl(c.source_url)}" target="_blank" class="case-link">Source: ${escapeHtml(c.source_url)}</a></div>`).join('')}`;
-            }
-            setTimeout(() => {
-                const resultSummary = document.getElementById('semi-result-summary');
-                if (resultSummary) {
-                    resultSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 100);
+            const selections = getPrecheckSelections('semi-precheck-panel');
+            const results = searchWithPrecheck(trimmedQuery, selections, searchSemiconductor);
+            renderResults(trimmedQuery || 'Semiconductor products', results.tags, results.cases, selections);
         }
 
         function renderSemiQuickActions() {
@@ -2671,7 +3161,7 @@
                     <div class="quick-action-label">${escapeHtml(item.name)}</div>
                     <div class="quick-action-hs">${escapeHtml(item.hs_code || '')}</div>
                     <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Export controls · Foundry rules · Supply chain security</div>`;
-                card.addEventListener('click', () => { document.getElementById('search-input').value = item.query; searchProducts(item.query); });
+                card.addEventListener('click', () => { document.getElementById('search-input-semi').value = item.query; searchSemiconductorProducts(item.query); });
                 container.appendChild(card);
             });
         }
