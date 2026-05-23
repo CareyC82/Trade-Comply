@@ -1,0 +1,21 @@
+edition: 3.0.0
+name: trade-comply-ai
+access: default
+
+vars:
+  region: cn-shenzhen
+
+resources:
+  tradecoai_agent:
+    component: fc3
+    props:
+      region: ${vars.region}
+      functionName: tradecoai-agent
+      description: Trade Comply grounded AI proxy (DeepSeek)
+      runtime: nodejs18
+      handler: index.handler
+      memorySize: 256
+      timeout: 60
+      code: ./fc-package
+      environmentVariables:
+        DEEPSEEK_API_KEY: ${env(DEEPSEEK_API_KEY)}

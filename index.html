@@ -588,6 +588,46 @@
             font-size: 0.9rem;
         }
 
+        .ai-sources {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--color-border);
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .ai-sources strong {
+            color: var(--color-text);
+        }
+
+        .ai-grounding-note {
+            margin-top: 8px;
+            font-size: 0.78rem;
+            color: var(--color-matched);
+            font-weight: 500;
+        }
+
+        .rule-cite {
+            color: var(--color-primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .rule-cite:hover {
+            text-decoration: underline;
+        }
+
+        .ai-no-rules-note {
+            margin: 12px 0;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: var(--color-warning-bg);
+            color: var(--color-warning-text);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
         /* Cases Container */
         #cases-container {
             margin-top: 24px;
@@ -1506,8 +1546,12 @@
             outOfRange: "Your query is outside the scope of this trade compliance pre-check. Current coverage focuses on China import/export signals for electronics, semiconductors, wireless devices, batteries, encryption, UAVs, dual-use controls, and related VAT or customs issues.",
             aiAssistant: "🤖 AI Assistant",
             askAiAssistant: "Ask AI Assistant",
-            askAiPlaceholder: "Enter your question...",
+            askAiPlaceholder: "Ask about the matched rules above (e.g. exemptions, documents needed)",
             aiError: "AI assistant temporarily unavailable, please try again later.",
+            aiNoMatchedRules: "No matched rules available for AI grounding. Review the cards above or submit feedback.",
+            aiBasedOnRules: "Based on {count} matched rule(s) from the library.",
+            aiInsufficientContext: "The rule library does not contain enough detail for a grounded AI answer.",
+            aiGeneralGuidance: "Includes general guidance not sourced from the rule library.",
             source: "Source",
             referenceSources: "Reference Sources:",
             searching: "Searching...",
@@ -1647,7 +1691,8 @@
             },
             currentDirection: 'export',
             viewHistory: [],
-            lastReport: null
+            lastReport: null,
+            aiContext: null
         };
 
         const PRECHECK_FACTORS = {
@@ -2404,6 +2449,58 @@
             `;
         }
 
+        function buildAiContext({ productQuery, direction, precheckSelections, tags, cases, profile }) {
+            const MAX_TAGS = 8;
+            const MAX_CASES = 3;
+
+            return {
+                product_query: productQuery || '',
+                direction: direction || AppState.currentDirection || 'export',
+                precheck_attributes: (precheckSelections || []).map(item => item.id),
+                risk_level: profile?.risk || 'low',
+                tag_ids: (tags || []).slice(0, MAX_TAGS).map(tag => tag.tag_id).filter(Boolean),
+                case_ids: (cases || []).slice(0, MAX_CASES).map(caseItem => caseItem.case_id).filter(Boolean),
+                match_count: {
+                    tags: (tags || []).length,
+                    cases: (cases || []).length
+                }
+            };
+        }
+
+        function expandAiContext(baseContext, userQuestion) {
+            if (!baseContext || !userQuestion || !userQuestion.trim()) {
+                return baseContext;
+            }
+
+            const extraResults = search(userQuestion.trim());
+            const mergedTagIds = mergeById(
+                [
+                    ...(baseContext.tag_ids || []).map(tagId => ({ tag_id: tagId })),
+                    ...(extraResults.tags || [])
+                ],
+                item => item.tag_id
+            ).slice(0, 8).map(item => item.tag_id);
+
+            const mergedCaseIds = mergeById(
+                [
+                    ...(baseContext.case_ids || []).map(caseId => ({ case_id: caseId })),
+                    ...(extraResults.cases || [])
+                ],
+                item => item.case_id
+            ).slice(0, 3).map(item => item.case_id);
+
+            return {
+                ...baseContext,
+                tag_ids: mergedTagIds,
+                case_ids: mergedCaseIds,
+                match_count: {
+                    tags: Math.max(baseContext.match_count?.tags || 0, mergedTagIds.length),
+                    cases: Math.max(baseContext.match_count?.cases || 0, mergedCaseIds.length)
+                },
+                expanded: true
+            };
+        }
+
         function createReportPayload(query, tags, cases, precheckSelections) {
             const profile = buildPrecheckProfile(precheckSelections || [], tags || []);
             return {
@@ -2562,44 +2659,55 @@
             }
 
             AppState.lastReport = createReportPayload(query, tags, cases, precheckSelections);
+            const precheckProfile = buildPrecheckProfile(precheckSelections, tags);
+            AppState.aiContext = buildAiContext({
+                productQuery: query,
+                direction: AppState.currentDirection,
+                precheckSelections,
+                tags,
+                cases,
+                profile: precheckProfile
+            });
             renderPrecheckSummary('precheck-summary-container', precheckSelections, tags);
 
-            // 显示AI助手查询输入框和按钮（仅在范围内时显示）
             const aiQuerySection = document.getElementById('ai-query-section');
             const isInRange = checkSearchRange(query) || precheckSelections.length > 0;
+            const hasMatchedRules = tags.length > 0;
             if (aiQuerySection) {
-                if (isInRange) {
+                if (isInRange && hasMatchedRules) {
                     aiQuerySection.innerHTML = `
+                        <div class="ai-grounding-note">${escapeHtml(t('aiBasedOnRules', { count: tags.length }))}</div>
                         <div style="display: flex; gap: 10px; margin: 15px 0; align-items: center;">
-                            <input type="text" id="ai-query-input" style="flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="${t('askAiPlaceholder') || '请输入您想咨询的内容...'}" value="">
+                            <input type="text" id="ai-query-input" style="flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="${t('askAiPlaceholder')}" value="">
                             <button id="ai-assistant-btn" class="ai-assistant-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;">
                                 🤖 ${t('askAiAssistant')}
                             </button>
                         </div>
                     `;
-                    
-                    // 添加AI助手按钮点击事件
-                    const aiBtn = document.getElementById('ai-assistant-btn');
-                    const aiInput = document.getElementById('ai-query-input');
-                    
-                    if (aiBtn && aiInput) {
-                        aiBtn.addEventListener('click', (e) => {
-                            const userQuery = aiInput.value.trim();
-                            if (userQuery) {
-                                callAiAssistant(userQuery);
-                            }
-                        });
-                        
-                        // 添加回车键事件
-                        aiInput.addEventListener('keyup', (e) => {
-                            if (e.key === 'Enter') {
-                                aiBtn.click();
-                            }
-                        });
-                    }
+                } else if (isInRange && !hasMatchedRules) {
+                    aiQuerySection.innerHTML = `<div class="ai-no-rules-note">${escapeHtml(t('aiNoMatchedRules'))}</div>`;
                 } else {
-                    // 超出范围，不显示AI助手
                     aiQuerySection.innerHTML = '';
+                }
+            }
+
+            if (isInRange && hasMatchedRules) {
+                const aiBtn = document.getElementById('ai-assistant-btn');
+                const aiInput = document.getElementById('ai-query-input');
+
+                if (aiBtn && aiInput) {
+                    aiBtn.addEventListener('click', () => {
+                        const userQuery = aiInput.value.trim();
+                        if (userQuery) {
+                            callAiAssistant(userQuery);
+                        }
+                    });
+
+                    aiInput.addEventListener('keyup', (e) => {
+                        if (e.key === 'Enter') {
+                            aiBtn.click();
+                        }
+                    });
                 }
             }
 
@@ -2661,6 +2769,9 @@
                         const card = document.createElement('div');
                         const safeTagType = escapeHtml(tag.tag_type || 'Unknown');
                         card.className = `compliance-card ${safeTagType.toLowerCase()}`;
+                        if (tag.tag_id) {
+                            card.id = `tag-${tag.tag_id}`;
+                        }
                         
                         const hsCodes = tag.related_hs_codes ? escapeHtml(tag.related_hs_codes.join(', ')) : 'Not specified';
                         const shortTagId = tag.tag_id ? escapeHtml(tag.tag_id.replace(/^CL-|-[0-9]+$/g, '')) : '';
@@ -2691,7 +2802,7 @@
                 casesContainer.innerHTML = `
                     <div class="cases-header">${t('relatedCases')}</div>
                     ${cases.map(caseItem => `
-                        <div class="case-card">
+                        <div class="case-card" ${caseItem.case_id ? `id="case-${escapeHtml(caseItem.case_id)}"` : ''}>
                             <div class="case-title">${escapeHtml(caseItem.title)}</div>
                             <div class="case-date">${escapeHtml(caseItem.date)}</div>
                             <div class="case-summary">${escapeHtml(caseItem.summary)}</div>
@@ -2709,24 +2820,26 @@
             if (!query.trim()) {
                 return;
             }
-            
-            // 设置超时
+
+            if (!AppState.aiContext || !AppState.aiContext.tag_ids?.length) {
+                removeAiBox();
+                createAiBox(t('aiNoMatchedRules'), null);
+                return;
+            }
+
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
-            
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+
             try {
-                // 检测是否为半导体相关查询，添加标识
-                const lowerQuery = query.toLowerCase();
-                const semiKeywords = ["chip", "semiconductor", "ic", "gpu", "cpu", "hbm", "dram", "nand", "wafer", "foundry", "processor"];
-                const isSemiQuery = semiKeywords.some(kw => lowerQuery.includes(kw));
-                
-                const requestBody = JSON.stringify({ 
-                    query: isSemiQuery ? `[Semiconductor] ${query.trim()}` : query.trim()
+                const context = expandAiContext(AppState.aiContext, query);
+                const requestBody = JSON.stringify({
+                    query: query.trim(),
+                    language: 'en',
+                    context
                 });
-                
-                // 更新按钮状态
+
                 updateAiButtonState(true);
-                
+
                 const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2734,14 +2847,18 @@
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
                 const data = await response.json();
                 handleAiResponse(data);
             } catch (error) {
                 clearTimeout(timeoutId);
                 console.error('API Error:', error);
-                // 显示错误信息
                 removeAiBox();
-                createAiBox(t('aiError'), '');
+                createAiBox(t('aiError'), null);
                 updateAiButtonState(false);
             }
         }
@@ -2766,17 +2883,17 @@
          * Handle AI response
          */
         function handleAiResponse(data) {
-            // 更新AI按钮状态
             updateAiButtonState(false);
-            
-            // 检查是否收到响应
+
             if (data.response && data.response.trim()) {
                 removeAiBox();
-                createAiBox(data.response, '');
-            } else {
-                // 如果没有响应，显示错误信息
+                createAiBox(data.response, data.grounding || null);
+            } else if (data.error) {
                 removeAiBox();
-                createAiBox(t('aiError'), '');
+                createAiBox(t('aiError'), null);
+            } else {
+                removeAiBox();
+                createAiBox(t('aiError'), null);
             }
         }
         
@@ -2788,29 +2905,80 @@
             if (existingAiBox) existingAiBox.remove();
         }
         
+        function scrollToCitation(citationId) {
+            const target = document.getElementById(citationId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.style.transition = 'box-shadow 0.3s ease';
+                target.style.boxShadow = '0 0 0 3px rgba(232, 168, 23, 0.45)';
+                setTimeout(() => {
+                    target.style.boxShadow = '';
+                }, 1800);
+            }
+        }
+
+        function buildGroundingFooter(grounding) {
+            if (!grounding) return '';
+
+            const citedIds = [
+                ...(grounding.cited_tag_ids || []),
+                ...(grounding.cited_case_ids || [])
+            ];
+
+            if (citedIds.length === 0) {
+                if (grounding.confidence === 'insufficient_context') {
+                    return `<div class="ai-sources">${escapeHtml(t('aiInsufficientContext'))}</div>`;
+                }
+                return '';
+            }
+
+            const links = citedIds.map(id => {
+                const anchorId = id.startsWith('CASE-') ? `case-${id}` : `tag-${id}`;
+                return `<a href="#" class="rule-cite" data-citation-id="${escapeHtml(anchorId)}">[${escapeHtml(id)}]</a>`;
+            }).join(' ');
+
+            let footer = `<div class="ai-sources"><strong>${escapeHtml(t('referenceSources'))}</strong> ${links}</div>`;
+
+            if (grounding.confidence === 'partial') {
+                footer += `<div class="ai-grounding-note">${escapeHtml(t('aiGeneralGuidance'))}</div>`;
+            }
+
+            return footer;
+        }
+
         /**
          * Create AI box
          */
-        function createAiBox(content, sourcesHtml) {
+        function createAiBox(content, grounding) {
             const aiBox = document.createElement('div');
             aiBox.className = 'ai-assistant-box';
             
-            // 格式化内容：处理加粗、换行等
             let formattedContent = escapeHtml(content);
-            // 处理 **加粗** 语法
             formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // 处理标题行（如 "1. REGULATORY REQUIREMENTS"）
             formattedContent = formattedContent.replace(/^(\d+\.\s+.+)$/gm, '<span class="ai-section-title">$1</span>');
-            // 处理换行
+            formattedContent = formattedContent.replace(/\[(CL-[A-Z]+-\d+|CASE-[A-Z0-9-]+)\]/g, (match, id) => {
+                const anchorId = id.startsWith('CASE-') ? `case-${id}` : `tag-${id}`;
+                return `<a href="#" class="rule-cite" data-citation-id="${anchorId}">[${id}]</a>`;
+            });
             formattedContent = formattedContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-            
-            aiBox.innerHTML = `<span class="ai-assistant-tag">🤖 AI Assistant</span>
+
+            const sourcesHtml = buildGroundingFooter(grounding);
+
+            aiBox.innerHTML = `<span class="ai-assistant-tag">${t('aiAssistant')}</span>
                                <div class="ai-assistant-content">
                                  <p>${formattedContent}</p>
                                </div>
                                ${sourcesHtml}`;
+
+            aiBox.querySelectorAll('.rule-cite').forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    scrollToCitation(link.dataset.citationId);
+                });
+            });
+
             const resultSummary = document.querySelector('.result-summary');
-            if(resultSummary && resultSummary.nextSibling) {
+            if (resultSummary && resultSummary.nextSibling) {
                 document.getElementById('result-view').insertBefore(aiBox, resultSummary.nextSibling);
             }
         }
@@ -2883,6 +3051,7 @@
 
             removeAiBox();
             AppState.lastReport = null;
+            AppState.aiContext = null;
         }
 
         /**
