@@ -1267,7 +1267,7 @@
                 <div class="quick-action-icon">📱</div>
                 <div class="quick-action-label">Electronics Import/Export Pre-Check</div>
                 <div class="quick-action-hs">Screen wireless, battery, encryption, UAV, CCC, SRRC, and dual-use compliance signals.</div>
-                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">75+ categories · 41 rules · 49 cases</div>
+                <div id="hub-electronics-stats" class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Loading coverage...</div>
             </div>
 
             <div class="quick-action-card" id="hub-incoterm">
@@ -1511,8 +1511,8 @@
     </div>
 
     <script>
-        // === 多语言翻译数据 ===
-        const translations = {
+        // === English UI strings ===
+        const UI_STRINGS = {
             title: "Trade Comply",
             subtitle: "Import/export compliance pre-checks for electronics and semiconductors. Current coverage starts with China.",
             export: "Export from China",
@@ -1761,21 +1761,20 @@
             }
         };
         
-        // === 翻译函数 ===
+        // === UI string helper ===
         function t(key, params = {}) {
-            const translation = translations[key];
-            if (!translation) return key;
+            const text = UI_STRINGS[key];
+            if (!text) return key;
             
-            // 替换参数 {param}
-            let result = translation;
+            let result = text;
             for (const [paramKey, paramValue] of Object.entries(params)) {
                 result = result.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), paramValue);
             }
             return result;
         }
 
-        // === 更新页面文本 ===
-        function updatePageText() {
+        // === Sync static UI copy from UI_STRINGS ===
+        function applyUiStrings() {
             // 更新标题和副标题
             updateElementText('home-title', t('title'));
             updateElementText('home-subtitle', t('subtitle'));
@@ -1865,6 +1864,14 @@
             if (el) el.textContent = text;
         }
 
+        function getTagCategoryLabel(tag) {
+            const label = tag.category_label || tag.category || 'General';
+            if ((AppState.currentDirection || 'export') === 'import' && tag.category === 'EXPORT_CTRL') {
+                return 'Import Control & Trade Remedies';
+            }
+            return label;
+        }
+
         // === 更新分类页面摘要 ===
         function updateCategoriesSummary() {
             const summaryEl = document.getElementById('categories-summary');
@@ -1877,6 +1884,21 @@
             });
             
             summaryEl.innerHTML = t('categoriesSummary', { total: totalItems, groups: totalGroups });
+        }
+
+        function updateHubStats() {
+            const statsEl = document.getElementById('hub-electronics-stats');
+            if (!statsEl) return;
+
+            const tags = AppState.data.tags || [];
+            const cases = AppState.data.cases || [];
+            const categories = AppState.data.categories || [];
+            let categoryItems = 0;
+            categories.forEach(group => {
+                categoryItems += (group.items || []).length;
+            });
+
+            statsEl.textContent = `${categoryItems} categories · ${tags.length} rules · ${cases.length} cases`;
         }
 
         // === XSS防护：转义HTML特殊字符 ===
@@ -1948,6 +1970,7 @@
                 renderKnowledgeBase();
                 renderCategories();
                 renderLatestUpdate();
+                updateHubStats();
             } catch (err) {
                 // 这个 catch 现在主要是防患未然（极少触发）
                 console.error('Critical data load error:', err);
@@ -2735,7 +2758,7 @@
                     resultFeedbackSection.style.display = 'none';
                 }
                 const groupedTags = tags.reduce((acc, tag) => {
-                    const categoryLabel = tag.category_label || tag.category;
+                    const categoryLabel = getTagCategoryLabel(tag);
                     if (!acc[categoryLabel]) {
                         acc[categoryLabel] = { category: categoryLabel, tags: [] };
                     }
@@ -2748,21 +2771,7 @@
                 Object.values(groupedTags).forEach(group => {
                     const categoryHeader = document.createElement('h3');
                     categoryHeader.style = 'margin: 20px 0 12px; color: var(--color-primary); font-size: 1.1rem;';
-                    // 根据当前方向调整分类标题显示
-                    let displayCategory = group.category;
-                    const currentDir = AppState.currentDirection || 'export';
-                    if (currentDir === 'import') {
-                        // 将出口相关分类标题转换为进口相关标题
-                        const categoryMapping = {
-                            'Export Control': 'Import Control & Trade Remedies',
-                            'EXPORT_CTRL': 'IMPORT_CONTROL',
-                            'Export Control & Dual-Use': 'Import Control & Trade Remedies'
-                        };
-                        if (categoryMapping[group.category]) {
-                            displayCategory = categoryMapping[group.category];
-                        }
-                    }
-                    categoryHeader.textContent = displayCategory; // textContent自带转义
+                    categoryHeader.textContent = group.category;
                     fragment.appendChild(categoryHeader);
 
                     group.tags.forEach(tag => {
@@ -2834,7 +2843,6 @@
                 const context = expandAiContext(AppState.aiContext, query);
                 const requestBody = JSON.stringify({
                     query: query.trim(),
-                    language: 'en',
                     context
                 });
 
@@ -3490,7 +3498,7 @@
             await initData();
             bindEvents();
             // 初始化页面文本
-            updatePageText();
+            applyUiStrings();
             // 清空搜索栏
             const searchInput = document.getElementById('search-input');
             if (searchInput) {

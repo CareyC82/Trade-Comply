@@ -99,8 +99,6 @@ http://localhost:8000
 - `data/incoterms.json` - Incoterms decision tree and calculator data.
 - `data/updates.json` - Recent update feed.
 
-Chinese data files are present for future localization, but the current UI primarily loads the English data set.
-
 ---
 
 ## Disclaimer

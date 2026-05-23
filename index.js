@@ -355,13 +355,12 @@ function postValidateResponse(text, context) {
     };
 }
 
-const messages = {
-    en: {
-        outOfRange: "Your query is outside the scope of this website's trade compliance information search.\n\nThis website mainly provides trade compliance information for the following categories:\n• Electronics (mobile phones, computers, headphones, etc.) CCC certification\n• Wireless communication devices (Bluetooth, WiFi, drones, etc.) SRRC certification\n• Battery safety and transportation regulations\n• Solar product import/export compliance\n• Industrial robot compliance requirements\n• Energy storage system safety standards\n• Export controls and dual-use items\n• VAT refund policies\n\nIf you have other needs or specific product compliance questions, please leave a message with details about the product.",
-        insufficientContext: "The rule library did not match any compliance signals for this product screen, so the AI assistant cannot provide a grounded answer.\n\nPlease review the matched cards above, download the pre-check report, or submit feedback with your product details.",
-        invalidTagIds: "The AI assistant could not verify the matched rule IDs against the server rule library. Please refresh the page and try again.",
-        libraryUnavailable: "The AI assistant rule library is temporarily unavailable on the server. Please try again later or use the matched cards above.",
-        systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. Always reply in English.
+const AI_MESSAGES = {
+    outOfRange: "Your query is outside the scope of this website's trade compliance information search.\n\nThis website mainly provides trade compliance information for the following categories:\n• Electronics (mobile phones, computers, headphones, etc.) CCC certification\n• Wireless communication devices (Bluetooth, WiFi, drones, etc.) SRRC certification\n• Battery safety and transportation regulations\n• Solar product import/export compliance\n• Industrial robot compliance requirements\n• Energy storage system safety standards\n• Export controls and dual-use items\n• VAT refund policies\n\nIf you have other needs or specific product compliance questions, please leave a message with details about the product.",
+    insufficientContext: "The rule library did not match any compliance signals for this product screen, so the AI assistant cannot provide a grounded answer.\n\nPlease review the matched cards above, download the pre-check report, or submit feedback with your product details.",
+    invalidTagIds: "The AI assistant could not verify the matched rule IDs against the server rule library. Please refresh the page and try again.",
+    libraryUnavailable: "The AI assistant rule library is temporarily unavailable on the server. Please try again later or use the matched cards above.",
+    systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. Always reply in English.
 
 CRITICAL - Response Structure:
 Structure your entire response using this exact format:
@@ -400,66 +399,16 @@ GROUNDING RULES (mandatory):
   "The rule library does not contain enough detail to answer this. Please verify with the official source or submit feedback."
 - Do NOT invent HS codes, penalty amounts, effective dates, agency names, or license requirements not present in the context.
 - You MAY add practical next steps, but label them clearly as "General guidance (not from rule library)".`
-    },
-    zh: {
-        outOfRange: "您的查询不在本网站的贸易合规信息搜索范围内。\n\n本网站主要提供以下类别的贸易合规信息：\n• 电子产品（手机、电脑、耳机等）CCC认证\n• 无线通信设备（蓝牙、WiFi、无人机等）SRRC认证\n• 电池安全与运输规定\n• 太阳能产品进出口合规\n• 工业机器人合规要求\n• 储能系统安全标准\n• 出口管制与两用物项\n• 增值税退税政策\n\n如果您有其他需求或特定产品的合规问题，请留言说明具体产品信息。",
-        insufficientContext: "规则库未匹配到可用于回答的合规信号，AI 助手无法提供有依据的回答。\n\n请查看上方匹配卡片、下载预检报告，或通过反馈表单提交产品信息。",
-        invalidTagIds: "AI 助手无法在后端规则库中验证所提交的规则 ID。请刷新页面后重试。",
-        libraryUnavailable: "服务器端规则库暂时不可用。请稍后重试，或先查看上方匹配卡片。",
-        systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. Always reply in Chinese.
-
-CRITICAL - Response Structure:
-Structure your entire response using this exact format:
-
-1. REGULATORY REQUIREMENTS
-For each applicable regulation (e.g., CCC, SRRC), explain:
-   a) What it is
-   b) Official source
-   c) Basic penalty risk
-
-2. EXEMPTIONS & CONDITIONS
-Explain any exemptions, special conditions, or thresholds that may apply.
-
-3. HIDDEN RISKS (Dual-Use & Scenario Analysis)
-Act as a risk detective. Based on the product's features, identify potential hidden compliance risks:
-   - Could certain specs trigger dual-use controls?
-   - Are there end-use or end-user concerns (e.g., military, surveillance)?
-   - Any new regulations (e.g., 2026 Japan controls, supply chain rules) that might apply?
-   - Data security issues (e.g., biometric data collection)?
-
-4. COMPLIANCE STRATEGY
-Provide actionable guidance:
-   - What documents should the exporter prepare?
-   - What official sources should they check?
-   - What steps can reduce customs risk?
-
-CRITICAL - Rules:
-- ONLY cover China trade regulations. NEVER mention FCC, CE, FDA, RoHS, WEEE, UL, etc.
-- If asked about non-China regulations, respond: "Sorry, I only cover China's trade compliance regulations."
-- Keep each section concise but specific.
-
-GROUNDING RULES (mandatory):
-- You MUST answer using ONLY the MATCHED RULES and RELATED CASES provided in the user message.
-- Every regulatory claim MUST cite a tag_id like [CL-CCC-001] or case_id like [CASE-003].
-- If the provided context does not contain enough detail, say exactly:
-  "The rule library does not contain enough detail to answer this. Please verify with the official source or submit feedback."
-- Do NOT invent HS codes, penalty amounts, effective dates, agency names, or license requirements not present in the context.
-- You MAY add practical next steps, but label them clearly as "General guidance (not from rule library)".`
-    }
 };
 
-function getLangConfig(language) {
-    return messages[language] || messages.en;
-}
-
-function getInsufficientContextMessage(langConfig, reason) {
+function getInsufficientContextMessage(reason) {
     if (reason === 'invalid_tag_ids') {
-        return langConfig.invalidTagIds;
+        return AI_MESSAGES.invalidTagIds;
     }
     if (reason === 'library_unavailable') {
-        return langConfig.libraryUnavailable;
+        return AI_MESSAGES.libraryUnavailable;
     }
-    return langConfig.insufficientContext;
+    return AI_MESSAGES.insufficientContext;
 }
 
 exports.handler = async (event) => {
@@ -533,8 +482,6 @@ exports.handler = async (event) => {
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
-    const language = typeof body.language === 'string' ? body.language.trim().toLowerCase() : 'en';
-    const langConfig = getLangConfig(language);
 
     if (!query) {
         return { statusCode: 200, headers, body: JSON.stringify({ message: "Service Online" }) };
@@ -550,7 +497,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                response: langConfig.outOfRange,
+                response: AI_MESSAGES.outOfRange,
                 grounding: { confidence: 'out_of_range' }
             })
         };
@@ -562,7 +509,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                response: getInsufficientContextMessage(langConfig, hydrationResult.reason),
+                response: getInsufficientContextMessage(hydrationResult.reason),
                 grounding: {
                     confidence: 'insufficient_context',
                     reason: hydrationResult.reason,
@@ -589,7 +536,7 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 model: 'deepseek-chat',
                 messages: [
-                    { role: 'system', content: langConfig.systemPrompt },
+                    { role: 'system', content: AI_MESSAGES.systemPrompt },
                     { role: 'user', content: userMessage }
                 ],
                 temperature: 0.2,
