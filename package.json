@@ -1,0 +1,10 @@
+{
+  "name": "trade-comply",
+  "private": true,
+  "scripts": {
+    "validate:catalog": "node scripts/validate-catalog.js",
+    "build:catalog": "node scripts/build-catalog.js",
+    "check:catalog": "node scripts/validate-catalog.js && node scripts/build-catalog.js --check",
+    "summarize:feedback": "node scripts/summarize-feedback.js"
+  }
+}

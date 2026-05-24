@@ -1,16 +1,16 @@
+function getSemiconductorScopeKeywords() {
+    return AppState.catalog?.semiconductorKeywords || [];
+}
+
 // ==================== 半导体搜索模块 ====================
 function searchSemiconductor(query) {
     const allTags = AppState.data.tags || [];
     const allCases = AppState.data.cases || [];
-    const semiKeywordGroups = [
-        ["chip", "semiconductor", "integrated circuit", "IC", "GPU", "AI chip", "HBM", "DRAM", "NAND", "FinFET", "GAA", "wafer", "foundry", "lithography", "ALD", "ALE", "etching", "EDA", "chiplet", "3D IC", "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "tape-out", "GDSII", "inference accelerator", "NVIDIA", "H200", "RTX Pro", "import ban", "anti-dumping", "analog chip", "interface IC", "gate driver IC", "chip import restriction", "MOFCOM chip", "wafer origin", "foundry origin", "chip origin rules", "supply chain security chip", "国家安全部 chip", "critical hardware", "chip supplier review"],
-        ["industrial robot", "collaborative robot", "cobot", "robot arm", "robot controller", "welding robot", "material handling", "energy storage", "battery system", "powerwall", "storage inverter", "pcs", "solar panel", "solar inverter", "photovoltaic", "optical transceiver", "fiber optic", "optical module", "3d printer", "additive manufacturing"]
-    ];
-    const allSemiKeywords = semiKeywordGroups.flat();
+    const allSemiKeywords = getSemiconductorScopeKeywords();
     const matchedTagIds = new Set();
     allTags.forEach(tag => {
         const keywords = tag.related_keywords || [];
-        if (keywords.some(kw => allSemiKeywords.includes(kw))) matchedTagIds.add(tag.tag_id);
+        if (keywords.some(kw => allSemiKeywords.includes(String(kw).toLowerCase()))) matchedTagIds.add(tag.tag_id);
         const hsCodes = tag.related_hs_codes || [];
         if (hsCodes.some(code => code.startsWith('854') || code.startsWith('8486') || code.startsWith('8479'))) matchedTagIds.add(tag.tag_id);
     });

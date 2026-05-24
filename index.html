@@ -240,7 +240,7 @@
                 <p style="font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:12px;">
                     Have a product or HS Code you needed that isn't covered? Share it below and we'll research it.
                 </p>
-                <form id="user-feedback-form" action="https://formspree.io/f/xbdwdzly" method="POST">
+                <form id="user-feedback-form" method="post" novalidate>
                     <label for="fb-product">Product or HS Code you searched</label>
                     <input type="text" id="fb-product" name="product" placeholder="e.g. smart ring, 8517.62" required>
                     
@@ -266,12 +266,14 @@
     </div>
 
     <script src="js/core.js"></script>
+    <script src="js/catalog.js"></script>
     <script src="js/data.js"></script>
     <script src="js/search.js"></script>
     <script src="js/precheck.js"></script>
     <script src="js/trust-boundary.js"></script>
     <script src="js/render.js"></script>
     <script src="js/ai.js"></script>
+    <script src="js/feedback.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/semiconductor.js"></script>
     <script src="js/incoterm.js"></script>

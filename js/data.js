@@ -24,13 +24,16 @@ async function initData() {
     
     // 使用独立 Catch 提高容错性
     try {
-        const [tags, cases, quickActions, kb, categories, updates] = await Promise.all([
+        const [tags, cases, quickActions, kb, categories, updates, catalogSchema, scopeConfig, catalogArtifact] = await Promise.all([
             fetchJsonSafe('data/tags.json', []),
             fetchJsonSafe('data/cases.json', []),
             fetchJsonSafe('data/quick-actions.json', []),
             fetchJsonSafe('data/knowledge-base.json', { categories: [] }),
             fetchJsonSafe('data/categories.json', []),
-            fetchJsonSafe('data/updates.json', [])
+            fetchJsonSafe('data/updates.json', []),
+            fetchJsonSafe('data/catalog.schema.json', {}),
+            fetchJsonSafe('data/scope-keywords.json', {}),
+            fetchJsonSafe('data/catalog.json', null)
         ]);
 
         AppState.data = { 
@@ -39,8 +42,24 @@ async function initData() {
             categories,
             updates,
             quickActions, 
-            knowledgeBase: kb 
+            knowledgeBase: kb,
+            catalogSchema,
+            scopeConfig
         };
+
+        let catalog = Catalog.hydrateScopeCatalog(catalogArtifact);
+        if (!catalog || !catalog.keywordList.length) {
+            catalog = Catalog.buildScopeCatalog({
+                tags,
+                cases,
+                categories,
+                scopeConfig,
+                catalogSchema
+            });
+            console.warn('catalog.json unavailable or empty; built scope catalog at runtime.');
+        }
+
+        AppState.catalog = catalog;
         
         renderQuickActions();
         renderKnowledgeBase();

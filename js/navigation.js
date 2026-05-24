@@ -229,89 +229,39 @@ function bindEvents() {
     }
 
     // Feedback modal
-    const feedbackTrigger = document.getElementById('feedback-trigger');
     const feedbackModal = document.getElementById('feedback-modal');
     const modalCancel = document.getElementById('modal-cancel');
     const feedbackForm = document.getElementById('user-feedback-form');
     const feedbackThanks = document.getElementById('feedback-thanks');
     const feedbackFormDiv = document.getElementById('feedback-form');
 
-    if (feedbackTrigger && feedbackModal) {
-        feedbackTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            feedbackModal.classList.add('open');
+    ['feedback-trigger', 'result-feedback-trigger', 'home-feedback-trigger', 'semi-feedback-trigger', 'incoterm-feedback-trigger']
+        .forEach(id => {
+            const trigger = document.getElementById(id);
+            if (trigger && feedbackModal) {
+                trigger.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    openFeedbackModal();
+                });
+            }
         });
-    }
-
-    // 结果页面的反馈链接
-    const resultFeedbackTrigger = document.getElementById('result-feedback-trigger');
-    if (resultFeedbackTrigger && feedbackModal) {
-        resultFeedbackTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            feedbackModal.classList.add('open');
-        });
-    }
-
-    // Hub 页面的反馈链接
-    const homeFeedbackTrigger = document.getElementById('home-feedback-trigger');
-    if (homeFeedbackTrigger && feedbackModal) {
-        homeFeedbackTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            feedbackModal.classList.add('open');
-        });
-    }
-
-    // 半导体页面的反馈链接
-    const semiFeedbackTrigger = document.getElementById('semi-feedback-trigger');
-    if (semiFeedbackTrigger && feedbackModal) {
-        semiFeedbackTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            feedbackModal.classList.add('open');
-        });
-    }
-
-    // Incoterm 页面的反馈链接
-    const incotermFeedbackTrigger = document.getElementById('incoterm-feedback-trigger');
-    if (incotermFeedbackTrigger && feedbackModal) {
-        incotermFeedbackTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            feedbackModal.classList.add('open');
-        });
-    }
 
     if (modalCancel && feedbackModal) {
+        feedbackModal.classList.remove('open');
         modalCancel.addEventListener('click', () => {
             feedbackModal.classList.remove('open');
         });
     }
 
     if (feedbackModal) {
-        feedbackModal.addEventListener('click', (e) => {
-            if (e.target === feedbackModal) {
+        feedbackModal.addEventListener('click', (event) => {
+            if (event.target === feedbackModal) {
                 feedbackModal.classList.remove('open');
             }
         });
     }
 
-    if (feedbackForm && feedbackThanks && feedbackFormDiv) {
-        feedbackForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            fetch(feedbackForm.action, {
-                method: 'POST',
-                body: new FormData(feedbackForm),
-                headers: { 'Accept': 'application/json' }
-            }).then(() => {
-                feedbackFormDiv.classList.add('hide');
-                feedbackThanks.classList.add('show');
-                setTimeout(() => {
-                    feedbackModal.classList.remove('open');
-                    feedbackFormDiv.classList.remove('hide');
-                    feedbackThanks.classList.remove('show');
-                    feedbackForm.reset();
-                }, 2500);
-            }).catch(() => {
-                alert('Failed to send. Please try again.');
-            });
-        });
+    if (feedbackForm && feedbackThanks && feedbackFormDiv && feedbackModal) {
+        bindFeedbackSubmit(feedbackForm, feedbackThanks, feedbackFormDiv, feedbackModal);
     }
 }

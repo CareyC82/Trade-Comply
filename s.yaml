@@ -11,7 +11,7 @@ resources:
     props:
       region: ${vars.region}
       functionName: tradecoai-agent
-      description: Trade Comply grounded AI proxy (DeepSeek)
+      description: Trade Comply grounded AI proxy and structured feedback storage
       runtime: nodejs18
       handler: index.handler
       memorySize: 256
@@ -19,3 +19,9 @@ resources:
       code: ./fc-package
       environmentVariables:
         DEEPSEEK_API_KEY: ${env(DEEPSEEK_API_KEY)}
+        # Optional: persist feedback JSON to OSS (otherwise logged to CloudWatch only)
+        OSS_BUCKET: ${env(OSS_BUCKET, '')}
+        OSS_REGION: ${env(OSS_REGION, cn-shenzhen)}
+        OSS_ACCESS_KEY_ID: ${env(OSS_ACCESS_KEY_ID, '')}
+        OSS_ACCESS_KEY_SECRET: ${env(OSS_ACCESS_KEY_SECRET, '')}
+        OSS_FEEDBACK_PREFIX: ${env(OSS_FEEDBACK_PREFIX, feedback)}

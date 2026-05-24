@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
+require('./js/catalog.js');
+
+const { buildScopeCatalog, queryMatchesScope } = globalThis.Catalog;
+const { handleFeedbackRequest } = require('./feedback-store');
+
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const ALLOWED_ORIGIN = "https://careyc82.github.io";
 const MAX_QUERY_LENGTH = 500;
@@ -9,44 +14,67 @@ const MAX_CONTEXT_TAGS = 8;
 const MAX_CONTEXT_CASES = 3;
 const MAX_FIELD_LENGTH = 500;
 
-const ALLOWED_KEYWORDS = [
-    "chip", "semiconductor", "integrated circuit", "ic", "gpu", "ai chip", "hbm", "dram", "nand",
-    "cpu", "processor", "wafer", "foundry", "lithography", "etching", "eda", "chiplet", "3d ic",
-    "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "inference accelerator",
-    "NVIDIA", "H200", "RTX Pro", "finfet", "gaa", "tape-out", "gdsii",
-    "phone", "mobile", "smartphone", "iphone", "android", "cellular",
-    "laptop", "computer", "pc", "notebook", "tablet", "ipad",
-    "headphone", "earphone", "earbud", "headset", "airpod",
-    "speaker", "audio", "sound", "microphone",
-    "camera", "webcam", "ip camera", "cctv", "surveillance",
-    "drone", "uav", "quadcopter", "unmanned aerial vehicle",
-    "battery", "lithium", "li-ion", "power bank", "charger",
-    "wireless", "wifi", "bluetooth", "rf", "radio", "nfc", "zigbee",
-    "iot", "smart device", "smart home", "smart watch", "wearable",
-    "solar", "photovoltaic", "pv panel", "inverter",
-    "robot", "robotic", "industrial robot", "automation",
-    "sensor", "lidar", "radar", "infrared", "thermal",
-    "display", "monitor", "screen", "lcd", "oled",
-    "printer", "3d printer", "fdm", "resin printer",
-    "router", "modem", "network", "switch",
-    "storage", "ssd", "hard drive", "memory",
-    "encryption", "encrypted", "crypto", "vpn",
-    "export", "import", "customs", "tariff", "vat",
-    "ccc", "srrc", "certification", "compliance",
-    "optical", "fiber", "module", "transceiver",
-    "walkie", "talkie", "two-way radio",
-    "earbuds", "headphones", "tws",
-    "机器人", "无人机", "电池", "太阳能", "储能", "耳机", "蓝牙耳机", "打印机", "光模块",
-    "industrial", "energy", "optical", "fdm printer", "server", "servers",
-    "electric bicycle", "e-bike", "ebike", "electric bike",
-    "电动自行车", "电单车"
-];
-
-const TAG_ID_PATTERN = /^CL-[A-Z]+-\d+$/;
-const CASE_ID_PATTERN = /^CASE-[A-Z0-9-]+$/;
+let TAG_ID_PATTERN = /^CL-[A-Z]+-\d+$/;
+let CASE_ID_PATTERN = /^CASE-[A-Z0-9-]+$/;
+let SCOPE_KEYWORD_LIST = [];
 
 let TAGS_BY_ID = {};
 let CASES_BY_ID = {};
+
+function readJsonFile(filePath, fallback) {
+    try {
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (error) {
+        console.error(`Failed to read ${filePath}:`, error.message);
+        return fallback;
+    }
+}
+
+function loadScopeCatalogFromArtifact(dataDir) {
+    const catalogPath = path.join(dataDir, 'catalog.json');
+    if (!fs.existsSync(catalogPath)) {
+        return false;
+    }
+
+    const catalogJson = readJsonFile(catalogPath, null);
+    const catalog = globalThis.Catalog.hydrateScopeCatalog(catalogJson);
+    if (!catalog || !catalog.keywordList.length) {
+        return false;
+    }
+
+    SCOPE_KEYWORD_LIST = catalog.keywordList;
+    TAG_ID_PATTERN = catalog.tagIdPattern;
+    CASE_ID_PATTERN = catalog.caseIdPattern;
+    console.log(`Scope catalog loaded from catalog.json: ${SCOPE_KEYWORD_LIST.length} keywords`);
+    return true;
+}
+
+function loadScopeCatalog() {
+    const dataDir = path.join(__dirname, 'data');
+    if (loadScopeCatalogFromArtifact(dataDir)) {
+        return;
+    }
+
+    const catalogSchema = readJsonFile(path.join(dataDir, 'catalog.schema.json'), {});
+    const scopeConfig = readJsonFile(path.join(dataDir, 'scope-keywords.json'), {});
+    const categories = readJsonFile(path.join(dataDir, 'categories.json'), []);
+    const tags = Object.values(TAGS_BY_ID);
+    const cases = Object.values(CASES_BY_ID);
+
+    const catalog = buildScopeCatalog({
+        tags,
+        cases,
+        categories,
+        scopeConfig,
+        catalogSchema
+    });
+
+    SCOPE_KEYWORD_LIST = catalog.keywordList;
+    TAG_ID_PATTERN = catalog.tagIdPattern;
+    CASE_ID_PATTERN = catalog.caseIdPattern;
+
+    console.log(`Scope catalog built at runtime: ${SCOPE_KEYWORD_LIST.length} keywords`);
+}
 
 function loadRuleLibrary() {
     const dataDir = path.join(__dirname, 'data');
@@ -65,23 +93,19 @@ function loadRuleLibrary() {
         );
 
         console.log(`Rule library loaded: ${Object.keys(TAGS_BY_ID).length} tags, ${Object.keys(CASES_BY_ID).length} cases`);
+        loadScopeCatalog();
     } catch (error) {
         console.error('Failed to load rule library from data/*.json:', error.message);
         TAGS_BY_ID = {};
         CASES_BY_ID = {};
+        SCOPE_KEYWORD_LIST = [];
     }
 }
 
 loadRuleLibrary();
 
 function checkSearchRange(query) {
-    const queryLower = query.toLowerCase();
-    for (const keyword of ALLOWED_KEYWORDS) {
-        if (queryLower.includes(keyword)) {
-            return true;
-        }
-    }
-    return false;
+    return queryMatchesScope(query, SCOPE_KEYWORD_LIST);
 }
 
 function truncateText(text, maxLength = MAX_FIELD_LENGTH) {
@@ -411,6 +435,53 @@ function getInsufficientContextMessage(reason) {
     return AI_MESSAGES.insufficientContext;
 }
 
+function getRequestMeta(event) {
+    const method = (event.httpMethod || event.requestContext?.http?.method || 'GET').toUpperCase();
+    const path = event.path || event.requestContext?.http?.path || '/';
+    return { method, path };
+}
+
+function parseRequestBody(event) {
+    let body;
+    let rawBody;
+
+    if (event.body) {
+        if (typeof event.body === 'string') {
+            rawBody = event.body;
+        } else if (Buffer.isBuffer(event.body)) {
+            rawBody = event.body.toString('utf-8');
+        } else if (typeof event.body === 'object') {
+            body = event.body;
+        }
+    } else if (event?.type === 'Buffer' && Array.isArray(event?.data)) {
+        rawBody = Buffer.from(event.data).toString('utf-8');
+    } else if (Buffer.isBuffer(event)) {
+        rawBody = event.toString('utf-8');
+    } else if (typeof event === 'string' && event.trim().startsWith('{')) {
+        rawBody = event;
+    }
+
+    if (typeof rawBody === 'string' && rawBody.trim()) {
+        body = JSON.parse(rawBody);
+
+        if (body?.body && typeof body.body === 'string') {
+            try {
+                const nested = JSON.parse(body.body);
+                if (nested?.query || nested?.product_query) {
+                    body = nested;
+                }
+            } catch (e) {
+            }
+        }
+    }
+
+    return body || {};
+}
+
+function isFeedbackPath(path) {
+    return path === '/feedback' || path.endsWith('/feedback');
+}
+
 exports.handler = async (event) => {
     const headers = {
         "Content-Type": "application/json",
@@ -419,11 +490,13 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
     };
 
-    if (event.httpMethod === 'OPTIONS') {
+    if (getRequestMeta(event).method === 'OPTIONS') {
         return { statusCode: 204, headers };
     }
 
-    if (event.httpMethod === 'GET' && event.path === '/visitors') {
+    const { method, path } = getRequestMeta(event);
+
+    if (method === 'GET' && path === '/visitors') {
         const now = Date.now();
         const today = Math.floor(Math.random() * 30) + Math.floor(now / 3600000) % 10;
         const total = Math.floor(Math.random() * 50) + 280 + Math.floor(now / 86400000) * 2;
@@ -434,51 +507,35 @@ exports.handler = async (event) => {
         };
     }
 
-    if (!DEEPSEEK_API_KEY) {
-        console.error('DEEPSEEK_API_KEY not set');
-        return { statusCode: 500, headers, body: JSON.stringify({ error: "API key not configured" }) };
-    }
-
     let body;
-    let rawBody;
-
     try {
-        if (event.body) {
-            if (typeof event.body === 'string') {
-                rawBody = event.body;
-            } else if (Buffer.isBuffer(event.body)) {
-                rawBody = event.body.toString('utf-8');
-            } else if (typeof event.body === 'object') {
-                body = event.body;
-            }
-        }
-        else if (event?.type === 'Buffer' && Array.isArray(event?.data)) {
-            const buffer = Buffer.from(event.data);
-            rawBody = buffer.toString('utf-8');
-        }
-        else if (Buffer.isBuffer(event)) {
-            rawBody = event.toString('utf-8');
-        }
-        else if (typeof event === 'string' && event.trim().startsWith('{')) {
-            rawBody = event;
-        }
-
-        if (typeof rawBody === 'string' && rawBody.trim()) {
-            body = JSON.parse(rawBody);
-
-            if (body?.body && typeof body.body === 'string') {
-                try {
-                    const nested = JSON.parse(body.body);
-                    if (nested?.query) {
-                        body = nested;
-                    }
-                } catch (e) {
-                }
-            }
-        }
+        body = parseRequestBody(event);
     } catch (e) {
         console.error('Parse error:', e.message);
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON: " + e.message }) };
+    }
+
+    if (method === 'POST' && isFeedbackPath(path)) {
+        try {
+            const result = await handleFeedbackRequest(body, event);
+            return {
+                statusCode: result.statusCode,
+                headers,
+                body: JSON.stringify(result.body)
+            };
+        } catch (error) {
+            console.error('Feedback handler error:', error.message);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ error: 'Failed to store feedback.' })
+            };
+        }
+    }
+
+    if (!DEEPSEEK_API_KEY) {
+        console.error('DEEPSEEK_API_KEY not set');
+        return { statusCode: 500, headers, body: JSON.stringify({ error: "API key not configured" }) };
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';

@@ -96,120 +96,19 @@ const UI_STRINGS = {
     trustVerifyTitleReview: "Suggested verification path (review required)",
     trustVerifyItemReviewCounsel: "Qualified trade compliance reviewer before any export from China — matched rules include controls that need human verification.",
     trustVerifyItemReviewDocs: "Prepare end-use / end-user documentation and align commercial invoice, packing list, and consignee details with matched requirements.",
-    trustVerifyItemReviewSource: "Follow official Source links on each matched card; this screen does not approve shipment."
+    trustVerifyItemReviewSource: "Follow official Source links on each matched card; this screen does not approve shipment.",
+    feedbackSubmitError: "Could not send feedback. Please try again in a moment."
 };
 
 // === 允许搜索的关键词范围 ===
-const ALLOWED_KEYWORDS = [
-    // 半导体相关
-    "chip", "semiconductor", "integrated circuit", "ic", "gpu", "ai chip", "hbm", "dram", "nand",
-    "cpu", "processor", "wafer", "foundry", "lithography", "etching", "eda", "chiplet", "3d ic",
-    "advanced packaging", "silicon photonics", "optical interconnect", "fabless", "inference accelerator",
-    // CCC 认证相关
-    "speaker", "earbuds", "headphones", "audio", "video player", "amplifier",
-    "laptop", "tablet", "computer", "server", "router", "switch", "monitor",
-    "smartphone", "mobile phone", "modem", "wireless headphones",
-    "power bank", "portable charger", "battery pack", "external battery", "mobile power", "powerbank",
-    "smart home", "smart plug", "smart bulb", "smart light", "doorbell", "thermostat",
-    "smoke detector", "alarm", "sensor", "home automation", "smart lock",
-    "dash cam", "dash camera", "car camera", "car dvr", "vehicle camera",
-    "car tracker", "gps tracker", "vehicle gps", "obd", "car charger",
-    "game console", "gaming console", "playstation", "xbox", "nintendo",
-    "game controller", "joystick", "gamepad", "gaming controller", "handheld game", "steam deck",
-    "medical device", "blood pressure monitor", "thermometer", "pulse oximeter",
-    "glucose meter", "nebulizer", "massager", "medical", "health device", "health monitor",
-    "projector", "home projector", "mini projector", "led projector", "portable projector",
-    "power adapter", "charger", "usb charger", "power supply", "ac adapter", "dc adapter",
-    "wall charger", "fast charger", "gan charger", "charging adapter",
-    "ssd", "hard drive", "external hard drive", "usb drive", "usb stick", "flash drive",
-    "thumb drive", "portable ssd", "memory card", "sd card",
-    "keyboard", "mouse", "computer mouse", "trackpad", "webcam", "web camera", "usb hub", "card reader",
-    "vr headset", "ar glasses", "smart glasses", "virtual reality", "augmented reality",
-    "mixed reality", "vr goggles", "ar headset", "apple vision", "meta quest", "vr device",
-    "vape", "e-cigarette", "electronic cigarette", "vaping device", "vape pen", "vape mod",
-    "pod system", "vape cartridge", "e-liquid", "vape juice", "vaporizer",
-    "3d printer", "3d printing", "additive manufacturing", "fdm printer", "resin printer",
-    "sla printer", "sls printer", "3d printing machine", "filament printer", "metal 3d printer", "industrial 3d printer",
-    
-    // 无线通信相关
-    "wifi", "bluetooth", "wireless", "radio", "zigbee", "nfc", "rfid",
-    "smart speaker", "drone", "ip camera",
-    "encryption", "encrypted", "crypto", "security", "password", "vpn",
-    "smartwatch", "smart watch", "fitness tracker", "wristband", "wearable", "fitbit",
-    "apple watch", "galaxy watch", "garmin", "activity tracker", "health tracker", "ring", "smart ring",
-    "smart sensor", "motion sensor", "door sensor", "temperature sensor", "humidity sensor", "smart thermostat",
-    "wireless keyboard", "wireless mouse", "bluetooth keyboard", "bluetooth mouse", "wireless trackpad", "wireless presenter",
-    "walkie talkie", "two way radio", "walkie-talkie", "two-way radio", "handheld radio", "uhf radio",
-    "vhf radio", "pmr radio", "dmr radio", "poe radio", "intercom", "long range radio",
-    
-    // 出口管制相关
-    "uav", "infrared", "night vision", "thermal camera", "quadcopter", "unmanned aerial", "multi-rotor",
-    "drone camera", "drone gimbal", "thermal camera drone", "drone payload", "drone parts", "uav parts",
-    "video transmitter", "video transmission", "drone accessories", "fpv", "first person view",
-    "drone flight controller", "drone motor", "drone frame",
-    
-    // 电池安全相关
-    "battery", "lithium", "li-ion",
-    "electric scooter", "e-scooter", "hoverboard", "self-balancing scooter", "electric skateboard",
-    "e-bike", "electric bicycle", "electric unicycle", "segway", "balance board", "personal mobility",
-    
-    // 太阳能相关
-    "solar panel", "solar inverter", "photovoltaic module", "solar cell", "photovoltaic", "solar energy",
-    "solar battery", "solar storage", "solar charger",
-    
-    // 工业机器人相关
-    "industrial robot", "collaborative robot", "cobot", "robot arm", "robot controller",
-    "welding robot", "material handling",
-    
-    // 储能系统相关
-    "energy storage", "battery system", "powerwall", "storage inverter", "pcs", "lithium battery", "storage system",
-    
-    // 税务优惠相关
-    "tax refund", "VAT refund", "drawback", "tax rebate", "cost saving", "tax incentive",
-    "export tax", "tax benefit", "tax exemption", "duty refund", "customs clearance finance",
-    "fiscal incentive", "export benefit",
-    
-    // HS编码相关
-    "8518", "8519", "8521", "8471", "8473", "8517", "8528", "8517.12", "8517.62",
-    "8507", "8507.60", "8507.80", "8516", "8526", "8531", "8536", "8525.80", "8525.89",
-    "8806", "8807", "8527", "8526.92", "9504.50", "9504.90", "8471.60", "9018", "9019",
-    "9020", "9021", "9022", "8528.62", "8528.69", "8504.40", "8504.90", "8471.70",
-    "8523.51", "8471.80", "8528.52", "8528.59", "9004.90", "8543.70", "3824.99",
-    "8529.90", "8807.30", "8711.60", "8711.90", "9503.00", "8485.20", "8477.80",
-    "8485.30", "8525.60", "8541.40", "8541.43", "8479.50", "8428.90", "8537.10",
-    "optical transceiver", "transceiver", "fiber optic", "fiber module", "optical module",
-];
+// Built at runtime from data/*.json via Catalog.buildScopeCatalog() in initData().
 
 // 检查查询是否在允许的搜索范围内
 function checkSearchRange(query) {
-    if (!query || typeof query !== 'string') {
+    if (!AppState.catalog || !AppState.catalog.keywordList) {
         return false;
     }
-    
-    const lowerQuery = query.toLowerCase();
-    
-    // 检查是否包含任何允许的关键词
-    for (const keyword of ALLOWED_KEYWORDS) {
-        if (lowerQuery.includes(keyword.toLowerCase())) {
-            return true;
-        }
-    }
-    
-    // 检查是否包含常见的合规相关词汇
-    const complianceKeywords = [
-        "ccc", "srrc", "认证", "合规", "出口", "进口", "关税", 
-        "退税", "管制", "标准", "安全", "电池", "hs", "编码",
-        "certification", "compliance", "export", "import", "tax", 
-        "regulation", "standard", "safety", "battery", "tariff"
-    ];
-    
-    for (const keyword of complianceKeywords) {
-        if (lowerQuery.includes(keyword.toLowerCase())) {
-            return true;
-        }
-    }
-    
-    return false;
+    return Catalog.queryMatchesScope(query, AppState.catalog.keywordList);
 }
 
 // === 避免污染全局变量，放入统一命名空间 ===
@@ -220,8 +119,11 @@ const AppState = {
         quickActions: [],
         knowledgeBase: {},
         categories: [],
-        updates: []
+        updates: [],
+        catalogSchema: {},
+        scopeConfig: {}
     },
+    catalog: null,
     currentDirection: 'export',
     currentView: 'home',
     lastReport: null,
