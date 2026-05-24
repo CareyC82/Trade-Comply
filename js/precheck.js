@@ -325,6 +325,15 @@ function expandAiContext(baseContext, userQuestion) {
 
 function createReportPayload(query, tags, cases, precheckSelections) {
     const profile = buildPrecheckProfile(precheckSelections || [], tags || []);
+    const trustContext = {
+        query,
+        direction: AppState.currentDirection,
+        tags: tags || [],
+        cases: cases || [],
+        precheckSelections: precheckSelections || [],
+        profile
+    };
+    const trustBoundary = buildTrustBoundary(trustContext);
     return {
         productQuery: query,
         direction: AppState.currentDirection === 'export' ? t('exportTitle') : t('importTitle'),
@@ -334,6 +343,7 @@ function createReportPayload(query, tags, cases, precheckSelections) {
         selectedAttributes: (precheckSelections || []).map(item => item.label),
         signals: profile.signals,
         nextChecks: profile.nextChecks,
+        trustBoundaryHtml: buildTrustBoundaryHtml(trustBoundary),
         tags: (tags || []).map(tag => ({
             tagId: tag.tag_id || '',
             category: tag.category_label || tag.category || '',
@@ -415,6 +425,13 @@ table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 13p
 th, td { border: 1px solid #E0E0E0; padding: 8px; vertical-align: top; text-align: left; }
 th { background: #F5F7FA; color: #1A3A5C; }
 a { color: #1A3A5C; }
+.trust-boundary-card { border: 1px solid #E0E0E0; border-left: 4px solid #1A3A5C; border-radius: 8px; padding: 16px; margin: 20px 0; background: #FAFBFC; }
+.trust-boundary-title { color: #1A3A5C; font-weight: 700; font-size: 1.05rem; }
+.trust-boundary-subtitle { color: #666; font-size: 0.85rem; margin-top: 4px; }
+.trust-boundary-section-title { color: #1A3A5C; font-size: 0.92rem; margin: 0 0 8px; }
+.trust-boundary-list { margin: 0; padding-left: 18px; color: #444; font-size: 0.84rem; }
+.boundary-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 0.72rem; font-weight: 700; }
+.scope-chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 2px; background: #F5F7FA; font-size: 0.76rem; }
 @media print { body { margin: 18mm; } }
     </style>
 </head>
@@ -422,6 +439,8 @@ a { color: #1A3A5C; }
     <h1>Trade Comply Pre-Check Report</h1>
     <div class="meta">Generated: ${escapeHtml(formatReportDate(report.generatedAt))}</div>
     <div class="notice">Preliminary import/export compliance screening only. This is not legal advice, customs advice, or a substitute for professional review.</div>
+
+    ${report.trustBoundaryHtml || ''}
 
     <div class="summary">
 <p><strong>Product / Query:</strong> ${escapeHtml(report.productQuery)}</p>

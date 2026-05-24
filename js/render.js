@@ -142,12 +142,11 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     }
 
     const casesContainer = document.getElementById('cases-container');
-    if (!casesContainer) return;
-
-    if (cases.length === 0) {
-        casesContainer.innerHTML = '';
-    } else {
-        casesContainer.innerHTML = `
+    if (casesContainer) {
+        if (cases.length === 0) {
+            casesContainer.innerHTML = '';
+        } else {
+            casesContainer.innerHTML = `
             <div class="cases-header">${t('relatedCases')}</div>
             ${cases.map(caseItem => `
                 <div class="case-card" ${caseItem.case_id ? `id="case-${escapeHtml(caseItem.case_id)}"` : ''}>
@@ -157,6 +156,16 @@ function renderResults(query, tags, cases, precheckSelections = []) {
                     <a href="${sanitizeUrl(caseItem.source_url)}" target="_blank" class="case-link">${t('source')} ${escapeHtml(caseItem.source_url)}</a>
                 </div>
             `).join('')}
-        `;
+            `;
+        }
     }
+
+    renderTrustBoundary('trust-boundary-container', {
+        query,
+        direction: AppState.currentDirection,
+        tags,
+        cases,
+        precheckSelections,
+        profile: precheckProfile
+    });
 }
