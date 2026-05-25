@@ -15,6 +15,7 @@ on:
       - "data/catalog.schema.json"
       - "s.yaml"
       - "scripts/package-fc.sh"
+      - "scripts/deploy-fc-ci.sh"
       - ".github/workflows/deploy-fc.yml"
   workflow_dispatch:
 
@@ -34,35 +35,18 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Build FC package
-        run: bash scripts/package-fc.sh
-
-      - name: Install Serverless Devs
-        run: npm install -g @serverless-devs/s@3
-
-      - name: Configure Alibaba Cloud credentials
+      - name: Deploy to Alibaba Cloud FC
         env:
           ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
           ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
-        run: |
-          if [ -z "$ALIBABA_CLOUD_ACCESS_KEY_ID" ] || [ -z "$ALIBABA_CLOUD_ACCESS_KEY_SECRET" ]; then
-            echo "ERROR: ALIBABA_CLOUD_ACCESS_KEY_ID and ALIBABA_CLOUD_ACCESS_KEY_SECRET secrets are required."
-            exit 1
-          fi
-          s config add \
-            --AccessKeyID "$ALIBABA_CLOUD_ACCESS_KEY_ID" \
-            --AccessKeySecret "$ALIBABA_CLOUD_ACCESS_KEY_SECRET" \
-            -a default
-
-      - name: Deploy function to Alibaba Cloud FC
-        env:
+          ALIBABA_CLOUD_ACCOUNT_ID: ${{ secrets.ALIBABA_CLOUD_ACCOUNT_ID }}
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_REGION: ${{ secrets.OSS_REGION }}
-          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
-          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
           OSS_FEEDBACK_PREFIX: ${{ secrets.OSS_FEEDBACK_PREFIX }}
-        run: s deploy -y
+        run: bash scripts/deploy-fc-ci.sh
 
       - name: Smoke test deployed function
         env:
