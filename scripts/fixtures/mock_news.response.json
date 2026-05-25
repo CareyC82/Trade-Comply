@@ -1,0 +1,72 @@
+{
+  "has_relevant_changes": true,
+  "analysis_summary": "MOFCOM Announcement 2026 No.18 adds export licensing for high-performance AI inference chips (GPU/NPU), HBM-equipped accelerators, advanced packaging technology transfers, and GDSII tape-out flows for 14nm-and-below logic to overseas foundries. HS codes 8541.40, 8542.31, 8479.50, and 8486.20 are referenced.",
+  "proposed_tags": [
+    {
+      "tag_id": "CL-CHIP-006",
+      "category": "EXPORT_CTRL",
+      "category_label": "Export Control",
+      "tag_type": "MATCHED",
+      "short_name": "[AI Chip Export License]",
+      "short_description": "High-performance AI inference chips now require export licenses from 2026-06-01",
+      "description": "From 2026-06-01, export of high-performance AI inference chips—including GPU, NPU, and similar accelerators—requires a dual-use export license when any threshold is met: FP8 compute at or above 4800 TOPS, integrated HBM2e or higher memory, or high-speed interconnects such as NVLink or CXL 2.0 for data-center or supercomputing deployment. Exporters must apply to MOFCOM for a dual-use export license and declare end-user and end-use accurately.",
+      "source_citation": "MOFCOM Announcement 2026 No.18; Dual-Use Items Export License Management Framework",
+      "source_url": "https://www.mofcom.gov.cn/",
+      "effective_date": "2026-06-01",
+      "status": "ACTIVE",
+      "direction": "export",
+      "related_hs_codes": [
+        "8541.40",
+        "8542.31",
+        "8479.50",
+        "8486.20"
+      ],
+      "related_keywords": [
+        "ai chip",
+        "gpu",
+        "npu",
+        "inference accelerator",
+        "hbm",
+        "4800 tops",
+        "nvlink",
+        "cxl 2.0",
+        "data center chip"
+      ],
+      "exemptions": "Certified consumer terminal devices such as smartphones and tablets are excluded when exported as complete units, but controlled chips exported separately still require licenses.",
+      "risk_scenarios": "Cloud-training or inference accelerators marketed for enterprise edge use may still trigger licensing if performance thresholds are met. Shipments lacking accurate end-user/end-use declarations may be held at customs.",
+      "display_order": 41,
+      "related_cases": []
+    },
+    {
+      "tag_id": "CL-CHIP-007",
+      "category": "EXPORT_CTRL",
+      "category_label": "Export Control",
+      "tag_type": "CHECK_REQUIRED",
+      "short_name": "[Advanced Chip Design Export]",
+      "short_description": "GDSII and advanced packaging technology transfers may require export controls",
+      "description": "The announcement adds controls on transfers of GDSII design files for 14nm-and-below logic chips to overseas foundries, as well as technology materials related to 2.5D/3D IC advanced packaging equipment. Fabless exporters should verify whether tape-out, design file, or packaging know-how shipments require a technology export license even when physical chips are not exported.",
+      "source_citation": "MOFCOM Announcement 2026 No.18",
+      "source_url": "https://www.mofcom.gov.cn/",
+      "effective_date": "2026-06-01",
+      "status": "ACTIVE",
+      "direction": "export",
+      "related_hs_codes": [
+        "8542.31",
+        "8486.20"
+      ],
+      "related_keywords": [
+        "gdsii",
+        "tape-out",
+        "14nm",
+        "3d ic",
+        "advanced packaging",
+        "foundry",
+        "chiplet"
+      ],
+      "exemptions": "Mature-node designs at 28nm and above for general commercial applications may fall outside the controlled scope, subject to end-use review.",
+      "risk_scenarios": "Sending updated design databases to offshore foundries for engineering trials can qualify as a controlled technology transfer even before mass production.",
+      "display_order": 42,
+      "related_cases": []
+    }
+  ]
+}

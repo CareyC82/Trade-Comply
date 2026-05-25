@@ -1579,5 +1579,43 @@
     "exemptions": "Standard consumer-grade chips for general commercial use that are not subject to specific import bans or anti-dumping measures are generally exempt. Chips fabricated at foundries in non-sanctioned countries and used for non-sensitive applications typically face fewer restrictions.",
     "risk_scenarios": "Importing chips from manufacturers under specific GAC import bans (e.g., NVIDIA H200) will result in customs seizure. Misdeclaring the wafer fabrication country of origin can trigger supply chain security investigations. Chips imported for use in critical infrastructure without supplier security review may be rejected. Anti-dumping duties may apply retroactively to analog chips from the United States if the investigation results in affirmative determinations.",
     "display_order": 44
+  },
+  {
+    "tag_id": "CL-CHIP-006",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "MATCHED",
+    "short_name": "[AI Inference Chip Export Control]",
+    "short_description": "Export controls on high-performance AI inference chips (GPU/NPU) with FP8 >=4800 TOPS, HBM2e+, or NVLink/CXL 2.0+.",
+    "description": "MOFCOM Announcement 2026 No.18 imposes export license requirements for AI inference chips meeting any of: FP8 >=4800 TOPS, integrated HBM2e+ memory, or support for NVLink/CXL 2.0+ interconnects for data center/supercomputing. Also controls GDSII design files for sub-14nm logic chips and 2.5D/3D IC integration equipment technical data. Exempts certified consumer electronics end products (e.g., smartphones, tablets) but controlled chips exported separately remain subject. Related HS codes: 8541.40, 8542.31, 8479.50, 8486.20.",
+    "source_citation": "MOFCOM Announcement 2026 No.18",
+    "source_url": "https://www.mofcom.gov.cn/",
+    "effective_date": "2026-06-01",
+    "status": "ACTIVE",
+    "direction": "export",
+    "related_hs_codes": [
+      "8541.40",
+      "8542.31",
+      "8479.50",
+      "8486.20"
+    ],
+    "related_keywords": [
+      "ai inference chip",
+      "gpu",
+      "npu",
+      "hbm",
+      "nvlink",
+      "cxl",
+      "datacenter",
+      "supercomputing",
+      "gdsii",
+      "2.5d",
+      "3d ic",
+      "advanced packaging"
+    ],
+    "related_cases": [],
+    "exemptions": "Certified consumer electronics end products (e.g., smartphones, tablets) are exempt, but controlled chips exported separately remain subject.",
+    "risk_scenarios": "Exporters of AI accelerators, GPUs, or chips with HBM must verify if performance thresholds are met and apply for dual-use export license. Design houses transferring GDSII for sub-14nm to overseas foundries need license. Advanced packaging equipment technical data exports also controlled.",
+    "display_order": 99
   }
 ]
