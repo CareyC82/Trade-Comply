@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "output_path": "data/inbox/latest_announcement.txt",
+  "manifest_path": "data/inbox/manifest.json",
+  "sources": [
+    {
+      "id": "mofcom-export-control",
+      "label": "MOFCOM export control announcements",
+      "url": "https://www.mofcom.gov.cn/zwgk/zcfb/index.html",
+      "enabled": true,
+      "max_chars": 12000
+    },
+    {
+      "id": "gac-customs-notices",
+      "label": "GAC customs notices",
+      "url": "http://www.customs.gov.cn/customs/302249/302270/index.html",
+      "enabled": true,
+      "max_chars": 12000
+    }
+  ]
+}
