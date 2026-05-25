@@ -35,18 +35,34 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Preflight secrets
+        env:
+          ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
+          ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: bash scripts/deploy-fc-ci.sh preflight
+
+      - name: Build FC package
+        run: bash scripts/deploy-fc-ci.sh build
+
+      - name: Install Aliyun CLI
+        run: bash scripts/deploy-fc-ci.sh install-cli
+
       - name: Deploy to Alibaba Cloud FC
         env:
           ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
           ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
-          ALIBABA_CLOUD_ACCOUNT_ID: ${{ secrets.ALIBABA_CLOUD_ACCOUNT_ID }}
           OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
           OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_REGION: ${{ secrets.OSS_REGION }}
           OSS_FEEDBACK_PREFIX: ${{ secrets.OSS_FEEDBACK_PREFIX }}
-        run: bash scripts/deploy-fc-ci.sh
+        run: |
+          bash scripts/deploy-fc-ci.sh configure
+          bash scripts/deploy-fc-ci.sh deploy
 
       - name: Smoke test deployed function
         env:
