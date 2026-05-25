@@ -1,0 +1,76 @@
+name: Deploy FC
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.js"
+      - "feedback-store.js"
+      - "js/catalog.js"
+      - "data/tags.json"
+      - "data/cases.json"
+      - "data/categories.json"
+      - "data/catalog.json"
+      - "data/scope-keywords.json"
+      - "data/catalog.schema.json"
+      - "s.yaml"
+      - "scripts/package-fc.sh"
+      - ".github/workflows/deploy-fc.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-fc-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build FC package
+        run: bash scripts/package-fc.sh
+
+      - name: Install Serverless Devs
+        run: npm install -g @serverless-devs/s@3
+
+      - name: Configure Alibaba Cloud credentials
+        env:
+          ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
+          ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
+        run: |
+          if [ -z "$ALIBABA_CLOUD_ACCESS_KEY_ID" ] || [ -z "$ALIBABA_CLOUD_ACCESS_KEY_SECRET" ]; then
+            echo "ERROR: ALIBABA_CLOUD_ACCESS_KEY_ID and ALIBABA_CLOUD_ACCESS_KEY_SECRET secrets are required."
+            exit 1
+          fi
+          s config add \
+            --AccessKeyID "$ALIBABA_CLOUD_ACCESS_KEY_ID" \
+            --AccessKeySecret "$ALIBABA_CLOUD_ACCESS_KEY_SECRET" \
+            -a default
+
+      - name: Deploy function to Alibaba Cloud FC
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
+          OSS_REGION: ${{ secrets.OSS_REGION }}
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          OSS_FEEDBACK_PREFIX: ${{ secrets.OSS_FEEDBACK_PREFIX }}
+        run: s deploy -y
+
+      - name: Smoke test deployed function
+        env:
+          FC_URL: ${{ secrets.FC_HTTP_URL }}
+        run: |
+          if [ -z "$FC_URL" ]; then
+            echo "FC_HTTP_URL secret not set; skipping smoke test."
+            exit 0
+          fi
+          curl -fsS "$FC_URL" | grep -q "Service Online"
+          echo "FC smoke test passed."
