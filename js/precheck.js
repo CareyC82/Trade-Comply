@@ -358,12 +358,6 @@ function createReportPayload(query, tags, cases, precheckSelections) {
             sourceUrl: tag.source_url || '',
             exemptions: tag.exemptions || '',
             riskScenarios: tag.risk_scenarios || ''
-        })),
-        cases: (cases || []).map(caseItem => ({
-            title: caseItem.title || '',
-            date: caseItem.date || '',
-            summary: caseItem.summary || '',
-            sourceUrl: caseItem.source_url || ''
         }))
     };
 }
@@ -398,15 +392,6 @@ function buildReportHtml(report) {
             <td>${escapeHtml(tag.shortDescription || tag.description)}</td>
             <td>${escapeHtml(tag.hsCodes.join(', ') || 'Not specified')}</td>
             <td>${tag.sourceUrl ? `<a href="${sanitizeUrl(tag.sourceUrl)}">${escapeHtml(tag.sourceCitation || tag.sourceUrl)}</a>` : escapeHtml(tag.sourceCitation || 'Not specified')}</td>
-        </tr>
-    `).join('');
-
-    const caseRows = report.cases.map(caseItem => `
-        <tr>
-            <td>${escapeHtml(caseItem.date)}</td>
-            <td>${escapeHtml(caseItem.title)}</td>
-            <td>${escapeHtml(caseItem.summary)}</td>
-            <td>${caseItem.sourceUrl ? `<a href="${sanitizeUrl(caseItem.sourceUrl)}">${escapeHtml(caseItem.sourceUrl)}</a>` : 'Not specified'}</td>
         </tr>
     `).join('');
 
@@ -456,9 +441,6 @@ ${report.nextChecks.length ? `<p><strong>Recommended next checks:</strong> ${rep
 
     <h2>Matched Compliance Signals</h2>
     ${report.tags.length ? `<table><thead><tr><th>Category</th><th>Rule ID</th><th>Description</th><th>HS Codes</th><th>Source</th></tr></thead><tbody>${tagRows}</tbody></table>` : '<p>No matched compliance signals.</p>'}
-
-    <h2>Related Penalty Cases</h2>
-    ${report.cases.length ? `<table><thead><tr><th>Date</th><th>Case</th><th>Summary</th><th>Source</th></tr></thead><tbody>${caseRows}</tbody></table>` : '<p>No related penalty cases found.</p>'}
 </body>
 </html>`;
 }
