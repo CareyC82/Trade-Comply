@@ -657,6 +657,14 @@ body {
     border-left: 4px solid var(--color-check);
 }
 
+/* Nested rule cards: category group already has the accent bar */
+.result-category-group .compliance-card.matched,
+.result-category-group .compliance-card.check,
+.result-category-group .compliance-card.check_required {
+    border-left: none;
+    border: 1px solid var(--color-border);
+}
+
 .compliance-tag {
     display: inline-block;
     padding: 4px 8px;
