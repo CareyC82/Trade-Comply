@@ -106,6 +106,9 @@ async function submitPolicyCorrectionForm(form) {
     if (!response.ok) {
         throw new Error(data.error || `Policy correction API error: ${response.status}`);
     }
+    if (data.message === 'Service Online') {
+        throw new Error('Policy correction API is not deployed yet. Please redeploy the FC function.');
+    }
 
     return data;
 }

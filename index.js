@@ -8,7 +8,14 @@ const { handleFeedbackRequest } = require('./feedback-store');
 const { handleComplianceFeedbackRequest } = require('./supabase-feedback');
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-const ALLOWED_ORIGIN = "https://careyc82.github.io";
+const ALLOWED_ORIGINS = new Set([
+    'https://careyc82.github.io',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500'
+]);
+const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
 const MAX_QUERY_LENGTH = 500;
 const TIMEOUT_MS = 30000;
 const MAX_CONTEXT_TAGS = 8;
@@ -547,10 +554,61 @@ function getInsufficientContextMessage(reason) {
     return AI_MESSAGES.insufficientContext;
 }
 
+function normalizePath(path) {
+    if (!path || typeof path !== 'string') {
+        return '/';
+    }
+    const withoutQuery = path.split('?')[0].trim();
+    if (!withoutQuery || withoutQuery === '/') {
+        return '/';
+    }
+    const withLeadingSlash = withoutQuery.startsWith('/') ? withoutQuery : `/${withoutQuery}`;
+    return withLeadingSlash.replace(/\/+$/, '') || '/';
+}
+
+function getHeaderValue(headers, name) {
+    if (!headers || typeof headers !== 'object') {
+        return '';
+    }
+    const target = name.toLowerCase();
+    for (const [key, value] of Object.entries(headers)) {
+        if (key.toLowerCase() === target) {
+            return String(value || '');
+        }
+    }
+    return '';
+}
+
 function getRequestMeta(event) {
-    const method = (event.httpMethod || event.requestContext?.http?.method || 'GET').toUpperCase();
-    const path = event.path || event.requestContext?.http?.path || '/';
+    const method = (event.httpMethod || event.requestContext?.http?.method || event.method || 'GET').toUpperCase();
+    const headerPath = getHeaderValue(event.headers, 'x-fc-request-path')
+        || getHeaderValue(event.headers, 'x-fc-request-uri')
+        || getHeaderValue(event.headers, 'x-forwarded-uri');
+    const path = normalizePath(
+        event.rawPath
+        || event.requestContext?.http?.path
+        || event.path
+        || (headerPath ? headerPath.split('?')[0] : '')
+        || '/'
+    );
     return { method, path };
+}
+
+function resolveAllowedOrigin(event) {
+    const origin = getHeaderValue(event.headers, 'origin');
+    if (origin && ALLOWED_ORIGINS.has(origin)) {
+        return origin;
+    }
+    return DEFAULT_ALLOWED_ORIGIN;
+}
+
+function buildCorsHeaders(event) {
+    return {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': resolveAllowedOrigin(event),
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    };
 }
 
 function parseRequestBody(event) {
@@ -591,26 +649,39 @@ function parseRequestBody(event) {
 }
 
 function isFeedbackPath(path) {
-    return path === '/feedback' || path.endsWith('/feedback');
+    return normalizePath(path) === '/feedback';
 }
 
 function isApiFeedbackPath(path) {
-    return path === '/api/feedback' || path.endsWith('/api/feedback');
+    return normalizePath(path) === '/api/feedback';
+}
+
+function inferPostRoute(path, body) {
+    if (isApiFeedbackPath(path)) {
+        return 'api_feedback';
+    }
+    if (isFeedbackPath(path)) {
+        return 'feedback';
+    }
+    if (!body || typeof body !== 'object') {
+        return null;
+    }
+    if (body.product_keyword || body.policy_type || body.source_url) {
+        return 'api_feedback';
+    }
+    if (body.product_query !== undefined || body.regulation_needed !== undefined) {
+        return 'feedback';
+    }
+    return null;
 }
 
 exports.handler = async (event) => {
-    const headers = {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    };
+    const headers = buildCorsHeaders(event);
+    const { method, path } = getRequestMeta(event);
 
-    if (getRequestMeta(event).method === 'OPTIONS') {
+    if (method === 'OPTIONS') {
         return { statusCode: 204, headers };
     }
-
-    const { method, path } = getRequestMeta(event);
 
     if (method === 'GET' && path === '/visitors') {
         const now = Date.now();
@@ -631,7 +702,9 @@ exports.handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON: " + e.message }) };
     }
 
-    if (method === 'POST' && isFeedbackPath(path)) {
+    const postRoute = method === 'POST' ? inferPostRoute(path, body) : null;
+
+    if (postRoute === 'feedback') {
         try {
             const result = await handleFeedbackRequest(body, event);
             return {
@@ -649,7 +722,7 @@ exports.handler = async (event) => {
         }
     }
 
-    if (method === 'POST' && isApiFeedbackPath(path)) {
+    if (postRoute === 'api_feedback') {
         try {
             const result = await handleComplianceFeedbackRequest(body);
             return {
