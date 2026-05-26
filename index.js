@@ -16,6 +16,7 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
+const FC_BUILD_ID = '20260527-feedback-v1';
 const MAX_QUERY_LENGTH = 500;
 const TIMEOUT_MS = 30000;
 const MAX_CONTEXT_TAGS = 8;
@@ -554,6 +555,14 @@ function getInsufficientContextMessage(reason) {
     return AI_MESSAGES.insufficientContext;
 }
 
+function getQueryParams(event) {
+    const raw = event.queryParameters || event.queryStringParameters || {};
+    if (Array.isArray(raw)) {
+        return {};
+    }
+    return raw || {};
+}
+
 function normalizePath(path) {
     if (!path || typeof path !== 'string') {
         return '/';
@@ -686,6 +695,21 @@ exports.handler = async (event) => {
         return { statusCode: 204, headers };
     }
 
+    if (method === 'GET') {
+        const health = getQueryParams(event).health;
+        if (health === 'feedback') {
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                    ok: true,
+                    build: FC_BUILD_ID,
+                    features: ['compliance_feedback', 'feedback', 'ai']
+                })
+            };
+        }
+    }
+
     if (method === 'GET' && path === '/visitors') {
         const now = Date.now();
         const today = Math.floor(Math.random() * 30) + Math.floor(now / 3600000) % 10;
@@ -751,7 +775,11 @@ exports.handler = async (event) => {
     const query = typeof body.query === 'string' ? body.query.trim() : '';
 
     if (!query) {
-        return { statusCode: 200, headers, body: JSON.stringify({ message: "Service Online" }) };
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ message: 'Service Online', build: FC_BUILD_ID })
+        };
     }
 
     if (query.length > MAX_QUERY_LENGTH) {
