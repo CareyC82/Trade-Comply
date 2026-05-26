@@ -16,10 +16,12 @@ function searchSemiconductor(query) {
     });
     let matchedTags = allTags.filter(tag => matchedTagIds.has(tag.tag_id));
     if (query && query.trim()) {
-        const lowerQuery = query.toLowerCase();
         const inputType = detectInputType(query);
-        if (inputType === 'hs_code') { matchedTags = matchByHSCode(query, matchedTags); }
-        else { matchedTags = matchedTags.filter(tag => { const keywords = tag.related_keywords || []; return keywords.some(kw => lowerQuery.includes(kw.toLowerCase())); }); }
+        if (inputType === 'hs_code') {
+            matchedTags = matchByHSCode(query, matchedTags);
+        } else {
+            matchedTags = matchByProductName(query, matchedTags);
+        }
     }
     const currentDirection = AppState.currentDirection || 'export';
     matchedTags = matchedTags.filter(tag => { const td = tag.direction || 'both'; return td === 'both' || td === currentDirection; });
