@@ -1,4 +1,4 @@
-const POLICY_CORRECTION_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run/api/feedback';
+const POLICY_CORRECTION_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run/';
 
 function getActiveProductKeyword() {
     const searchTermEl = document.getElementById('search-term');
@@ -26,6 +26,7 @@ function buildPolicyCorrectionPayload(form) {
     const messageInput = form.querySelector('#pc-user-message');
 
     return {
+        action: 'compliance_feedback',
         product_keyword: productInput ? productInput.value.trim() : '',
         policy_type: policyTypeInput ? policyTypeInput.value.trim() : '',
         source_url: sourceUrlInput ? sourceUrlInput.value.trim() : '',
@@ -136,7 +137,8 @@ function bindPolicyCorrectionSubmit(form, modal) {
             closePolicyCorrectionModal();
         } catch (error) {
             console.error('Policy correction submit failed:', error);
-            alert(t('policyCorrectionSubmitError'));
+            const detail = error && error.message ? `\n\n${error.message}` : '';
+            alert(`${t('policyCorrectionSubmitError')}${detail}`);
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;

@@ -666,6 +666,9 @@ function inferPostRoute(path, body) {
     if (!body || typeof body !== 'object') {
         return null;
     }
+    if (body.action === 'compliance_feedback') {
+        return 'api_feedback';
+    }
     if (body.product_keyword || body.policy_type || body.source_url) {
         return 'api_feedback';
     }

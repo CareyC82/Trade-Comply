@@ -3,6 +3,20 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 
 const POLICY_TYPES = new Set(['Export control', 'CCC certification', 'No applicable policy']);
 
+const POLICY_TYPE_ALIASES = {
+    '出口管制': 'Export control',
+    'CCC认证': 'CCC certification',
+    '暂无政策': 'No applicable policy'
+};
+
+function normalizePolicyType(value) {
+    const trimmed = trimField(value, MAX_LENGTH.policy_type);
+    if (POLICY_TYPE_ALIASES[trimmed]) {
+        return POLICY_TYPE_ALIASES[trimmed];
+    }
+    return trimmed;
+}
+
 const MAX_LENGTH = {
     product_keyword: 200,
     policy_type: 64,
@@ -32,7 +46,7 @@ function validateComplianceFeedbackPayload(body) {
     }
 
     const product_keyword = trimField(body.product_keyword, MAX_LENGTH.product_keyword);
-    const policy_type = trimField(body.policy_type, MAX_LENGTH.policy_type);
+    const policy_type = normalizePolicyType(body.policy_type);
     const source_url = trimField(body.source_url, MAX_LENGTH.source_url);
     const user_message = trimField(body.user_message, MAX_LENGTH.user_message);
 
