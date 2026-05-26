@@ -309,6 +309,19 @@ function getTagCategoryLabel(tag) {
     return label;
 }
 
+const CATEGORY_THEME = {
+    EXPORT_CTRL: { class: 'export-ctrl', icon: '🛡️' },
+    COMPULSORY_CERT: { class: 'compulsory-cert', icon: '✅' },
+    TAX_INCENTIVE: { class: 'tax-incentive', icon: '💰' },
+    WIRELESS_TELECOM: { class: 'wireless-telecom', icon: '📡' },
+    COMPLIANCE_STD: { class: 'compliance-std', icon: '📋' },
+    OTHER: { class: 'other', icon: '📦' }
+};
+
+function getCategoryTheme(categoryCode) {
+    return CATEGORY_THEME[categoryCode] || CATEGORY_THEME.OTHER;
+}
+
 // === 更新分类页面摘要 ===
 function updateCategoriesSummary() {
     const summaryEl = document.getElementById('categories-summary');

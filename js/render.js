@@ -99,7 +99,11 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         const groupedTags = tags.reduce((acc, tag) => {
             const categoryLabel = getTagCategoryLabel(tag);
             if (!acc[categoryLabel]) {
-                acc[categoryLabel] = { category: categoryLabel, tags: [] };
+                acc[categoryLabel] = {
+                    category: categoryLabel,
+                    categoryCode: tag.category || 'OTHER',
+                    tags: []
+                };
             }
             acc[categoryLabel].tags.push(tag);
             return acc;
@@ -108,13 +112,15 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         const fragment = document.createDocumentFragment();
 
         Object.values(groupedTags).forEach(group => {
+            const theme = getCategoryTheme(group.categoryCode);
             const groupEl = document.createElement('div');
-            groupEl.className = 'result-category-group category-group collapsible-panel';
+            groupEl.className = `result-category-group category-group collapsible-panel result-category-group--${theme.class}`;
             const ruleCount = group.tags.length;
             const ruleLabel = ruleCount === 1 ? 'rule' : 'rules';
 
             groupEl.innerHTML = `
                 <button type="button" class="category-group-header collapsible-header" aria-expanded="false">
+                    <span class="group-icon group-icon--themed" aria-hidden="true">${theme.icon}</span>
                     <span class="group-title">${escapeHtml(group.category)}</span>
                     <span class="group-count">${ruleCount} ${ruleLabel}</span>
                     <span class="arrow" aria-hidden="true">▶</span>

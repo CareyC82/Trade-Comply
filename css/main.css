@@ -1247,6 +1247,160 @@ body {
 
 .result-category-group {
     margin: 0;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--color-card-shadow);
+    overflow: hidden;
+}
+
+.result-category-group .category-group-header {
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.result-category-group .group-icon--themed {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-right: 4px;
+    border-radius: 8px;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.result-category-group .group-count {
+    margin-left: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(26, 58, 92, 0.08);
+    color: var(--color-primary);
+}
+
+.result-category-group--export-ctrl {
+    border-left-color: #1A3A5C;
+}
+
+.result-category-group--export-ctrl .category-group-header {
+    background: rgba(26, 58, 92, 0.08);
+}
+
+.result-category-group--export-ctrl .group-icon--themed {
+    background: rgba(26, 58, 92, 0.14);
+}
+
+.result-category-group--export-ctrl .group-title {
+    color: #1A3A5C;
+}
+
+.result-category-group--compulsory-cert {
+    border-left-color: var(--color-matched);
+}
+
+.result-category-group--compulsory-cert .category-group-header {
+    background: rgba(46, 125, 50, 0.08);
+}
+
+.result-category-group--compulsory-cert .group-icon--themed {
+    background: rgba(46, 125, 50, 0.14);
+}
+
+.result-category-group--compulsory-cert .group-title {
+    color: #2E7D32;
+}
+
+.result-category-group--compulsory-cert .group-count {
+    background: rgba(46, 125, 50, 0.12);
+    color: #2E7D32;
+}
+
+.result-category-group--tax-incentive {
+    border-left-color: var(--color-accent);
+}
+
+.result-category-group--tax-incentive .category-group-header {
+    background: rgba(232, 168, 23, 0.12);
+}
+
+.result-category-group--tax-incentive .group-icon--themed {
+    background: rgba(232, 168, 23, 0.2);
+}
+
+.result-category-group--tax-incentive .group-title {
+    color: #8B6914;
+}
+
+.result-category-group--tax-incentive .group-count {
+    background: rgba(232, 168, 23, 0.18);
+    color: #8B6914;
+}
+
+.result-category-group--wireless-telecom {
+    border-left-color: #1565C0;
+}
+
+.result-category-group--wireless-telecom .category-group-header {
+    background: rgba(21, 101, 192, 0.08);
+}
+
+.result-category-group--wireless-telecom .group-icon--themed {
+    background: rgba(21, 101, 192, 0.14);
+}
+
+.result-category-group--wireless-telecom .group-title {
+    color: #1565C0;
+}
+
+.result-category-group--wireless-telecom .group-count {
+    background: rgba(21, 101, 192, 0.12);
+    color: #1565C0;
+}
+
+.result-category-group--compliance-std {
+    border-left-color: #6A1B9A;
+}
+
+.result-category-group--compliance-std .category-group-header {
+    background: rgba(106, 27, 154, 0.08);
+}
+
+.result-category-group--compliance-std .group-icon--themed {
+    background: rgba(106, 27, 154, 0.14);
+}
+
+.result-category-group--compliance-std .group-title {
+    color: #6A1B9A;
+}
+
+.result-category-group--compliance-std .group-count {
+    background: rgba(106, 27, 154, 0.12);
+    color: #6A1B9A;
+}
+
+.result-category-group--other {
+    border-left-color: #78909C;
+}
+
+.result-category-group--other .category-group-header {
+    background: rgba(120, 144, 156, 0.1);
+}
+
+.result-category-group--other .group-icon--themed {
+    background: rgba(120, 144, 156, 0.16);
+}
+
+.result-category-group--other .group-title {
+    color: #546E7A;
+}
+
+.result-category-group--other .group-count {
+    background: rgba(120, 144, 156, 0.14);
+    color: #546E7A;
 }
 
 .result-category-group .category-group-items,
