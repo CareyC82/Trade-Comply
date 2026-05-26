@@ -16,8 +16,9 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260527-feedback-v2';
+const FC_BUILD_ID = '20260527-feedback-v3';
 const COMPLIANCE_FEEDBACK_QUERY = 'COMPLIANCE_FEEDBACK';
+const COMPLIANCE_FEEDBACK_PREFIX = `${COMPLIANCE_FEEDBACK_QUERY}:`;
 const MAX_QUERY_LENGTH = 500;
 const TIMEOUT_MS = 30000;
 const MAX_CONTEXT_TAGS = 8;
@@ -720,6 +721,19 @@ function extractComplianceFeedbackPayload(body) {
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
+    if (query.startsWith(COMPLIANCE_FEEDBACK_PREFIX)) {
+        const encoded = query.slice(COMPLIANCE_FEEDBACK_PREFIX.length);
+        try {
+            const parsed = JSON.parse(encoded);
+            if (parsed && typeof parsed === 'object') {
+                return parsed;
+            }
+        } catch (error) {
+            console.error('Compliance feedback payload parse failed:', error.message);
+            return null;
+        }
+    }
+
     if (query === COMPLIANCE_FEEDBACK_QUERY && body.context && typeof body.context === 'object') {
         return body.context;
     }
@@ -860,11 +874,11 @@ exports.handler = async (rawEvent) => {
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
 
-    if (query === COMPLIANCE_FEEDBACK_QUERY) {
+    if (query === COMPLIANCE_FEEDBACK_QUERY || query.startsWith(COMPLIANCE_FEEDBACK_PREFIX)) {
         return {
             statusCode: 400,
             headers,
-            body: JSON.stringify({ error: 'Compliance feedback context is missing.' })
+            body: JSON.stringify({ error: 'Compliance feedback payload is missing or invalid.' })
         };
     }
 

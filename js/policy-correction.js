@@ -1,4 +1,5 @@
 const POLICY_CORRECTION_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run/';
+const COMPLIANCE_FEEDBACK_PREFIX = 'COMPLIANCE_FEEDBACK:';
 
 function getActiveProductKeyword() {
     const searchTermEl = document.getElementById('search-term');
@@ -25,14 +26,15 @@ function buildPolicyCorrectionPayload(form) {
     const sourceUrlInput = form.querySelector('#pc-source-url');
     const messageInput = form.querySelector('#pc-user-message');
 
+    const payload = {
+        product_keyword: productInput ? productInput.value.trim() : '',
+        policy_type: policyTypeInput ? policyTypeInput.value.trim() : '',
+        source_url: sourceUrlInput ? sourceUrlInput.value.trim() : '',
+        user_message: messageInput ? messageInput.value.trim() : ''
+    };
+
     return {
-        query: 'COMPLIANCE_FEEDBACK',
-        context: {
-            product_keyword: productInput ? productInput.value.trim() : '',
-            policy_type: policyTypeInput ? policyTypeInput.value.trim() : '',
-            source_url: sourceUrlInput ? sourceUrlInput.value.trim() : '',
-            user_message: messageInput ? messageInput.value.trim() : ''
-        }
+        query: `${COMPLIANCE_FEEDBACK_PREFIX}${JSON.stringify(payload)}`
     };
 }
 
