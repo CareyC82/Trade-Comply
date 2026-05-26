@@ -172,11 +172,7 @@ function buildTrustBoundary(context = {}) {
     };
 }
 
-function buildTrustBoundaryHtml(boundary) {
-    if (!boundary) {
-        return '';
-    }
-
+function getTrustBoundaryParts(boundary) {
     const { covered } = boundary;
     const statusClass = `boundary-badge boundary-badge--${covered.status.tone}`;
 
@@ -220,6 +216,31 @@ function buildTrustBoundaryHtml(boundary) {
     const verifyList = boundary.verifyWith.items
         .map(item => `<li>${escapeHtml(item)}</li>`)
         .join('');
+
+    return {
+        statusClass,
+        coveredRows,
+        categoryBlock,
+        precheckBlock,
+        notCoveredList,
+        verifyList
+    };
+}
+
+function buildTrustBoundaryHtml(boundary) {
+    if (!boundary) {
+        return '';
+    }
+
+    const {
+        statusClass,
+        coveredRows,
+        categoryBlock,
+        precheckBlock,
+        notCoveredList,
+        verifyList
+    } = getTrustBoundaryParts(boundary);
+    const { covered } = boundary;
 
     return `
         <div class="trust-boundary-card" role="region" aria-label="${escapeHtml(boundary.title)}">
@@ -267,6 +288,52 @@ function buildTrustBoundaryHtml(boundary) {
                         <ul class="trust-boundary-list">${verifyList}</ul>
                     </div>
                 </section>
+            </div>
+        </div>
+    `;
+}
+
+function buildTrustBoundaryReportHtml(boundary) {
+    if (!boundary) {
+        return '';
+    }
+
+    const {
+        statusClass,
+        coveredRows,
+        categoryBlock,
+        precheckBlock,
+        notCoveredList,
+        verifyList
+    } = getTrustBoundaryParts(boundary);
+
+    return `
+        <div class="report-block report-trust-card">
+            <div class="report-trust-header">
+                <div>
+                    <h2 class="report-trust-title">${escapeHtml(boundary.title)}</h2>
+                    <p class="report-trust-subtitle">${escapeHtml(boundary.subtitle)}</p>
+                </div>
+                <span class="${statusClass}">${escapeHtml(t(boundary.covered.status.badgeKey))}</span>
+            </div>
+
+            <div class="report-trust-section">
+                <h3>${escapeHtml(t('trustCoveredHeading'))}</h3>
+                <ul class="trust-boundary-list">${coveredRows.join('')}</ul>
+                ${categoryBlock}
+                ${precheckBlock}
+            </div>
+
+            <div class="report-trust-section">
+                <h3>${escapeHtml(t('trustNotCoveredHeading'))}</h3>
+                <ul class="trust-boundary-list trust-boundary-list--muted">${notCoveredList}</ul>
+            </div>
+
+            <div class="report-trust-section">
+                <h3>${escapeHtml(t('trustVerifyHeading'))}</h3>
+                <p class="report-verify-badge">${escapeHtml(boundary.verifyWith.badge)}</p>
+                <p class="trust-boundary-verify-title">${escapeHtml(boundary.verifyWith.title)}</p>
+                <ul class="trust-boundary-list">${verifyList}</ul>
             </div>
         </div>
     `;

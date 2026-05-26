@@ -346,7 +346,7 @@ function createReportPayload(query, tags, cases, precheckSelections) {
         selectedAttributes: (precheckSelections || []).map(item => item.label),
         signals: profile.signals,
         nextChecks: profile.nextChecks,
-        trustBoundaryHtml: buildTrustBoundaryHtml(trustBoundary),
+        trustBoundaryHtml: buildTrustBoundaryReportHtml(trustBoundary),
         tags: (tags || []).map(tag => ({
             tagId: tag.tag_id || '',
             category: tag.category_label || tag.category || '',
@@ -402,30 +402,36 @@ function buildReportHtml(report) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Comply Pre-Check Report</title>
     <style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #243447; margin: 32px; line-height: 1.55; }
-h1 { color: #1A3A5C; margin-bottom: 4px; }
-h2 { color: #1A3A5C; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin-top: 28px; }
-.meta, .notice { color: #666; font-size: 14px; }
-.summary { border: 1px solid #E0E0E0; border-left: 5px solid #E8A817; border-radius: 8px; padding: 16px; margin: 20px 0; }
-.risk { display: inline-block; border-radius: 999px; padding: 5px 10px; background: #FDECEC; color: #B42318; font-weight: 700; }
-.chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 4px 9px; margin: 3px; background: #F5F7FA; font-size: 13px; }
-table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 13px; }
-th, td { border: 1px solid #E0E0E0; padding: 8px; vertical-align: top; text-align: left; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #243447; margin: 0; padding: 24px; line-height: 1.55; font-size: 12px; }
+h1 { color: #1A3A5C; margin: 0 0 6px; font-size: 22px; }
+h2 { color: #1A3A5C; font-size: 16px; margin: 0; }
+h3 { color: #1A3A5C; font-size: 13px; margin: 0 0 8px; }
+.meta, .notice { color: #666; font-size: 12px; }
+.notice { margin-top: 8px; }
+.report-block { page-break-inside: avoid; break-inside: avoid; margin-bottom: 18px; }
+.summary { border: 1px solid #E0E0E0; border-left: 5px solid #E8A817; border-radius: 8px; padding: 14px; margin: 0 0 18px; page-break-inside: avoid; break-inside: avoid; }
+.risk { display: inline-block; border-radius: 999px; padding: 4px 9px; background: #FDECEC; color: #B42318; font-weight: 700; font-size: 11px; }
+.chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 3px 3px 0 0; background: #F5F7FA; font-size: 11px; }
+table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 11px; page-break-inside: auto; }
+tr { page-break-inside: avoid; break-inside: avoid; }
+th, td { border: 1px solid #E0E0E0; padding: 7px; vertical-align: top; text-align: left; }
 th { background: #F5F7FA; color: #1A3A5C; }
-a { color: #1A3A5C; }
-.trust-boundary-card { border: 1px solid #E0E0E0; border-left: 4px solid #1A3A5C; border-radius: 8px; padding: 16px; margin: 20px 0; background: #FAFBFC; }
-.trust-boundary-title { color: #1A3A5C; font-weight: 700; font-size: 1.05rem; }
-.trust-boundary-subtitle { color: #666; font-size: 0.85rem; margin-top: 4px; }
-.trust-boundary-section-title { color: #1A3A5C; font-size: 0.92rem; margin: 0 0 8px; }
-.trust-boundary-list { margin: 0; padding-left: 18px; color: #444; font-size: 0.84rem; }
-.boundary-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 0.72rem; font-weight: 700; }
-.scope-chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 2px; background: #F5F7FA; font-size: 0.76rem; }
-.trust-boundary-grid { display: block; }
-.trust-boundary-section { margin-bottom: 12px; border: 1px solid #E0E0E0; border-radius: 8px; padding: 10px 12px; background: #FAFBFC; }
-.collapsible-body { display: block !important; }
-.collapsible-header { display: block; width: 100%; border: none; background: transparent; padding: 0 0 8px; font: inherit; text-align: left; cursor: default; }
-.collapsible-header .arrow { display: none; }
-@media print { body { margin: 18mm; } }
+a { color: #1A3A5C; word-break: break-all; }
+.report-trust-card { border: 1px solid #E0E0E0; border-left: 4px solid #1A3A5C; border-radius: 8px; padding: 14px; background: #FAFBFC; }
+.report-trust-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.report-trust-title { color: #1A3A5C; font-size: 16px; margin: 0 0 4px; }
+.report-trust-subtitle { color: #666; font-size: 11px; margin: 0; line-height: 1.45; }
+.report-trust-section { margin-top: 12px; padding-top: 10px; border-top: 1px solid #E0E0E0; page-break-inside: avoid; break-inside: avoid; }
+.report-trust-section:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+.trust-boundary-list { margin: 0; padding-left: 18px; color: #444; font-size: 11px; }
+.trust-boundary-list--muted { color: #666; }
+.trust-boundary-verify-title { color: #666; font-size: 11px; margin: 0 0 8px; font-weight: 600; }
+.report-verify-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; margin: 0 0 8px; background: rgba(26, 58, 92, 0.08); color: #1A3A5C; font-size: 11px; font-weight: 700; }
+.boundary-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.boundary-subsection { margin-top: 10px; }
+.boundary-subheading { color: #666; font-size: 10px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+.scope-chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 2px 3px 0 0; background: #fff; font-size: 10px; }
+.section-heading { color: #1A3A5C; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin: 0 0 10px; font-size: 15px; page-break-after: avoid; }
     </style>
 </head>
 <body>
@@ -433,9 +439,7 @@ a { color: #1A3A5C; }
     <div class="meta">Generated: ${escapeHtml(formatReportDate(report.generatedAt))}</div>
     <div class="notice">Preliminary import/export compliance screening only. This is not legal advice, customs advice, or a substitute for professional review.</div>
 
-    ${report.trustBoundaryHtml || ''}
-
-    <div class="summary">
+    <div class="summary report-block">
 <p><strong>Product / Query:</strong> ${escapeHtml(report.productQuery)}</p>
 <p><strong>Direction:</strong> ${escapeHtml(report.direction)}</p>
 <p><strong>Pre-check risk level:</strong> <span class="risk">${escapeHtml(report.riskLabel)}</span></p>
@@ -444,7 +448,9 @@ ${report.signals.length ? `<p><strong>Triggered signals:</strong><br>${report.si
 ${report.nextChecks.length ? `<p><strong>Recommended next checks:</strong> ${report.nextChecks.map(escapeHtml).join(' ')}</p>` : ''}
     </div>
 
-    <h2>Matched Compliance Signals</h2>
+    ${report.trustBoundaryHtml || ''}
+
+    <h2 class="section-heading">Matched Compliance Signals</h2>
     ${report.tags.length ? `<table><thead><tr><th>Category</th><th>Rule ID</th><th>Description</th><th>HS Codes</th><th>Source</th></tr></thead><tbody>${tagRows}</tbody></table>` : '<p>No matched compliance signals.</p>'}
 </body>
 </html>`;
@@ -476,24 +482,27 @@ function loadHtml2Pdf() {
     return html2PdfLoaderPromise;
 }
 
-function buildReportPdfElement(report) {
-    const html = buildReportHtml(report);
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const root = document.createElement('div');
-    root.className = 'precheck-report-pdf-root';
-    root.style.width = '794px';
-    root.style.background = '#ffffff';
-
-    const styleEl = doc.querySelector('style');
-    if (styleEl) {
-        root.appendChild(styleEl.cloneNode(true));
-    }
-
-    Array.from(doc.body.childNodes).forEach(node => {
-        root.appendChild(node.cloneNode(true));
+function waitForReportFrame(iframe) {
+    return new Promise((resolve) => {
+        const done = () => resolve(iframe.contentDocument.body);
+        if (iframe.contentDocument?.readyState === 'complete') {
+            setTimeout(done, 100);
+            return;
+        }
+        iframe.addEventListener('load', () => setTimeout(done, 100), { once: true });
     });
+}
 
-    return root;
+function createReportRenderFrame(report) {
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.cssText = 'position:fixed;left:0;top:0;width:794px;height:1123px;border:0;opacity:0;pointer-events:none;z-index:-1;';
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument;
+    doc.open();
+    doc.write(buildReportHtml(report));
+    doc.close();
+    return waitForReportFrame(iframe).then(body => ({ iframe, body }));
 }
 
 async function downloadPrecheckReport() {
@@ -507,32 +516,27 @@ async function downloadPrecheckReport() {
         btn.textContent = 'Generating PDF...';
     }
 
-    const mount = document.createElement('div');
-    mount.style.position = 'fixed';
-    mount.style.left = '-10000px';
-    mount.style.top = '0';
-    mount.style.zIndex = '-1';
+    let frame = null;
 
     try {
         const html2pdf = await loadHtml2Pdf();
-        const reportEl = buildReportPdfElement(AppState.lastReport);
-        mount.appendChild(reportEl);
-        document.body.appendChild(mount);
+        const rendered = await createReportRenderFrame(AppState.lastReport);
+        frame = rendered.iframe;
 
         const filename = `trade-comply-precheck-${slugifyFilePart(AppState.lastReport.productQuery)}.pdf`;
         await html2pdf().set({
-            margin: [12, 12, 12, 12],
+            margin: [10, 10, 10, 10],
             filename,
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
+            image: { type: 'jpeg', quality: 0.92 },
+            html2canvas: { scale: 1.5, useCORS: true, logging: false, scrollY: 0 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['css', 'legacy'] }
-        }).from(reportEl).save();
+            pagebreak: { mode: 'avoid-all' }
+        }).from(rendered.body).save();
     } catch (error) {
         console.error('PDF generation failed:', error);
         window.alert('Could not generate the PDF report. Please check your connection and try again.');
     } finally {
-        mount.remove();
+        frame?.remove();
         if (btn) {
             btn.disabled = false;
             btn.textContent = originalLabel;
