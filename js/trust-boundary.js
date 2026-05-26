@@ -232,25 +232,38 @@ function buildTrustBoundaryHtml(boundary) {
             </div>
 
             <div class="trust-boundary-grid">
-                <section class="trust-boundary-section">
-                    <h3 class="trust-boundary-section-title">${escapeHtml(t('trustCoveredHeading'))}</h3>
-                    <ul class="trust-boundary-list">${coveredRows.join('')}</ul>
-                    ${categoryBlock}
-                    ${precheckBlock}
-                </section>
-
-                <section class="trust-boundary-section">
-                    <h3 class="trust-boundary-section-title">${escapeHtml(t('trustNotCoveredHeading'))}</h3>
-                    <ul class="trust-boundary-list trust-boundary-list--muted">${notCoveredList}</ul>
-                </section>
-
-                <section class="trust-boundary-section trust-boundary-section--verify">
-                    <div class="trust-boundary-verify-top">
-                        <h3 class="trust-boundary-section-title">${escapeHtml(t('trustVerifyHeading'))}</h3>
-                        <span class="boundary-badge boundary-badge--verify">${escapeHtml(boundary.verifyWith.badge)}</span>
+                <section class="trust-boundary-section collapsible-panel">
+                    <button type="button" class="trust-boundary-section-header collapsible-header" aria-expanded="false">
+                        <span class="trust-boundary-section-title">${escapeHtml(t('trustCoveredHeading'))}</span>
+                        <span class="arrow" aria-hidden="true">▶</span>
+                    </button>
+                    <div class="trust-boundary-section-body collapsible-body">
+                        <ul class="trust-boundary-list">${coveredRows.join('')}</ul>
+                        ${categoryBlock}
+                        ${precheckBlock}
                     </div>
-                    <p class="trust-boundary-verify-title">${escapeHtml(boundary.verifyWith.title)}</p>
-                    <ul class="trust-boundary-list">${verifyList}</ul>
+                </section>
+
+                <section class="trust-boundary-section collapsible-panel">
+                    <button type="button" class="trust-boundary-section-header collapsible-header" aria-expanded="false">
+                        <span class="trust-boundary-section-title">${escapeHtml(t('trustNotCoveredHeading'))}</span>
+                        <span class="arrow" aria-hidden="true">▶</span>
+                    </button>
+                    <div class="trust-boundary-section-body collapsible-body">
+                        <ul class="trust-boundary-list trust-boundary-list--muted">${notCoveredList}</ul>
+                    </div>
+                </section>
+
+                <section class="trust-boundary-section trust-boundary-section--verify collapsible-panel">
+                    <button type="button" class="trust-boundary-section-header collapsible-header" aria-expanded="false">
+                        <span class="trust-boundary-section-title">${escapeHtml(t('trustVerifyHeading'))}</span>
+                        <span class="boundary-badge boundary-badge--verify">${escapeHtml(boundary.verifyWith.badge)}</span>
+                        <span class="arrow" aria-hidden="true">▶</span>
+                    </button>
+                    <div class="trust-boundary-section-body collapsible-body">
+                        <p class="trust-boundary-verify-title">${escapeHtml(boundary.verifyWith.title)}</p>
+                        <ul class="trust-boundary-list">${verifyList}</ul>
+                    </div>
                 </section>
             </div>
         </div>

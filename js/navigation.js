@@ -131,13 +131,11 @@ function bindEvents() {
     // Categories 事件委托 (替代内联 onclick)
     const categoriesContainer = document.getElementById('categories-container');
     if (categoriesContainer) {
+        bindCollapsiblePanels(categoriesContainer);
         categoriesContainer.addEventListener('click', (e) => {
-            const header = e.target.closest('.category-group-header');
-            if (header) {
-                header.parentElement.classList.toggle('open');
+            if (e.target.closest('.collapsible-header')) {
                 return;
             }
-            
             const tag = e.target.closest('.category-tag');
             if (tag) {
                 const query = tag.dataset.query;
@@ -145,6 +143,11 @@ function bindEvents() {
                 searchFromCategory(query, hsCode);
             }
         });
+    }
+
+    const resultView = document.getElementById('result-view');
+    if (resultView) {
+        bindCollapsiblePanels(resultView);
     }
 
     // Direction toggle

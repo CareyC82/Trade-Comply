@@ -108,34 +108,58 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         const fragment = document.createDocumentFragment();
 
         Object.values(groupedTags).forEach(group => {
-            const categoryHeader = document.createElement('h3');
-            categoryHeader.style = 'margin: 20px 0 12px; color: var(--color-primary); font-size: 1.1rem;';
-            categoryHeader.textContent = group.category;
-            fragment.appendChild(categoryHeader);
+            const groupEl = document.createElement('div');
+            groupEl.className = 'result-category-group category-group collapsible-panel';
+            const ruleCount = group.tags.length;
+            const ruleLabel = ruleCount === 1 ? 'rule' : 'rules';
+
+            groupEl.innerHTML = `
+                <button type="button" class="category-group-header collapsible-header" aria-expanded="false">
+                    <span class="group-title">${escapeHtml(group.category)}</span>
+                    <span class="group-count">${ruleCount} ${ruleLabel}</span>
+                    <span class="arrow" aria-hidden="true">▶</span>
+                </button>
+                <div class="category-group-items result-category-items"></div>
+            `;
+
+            const itemsEl = groupEl.querySelector('.result-category-items');
 
             group.tags.forEach(tag => {
                 const card = document.createElement('div');
                 const safeTagType = escapeHtml(tag.tag_type || 'Unknown');
-                card.className = `compliance-card ${safeTagType.toLowerCase()}`;
+                const tagTypeClass = safeTagType.toLowerCase();
+                card.className = `compliance-card collapsible-panel ${tagTypeClass}`;
                 if (tag.tag_id) {
                     card.id = `tag-${tag.tag_id}`;
                 }
-                
+
                 const hsCodes = tag.related_hs_codes ? escapeHtml(tag.related_hs_codes.join(', ')) : 'Not specified';
                 const shortTagId = tag.tag_id ? escapeHtml(tag.tag_id.replace(/^CL-|-[0-9]+$/g, '')) : '';
-                
-                // 全部使用 escapeHtml，且处理 source URL
+                const cardLabel = escapeHtml(tag.short_name || shortTagId || tag.tag_id || 'Rule');
+                const cardHint = escapeHtml(tag.short_description || '');
+
                 card.innerHTML = `
-                    <span class="compliance-tag ${safeTagType.toLowerCase()}">${safeTagType}</span>
-                    <div class="compliance-title">${shortTagId}: ${escapeHtml(tag.description)}</div>
-                    <div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || 'No details available')}</div>
-                    ${tag.exemptions ? `<div class="compliance-extra exemptions-row">✔️ <strong>Exemptions:</strong> ${escapeHtml(tag.exemptions)}</div>` : ''}
-                    ${tag.risk_scenarios ? `<div class="compliance-extra risk-row">⚠️ <strong>Risk Scenarios:</strong> ${escapeHtml(tag.risk_scenarios)}</div>` : ''}
-                    <div class="compliance-hs"><strong>${t('hsCode')}:</strong> ${hsCodes}</div>
-                    ${tag.source_citation ? `<div class="compliance-source"><strong>${t('source')}:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_citation)}</a></div>` : ''}
+                    <button type="button" class="compliance-card-header collapsible-header" aria-expanded="false">
+                        <span class="compliance-tag ${tagTypeClass}">${safeTagType}</span>
+                        <span class="compliance-card-header-text">
+                            <span class="compliance-card-header-title">${cardLabel}</span>
+                            ${cardHint ? `<span class="compliance-card-header-hint">${cardHint}</span>` : ''}
+                        </span>
+                        <span class="arrow" aria-hidden="true">▶</span>
+                    </button>
+                    <div class="compliance-card-body collapsible-body">
+                        <div class="compliance-title">${shortTagId}: ${escapeHtml(tag.description)}</div>
+                        <div class="compliance-desc">${escapeHtml(tag.short_description || tag.description || 'No details available')}</div>
+                        ${tag.exemptions ? `<div class="compliance-extra exemptions-row">✔️ <strong>Exemptions:</strong> ${escapeHtml(tag.exemptions)}</div>` : ''}
+                        ${tag.risk_scenarios ? `<div class="compliance-extra risk-row">⚠️ <strong>Risk Scenarios:</strong> ${escapeHtml(tag.risk_scenarios)}</div>` : ''}
+                        <div class="compliance-hs"><strong>${t('hsCode')}:</strong> ${hsCodes}</div>
+                        ${tag.source_citation ? `<div class="compliance-source"><strong>${t('source')}:</strong> <a href="${sanitizeUrl(tag.source_url)}" target="_blank">${escapeHtml(tag.source_citation)}</a></div>` : ''}
+                    </div>
                 `;
-                fragment.appendChild(card);
+                itemsEl.appendChild(card);
             });
+
+            fragment.appendChild(groupEl);
         });
         
         cardsContainer.appendChild(fragment);
@@ -146,16 +170,29 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         if (cases.length === 0) {
             casesContainer.innerHTML = '';
         } else {
-            casesContainer.innerHTML = `
-            <div class="cases-header">${t('relatedCases')}</div>
-            ${cases.map(caseItem => `
-                <div class="case-card" ${caseItem.case_id ? `id="case-${escapeHtml(caseItem.case_id)}"` : ''}>
-                    <div class="case-title">${escapeHtml(caseItem.title)}</div>
-                    <div class="case-date">${escapeHtml(caseItem.date)}</div>
-                    <div class="case-summary">${escapeHtml(caseItem.summary)}</div>
-                    <a href="${sanitizeUrl(caseItem.source_url)}" target="_blank" class="case-link">${t('source')} ${escapeHtml(caseItem.source_url)}</a>
+            const caseCards = cases.map(caseItem => `
+                <div class="case-card collapsible-panel" ${caseItem.case_id ? `id="case-${escapeHtml(caseItem.case_id)}"` : ''}>
+                    <button type="button" class="case-card-header collapsible-header" aria-expanded="false">
+                        <span class="case-card-header-title">${escapeHtml(caseItem.title)}</span>
+                        <span class="case-card-header-date">${escapeHtml(caseItem.date)}</span>
+                        <span class="arrow" aria-hidden="true">▶</span>
+                    </button>
+                    <div class="case-card-body collapsible-body">
+                        <div class="case-summary">${escapeHtml(caseItem.summary)}</div>
+                        <a href="${sanitizeUrl(caseItem.source_url)}" target="_blank" class="case-link">${t('source')} ${escapeHtml(caseItem.source_url)}</a>
+                    </div>
                 </div>
-            `).join('')}
+            `).join('');
+
+            casesContainer.innerHTML = `
+                <div class="cases-group collapsible-panel">
+                    <button type="button" class="cases-group-header collapsible-header" aria-expanded="false">
+                        <span class="cases-group-title">${escapeHtml(t('relatedCases'))}</span>
+                        <span class="group-count">${cases.length}</span>
+                        <span class="arrow" aria-hidden="true">▶</span>
+                    </button>
+                    <div class="cases-group-body collapsible-body">${caseCards}</div>
+                </div>
             `;
         }
     }

@@ -241,30 +241,33 @@ function renderPrecheckSummary(containerId, selections, tags, cardsContainerId =
     const checkItems = profile.nextCheckItems || profile.nextChecks.map(text => ({ text }));
 
     container.innerHTML = `
-        <div class="precheck-summary-card">
-            <div class="precheck-summary-top">
-                <div class="precheck-risk-label">Pre-check risk level</div>
+        <div class="precheck-summary-card collapsible-panel">
+            <button type="button" class="precheck-summary-header collapsible-header" aria-expanded="false">
+                <span class="precheck-risk-label">Pre-check risk level</span>
                 <span class="risk-pill ${escapeHtml(profile.risk)}">${escapeHtml(getRiskLabel(profile.risk))}</span>
-            </div>
-            ${profile.riskReason ? `<div class="precheck-risk-reason">${escapeHtml(profile.riskReason)}</div>` : ''}
-            ${signalChips.length > 0 ? `
-                <div class="precheck-chips">
-                    ${signalChips.map(signal => `<span class="precheck-chip">${escapeHtml(signal)}</span>`).join('')}
+                <span class="arrow" aria-hidden="true">▶</span>
+            </button>
+            <div class="precheck-summary-body collapsible-body">
+                ${profile.riskReason ? `<div class="precheck-risk-reason">${escapeHtml(profile.riskReason)}</div>` : ''}
+                ${signalChips.length > 0 ? `
+                    <div class="precheck-chips">
+                        ${signalChips.map(signal => `<span class="precheck-chip">${escapeHtml(signal)}</span>`).join('')}
+                    </div>
+                ` : ''}
+                <div class="precheck-next">
+                    <strong>Recommended next checks:</strong>
+                    ${checkItems.length > 0 ? `
+                        <ol class="precheck-check-list">
+                            ${checkItems.map(item => `<li>${formatPrecheckCheckText(item.text)}</li>`).join('')}
+                        </ol>
+                    ` : 'Review matched rule cards below and confirm product specifications before relying on this first-pass screen.'}
                 </div>
-            ` : ''}
-            <div class="precheck-next">
-                <strong>Recommended next checks:</strong>
-                ${checkItems.length > 0 ? `
-                    <ol class="precheck-check-list">
-                        ${checkItems.map(item => `<li>${formatPrecheckCheckText(item.text)}</li>`).join('')}
-                    </ol>
-                ` : 'Review matched rule cards below and confirm product specifications before relying on this first-pass screen.'}
+                ${profile.matchedRuleCount > 0 ? `
+                    <div class="precheck-summary-actions">
+                        <button type="button" class="precheck-jump-btn">View matched rules ↓</button>
+                    </div>
+                ` : ''}
             </div>
-            ${profile.matchedRuleCount > 0 ? `
-                <div class="precheck-summary-actions">
-                    <button type="button" class="precheck-jump-btn">View matched rules ↓</button>
-                </div>
-            ` : ''}
         </div>
     `;
 

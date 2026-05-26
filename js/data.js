@@ -201,16 +201,16 @@ function renderCategories() {
 
     categories.forEach(group => {
         const groupEl = document.createElement('div');
-        groupEl.className = 'category-group';
+        groupEl.className = 'category-group collapsible-panel';
         
         // 去除了内联 onclick
         groupEl.innerHTML = `
-            <div class="category-group-header">
+            <button type="button" class="category-group-header collapsible-header" aria-expanded="false">
                 <span class="group-icon">${escapeHtml(group.group_icon)}</span>
                 <span>${escapeHtml(group.group_name)}</span>
                 <span class="group-count">${group.items.length}</span>
-                <span class="arrow">▶</span>
-            </div>
+                <span class="arrow" aria-hidden="true">▶</span>
+            </button>
             <div class="category-group-items">
                 ${group.items.map(item => `
                     <span class="category-tag" data-query="${escapeHtml(item.query)}" data-hscode="${escapeHtml(item.hs_code || '')}">

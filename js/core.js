@@ -356,6 +356,27 @@ function sanitizeUrl(url) {
     return escapeHtml(url);
 }
 
+/** Collapsible panels: click .collapsible-header to toggle .collapsible-panel.open */
+function bindCollapsiblePanels(root) {
+    if (!root || root.dataset.collapsibleBound === '1') {
+        return;
+    }
+    root.dataset.collapsibleBound = '1';
+    root.addEventListener('click', (event) => {
+        const header = event.target.closest('.collapsible-header');
+        if (!header || !root.contains(header)) {
+            return;
+        }
+        const panel = header.closest('.collapsible-panel');
+        if (!panel) {
+            return;
+        }
+        event.preventDefault();
+        const open = panel.classList.toggle('open');
+        header.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+}
+
 /**
  * 具有降级能力的 JSON 加载器，防止单个文件失败导致应用崩溃
  */
