@@ -1385,6 +1385,38 @@ body {
     flex-shrink: 0;
 }
 
+.trust-boundary-section-header--verify {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
+
+.trust-boundary-section-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.trust-boundary-section-header--verify .trust-boundary-section-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.trust-boundary-section-header--verify .boundary-badge--verify {
+    align-self: flex-start;
+    white-space: normal;
+    line-height: 1.35;
+    max-width: 100%;
+}
+
+.trust-boundary-section-header--verify .arrow {
+    margin-left: 0;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
 .trust-boundary-section-body {
     padding: 0 12px 12px;
 }

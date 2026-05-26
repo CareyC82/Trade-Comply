@@ -255,10 +255,12 @@ function buildTrustBoundaryHtml(boundary) {
                 </section>
 
                 <section class="trust-boundary-section trust-boundary-section--verify collapsible-panel">
-                    <button type="button" class="trust-boundary-section-header collapsible-header" aria-expanded="false">
-                        <span class="trust-boundary-section-title">${escapeHtml(t('trustVerifyHeading'))}</span>
+                    <button type="button" class="trust-boundary-section-header trust-boundary-section-header--verify collapsible-header" aria-expanded="false">
+                        <span class="trust-boundary-section-header-row">
+                            <span class="trust-boundary-section-title">${escapeHtml(t('trustVerifyHeading'))}</span>
+                            <span class="arrow" aria-hidden="true">▶</span>
+                        </span>
                         <span class="boundary-badge boundary-badge--verify">${escapeHtml(boundary.verifyWith.badge)}</span>
-                        <span class="arrow" aria-hidden="true">▶</span>
                     </button>
                     <div class="trust-boundary-section-body collapsible-body">
                         <p class="trust-boundary-verify-title">${escapeHtml(boundary.verifyWith.title)}</p>
