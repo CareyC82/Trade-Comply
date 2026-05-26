@@ -174,18 +174,18 @@ function renderPolicyCorrectionSection(variant) {
         : t('policyCorrectionBtnHasResults');
 
     return `
-        <button type="button" class="policy-correction-btn policy-correction-trigger" data-correction-variant="${escapeHtml(variant)}">
+        <a href="#" class="feedback-link report-action-link policy-correction-trigger" data-correction-variant="${escapeHtml(variant)}">
             ${escapeHtml(label)}
-        </button>
+        </a>
     `;
 }
 
 function renderTrustBoundaryCorrectionCta() {
     return `
         <div class="trust-boundary-correction-cta">
-            <button type="button" class="policy-correction-btn policy-correction-btn--compact policy-correction-trigger" data-correction-variant="no_match">
+            <a href="#" class="feedback-link policy-correction-trigger" data-correction-variant="no_match">
                 ${escapeHtml(t('policyCorrectionBtnNoMatch'))}
-            </button>
+            </a>
         </div>
     `;
 }

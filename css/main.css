@@ -480,28 +480,41 @@ body {
 
 .report-actions {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
+    align-items: stretch;
+    gap: 12px;
     margin: 28px 0 24px;
-    padding-top: 8px;
+    padding: 8px 16px 0;
 }
 
-.report-btn {
-    display: inline-flex;
+.policy-correction-slot {
+    flex: 1 1 240px;
+    max-width: 360px;
+    display: flex;
+    align-items: stretch;
+}
+
+.report-actions .report-action-link {
+    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background-color: var(--color-primary);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    font-size: 0.86rem;
-    font-weight: 700;
+    justify-content: center;
+    flex: 1 1 240px;
+    max-width: 360px;
+    width: 100%;
     min-height: 42px;
+    padding: 10px 16px;
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 1.35;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
-.report-btn:hover {
-    opacity: 0.92;
+button.report-action-link {
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 /* Latest Update Bar */
@@ -1843,7 +1856,8 @@ body {
     transition: all 0.2s;
 }
 
-.feedback-link:hover {
+.feedback-link:hover,
+button.feedback-link:hover {
     background-color: var(--color-primary);
     color: white;
 }
@@ -1950,47 +1964,16 @@ body {
     display: none;
 }
 
-/* Policy correction */
-.policy-correction-section {
-    text-align: center;
-    padding: 8px 16px 4px;
-}
-
-.policy-correction-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    max-width: 520px;
-    padding: 14px 20px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #5b4fd6 0%, #7c3aed 100%);
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(91, 79, 214, 0.28);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.policy-correction-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 24px rgba(91, 79, 214, 0.34);
-}
-
-.policy-correction-btn--compact {
-    width: auto;
-    max-width: none;
-    padding: 10px 16px;
-    font-size: 0.88rem;
-}
-
+/* Policy correction (uses .feedback-link — same as hub feedback) */
 .trust-boundary-correction-cta {
     margin-top: 14px;
     padding-top: 12px;
     border-top: 1px dashed var(--color-border);
+    text-align: center;
+}
+
+.trust-boundary-correction-cta .feedback-link {
+    display: inline-block;
 }
 
 .policy-correction-intro {
