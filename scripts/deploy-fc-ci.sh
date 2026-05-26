@@ -15,7 +15,7 @@ trim_secret() {
 ACCESS_KEY_ID="$(trim_secret "${ALIBABA_CLOUD_ACCESS_KEY_ID:-${OSS_ACCESS_KEY_ID:-}}")"
 ACCESS_KEY_SECRET="$(trim_secret "${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-${OSS_ACCESS_KEY_SECRET:-}}")"
 DEEPSEEK_API_KEY="$(trim_secret "${DEEPSEEK_API_KEY:-}")"
-FC_FUNCTION_NAME="${FC_FUNCTION_NAME:-tradecoai-agent}"
+FC_FUNCTION_NAME="${FC_FUNCTION_NAME:-tradecomply_ai_agent}"
 FC_REGION="${FC_REGION:-cn-shenzhen}"
 
 preflight() {
