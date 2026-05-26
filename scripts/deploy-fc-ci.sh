@@ -4,9 +4,17 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-ACCESS_KEY_ID="${ALIBABA_CLOUD_ACCESS_KEY_ID:-${OSS_ACCESS_KEY_ID:-}}"
-ACCESS_KEY_SECRET="${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-${OSS_ACCESS_KEY_SECRET:-}}"
-DEEPSEEK_API_KEY="${DEEPSEEK_API_KEY:-}"
+trim_secret() {
+  local value="$1"
+  value="${value//$'\r'/}"
+  value="${value%"${value##*[![:space:]]}"}"
+  value="${value#"${value%%[![:space:]]*}"}"
+  printf '%s' "$value"
+}
+
+ACCESS_KEY_ID="$(trim_secret "${ALIBABA_CLOUD_ACCESS_KEY_ID:-${OSS_ACCESS_KEY_ID:-}}")"
+ACCESS_KEY_SECRET="$(trim_secret "${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-${OSS_ACCESS_KEY_SECRET:-}}")"
+DEEPSEEK_API_KEY="$(trim_secret "${DEEPSEEK_API_KEY:-}")"
 FC_FUNCTION_NAME="${FC_FUNCTION_NAME:-tradecoai-agent}"
 FC_REGION="${FC_REGION:-cn-shenzhen}"
 
@@ -64,6 +72,20 @@ configure_aliyun_cli() {
   echo "Aliyun CLI configured for region ${FC_REGION}."
 }
 
+verify_fc_access() {
+  echo "Verifying FC API access for ${FC_FUNCTION_NAME} (${FC_REGION})..."
+  if ! aliyun fc get-function \
+    --function-name "$FC_FUNCTION_NAME" \
+    --region "$FC_REGION" \
+    --quiet 2>&1; then
+    echo "ERROR: Cannot read function '${FC_FUNCTION_NAME}' in region '${FC_REGION}'." >&2
+    echo "Check GitHub secrets (no extra spaces/newlines) and RAM policy on the deploy user:" >&2
+    echo "  - AliyunFCFullAccess (recommended), or at least fc:GetFunction + fc:UpdateFunction" >&2
+    exit 1
+  fi
+  echo "FC access OK."
+}
+
 deploy_function() {
   if [ ! -f fc-deploy.zip ]; then
     echo "ERROR: fc-deploy.zip not found. Run package-fc.sh first." >&2
@@ -78,7 +100,7 @@ deploy_function() {
   local oss_key_secret="${OSS_ACCESS_KEY_SECRET:-$ACCESS_KEY_SECRET}"
 
   echo "Updating FC function code and environment variables..."
-  aliyun fc update-function \
+  if ! aliyun fc update-function \
     --function-name "$FC_FUNCTION_NAME" \
     --region "$FC_REGION" \
     --code "zipFile=${zip_b64}" \
@@ -88,7 +110,10 @@ deploy_function() {
       "OSS_REGION=${OSS_REGION:-cn-shenzhen}" \
       "OSS_ACCESS_KEY_ID=${oss_key_id}" \
       "OSS_ACCESS_KEY_SECRET=${oss_key_secret}" \
-      "OSS_FEEDBACK_PREFIX=${OSS_FEEDBACK_PREFIX:-feedback}"
+      "OSS_FEEDBACK_PREFIX=${OSS_FEEDBACK_PREFIX:-feedback}"; then
+    echo "ERROR: fc update-function failed (see Aliyun error above)." >&2
+    exit 1
+  fi
 
   echo "FC deploy completed."
 }
@@ -106,7 +131,11 @@ case "${1:-all}" in
   configure)
     configure_aliyun_cli
     ;;
+  verify)
+    verify_fc_access
+    ;;
   deploy)
+    verify_fc_access
     deploy_function
     ;;
   all)
