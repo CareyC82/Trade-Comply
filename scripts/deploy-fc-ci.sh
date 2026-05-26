@@ -110,7 +110,9 @@ deploy_function() {
       "OSS_REGION=${OSS_REGION:-cn-shenzhen}" \
       "OSS_ACCESS_KEY_ID=${oss_key_id}" \
       "OSS_ACCESS_KEY_SECRET=${oss_key_secret}" \
-      "OSS_FEEDBACK_PREFIX=${OSS_FEEDBACK_PREFIX:-feedback}"; then
+      "OSS_FEEDBACK_PREFIX=${OSS_FEEDBACK_PREFIX:-feedback}" \
+      "SUPABASE_URL=${SUPABASE_URL:-}" \
+      "SUPABASE_KEY=${SUPABASE_KEY:-}"; then
     echo "ERROR: fc update-function failed (see Aliyun error above)." >&2
     exit 1
   fi

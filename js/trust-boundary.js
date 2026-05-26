@@ -217,13 +217,18 @@ function getTrustBoundaryParts(boundary) {
         .map(item => `<li>${escapeHtml(item)}</li>`)
         .join('');
 
+    const correctionCta = covered.status.tone === 'no-match' && covered.isInRange
+        ? renderTrustBoundaryCorrectionCta()
+        : '';
+
     return {
         statusClass,
         coveredRows,
         categoryBlock,
         precheckBlock,
         notCoveredList,
-        verifyList
+        verifyList,
+        correctionCta
     };
 }
 
@@ -238,7 +243,8 @@ function buildTrustBoundaryHtml(boundary) {
         categoryBlock,
         precheckBlock,
         notCoveredList,
-        verifyList
+        verifyList,
+        correctionCta
     } = getTrustBoundaryParts(boundary);
     const { covered } = boundary;
 
@@ -262,6 +268,7 @@ function buildTrustBoundaryHtml(boundary) {
                         <ul class="trust-boundary-list">${coveredRows.join('')}</ul>
                         ${categoryBlock}
                         ${precheckBlock}
+                        ${correctionCta}
                     </div>
                 </section>
 
@@ -341,5 +348,6 @@ function renderTrustBoundary(containerId, context) {
 
     const boundary = buildTrustBoundary(context);
     container.innerHTML = buildTrustBoundaryHtml(boundary);
+    bindPolicyCorrectionTriggers(container);
     return boundary;
 }

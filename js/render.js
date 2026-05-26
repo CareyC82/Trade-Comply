@@ -107,6 +107,19 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         matchedRuleCount: tags.length
     });
 
+    const policyCorrectionSection = document.getElementById('policy-correction-section');
+    if (policyCorrectionSection) {
+        if (!isBrowseAllQuery(query)) {
+            const variant = tags.length === 0 ? 'no_match' : 'has_results';
+            policyCorrectionSection.style.display = 'block';
+            policyCorrectionSection.innerHTML = renderPolicyCorrectionSection(variant);
+            bindPolicyCorrectionTriggers(policyCorrectionSection);
+        } else {
+            policyCorrectionSection.style.display = 'none';
+            policyCorrectionSection.innerHTML = '';
+        }
+    }
+
     const cardsContainer = document.getElementById('result-cards-container');
     if (!cardsContainer) return;
     cardsContainer.innerHTML = '';

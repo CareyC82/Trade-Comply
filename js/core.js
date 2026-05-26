@@ -99,7 +99,22 @@ const UI_STRINGS = {
     trustVerifyItemReviewCounsel: "Qualified trade compliance reviewer before any export from China — matched rules include controls that need human verification.",
     trustVerifyItemReviewDocs: "Prepare end-use / end-user documentation and align commercial invoice, packing list, and consignee details with matched requirements.",
     trustVerifyItemReviewSource: "Follow official Source links on each matched card; this screen does not approve shipment.",
-    feedbackSubmitError: "Could not send feedback. Please try again in a moment."
+    feedbackSubmitError: "Could not send feedback. Please try again in a moment.",
+    policyCorrectionBtnHasResults: "结果有误？点此向官方纠偏",
+    policyCorrectionBtnNoMatch: "补充该产品政策",
+    policyCorrectionTitle: "Policy data correction",
+    policyCorrectionIntro: "Help us align the rule library with official sources. Submissions are reviewed before any database update.",
+    policyCorrectionProduct: "Product keyword",
+    policyCorrectionPolicyType: "Policy type",
+    policyCorrectionPolicyTypePlaceholder: "Select policy type",
+    policyCorrectionSourceUrl: "Official source URL",
+    policyCorrectionSourceUrlPlaceholder: "Attach an official notice or legal basis link to speed up review",
+    policyCorrectionMessage: "Details",
+    policyCorrectionMessagePlaceholder: "Describe the policy change, effective date, or why the current screen is incorrect...",
+    policyCorrectionSubmit: "Submit correction",
+    policyCorrectionSubmitting: "Submitting...",
+    policyCorrectionSuccess: "✅ Correction submitted. Our team will review it against official sources.",
+    policyCorrectionSubmitError: "Could not submit correction. Please try again in a moment."
 };
 
 // === 允许搜索的关键词范围 ===
@@ -272,9 +287,9 @@ function applyUiStrings() {
     
     // 更新反馈弹窗
     updateElementText('feedback-thanks', t('thanksFeedback'));
-    const feedbackH3 = document.querySelector('.modal-box h3');
+    const feedbackH3 = document.querySelector('#feedback-form h3');
     if (feedbackH3) feedbackH3.textContent = t('helpImprove');
-    const feedbackP = document.querySelector('.modal-box p');
+    const feedbackP = document.querySelector('#feedback-form p');
     if (feedbackP) feedbackP.textContent = t('feedbackMessage');
     
     const fbProductLabel = document.querySelector('label[for="fb-product"]');
@@ -286,7 +301,7 @@ function applyUiStrings() {
     
     const modalCancel = document.getElementById('modal-cancel');
     if (modalCancel) modalCancel.textContent = t('cancel');
-    const modalSubmit = document.querySelector('.modal-submit');
+    const modalSubmit = document.querySelector('#user-feedback-form .modal-submit');
     if (modalSubmit) modalSubmit.textContent = t('sendFeedback');
     
     // 更新输入框占位符
@@ -296,6 +311,29 @@ function applyUiStrings() {
     if (fbMessageTextarea) fbMessageTextarea.placeholder = t('feedbackRegulation');
     const fbEmailInput = document.getElementById('fb-email');
     if (fbEmailInput) fbEmailInput.placeholder = 'you@company.com';
+
+    // 政策纠偏弹窗
+    updateElementText('policy-correction-title', t('policyCorrectionTitle'));
+    updateElementText('policy-correction-intro', t('policyCorrectionIntro'));
+    updateElementText('pc-product-keyword-label', t('policyCorrectionProduct'));
+    updateElementText('pc-policy-type-label', t('policyCorrectionPolicyType'));
+    updateElementText('pc-source-url-label', t('policyCorrectionSourceUrl'));
+    updateElementText('pc-user-message-label', t('policyCorrectionMessage'));
+    updateElementText('policy-correction-cancel', t('cancel'));
+
+    const policySubmit = document.querySelector('#policy-correction-form .policy-correction-submit');
+    if (policySubmit) policySubmit.textContent = t('policyCorrectionSubmit');
+
+    const policyTypeSelect = document.getElementById('pc-policy-type');
+    if (policyTypeSelect && policyTypeSelect.options.length > 0) {
+        policyTypeSelect.options[0].textContent = t('policyCorrectionPolicyTypePlaceholder');
+    }
+
+    const sourceUrlInput = document.getElementById('pc-source-url');
+    if (sourceUrlInput) sourceUrlInput.placeholder = t('policyCorrectionSourceUrlPlaceholder');
+
+    const policyMessageTextarea = document.getElementById('pc-user-message');
+    if (policyMessageTextarea) policyMessageTextarea.placeholder = t('policyCorrectionMessagePlaceholder');
 }
 
 // === 更新元素文本 ===

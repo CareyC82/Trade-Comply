@@ -5,6 +5,7 @@ require('./js/catalog.js');
 
 const { buildScopeCatalog, queryMatchesScope } = globalThis.Catalog;
 const { handleFeedbackRequest } = require('./feedback-store');
+const { handleComplianceFeedbackRequest } = require('./supabase-feedback');
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const ALLOWED_ORIGIN = "https://careyc82.github.io";
@@ -578,7 +579,7 @@ function parseRequestBody(event) {
         if (body?.body && typeof body.body === 'string') {
             try {
                 const nested = JSON.parse(body.body);
-                if (nested?.query || nested?.product_query) {
+                if (nested?.query || nested?.product_query || nested?.product_keyword) {
                     body = nested;
                 }
             } catch (e) {
@@ -591,6 +592,10 @@ function parseRequestBody(event) {
 
 function isFeedbackPath(path) {
     return path === '/feedback' || path.endsWith('/feedback');
+}
+
+function isApiFeedbackPath(path) {
+    return path === '/api/feedback' || path.endsWith('/api/feedback');
 }
 
 exports.handler = async (event) => {
@@ -640,6 +645,24 @@ exports.handler = async (event) => {
                 statusCode: 500,
                 headers,
                 body: JSON.stringify({ error: 'Failed to store feedback.' })
+            };
+        }
+    }
+
+    if (method === 'POST' && isApiFeedbackPath(path)) {
+        try {
+            const result = await handleComplianceFeedbackRequest(body);
+            return {
+                statusCode: result.statusCode,
+                headers,
+                body: JSON.stringify(result.body)
+            };
+        } catch (error) {
+            console.error('Policy correction handler error:', error.message);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ error: 'Failed to store policy correction feedback.' })
             };
         }
     }

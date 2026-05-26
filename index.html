@@ -125,6 +125,8 @@
             <button id="download-report-btn" class="report-btn" type="button">Download Pre-Check Report (PDF)</button>
         </div>
 
+        <div id="policy-correction-section" class="policy-correction-section" style="display: none;"></div>
+
         <div id="result-feedback-section" class="feedback-section" style="display: none;">
             <a href="#" class="feedback-link" id="result-feedback-trigger">💬 Can't find your product? Tell us</a>
         </div>
@@ -229,6 +231,40 @@
             </div>
     </div>
 
+    <div class="modal-overlay" id="policy-correction-modal">
+        <div class="modal-box policy-correction-modal-box">
+            <div class="feedback-form" id="policy-correction-form-wrap">
+                <h3 id="policy-correction-title">Policy data correction</h3>
+                <p class="policy-correction-intro" id="policy-correction-intro">
+                    Help us align the rule library with official sources. Submissions are reviewed before any database update.
+                </p>
+                <form id="policy-correction-form" novalidate>
+                    <label for="pc-product-keyword" id="pc-product-keyword-label">Product keyword</label>
+                    <input type="text" id="pc-product-keyword" name="product_keyword" required>
+
+                    <label for="pc-policy-type" id="pc-policy-type-label">Policy type</label>
+                    <select id="pc-policy-type" name="policy_type" required>
+                        <option value="">Select policy type</option>
+                        <option value="出口管制">出口管制</option>
+                        <option value="CCC认证">CCC认证</option>
+                        <option value="暂无政策">暂无政策</option>
+                    </select>
+
+                    <label for="pc-source-url" id="pc-source-url-label">Official source URL</label>
+                    <input type="url" id="pc-source-url" name="source_url" required placeholder="https://">
+
+                    <label for="pc-user-message" id="pc-user-message-label">Details</label>
+                    <textarea id="pc-user-message" name="user_message" required></textarea>
+
+                    <div class="modal-buttons">
+                        <button type="button" class="modal-cancel" id="policy-correction-cancel">Cancel</button>
+                        <button type="submit" class="modal-submit policy-correction-submit">Submit correction</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="feedback-modal">
         <div class="modal-box">
             <div class="feedback-thanks" id="feedback-thanks">
@@ -264,18 +300,19 @@
         <button id="nav-categories" class="nav-btn">📋 Categories</button>
     </div>
 
-    <script src="js/core.js?v=20260526"></script>
-    <script src="js/catalog.js?v=20260526"></script>
-    <script src="js/data.js?v=20260526"></script>
-    <script src="js/search.js?v=20260526"></script>
-    <script src="js/precheck.js?v=20260526"></script>
-    <script src="js/trust-boundary.js?v=20260526"></script>
-    <script src="js/ai.js?v=20260526"></script>
-    <script src="js/render.js?v=20260526"></script>
-    <script src="js/feedback.js?v=20260526"></script>
-    <script src="js/navigation.js?v=20260526"></script>
-    <script src="js/semiconductor.js?v=20260526"></script>
-    <script src="js/incoterm.js?v=20260526"></script>
-    <script src="js/main.js?v=20260526"></script>
+    <script src="js/core.js?v=20260527"></script>
+    <script src="js/catalog.js?v=20260527"></script>
+    <script src="js/data.js?v=20260527"></script>
+    <script src="js/search.js?v=20260527"></script>
+    <script src="js/precheck.js?v=20260527"></script>
+    <script src="js/trust-boundary.js?v=20260527"></script>
+    <script src="js/ai.js?v=20260527"></script>
+    <script src="js/render.js?v=20260527"></script>
+    <script src="js/feedback.js?v=20260527"></script>
+    <script src="js/policy-correction.js?v=20260527"></script>
+    <script src="js/navigation.js?v=20260527"></script>
+    <script src="js/semiconductor.js?v=20260527"></script>
+    <script src="js/incoterm.js?v=20260527"></script>
+    <script src="js/main.js?v=20260527"></script>
 </body>
 </html>

@@ -267,4 +267,6 @@ function bindEvents() {
     if (feedbackForm && feedbackThanks && feedbackFormDiv && feedbackModal) {
         bindFeedbackSubmit(feedbackForm, feedbackThanks, feedbackFormDiv, feedbackModal);
     }
+
+    initPolicyCorrectionUi();
 }

@@ -6,6 +6,7 @@ on:
     paths:
       - "index.js"
       - "feedback-store.js"
+      - "supabase-feedback.js"
       - "js/catalog.js"
       - "data/tags.json"
       - "data/cases.json"
@@ -57,6 +58,8 @@ jobs:
           OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
           OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_REGION: ${{ secrets.OSS_REGION }}
           OSS_FEEDBACK_PREFIX: ${{ secrets.OSS_FEEDBACK_PREFIX }}
