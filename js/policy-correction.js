@@ -26,11 +26,13 @@ function buildPolicyCorrectionPayload(form) {
     const messageInput = form.querySelector('#pc-user-message');
 
     return {
-        action: 'compliance_feedback',
-        product_keyword: productInput ? productInput.value.trim() : '',
-        policy_type: policyTypeInput ? policyTypeInput.value.trim() : '',
-        source_url: sourceUrlInput ? sourceUrlInput.value.trim() : '',
-        user_message: messageInput ? messageInput.value.trim() : ''
+        query: 'COMPLIANCE_FEEDBACK',
+        context: {
+            product_keyword: productInput ? productInput.value.trim() : '',
+            policy_type: policyTypeInput ? policyTypeInput.value.trim() : '',
+            source_url: sourceUrlInput ? sourceUrlInput.value.trim() : '',
+            user_message: messageInput ? messageInput.value.trim() : ''
+        }
     };
 }
 
@@ -107,7 +109,7 @@ async function submitPolicyCorrectionForm(form) {
     if (!response.ok) {
         throw new Error(data.error || `Policy correction API error: ${response.status}`);
     }
-    if (data.message === 'Service Online') {
+    if (data.message === 'Service Online' && !data.ok) {
         throw new Error('Policy correction API is not deployed yet. Please redeploy the FC function.');
     }
 

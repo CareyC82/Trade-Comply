@@ -16,7 +16,8 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260527-feedback-v1';
+const FC_BUILD_ID = '20260527-feedback-v2';
+const COMPLIANCE_FEEDBACK_QUERY = 'COMPLIANCE_FEEDBACK';
 const MAX_QUERY_LENGTH = 500;
 const TIMEOUT_MS = 30000;
 const MAX_CONTEXT_TAGS = 8;
@@ -555,12 +556,57 @@ function getInsufficientContextMessage(reason) {
     return AI_MESSAGES.insufficientContext;
 }
 
-function getQueryParams(event) {
-    const raw = event.queryParameters || event.queryStringParameters || {};
-    if (Array.isArray(raw)) {
-        return {};
+function normalizeEvent(rawEvent) {
+    if (typeof rawEvent === 'string' && rawEvent.trim()) {
+        try {
+            return JSON.parse(rawEvent);
+        } catch (error) {
+            return {};
+        }
     }
-    return raw || {};
+    return rawEvent || {};
+}
+
+function parseQueryString(queryString) {
+    const params = {};
+    if (!queryString || typeof queryString !== 'string') {
+        return params;
+    }
+    const trimmed = queryString.startsWith('?') ? queryString.slice(1) : queryString;
+    trimmed.split('&').forEach(part => {
+        if (!part) {
+            return;
+        }
+        const [rawKey, rawValue = ''] = part.split('=');
+        if (!rawKey) {
+            return;
+        }
+        try {
+            params[decodeURIComponent(rawKey)] = decodeURIComponent(rawValue);
+        } catch (error) {
+            params[rawKey] = rawValue;
+        }
+    });
+    return params;
+}
+
+function getQueryParams(event) {
+    const params = {};
+    const raw = event.queryParameters || event.queryStringParameters;
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+        Object.assign(params, raw);
+    }
+    Object.assign(params, parseQueryString(event.queryString || ''));
+    for (const source of [
+        event.rawPath,
+        event.path,
+        getHeaderValue(event.headers, 'x-fc-request-uri')
+    ]) {
+        if (typeof source === 'string' && source.includes('?')) {
+            Object.assign(params, parseQueryString(source.split('?').slice(1).join('?')));
+        }
+    }
+    return params;
 }
 
 function normalizePath(path) {
@@ -641,6 +687,9 @@ function parseRequestBody(event) {
     }
 
     if (typeof rawBody === 'string' && rawBody.trim()) {
+        if (event.isBase64Encoded === true || event.isBase64Encoded === 'true') {
+            rawBody = Buffer.from(rawBody, 'base64').toString('utf-8');
+        }
         body = JSON.parse(rawBody);
 
         if (body?.body && typeof body.body === 'string') {
@@ -665,6 +714,23 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
+function extractComplianceFeedbackPayload(body) {
+    if (!body || typeof body !== 'object') {
+        return null;
+    }
+
+    const query = typeof body.query === 'string' ? body.query.trim() : '';
+    if (query === COMPLIANCE_FEEDBACK_QUERY && body.context && typeof body.context === 'object') {
+        return body.context;
+    }
+
+    if (body.action === 'compliance_feedback' || body.product_keyword || body.policy_type || body.source_url) {
+        return body;
+    }
+
+    return null;
+}
+
 function inferPostRoute(path, body) {
     if (isApiFeedbackPath(path)) {
         return 'api_feedback';
@@ -687,7 +753,8 @@ function inferPostRoute(path, body) {
     return null;
 }
 
-exports.handler = async (event) => {
+exports.handler = async (rawEvent) => {
+    const event = normalizeEvent(rawEvent);
     const headers = buildCorsHeaders(event);
     const { method, path } = getRequestMeta(event);
 
@@ -727,6 +794,25 @@ exports.handler = async (event) => {
     } catch (e) {
         console.error('Parse error:', e.message);
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON: " + e.message }) };
+    }
+
+    const compliancePayload = method === 'POST' ? extractComplianceFeedbackPayload(body) : null;
+    if (compliancePayload) {
+        try {
+            const result = await handleComplianceFeedbackRequest(compliancePayload);
+            return {
+                statusCode: result.statusCode,
+                headers,
+                body: JSON.stringify(result.body)
+            };
+        } catch (error) {
+            console.error('Policy correction handler error:', error.message);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ error: 'Failed to store policy correction feedback.' })
+            };
+        }
     }
 
     const postRoute = method === 'POST' ? inferPostRoute(path, body) : null;
@@ -773,6 +859,14 @@ exports.handler = async (event) => {
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
+
+    if (query === COMPLIANCE_FEEDBACK_QUERY) {
+        return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Compliance feedback context is missing.' })
+        };
+    }
 
     if (!query) {
         return {
