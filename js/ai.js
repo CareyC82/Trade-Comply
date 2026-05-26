@@ -3,9 +3,9 @@ async function callAiAssistant(query) {
         return;
     }
 
-    if (!AppState.aiContext || !AppState.aiContext.tag_ids?.length) {
+    if (!AppState.aiContext) {
         removeAiBox();
-        createAiBox(t('aiNoMatchedRules'), null);
+        createAiBox(t('aiError'), null);
         return;
     }
 

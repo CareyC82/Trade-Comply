@@ -299,7 +299,6 @@ function buildTrustBoundaryReportHtml(boundary) {
     }
 
     const {
-        statusClass,
         coveredRows,
         categoryBlock,
         precheckBlock,
@@ -308,30 +307,25 @@ function buildTrustBoundaryReportHtml(boundary) {
     } = getTrustBoundaryParts(boundary);
 
     return `
-        <div class="report-block report-trust-card">
-            <div class="report-trust-header">
-                <div>
-                    <h2 class="report-trust-title">${escapeHtml(boundary.title)}</h2>
-                    <p class="report-trust-subtitle">${escapeHtml(boundary.subtitle)}</p>
-                </div>
-                <span class="${statusClass}">${escapeHtml(t(boundary.covered.status.badgeKey))}</span>
-            </div>
+        <div class="trust-boundary-card">
+            <div class="trust-boundary-title">${escapeHtml(boundary.title)}</div>
+            <div class="trust-boundary-subtitle">${escapeHtml(boundary.subtitle)}</div>
 
-            <div class="report-trust-section">
-                <h3>${escapeHtml(t('trustCoveredHeading'))}</h3>
+            <div class="trust-boundary-section">
+                <div class="trust-boundary-section-title">${escapeHtml(t('trustCoveredHeading'))}</div>
                 <ul class="trust-boundary-list">${coveredRows.join('')}</ul>
                 ${categoryBlock}
                 ${precheckBlock}
             </div>
 
-            <div class="report-trust-section">
-                <h3>${escapeHtml(t('trustNotCoveredHeading'))}</h3>
+            <div class="trust-boundary-section">
+                <div class="trust-boundary-section-title">${escapeHtml(t('trustNotCoveredHeading'))}</div>
                 <ul class="trust-boundary-list trust-boundary-list--muted">${notCoveredList}</ul>
             </div>
 
-            <div class="report-trust-section">
-                <h3>${escapeHtml(t('trustVerifyHeading'))}</h3>
-                <p class="report-verify-badge">${escapeHtml(boundary.verifyWith.badge)}</p>
+            <div class="trust-boundary-section trust-boundary-section--verify">
+                <div class="trust-boundary-section-title">${escapeHtml(t('trustVerifyHeading'))}</div>
+                <span class="boundary-badge boundary-badge--verify">${escapeHtml(boundary.verifyWith.badge)}</span>
                 <p class="trust-boundary-verify-title">${escapeHtml(boundary.verifyWith.title)}</p>
                 <ul class="trust-boundary-list">${verifyList}</ul>
             </div>

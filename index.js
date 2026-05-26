@@ -200,6 +200,96 @@ function mapCaseForPrompt(caseItem) {
     };
 }
 
+function scoreTagAgainstQuery(tag, queryLower, queryWords) {
+    let score = 0;
+    const keywords = tag.related_keywords || [];
+
+    keywords.forEach(keyword => {
+        const keywordLower = String(keyword).toLowerCase();
+        if (keywordLower === queryLower) {
+            score += 10;
+        } else if (queryWords.includes(keywordLower)) {
+            score += 5;
+        } else if (queryLower.includes(keywordLower) || keywordLower.includes(queryLower)) {
+            score += 2;
+        }
+    });
+
+    const textBlob = `${tag.tag_id || ''} ${tag.short_description || ''} ${tag.description || ''}`.toLowerCase();
+    if (textBlob.includes(queryLower)) {
+        score += 3;
+    }
+
+    return score;
+}
+
+function searchTagsForExploratory(query, direction, limitPerBucket = 6) {
+    const queryLower = String(query || '').trim().toLowerCase();
+    if (!queryLower) {
+        return { sameDirection: [], otherDirection: [] };
+    }
+
+    const queryWords = queryLower.split(/\s+/).filter(Boolean);
+    const scored = Object.values(TAGS_BY_ID)
+        .map(tag => ({ tag, score: scoreTagAgainstQuery(tag, queryLower, queryWords) }))
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+    const sameDirection = [];
+    const otherDirection = [];
+
+    for (const { tag } of scored) {
+        const mapped = mapTagForPrompt(tag);
+        if (tagMatchesDirection(tag, direction)) {
+            if (sameDirection.length < limitPerBucket) {
+                sameDirection.push(mapped);
+            }
+        } else if (otherDirection.length < limitPerBucket) {
+            otherDirection.push(mapped);
+        }
+        if (sameDirection.length >= limitPerBucket && otherDirection.length >= limitPerBucket) {
+            break;
+        }
+    }
+
+    return { sameDirection, otherDirection };
+}
+
+function hydrateExploratoryContext(context, userQuery) {
+    const direction = context?.direction === 'import' ? 'import' : 'export';
+    const productQuery = truncateText(context?.product_query || userQuery || '', 200);
+    const searchText = truncateText(userQuery || productQuery, 200);
+    const riskLevel = truncateText(context?.risk_level || 'low', 40);
+    const precheckAttributes = Array.isArray(context?.precheck_attributes)
+        ? context.precheck_attributes.filter(attr => typeof attr === 'string').slice(0, 12)
+        : [];
+
+    const { sameDirection, otherDirection } = searchTagsForExploratory(searchText, direction);
+
+    if (sameDirection.length === 0 && otherDirection.length === 0) {
+        return { valid: false, reason: 'no_matched_rules' };
+    }
+
+    return {
+        valid: true,
+        exploratory: true,
+        context: {
+            product_query: productQuery,
+            direction,
+            risk_level: riskLevel,
+            precheck_attributes: precheckAttributes,
+            matched_tags: sameDirection,
+            reference_tags: otherDirection,
+            related_cases: [],
+            match_count: {
+                tags: Number(context?.match_count?.tags) || 0,
+                cases: Number(context?.match_count?.cases) || 0
+            },
+            screen_had_no_rules: true
+        }
+    };
+}
+
 function hydrateContext(context) {
     if (!context || typeof context !== 'object') {
         return { valid: false, reason: 'missing_context' };
@@ -312,7 +402,8 @@ function formatCaseBlock(caseItem) {
 }
 
 function buildGroundedUserMessage(context, userQuery) {
-    const tagBlocks = context.matched_tags.map(formatTagBlock).join('\n\n');
+    const matchedBlocks = (context.matched_tags || []).map(formatTagBlock).join('\n\n');
+    const referenceBlocks = (context.reference_tags || []).map(formatTagBlock).join('\n\n');
     const caseBlocks = context.related_cases.length
         ? context.related_cases.map(formatCaseBlock).join('\n\n')
         : 'None matched.';
@@ -320,28 +411,48 @@ function buildGroundedUserMessage(context, userQuery) {
     const directionLabel = context.direction === 'import'
         ? 'import INTO China'
         : 'export FROM China';
+    const oppositeDirectionLabel = context.direction === 'import'
+        ? 'export FROM China'
+        : 'import INTO China';
 
-    return [
+    const lines = [
         `PRODUCT QUERY: ${context.product_query || 'Not specified'}`,
         `DIRECTION: ${directionLabel}`,
         `RISK LEVEL: ${context.risk_level}`,
         `PRECHECK ATTRIBUTES: ${context.precheck_attributes.join(', ') || 'none'}`,
-        '',
-        `=== MATCHED RULES (${context.match_count.tags} total, top ${context.matched_tags.length} shown) ===`,
-        tagBlocks || 'None matched.',
-        '',
-        `=== RELATED CASES (${context.match_count.cases} total) ===`,
-        caseBlocks,
-        '',
-        '=== USER QUESTION ===',
-        userQuery
-    ].join('\n');
+        ''
+    ];
+
+    if (context.screen_had_no_rules) {
+        lines.push('SCREEN RESULT: No compliance rule cards were displayed for this product and direction.');
+        lines.push('Use the library sections below. If only reference rules exist for the other direction, say so clearly and suggest switching direction on the site.');
+        lines.push('');
+    }
+
+    lines.push(`=== MATCHED RULES FOR ${directionLabel.toUpperCase()} (${context.matched_tags.length} in library context) ===`);
+    lines.push(matchedBlocks || 'None in library for this direction.');
+    lines.push('');
+
+    if (referenceBlocks) {
+        lines.push(`=== REFERENCE RULES (${oppositeDirectionLabel} only — not shown on screen) ===`);
+        lines.push(referenceBlocks);
+        lines.push('');
+    }
+
+    lines.push(`=== RELATED CASES (${context.match_count.cases} on screen) ===`);
+    lines.push(caseBlocks);
+    lines.push('');
+    lines.push('=== USER QUESTION ===');
+    lines.push(userQuery);
+
+    return lines.join('\n');
 }
 
 function postValidateResponse(text, context) {
     const allowedIds = new Set([
-        ...context.matched_tags.map(tag => tag.tag_id),
-        ...context.related_cases.map(caseItem => caseItem.case_id)
+        ...(context.matched_tags || []).map(tag => tag.tag_id),
+        ...(context.reference_tags || []).map(tag => tag.tag_id),
+        ...(context.related_cases || []).map(caseItem => caseItem.case_id)
     ]);
 
     const cited = [...text.matchAll(/\[([A-Z]+-[A-Z0-9-]+)\]/g)].map(match => match[1]);
@@ -381,7 +492,7 @@ function postValidateResponse(text, context) {
 
 const AI_MESSAGES = {
     outOfRange: "Your query is outside the scope of this website's trade compliance information search.\n\nThis website mainly provides trade compliance information for the following categories:\n• Electronics (mobile phones, computers, headphones, etc.) CCC certification\n• Wireless communication devices (Bluetooth, WiFi, drones, etc.) SRRC certification\n• Battery safety and transportation regulations\n• Solar product import/export compliance\n• Industrial robot compliance requirements\n• Energy storage system safety standards\n• Export controls and dual-use items\n• VAT refund policies\n\nIf you have other needs or specific product compliance questions, please leave a message with details about the product.",
-    insufficientContext: "The rule library did not match any compliance signals for this product screen, so the AI assistant cannot provide a grounded answer.\n\nPlease review the matched cards above, download the pre-check report, or submit feedback with your product details.",
+    insufficientContext: "The rule library did not find related compliance signals for this product and question.\n\nTry switching import/export direction, broadening the product description, or submit feedback with your product details.",
     invalidTagIds: "The AI assistant could not verify the matched rule IDs against the server rule library. Please refresh the page and try again.",
     libraryUnavailable: "The AI assistant rule library is temporarily unavailable on the server. Please try again later or use the matched cards above.",
     systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. Always reply in English.
@@ -560,7 +671,11 @@ exports.handler = async (event) => {
         };
     }
 
-    const hydrationResult = hydrateContext(body.context);
+    let hydrationResult = hydrateContext(body.context);
+    if (!hydrationResult.valid && hydrationResult.reason === 'no_matched_rules') {
+        hydrationResult = hydrateExploratoryContext(body.context, query);
+    }
+
     if (!hydrationResult.valid) {
         return {
             statusCode: 200,

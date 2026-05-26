@@ -1,3 +1,62 @@
+function isBrowseAllQuery(query) {
+    const normalized = (query || '').trim().toLowerCase();
+    if (!normalized) return true;
+    const browseLabels = [t('allProducts'), t('allCases'), 'Semiconductor products', 'semiconductor products'];
+    return browseLabels.some(label => label && label.toLowerCase() === normalized);
+}
+
+function renderAiQuerySection(container, { showAssistant, matchedRuleCount }) {
+    if (!container) {
+        return;
+    }
+
+    if (!showAssistant) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const note = matchedRuleCount > 0
+        ? escapeHtml(t('aiBasedOnRules', { count: matchedRuleCount }))
+        : escapeHtml(t('aiNoRulesExploratory'));
+    const placeholder = matchedRuleCount > 0
+        ? t('askAiPlaceholder')
+        : t('askAiPlaceholderNoRules');
+
+    container.innerHTML = `
+        <div class="ai-grounding-note">${note}</div>
+        <div class="ai-query-row">
+            <input type="text" id="ai-query-input" class="ai-query-input" placeholder="${escapeHtml(placeholder)}" value="">
+            <button id="ai-assistant-btn" class="ai-assistant-btn" type="button">
+                🤖 ${escapeHtml(t('askAiAssistant'))}
+            </button>
+        </div>
+    `;
+
+    bindAiQuerySectionHandlers();
+}
+
+function bindAiQuerySectionHandlers() {
+    const aiBtn = document.getElementById('ai-assistant-btn');
+    const aiInput = document.getElementById('ai-query-input');
+
+    if (!aiBtn || !aiInput) {
+        return;
+    }
+
+    aiBtn.addEventListener('click', () => {
+        const userQuery = aiInput.value.trim();
+        if (userQuery) {
+            callAiAssistant(userQuery);
+        }
+    });
+
+    aiInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            aiBtn.click();
+        }
+    });
+}
+
 function searchProducts(query) {
     AppState.searchOrigin = 'electronics';
     const trimmedQuery = query ? query.trim() : '';
@@ -33,46 +92,20 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     });
     renderPrecheckSummary('precheck-summary-container', precheckSelections, tags);
 
+    renderTrustBoundary('trust-boundary-container', {
+        query,
+        direction: AppState.currentDirection,
+        tags,
+        cases,
+        precheckSelections,
+        profile: precheckProfile
+    });
+
     const aiQuerySection = document.getElementById('ai-query-section');
-    const isInRange = checkSearchRange(query) || precheckSelections.length > 0;
-    const hasMatchedRules = tags.length > 0;
-    if (aiQuerySection) {
-        if (isInRange && hasMatchedRules) {
-            aiQuerySection.innerHTML = `
-                <div class="ai-grounding-note">${escapeHtml(t('aiBasedOnRules', { count: tags.length }))}</div>
-                <div style="display: flex; gap: 10px; margin: 15px 0; align-items: center;">
-                    <input type="text" id="ai-query-input" style="flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="${t('askAiPlaceholder')}" value="">
-                    <button id="ai-assistant-btn" class="ai-assistant-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;">
-                        🤖 ${t('askAiAssistant')}
-                    </button>
-                </div>
-            `;
-        } else if (isInRange && !hasMatchedRules) {
-            aiQuerySection.innerHTML = `<div class="ai-no-rules-note">${escapeHtml(t('aiNoMatchedRules'))}</div>`;
-        } else {
-            aiQuerySection.innerHTML = '';
-        }
-    }
-
-    if (isInRange && hasMatchedRules) {
-        const aiBtn = document.getElementById('ai-assistant-btn');
-        const aiInput = document.getElementById('ai-query-input');
-
-        if (aiBtn && aiInput) {
-            aiBtn.addEventListener('click', () => {
-                const userQuery = aiInput.value.trim();
-                if (userQuery) {
-                    callAiAssistant(userQuery);
-                }
-            });
-
-            aiInput.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') {
-                    aiBtn.click();
-                }
-            });
-        }
-    }
+    renderAiQuerySection(aiQuerySection, {
+        showAssistant: !isBrowseAllQuery(query) || precheckSelections.length > 0,
+        matchedRuleCount: tags.length
+    });
 
     const cardsContainer = document.getElementById('result-cards-container');
     if (!cardsContainer) return;
@@ -207,13 +240,4 @@ function renderResults(query, tags, cases, precheckSelections = []) {
             `;
         }
     }
-
-    renderTrustBoundary('trust-boundary-container', {
-        query,
-        direction: AppState.currentDirection,
-        tags,
-        cases,
-        precheckSelections,
-        profile: precheckProfile
-    });
 }

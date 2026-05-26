@@ -384,17 +384,40 @@ function slugifyFilePart(text) {
         .slice(0, 48) || 'all-products';
 }
 
-function buildReportHtml(report) {
-    const tagRows = report.tags.map(tag => `
-        <tr>
-            <td>${escapeHtml(tag.category)}</td>
-            <td>${escapeHtml(tag.tagId)}</td>
-            <td>${escapeHtml(tag.shortDescription || tag.description)}</td>
-            <td>${escapeHtml(tag.hsCodes.join(', ') || 'Not specified')}</td>
-            <td>${tag.sourceUrl ? `<a href="${sanitizeUrl(tag.sourceUrl)}">${escapeHtml(tag.sourceCitation || tag.sourceUrl)}</a>` : escapeHtml(tag.sourceCitation || 'Not specified')}</td>
-        </tr>
+function buildReportSignalRowsHtml(tags) {
+    const cellStyle = 'display:table-cell;border:1px solid #E0E0E0;padding:8px;vertical-align:top;text-align:left;font-size:13px;line-height:1.45;word-wrap:break-word;overflow-wrap:break-word;';
+    const headStyle = cellStyle + 'background:#F5F7FA;color:#1A3A5C;font-weight:700;';
+    const w = {
+        category: 'width:96px;min-width:96px;max-width:96px;',
+        rule: 'width:96px;min-width:96px;max-width:96px;',
+        desc: 'width:238px;min-width:238px;max-width:238px;',
+        hs: 'width:128px;min-width:128px;max-width:128px;',
+        source: 'width:136px;min-width:136px;max-width:136px;'
+    };
+
+    const header = `
+        <div style="display:table-row;">
+            <div style="${headStyle}${w.category}">Category</div>
+            <div style="${headStyle}${w.rule}">Rule ID</div>
+            <div style="${headStyle}${w.desc}">Description</div>
+            <div style="${headStyle}${w.hs}">HS Codes</div>
+            <div style="${headStyle}${w.source}">Source</div>
+        </div>`;
+
+    const rows = (tags || []).map(tag => `
+        <div style="display:table-row;">
+            <div style="${cellStyle}${w.category}">${escapeHtml(tag.category)}</div>
+            <div style="${cellStyle}${w.rule}">${escapeHtml(tag.tagId)}</div>
+            <div style="${cellStyle}${w.desc}">${escapeHtml(tag.shortDescription || tag.description)}</div>
+            <div style="${cellStyle}${w.hs}">${escapeHtml(tag.hsCodes.join(', ') || 'Not specified')}</div>
+            <div style="${cellStyle}${w.source}">${tag.sourceUrl ? `<a href="${sanitizeUrl(tag.sourceUrl)}" style="color:#1A3A5C;text-decoration:underline;">${escapeHtml(tag.sourceCitation || tag.sourceUrl)}</a>` : escapeHtml(tag.sourceCitation || 'Not specified')}</div>
+        </div>
     `).join('');
 
+    return header + rows;
+}
+
+function buildReportHtml(report) {
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -402,56 +425,65 @@ function buildReportHtml(report) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Comply Pre-Check Report</title>
     <style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #243447; margin: 0; padding: 24px; line-height: 1.55; font-size: 12px; }
-h1 { color: #1A3A5C; margin: 0 0 6px; font-size: 22px; }
-h2 { color: #1A3A5C; font-size: 16px; margin: 0; }
-h3 { color: #1A3A5C; font-size: 13px; margin: 0 0 8px; }
-.meta, .notice { color: #666; font-size: 12px; }
-.notice { margin-top: 8px; }
-.report-block { page-break-inside: avoid; break-inside: avoid; margin-bottom: 18px; }
-.summary { border: 1px solid #E0E0E0; border-left: 5px solid #E8A817; border-radius: 8px; padding: 14px; margin: 0 0 18px; page-break-inside: avoid; break-inside: avoid; }
-.risk { display: inline-block; border-radius: 999px; padding: 4px 9px; background: #FDECEC; color: #B42318; font-weight: 700; font-size: 11px; }
-.chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 3px 3px 0 0; background: #F5F7FA; font-size: 11px; }
-table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 11px; page-break-inside: auto; }
-tr { page-break-inside: avoid; break-inside: avoid; }
-th, td { border: 1px solid #E0E0E0; padding: 7px; vertical-align: top; text-align: left; }
-th { background: #F5F7FA; color: #1A3A5C; }
-a { color: #1A3A5C; word-break: break-all; }
-.report-trust-card { border: 1px solid #E0E0E0; border-left: 4px solid #1A3A5C; border-radius: 8px; padding: 14px; background: #FAFBFC; }
-.report-trust-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
-.report-trust-title { color: #1A3A5C; font-size: 16px; margin: 0 0 4px; }
-.report-trust-subtitle { color: #666; font-size: 11px; margin: 0; line-height: 1.45; }
-.report-trust-section { margin-top: 12px; padding-top: 10px; border-top: 1px solid #E0E0E0; page-break-inside: avoid; break-inside: avoid; }
-.report-trust-section:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
-.trust-boundary-list { margin: 0; padding-left: 18px; color: #444; font-size: 11px; }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #ffffff !important; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #243447; line-height: 1.55; font-size: 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.report-root { width: 794px; padding: 32px; background: #ffffff; }
+h1 { color: #1A3A5C; margin: 0 0 4px; font-size: 24px; font-weight: 700; }
+h2 { color: #1A3A5C; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin: 28px 0 12px; font-size: 16px; font-weight: 700; }
+.meta, .notice { color: #666; font-size: 14px; }
+.notice { margin: 8px 0 0; }
+.summary { border: 1px solid #E0E0E0; border-left: 5px solid #E8A817; border-radius: 8px; padding: 16px; margin: 20px 0; background: #FFFFFF; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+.summary p { margin: 0 0 10px; page-break-inside: avoid; break-inside: avoid; }
+.summary p:last-child { margin-bottom: 0; }
+.risk { display: inline-block; border-radius: 999px; padding: 5px 10px; background: #FDECEC; color: #B42318; font-weight: 700; font-size: 13px; white-space: nowrap; page-break-inside: avoid; break-inside: avoid; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 4px 9px; margin: 3px; background: #F5F7FA; font-size: 13px; white-space: nowrap; page-break-inside: avoid; break-inside: avoid; }
+.avoid-page-break { page-break-inside: avoid !important; break-inside: avoid !important; }
+.signals-table-wrap { width: 694px; margin-top: 10px; }
+.signals-table { display: table; width: 694px; border-collapse: collapse; table-layout: fixed; border: 1px solid #E0E0E0; background: #FFFFFF; }
+a { color: #1A3A5C; word-break: break-word; }
+.trust-boundary-card { border: 1px solid #E0E0E0; border-left: 4px solid #1A3A5C; border-radius: 8px; padding: 16px; margin: 20px 0; background: #FAFBFC; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+.trust-boundary-title { color: #1A3A5C; font-weight: 700; font-size: 16px; margin: 0 0 4px; }
+.trust-boundary-subtitle { color: #666; font-size: 13px; margin: 0 0 4px; line-height: 1.45; }
+.trust-boundary-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid #E0E0E0; }
+.trust-boundary-section--verify { border-top-color: rgba(26, 58, 92, 0.18); }
+.trust-boundary-section-title { color: #1A3A5C; font-size: 14px; font-weight: 700; margin: 0 0 8px; }
+.trust-boundary-list { margin: 0; padding-left: 18px; color: #444; font-size: 13px; }
+.trust-boundary-list li { margin-bottom: 6px; }
 .trust-boundary-list--muted { color: #666; }
-.trust-boundary-verify-title { color: #666; font-size: 11px; margin: 0 0 8px; font-weight: 600; }
-.report-verify-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; margin: 0 0 8px; background: rgba(26, 58, 92, 0.08); color: #1A3A5C; font-size: 11px; font-weight: 700; }
-.boundary-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.trust-boundary-verify-title { color: #666; font-size: 13px; margin: 8px 0; font-weight: 600; }
+.boundary-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+.boundary-badge--verify { background: rgba(26, 58, 92, 0.08); color: #1A3A5C; border-color: rgba(26, 58, 92, 0.18); margin-bottom: 4px; }
 .boundary-subsection { margin-top: 10px; }
-.boundary-subheading { color: #666; font-size: 10px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
-.scope-chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 2px 3px 0 0; background: #fff; font-size: 10px; }
-.section-heading { color: #1A3A5C; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin: 0 0 10px; font-size: 15px; page-break-after: avoid; }
+.boundary-subheading { color: #666; font-size: 11px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+.scope-chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 2px; background: #F5F7FA; font-size: 12px; }
     </style>
 </head>
 <body>
+    <div id="report-root" class="report-root">
     <h1>Trade Comply Pre-Check Report</h1>
     <div class="meta">Generated: ${escapeHtml(formatReportDate(report.generatedAt))}</div>
     <div class="notice">Preliminary import/export compliance screening only. This is not legal advice, customs advice, or a substitute for professional review.</div>
 
-    <div class="summary report-block">
-<p><strong>Product / Query:</strong> ${escapeHtml(report.productQuery)}</p>
-<p><strong>Direction:</strong> ${escapeHtml(report.direction)}</p>
-<p><strong>Pre-check risk level:</strong> <span class="risk">${escapeHtml(report.riskLabel)}</span></p>
-${report.selectedAttributes.length ? `<p><strong>Selected attributes:</strong><br>${report.selectedAttributes.map(item => `<span class="chip">${escapeHtml(item)}</span>`).join('')}</p>` : ''}
-${report.signals.length ? `<p><strong>Triggered signals:</strong><br>${report.signals.map(item => `<span class="chip">${escapeHtml(item)}</span>`).join('')}</p>` : ''}
-${report.nextChecks.length ? `<p><strong>Recommended next checks:</strong> ${report.nextChecks.map(escapeHtml).join(' ')}</p>` : ''}
-    </div>
-
     ${report.trustBoundaryHtml || ''}
 
-    <h2 class="section-heading">Matched Compliance Signals</h2>
-    ${report.tags.length ? `<table><thead><tr><th>Category</th><th>Rule ID</th><th>Description</th><th>HS Codes</th><th>Source</th></tr></thead><tbody>${tagRows}</tbody></table>` : '<p>No matched compliance signals.</p>'}
+    <div class="summary avoid-page-break" style="border:1px solid #E0E0E0;border-left:5px solid #E8A817;border-radius:8px;padding:16px;margin:20px 0;background:#FFFFFF;page-break-inside:avoid;break-inside:avoid;overflow:hidden;">
+<p style="page-break-inside:avoid;break-inside:avoid;"><strong>Product / Query:</strong> ${escapeHtml(report.productQuery)}</p>
+<p style="page-break-inside:avoid;break-inside:avoid;"><strong>Direction:</strong> ${escapeHtml(report.direction)}</p>
+<p style="page-break-inside:avoid;break-inside:avoid;"><strong>Pre-check risk level:</strong> <span class="risk" style="display:inline-block;border-radius:999px;padding:5px 10px;background:#FDECEC;color:#B42318;font-weight:700;white-space:nowrap;">${escapeHtml(report.riskLabel)}</span></p>
+${report.selectedAttributes.length ? `<p style="page-break-inside:avoid;break-inside:avoid;"><strong>Selected attributes:</strong><br>${report.selectedAttributes.map(item => `<span class="chip" style="display:inline-block;border:1px solid #E0E0E0;border-radius:999px;padding:4px 9px;margin:3px;background:#F5F7FA;white-space:nowrap;">${escapeHtml(item)}</span>`).join('')}</p>` : ''}
+${report.signals.length ? `<p style="page-break-inside:avoid;break-inside:avoid;"><strong>Triggered signals:</strong><br>${report.signals.map(item => `<span class="chip" style="display:inline-block;border:1px solid #E0E0E0;border-radius:999px;padding:4px 9px;margin:3px;background:#F5F7FA;white-space:nowrap;">${escapeHtml(item)}</span>`).join('')}</p>` : ''}
+${report.nextChecks.length ? `<p style="page-break-inside:avoid;break-inside:avoid;"><strong>Recommended next checks:</strong> ${report.nextChecks.map(escapeHtml).join(' ')}</p>` : ''}
+    </div>
+
+    <h2>Matched Compliance Signals</h2>
+    ${report.tags.length ? `
+    <div class="signals-table-wrap">
+        <div class="signals-table" style="display:table;width:694px;border-collapse:collapse;border:1px solid #E0E0E0;background:#FFFFFF;">
+            ${buildReportSignalRowsHtml(report.tags)}
+        </div>
+    </div>` : '<p>No matched compliance signals.</p>'}
+    </div>
 </body>
 </html>`;
 }
@@ -484,25 +516,36 @@ function loadHtml2Pdf() {
 
 function waitForReportFrame(iframe) {
     return new Promise((resolve) => {
-        const done = () => resolve(iframe.contentDocument.body);
+        const finish = () => {
+            const doc = iframe.contentDocument;
+            const root = doc.getElementById('report-root');
+            if (!root) {
+                resolve({ root: doc.body, contentHeight: doc.body.scrollHeight });
+                return;
+            }
+            const contentHeight = root.scrollHeight;
+            iframe.style.width = '794px';
+            iframe.style.height = `${contentHeight}px`;
+            resolve({ root, contentHeight });
+        };
         if (iframe.contentDocument?.readyState === 'complete') {
-            setTimeout(done, 100);
+            setTimeout(finish, 200);
             return;
         }
-        iframe.addEventListener('load', () => setTimeout(done, 100), { once: true });
+        iframe.addEventListener('load', () => setTimeout(finish, 200), { once: true });
     });
 }
 
 function createReportRenderFrame(report) {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('aria-hidden', 'true');
-    iframe.style.cssText = 'position:fixed;left:0;top:0;width:794px;height:1123px;border:0;opacity:0;pointer-events:none;z-index:-1;';
+    iframe.style.cssText = 'position:fixed;left:0;top:0;width:794px;height:600px;border:0;opacity:0;pointer-events:none;z-index:-1;';
     document.body.appendChild(iframe);
     const doc = iframe.contentDocument;
     doc.open();
     doc.write(buildReportHtml(report));
     doc.close();
-    return waitForReportFrame(iframe).then(body => ({ iframe, body }));
+    return waitForReportFrame(iframe).then(({ root, contentHeight }) => ({ iframe, root, contentHeight }));
 }
 
 async function downloadPrecheckReport() {
@@ -527,11 +570,21 @@ async function downloadPrecheckReport() {
         await html2pdf().set({
             margin: [10, 10, 10, 10],
             filename,
-            image: { type: 'jpeg', quality: 0.92 },
-            html2canvas: { scale: 1.5, useCORS: true, logging: false, scrollY: 0 },
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0
+            },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: 'avoid-all' }
-        }).from(rendered.body).save();
+            pagebreak: {
+                mode: ['css', 'legacy'],
+                avoid: ['.avoid-page-break', '.summary', '.trust-boundary-card']
+            }
+        }).from(rendered.root).save();
     } catch (error) {
         console.error('PDF generation failed:', error);
         window.alert('Could not generate the PDF report. Please check your connection and try again.');
