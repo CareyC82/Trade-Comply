@@ -1,32 +1,9 @@
 function searchProducts(query) {
     AppState.searchOrigin = 'electronics';
-    const trimmedQuery = (query ?? document.getElementById('result-search-input')?.value ?? document.getElementById('search-input')?.value ?? '').trim();
-    syncResultSearchInputs(trimmedQuery);
+    const trimmedQuery = query ? query.trim() : '';
     const selections = getPrecheckSelections('precheck-panel');
     const results = searchWithPrecheck(trimmedQuery, selections, search);
     renderResults(trimmedQuery || t('allProducts'), results.tags, results.cases, selections);
-}
-
-function syncResultSearchInputs(query) {
-    const value = query || '';
-    const resultInput = document.getElementById('result-search-input');
-    if (resultInput) resultInput.value = value;
-    if (AppState.searchOrigin === 'semiconductor') {
-        const semiInput = document.getElementById('search-input-semi');
-        if (semiInput) semiInput.value = value;
-    } else {
-        const electronicsInput = document.getElementById('search-input');
-        if (electronicsInput) electronicsInput.value = value;
-    }
-}
-
-function runResultPageSearch() {
-    const query = document.getElementById('result-search-input')?.value ?? '';
-    if (AppState.searchOrigin === 'semiconductor') {
-        searchSemiconductorProducts(query);
-        return;
-    }
-    searchProducts(query);
 }
 
 /**
@@ -34,7 +11,6 @@ function runResultPageSearch() {
  */
 function renderResults(query, tags, cases, precheckSelections = []) {
     showView('result');
-    syncResultSearchInputs(query);
     // 清空旧的 AI 结果
     removeAiBox();
 
