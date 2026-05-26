@@ -37,15 +37,21 @@ build_package() {
 install_aliyun_cli() {
   if command -v aliyun >/dev/null 2>&1; then
     echo "Aliyun CLI already installed: $(aliyun version)"
-    return 0
+  else
+    echo "Installing Aliyun CLI..."
+    curl -fsSL https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz -o /tmp/aliyun-cli.tgz
+    tar -xzf /tmp/aliyun-cli.tgz -C /tmp
+    chmod +x /tmp/aliyun
+    sudo mv /tmp/aliyun /usr/local/bin/aliyun
+    aliyun version
   fi
 
-  echo "Installing Aliyun CLI..."
-  curl -fsSL https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz -o /tmp/aliyun-cli.tgz
-  tar -xzf /tmp/aliyun-cli.tgz -C /tmp
-  chmod +x /tmp/aliyun
-  sudo mv /tmp/aliyun /usr/local/bin/aliyun
-  aliyun version
+  if ! aliyun plugin list 2>/dev/null | grep -q 'aliyun-cli-fc'; then
+    echo "Installing Aliyun FC plugin (required for fc update-function)..."
+    aliyun plugin install --name aliyun-cli-fc
+  else
+    echo "Aliyun FC plugin already installed."
+  fi
 }
 
 configure_aliyun_cli() {
@@ -58,41 +64,32 @@ configure_aliyun_cli() {
   echo "Aliyun CLI configured for region ${FC_REGION}."
 }
 
-write_update_body() {
-  node <<'NODE'
-const fs = require('fs');
-const path = require('path');
-
-const zipPath = path.join(process.cwd(), 'fc-deploy.zip');
-if (!fs.existsSync(zipPath)) {
-  console.error('ERROR: fc-deploy.zip not found. Run package-fc.sh first.');
-  process.exit(1);
-}
-
-const body = {
-  code: {
-    zipFile: fs.readFileSync(zipPath).toString('base64')
-  },
-  environmentVariables: {
-    DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY || '',
-    OSS_BUCKET: process.env.OSS_BUCKET || '',
-    OSS_REGION: process.env.OSS_REGION || 'cn-shenzhen',
-    OSS_ACCESS_KEY_ID: process.env.OSS_ACCESS_KEY_ID || process.env.ALIBABA_CLOUD_ACCESS_KEY_ID || '',
-    OSS_ACCESS_KEY_SECRET: process.env.OSS_ACCESS_KEY_SECRET || process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET || '',
-    OSS_FEEDBACK_PREFIX: process.env.OSS_FEEDBACK_PREFIX || 'feedback'
-  }
-};
-
-fs.writeFileSync('fc-update-body.json', JSON.stringify(body));
-console.log(`Prepared fc-update-body.json (${Math.round(fs.statSync('fc-update-body.json').size / 1024)} KB).`);
-NODE
-}
-
 deploy_function() {
+  if [ ! -f fc-deploy.zip ]; then
+    echo "ERROR: fc-deploy.zip not found. Run package-fc.sh first." >&2
+    exit 1
+  fi
+
+  local zip_b64
+  zip_b64="$(base64 -w0 fc-deploy.zip)"
+  echo "Prepared code payload ($(wc -c < fc-deploy.zip) bytes zip, ${#zip_b64} base64 chars)."
+
+  local oss_key_id="${OSS_ACCESS_KEY_ID:-$ACCESS_KEY_ID}"
+  local oss_key_secret="${OSS_ACCESS_KEY_SECRET:-$ACCESS_KEY_SECRET}"
+
   echo "Updating FC function code and environment variables..."
-  aliyun fc PUT "/2023-03-30/functions/${FC_FUNCTION_NAME}" \
+  aliyun fc update-function \
+    --function-name "$FC_FUNCTION_NAME" \
     --region "$FC_REGION" \
-    --body "file://fc-update-body.json"
+    --code "zipFile=${zip_b64}" \
+    --environment-variables \
+      "DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}" \
+      "OSS_BUCKET=${OSS_BUCKET:-}" \
+      "OSS_REGION=${OSS_REGION:-cn-shenzhen}" \
+      "OSS_ACCESS_KEY_ID=${oss_key_id}" \
+      "OSS_ACCESS_KEY_SECRET=${oss_key_secret}" \
+      "OSS_FEEDBACK_PREFIX=${OSS_FEEDBACK_PREFIX:-feedback}"
+
   echo "FC deploy completed."
 }
 
@@ -110,7 +107,6 @@ case "${1:-all}" in
     configure_aliyun_cli
     ;;
   deploy)
-    write_update_body
     deploy_function
     ;;
   all)
@@ -118,7 +114,6 @@ case "${1:-all}" in
     build_package
     install_aliyun_cli
     configure_aliyun_cli
-    write_update_body
     deploy_function
     ;;
   *)
