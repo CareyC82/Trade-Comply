@@ -1,14 +1,13 @@
 const POLICY_CORRECTION_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run/';
-const COMPLIANCE_FEEDBACK_MARKER = '__COMPLIANCE_FB__';
+const COMPLIANCE_FEEDBACK_HEX_MARKER = 'CFB';
 
 function encodeComplianceQuery(payload) {
     const json = JSON.stringify(payload);
     const bytes = new TextEncoder().encode(json);
-    let binary = '';
-    bytes.forEach(byte => {
-        binary += String.fromCharCode(byte);
-    });
-    return `${COMPLIANCE_FEEDBACK_MARKER}${btoa(binary)}`;
+    const hex = Array.from(bytes)
+        .map(byte => byte.toString(16).padStart(2, '0'))
+        .join('');
+    return `${COMPLIANCE_FEEDBACK_HEX_MARKER}${hex}`;
 }
 
 function getActiveProductKeyword() {
@@ -123,6 +122,10 @@ async function submitPolicyCorrectionForm(form) {
     }
     if (data.message === 'Service Online' && !data.ok) {
         throw new Error('Policy correction API is not deployed yet. Please redeploy the FC function.');
+    }
+
+    if (data.debug) {
+        console.warn('Policy correction API debug:', data.debug);
     }
 
     return data;

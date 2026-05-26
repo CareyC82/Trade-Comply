@@ -16,10 +16,11 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260527-feedback-v4';
+const FC_BUILD_ID = '20260527-feedback-v5';
 const COMPLIANCE_FEEDBACK_QUERY = 'COMPLIANCE_FEEDBACK';
 const COMPLIANCE_FEEDBACK_PREFIX = `${COMPLIANCE_FEEDBACK_QUERY}:`;
 const COMPLIANCE_FEEDBACK_MARKER = '__COMPLIANCE_FB__';
+const COMPLIANCE_FEEDBACK_HEX_MARKER = 'CFB';
 const MAX_QUERY_LENGTH = 500;
 const TIMEOUT_MS = 30000;
 const MAX_CONTEXT_TAGS = 8;
@@ -738,10 +739,33 @@ function decodeComplianceFeedbackBase64(encoded) {
     }
 
     try {
-        const json = Buffer.from(encoded, 'base64').toString('utf-8');
+        let normalized = encoded.replace(/-/g, '+').replace(/_/g, '/');
+        const remainder = normalized.length % 4;
+        if (remainder) {
+            normalized += '='.repeat(4 - remainder);
+        }
+        const json = Buffer.from(normalized, 'base64').toString('utf-8');
         return JSON.parse(json);
     } catch (error) {
         console.error('Compliance feedback base64 decode failed:', error.message);
+        return null;
+    }
+}
+
+function decodeComplianceFeedbackHex(encoded) {
+    if (!encoded || typeof encoded !== 'string' || encoded.length % 2 !== 0) {
+        return null;
+    }
+
+    if (!/^[0-9a-fA-F]+$/.test(encoded)) {
+        return null;
+    }
+
+    try {
+        const json = Buffer.from(encoded, 'hex').toString('utf-8');
+        return JSON.parse(json);
+    } catch (error) {
+        console.error('Compliance feedback hex decode failed:', error.message);
         return null;
     }
 }
@@ -752,6 +776,10 @@ function extractComplianceFeedbackPayload(body) {
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
+    if (query.startsWith(COMPLIANCE_FEEDBACK_HEX_MARKER) && query.length > COMPLIANCE_FEEDBACK_HEX_MARKER.length) {
+        return decodeComplianceFeedbackHex(query.slice(COMPLIANCE_FEEDBACK_HEX_MARKER.length));
+    }
+
     if (query.startsWith(COMPLIANCE_FEEDBACK_MARKER)) {
         return decodeComplianceFeedbackBase64(query.slice(COMPLIANCE_FEEDBACK_MARKER.length));
     }
@@ -902,11 +930,19 @@ exports.handler = async (rawEvent) => {
 
     if (query === COMPLIANCE_FEEDBACK_QUERY
         || query.startsWith(COMPLIANCE_FEEDBACK_PREFIX)
-        || query.startsWith(COMPLIANCE_FEEDBACK_MARKER)) {
+        || query.startsWith(COMPLIANCE_FEEDBACK_MARKER)
+        || query.startsWith(COMPLIANCE_FEEDBACK_HEX_MARKER)) {
         return {
             statusCode: 400,
             headers,
-            body: JSON.stringify({ error: 'Compliance feedback payload is missing or invalid.' })
+            body: JSON.stringify({
+                error: 'Compliance feedback payload is missing or invalid.',
+                debug: {
+                    build: FC_BUILD_ID,
+                    queryLength: query.length,
+                    queryPrefix: query.slice(0, 48)
+                }
+            })
         };
     }
 
