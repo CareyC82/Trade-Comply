@@ -420,6 +420,11 @@ a { color: #1A3A5C; }
 .trust-boundary-list { margin: 0; padding-left: 18px; color: #444; font-size: 0.84rem; }
 .boundary-badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 0.72rem; font-weight: 700; }
 .scope-chip { display: inline-block; border: 1px solid #E0E0E0; border-radius: 999px; padding: 3px 8px; margin: 2px; background: #F5F7FA; font-size: 0.76rem; }
+.trust-boundary-grid { display: block; }
+.trust-boundary-section { margin-bottom: 12px; border: 1px solid #E0E0E0; border-radius: 8px; padding: 10px 12px; background: #FAFBFC; }
+.collapsible-body { display: block !important; }
+.collapsible-header { display: block; width: 100%; border: none; background: transparent; padding: 0 0 8px; font: inherit; text-align: left; cursor: default; }
+.collapsible-header .arrow { display: none; }
 @media print { body { margin: 18mm; } }
     </style>
 </head>
@@ -445,16 +450,92 @@ ${report.nextChecks.length ? `<p><strong>Recommended next checks:</strong> ${rep
 </html>`;
 }
 
-function downloadPrecheckReport() {
+const HTML2PDF_URL = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js';
+let html2PdfLoaderPromise = null;
+
+function loadHtml2Pdf() {
+    if (window.html2pdf) {
+        return Promise.resolve(window.html2pdf);
+    }
+    if (!html2PdfLoaderPromise) {
+        html2PdfLoaderPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = HTML2PDF_URL;
+            script.async = true;
+            script.onload = () => {
+                if (window.html2pdf) {
+                    resolve(window.html2pdf);
+                    return;
+                }
+                reject(new Error('html2pdf failed to load'));
+            };
+            script.onerror = () => reject(new Error('html2pdf script unavailable'));
+            document.head.appendChild(script);
+        });
+    }
+    return html2PdfLoaderPromise;
+}
+
+function buildReportPdfElement(report) {
+    const html = buildReportHtml(report);
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const root = document.createElement('div');
+    root.className = 'precheck-report-pdf-root';
+    root.style.width = '794px';
+    root.style.background = '#ffffff';
+
+    const styleEl = doc.querySelector('style');
+    if (styleEl) {
+        root.appendChild(styleEl.cloneNode(true));
+    }
+
+    Array.from(doc.body.childNodes).forEach(node => {
+        root.appendChild(node.cloneNode(true));
+    });
+
+    return root;
+}
+
+async function downloadPrecheckReport() {
     if (!AppState.lastReport) return;
-    const html = buildReportHtml(AppState.lastReport);
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `trade-comply-precheck-${slugifyFilePart(AppState.lastReport.productQuery)}.html`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+
+    const btn = document.getElementById('download-report-btn');
+    const originalLabel = btn?.textContent || 'Download Pre-Check Report (PDF)';
+
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Generating PDF...';
+    }
+
+    const mount = document.createElement('div');
+    mount.style.position = 'fixed';
+    mount.style.left = '-10000px';
+    mount.style.top = '0';
+    mount.style.zIndex = '-1';
+
+    try {
+        const html2pdf = await loadHtml2Pdf();
+        const reportEl = buildReportPdfElement(AppState.lastReport);
+        mount.appendChild(reportEl);
+        document.body.appendChild(mount);
+
+        const filename = `trade-comply-precheck-${slugifyFilePart(AppState.lastReport.productQuery)}.pdf`;
+        await html2pdf().set({
+            margin: [12, 12, 12, 12],
+            filename,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
+        }).from(reportEl).save();
+    } catch (error) {
+        console.error('PDF generation failed:', error);
+        window.alert('Could not generate the PDF report. Please check your connection and try again.');
+    } finally {
+        mount.remove();
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = originalLabel;
+        }
+    }
 }
