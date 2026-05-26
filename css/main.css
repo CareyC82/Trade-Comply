@@ -466,10 +466,20 @@ body {
 
 .trust-boundary-verify-top {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: flex-start;
     gap: 8px;
     margin-bottom: 4px;
+}
+
+.trust-boundary-verify-top .trust-boundary-section-title {
+    margin-bottom: 0;
+}
+
+.trust-boundary-verify-top .boundary-badge--verify {
+    white-space: normal;
+    text-align: left;
+    line-height: 1.35;
 }
 
 .trust-boundary-verify-title {
