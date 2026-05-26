@@ -190,11 +190,15 @@ function renderResults(query, tags, cases, precheckSelections = []) {
                 </div>
             `).join('');
 
+            const caseCount = cases.length;
+            const caseLabel = caseCount === 1 ? 'case' : 'cases';
+
             casesContainer.innerHTML = `
-                <div class="cases-group collapsible-panel">
-                    <button type="button" class="cases-group-header collapsible-header" aria-expanded="false">
-                        <span class="cases-group-title">${escapeHtml(t('relatedCases'))}</span>
-                        <span class="group-count">${cases.length}</span>
+                <div class="result-category-group cases-group collapsible-panel result-category-group--penalty-cases">
+                    <button type="button" class="category-group-header collapsible-header" aria-expanded="false">
+                        <span class="group-icon group-icon--themed" aria-hidden="true">⚖️</span>
+                        <span class="group-title">${escapeHtml(t('relatedCases'))}</span>
+                        <span class="group-count">${caseCount} ${caseLabel}</span>
                         <span class="arrow" aria-hidden="true">▶</span>
                     </button>
                     <div class="cases-group-body collapsible-body">${caseCards}</div>

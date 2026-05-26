@@ -1580,29 +1580,28 @@ body {
 }
 
 .cases-group {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    overflow: hidden;
     margin-top: 8px;
 }
 
-.cases-group-header {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 12px 14px;
-    border: none;
-    background: #FAFBFC;
-    cursor: pointer;
-    font-family: inherit;
-    font-weight: 600;
-    color: var(--color-primary);
-    text-align: left;
+.result-category-group--penalty-cases {
+    border-left-color: #C62828;
 }
 
-.cases-group-title {
-    flex: 1;
+.result-category-group--penalty-cases .category-group-header {
+    background: rgba(198, 40, 40, 0.08);
+}
+
+.result-category-group--penalty-cases .group-icon--themed {
+    background: rgba(198, 40, 40, 0.14);
+}
+
+.result-category-group--penalty-cases .group-title {
+    color: #B71C1C;
+}
+
+.result-category-group--penalty-cases .group-count {
+    background: rgba(198, 40, 40, 0.12);
+    color: #B71C1C;
 }
 
 .cases-group-body {
