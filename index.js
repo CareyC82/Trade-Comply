@@ -16,9 +16,10 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260527-feedback-v3';
+const FC_BUILD_ID = '20260527-feedback-v4';
 const COMPLIANCE_FEEDBACK_QUERY = 'COMPLIANCE_FEEDBACK';
 const COMPLIANCE_FEEDBACK_PREFIX = `${COMPLIANCE_FEEDBACK_QUERY}:`;
+const COMPLIANCE_FEEDBACK_MARKER = '__COMPLIANCE_FB__';
 const MAX_QUERY_LENGTH = 500;
 const TIMEOUT_MS = 30000;
 const MAX_CONTEXT_TAGS = 8;
@@ -715,23 +716,48 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
+function decodeComplianceFeedbackPayload(encoded) {
+    if (!encoded || typeof encoded !== 'string') {
+        return null;
+    }
+
+    try {
+        return JSON.parse(encoded);
+    } catch (error) {
+        try {
+            return JSON.parse(encoded.replace(/\\"/g, '"'));
+        } catch (innerError) {
+            return null;
+        }
+    }
+}
+
+function decodeComplianceFeedbackBase64(encoded) {
+    if (!encoded || typeof encoded !== 'string') {
+        return null;
+    }
+
+    try {
+        const json = Buffer.from(encoded, 'base64').toString('utf-8');
+        return JSON.parse(json);
+    } catch (error) {
+        console.error('Compliance feedback base64 decode failed:', error.message);
+        return null;
+    }
+}
+
 function extractComplianceFeedbackPayload(body) {
     if (!body || typeof body !== 'object') {
         return null;
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
+    if (query.startsWith(COMPLIANCE_FEEDBACK_MARKER)) {
+        return decodeComplianceFeedbackBase64(query.slice(COMPLIANCE_FEEDBACK_MARKER.length));
+    }
+
     if (query.startsWith(COMPLIANCE_FEEDBACK_PREFIX)) {
-        const encoded = query.slice(COMPLIANCE_FEEDBACK_PREFIX.length);
-        try {
-            const parsed = JSON.parse(encoded);
-            if (parsed && typeof parsed === 'object') {
-                return parsed;
-            }
-        } catch (error) {
-            console.error('Compliance feedback payload parse failed:', error.message);
-            return null;
-        }
+        return decodeComplianceFeedbackPayload(query.slice(COMPLIANCE_FEEDBACK_PREFIX.length));
     }
 
     if (query === COMPLIANCE_FEEDBACK_QUERY && body.context && typeof body.context === 'object') {
@@ -874,7 +900,9 @@ exports.handler = async (rawEvent) => {
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
 
-    if (query === COMPLIANCE_FEEDBACK_QUERY || query.startsWith(COMPLIANCE_FEEDBACK_PREFIX)) {
+    if (query === COMPLIANCE_FEEDBACK_QUERY
+        || query.startsWith(COMPLIANCE_FEEDBACK_PREFIX)
+        || query.startsWith(COMPLIANCE_FEEDBACK_MARKER)) {
         return {
             statusCode: 400,
             headers,
