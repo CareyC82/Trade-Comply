@@ -34,7 +34,9 @@ function searchSemiconductor(query) {
 }
 
 function searchSemiconductorProducts(query) {
-    const trimmedQuery = query ? query.trim() : '';
+    AppState.searchOrigin = 'semiconductor';
+    const trimmedQuery = (query ?? document.getElementById('result-search-input')?.value ?? document.getElementById('search-input-semi')?.value ?? '').trim();
+    syncResultSearchInputs(trimmedQuery);
     const selections = getPrecheckSelections('semi-precheck-panel');
     const results = searchWithPrecheck(trimmedQuery, selections, searchSemiconductor);
     renderResults(trimmedQuery || 'Semiconductor products', results.tags, results.cases, selections);

@@ -126,6 +126,7 @@ const AppState = {
     catalog: null,
     currentDirection: 'export',
     currentView: 'home',
+    searchOrigin: 'electronics',
     lastReport: null,
     aiContext: null
 };

@@ -91,7 +91,7 @@ function handlePopState(event) {
 }
 
 function resetPrecheckState() {
-    const inputsToClear = ['search-input', 'search-input-semi', 'ai-query-input', 'semi-ai-query-input'];
+    const inputsToClear = ['search-input', 'search-input-semi', 'result-search-input', 'ai-query-input', 'semi-ai-query-input'];
     inputsToClear.forEach(id => {
         const input = document.getElementById(id);
         if (input) input.value = '';
@@ -171,6 +171,20 @@ function bindEvents() {
         searchInput.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') {
                 searchProducts(e.target.value);
+            }
+        });
+    }
+
+    const resultSearchBtn = document.getElementById('result-search-btn');
+    if (resultSearchBtn) {
+        resultSearchBtn.addEventListener('click', runResultPageSearch);
+    }
+
+    const resultSearchInput = document.getElementById('result-search-input');
+    if (resultSearchInput) {
+        resultSearchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                runResultPageSearch();
             }
         });
     }
