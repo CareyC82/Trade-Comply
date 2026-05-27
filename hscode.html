@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI HS Code Classifier | Trade Comply</title>
-    <link rel="stylesheet" href="css/main.css?v=20260528-hscode2">
+    <link rel="stylesheet" href="css/main.css?v=20260528-hscode3">
 </head>
 <body class="hscode-page-body">
     <div class="hscode-page view-container active">
@@ -21,6 +21,12 @@
         </div>
 
         <form id="hscode-form" class="hscode-form" novalidate>
+            <div class="hscode-direction-label">Trade direction for compliance check</div>
+            <div class="direction-toggle hscode-direction-toggle" role="radiogroup" aria-label="Trade direction">
+                <button type="button" id="hscode-direction-export" class="direction-btn active" data-direction="export">Export from China</button>
+                <button type="button" id="hscode-direction-import" class="direction-btn" data-direction="import">Import into China</button>
+            </div>
+
             <label for="hscode-description" class="hscode-label">Product description</label>
             <textarea
                 id="hscode-description"
@@ -86,6 +92,7 @@
         let lastClassifyAt = 0;
         let classifyInFlight = false;
         let lastHsCode = '';
+        let selectedDirection = 'export';
 
         function getDescription() {
             const el = document.getElementById('hscode-description');
@@ -126,9 +133,31 @@
             panel.hidden = true;
         }
 
+        function getSelectedDirection() {
+            return selectedDirection === 'import' ? 'import' : 'export';
+        }
+
+        function bindDirectionToggle() {
+            const exportBtn = document.getElementById('hscode-direction-export');
+            const importBtn = document.getElementById('hscode-direction-import');
+            if (!exportBtn || !importBtn) {
+                return;
+            }
+
+            const applyDirection = (direction) => {
+                selectedDirection = direction === 'import' ? 'import' : 'export';
+                exportBtn.classList.toggle('active', selectedDirection === 'export');
+                importBtn.classList.toggle('active', selectedDirection === 'import');
+            };
+
+            exportBtn.addEventListener('click', () => applyDirection('export'));
+            importBtn.addEventListener('click', () => applyDirection('import'));
+        }
+
         function buildComplianceUrl(hscode) {
             const params = new URLSearchParams();
             params.set('search', hscode);
+            params.set('direction', getSelectedDirection());
             return `index.html?${params.toString()}`;
         }
 
@@ -245,6 +274,8 @@
             const form = document.getElementById('hscode-form');
             const textarea = document.getElementById('hscode-description');
             const risksBtn = document.getElementById('hscode-check-risks-btn');
+
+            bindDirectionToggle();
 
             if (form) {
                 form.addEventListener('submit', (event) => {

@@ -1,31 +1,55 @@
 loadIncotermData();
 
 /**
- * Deep-link from hscode.html: index.html?search=81099000
- * Must read query BEFORE any history.replaceState that strips ?search=...
+ * Deep-link from hscode.html: index.html?search=81099000&direction=import
+ * Must read query BEFORE any history.replaceState that strips URL params.
  */
-function getInboundSearchQuery() {
-    const params = new URLSearchParams(window.location.search);
-    const searchParam = params.get('search');
-    if (searchParam && searchParam.trim()) {
-        return searchParam.trim();
-    }
-
-    const hsParam = params.get('hs');
-    if (hsParam && hsParam.trim() && params.get('autoSearch') === '1') {
-        return hsParam.trim();
-    }
-
-    return '';
+function normalizeInboundDirection(value) {
+    const normalized = (value || '').trim().toLowerCase();
+    return normalized === 'import' ? 'import' : 'export';
 }
 
-function handleInboundSearchFromUrl(inboundQuery) {
+function getInboundDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+
+    let query = '';
+    const searchParam = params.get('search');
+    if (searchParam && searchParam.trim()) {
+        query = searchParam.trim();
+    } else {
+        const hsParam = params.get('hs');
+        if (hsParam && hsParam.trim() && params.get('autoSearch') === '1') {
+            query = hsParam.trim();
+        }
+    }
+
+    const direction = normalizeInboundDirection(params.get('direction'));
+
+    return { query, direction };
+}
+
+function applyInboundDirection(direction) {
+    const safeDirection = normalizeInboundDirection(direction);
+    setDirection(safeDirection);
+
+    const exportBtn = document.getElementById('direction-export');
+    const importBtn = document.getElementById('direction-import');
+
+    if (safeDirection === 'import') {
+        importBtn?.click();
+    } else {
+        exportBtn?.click();
+    }
+}
+
+function handleInboundSearchFromUrl(inboundQuery, inboundDirection) {
     const query = (inboundQuery || '').trim();
     if (!query) {
         return;
     }
 
     showView('electronics', false);
+    applyInboundDirection(inboundDirection);
 
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
@@ -41,13 +65,13 @@ function handleInboundSearchFromUrl(inboundQuery) {
 document.addEventListener('DOMContentLoaded', async () => {
     await initData();
 
-    const inboundQuery = getInboundSearchQuery();
+    const { query: inboundQuery, direction: inboundDirection } = getInboundDeepLink();
 
     bindEvents();
     applyUiStrings();
 
     if (inboundQuery) {
-        handleInboundSearchFromUrl(inboundQuery);
+        handleInboundSearchFromUrl(inboundQuery, inboundDirection);
         return;
     }
 
