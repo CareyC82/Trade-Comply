@@ -22,9 +22,26 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260527-feedback-v7';
+const FC_BUILD_ID = '20260528-hscode-v1';
 const MAX_QUERY_LENGTH = 500;
+const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
+const HSCODE_CLASSIFY_MAX_TOKENS = 1200;
+
+const HSCODE_CLASSIFY_SYSTEM_PROMPT = `你是一位拥有20年报关经验的中国海关商品归类专家。请严格根据《进出口税则商品及品目注释》和归类总规则（GIR），对用户描述的商品进行专业分析。
+
+你必须只返回一个 JSON 对象，不要输出 Markdown、不要输出任何 JSON 以外的文字。JSON 结构必须严格为：
+{
+  "hscode": "前6位或10位编码（仅数字，可含一个点分隔符）",
+  "official_name": "海关官方标准品名",
+  "confidence": "置信度百分比（如 85%）",
+  "reasoning": "详细的归类总规则依据和材质用途分析"
+}
+
+要求：
+- 若信息不足，仍给出最可能编码，并在 reasoning 中说明需补充的信息。
+- hscode 优先给出8位或10位税号；若仅能判断到6位，在 reasoning 中说明。
+- 不要编造不存在的税号注释条文；依据请写清 GIR 条款逻辑。`;
 const MAX_CONTEXT_TAGS = 8;
 const MAX_CONTEXT_CASES = 3;
 const MAX_FIELD_LENGTH = 500;
@@ -737,6 +754,135 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
+function parseHsCodeClassificationPayload(text) {
+    if (!text || typeof text !== 'string') {
+        throw new Error('Empty model response');
+    }
+
+    let jsonText = text.trim();
+    const fenced = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fenced) {
+        jsonText = fenced[1].trim();
+    } else {
+        const firstBrace = jsonText.indexOf('{');
+        const lastBrace = jsonText.lastIndexOf('}');
+        if (firstBrace >= 0 && lastBrace > firstBrace) {
+            jsonText = jsonText.slice(firstBrace, lastBrace + 1);
+        }
+    }
+
+    const parsed = JSON.parse(jsonText);
+    const hscode = String(parsed.hscode || parsed.hs_code || '').trim();
+    const official_name = String(parsed.official_name || parsed.officialName || '').trim();
+    const confidence = String(parsed.confidence || '').trim();
+    const reasoning = String(parsed.reasoning || parsed.reason || '').trim();
+
+    if (!hscode || !official_name || !reasoning) {
+        throw new Error('Model JSON missing required fields');
+    }
+
+    return { hscode, official_name, confidence, reasoning };
+}
+
+async function callDeepSeekForHsCode(description) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    { role: 'system', content: HSCODE_CLASSIFY_SYSTEM_PROMPT },
+                    { role: 'user', content: `请对以下商品进行 HS 编码归类：\n\n${description}` }
+                ],
+                temperature: 0.1,
+                max_tokens: HSCODE_CLASSIFY_MAX_TOKENS,
+                response_format: { type: 'json_object' }
+            }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`DeepSeek API error: ${response.status} ${errorText}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || '';
+        return parseHsCodeClassificationPayload(content);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+}
+
+async function handleHsCodeClassifyRequest(body, headers) {
+    const description = typeof body.description === 'string' ? body.description.trim() : '';
+
+    if (!description) {
+        return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'description is required.' })
+        };
+    }
+
+    if (description.length > MAX_HSCODE_DESCRIPTION_LENGTH) {
+        return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: `description must be at most ${MAX_HSCODE_DESCRIPTION_LENGTH} characters.` })
+        };
+    }
+
+    if (!DEEPSEEK_API_KEY) {
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ error: 'API key not configured' })
+        };
+    }
+
+    try {
+        const classification = await callDeepSeekForHsCode(description);
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                ok: true,
+                classification
+            })
+        };
+    } catch (error) {
+        console.error('HS code classify error:', error.message);
+
+        if (error.name === 'AbortError') {
+            return {
+                statusCode: 504,
+                headers,
+                body: JSON.stringify({ error: 'Request timeout' })
+            };
+        }
+
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({
+                error: 'Failed to classify product. Please try again with a clearer description.',
+                detail: error.message
+            })
+        };
+    }
+}
+
 function inferPostRoute(path, body) {
     if (isApiFeedbackPath(path)) {
         return 'api_feedback';
@@ -777,7 +923,7 @@ exports.handler = async (rawEvent) => {
                 body: JSON.stringify({
                     ok: true,
                     build: FC_BUILD_ID,
-                    features: ['compliance_feedback', 'feedback', 'ai']
+                    features: ['compliance_feedback', 'feedback', 'ai', 'hscode_classify']
                 })
             };
         }
@@ -835,6 +981,11 @@ exports.handler = async (rawEvent) => {
                 }
             })
         };
+    }
+
+    if (method === 'POST' && body.action === 'hscode_classify') {
+        const hsResult = await handleHsCodeClassifyRequest(body, headers);
+        return hsResult;
     }
 
     const postRoute = method === 'POST' ? inferPostRoute(path, body) : null;

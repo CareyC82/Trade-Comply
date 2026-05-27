@@ -4,26 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI HS Code Classifier | Trade Comply</title>
-    <link rel="stylesheet" href="css/main.css?v=20260528-nav5">
+    <link rel="stylesheet" href="css/main.css?v=20260528-hscode">
 </head>
-<body>
-    <div class="view-container active" style="display: block; max-width: 640px; margin: 0 auto;">
-        <div style="padding: 24px 0 12px;">
-            <a href="index.html" class="back-link">&larr; Back to Home</a>
+<body class="hscode-page-body">
+    <div class="hscode-page view-container active">
+        <header class="hscode-header">
+            <a href="index.html" class="back-link hscode-back-link">&larr; Back to Home</a>
+            <div class="home-header hscode-home-header">
+                <h1 class="home-title hscode-page-title">AI HS Code Intelligent Classification</h1>
+                <p class="home-subtitle">China Customs HS Pre-Classification</p>
+            </div>
+        </header>
+
+        <div class="disclaimer-bar hscode-disclaimer">
+            <span>AI-assisted pre-classification only. Final HS determination must be verified by a licensed broker or customs authority.</span>
         </div>
 
-        <div class="home-header" style="padding-top: 16px;">
-            <h1 class="home-title" style="white-space: normal; font-size: 1.35rem;">🔍 AI HS Code Classifier</h1>
-            <p class="home-subtitle">智能归类 · Coming soon</p>
+        <form id="hscode-form" class="hscode-form" novalidate>
+            <label for="hscode-description" class="hscode-label">Product description</label>
+            <textarea
+                id="hscode-description"
+                class="hscode-textarea"
+                rows="8"
+                maxlength="2000"
+                placeholder="Enter a detailed product description: materials, specifications, main functions, and intended use. More detail improves classification accuracy."
+                required
+            ></textarea>
+            <div class="hscode-form-meta">
+                <span id="hscode-char-count" class="hscode-char-count">0 / 2000</span>
+            </div>
+            <button type="submit" id="hscode-submit-btn" class="hscode-submit-btn">Start Classification</button>
+        </form>
+
+        <div id="hscode-loading" class="hscode-loading" hidden aria-live="polite">
+            <div class="hscode-loading-spinner" aria-hidden="true"></div>
+            <p>Running AI classification, please wait…</p>
         </div>
 
-        <div class="disclaimer-bar">
-            <span>This tool is under development. For compliance pre-screening, use the core product hubs on the home page.</span>
-        </div>
+        <div id="hscode-error" class="hscode-error" hidden role="alert"></div>
 
-        <div class="feedback-section">
-            <a href="index.html" class="feedback-link">🏠 Return to Trade Comply</a>
-        </div>
+        <section id="hscode-result" class="hscode-result" hidden aria-live="polite">
+            <h2 class="hscode-result-heading">归类结果 Classification result</h2>
+            <div class="hscode-result-grid">
+                <div class="hscode-result-main">
+                    <div class="hscode-result-label">推荐 HS Code</div>
+                    <div id="hscode-result-code" class="hscode-result-code">—</div>
+                    <a id="hscode-compliance-link" class="hscode-compliance-link" href="index.html">
+                        一键检查该编码的进出口合规风险 &rarr;
+                    </a>
+                </div>
+                <div class="hscode-result-side">
+                    <div class="hscode-result-field">
+                        <div class="hscode-result-label">海关官方品名</div>
+                        <div id="hscode-result-name" class="hscode-result-value">—</div>
+                    </div>
+                    <div class="hscode-result-field">
+                        <div class="hscode-result-label">置信度</div>
+                        <div id="hscode-result-confidence" class="hscode-result-confidence">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hscode-result-reasoning-block">
+                <div class="hscode-result-label">AI 归类依据 / 理由</div>
+                <p id="hscode-result-reasoning" class="hscode-result-reasoning"></p>
+            </div>
+        </section>
     </div>
 
     <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
@@ -31,5 +76,7 @@
         <a id="nav-incoterm" class="nav-btn nav-btn-link" href="index.html#incoterm">📦 Incoterm</a>
         <span id="nav-hscode" class="nav-btn active" aria-current="page">🔍 HS Code<span class="nav-btn-badge">Beta</span></span>
     </nav>
+
+    <script src="js/hscode.js?v=20260528"></script>
 </body>
 </html>
