@@ -35,7 +35,20 @@ function applyView(view) {
     window.scrollTo(0, 0);
 
     AppState.currentView = safeView;
+    syncBottomNavActive(safeView);
     return safeView;
+}
+
+function syncBottomNavActive(view) {
+    const activeByView = {
+        home: 'nav-home',
+        incoterm: 'nav-incoterm'
+    };
+    const activeId = activeByView[view] || null;
+
+    document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
+        btn.classList.toggle('active', Boolean(activeId && btn.id === activeId));
+    });
 }
 
 /**
@@ -191,12 +204,10 @@ function bindEvents() {
     document.getElementById('back-to-home-from-cat')?.addEventListener('click', goBack);
     document.getElementById('download-report-btn')?.addEventListener('click', downloadPrecheckReport);
     addNavEvent('nav-home', 'home');
-    addNavEvent('nav-kb', 'kb');
-    addNavEvent('nav-categories', 'categories');
+    addNavEvent('nav-incoterm', 'incoterm');
 
     // Hub Card Events
     document.getElementById('hub-electronics')?.addEventListener('click', () => showView('electronics'));
-    document.getElementById('hub-incoterm')?.addEventListener('click', () => showView('incoterm'));
     document.getElementById('hub-semiconductor')?.addEventListener('click', () => showView('semiconductor'));
     document.getElementById('back-to-hub')?.addEventListener('click', (e) => {
         e.preventDefault();

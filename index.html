@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Comply</title>
-    <link rel="stylesheet" href="css/main.css?v=20260527d">
+    <link rel="stylesheet" href="css/main.css?v=20260528-nav5">
 </head>
 <body>
 
@@ -15,30 +15,23 @@
             <p class="home-subtitle">Import/export compliance pre-checks for electronics and semiconductors. Current coverage starts with China.</p>
         </div>
 
-        <div class="quick-actions-grid">
-            <div class="quick-action-card" id="hub-electronics">
+        <div class="hub-core-grid">
+            <div class="quick-action-card hub-core-card" id="hub-electronics">
                 <div class="quick-action-icon">📱</div>
                 <div class="quick-action-label">Electronics Import/Export Pre-Check</div>
                 <div class="quick-action-hs">Screen wireless, battery, encryption, UAV, CCC, SRRC, and dual-use compliance signals.</div>
-                <div id="hub-electronics-stats" class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Loading coverage...</div>
+                <div id="hub-electronics-stats" class="quick-action-hs hub-core-stats">Loading coverage...</div>
             </div>
 
-            <div class="quick-action-card" id="hub-incoterm">
-                <div class="quick-action-icon">📦</div>
-                <div class="quick-action-label">Supporting Tool: Incoterm Check</div>
-                <div class="quick-action-hs">Verify trade terms and customs value inputs that affect export documentation.</div>
-                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">11 Incoterms · Decision tree · Calculator</div>
-            </div>
-
-            <div class="quick-action-card" id="hub-semiconductor">
+            <div class="quick-action-card hub-core-card" id="hub-semiconductor">
                 <div class="quick-action-icon">🔬</div>
                 <div class="quick-action-label">Semiconductor Trade Controls</div>
                 <div class="quick-action-hs">Pre-screen chips, equipment, foundry services, advanced packaging, and supply chain risks.</div>
-                <div class="quick-action-hs" style="margin-top: 4px; color: var(--color-accent); font-weight: 500;">Chip controls · Foundry rules · End-use risk</div>
+                <div class="quick-action-hs hub-core-stats">Chip controls · Foundry rules · End-use risk</div>
             </div>
         </div>
 
-        <div class="disclaimer-bar" style="margin-top: 24px;">
+        <div class="disclaimer-bar hub-disclaimer">
             <span>Pre-screening only. This tool cites official sources and does not provide legal advice.</span>
         </div>
 
@@ -294,11 +287,11 @@
         </div>
     </div>
 
-    <div class="bottom-nav">
-        <button id="nav-home" class="nav-btn active">🏠 Home</button>
-        <button id="nav-kb" class="nav-btn">📚 Knowledge Base</button>
-        <button id="nav-categories" class="nav-btn">📋 Categories</button>
-    </div>
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <button id="nav-home" class="nav-btn active" type="button">🏠 Home</button>
+        <button id="nav-incoterm" class="nav-btn" type="button">📦 Incoterm</button>
+        <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code<span class="nav-btn-badge">Beta</span></a>
+    </nav>
 
     <script src="js/core.js?v=20260527d"></script>
     <script src="js/catalog.js?v=20260527"></script>
@@ -311,7 +304,7 @@
     <script src="js/feedback.js?v=20260527"></script>
     <script src="compliance-feedback-codec.js?v=20260528"></script>
     <script src="js/policy-correction.js?v=20260527v6"></script>
-    <script src="js/navigation.js?v=20260527"></script>
+    <script src="js/navigation.js?v=20260528c"></script>
     <script src="js/semiconductor.js?v=20260527"></script>
     <script src="js/incoterm.js?v=20260527"></script>
     <script src="js/main.js?v=20260527"></script>

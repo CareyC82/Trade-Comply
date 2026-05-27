@@ -31,7 +31,7 @@ body {
     color: var(--color-text);
     line-height: 1.6;
     min-height: 100vh;
-    padding-bottom: 80px;
+    padding-bottom: 72px;
 }
 
 /* View Containers */
@@ -563,6 +563,162 @@ button.report-action-link {
 .quick-action-hs {
     font-size: 0.8rem;
     color: var(--color-text-secondary);
+}
+
+/* Home hub — two core verticals */
+.hub-core-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    max-width: 760px;
+    margin: 0 auto 28px;
+    padding: 0 4px;
+}
+
+.hub-core-grid .hub-core-card {
+    padding: 28px 22px;
+    min-height: 200px;
+    border: 1px solid rgba(26, 58, 92, 0.08);
+    background: linear-gradient(165deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.hub-core-grid .hub-core-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 28px rgba(26, 58, 92, 0.14);
+    border-color: rgba(26, 58, 92, 0.18);
+}
+
+.hub-core-grid .quick-action-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.hub-core-grid .quick-action-label {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    margin-bottom: 10px;
+}
+
+.hub-core-stats {
+    margin-top: 8px;
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+
+.hub-disclaimer {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Trade Toolbox */
+.trade-toolbox {
+    max-width: 760px;
+    margin: 0 auto 24px;
+    padding: 0 4px;
+}
+
+.trade-toolbox-header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.trade-toolbox-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: -0.02em;
+}
+
+.trade-toolbox-title-zh {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+}
+
+.trade-toolbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.toolbox-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 18px 16px 16px;
+    box-shadow: 0 2px 10px var(--color-card-shadow);
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.toolbox-card:hover,
+.toolbox-card:focus-visible {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 24px rgba(26, 58, 92, 0.14);
+    border-color: rgba(26, 58, 92, 0.25);
+    outline: none;
+}
+
+.toolbox-card-link {
+    cursor: pointer;
+}
+
+.toolbox-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f59e0b 0%, var(--color-accent) 100%);
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: 0 2px 6px rgba(232, 168, 23, 0.35);
+}
+
+.toolbox-card-icon {
+    font-size: 1.75rem;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.toolbox-card-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+    padding-right: 48px;
+}
+
+.toolbox-card-desc-zh {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.toolbox-card-desc,
+.toolbox-card-meta {
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+}
+
+.toolbox-card-meta {
+    margin-top: auto;
+    padding-top: 8px;
+    color: var(--color-accent);
+    font-weight: 600;
 }
 
 /* Disclaimer Bar */
@@ -1747,37 +1903,86 @@ button.report-action-link {
 
 .bottom-nav {
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
+    flex-wrap: wrap;
     position: fixed;
-    bottom: 0;
+    bottom: env(safe-area-inset-bottom, 0);
     left: 0;
-    right: 0;
-    background: var(--color-bg);
-    border-top: 1px solid var(--color-border);
-    padding: 8px 0 12px;
+    right: auto;
     z-index: 100;
-    gap: 8px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+    width: auto;
+    max-width: calc(100vw - 16px);
+    gap: 4px;
+    margin: 0;
+    padding: 8px 10px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-left: none;
+    border-bottom: none;
+    border-radius: 0 12px 0 0;
+    box-shadow: 2px -2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.bottom-nav--dock {
+    /* docked bottom-left, same placement as legacy Home tab */
 }
 
 .nav-btn {
-    flex: 1;
-    padding: 12px;
+    position: relative;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 14px;
     background-color: transparent;
     border: none;
     border-radius: 8px;
     font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
     min-height: 44px;
     color: #999;
+    text-decoration: none;
+}
+
+.nav-btn-badge {
+    position: absolute;
+    top: -4px;
+    right: -2px;
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f59e0b 0%, var(--color-accent) 100%);
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+.nav-btn:hover,
+.nav-btn:focus-visible {
+    outline: none;
+    background-color: rgba(26, 58, 92, 0.06);
 }
 
 .nav-btn.active {
     background-color: rgba(26, 58, 92, 0.1);
     color: var(--color-primary);
     font-weight: 600;
+}
+
+.nav-btn-link {
+    color: #999;
+}
+
+.nav-btn-link.active {
+    color: var(--color-primary);
 }
 
 /* Case Library Button */
@@ -1797,6 +2002,19 @@ button.report-action-link {
 
 .case-library-btn:hover {
     background-color: rgba(26, 58, 92, 0.05);
+}
+
+@media (max-width: 640px) {
+    .hub-core-grid,
+    .trade-toolbox-grid {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+    }
+
+    .hub-core-grid .hub-core-card {
+        min-height: auto;
+        padding: 22px 18px;
+    }
 }
 
 /* Responsive Design */
@@ -1823,16 +2041,24 @@ button.report-action-link {
         grid-template-columns: repeat(4, 1fr);
     }
 
+    .hub-core-grid {
+        gap: 24px;
+        max-width: 800px;
+    }
+
+    .hub-core-grid .hub-core-card {
+        padding: 32px 28px;
+        min-height: 220px;
+    }
+
+    .trade-toolbox {
+        max-width: 800px;
+    }
+
     .precheck-options {
         grid-template-columns: repeat(3, 1fr);
     }
 
-    .bottom-nav {
-        max-width: 800px;
-        left: auto;
-        right: auto;
-        border-radius: 12px 12px 0 0;
-    }
 }
 
 /* Feedback Button */

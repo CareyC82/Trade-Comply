@@ -11,6 +11,9 @@ const UI_STRINGS = {
     viewCases: "View Case Library",
     feedback: "💬 Can't find your product? Tell us",
     home: "🏠 Home",
+    navHome: "Home",
+    navIncoterm: "Incoterm",
+    navHsCode: "HS Code",
     knowledgeBase: "📚 Knowledge Base",
     categories: "📋 Categories",
     back: "< Back",
@@ -255,10 +258,15 @@ function applyUiStrings() {
     // 更新反馈链接
     updateElementText('feedback-trigger', t('feedback'));
     
-    // 更新导航按钮
-    updateElementText('nav-home', t('home'));
-    updateElementText('nav-kb', t('knowledgeBase'));
-    updateElementText('nav-categories', t('categories'));
+    // 更新底部导航（左下角 dock）
+    const navHome = document.getElementById('nav-home');
+    if (navHome) navHome.textContent = `🏠 ${t('navHome')}`;
+    const navIncoterm = document.getElementById('nav-incoterm');
+    if (navIncoterm) navIncoterm.textContent = `📦 ${t('navIncoterm')}`;
+    const navHsCode = document.getElementById('nav-hscode');
+    if (navHsCode) {
+        navHsCode.innerHTML = `🔍 ${t('navHsCode')}<span class="nav-btn-badge">Beta</span>`;
+    }
     
     // 更新返回按钮
     const backBtns = document.querySelectorAll('.back-btn');
