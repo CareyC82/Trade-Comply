@@ -79,7 +79,7 @@
 
     <script>
     (function () {
-        const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run';
+        const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run?action=hscode_classify';
         const HSCODE_MIN_INTERVAL_MS = 15000;
         const HSCODE_MAX_DESCRIPTION = 2000;
 
@@ -217,8 +217,12 @@
                     throw new Error(data.error || `API error: ${response.status}`);
                 }
 
+                if (data.message === 'Service Online' && !data.ok) {
+                    throw new Error('HS Code API is not active on the server yet. Please wait for FC deploy to finish or retry in a minute.');
+                }
+
                 if (!data.ok || !data.classification) {
-                    throw new Error(data.error || 'Invalid classification response');
+                    throw new Error(data.error || data.detail || 'Invalid classification response');
                 }
 
                 lastClassifyAt = Date.now();

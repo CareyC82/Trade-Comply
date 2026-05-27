@@ -22,7 +22,7 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260528-hscode-v2';
+const FC_BUILD_ID = '20260528-hscode-v3';
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
@@ -721,7 +721,7 @@ function parseRequestBody(event) {
         if (body?.body && typeof body.body === 'string') {
             try {
                 const nested = JSON.parse(body.body);
-                if (nested?.query || nested?.product_query || nested?.product_keyword) {
+                if (nested?.query || nested?.product_query || nested?.product_keyword || nested?.action || nested?.description) {
                     body = nested;
                 }
             } catch (e) {
@@ -733,11 +733,32 @@ function parseRequestBody(event) {
         body = {};
     }
 
+    const payloadKeys = ['action', 'description', 'query', 'context', 'product_keyword', 'policy_type', 'source_url', 'user_message'];
+    if (event && typeof event === 'object' && !Array.isArray(event)) {
+        payloadKeys.forEach((key) => {
+            if (event[key] !== undefined && body[key] === undefined) {
+                body[key] = event[key];
+            }
+        });
+    }
+
     if (typeof event.query === 'string' && event.query.trim() && !body.query) {
         body.query = event.query.trim();
     }
 
     return body;
+}
+
+function isHsCodeClassifyPath(path) {
+    return normalizePath(path) === '/api/hscode';
+}
+
+function isHsCodeClassifyRequest(body, event) {
+    if (body?.action === 'hscode_classify') {
+        return true;
+    }
+    const params = getQueryParams(event || {});
+    return params.action === 'hscode_classify';
 }
 
 function isFeedbackPath(path) {
@@ -793,7 +814,7 @@ async function callDeepSeekForHsCode(description) {
                 model: 'deepseek-chat',
                 messages: [
                     { role: 'system', content: HSCODE_CLASSIFY_SYSTEM_PROMPT },
-                    { role: 'user', content: `请对以下商品进行 HS 编码归类：\n\n${description}` }
+                    { role: 'user', content: `Classify the following product for China Customs HS Code purposes:\n\n${description}` }
                 ],
                 temperature: 0.1,
                 max_tokens: HSCODE_CLASSIFY_MAX_TOKENS,
@@ -943,6 +964,15 @@ exports.handler = async (rawEvent) => {
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
+    const queryParams = getQueryParams(event);
+
+    if (isHsCodeClassifyRequest(body, event) || (method === 'POST' && isHsCodeClassifyPath(path))) {
+        if (!body.description && queryParams.description) {
+            body.description = queryParams.description;
+        }
+        return handleHsCodeClassifyRequest(body, headers);
+    }
+
     const compliancePayload = extractComplianceFeedbackPayload(body);
     if (compliancePayload) {
         try {
@@ -975,11 +1005,6 @@ exports.handler = async (rawEvent) => {
                 }
             })
         };
-    }
-
-    if (method === 'POST' && body.action === 'hscode_classify') {
-        const hsResult = await handleHsCodeClassifyRequest(body, headers);
-        return hsResult;
     }
 
     const postRoute = method === 'POST' ? inferPostRoute(path, body) : null;
