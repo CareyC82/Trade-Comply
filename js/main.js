@@ -1,18 +1,32 @@
 loadIncotermData();
 
-function handleInboundSearchFromUrl() {
+/**
+ * Deep-link from hscode.html: index.html?search=81099000
+ * Must read query BEFORE any history.replaceState that strips ?search=...
+ */
+function getInboundSearchQuery() {
     const params = new URLSearchParams(window.location.search);
-    const query = params.get('search') || params.get('hs');
-    const legacyAuto = params.get('autoSearch') === '1';
+    const searchParam = params.get('search');
+    if (searchParam && searchParam.trim()) {
+        return searchParam.trim();
+    }
 
+    const hsParam = params.get('hs');
+    if (hsParam && hsParam.trim() && params.get('autoSearch') === '1') {
+        return hsParam.trim();
+    }
+
+    return '';
+}
+
+function handleInboundSearchFromUrl(inboundQuery) {
+    const query = (inboundQuery || '').trim();
     if (!query) {
         return;
     }
-    if (!params.get('search') && !legacyAuto) {
-        return;
-    }
 
-    showView('electronics');
+    showView('electronics', false);
+
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.value = query;
@@ -20,31 +34,24 @@ function handleInboundSearchFromUrl() {
 
     searchProducts(query);
 
-    const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
+    const cleanUrl = `${window.location.pathname}#electronics`;
     history.replaceState({ view: 'result' }, '', cleanUrl);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initData();
 
-    const params = new URLSearchParams(window.location.search);
-    const hasAutoHsSearch = Boolean(params.get('search'))
-        || (params.get('hs') && params.get('autoSearch') === '1');
-
-    if (hasAutoHsSearch) {
-        applyView('electronics');
-        history.replaceState({ view: 'electronics' }, '', `${window.location.pathname}#electronics`);
-    } else {
-        initViewHistory();
-    }
+    const inboundQuery = getInboundSearchQuery();
 
     bindEvents();
     applyUiStrings();
 
-    if (hasAutoHsSearch) {
-        handleInboundSearchFromUrl();
+    if (inboundQuery) {
+        handleInboundSearchFromUrl(inboundQuery);
         return;
     }
+
+    initViewHistory();
 
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
