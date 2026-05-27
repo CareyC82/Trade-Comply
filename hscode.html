@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI HS Code Classifier | Trade Comply</title>
-    <link rel="stylesheet" href="css/main.css?v=20260528-hscode">
+    <link rel="stylesheet" href="css/main.css?v=20260528-hscode2">
 </head>
 <body class="hscode-page-body">
     <div class="hscode-page view-container active">
@@ -44,29 +44,29 @@
         <div id="hscode-error" class="hscode-error" hidden role="alert"></div>
 
         <section id="hscode-result" class="hscode-result" hidden aria-live="polite">
-            <h2 class="hscode-result-heading">归类结果 Classification result</h2>
-            <div class="hscode-result-grid">
-                <div class="hscode-result-main">
-                    <div class="hscode-result-label">推荐 HS Code</div>
+            <h2 class="hscode-result-heading">Classification Result</h2>
+
+            <div class="hscode-result-row hscode-result-row--code">
+                <div class="hscode-result-row-label">💡 Recommended HS Code</div>
+                <div class="hscode-result-code-row">
                     <div id="hscode-result-code" class="hscode-result-code">—</div>
-                    <a id="hscode-compliance-link" class="hscode-compliance-link" href="index.html">
-                        一键检查该编码的进出口合规风险 &rarr;
-                    </a>
-                </div>
-                <div class="hscode-result-side">
-                    <div class="hscode-result-field">
-                        <div class="hscode-result-label">海关官方品名</div>
-                        <div id="hscode-result-name" class="hscode-result-value">—</div>
-                    </div>
-                    <div class="hscode-result-field">
-                        <div class="hscode-result-label">置信度</div>
-                        <div id="hscode-result-confidence" class="hscode-result-confidence">—</div>
-                    </div>
+                    <button type="button" id="hscode-check-risks-btn" class="hscode-check-risks-btn">Check Risks</button>
                 </div>
             </div>
-            <div class="hscode-result-reasoning-block">
-                <div class="hscode-result-label">AI 归类依据 / 理由</div>
-                <p id="hscode-result-reasoning" class="hscode-result-reasoning"></p>
+
+            <div class="hscode-result-row">
+                <div class="hscode-result-row-label">📝 Official Commodity Name</div>
+                <div id="hscode-result-name" class="hscode-result-value">—</div>
+            </div>
+
+            <div class="hscode-result-row">
+                <div class="hscode-result-row-label">📊 Confidence Score</div>
+                <div id="hscode-result-confidence" class="hscode-result-confidence">—</div>
+            </div>
+
+            <div class="hscode-result-row hscode-result-row--reasoning">
+                <div class="hscode-result-row-label">🔍 Classification Justification</div>
+                <div id="hscode-result-reasoning" class="hscode-result-reasoning"></div>
             </div>
         </section>
     </div>
@@ -77,6 +77,195 @@
         <span id="nav-hscode" class="nav-btn active" aria-current="page">🔍 HS Code<span class="nav-btn-badge">Beta</span></span>
     </nav>
 
-    <script src="js/hscode.js?v=20260528"></script>
+    <script>
+    (function () {
+        const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run';
+        const HSCODE_MIN_INTERVAL_MS = 15000;
+        const HSCODE_MAX_DESCRIPTION = 2000;
+
+        let lastClassifyAt = 0;
+        let classifyInFlight = false;
+        let lastHsCode = '';
+
+        function getDescription() {
+            const el = document.getElementById('hscode-description');
+            return el ? el.value.trim() : '';
+        }
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('hscode-submit-btn');
+            const panel = document.getElementById('hscode-loading');
+            if (btn) {
+                btn.disabled = isLoading;
+                btn.classList.toggle('is-loading', isLoading);
+                btn.textContent = isLoading ? 'Loading...' : 'Start Classification';
+            }
+            if (panel) {
+                panel.hidden = !isLoading;
+            }
+        }
+
+        function showError(message) {
+            const box = document.getElementById('hscode-error');
+            if (!box) return;
+            box.hidden = false;
+            box.textContent = message;
+        }
+
+        function hideError() {
+            const box = document.getElementById('hscode-error');
+            if (!box) return;
+            box.hidden = true;
+            box.textContent = '';
+        }
+
+        function hideResult() {
+            const panel = document.getElementById('hscode-result');
+            if (!panel) return;
+            panel.classList.remove('is-visible');
+            panel.hidden = true;
+        }
+
+        function buildComplianceUrl(hscode) {
+            const params = new URLSearchParams();
+            params.set('search', hscode);
+            return `index.html?${params.toString()}`;
+        }
+
+        function renderResult(classification) {
+            const panel = document.getElementById('hscode-result');
+            if (!panel) return;
+
+            const hs = String(classification.hscode || '').trim();
+            const name = String(classification.official_name || '').trim();
+            const confidence = String(classification.confidence || '—').trim();
+            const reasoning = String(classification.reasoning || '').trim();
+
+            lastHsCode = hs;
+
+            document.getElementById('hscode-result-code').textContent = hs || '—';
+            document.getElementById('hscode-result-name').textContent = name || '—';
+            document.getElementById('hscode-result-confidence').textContent = confidence || '—';
+            document.getElementById('hscode-result-reasoning').textContent = reasoning || '—';
+
+            panel.hidden = false;
+            panel.classList.remove('is-visible');
+            requestAnimationFrame(() => {
+                panel.classList.add('is-visible');
+            });
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function goToComplianceCheck() {
+            if (!lastHsCode) {
+                alert('No HS Code available yet. Please run classification first.');
+                return;
+            }
+            window.location.href = buildComplianceUrl(lastHsCode);
+        }
+
+        async function classifyProduct() {
+            if (classifyInFlight) {
+                return;
+            }
+
+            const description = getDescription();
+            hideError();
+            hideResult();
+
+            if (!description) {
+                alert('Please enter a product description before starting classification.');
+                return;
+            }
+
+            if (description.length > HSCODE_MAX_DESCRIPTION) {
+                alert(`Description is too long. Please keep it within ${HSCODE_MAX_DESCRIPTION} characters.`);
+                return;
+            }
+
+            const now = Date.now();
+            if (now - lastClassifyAt < HSCODE_MIN_INTERVAL_MS) {
+                const waitSec = Math.ceil((HSCODE_MIN_INTERVAL_MS - (now - lastClassifyAt)) / 1000);
+                alert(`Please wait ${waitSec} seconds before trying again.`);
+                return;
+            }
+
+            classifyInFlight = true;
+            setLoading(true);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 35000);
+
+            try {
+                const response = await fetch(HSCODE_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'hscode_classify',
+                        description
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(data.error || `API error: ${response.status}`);
+                }
+
+                if (!data.ok || !data.classification) {
+                    throw new Error(data.error || 'Invalid classification response');
+                }
+
+                lastClassifyAt = Date.now();
+                renderResult(data.classification);
+            } catch (error) {
+                clearTimeout(timeoutId);
+                console.error('HS classify failed:', error);
+                if (error.name === 'AbortError') {
+                    showError('Request timed out. Please try again or shorten the description.');
+                } else {
+                    showError(error.message || 'Classification failed. Please try again.');
+                }
+            } finally {
+                classifyInFlight = false;
+                setLoading(false);
+            }
+        }
+
+        function bindHsCodePage() {
+            const form = document.getElementById('hscode-form');
+            const textarea = document.getElementById('hscode-description');
+            const risksBtn = document.getElementById('hscode-check-risks-btn');
+
+            if (form) {
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    classifyProduct();
+                });
+            }
+
+            if (risksBtn) {
+                risksBtn.addEventListener('click', goToComplianceCheck);
+            }
+
+            if (textarea) {
+                textarea.addEventListener('input', () => {
+                    const counter = document.getElementById('hscode-char-count');
+                    if (counter) {
+                        counter.textContent = `${textarea.value.length} / ${HSCODE_MAX_DESCRIPTION}`;
+                    }
+                });
+                textarea.dispatchEvent(new Event('input'));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', bindHsCodePage);
+    })();
+    </script>
 </body>
 </html>

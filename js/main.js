@@ -2,20 +2,23 @@ loadIncotermData();
 
 function handleInboundSearchFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    const hs = params.get('hs');
-    const autoSearch = params.get('autoSearch');
+    const query = params.get('search') || params.get('hs');
+    const legacyAuto = params.get('autoSearch') === '1';
 
-    if (!hs || autoSearch !== '1') {
+    if (!query) {
+        return;
+    }
+    if (!params.get('search') && !legacyAuto) {
         return;
     }
 
     showView('electronics');
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
-        searchInput.value = hs;
+        searchInput.value = query;
     }
 
-    searchProducts(hs);
+    searchProducts(query);
 
     const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
     history.replaceState({ view: 'result' }, '', cleanUrl);
@@ -25,7 +28,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initData();
 
     const params = new URLSearchParams(window.location.search);
-    const hasAutoHsSearch = params.get('hs') && params.get('autoSearch') === '1';
+    const hasAutoHsSearch = Boolean(params.get('search'))
+        || (params.get('hs') && params.get('autoSearch') === '1');
 
     if (hasAutoHsSearch) {
         applyView('electronics');

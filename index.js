@@ -22,26 +22,20 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260528-hscode-v1';
+const FC_BUILD_ID = '20260528-hscode-v2';
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
 const HSCODE_CLASSIFY_MAX_TOKENS = 1200;
 
-const HSCODE_CLASSIFY_SYSTEM_PROMPT = `你是一位拥有20年报关经验的中国海关商品归类专家。请严格根据《进出口税则商品及品目注释》和归类总规则（GIR），对用户描述的商品进行专业分析。
-
-你必须只返回一个 JSON 对象，不要输出 Markdown、不要输出任何 JSON 以外的文字。JSON 结构必须严格为：
+const HSCODE_CLASSIFY_SYSTEM_PROMPT = `You are a professional Customs Tariff Specialist with 20 years of experience in China Customs HS Code classification. Analyze the user's product description strictly based on the Harmonized System (HS) General Interpretative Rules (GIR).
+You MUST return a valid JSON object ONLY. Do not include any introductory text or markdown code blocks. The JSON structure must be exactly as follows:
 {
-  "hscode": "前6位或10位编码（仅数字，可含一个点分隔符）",
-  "official_name": "海关官方标准品名",
-  "confidence": "置信度百分比（如 85%）",
-  "reasoning": "详细的归类总规则依据和材质用途分析"
-}
-
-要求：
-- 若信息不足，仍给出最可能编码，并在 reasoning 中说明需补充的信息。
-- hscode 优先给出8位或10位税号；若仅能判断到6位，在 reasoning 中说明。
-- 不要编造不存在的税号注释条文；依据请写清 GIR 条款逻辑。`;
+  "hscode": "The 6-digit or 10-digit HS Code",
+  "official_name": "Official standard customs commodity name in English",
+  "confidence": "e.g., 95%",
+  "reasoning": "Detailed technical classification justification in English. Must cite specific GIR rules (e.g., GIR 1, GIR 6) and analyze based on material, function, and intended use."
+}`;
 const MAX_CONTEXT_TAGS = 8;
 const MAX_CONTEXT_CASES = 3;
 const MAX_FIELD_LENGTH = 500;
