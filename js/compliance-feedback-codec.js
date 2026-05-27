@@ -2,9 +2,12 @@ const COMPLIANCE_FEEDBACK_MARKER_V1 = 'CFB1:';
 
 const POLICY_TYPE_TO_CODE = {
     'Export control': 'E',
+    'Import control': 'I',
     'CCC certification': 'C',
     'No applicable policy': 'N',
     '出口管制': 'E',
+    '进口管制': 'I',
+    'import_control': 'I',
     'CCC认证': 'C',
     '暂无政策': 'N'
 };

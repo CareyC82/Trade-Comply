@@ -1,10 +1,12 @@
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 
-const POLICY_TYPES = new Set(['Export control', 'CCC certification', 'No applicable policy']);
+const POLICY_TYPES = new Set(['Export control', 'Import control', 'CCC certification', 'No applicable policy']);
 
 const POLICY_TYPE_ALIASES = {
     '出口管制': 'Export control',
+    '进口管制': 'Import control',
+    'import_control': 'Import control',
     'CCC认证': 'CCC certification',
     '暂无政策': 'No applicable policy'
 };
@@ -55,7 +57,7 @@ function validateComplianceFeedbackPayload(body) {
     }
 
     if (!policy_type || !POLICY_TYPES.has(policy_type)) {
-        return { ok: false, statusCode: 400, error: 'policy_type must be one of: Export control, CCC certification, No applicable policy.' };
+        return { ok: false, statusCode: 400, error: 'policy_type must be one of: Export control, Import control, CCC certification, No applicable policy.' };
     }
 
     if (!source_url) {

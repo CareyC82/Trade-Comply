@@ -5,15 +5,19 @@ const LEGACY_MARKER_HEX = 'CFB';
 
 const POLICY_CODE_TO_TYPE = {
     E: 'Export control',
+    I: 'Import control',
     C: 'CCC certification',
     N: 'No applicable policy'
 };
 
 const POLICY_TYPE_TO_CODE = {
     'Export control': 'E',
+    'Import control': 'I',
     'CCC certification': 'C',
     'No applicable policy': 'N',
     '出口管制': 'E',
+    '进口管制': 'I',
+    'import_control': 'I',
     'CCC认证': 'C',
     '暂无政策': 'N'
 };
