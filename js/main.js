@@ -3,29 +3,14 @@ loadIncotermData();
 /**
  * Deep-link from hscode.html: index.html?search=81099000&direction=import
  * Must read query BEFORE any history.replaceState that strips URL params.
+ * Parser lives in lib/deep-link.js (global TradeComplyDeepLink).
  */
 function normalizeInboundDirection(value) {
-    const normalized = (value || '').trim().toLowerCase();
-    return normalized === 'import' ? 'import' : 'export';
+    return globalThis.TradeComplyDeepLink.normalizeInboundDirection(value);
 }
 
 function getInboundDeepLink() {
-    const params = new URLSearchParams(window.location.search);
-
-    let query = '';
-    const searchParam = params.get('search');
-    if (searchParam && searchParam.trim()) {
-        query = searchParam.trim();
-    } else {
-        const hsParam = params.get('hs');
-        if (hsParam && hsParam.trim() && params.get('autoSearch') === '1') {
-            query = hsParam.trim();
-        }
-    }
-
-    const direction = normalizeInboundDirection(params.get('direction'));
-
-    return { query, direction };
+    return globalThis.TradeComplyDeepLink.getInboundDeepLinkFromSearch(window.location.search);
 }
 
 function applyInboundDirection(direction) {

@@ -131,8 +131,10 @@
                 <div class="status-bar" id="status-bar">加载中…</div>
                 <div class="row">
                     <button type="button" class="btn-ghost" id="btn-refresh">刷新列表</button>
+                    <button type="button" class="btn-primary" id="btn-publish-sync">推送到 GitHub（三路径同步）</button>
                     <button type="button" class="btn-ghost" id="btn-logout">退出</button>
                 </div>
+                <p class="meta" style="margin-top:10px">批准后请运行推送：本地需配置 <code>GIT_AUTHOR</code> 与 <code>GITHUB_TOKEN</code>，或终端执行 <code>npm run publish:reviewed -- --dispatch</code></p>
             </div>
             <div id="pending-list"></div>
         </div>
@@ -296,7 +298,25 @@
             showReview();
         });
 
+        async function publishSync() {
+            if (!window.confirm('将一次性 commit 并 push：tags.json + catalog.json + pending queue？')) {
+                return;
+            }
+            statusBar.textContent = '正在推送到 GitHub…';
+            try {
+                const result = await apiFetch('/api/review/publish-sync', {
+                    method: 'POST',
+                    body: JSON.stringify({ dispatch: true })
+                });
+                statusBar.textContent = result.message || '推送完成';
+            } catch (err) {
+                statusBar.classList.add('error');
+                statusBar.textContent = `推送失败: ${err.message}。请在终端运行: npm run publish:reviewed -- --dispatch`;
+            }
+        }
+
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
+        document.getElementById('btn-publish-sync').addEventListener('click', publishSync);
         document.getElementById('btn-logout').addEventListener('click', showLogin);
 
         if (localStorage.getItem(API_BASE_KEY)) {

@@ -10,6 +10,7 @@ const {
     extractComplianceFeedbackPayload,
     isComplianceFeedbackQuery
 } = require('./compliance-feedback-codec');
+const { parseHsCodeClassificationPayload } = require('./lib/parse-model-json');
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const ALLOWED_ORIGINS = new Set([
@@ -767,36 +768,6 @@ function isFeedbackPath(path) {
 
 function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
-}
-
-function parseHsCodeClassificationPayload(text) {
-    if (!text || typeof text !== 'string') {
-        throw new Error('Empty model response');
-    }
-
-    let jsonText = text.trim();
-    const fenced = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    if (fenced) {
-        jsonText = fenced[1].trim();
-    } else {
-        const firstBrace = jsonText.indexOf('{');
-        const lastBrace = jsonText.lastIndexOf('}');
-        if (firstBrace >= 0 && lastBrace > firstBrace) {
-            jsonText = jsonText.slice(firstBrace, lastBrace + 1);
-        }
-    }
-
-    const parsed = JSON.parse(jsonText);
-    const hscode = String(parsed.hscode || parsed.hs_code || '').trim();
-    const official_name = String(parsed.official_name || parsed.officialName || '').trim();
-    const confidence = String(parsed.confidence || '').trim();
-    const reasoning = String(parsed.reasoning || parsed.reason || '').trim();
-
-    if (!hscode || !official_name || !reasoning) {
-        throw new Error('Model JSON missing required fields');
-    }
-
-    return { hscode, official_name, confidence, reasoning };
 }
 
 async function callDeepSeekForHsCode(description) {

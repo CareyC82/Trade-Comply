@@ -16,6 +16,10 @@ const {
     rejectPendingItem,
     loadQueue
 } = require('../lib/data-review');
+const {
+    maybeTriggerPublishSyncAfterApprove,
+    publishReviewedDataToGit
+} = require('../lib/publish-sync');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
@@ -131,11 +135,30 @@ async function handleApi(req, res) {
             return;
         }
 
-        const result = urlPath.endsWith('/approve')
-            ? approvePendingItem(pendingId)
-            : rejectPendingItem(pendingId);
+        if (urlPath.endsWith('/approve')) {
+            const result = await approvePendingItem(pendingId);
+            if (result.ok) {
+                const sync = await maybeTriggerPublishSyncAfterApprove({ pendingId });
+                result.sync = sync;
+            }
+            sendJson(res, result.ok ? 200 : 400, result);
+            return;
+        }
 
+        const result = rejectPendingItem(pendingId);
         sendJson(res, result.ok ? 200 : 400, result);
+        return;
+    }
+
+    if (req.method === 'POST' && urlPath === '/api/review/publish-sync') {
+        try {
+            const body = await readBody(req);
+            const dispatch = body.dispatch === true || process.env.PUBLISH_DISPATCH === '1';
+            const result = await publishReviewedDataToGit({ dispatch });
+            sendJson(res, 200, result);
+        } catch (error) {
+            sendJson(res, 400, { ok: false, error: error.message });
+        }
         return;
     }
 

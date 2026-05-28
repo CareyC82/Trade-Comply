@@ -11,9 +11,10 @@ if [[ ! -f "$ROOT/data/catalog.json" ]]; then
 fi
 
 rm -rf "$PKG_DIR" "$ZIP"
-mkdir -p "$PKG_DIR/data" "$PKG_DIR/js"
+mkdir -p "$PKG_DIR/data" "$PKG_DIR/js" "$PKG_DIR/lib"
 
 cp "$ROOT/index.js" "$PKG_DIR/"
+cp "$ROOT/lib/parse-model-json.js" "$PKG_DIR/lib/"
 cp "$ROOT/compliance-feedback-codec.js" "$PKG_DIR/"
 cp "$ROOT/feedback-store.js" "$PKG_DIR/"
 cp "$ROOT/supabase-feedback.js" "$PKG_DIR/"
@@ -27,7 +28,7 @@ cp "$ROOT/data/catalog.json" "$PKG_DIR/data/"
 
 (
   cd "$PKG_DIR"
-  zip -r "$ZIP" index.js compliance-feedback-codec.js feedback-store.js supabase-feedback.js js/catalog.js data/tags.json data/cases.json data/categories.json data/catalog.schema.json data/scope-keywords.json data/catalog.json
+  zip -r "$ZIP" index.js lib/parse-model-json.js compliance-feedback-codec.js feedback-store.js supabase-feedback.js js/catalog.js data/tags.json data/cases.json data/categories.json data/catalog.schema.json data/scope-keywords.json data/catalog.json
 )
 
 if ! unzip -l "$ZIP" | grep -q 'compliance-feedback-codec.js'; then

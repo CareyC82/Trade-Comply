@@ -89,6 +89,65 @@ http://localhost:8000
 
 ---
 
+## Developer Workflow & Data Review SOP
+
+### Local dual services
+
+| Service | Command | URL | Purpose |
+|---------|---------|-----|---------|
+| **Site preview (Pages)** | `npm run dev:preview` or `python3 -m http.server 8000` | http://localhost:8000 | User-facing `index.html`, loads **production** JSON |
+| **Review admin API** | `ADMIN_REVIEW_PASSWORD='secret' npm run dev:admin` | http://127.0.0.1:8787/admin.html | Human review of **pending** queue |
+
+Environment variables:
+
+| Variable | Where | Purpose |
+|----------|-------|---------|
+| `ADMIN_REVIEW_PASSWORD` | Local admin server | Bearer token for `/api/review/*` |
+| `ADMIN_REVIEW_PORT` | Optional (default `8787`) | Admin listen port |
+| `DEEPSEEK_API_KEY` | FC / policy tracker CI | AI parsing & HS classify |
+| `GITHUB_TOKEN` | CI + optional local publish | Issues, `repository_dispatch`, git push |
+| `AUTO_PUBLISH_SYNC=1` | Optional on admin server | Auto git push after each Approve |
+| `PUBLISH_DISPATCH=1` | With publish | Trigger `sync-prod-deploy` → redeploy FC |
+
+Alibaba FC (production API) secrets are configured in GitHub Actions (`deploy-fc.yml`), not in the static site.
+
+### Standard review iron law
+
+1. **`git pull origin main`** — sync remote `pending_data` written by the 02:00 policy tracker.
+2. **Review locally** — http://127.0.0.1:8787/admin.html → Approve / Reject each item.
+3. **Publish in one shot** — after all approvals, push **all three paths together** (never partial):
+
+```bash
+npm run build:catalog    # if not already rebuilt by approve
+npm run publish:reviewed -- --dispatch
+```
+
+This commits and pushes:
+
+- `data/tags.json` (and `data/cases.json` if changed)
+- `data/catalog.json`
+- `data/pending_data/queue.json`
+
+Commit messages must include **`[admin-publish]`** for production data changes (CI guardrail).
+
+4. **GitHub Pages** updates from the push automatically. **`--dispatch`** triggers [Sync Prod Deploy](.github/workflows/sync-prod-deploy.yml) to redeploy FC with the same JSON.
+
+### Automation boundaries (CI guardrail)
+
+- **Policy tracker (bot)** may only write `data/pending_data/queue.json` and `data/inbox/*`.
+- **Production files** (`data/tags.json`, `data/cases.json`, `data/catalog.json`) must not be modified by automation; only human/admin commits with `[admin-publish]`.
+- When staging adds items, an Issue is opened: `🚨 [Action Required] Daily Regulatory Update Pending Review - YYYY-MM-DD`.
+
+See [docs/DATA_REVIEW.md](docs/DATA_REVIEW.md) and [docs/ENGINEERING.md](docs/ENGINEERING.md).
+
+### Tests
+
+```bash
+npm test
+```
+
+---
+
 ## Data Files
 
 - `data/tags.json` - Compliance tags and rule mappings.

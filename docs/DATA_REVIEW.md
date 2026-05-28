@@ -42,16 +42,16 @@ node scripts/admin-server.js
 - **✅ Approve & Publish**：从 `pending_data` 移除 → 追加到 `data/tags.json`（或 `cases.json`）→ 自动运行 `node scripts/build-catalog.js`
 - **❌ Reject**：仅从待审队列删除，不改动线上数据
 
-### 3. 发布到 GitHub Pages
+### 3. 发布到 GitHub Pages（三路径一次性推送）
 
-批准后本地文件已更新，需要提交并推送：
+批准后本地文件已更新，**必须一次性**提交并推送核心路径（防止 Pages / FC / 队列不一致）：
 
 ```bash
-git add data/tags.json data/catalog.json data/pending_data/queue.json
-# 若批准的是案例：git add data/cases.json
-git commit -m "chore: publish reviewed compliance data"
-git push
+npm run build:catalog
+npm run publish:reviewed -- --dispatch
 ```
+
+等价于 `git add` + `commit [admin-publish]` + `push`，并触发 `sync-prod-deploy` 重新部署 FC。
 
 用户刷新 <https://careyc82.github.io/Trade-Comply/> 即可看到新规则。
 

@@ -2,12 +2,18 @@
   "name": "trade-comply",
   "private": true,
   "scripts": {
+    "test": "node --test test/**/*.test.js",
     "validate:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js",
     "build:catalog": "bash scripts/with-node.sh node scripts/build-catalog.js",
     "check:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js && bash scripts/with-node.sh node scripts/build-catalog.js --check",
     "summarize:feedback": "bash scripts/with-node.sh node scripts/summarize-feedback.js",
     "parse:announcement": "bash scripts/with-node.sh node scripts/auto-parse-announcement.js",
     "fetch:policy-news": "bash scripts/with-node.sh node scripts/fetch-policy-news.js",
-    "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js"
+    "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js",
+    "dev:preview": "python3 -m http.server 8000",
+    "dev:admin": "node scripts/admin-server.js",
+    "publish:reviewed": "node scripts/publish-reviewed-data.js",
+    "guardrail:prod": "node scripts/check-prod-guardrail.js",
+    "validate:pending": "node scripts/validate-pending-queue.js"
   }
 }
