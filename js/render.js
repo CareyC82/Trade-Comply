@@ -177,23 +177,37 @@ function renderResults(query, tags, cases, precheckSelections = []) {
 
             const itemsEl = groupEl.querySelector('.result-category-items');
 
+            const selectedCountry = AppState.currentCountry || 'US';
+            const countryApi = globalThis.TradeComplyCountry;
+
             group.tags.forEach(tag => {
                 const card = document.createElement('div');
                 const safeTagType = escapeHtml(tag.tag_type || 'Unknown');
                 const tagTypeClass = safeTagType.toLowerCase();
-                card.className = `compliance-card collapsible-panel ${tagTypeClass}`;
+                const isCountryMatch = countryApi
+                    && countryApi.countryPriorityScore(tag, selectedCountry) >= 100;
+                card.className = `compliance-card collapsible-panel ${tagTypeClass}${isCountryMatch ? ' country-match-highlight' : ''}`;
                 if (tag.tag_id) {
                     card.id = `tag-${tag.tag_id}`;
                 }
 
-                const hsCodes = tag.related_hs_codes ? escapeHtml(tag.related_hs_codes.join(', ')) : 'Not specified';
+                const hsCodes = tag.hs_code
+                    ? escapeHtml(tag.hs_code)
+                    : (tag.related_hs_codes ? escapeHtml(tag.related_hs_codes.join(', ')) : 'Not specified');
                 const shortTagId = tag.tag_id ? escapeHtml(tag.tag_id.replace(/^CL-|-[0-9]+$/g, '')) : '';
+                const countryLabel = countryApi ? countryApi.getCountryLabel(tag.country) : (tag.country || '');
+                const riskBadge = tag.risk_level ? `<span class="risk-level-badge risk-level-${String(tag.risk_level).toLowerCase()}">${escapeHtml(tag.risk_level)}</span>` : '';
+                const countryBadge = countryLabel
+                    ? `<span class="country-target-badge${isCountryMatch ? ' country-target-badge--match' : ''}">${escapeHtml(countryLabel)}</span>`
+                    : '';
                 const cardLabel = escapeHtml(tag.short_name || shortTagId || tag.tag_id || 'Rule');
-                const cardHint = escapeHtml(tag.short_description || '');
+                const cardHint = escapeHtml(tag.short_description || tag.content_en || '');
 
                 card.innerHTML = `
                     <button type="button" class="compliance-card-header collapsible-header" aria-expanded="false">
                         <span class="compliance-tag ${tagTypeClass}">${safeTagType}</span>
+                        ${countryBadge}
+                        ${riskBadge}
                         <span class="compliance-card-header-text">
                             <span class="compliance-card-header-title">${cardLabel}</span>
                             ${cardHint ? `<span class="compliance-card-header-hint">${cardHint}</span>` : ''}

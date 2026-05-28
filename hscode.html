@@ -27,6 +27,11 @@
                 <button type="button" id="hscode-direction-import" class="direction-btn" data-direction="import">Import into China</button>
             </div>
 
+            <div class="trade-country-row hscode-trade-country-row">
+                <label for="hscode-trade-country" class="trade-country-label">Counterparty country / region</label>
+                <select id="hscode-trade-country" class="trade-country-select" aria-label="Counterparty country or region"></select>
+            </div>
+
             <label for="hscode-description" class="hscode-label">Product description</label>
             <textarea
                 id="hscode-description"
@@ -83,6 +88,7 @@
         <span id="nav-hscode" class="nav-btn active" aria-current="page">🔍 HS Code<span class="nav-btn-badge">Beta</span></span>
     </nav>
 
+    <script src="lib/trade-country.js?v=20260529"></script>
     <script>
     (function () {
         const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run?action=hscode_classify';
@@ -93,6 +99,7 @@
         let classifyInFlight = false;
         let lastHsCode = '';
         let selectedDirection = 'export';
+        let selectedCountry = 'US';
 
         function getDescription() {
             const el = document.getElementById('hscode-description');
@@ -137,9 +144,23 @@
             return selectedDirection === 'import' ? 'import' : 'export';
         }
 
+        function populateHscodeCountrySelect(direction) {
+            const select = document.getElementById('hscode-trade-country');
+            if (!select || !globalThis.TradeComplyCountry) {
+                return;
+            }
+            const { getCountryOptionsForDirection, normalizeCountryCode } = globalThis.TradeComplyCountry;
+            const options = getCountryOptionsForDirection(direction);
+            const selected = normalizeCountryCode(selectedCountry);
+            select.innerHTML = options.map((opt) => `<option value="${opt.value}">${opt.label}</option>`).join('');
+            select.value = options.some((o) => o.value === selected) ? selected : options[0].value;
+            selectedCountry = select.value;
+        }
+
         function bindDirectionToggle() {
             const exportBtn = document.getElementById('hscode-direction-export');
             const importBtn = document.getElementById('hscode-direction-import');
+            const countrySelect = document.getElementById('hscode-trade-country');
             if (!exportBtn || !importBtn) {
                 return;
             }
@@ -148,16 +169,26 @@
                 selectedDirection = direction === 'import' ? 'import' : 'export';
                 exportBtn.classList.toggle('active', selectedDirection === 'export');
                 importBtn.classList.toggle('active', selectedDirection === 'import');
+                populateHscodeCountrySelect(selectedDirection);
             };
 
             exportBtn.addEventListener('click', () => applyDirection('export'));
             importBtn.addEventListener('click', () => applyDirection('import'));
+
+            if (countrySelect) {
+                countrySelect.addEventListener('change', () => {
+                    selectedCountry = countrySelect.value;
+                });
+            }
+
+            populateHscodeCountrySelect(selectedDirection);
         }
 
         function buildComplianceUrl(hscode) {
             const params = new URLSearchParams();
             params.set('search', hscode);
             params.set('direction', getSelectedDirection());
+            params.set('country', selectedCountry || 'US');
             return `index.html?${params.toString()}`;
         }
 

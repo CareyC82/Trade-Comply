@@ -37,9 +37,14 @@ function buildIssueBody(items) {
         '',
         '### Items',
         ...items.map((item) => {
-            const id = item.kind === 'case' ? item.payload?.case_id : item.payload?.tag_id;
-            const title = item.payload?.short_description || item.payload?.title || '(no title)';
-            return `- \`${item.pending_id}\` — **${id || 'n/a'}** (${item.kind}): ${title}`;
+            const p = item.payload || {};
+            const id = item.kind === 'case'
+                ? p.case_id
+                : (p.signal_id || p.tag_id);
+            const title = p.short_description || p.content_en || p.title || '(no title)';
+            const country = p.country ? ` · ${p.country}` : '';
+            const direction = p.direction ? ` · ${p.direction}` : '';
+            return `- \`${item.pending_id}\` — **${id || 'n/a'}** (${item.kind}${country}${direction}): ${title}`;
         }),
         '',
         '### Review steps (required)',

@@ -59,6 +59,11 @@
             <button id="direction-import" class="direction-btn">Import into China</button>
         </div>
 
+        <div class="trade-country-row">
+            <label for="trade-country" class="trade-country-label">Counterparty country / region</label>
+            <select id="trade-country" class="trade-country-select" aria-label="Counterparty country or region"></select>
+        </div>
+
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Enter product, HS Code, or risk feature" id="search-input" />
             <button class="search-btn" id="search-btn">GO</button>
@@ -147,6 +152,12 @@
             <button id="direction-export-semi" class="direction-btn active">Export from China</button>
             <button id="direction-import-semi" class="direction-btn">Import into China</button>
         </div>
+
+        <div class="trade-country-row">
+            <label for="trade-country-semi" class="trade-country-label">Counterparty country / region</label>
+            <select id="trade-country-semi" class="trade-country-select" aria-label="Counterparty country or region"></select>
+        </div>
+
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Enter chip, equipment, HS Code, or risk feature" id="search-input-semi" />
             <button class="search-btn" id="search-btn-semi">GO</button>
@@ -307,7 +318,10 @@
     <script src="js/navigation.js?v=20260528c"></script>
     <script src="js/semiconductor.js?v=20260527"></script>
     <script src="js/incoterm.js?v=20260527"></script>
-    <script src="lib/deep-link.js?v=20260528e"></script>
-    <script src="js/main.js?v=20260528e"></script>
+    <script src="lib/trade-country.js?v=20260529"></script>
+    <script src="lib/deep-link.js?v=20260529"></script>
+    <script src="js/tag-enrich.js?v=20260529"></script>
+    <script src="js/trade-country-ui.js?v=20260529"></script>
+    <script src="js/main.js?v=20260529"></script>
 </body>
 </html>

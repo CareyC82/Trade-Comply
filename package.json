@@ -10,6 +10,8 @@
     "parse:announcement": "bash scripts/with-node.sh node scripts/auto-parse-announcement.js",
     "fetch:policy-news": "bash scripts/with-node.sh node scripts/fetch-policy-news.js",
     "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js",
+    "pipeline:global": "python3 pipeline/pipeline.py",
+    "pipeline:global:offline": "python3 pipeline/pipeline.py --offline",
     "dev:preview": "python3 -m http.server 8000",
     "dev:admin": "node scripts/admin-server.js",
     "publish:reviewed": "node scripts/publish-reviewed-data.js",

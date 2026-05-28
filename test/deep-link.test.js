@@ -20,6 +20,11 @@ describe('deep-link', () => {
         assert.equal(link.direction, 'import');
     });
 
+    it('reads country from query string', () => {
+        const link = getInboundDeepLinkFromSearch('?search=854140&direction=export&country=US');
+        assert.equal(link.country, 'US');
+    });
+
     it('supports legacy hs + autoSearch deep link', () => {
         const link = getInboundDeepLinkFromSearch('?hs=854140&autoSearch=1&direction=export');
         assert.equal(link.query, '854140');

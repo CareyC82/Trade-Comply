@@ -61,6 +61,8 @@ Near-term priorities:
 
 - Product name and HS Code search.
 - Export/import direction toggle.
+- **Multi-country counterparty panel** (US / EU / ASEAN / RU / TW / JP / KR) with deep-link from HS classifier.
+- **Global compliance pipeline** (CCPIT/MOFCOM-style alerts + US BIS) → `pending_data` → human review.
 - Electronics and semiconductor category indexes.
 - Official-source compliance cards.
 - Penalty case library.

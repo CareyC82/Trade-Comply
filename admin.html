@@ -184,14 +184,21 @@
 
         function formatKind(kind) {
             if (kind === 'case') return 'HS 风险案例';
+            if (kind === 'risk_signal') return '多国风险信号';
             return '政策标签';
         }
 
         function renderItem(item) {
             const p = item.payload || {};
             const isCase = item.kind === 'case';
-            const title = isCase ? (p.title || p.case_id) : (p.short_name || p.tag_id);
-            const desc = isCase ? (p.summary || '') : (p.short_description || p.description || '');
+            const title = isCase
+                ? (p.title || p.case_id)
+                : (p.short_name || p.signal_id || p.tag_id);
+            const desc = isCase
+                ? (p.summary || '')
+                : (p.content_en || p.short_description || p.description || '');
+            const countryLine = p.country ? ` · ${p.country}` : '';
+            const riskLine = p.risk_level ? ` · ${p.risk_level}` : '';
             const hs = Array.isArray(p.related_hs_codes) ? p.related_hs_codes.join(', ') : '';
             const idLabel = isCase ? p.case_id : p.tag_id;
             const submitted = item.submitted_at ? new Date(item.submitted_at).toLocaleString('zh-CN') : '';
@@ -205,7 +212,7 @@
                     <h3>${escapeHtml(title)} <span class="meta">(${escapeHtml(idLabel || '')})</span></h3>
                     <p class="desc">${escapeHtml(desc)}</p>
                     ${hs ? `<p class="hs-list">HS: ${escapeHtml(hs)}</p>` : ''}
-                    <p class="meta">来源: ${escapeHtml(item.source || '')} · ${submitted}</p>
+                    <p class="meta">来源: ${escapeHtml(p.source || item.source || '')}${countryLine}${riskLine} · ${submitted}</p>
                     ${item.meta?.analysis_summary ? `<p class="meta">AI 摘要: ${escapeHtml(item.meta.analysis_summary)}</p>` : ''}
                     <div class="actions">
                         <button type="button" class="btn-approve" data-action="approve">✅ Approve &amp; Publish</button>

@@ -145,6 +145,7 @@ const AppState = {
     },
     catalog: null,
     currentDirection: 'export',
+    currentCountry: 'US',
     currentView: 'home',
     searchOrigin: 'electronics',
     lastReport: null,

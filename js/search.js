@@ -112,8 +112,24 @@ function search(query) {
         return tagDirection === 'both' || tagDirection === currentDirection;
     });
 
-    // Sort results
+    const selectedCountry = AppState.currentCountry || 'US';
+    const countryApi = globalThis.TradeComplyCountry;
+
+    // Sort: country match first, then risk level, then legacy order
     matchedTags.sort((a, b) => {
+        const countryA = countryApi ? countryApi.countryPriorityScore(a, selectedCountry) : 0;
+        const countryB = countryApi ? countryApi.countryPriorityScore(b, selectedCountry) : 0;
+        if (countryB !== countryA) {
+            return countryB - countryA;
+        }
+
+        const riskOrder = { High: 3, Medium: 2, Low: 1 };
+        const riskA = riskOrder[a.risk_level] || 1;
+        const riskB = riskOrder[b.risk_level] || 1;
+        if (riskB !== riskA) {
+            return riskB - riskA;
+        }
+
         const typeOrderA = a.tag_type === 'MATCHED' ? 1 : 0;
         const typeOrderB = b.tag_type === 'MATCHED' ? 1 : 0;
         if (typeOrderB !== typeOrderA) return typeOrderB - typeOrderA;

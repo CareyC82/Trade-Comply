@@ -10,6 +10,10 @@ function setDirection(direction) {
         exportBtn.classList.toggle('active', direction === 'export');
         importBtn.classList.toggle('active', direction === 'import');
     }
+
+    if (typeof syncTradeCountrySelects === 'function') {
+        syncTradeCountrySelects(direction);
+    }
 }
 
 function getViewFromLocation() {
@@ -169,7 +173,9 @@ function bindEvents() {
     const importBtn = document.getElementById('direction-import');
     if (importBtn) importBtn.addEventListener('click', () => setDirection('import'));
 
-
+    if (typeof bindTradeCountryControls === 'function') {
+        bindTradeCountryControls();
+    }
 
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
@@ -219,8 +225,26 @@ function bindEvents() {
     document.getElementById('back-to-hub-from-semi')?.addEventListener('click', (e) => { e.preventDefault(); resetPrecheckState(); showView('home'); });
     const semiExportBtn = document.getElementById('direction-export-semi');
     const semiImportBtn = document.getElementById('direction-import-semi');
-    if (semiExportBtn) semiExportBtn.addEventListener('click', () => { AppState.currentDirection = 'export'; semiExportBtn.classList.add('active'); semiImportBtn?.classList.remove('active'); });
-    if (semiImportBtn) semiImportBtn.addEventListener('click', () => { AppState.currentDirection = 'import'; semiImportBtn.classList.add('active'); semiExportBtn?.classList.remove('active'); });
+    if (semiExportBtn) {
+        semiExportBtn.addEventListener('click', () => {
+            AppState.currentDirection = 'export';
+            semiExportBtn.classList.add('active');
+            semiImportBtn?.classList.remove('active');
+            if (typeof syncTradeCountrySelects === 'function') {
+                syncTradeCountrySelects('export');
+            }
+        });
+    }
+    if (semiImportBtn) {
+        semiImportBtn.addEventListener('click', () => {
+            AppState.currentDirection = 'import';
+            semiImportBtn.classList.add('active');
+            semiExportBtn?.classList.remove('active');
+            if (typeof syncTradeCountrySelects === 'function') {
+                syncTradeCountrySelects('import');
+            }
+        });
+    }
     document.getElementById('search-btn-semi')?.addEventListener('click', () => { const q = document.getElementById('search-input-semi')?.value; searchSemiconductorProducts(q); });
     document.getElementById('search-input-semi')?.addEventListener('keyup', (e) => { if (e.key === 'Enter') { const q = e.target.value; searchSemiconductorProducts(q); } });
 

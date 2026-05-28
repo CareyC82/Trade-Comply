@@ -36,8 +36,15 @@ async function initData() {
             fetchJsonSafe('data/catalog.json', null)
         ]);
 
+        const enrichedTags = (tags || []).map((tag) => {
+            if (typeof enrichTagForCountryPanel === 'function') {
+                return enrichTagForCountryPanel(tag);
+            }
+            return tag;
+        });
+
         AppState.data = { 
-            tags, 
+            tags: enrichedTags, 
             cases, 
             categories,
             updates,
@@ -50,7 +57,7 @@ async function initData() {
         let catalog = Catalog.hydrateScopeCatalog(catalogArtifact);
         if (!catalog || !catalog.keywordList.length) {
             catalog = Catalog.buildScopeCatalog({
-                tags,
+                tags: enrichedTags,
                 cases,
                 categories,
                 scopeConfig,

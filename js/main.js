@@ -27,7 +27,7 @@ function applyInboundDirection(direction) {
     }
 }
 
-function handleInboundSearchFromUrl(inboundQuery, inboundDirection) {
+function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry) {
     const query = (inboundQuery || '').trim();
     if (!query) {
         return;
@@ -35,6 +35,11 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection) {
 
     showView('electronics', false);
     applyInboundDirection(inboundDirection);
+    if (typeof initTradeCountryForDirection === 'function') {
+        initTradeCountryForDirection(inboundDirection, inboundCountry);
+    } else if (inboundCountry) {
+        setTradeCountry(inboundCountry);
+    }
 
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
@@ -50,13 +55,19 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection) {
 document.addEventListener('DOMContentLoaded', async () => {
     await initData();
 
-    const { query: inboundQuery, direction: inboundDirection } = getInboundDeepLink();
+    const { query: inboundQuery, direction: inboundDirection, country: inboundCountry } = getInboundDeepLink();
 
     bindEvents();
     applyUiStrings();
+    if (typeof bindTradeCountryControls === 'function') {
+        bindTradeCountryControls();
+    }
+    if (typeof initTradeCountryForDirection === 'function') {
+        initTradeCountryForDirection(AppState.currentDirection || 'export', inboundCountry);
+    }
 
     if (inboundQuery) {
-        handleInboundSearchFromUrl(inboundQuery, inboundDirection);
+        handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry);
         return;
     }
 
