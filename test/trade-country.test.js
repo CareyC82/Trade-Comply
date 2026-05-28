@@ -3,7 +3,10 @@ const assert = require('node:assert/strict');
 const {
     normalizeCountryCode,
     getCountryOptionsForDirection,
-    countryPriorityScore
+    countryPriorityScore,
+    getTagCountryBadgeCode,
+    analyzeCountryCoverage,
+    buildCountryContextMessage
 } = require('../lib/trade-country');
 
 describe('trade-country', () => {
@@ -24,5 +27,18 @@ describe('trade-country', () => {
     it('normalizes aliases', () => {
         assert.equal(normalizeCountryCode('united states'), 'US');
         assert.equal(normalizeCountryCode('Taiwan'), 'TW');
+    });
+
+    it('maps GLOBAL rules to CN badge for export baseline', () => {
+        const tag = { country: 'GLOBAL', short_name: 'Test' };
+        assert.equal(getTagCountryBadgeCode(tag, 'export'), 'CN');
+    });
+
+    it('builds fallback context when only baseline rules', () => {
+        const tags = [{ country: 'GLOBAL' }, { country: 'GLOBAL' }];
+        const coverage = analyzeCountryCoverage(tags, 'US', 'export');
+        const message = buildCountryContextMessage(coverage);
+        assert.match(message, /No United States-specific destination/i);
+        assert.match(message, /2 China export baseline/i);
     });
 });

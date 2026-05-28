@@ -6,11 +6,23 @@ loadIncotermData();
  * Parser lives in lib/deep-link.js (global TradeComplyDeepLink).
  */
 function normalizeInboundDirection(value) {
-    return globalThis.TradeComplyDeepLink.normalizeInboundDirection(value);
+    if (globalThis.TradeComplyDeepLink) {
+        return globalThis.TradeComplyDeepLink.normalizeInboundDirection(value);
+    }
+    const normalized = (value || '').trim().toLowerCase();
+    return normalized === 'import' ? 'import' : 'export';
 }
 
 function getInboundDeepLink() {
-    return globalThis.TradeComplyDeepLink.getInboundDeepLinkFromSearch(window.location.search);
+    if (globalThis.TradeComplyDeepLink) {
+        return globalThis.TradeComplyDeepLink.getInboundDeepLinkFromSearch(window.location.search);
+    }
+    const params = new URLSearchParams(window.location.search);
+    return {
+        query: (params.get('search') || '').trim(),
+        direction: normalizeInboundDirection(params.get('direction')),
+        country: (params.get('country') || 'US').trim().toUpperCase()
+    };
 }
 
 function applyInboundDirection(direction) {
@@ -53,28 +65,43 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCount
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await initData();
+    try {
+        if (typeof initGlobalCollapsiblePanels === 'function') {
+            initGlobalCollapsiblePanels();
+        }
 
-    const { query: inboundQuery, direction: inboundDirection, country: inboundCountry } = getInboundDeepLink();
+        await initData();
 
-    bindEvents();
-    applyUiStrings();
-    if (typeof bindTradeCountryControls === 'function') {
-        bindTradeCountryControls();
-    }
-    if (typeof initTradeCountryForDirection === 'function') {
-        initTradeCountryForDirection(AppState.currentDirection || 'export', inboundCountry);
-    }
+        const { query: inboundQuery, direction: inboundDirection, country: inboundCountry } = getInboundDeepLink();
 
-    if (inboundQuery) {
-        handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry);
-        return;
-    }
+        bindEvents();
+        applyUiStrings();
 
-    initViewHistory();
+        if (typeof bindTradeCountryControls === 'function') {
+            bindTradeCountryControls();
+        }
+        if (typeof initTradeCountryForDirection === 'function') {
+            initTradeCountryForDirection(AppState.currentDirection || 'export', inboundCountry);
+        }
 
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.value = '';
+        if (inboundQuery) {
+            handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry);
+            return;
+        }
+
+        initViewHistory();
+
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+    } catch (error) {
+        console.error('Trade Comply init failed:', error);
+        if (typeof bindEvents === 'function') {
+            bindEvents();
+        }
+        if (typeof initGlobalCollapsiblePanels === 'function') {
+            initGlobalCollapsiblePanels();
+        }
     }
 });

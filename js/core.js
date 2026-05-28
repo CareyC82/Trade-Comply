@@ -421,17 +421,28 @@ function sanitizeUrl(url) {
 
 /** Collapsible panels: click .collapsible-header to toggle .collapsible-panel.open */
 function bindCollapsiblePanels(root) {
+    initGlobalCollapsiblePanels();
     if (!root || root.dataset.collapsibleBound === '1') {
         return;
     }
     root.dataset.collapsibleBound = '1';
-    root.addEventListener('click', (event) => {
+}
+
+function initGlobalCollapsiblePanels() {
+    if (document.documentElement.dataset.globalCollapsibleBound === '1') {
+        return;
+    }
+    document.documentElement.dataset.globalCollapsibleBound = '1';
+    document.addEventListener('click', (event) => {
         const header = event.target.closest('.collapsible-header');
-        if (!header || !root.contains(header)) {
+        if (!header) {
             return;
         }
         const panel = header.closest('.collapsible-panel');
         if (!panel) {
+            return;
+        }
+        if (event.target.closest('a')) {
             return;
         }
         event.preventDefault();

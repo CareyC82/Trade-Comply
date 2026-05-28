@@ -123,22 +123,162 @@ body {
     margin-bottom: 16px;
 }
 
-.country-target-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: var(--color-bg-secondary);
-    color: var(--color-primary);
-    margin-left: 6px;
+.country-context-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    border: 1px solid var(--color-border);
+    background: #f8fafc;
+    color: var(--color-text-secondary);
 }
 
-.country-target-badge--match {
-    background: rgba(232, 168, 23, 0.25);
-    color: #8B6914;
-    border: 1px solid var(--color-accent);
+.country-context-banner--matched {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1e3a8a;
+}
+
+.country-context-banner--fallback {
+    border-color: #fcd34d;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.country-context-banner__icon {
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+.country-context-banner__text {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+.country-context-banner__meta {
+    flex: 1 1 100%;
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.result-summary-country {
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+.result-summary-arrow {
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+
+.result-summary-role {
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.country-code-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.1rem;
+    padding: 2px 7px;
+    margin-right: 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    flex-shrink: 0;
+}
+
+.country-code-badge--cn {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.country-code-badge--us {
+    background: #dbeafe;
+    color: #1e3a8a;
+    border-color: #93c5fd;
+}
+
+.country-code-badge--eu {
+    background: #ede9fe;
+    color: #5b21b6;
+    border-color: #c4b5fd;
+}
+
+.country-code-badge--asean {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #6ee7b7;
+}
+
+.country-code-badge--ru {
+    background: #f3f4f6;
+    color: #374151;
+    border-color: #d1d5db;
+}
+
+.country-code-badge--tw,
+.country-code-badge--jp,
+.country-code-badge--kr {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+
+.country-code-badge--other {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    border-color: var(--color-border);
+}
+
+.compliance-card-header-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.compliance-card-title-text {
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.country-scope-pill {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    line-height: 1.35;
+}
+
+.country-match-ribbon {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.country-match-ribbon--exact {
+    background: linear-gradient(90deg, rgba(30, 58, 138, 0.12), rgba(30, 58, 138, 0.02));
+    color: #1e3a8a;
+}
+
+.country-match-ribbon--baseline {
+    background: linear-gradient(90deg, rgba(153, 27, 27, 0.08), transparent);
+    color: #7f1d1d;
 }
 
 .risk-level-badge {
@@ -166,12 +306,20 @@ body {
 }
 
 .compliance-card.country-match-highlight {
-    border: 2px solid var(--color-accent);
-    box-shadow: 0 4px 16px rgba(232, 168, 23, 0.25);
+    border: 1.5px solid #1e3a8a;
+    box-shadow: 0 4px 18px rgba(30, 58, 138, 0.18);
 }
 
 .compliance-card.country-match-highlight .compliance-card-header {
-    background: linear-gradient(90deg, rgba(232, 168, 23, 0.12), transparent);
+    background: linear-gradient(90deg, rgba(30, 58, 138, 0.08), transparent);
+}
+
+.compliance-card.country-baseline-rule {
+    border: 1px solid #e5e7eb;
+}
+
+.compliance-card.country-baseline-rule .country-code-badge--cn {
+    box-shadow: 0 0 0 1px rgba(153, 27, 27, 0.15);
 }
 
 /* Search Container */

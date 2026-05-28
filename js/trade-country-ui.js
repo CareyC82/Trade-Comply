@@ -14,7 +14,10 @@ function getActiveTradeCountrySelect() {
 }
 
 function populateTradeCountrySelect(selectEl, direction, selectedCode) {
-    if (!selectEl || !globalThis.TradeComplyCountry) {
+    if (!selectEl) {
+        return;
+    }
+    if (!globalThis.TradeComplyCountry) {
         return;
     }
     const { getCountryOptionsForDirection, normalizeCountryCode } = globalThis.TradeComplyCountry;
@@ -35,6 +38,10 @@ function syncTradeCountrySelects(direction, selectedCode) {
 }
 
 function setTradeCountry(countryCode) {
+    if (!globalThis.TradeComplyCountry) {
+        AppState.currentCountry = countryCode || 'US';
+        return;
+    }
     const { normalizeCountryCode } = globalThis.TradeComplyCountry;
     AppState.currentCountry = normalizeCountryCode(countryCode);
     const active = getActiveTradeCountrySelect();

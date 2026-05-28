@@ -73,11 +73,24 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     // 清空旧的 AI 结果
     removeAiBox();
 
-    const directionText = AppState.currentDirection === 'export' ? t('exportTitle') : t('importTitle');
+    const direction = AppState.currentDirection || 'export';
+    const selectedCountry = AppState.currentCountry || 'US';
+    const countryApi = globalThis.TradeComplyCountry;
+    const selectedCountryLabel = countryApi
+        ? countryApi.getCountryLabel(selectedCountry)
+        : selectedCountry;
+    const roleLabel = countryApi
+        ? countryApi.getCounterpartyRoleLabel(direction)
+        : (direction === 'import' ? 'origin' : 'destination');
+
+    const directionText = direction === 'export' ? t('exportTitle') : t('importTitle');
     const resultSummary = document.querySelector('.result-summary p');
     if (resultSummary) {
-        // XSS 修复：过滤查询词
-        resultSummary.innerHTML = `${directionText}: ${t('foundRegulations')} <span id="result-count">${tags.length}</span> ${t('regulationsFor')} '<span id="search-term">${escapeHtml(query)}</span>'`;
+        resultSummary.innerHTML = `${directionText} <span class="result-summary-arrow" aria-hidden="true">→</span> <span class="result-summary-country">${escapeHtml(selectedCountryLabel)}</span>: ${t('foundRegulations')} <span id="result-count">${tags.length}</span> ${t('regulationsFor')} '<span id="search-term">${escapeHtml(query)}</span>' <span class="result-summary-role">(${escapeHtml(roleLabel)} focus)</span>`;
+    }
+
+    if (typeof renderCountryContextBanner === 'function') {
+        renderCountryContextBanner(tags, selectedCountry, direction);
     }
 
     AppState.lastReport = createReportPayload(query, tags, cases, precheckSelections);
@@ -177,16 +190,23 @@ function renderResults(query, tags, cases, precheckSelections = []) {
 
             const itemsEl = groupEl.querySelector('.result-category-items');
 
-            const selectedCountry = AppState.currentCountry || 'US';
-            const countryApi = globalThis.TradeComplyCountry;
-
             group.tags.forEach(tag => {
                 const card = document.createElement('div');
                 const safeTagType = escapeHtml(tag.tag_type || 'Unknown');
                 const tagTypeClass = safeTagType.toLowerCase();
-                const isCountryMatch = countryApi
-                    && countryApi.countryPriorityScore(tag, selectedCountry) >= 100;
-                card.className = `compliance-card collapsible-panel ${tagTypeClass}${isCountryMatch ? ' country-match-highlight' : ''}`;
+                const countryMeta = typeof buildTagCountryDisplayMeta === 'function'
+                    ? buildTagCountryDisplayMeta(tag, selectedCountry, direction)
+                    : { badgeCode: 'CN', badgeClass: 'cn', scopeLine: '', isExact: false, isBaseline: true, matchRibbon: '' };
+
+                const cardClasses = [
+                    'compliance-card',
+                    'collapsible-panel',
+                    tagTypeClass,
+                    countryMeta.isExact ? 'country-match-highlight' : '',
+                    countryMeta.isBaseline ? 'country-baseline-rule' : ''
+                ].filter(Boolean).join(' ');
+
+                card.className = cardClasses;
                 if (tag.tag_id) {
                     card.id = `tag-${tag.tag_id}`;
                 }
@@ -195,21 +215,30 @@ function renderResults(query, tags, cases, precheckSelections = []) {
                     ? escapeHtml(tag.hs_code)
                     : (tag.related_hs_codes ? escapeHtml(tag.related_hs_codes.join(', ')) : 'Not specified');
                 const shortTagId = tag.tag_id ? escapeHtml(tag.tag_id.replace(/^CL-|-[0-9]+$/g, '')) : '';
-                const countryLabel = countryApi ? countryApi.getCountryLabel(tag.country) : (tag.country || '');
                 const riskBadge = tag.risk_level ? `<span class="risk-level-badge risk-level-${String(tag.risk_level).toLowerCase()}">${escapeHtml(tag.risk_level)}</span>` : '';
-                const countryBadge = countryLabel
-                    ? `<span class="country-target-badge${isCountryMatch ? ' country-target-badge--match' : ''}">${escapeHtml(countryLabel)}</span>`
+                const countryCodeBadge = typeof buildCountryBadgeHtml === 'function'
+                    ? buildCountryBadgeHtml(countryMeta)
+                    : '';
+                const matchRibbon = typeof buildMatchRibbonHtml === 'function'
+                    ? buildMatchRibbonHtml(countryMeta)
                     : '';
                 const cardLabel = escapeHtml(tag.short_name || shortTagId || tag.tag_id || 'Rule');
                 const cardHint = escapeHtml(tag.short_description || tag.content_en || '');
+                const scopePill = countryMeta.scopeLine
+                    ? `<span class="country-scope-pill">${escapeHtml(countryMeta.scopeLine)}</span>`
+                    : '';
 
                 card.innerHTML = `
+                    ${matchRibbon}
                     <button type="button" class="compliance-card-header collapsible-header" aria-expanded="false">
                         <span class="compliance-tag ${tagTypeClass}">${safeTagType}</span>
-                        ${countryBadge}
                         ${riskBadge}
                         <span class="compliance-card-header-text">
-                            <span class="compliance-card-header-title">${cardLabel}</span>
+                            <span class="compliance-card-header-title">
+                                ${countryCodeBadge}
+                                <span class="compliance-card-title-text">${cardLabel}</span>
+                            </span>
+                            ${scopePill}
                             ${cardHint ? `<span class="compliance-card-header-hint">${cardHint}</span>` : ''}
                         </span>
                         <span class="arrow" aria-hidden="true">▶</span>
@@ -230,6 +259,10 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         });
         
         cardsContainer.appendChild(fragment);
+    }
+
+    if (typeof initGlobalCollapsiblePanels === 'function') {
+        initGlobalCollapsiblePanels();
     }
 
     const casesContainer = document.getElementById('cases-container');
