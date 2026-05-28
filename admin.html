@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Trade Comply — 数据审核</title>
+    <style>
+        :root {
+            --bg: #0f1419;
+            --card: #1a2332;
+            --border: #2d3a4d;
+            --text: #e8edf4;
+            --muted: #8b9cb3;
+            --green: #22c55e;
+            --red: #ef4444;
+            --accent: #3b82f6;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        .wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+        }
+        h1 { font-size: 1.35rem; margin: 0 0 4px; }
+        .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .panel h2 { font-size: 1rem; margin: 0 0 12px; }
+        label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-approve { background: var(--green); color: #052e16; }
+        .btn-reject { background: transparent; color: var(--red); border: 1px solid var(--red); }
+        .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status-bar {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+        .status-bar.error { color: var(--red); }
+        .empty {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--muted);
+        }
+        .item {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            background: rgba(0,0,0,0.15);
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--border);
+            color: var(--muted);
+        }
+        .badge.tag { background: #1e3a5f; color: #93c5fd; }
+        .badge.case { background: #3b2f1e; color: #fcd34d; }
+        .item h3 { margin: 8px 0 6px; font-size: 1.05rem; }
+        .meta { font-size: 0.8rem; color: var(--muted); }
+        .desc { margin: 10px 0; font-size: 0.92rem; }
+        .hs-list { font-size: 0.85rem; color: var(--muted); }
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+        #login-panel { max-width: 420px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <h1>Trade Comply · 合规数据审核</h1>
+        <p class="subtitle">待审核项来自每日 02:00 自动抓取 + AI 解析，批准后才会写入线上 <code>data/tags.json</code> / <code>data/cases.json</code>。</p>
+
+        <div id="login-panel" class="panel">
+            <h2>登录</h2>
+            <label for="api-base">审核 API 地址（本地默认）</label>
+            <input type="text" id="api-base" value="http://127.0.0.1:8787" autocomplete="off">
+            <label for="password" style="margin-top:12px">审核密码（与 <code>ADMIN_REVIEW_PASSWORD</code> 一致）</label>
+            <input type="password" id="password" placeholder="Enter review password" autocomplete="current-password">
+            <div class="row">
+                <button type="button" class="btn-primary" id="btn-login">进入审核台</button>
+            </div>
+            <p class="meta" style="margin-top:12px">请先运行：<code>ADMIN_REVIEW_PASSWORD=xxx node scripts/admin-server.js</code></p>
+        </div>
+
+        <div id="review-panel" class="hidden">
+            <div class="panel">
+                <div class="status-bar" id="status-bar">加载中…</div>
+                <div class="row">
+                    <button type="button" class="btn-ghost" id="btn-refresh">刷新列表</button>
+                    <button type="button" class="btn-ghost" id="btn-logout">退出</button>
+                </div>
+            </div>
+            <div id="pending-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'tc_admin_token';
+        const API_BASE_KEY = 'tc_admin_api_base';
+
+        const loginPanel = document.getElementById('login-panel');
+        const reviewPanel = document.getElementById('review-panel');
+        const statusBar = document.getElementById('status-bar');
+        const pendingList = document.getElementById('pending-list');
+        const apiBaseInput = document.getElementById('api-base');
+        const passwordInput = document.getElementById('password');
+
+        function getApiBase() {
+            return (localStorage.getItem(API_BASE_KEY) || apiBaseInput.value || '').replace(/\/$/, '');
+        }
+
+        function getToken() {
+            return sessionStorage.getItem(STORAGE_KEY) || '';
+        }
+
+        function setToken(token) {
+            if (token) {
+                sessionStorage.setItem(STORAGE_KEY, token);
+            } else {
+                sessionStorage.removeItem(STORAGE_KEY);
+            }
+        }
+
+        async function apiFetch(path, options = {}) {
+            const base = getApiBase();
+            const headers = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+                ...(options.headers || {})
+            };
+            const response = await fetch(`${base}${path}`, { ...options, headers });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.error || data.message || `HTTP ${response.status}`);
+            }
+            return data;
+        }
+
+        function formatKind(kind) {
+            if (kind === 'case') return 'HS 风险案例';
+            return '政策标签';
+        }
+
+        function renderItem(item) {
+            const p = item.payload || {};
+            const isCase = item.kind === 'case';
+            const title = isCase ? (p.title || p.case_id) : (p.short_name || p.tag_id);
+            const desc = isCase ? (p.summary || '') : (p.short_description || p.description || '');
+            const hs = Array.isArray(p.related_hs_codes) ? p.related_hs_codes.join(', ') : '';
+            const idLabel = isCase ? p.case_id : p.tag_id;
+            const submitted = item.submitted_at ? new Date(item.submitted_at).toLocaleString('zh-CN') : '';
+
+            return `
+                <article class="item" data-pending-id="${item.pending_id}">
+                    <div class="item-header">
+                        <span class="badge ${item.kind}">${formatKind(item.kind)}</span>
+                        <span class="meta">${item.pending_id}</span>
+                    </div>
+                    <h3>${escapeHtml(title)} <span class="meta">(${escapeHtml(idLabel || '')})</span></h3>
+                    <p class="desc">${escapeHtml(desc)}</p>
+                    ${hs ? `<p class="hs-list">HS: ${escapeHtml(hs)}</p>` : ''}
+                    <p class="meta">来源: ${escapeHtml(item.source || '')} · ${submitted}</p>
+                    ${item.meta?.analysis_summary ? `<p class="meta">AI 摘要: ${escapeHtml(item.meta.analysis_summary)}</p>` : ''}
+                    <div class="actions">
+                        <button type="button" class="btn-approve" data-action="approve">✅ Approve &amp; Publish</button>
+                        <button type="button" class="btn-reject" data-action="reject">❌ Reject</button>
+                    </div>
+                </article>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text ?? '');
+            return div.innerHTML;
+        }
+
+        async function loadPending() {
+            statusBar.classList.remove('error');
+            statusBar.textContent = '加载待审核列表…';
+            pendingList.innerHTML = '';
+
+            try {
+                const data = await apiFetch('/api/review/pending');
+                const items = data.items || [];
+                statusBar.textContent = items.length
+                    ? `共 ${items.length} 条待审核 · 队列更新于 ${data.updated_at || '—'}`
+                    : '暂无待审核数据';
+
+                if (items.length === 0) {
+                    pendingList.innerHTML = '<div class="empty">pending_data 队列为空。凌晨任务有新结果时会出现在这里。</div>';
+                    return;
+                }
+
+                pendingList.innerHTML = items.map(renderItem).join('');
+                pendingList.querySelectorAll('[data-action]').forEach(btn => {
+                    btn.addEventListener('click', () => handleAction(btn));
+                });
+            } catch (err) {
+                statusBar.classList.add('error');
+                statusBar.textContent = `加载失败: ${err.message}`;
+            }
+        }
+
+        async function handleAction(button) {
+            const card = button.closest('.item');
+            const pendingId = card?.dataset?.pendingId;
+            const action = button.dataset.action;
+            if (!pendingId || !action) return;
+
+            const label = action === 'approve' ? '批准并发布到线上' : '拒绝并删除';
+            if (!window.confirm(`确认${label}？\n\n${pendingId}`)) return;
+
+            button.disabled = true;
+            card.querySelectorAll('button').forEach(b => { b.disabled = true; });
+
+            try {
+                const path = action === 'approve' ? '/api/review/approve' : '/api/review/reject';
+                const result = await apiFetch(path, {
+                    method: 'POST',
+                    body: JSON.stringify({ pending_id: pendingId })
+                });
+                statusBar.textContent = result.message || '操作成功';
+                await loadPending();
+            } catch (err) {
+                statusBar.classList.add('error');
+                statusBar.textContent = err.message;
+                card.querySelectorAll('button').forEach(b => { b.disabled = false; });
+            }
+        }
+
+        function showReview() {
+            loginPanel.classList.add('hidden');
+            reviewPanel.classList.remove('hidden');
+            loadPending();
+        }
+
+        function showLogin() {
+            reviewPanel.classList.add('hidden');
+            loginPanel.classList.remove('hidden');
+            setToken('');
+        }
+
+        document.getElementById('btn-login').addEventListener('click', () => {
+            const token = passwordInput.value.trim();
+            if (!token) {
+                alert('请输入审核密码');
+                return;
+            }
+            localStorage.setItem(API_BASE_KEY, apiBaseInput.value.trim());
+            setToken(token);
+            showReview();
+        });
+
+        document.getElementById('btn-refresh').addEventListener('click', loadPending);
+        document.getElementById('btn-logout').addEventListener('click', showLogin);
+
+        if (localStorage.getItem(API_BASE_KEY)) {
+            apiBaseInput.value = localStorage.getItem(API_BASE_KEY);
+        }
+
+        if (getToken()) {
+            showReview();
+        }
+    </script>
+</body>
+</html>
