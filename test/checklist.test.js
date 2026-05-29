@@ -27,6 +27,26 @@ describe('checklist', () => {
         assert.match(getPhaseDisplayLabel('其他'), /Other compliance/i);
     });
 
+    it('reads stage/phase fields and ignores rule category codes', () => {
+        const { extractRawPhaseFromItem } = require('../lib/checklist');
+        assert.equal(extractRawPhaseFromItem({ stage: 'pre-shipment', category: 'EXPORT_CTRL' }), 'pre-shipment');
+        assert.equal(normalizePhase({ phase: 'documentation', category: 'EXPORT_CTRL' }), 'documentation');
+        assert.equal(normalizePhase({ category: 'EXPORT_CTRL', task: 'x' }), 'other');
+    });
+
+    it('groups checklist items by phase key', () => {
+        const { groupChecklistByPhase } = require('../lib/checklist');
+        const groups = groupChecklistByPhase([
+            { phase: 'technical', task: 'A', desc: 'a' },
+            { phase: 'documentation', task: 'B', desc: 'b' },
+            { stage: 'environmental', task: 'C', desc: 'c' }
+        ]);
+        assert.equal(groups.length, 3);
+        assert.equal(groups[0].phaseKey, 'technical');
+        assert.equal(groups[1].phaseKey, 'environmental');
+        assert.equal(groups[2].phaseKey, 'documentation');
+    });
+
     it('merges AI checklist items for KR import', () => {
         const items = buildSessionChecklist({
             tags: [],

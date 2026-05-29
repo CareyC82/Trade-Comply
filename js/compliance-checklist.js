@@ -48,19 +48,31 @@ const CHECKLIST_PHASE_LABELS = {
     other: '📌 Other compliance actions'
 };
 
-function normalizeChecklistPhaseLite(phase) {
+function extractChecklistRawPhase(item) {
+    const api = getChecklistApi();
+    if (api?.extractRawPhaseFromItem) {
+        return api.extractRawPhaseFromItem(item);
+    }
+    return String(item?.phase || item?.stage || item?.category || '').trim();
+}
+
+function normalizeChecklistPhaseLite(phaseOrItem) {
     const api = getChecklistApi();
     if (api?.normalizePhase) {
-        return api.normalizePhase(phase);
+        return api.normalizePhase(phaseOrItem);
     }
-    const raw = String(phase || '').trim().toLowerCase();
-    if (raw === 'technical' || raw.includes('tech') || raw.includes('核查')) {
+    const raw = String(
+        typeof phaseOrItem === 'object'
+            ? extractChecklistRawPhase(phaseOrItem)
+            : (phaseOrItem || '')
+    ).trim().toLowerCase();
+    if (raw.includes('tech') || raw.includes('pre') || raw.includes('技术') || raw.includes('出口前')) {
         return 'technical';
     }
-    if (raw === 'environmental' || raw.includes('environment') || raw.includes('环保')) {
+    if (raw.includes('environ') || raw.includes('green') || raw.includes('环保') || raw.includes('绿色')) {
         return 'environmental';
     }
-    if (raw === 'documentation' || raw.includes('document') || raw.includes('customs') || raw.includes('单证')) {
+    if (raw.includes('custom') || raw.includes('doc') || raw.includes('海关') || raw.includes('单证')) {
         return 'documentation';
     }
     return 'other';
@@ -73,7 +85,7 @@ function groupChecklistByPhaseLite(items) {
     }
     const groups = new Map();
     (items || []).forEach((item) => {
-        const phaseKey = normalizeChecklistPhaseLite(item.phase);
+        const phaseKey = normalizeChecklistPhaseLite(item);
         const phaseLabel = CHECKLIST_PHASE_LABELS[phaseKey] || CHECKLIST_PHASE_LABELS.other;
         if (!groups.has(phaseKey)) {
             groups.set(phaseKey, { phaseKey, phaseLabel, items: [] });
@@ -107,8 +119,8 @@ function mergeTagChecklistsInline(tags) {
     if (api?.normalizeChecklist) {
         return api.normalizeChecklist(merged);
     }
-    return merged.map((item, index) => {
-        const phase = normalizeChecklistPhaseLite(item.phase);
+    return merged.map((item) => {
+        const phase = normalizeChecklistPhaseLite(item);
         return {
             id: String(item.id || `${phase}::${item.task}`).slice(0, 120),
             phase,
@@ -228,9 +240,19 @@ function renderComplianceChecklistPanel(containerId, checklist) {
         return;
     }
 
-    AppState.complianceChecklist = checklist || [];
+    const checklistData = checklist || [];
+    console.log('Real AI Checklist Data:', checklistData);
+    console.log('Checklist phase fields:', checklistData.map((item) => ({
+        phase: item?.phase,
+        stage: item?.stage,
+        category: item?.category,
+        raw: extractChecklistRawPhase(item),
+        normalized: normalizeChecklistPhaseLite(item)
+    })));
 
-    if (!checklist || checklist.length === 0) {
+    AppState.complianceChecklist = checklistData;
+
+    if (!checklistData.length) {
         container.hidden = true;
         container.style.display = 'none';
         container.innerHTML = '';
@@ -241,7 +263,7 @@ function renderComplianceChecklistPanel(containerId, checklist) {
     container.style.display = '';
     container.hidden = false;
 
-    const groups = groupChecklistByPhaseLite(checklist);
+    const groups = groupChecklistByPhaseLite(checklistData);
 
     const groupsHtml = groups.map((group) => `
         <div class="compliance-checklist-phase">
@@ -273,7 +295,7 @@ function renderComplianceChecklistPanel(containerId, checklist) {
             <button type="button" class="compliance-checklist-header category-group-header collapsible-header" aria-expanded="false">
                 <span class="group-icon group-icon--themed" aria-hidden="true">📋</span>
                 <span class="group-title compliance-checklist-title">Actionable Compliance Checklist</span>
-                <span class="group-count compliance-checklist-count">${checklist.length} ${checklist.length === 1 ? 'task' : 'tasks'}</span>
+                <span class="group-count compliance-checklist-count">${checklistData.length} ${checklistData.length === 1 ? 'task' : 'tasks'}</span>
                 <span class="arrow" aria-hidden="true">▶</span>
             </button>
             <div class="compliance-checklist-body collapsible-body">
