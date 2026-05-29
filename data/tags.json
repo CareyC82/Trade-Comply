@@ -1401,7 +1401,28 @@
     ],
     "exemptions": "Consumer-grade microcontrollers (MCUs) at mature process nodes (28nm and above) for general commercial use are generally exempt. Chips with transistor count below 50 billion and no AI/ML acceleration capability may not trigger high-performance controls. Legacy memory chips (DDR3, LPDDR3 and below) are typically exempt.",
     "risk_scenarios": "Any AI training or inference chip above 4800 TOPS of FP8 performance may trigger export license requirements regardless of commercial designation. GPU/NPU chips with high-speed interconnects (NVLink, CXL 2.0+) face additional scrutiny. Chips designed for data center deployment or supercomputing clusters are classified as controlled items even if labeled as 'consumer products'. Exporting GDSII design files to overseas foundries for 14nm and below requires a separate technology export license.",
-    "display_order": 39
+    "display_order": 39,
+    "related_cases": [
+      "CASE-050",
+      "CASE-051"
+    ],
+    "checklist": [
+      {
+        "phase": "technical",
+        "task": "Screen HBM / advanced DRAM against 2026 dual-use catalog thresholds",
+        "desc": "Confirm whether the memory IC (HBM stack, 3D DRAM, or high-bandwidth module) triggers MOFCOM export license requirements before shipping to the United States."
+      },
+      {
+        "phase": "documentation",
+        "task": "Prepare end-user and end-use statements for US consignee",
+        "desc": "Collect signed end-user certificates, commodity classification worksheets, and contract excerpts showing civilian end-use for controlled semiconductor shipments."
+      },
+      {
+        "phase": "technical",
+        "task": "Verify GDSII / technology export license for overseas fab flows",
+        "desc": "If design data leaves China for tape-out, confirm separate technology export licensing for sub-14nm logic or controlled memory IP."
+      }
+    ]
   },
   {
     "tag_id": "CL-CHIP-002",
@@ -1442,7 +1463,19 @@
     ],
     "exemptions": "ICs fabricated at multiple foundries where the final process step was performed in China may declare China as origin. Chips that are only packaged or tested in a country (not fabricated there) do not need to declare that country as wafer origin.",
     "risk_scenarios": "Misdeclaring a TSMC-fabricated chip as 'SMIC-fabricated' (or vice versa) is treated as false declaration and can trigger supply chain security investigations. Chips fabricated at multiple foundries require careful documentation of which wafer fabrication step occurred at which location. Non-Chinese foundries may be subject to additional scrutiny if the chip is destined for a sensitive end-use.",
-    "display_order": 40
+    "display_order": 40,
+    "checklist": [
+      {
+        "phase": "documentation",
+        "task": "Declare country of wafer fabrication on HS 8542 customs entry",
+        "desc": "Populate the mandatory foundry-location field on export declarations; align with wafer invoices and fab flow certificates."
+      },
+      {
+        "phase": "documentation",
+        "task": "Retain multi-fab process step traceability pack",
+        "desc": "Document which fabrication steps occurred at each foundry when wafers move between sites before export to the US."
+      }
+    ]
   },
   {
     "tag_id": "CL-CHIP-003",
@@ -1477,7 +1510,19 @@
     ],
     "exemptions": "Routine commercial orders of standard commodity chips (e.g., standard DRAM, NAND flash) without access to sensitive process or yield data are generally exempt. Supply chain mapping limited to first-tier suppliers' names and locations is generally permissible.",
     "risk_scenarios": "Foreign entities conducting detailed semiconductor supply chain audits (process node verification, yield rate data, customer lists) within China may be denied access under the 2026 Supply Chain Security Regulations. Chinese chip companies may face penalties if they comply with foreign government requests (e.g., U.S. UFLPA inquiries) to provide detailed supply chain information on Chinese semiconductor suppliers. Exporting advanced chip design files (GDSII) to overseas foundries without verifying compliance with Chinese export controls can result in both export violations and supply chain security violations.",
-    "display_order": 41
+    "display_order": 41,
+    "checklist": [
+      {
+        "phase": "technical",
+        "task": "Limit sensitive yield / customer data shared with foreign buyers",
+        "desc": "Review what process-node, yield, and customer-list data can be disclosed to US customers or auditors without violating PRC supply chain security rules."
+      },
+      {
+        "phase": "documentation",
+        "task": "Document internal approval before responding to UFLPA-style inquiries",
+        "desc": "Route foreign supply-chain questionnaires through legal/compliance review before releasing fab or subcontractor details."
+      }
+    ]
   },
   {
     "tag_id": "CL-DU-004",

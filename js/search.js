@@ -218,6 +218,16 @@ function search(query) {
         return { case: caseItem, score: score };
     }).filter(item => item.score > 0).sort((a, b) => b.score - a.score).map(item => item.case);
 
+    const enrichApi = globalThis.TradeComplyMatchedResults;
+    if (enrichApi?.collectCasesForMatchedTags && enrichApi?.mergeCasesById) {
+        const linkedCases = enrichApi.collectCasesForMatchedTags(
+            matchedTags,
+            cases,
+            currentDirection
+        );
+        matchedCases = enrichApi.mergeCasesById(matchedCases, linkedCases);
+    }
+
     return { tags: matchedTags, cases: matchedCases };
 }
 
