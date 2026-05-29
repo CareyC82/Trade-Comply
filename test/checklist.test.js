@@ -7,6 +7,17 @@ const {
 } = require('../lib/checklist');
 
 describe('checklist', () => {
+    it('loads US export baseline tasks in Node', () => {
+        const items = buildSessionChecklist({
+            tags: [],
+            aiChecklist: [],
+            country: 'US',
+            direction: 'export'
+        });
+        assert.ok(items.length >= 3);
+        assert.ok(items.some((i) => /FCC|301|BIS/i.test(i.task)));
+    });
+
     it('merges AI and baseline items for KR import', () => {
         const items = buildSessionChecklist({
             tags: [],

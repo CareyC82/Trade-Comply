@@ -10,7 +10,9 @@ function buildComplianceChecklistForResults(tags, options = {}) {
     const api = getChecklistApi();
     const country = options.country || AppState.currentCountry || 'US';
     const direction = options.direction || AppState.currentDirection || 'export';
-    const aiChecklist = options.aiChecklist || AppState.hsContext?.checklist || [];
+    const aiChecklist = options.aiChecklist
+        || AppState.hsContext?.checklist
+        || [];
 
     if (!api) {
         return [];
@@ -18,10 +20,37 @@ function buildComplianceChecklistForResults(tags, options = {}) {
 
     return api.buildSessionChecklist({
         tags: tags || [],
-        aiChecklist,
+        aiChecklist: Array.isArray(aiChecklist) ? aiChecklist : [],
         country,
         direction,
         includeBaseline: options.includeBaseline !== false
+    });
+}
+
+function bindComplianceChecklistCheckboxHandlers(root) {
+    const scope = root || document;
+    scope.querySelectorAll('.compliance-checklist-checkbox').forEach((input) => {
+        input.addEventListener('change', () => {
+            const id = input.dataset.checklistId;
+            if (input.checked) {
+                AppState.checklistChecked[id] = true;
+            } else {
+                delete AppState.checklistChecked[id];
+            }
+            const row = input.closest('.compliance-checklist-item');
+            if (!row) {
+                return;
+            }
+            row.classList.toggle('is-done', input.checked);
+            const taskEl = row.querySelector('.compliance-checklist-task');
+            const descEl = row.querySelector('.compliance-checklist-desc');
+            if (taskEl) {
+                taskEl.classList.toggle('completed', input.checked);
+            }
+            if (descEl) {
+                descEl.classList.toggle('completed', input.checked);
+            }
+        });
     });
 }
 
@@ -48,14 +77,17 @@ function renderComplianceChecklistPanel(containerId, checklist) {
             <ul class="compliance-checklist-items">
                 ${group.items.map((item) => {
                     const checked = AppState.checklistChecked[item.id];
-                    const rowClass = checked ? 'compliance-checklist-item is-done' : 'compliance-checklist-item';
+                    const rowClass = checked
+                        ? 'compliance-checklist-item is-done'
+                        : 'compliance-checklist-item';
+                    const completedClass = checked ? ' completed' : '';
                     return `
                     <li class="${rowClass}" data-checklist-id="${escapeHtml(item.id)}">
                         <label class="compliance-checklist-label">
                             <input type="checkbox" class="compliance-checklist-checkbox" data-checklist-id="${escapeHtml(item.id)}" ${checked ? 'checked' : ''}>
-                            <span class="compliance-checklist-task">${escapeHtml(item.task)}</span>
+                            <span class="compliance-checklist-task${completedClass}">${escapeHtml(item.task)}</span>
                         </label>
-                        ${item.desc ? `<p class="compliance-checklist-desc">${escapeHtml(item.desc)}</p>` : ''}
+                        ${item.desc ? `<p class="compliance-checklist-desc${completedClass}">${escapeHtml(item.desc)}</p>` : ''}
                     </li>`;
                 }).join('')}
             </ul>
@@ -63,34 +95,26 @@ function renderComplianceChecklistPanel(containerId, checklist) {
     `).join('');
 
     container.hidden = false;
+    container.classList.add('compliance-checklist-container--visible');
     container.innerHTML = `
-        <section class="compliance-checklist-panel collapsible-panel" aria-label="Compliance To-Do Checklist">
+        <section class="compliance-checklist-panel collapsible-panel" aria-label="Actionable Compliance Checklist">
             <button type="button" class="compliance-checklist-header collapsible-header" aria-expanded="true">
-                <span class="compliance-checklist-title">Compliance To-Do Checklist</span>
+                <span class="compliance-checklist-title">📋 Actionable Compliance Checklist</span>
                 <span class="compliance-checklist-count">${checklist.length} tasks</span>
                 <span class="arrow" aria-hidden="true">▼</span>
             </button>
             <div class="compliance-checklist-body collapsible-body is-open">
-                <p class="compliance-checklist-note">Action items for your selected market. Check off tasks as you complete them; included in the print report.</p>
+                <p class="compliance-checklist-note">Grouped by compliance phase for your selected market. Check off tasks as you complete them — your selections are included in the print report.</p>
                 ${groupsHtml}
             </div>
         </section>
     `;
 
-    container.querySelectorAll('.compliance-checklist-checkbox').forEach((input) => {
-        input.addEventListener('change', () => {
-            const id = input.dataset.checklistId;
-            if (input.checked) {
-                AppState.checklistChecked[id] = true;
-            } else {
-                delete AppState.checklistChecked[id];
-            }
-            const row = input.closest('.compliance-checklist-item');
-            if (row) {
-                row.classList.toggle('is-done', input.checked);
-            }
-        });
-    });
+    bindComplianceChecklistCheckboxHandlers(container);
+
+    if (typeof initGlobalCollapsiblePanels === 'function') {
+        initGlobalCollapsiblePanels(container);
+    }
 }
 
 function getChecklistForReport() {
@@ -113,7 +137,7 @@ function buildFlowLabel(direction, countryCode) {
 function buildReportChecklistRowsHtml(items) {
     return (items || []).map((item) => `
         <tr class="checklist-print-row avoid-page-break">
-            <td class="checklist-print-box">[ ]</td>
+            <td class="checklist-print-box">${item.checked ? '[x]' : '[ ]'}</td>
             <td class="checklist-print-phase">${escapeHtml(item.phase)}</td>
             <td class="checklist-print-task">
                 <strong>${escapeHtml(item.task)}</strong>

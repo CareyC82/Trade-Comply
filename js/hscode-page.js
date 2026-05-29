@@ -144,20 +144,51 @@ function buildComplianceUrl(hscode) {
     return `index.html?${params.toString()}`;
 }
 
-function renderHscodeChecklist(classification) {
-    const container = document.getElementById('hscode-checklist-container');
-    if (!container || !globalThis.TradeComplyChecklist) {
-        return;
+function ensureComplianceChecklistContainer() {
+    let container = document.getElementById('compliance-checklist-container');
+    if (container) {
+        return container;
     }
-    const checklist = globalThis.TradeComplyChecklist.buildSessionChecklist({
-        tags: [],
-        aiChecklist: classification.checklist || [],
+    const reasoningRow = document.querySelector('.hscode-result-row--reasoning');
+    if (!reasoningRow || !reasoningRow.parentNode) {
+        return null;
+    }
+    container = document.createElement('div');
+    container.id = 'compliance-checklist-container';
+    container.className = 'compliance-checklist-slot hscode-checklist-slot';
+    container.hidden = true;
+    container.setAttribute('aria-live', 'polite');
+    reasoningRow.insertAdjacentElement('afterend', container);
+    return container;
+}
+
+function renderHscodeChecklist(classification) {
+    ensureComplianceChecklistContainer();
+    const aiChecklist = classification.checklist || [];
+    const options = {
         country: selectedCountry,
         direction: getSelectedDirection(),
-        includeBaseline: true
-    });
+        aiChecklist
+    };
+
+    let checklist = [];
+    if (typeof mountComplianceChecklist === 'function') {
+        checklist = mountComplianceChecklist('compliance-checklist-container', [], options);
+    } else if (globalThis.TradeComplyChecklist) {
+        checklist = globalThis.TradeComplyChecklist.buildSessionChecklist({
+            tags: [],
+            aiChecklist,
+            country: selectedCountry,
+            direction: getSelectedDirection(),
+            includeBaseline: true
+        });
+        if (typeof renderComplianceChecklistPanel === 'function') {
+            renderComplianceChecklistPanel('compliance-checklist-container', checklist);
+        }
+    }
+
     AppState.complianceChecklist = checklist;
-    AppState.checklistChecked = {};
+    AppState.checklistChecked = AppState.checklistChecked || {};
     AppState.hsContext = {
         chinaCode: classification.china_code || classification.hscode || '',
         counterpartyCode: classification.counterparty_code || '',
@@ -166,9 +197,6 @@ function renderHscodeChecklist(classification) {
         productDescription: lastProductDescription,
         checklist
     };
-    if (typeof renderComplianceChecklistPanel === 'function') {
-        renderComplianceChecklistPanel('hscode-checklist-container', checklist);
-    }
 }
 
 function buildHscodePrintReport() {
@@ -293,7 +321,7 @@ async function classifyProduct() {
     lastProductDescription = description;
     hideError();
     hideResult();
-    const checklistSlot = document.getElementById('hscode-checklist-container');
+    const checklistSlot = document.getElementById('compliance-checklist-container');
     if (checklistSlot) {
         checklistSlot.hidden = true;
         checklistSlot.innerHTML = '';

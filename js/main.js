@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode"></script>
  */
 (function () {
-    const BUILD = '20260531print';
+    const BUILD = '20260601checklist';
     const entryScript = document.currentScript;
     const app = entryScript?.dataset?.app
         || (/\/hscode\.html/i.test(window.location.pathname) ? 'hscode' : 'index');
@@ -72,10 +72,41 @@
         }
     }
 
+    async function primeChecklistBaselines() {
+        if (globalThis.TradeComplyChecklist?.initChecklistBaselines) {
+            await globalThis.TradeComplyChecklist.initChecklistBaselines();
+        }
+    }
+
+    /**
+     * Mount or refresh the on-page compliance checklist (index + hscode).
+     */
+    function mountComplianceChecklist(containerId, tags, options = {}) {
+        if (typeof buildComplianceChecklistForResults !== 'function'
+            || typeof renderComplianceChecklistPanel !== 'function') {
+            return [];
+        }
+        const checklist = buildComplianceChecklistForResults(tags, {
+            country: options.country || AppState.currentCountry,
+            direction: options.direction || AppState.currentDirection,
+            aiChecklist: options.aiChecklist,
+            includeBaseline: options.includeBaseline
+        });
+        renderComplianceChecklistPanel(containerId, checklist);
+        const el = document.getElementById(containerId);
+        if (el && checklist.length > 0) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        return checklist;
+    }
+
+    globalThis.mountComplianceChecklist = mountComplianceChecklist;
+
     async function start() {
         try {
             const modules = app === 'hscode' ? HSCODE_MODULES : INDEX_MODULES;
             await loadModules(modules);
+            await primeChecklistBaselines();
 
             onDocumentReady(() => {
                 if (app === 'hscode') {

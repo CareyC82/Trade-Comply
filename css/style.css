@@ -2836,6 +2836,25 @@ button.feedback-link:hover {
 }
 
 /* Compliance To-Do Checklist */
+#compliance-checklist-container.compliance-checklist-container--visible,
+.compliance-checklist-slot:not([hidden]) {
+    display: block;
+    margin: 20px 16px 8px;
+}
+
+.compliance-checklist-task.completed,
+.compliance-checklist-item.is-done .compliance-checklist-task {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.compliance-checklist-desc.completed,
+.compliance-checklist-item.is-done .compliance-checklist-desc {
+    text-decoration: line-through;
+    color: #9ca3af;
+    opacity: 0.85;
+}
+
 .compliance-checklist-panel {
     margin: 16px 0;
     border: 1px solid var(--color-border);
