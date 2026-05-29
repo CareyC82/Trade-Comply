@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode"></script>
  */
 (function () {
-    const BUILD = '20260602quick-tabs';
+    const BUILD = '20260602home-tabs';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const app = entryScript?.dataset?.app
@@ -19,8 +19,8 @@
         'js/trade-country-ui.js',
         'js/country-render.js',
         'js/catalog.js',
-        'js/data.js',
         'js/quick-select-grid.js',
+        'js/data.js',
         'lib/matched-results.js',
         'js/search.js',
         'js/compliance-checklist.js',

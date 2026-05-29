@@ -110,9 +110,34 @@ function renderLatestUpdate() {
 }
 
 /**
- * Render tabbed quick select grid (replaces flat quick-actions.json list on index).
+ * Render tabbed quick select on home + electronics views.
  */
+function renderHomeQuickSelect() {
+    const container = document.getElementById('home-quick-select-container');
+    if (!container || typeof renderQuickSelectGrid !== 'function') {
+        return;
+    }
+    renderQuickSelectGrid('home-quick-select-container', {
+        mode: 'search',
+        defaultTrack: 'consumer',
+        onSelect: ({ query }) => {
+            if (typeof showView === 'function') {
+                showView('electronics');
+            }
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = query;
+            }
+            if (typeof searchProducts === 'function') {
+                searchProducts(query);
+            }
+        }
+    });
+}
+
 function renderQuickActions() {
+    renderHomeQuickSelect();
+
     const container = document.getElementById('quick-actions-container');
     if (!container) {
         return;
