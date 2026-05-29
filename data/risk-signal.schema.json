@@ -27,6 +27,19 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "checklist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["phase", "task", "desc"],
+        "properties": {
+          "phase": { "type": "string", "minLength": 2 },
+          "task": { "type": "string", "minLength": 2 },
+          "desc": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
     "pipeline_source": { "type": "string" },
     "fetched_at": { "type": "string", "format": "date-time" }
   },

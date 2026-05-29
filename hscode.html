@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI HS Code Classifier | Trade Comply</title>
-    <link rel="stylesheet" href="css/main.css?v=20260529-hscode-dual">
+    <link rel="stylesheet" href="css/main.css?v=20260530a-hscode-report">
 </head>
 <body class="hscode-page-body">
     <div class="hscode-page view-container active">
@@ -86,6 +86,12 @@
                 <div class="hscode-result-row-label">🔍 Classification Justification</div>
                 <div id="hscode-result-reasoning" class="hscode-result-reasoning"></div>
             </div>
+
+            <div id="hscode-checklist-container" class="hscode-checklist-slot" hidden></div>
+
+            <div class="hscode-report-actions">
+                <button type="button" id="hscode-download-report-btn" class="hscode-report-btn">Download Pre-Check Report (Print / PDF)</button>
+            </div>
         </section>
     </div>
 
@@ -95,9 +101,12 @@
         <span id="nav-hscode" class="nav-btn active" aria-current="page">🔍 HS Code<span class="nav-btn-badge">Beta</span></span>
     </nav>
 
-    <script src="lib/country-registry.js?v=20260529d"></script>
-    <script src="lib/trade-country.js?v=20260529d"></script>
-    <script src="lib/hscode-dual.js?v=20260529d"></script>
+    <script src="js/core.js?v=20260530a"></script>
+    <script src="lib/country-registry.js?v=20260530a"></script>
+    <script src="lib/trade-country.js?v=20260530a"></script>
+    <script src="lib/checklist.js?v=20260530a"></script>
+    <script src="lib/hscode-dual.js?v=20260530a"></script>
+    <script src="js/compliance-checklist.js?v=20260530a"></script>
     <script>
     (function () {
         const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run?action=hscode_classify';
@@ -110,6 +119,8 @@
         let lastHs6 = '';
         let selectedDirection = 'export';
         let selectedCountry = 'US';
+        let lastClassification = null;
+        let lastProductDescription = '';
 
         function getDescription() {
             const el = document.getElementById('hscode-description');
@@ -225,7 +236,76 @@
             params.set('search', search);
             params.set('direction', getSelectedDirection());
             params.set('country', selectedCountry || 'US');
+            if (lastClassification) {
+                const china = lastClassification.china_code || lastClassification.hscode || '';
+                const cp = lastClassification.counterparty_code || '';
+                if (china) params.set('china_hs', china);
+                if (cp) params.set('cp_hs', cp);
+                if (lastClassification.official_name) {
+                    params.set('product', lastClassification.official_name);
+                }
+            }
+            if (lastProductDescription) {
+                params.set('desc', lastProductDescription.slice(0, 200));
+            }
             return `index.html?${params.toString()}`;
+        }
+
+        function renderHscodeChecklist(classification) {
+            const container = document.getElementById('hscode-checklist-container');
+            if (!container || !globalThis.TradeComplyChecklist) {
+                return;
+            }
+            const checklist = globalThis.TradeComplyChecklist.buildSessionChecklist({
+                tags: [],
+                aiChecklist: classification.checklist || [],
+                country: selectedCountry,
+                direction: getSelectedDirection(),
+                includeBaseline: true
+            });
+            AppState.complianceChecklist = checklist;
+            AppState.checklistChecked = {};
+            AppState.hsContext = {
+                chinaCode: classification.china_code || classification.hscode || '',
+                counterpartyCode: classification.counterparty_code || '',
+                counterpartyHsLabel: classification.counterparty_code_label || '',
+                officialName: classification.official_name || '',
+                productDescription: lastProductDescription,
+                checklist
+            };
+            if (typeof renderComplianceChecklistPanel === 'function') {
+                renderComplianceChecklistPanel('hscode-checklist-container', checklist);
+            }
+        }
+
+        function buildHscodePrintReport() {
+            const countryApi = globalThis.TradeComplyCountry;
+            const countryLabel = countryApi
+                ? countryApi.getCountryLabel(selectedCountry)
+                : selectedCountry;
+            const flowLabel = typeof buildFlowLabel === 'function'
+                ? buildFlowLabel(getSelectedDirection(), selectedCountry)
+                : `CN → ${countryLabel}`;
+            return {
+                productQuery: lastClassification?.official_name || lastProductDescription || 'HS classification',
+                flowLabel,
+                generatedAtLabel: new Date().toLocaleString('en', {
+                    year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                }),
+                riskLabel: 'Medium',
+                chinaHsCode: lastClassification?.china_code || lastHsCode || '—',
+                counterpartyHsCode: lastClassification?.counterparty_code || '—',
+                counterpartyHsLabel: lastClassification?.counterparty_code_label || `${countryLabel} HS`,
+                riskSummaries: [{
+                    type: 'CLASSIFIED',
+                    riskLevel: 'Medium',
+                    title: lastClassification?.official_name || 'Product classification',
+                    description: (lastClassification?.reasoning || '').slice(0, 400)
+                }],
+                checklist: typeof getChecklistForReport === 'function'
+                    ? getChecklistForReport()
+                    : AppState.complianceChecklist || []
+            };
         }
 
         function enrichResultClient(classification) {
@@ -250,10 +330,13 @@
             const reasoning = String(enriched.reasoning || '').trim();
             const hs6 = String(enriched.hs6 || '').trim();
 
+            lastClassification = enriched;
             lastHsCode = chinaCode || counterpartyCode;
             lastHs6 = hs6 || (globalThis.TradeComplyHsDual
                 ? globalThis.TradeComplyHsDual.extractHs6(lastHsCode)
                 : String(lastHsCode).replace(/\D/g, '').slice(0, 6));
+
+            renderHscodeChecklist(enriched);
 
             const chinaLabelEl = document.getElementById('hscode-china-label');
             const chinaCodeEl = document.getElementById('hscode-china-code');
@@ -314,8 +397,14 @@
             }
 
             const description = getDescription();
+            lastProductDescription = description;
             hideError();
             hideResult();
+            const checklistSlot = document.getElementById('hscode-checklist-container');
+            if (checklistSlot) {
+                checklistSlot.hidden = true;
+                checklistSlot.innerHTML = '';
+            }
 
             if (!description) {
                 alert('Please enter a product description before starting classification.');
@@ -399,6 +488,7 @@
             const form = document.getElementById('hscode-form');
             const textarea = document.getElementById('hscode-description');
             const risksBtn = document.getElementById('hscode-check-risks-btn');
+            const reportBtn = document.getElementById('hscode-download-report-btn');
 
             bindDirectionToggle();
 
@@ -411,6 +501,18 @@
 
             if (risksBtn) {
                 risksBtn.addEventListener('click', goToComplianceCheck);
+            }
+
+            if (reportBtn) {
+                reportBtn.addEventListener('click', () => {
+                    if (!lastClassification) {
+                        alert('Run classification first to generate the report.');
+                        return;
+                    }
+                    if (typeof printEnterprisePrecheckReport === 'function') {
+                        printEnterprisePrecheckReport(buildHscodePrintReport());
+                    }
+                });
             }
 
             if (textarea) {

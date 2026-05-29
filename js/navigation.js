@@ -117,6 +117,8 @@ function handlePopState(event) {
 }
 
 function resetPrecheckState() {
+    AppState.complianceChecklist = [];
+    AppState.checklistChecked = {};
     const inputsToClear = ['search-input', 'search-input-semi', 'ai-query-input', 'semi-ai-query-input'];
     inputsToClear.forEach(id => {
         const input = document.getElementById(id);
@@ -127,9 +129,14 @@ function resetPrecheckState() {
         input.checked = false;
     });
 
-    ['precheck-summary-container', 'semi-precheck-summary-container', 'ai-query-section', 'semi-ai-query-section'].forEach(id => {
+    ['precheck-summary-container', 'semi-precheck-summary-container', 'ai-query-section', 'semi-ai-query-section', 'compliance-checklist-container'].forEach(id => {
         const container = document.getElementById(id);
-        if (container) container.innerHTML = '';
+        if (container) {
+            container.innerHTML = '';
+            if (id === 'compliance-checklist-container') {
+                container.hidden = true;
+            }
+        }
     });
 
     const semiSummary = document.getElementById('semi-result-summary');

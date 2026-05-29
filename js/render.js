@@ -110,6 +110,16 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     });
     renderPrecheckSummary('precheck-summary-container', precheckSelections, tags);
 
+    if (typeof renderComplianceChecklistPanel === 'function') {
+        const checklist = typeof buildComplianceChecklistForResults === 'function'
+            ? buildComplianceChecklistForResults(tags, {
+                country: selectedCountry,
+                direction
+            })
+            : [];
+        renderComplianceChecklistPanel('compliance-checklist-container', checklist);
+    }
+
     renderTrustBoundary('trust-boundary-container', {
         query,
         direction: AppState.currentDirection,

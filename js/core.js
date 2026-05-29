@@ -149,7 +149,10 @@ const AppState = {
     currentView: 'home',
     searchOrigin: 'electronics',
     lastReport: null,
-    aiContext: null
+    aiContext: null,
+    hsContext: null,
+    complianceChecklist: [],
+    checklistChecked: {}
 };
 
 const VALID_VIEWS = ['home', 'electronics', 'semiconductor', 'incoterm', 'result', 'kb', 'categories'];

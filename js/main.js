@@ -72,7 +72,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await initData();
 
-        const { query: inboundQuery, direction: inboundDirection, country: inboundCountry } = getInboundDeepLink();
+        const inbound = getInboundDeepLink();
+        const {
+            query: inboundQuery,
+            direction: inboundDirection,
+            country: inboundCountry,
+            hsContext: inboundHsContext
+        } = inbound;
 
         bindEvents();
         applyUiStrings();
@@ -82,6 +88,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (typeof initTradeCountryForDirection === 'function') {
             initTradeCountryForDirection(AppState.currentDirection || 'export', inboundCountry);
+        }
+
+        if (inboundHsContext && (inboundHsContext.chinaCode || inboundHsContext.counterpartyCode)) {
+            AppState.hsContext = inboundHsContext;
         }
 
         if (inboundQuery) {

@@ -33,7 +33,8 @@ const FC_BUILD_ID = '20260529-hscode-dual-v1';
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
-const HSCODE_CLASSIFY_MAX_TOKENS = 1200;
+const HSCODE_CLASSIFY_MAX_TOKENS = 2200;
+const { buildSessionChecklist } = require('./lib/checklist');
 
 const HSCODE_CLASSIFY_SYSTEM_PROMPT = buildHsCodeSystemPrompt();
 const MAX_CONTEXT_TAGS = 8;
@@ -803,7 +804,15 @@ async function callDeepSeekForHsCode(description, context = {}) {
         const data = await response.json();
         const content = data.choices?.[0]?.message?.content || '';
         const parsed = parseHsCodeClassificationPayload(content);
-        return enrichClassification(parsed, context);
+        const enriched = enrichClassification(parsed, context);
+        enriched.checklist = buildSessionChecklist({
+            tags: [],
+            aiChecklist: enriched.checklist || parsed.checklist || [],
+            country: context.counterpartyCountry || 'US',
+            direction: context.direction || 'export',
+            includeBaseline: true
+        });
+        return enriched;
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
@@ -846,12 +855,22 @@ async function handleHsCodeClassifyRequest(body, headers) {
             direction,
             counterpartyCountry
         });
+        const checklist = buildSessionChecklist({
+            tags: [],
+            aiChecklist: classification.checklist || [],
+            country: counterpartyCountry,
+            direction,
+            includeBaseline: true
+        });
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 ok: true,
-                classification,
+                classification: {
+                    ...classification,
+                    checklist
+                },
                 trade_context: {
                     direction,
                     counterparty_country: counterpartyCountry

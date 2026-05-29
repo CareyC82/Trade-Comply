@@ -12,6 +12,8 @@ from typing import List
 from country_registry import (
     build_structurer_system_prompt,
     build_user_context,
+    get_baseline_checklist,
+    normalize_checklist_payload,
     normalize_country_code,
 )
 
@@ -48,6 +50,8 @@ def _heuristic_structure(item: dict) -> dict:
     content_en = text.strip()[:1200]
     content_zh = content_en
 
+    checklist = get_baseline_checklist(country, direction)[:4]
+
     return {
         "hs_code": hs_code,
         "direction": direction,
@@ -56,6 +60,7 @@ def _heuristic_structure(item: dict) -> dict:
         "source": source,
         "content_en": content_en,
         "content_zh": content_zh,
+        "checklist": checklist,
         "source_url": item.get("source_url"),
         "pipeline_source": item.get("scraper", "pipeline"),
         "fetched_at": datetime.now(timezone.utc).isoformat(),
@@ -96,6 +101,9 @@ def _deepseek_structure(item: dict, api_key: str) -> dict:
     content = payload["choices"][0]["message"]["content"]
     parsed = json.loads(content)
     parsed["country"] = normalize_country_code(parsed.get("country"))
+    ai_checklist = normalize_checklist_payload(parsed.get("checklist"))
+    baseline = get_baseline_checklist(parsed["country"], parsed.get("direction") or "export")
+    parsed["checklist"] = ai_checklist or baseline[:4]
     parsed.setdefault("source", item.get("source_org"))
     parsed.setdefault("source_url", item.get("source_url"))
     parsed.setdefault("pipeline_source", item.get("scraper", "pipeline"))

@@ -2834,3 +2834,155 @@ button.feedback-link:hover {
     color: var(--color-text);
     white-space: pre-wrap;
 }
+
+/* Compliance To-Do Checklist */
+.compliance-checklist-panel {
+    margin: 16px 0;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.compliance-checklist-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border: none;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef4fb 100%);
+    cursor: pointer;
+    text-align: left;
+}
+
+.compliance-checklist-title {
+    font-weight: 700;
+    color: var(--color-primary);
+    flex: 1;
+}
+
+.compliance-checklist-count {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 2px 10px;
+}
+
+.compliance-checklist-body {
+    padding: 12px 16px 16px;
+}
+
+.compliance-checklist-note {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin: 0 0 12px;
+}
+
+.compliance-checklist-phase-title {
+    font-size: 0.9rem;
+    color: var(--color-primary);
+    margin: 12px 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.compliance-checklist-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.compliance-checklist-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.compliance-checklist-item:last-child {
+    border-bottom: none;
+}
+
+.compliance-checklist-item.is-done .compliance-checklist-task {
+    text-decoration: line-through;
+    color: var(--color-text-secondary);
+}
+
+.compliance-checklist-item.is-done .compliance-checklist-desc {
+    opacity: 0.65;
+}
+
+.compliance-checklist-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.compliance-checklist-checkbox {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+}
+
+.compliance-checklist-task {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.compliance-checklist-desc {
+    margin: 6px 0 0 28px;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+.hscode-checklist-slot {
+    margin-top: 16px;
+}
+
+.hscode-report-actions {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+}
+
+.hscode-report-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--color-primary);
+    border-radius: 10px;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.hscode-report-btn:hover {
+    filter: brightness(1.05);
+}
+
+@media print {
+    .bottom-nav,
+    .hscode-form,
+    .hscode-header,
+    .hscode-disclaimer,
+    .hscode-loading,
+    .hscode-error,
+    .hscode-check-risks-btn,
+    .hscode-report-actions,
+    .compliance-checklist-checkbox {
+        display: none !important;
+    }
+
+    .hscode-page-body {
+        background: #fff;
+    }
+
+    .compliance-checklist-item {
+        page-break-inside: avoid;
+    }
+}

@@ -5,7 +5,11 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Tuple
 
-from country_registry import load_registry, normalize_country_code
+from country_registry import (
+    load_registry,
+    normalize_checklist_payload,
+    normalize_country_code,
+)
 
 ALLOWED_COUNTRIES = frozenset(load_registry().get("canonical_codes", []))
 ALLOWED_DIRECTIONS = frozenset({"export", "import"})
@@ -101,6 +105,12 @@ def validate_data_schema(data: Any, kind: str = "risk_signal") -> Tuple[bool, Li
         errors.append("content_zh is missing or too short")
     if _contains_hallucination(content_en) or _contains_hallucination(content_zh):
         errors.append("content contains AI hallucination or empty placeholder text")
+
+    raw_checklist = data.get("checklist")
+    if raw_checklist is not None:
+        cleaned = normalize_checklist_payload(raw_checklist)
+        if isinstance(raw_checklist, list) and len(raw_checklist) > 0 and len(cleaned) == 0:
+            errors.append("checklist items are invalid; each needs phase, task, desc")
 
     return len(errors) == 0, errors
 

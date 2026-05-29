@@ -337,15 +337,47 @@ function createReportPayload(query, tags, cases, precheckSelections) {
         profile
     };
     const trustBoundary = buildTrustBoundary(trustContext);
+    const direction = AppState.currentDirection || 'export';
+    const country = AppState.currentCountry || 'US';
+    const hs = AppState.hsContext || {};
+    const checklist = typeof buildComplianceChecklistForResults === 'function'
+        ? buildComplianceChecklistForResults(tags, { country, direction })
+        : [];
+    if (typeof buildComplianceChecklistForResults === 'function') {
+        AppState.complianceChecklist = checklist;
+    }
+
+    const countryApi = globalThis.TradeComplyCountry;
+    const counterpartyHsLabel = hs.counterpartyHsLabel
+        || (countryApi ? `${countryApi.getCountryLabel(country)} HS` : 'Counterparty HS');
+
     return {
         productQuery: query,
-        direction: AppState.currentDirection === 'export' ? t('exportTitle') : t('importTitle'),
+        direction: direction === 'export' ? t('exportTitle') : t('importTitle'),
+        directionRaw: direction,
+        country,
+        countryLabel: countryApi ? countryApi.getCountryLabel(country) : country,
+        flowLabel: typeof buildFlowLabel === 'function'
+            ? buildFlowLabel(direction, country)
+            : `${direction} ${country}`,
         generatedAt: new Date().toISOString(),
+        generatedAtLabel: formatReportDate(new Date().toISOString()),
         risk: profile.risk,
         riskLabel: getRiskLabel(profile.risk),
         selectedAttributes: (precheckSelections || []).map(item => item.label),
         signals: profile.signals,
         nextChecks: profile.nextChecks,
+        chinaHsCode: hs.chinaCode || '',
+        counterpartyHsCode: hs.counterpartyCode || '',
+        counterpartyHsLabel,
+        officialName: hs.officialName || '',
+        checklist: typeof getChecklistForReport === 'function' ? getChecklistForReport() : checklist,
+        riskSummaries: (tags || []).slice(0, 12).map(tag => ({
+            type: tag.tag_type || 'CHECK',
+            riskLevel: tag.risk_level || 'Medium',
+            title: tag.short_name || tag.tag_id || '',
+            description: tag.short_description || tag.description || ''
+        })),
         trustBoundaryHtml: buildTrustBoundaryReportHtml(trustBoundary),
         tags: (tags || []).map(tag => ({
             tagId: tag.tag_id || '',
@@ -548,48 +580,45 @@ function createReportRenderFrame(report) {
     return waitForReportFrame(iframe).then(({ root, contentHeight }) => ({ iframe, root, contentHeight }));
 }
 
-async function downloadPrecheckReport() {
-    if (!AppState.lastReport) return;
+function downloadPrecheckReport() {
+    if (!AppState.lastReport) {
+        return;
+    }
 
     const btn = document.getElementById('download-report-btn');
-    const originalLabel = btn?.textContent || 'Download Pre-Check Report (PDF)';
+    const originalLabel = btn?.textContent || 'Download Pre-Check Report (Print / PDF)';
 
     if (btn) {
         btn.disabled = true;
-        btn.textContent = 'Generating PDF...';
+        btn.textContent = 'Opening print preview…';
     }
 
-    let frame = null;
-
     try {
-        const html2pdf = await loadHtml2Pdf();
-        const rendered = await createReportRenderFrame(AppState.lastReport);
-        frame = rendered.iframe;
+        const report = {
+            ...AppState.lastReport,
+            checklist: typeof getChecklistForReport === 'function'
+                ? getChecklistForReport()
+                : AppState.lastReport.checklist,
+            generatedAtLabel: formatReportDate(AppState.lastReport.generatedAt)
+        };
 
-        const filename = `trade-comply-precheck-${slugifyFilePart(AppState.lastReport.productQuery)}.pdf`;
-        await html2pdf().set({
-            margin: [10, 10, 10, 10],
-            filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff',
-                scrollX: 0,
-                scrollY: 0
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: {
-                mode: ['css', 'legacy'],
-                avoid: ['.avoid-page-break', '.summary', '.trust-boundary-card']
-            }
-        }).from(rendered.root).save();
+        if (typeof printEnterprisePrecheckReport === 'function') {
+            printEnterprisePrecheckReport(report);
+        } else if (typeof buildEnterpriseReportHtml === 'function') {
+            const iframe = document.createElement('iframe');
+            iframe.style.cssText = 'position:fixed;left:-9999px;width:0;height:0;border:0;';
+            document.body.appendChild(iframe);
+            iframe.contentDocument.open();
+            iframe.contentDocument.write(buildEnterpriseReportHtml(report));
+            iframe.contentDocument.close();
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            setTimeout(() => iframe.remove(), 1000);
+        }
     } catch (error) {
-        console.error('PDF generation failed:', error);
-        window.alert('Could not generate the PDF report. Please check your connection and try again.');
+        console.error('Print report failed:', error);
+        window.alert('Could not open the print report. Please try again.');
     } finally {
-        frame?.remove();
         if (btn) {
             btn.disabled = false;
             btn.textContent = originalLabel;
