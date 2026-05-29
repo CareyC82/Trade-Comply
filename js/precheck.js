@@ -604,16 +604,6 @@ function downloadPrecheckReport() {
 
         if (typeof printEnterprisePrecheckReport === 'function') {
             printEnterprisePrecheckReport(report);
-        } else if (typeof buildEnterpriseReportHtml === 'function') {
-            const iframe = document.createElement('iframe');
-            iframe.style.cssText = 'position:fixed;left:-9999px;width:0;height:0;border:0;';
-            document.body.appendChild(iframe);
-            iframe.contentDocument.open();
-            iframe.contentDocument.write(buildEnterpriseReportHtml(report));
-            iframe.contentDocument.close();
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-            setTimeout(() => iframe.remove(), 1000);
         }
     } catch (error) {
         console.error('Print report failed:', error);

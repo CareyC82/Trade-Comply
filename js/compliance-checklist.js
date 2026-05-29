@@ -214,18 +214,63 @@ function buildEnterpriseReportHtml(report) {
 </html>`;
 }
 
+function removePrintFrame() {
+    const frame = document.getElementById('tc-print-frame');
+    if (frame) {
+        frame.remove();
+    }
+}
+
+/**
+ * Print via hidden iframe (no pop-up window — works when blockers are on).
+ */
 function printEnterprisePrecheckReport(report) {
     const html = buildEnterpriseReportHtml(report);
-    const printWindow = window.open('', '_blank', 'noopener,noreferrer');
-    if (!printWindow) {
-        window.alert('Pop-up blocked. Please allow pop-ups to print the report.');
+    removePrintFrame();
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'tc-print-frame';
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.setAttribute('title', 'Compliance pre-check print report');
+    iframe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;border:0;opacity:0;pointer-events:none;z-index:-1;';
+
+    let printStarted = false;
+    const runPrint = () => {
+        if (printStarted) {
+            return;
+        }
+        printStarted = true;
+
+        const win = iframe.contentWindow;
+        if (!win) {
+            window.alert('Could not open the print dialog. Please try again.');
+            removePrintFrame();
+            return;
+        }
+        try {
+            win.focus();
+            win.print();
+        } catch (error) {
+            console.error('Print failed:', error);
+            window.alert('Could not open the print dialog. Please try again.');
+        }
+        setTimeout(removePrintFrame, 120000);
+    };
+
+    iframe.onload = () => setTimeout(runPrint, 200);
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) {
+        window.alert('Could not prepare the print report. Please try again.');
+        removePrintFrame();
         return;
     }
-    printWindow.document.open();
-    printWindow.document.write(html);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-        printWindow.print();
-    }, 400);
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    if (doc.readyState === 'complete') {
+        setTimeout(runPrint, 250);
+    }
 }
