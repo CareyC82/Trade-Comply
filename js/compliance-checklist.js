@@ -514,8 +514,8 @@ function renderComplianceChecklistPanel(containerId, checklist) {
 
         container.classList.add('compliance-checklist-container--visible');
         container.innerHTML = `
-            <section class="compliance-checklist-panel result-category-group result-category-group--compliance-checklist collapsible-panel open" aria-label="Actionable Compliance Checklist">
-                <button type="button" class="compliance-checklist-header category-group-header collapsible-header" aria-expanded="true">
+            <section class="compliance-checklist-panel result-category-group result-category-group--compliance-checklist collapsible-panel" aria-label="Actionable Compliance Checklist">
+                <button type="button" class="compliance-checklist-header category-group-header collapsible-header" aria-expanded="false">
                     <span class="group-icon group-icon--themed" aria-hidden="true">📋</span>
                     <span class="group-title compliance-checklist-title">Actionable Compliance Checklist</span>
                     <span class="group-count compliance-checklist-count">${checklistData.length} ${checklistData.length === 1 ? 'task' : 'tasks'}</span>
