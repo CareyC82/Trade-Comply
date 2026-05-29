@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode"></script>
  */
 (function () {
-    const BUILD = '20260602fix';
+    const BUILD = '20260602en';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const app = entryScript?.dataset?.app

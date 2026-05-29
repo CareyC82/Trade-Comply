@@ -3,7 +3,9 @@ const assert = require('node:assert/strict');
 const {
     normalizeChecklist,
     buildSessionChecklist,
-    collectChecklistsFromTags
+    collectChecklistsFromTags,
+    getPhaseDisplayLabel,
+    normalizePhase
 } = require('../lib/checklist');
 
 describe('checklist', () => {
@@ -19,10 +21,10 @@ describe('checklist', () => {
     });
 
     it('maps English phase labels for display', () => {
-        const { getPhaseDisplayLabel, normalizePhase } = require('../lib/checklist');
-        assert.equal(normalizePhase('technical'), '技术核查');
-        assert.match(getPhaseDisplayLabel('environmental'), /环保/);
-        assert.match(getPhaseDisplayLabel('documentation'), /单证/);
+        assert.equal(normalizePhase('technical'), 'technical');
+        assert.match(getPhaseDisplayLabel('environmental'), /Environmental/i);
+        assert.match(getPhaseDisplayLabel('documentation'), /Customs/i);
+        assert.match(getPhaseDisplayLabel('其他'), /Other compliance/i);
     });
 
     it('merges AI checklist items for KR import', () => {
@@ -34,8 +36,8 @@ describe('checklist', () => {
             includeBaseline: false
         });
         assert.equal(items.length, 1);
-        assert.equal(items[0].phase, '技术核查');
-        assert.ok(items[0].phaseLabel.includes('技术与资质'));
+        assert.equal(items[0].phase, 'technical');
+        assert.match(items[0].phaseLabel, /technical/i);
     });
 
     it('can opt in to country baseline when needed', () => {
@@ -51,8 +53,8 @@ describe('checklist', () => {
 
     it('collects checklist from matching tags only', () => {
         const tags = [
-            { tag_id: 'CL-KR-001', country: 'KR', direction: 'import', checklist: [{ phase: '单证准备', task: 'KR pack', desc: 'docs' }] },
-            { tag_id: 'CL-JP-001', country: 'JP', direction: 'import', checklist: [{ phase: '单证准备', task: 'JP pack', desc: 'docs' }] }
+            { tag_id: 'CL-KR-001', country: 'KR', direction: 'import', checklist: [{ phase: 'documentation', task: 'KR pack', desc: 'docs' }] },
+            { tag_id: 'CL-JP-001', country: 'JP', direction: 'import', checklist: [{ phase: 'documentation', task: 'JP pack', desc: 'docs' }] }
         ];
         const collected = collectChecklistsFromTags(tags, 'KR', 'import');
         assert.equal(collected.length, 1);
@@ -61,8 +63,8 @@ describe('checklist', () => {
 
     it('dedupes by phase+task', () => {
         const merged = normalizeChecklist([
-            { phase: '技术核查', task: 'FCC', desc: 'a' },
-            { phase: '技术核查', task: 'FCC', desc: 'b' }
+            { phase: 'technical', task: 'FCC', desc: 'a' },
+            { phase: 'technical', task: 'FCC', desc: 'b' }
         ]);
         assert.equal(merged.length, 1);
     });

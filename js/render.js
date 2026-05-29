@@ -65,8 +65,42 @@ function resolveCasesForMatchedTags(tags, cases) {
     if (enrichApi?.collectCasesForMatchedTags && enrichApi?.mergeCasesById) {
         const linked = enrichApi.collectCasesForMatchedTags(tags, allCases, direction);
         resolved = enrichApi.mergeCasesById(resolved, linked);
+        return resolved;
     }
-    return resolved;
+
+    const tagIds = new Set((tags || []).map((tag) => tag?.tag_id).filter(Boolean));
+    const byId = new Map();
+    resolved.forEach((caseItem) => {
+        if (caseItem?.case_id) {
+            byId.set(caseItem.case_id, caseItem);
+        }
+    });
+    allCases.forEach((caseItem) => {
+        if (!caseItem?.case_id) {
+            return;
+        }
+        const caseDirection = caseItem.direction || 'both';
+        if (caseDirection !== 'both' && caseDirection !== direction) {
+            return;
+        }
+        const linkedByTag = (caseItem.related_tags || []).some((id) => tagIds.has(id));
+        if (linkedByTag) {
+            byId.set(caseItem.case_id, caseItem);
+        }
+    });
+    (tags || []).forEach((tag) => {
+        (tag.related_cases || []).forEach((caseId) => {
+            const caseItem = allCases.find((c) => c.case_id === caseId);
+            if (!caseItem) {
+                return;
+            }
+            const caseDirection = caseItem.direction || 'both';
+            if (caseDirection === 'both' || caseDirection === direction) {
+                byId.set(caseItem.case_id, caseItem);
+            }
+        });
+    });
+    return [...byId.values()];
 }
 
 function searchProducts(query) {
@@ -286,6 +320,8 @@ function renderResults(query, tags, cases, precheckSelections = []) {
 
     const casesContainer = document.getElementById('cases-container');
     if (casesContainer) {
+        casesContainer.hidden = false;
+        casesContainer.style.display = '';
         if (cases.length === 0) {
             casesContainer.innerHTML = '';
         } else {

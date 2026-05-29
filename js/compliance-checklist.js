@@ -41,7 +41,53 @@ function collectDynamicAiChecklists(options = {}) {
     return merged;
 }
 
-function mergeTagChecklistsInline(tags, country, direction) {
+const CHECKLIST_PHASE_LABELS = {
+    technical: '📦 Pre-shipment technical & certification checks',
+    environmental: '🌱 Environmental & green-market registration',
+    documentation: '📑 Customs & documentation preparation',
+    other: '📌 Other compliance actions'
+};
+
+function normalizeChecklistPhaseLite(phase) {
+    const api = getChecklistApi();
+    if (api?.normalizePhase) {
+        return api.normalizePhase(phase);
+    }
+    const raw = String(phase || '').trim().toLowerCase();
+    if (raw === 'technical' || raw.includes('tech') || raw.includes('核查')) {
+        return 'technical';
+    }
+    if (raw === 'environmental' || raw.includes('environment') || raw.includes('环保')) {
+        return 'environmental';
+    }
+    if (raw === 'documentation' || raw.includes('document') || raw.includes('customs') || raw.includes('单证')) {
+        return 'documentation';
+    }
+    return 'other';
+}
+
+function groupChecklistByPhaseLite(items) {
+    const api = getChecklistApi();
+    if (api?.groupChecklistByPhase) {
+        return api.groupChecklistByPhase(items);
+    }
+    const groups = new Map();
+    (items || []).forEach((item) => {
+        const phaseKey = normalizeChecklistPhaseLite(item.phase);
+        const phaseLabel = CHECKLIST_PHASE_LABELS[phaseKey] || CHECKLIST_PHASE_LABELS.other;
+        if (!groups.has(phaseKey)) {
+            groups.set(phaseKey, { phaseKey, phaseLabel, items: [] });
+        }
+        groups.get(phaseKey).items.push({ ...item, phase: phaseKey, phaseLabel });
+    });
+    const order = ['technical', 'environmental', 'documentation', 'other'];
+    return order
+        .filter((key) => groups.has(key))
+        .concat([...groups.keys()].filter((key) => !order.includes(key)))
+        .map((key) => groups.get(key));
+}
+
+function mergeTagChecklistsInline(tags) {
     const merged = [];
     (tags || []).forEach((tag) => {
         const list = tag.checklist;
@@ -61,7 +107,17 @@ function mergeTagChecklistsInline(tags, country, direction) {
     if (api?.normalizeChecklist) {
         return api.normalizeChecklist(merged);
     }
-    return merged;
+    return merged.map((item, index) => {
+        const phase = normalizeChecklistPhaseLite(item.phase);
+        return {
+            id: String(item.id || `${phase}::${item.task}`).slice(0, 120),
+            phase,
+            phaseLabel: CHECKLIST_PHASE_LABELS[phase] || CHECKLIST_PHASE_LABELS.other,
+            task: String(item.task || '').trim(),
+            desc: String(item.desc || item.description || '').trim(),
+            source: item.source || 'tag'
+        };
+    });
 }
 
 function buildComplianceChecklistForResults(tags, options = {}) {
@@ -81,7 +137,7 @@ function buildComplianceChecklistForResults(tags, options = {}) {
         });
     }
 
-    const fromTags = mergeTagChecklistsInline(tags, country, direction);
+    const fromTags = mergeTagChecklistsInline(tags);
     if (aiChecklist.length > 0 && api?.mergeChecklists) {
         return api.mergeChecklists(fromTags, aiChecklist);
     }
@@ -185,16 +241,11 @@ function renderComplianceChecklistPanel(containerId, checklist) {
     container.style.display = '';
     container.hidden = false;
 
-    const api = getChecklistApi();
-    const groups = api ? api.groupChecklistByPhase(checklist) : [{
-        phaseKey: '其他',
-        phaseLabel: '📌 其他合规行动',
-        items: checklist
-    }];
+    const groups = groupChecklistByPhaseLite(checklist);
 
     const groupsHtml = groups.map((group) => `
         <div class="compliance-checklist-phase">
-            <h3 class="compliance-checklist-phase-title">${escapeHtml(group.phaseLabel || group.phase || '其他')}</h3>
+            <h3 class="compliance-checklist-phase-title">${escapeHtml(group.phaseLabel || group.phase || 'Other compliance actions')}</h3>
             <ul class="compliance-checklist-items">
                 ${group.items.map((item) => {
                     const checked = AppState.checklistChecked[item.id];
