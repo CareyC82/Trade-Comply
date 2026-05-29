@@ -319,7 +319,9 @@ function mountResultComplianceChecklist(tags, selectedCountry, direction) {
         mountComplianceChecklist('compliance-checklist-container', tags, options);
         return;
     }
-    if (typeof placeChecklistSlotAfterRiskCards === 'function') {
+    if (typeof placeChecklistSlotAfterPenaltyCases === 'function') {
+        placeChecklistSlotAfterPenaltyCases();
+    } else if (typeof placeChecklistSlotAfterRiskCards === 'function') {
         placeChecklistSlotAfterRiskCards();
     }
     if (typeof buildComplianceChecklistForResults === 'function'

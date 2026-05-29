@@ -16,6 +16,8 @@
     --color-danger-bg: rgba(239, 68, 68, 0.1);
     --color-danger-border: #EF4444;
     --color-danger-text: #DC2626;
+    --color-checklist: #7B1FA2;
+    --color-checklist-dark: #6A1B9A;
 }
 
 /* Base Styles */
@@ -2071,6 +2073,31 @@ button.report-action-link {
     color: #B71C1C;
 }
 
+.result-category-group--compliance-checklist {
+    border-left-color: var(--color-checklist);
+}
+
+.result-category-group--compliance-checklist .category-group-header,
+.result-category-group--compliance-checklist .compliance-checklist-header {
+    background: rgba(123, 31, 162, 0.08);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.result-category-group--compliance-checklist .group-icon--themed {
+    background: rgba(123, 31, 162, 0.14);
+}
+
+.result-category-group--compliance-checklist .group-title,
+.result-category-group--compliance-checklist .compliance-checklist-title {
+    color: var(--color-checklist-dark);
+}
+
+.result-category-group--compliance-checklist .group-count,
+.result-category-group--compliance-checklist .compliance-checklist-count {
+    background: rgba(123, 31, 162, 0.12);
+    color: var(--color-checklist-dark);
+}
+
 .cases-group-body {
     padding: 10px 12px 12px;
     display: flex;
@@ -2839,7 +2866,7 @@ button.feedback-link:hover {
 #compliance-checklist-container.compliance-checklist-container--visible,
 .compliance-checklist-slot:not([hidden]) {
     display: block;
-    margin: 20px 16px 8px;
+    margin: 10px 0 0;
 }
 
 .compliance-checklist-task.completed,
@@ -2856,44 +2883,15 @@ button.feedback-link:hover {
 }
 
 .compliance-checklist-panel {
-    margin: 16px 0;
-    border: 2px solid rgba(26, 58, 92, 0.15);
-    border-left: 5px solid var(--color-accent);
-    border-radius: 12px;
-    background: linear-gradient(180deg, #fffdf8 0%, #ffffff 100%);
-    overflow: hidden;
-    box-shadow: 0 4px 14px rgba(26, 58, 92, 0.08);
+    margin: 0;
 }
 
-.compliance-checklist-header {
+.compliance-checklist-panel .compliance-checklist-header {
     width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-    border: none;
-    background: linear-gradient(135deg, #f8fafc 0%, #eef4fb 100%);
-    cursor: pointer;
-    text-align: left;
-}
-
-.compliance-checklist-title {
-    font-weight: 700;
-    color: var(--color-primary);
-    flex: 1;
-}
-
-.compliance-checklist-count {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
-    background: #fff;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    padding: 2px 10px;
 }
 
 .compliance-checklist-body {
-    padding: 12px 16px 16px;
+    padding: 10px 12px 12px;
 }
 
 .compliance-checklist-note {

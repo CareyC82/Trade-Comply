@@ -61,8 +61,7 @@ function buildComplianceChecklistForResults(tags, options = {}) {
     });
 }
 
-function placeChecklistSlotAfterRiskCards() {
-    const cardsContainer = document.getElementById('result-cards-container');
+function placeChecklistSlotAfterPenaltyCases() {
     let slot = document.getElementById('compliance-checklist-container');
     if (!slot) {
         slot = document.createElement('div');
@@ -70,21 +69,26 @@ function placeChecklistSlotAfterRiskCards() {
         slot.className = 'compliance-checklist-slot';
         slot.setAttribute('aria-live', 'polite');
     }
-    if (cardsContainer?.parentNode) {
-        const casesContainer = document.getElementById('cases-container');
-        if (casesContainer && slot.nextElementSibling !== casesContainer) {
-            casesContainer.insertAdjacentElement('beforebegin', slot);
-        } else if (slot.parentNode !== cardsContainer.parentNode
-            || slot.previousElementSibling !== cardsContainer) {
-            cardsContainer.insertAdjacentElement('afterend', slot);
+    const casesContainer = document.getElementById('cases-container');
+    if (casesContainer?.parentNode) {
+        if (slot.parentNode !== casesContainer.parentNode
+            || slot.previousElementSibling !== casesContainer) {
+            casesContainer.insertAdjacentElement('afterend', slot);
         }
+        return slot;
+    }
+    const cardsContainer = document.getElementById('result-cards-container');
+    if (cardsContainer?.parentNode
+        && (slot.parentNode !== cardsContainer.parentNode
+            || slot.previousElementSibling !== cardsContainer)) {
+        cardsContainer.insertAdjacentElement('afterend', slot);
     }
     return slot;
 }
 
 function mountComplianceChecklist(containerId, tags, options = {}) {
     const targetId = containerId || 'compliance-checklist-container';
-    placeChecklistSlotAfterRiskCards();
+    placeChecklistSlotAfterPenaltyCases();
     const checklist = buildComplianceChecklistForResults(tags, {
         country: options.country || AppState.currentCountry,
         direction: options.direction || AppState.currentDirection,
@@ -102,7 +106,8 @@ function mountComplianceChecklist(containerId, tags, options = {}) {
 if (typeof globalThis !== 'undefined') {
     globalThis.mountComplianceChecklist = mountComplianceChecklist;
     globalThis.buildComplianceChecklistForResults = buildComplianceChecklistForResults;
-    globalThis.placeChecklistSlotAfterRiskCards = placeChecklistSlotAfterRiskCards;
+    globalThis.placeChecklistSlotAfterPenaltyCases = placeChecklistSlotAfterPenaltyCases;
+    globalThis.placeChecklistSlotAfterRiskCards = placeChecklistSlotAfterPenaltyCases;
     globalThis.extractChecklistFromApiPayload = extractChecklistFromApiPayload;
     globalThis.collectDynamicAiChecklists = collectDynamicAiChecklists;
 }
@@ -186,13 +191,14 @@ function renderComplianceChecklistPanel(containerId, checklist) {
     container.hidden = false;
     container.classList.add('compliance-checklist-container--visible');
     container.innerHTML = `
-        <section class="compliance-checklist-panel collapsible-panel" aria-label="Actionable Compliance Checklist">
-            <button type="button" class="compliance-checklist-header collapsible-header" aria-expanded="true">
-                <span class="compliance-checklist-title">📋 Actionable Compliance Checklist</span>
-                <span class="compliance-checklist-count">${checklist.length} tasks</span>
-                <span class="arrow" aria-hidden="true">▼</span>
+        <section class="compliance-checklist-panel result-category-group result-category-group--compliance-checklist collapsible-panel" aria-label="Actionable Compliance Checklist">
+            <button type="button" class="compliance-checklist-header category-group-header collapsible-header" aria-expanded="false">
+                <span class="group-icon group-icon--themed" aria-hidden="true">📋</span>
+                <span class="group-title compliance-checklist-title">Actionable Compliance Checklist</span>
+                <span class="group-count compliance-checklist-count">${checklist.length} ${checklist.length === 1 ? 'task' : 'tasks'}</span>
+                <span class="arrow" aria-hidden="true">▶</span>
             </button>
-            <div class="compliance-checklist-body collapsible-body is-open">
+            <div class="compliance-checklist-body collapsible-body">
                 <p class="compliance-checklist-note">Grouped by compliance phase for your selected market. Check off tasks as you complete them — your selections are included in the print report.</p>
                 ${groupsHtml}
             </div>

@@ -181,7 +181,7 @@ function renderHscodeChecklist(classification) {
             aiChecklist,
             country: selectedCountry,
             direction: getSelectedDirection(),
-            includeBaseline: true
+            includeBaseline: false
         });
         if (typeof renderComplianceChecklistPanel === 'function') {
             renderComplianceChecklistPanel('compliance-checklist-container', checklist);
