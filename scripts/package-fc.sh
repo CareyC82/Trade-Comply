@@ -17,6 +17,8 @@ cp "$ROOT/index.js" "$PKG_DIR/"
 cp "$ROOT/lib/parse-model-json.js" "$PKG_DIR/lib/"
 cp "$ROOT/lib/country-registry.js" "$PKG_DIR/lib/"
 cp "$ROOT/lib/hscode-dual.js" "$PKG_DIR/lib/"
+cp "$ROOT/lib/industry-checklist-baseline.js" "$PKG_DIR/lib/"
+cp "$ROOT/lib/checklist.js" "$PKG_DIR/lib/"
 cp "$ROOT/data/country-registry.json" "$PKG_DIR/data/"
 cp "$ROOT/compliance-feedback-codec.js" "$PKG_DIR/"
 cp "$ROOT/feedback-store.js" "$PKG_DIR/"
@@ -36,6 +38,8 @@ cp "$ROOT/data/catalog.json" "$PKG_DIR/data/"
     lib/parse-model-json.js \
     lib/country-registry.js \
     lib/hscode-dual.js \
+    lib/industry-checklist-baseline.js \
+    lib/checklist.js \
     compliance-feedback-codec.js \
     feedback-store.js \
     supabase-feedback.js \
@@ -50,7 +54,7 @@ cp "$ROOT/data/catalog.json" "$PKG_DIR/data/"
 )
 
 ZIP_LIST="$(unzip -l "$ZIP")"
-for required in compliance-feedback-codec.js lib/hscode-dual.js lib/country-registry.js data/country-registry.json; do
+for required in compliance-feedback-codec.js lib/hscode-dual.js lib/industry-checklist-baseline.js lib/checklist.js lib/country-registry.js data/country-registry.json; do
   if ! printf '%s\n' "$ZIP_LIST" | grep -Fq "$required"; then
     echo "ERROR: fc-deploy.zip is missing $required" >&2
     exit 1
