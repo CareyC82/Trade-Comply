@@ -306,18 +306,21 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         }
     }
 
+    mountResultComplianceChecklist(tags, selectedCountry, direction);
+}
+
+function mountResultComplianceChecklist(tags, selectedCountry, direction) {
+    const options = { country: selectedCountry, direction };
     if (typeof mountComplianceChecklist === 'function') {
-        mountComplianceChecklist('compliance-checklist-container', tags, {
-            country: selectedCountry,
-            direction
-        });
-    } else if (typeof renderComplianceChecklistPanel === 'function') {
-        const checklist = typeof buildComplianceChecklistForResults === 'function'
-            ? buildComplianceChecklistForResults(tags, {
-                country: selectedCountry,
-                direction
-            })
-            : [];
+        mountComplianceChecklist('compliance-checklist-container', tags, options);
+        return;
+    }
+    if (typeof placeChecklistSlotAfterRiskCards === 'function') {
+        placeChecklistSlotAfterRiskCards();
+    }
+    if (typeof buildComplianceChecklistForResults === 'function'
+        && typeof renderComplianceChecklistPanel === 'function') {
+        const checklist = buildComplianceChecklistForResults(tags, options);
         renderComplianceChecklistPanel('compliance-checklist-container', checklist);
     }
 }

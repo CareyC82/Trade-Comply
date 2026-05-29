@@ -6,6 +6,13 @@ function getChecklistApi() {
     return globalThis.TradeComplyChecklist || null;
 }
 
+/** Minimal US export fallback if checklist.js fails to load (stale cache). */
+const FALLBACK_US_EXPORT_CHECKLIST = [
+    { phase: '技术核查', task: 'FCC Part 15 / Part 18 RF conformity', desc: 'Confirm FCC IDs and RF conformity for wireless features.' },
+    { phase: '技术核查', task: 'Section 301 & HTS tariff exposure', desc: 'Map HTS line against Section 301 and additional duties.' },
+    { phase: '单证准备', task: 'BIS / Entity List screening pack', desc: 'Run restricted party and export control screening.' }
+];
+
 function buildComplianceChecklistForResults(tags, options = {}) {
     const api = getChecklistApi();
     const country = options.country || AppState.currentCountry || 'US';
@@ -14,17 +21,72 @@ function buildComplianceChecklistForResults(tags, options = {}) {
         || AppState.hsContext?.checklist
         || [];
 
-    if (!api) {
-        return [];
+    if (api) {
+        const items = api.buildSessionChecklist({
+            tags: tags || [],
+            aiChecklist: Array.isArray(aiChecklist) ? aiChecklist : [],
+            country,
+            direction,
+            includeBaseline: options.includeBaseline !== false
+        });
+        if (items.length > 0) {
+            return items;
+        }
     }
 
-    return api.buildSessionChecklist({
-        tags: tags || [],
-        aiChecklist: Array.isArray(aiChecklist) ? aiChecklist : [],
-        country,
-        direction,
-        includeBaseline: options.includeBaseline !== false
+    if (direction === 'export' && country === 'US') {
+        return FALLBACK_US_EXPORT_CHECKLIST.map((item, index) => ({
+            id: `${item.phase}::${item.task}`,
+            ...item,
+            source: 'fallback'
+        }));
+    }
+
+    return [];
+}
+
+function placeChecklistSlotAfterRiskCards() {
+    const cardsContainer = document.getElementById('result-cards-container');
+    let slot = document.getElementById('compliance-checklist-container');
+    if (!slot) {
+        slot = document.createElement('div');
+        slot.id = 'compliance-checklist-container';
+        slot.className = 'compliance-checklist-slot';
+        slot.setAttribute('aria-live', 'polite');
+    }
+    if (cardsContainer?.parentNode) {
+        const casesContainer = document.getElementById('cases-container');
+        if (casesContainer && slot.nextElementSibling !== casesContainer) {
+            casesContainer.insertAdjacentElement('beforebegin', slot);
+        } else if (slot.parentNode !== cardsContainer.parentNode
+            || slot.previousElementSibling !== cardsContainer) {
+            cardsContainer.insertAdjacentElement('afterend', slot);
+        }
+    }
+    return slot;
+}
+
+function mountComplianceChecklist(containerId, tags, options = {}) {
+    const targetId = containerId || 'compliance-checklist-container';
+    placeChecklistSlotAfterRiskCards();
+    const checklist = buildComplianceChecklistForResults(tags, {
+        country: options.country || AppState.currentCountry,
+        direction: options.direction || AppState.currentDirection,
+        aiChecklist: options.aiChecklist,
+        includeBaseline: options.includeBaseline
     });
+    renderComplianceChecklistPanel(targetId, checklist);
+    const el = document.getElementById(targetId);
+    if (el && checklist.length > 0) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return checklist;
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.mountComplianceChecklist = mountComplianceChecklist;
+    globalThis.buildComplianceChecklistForResults = buildComplianceChecklistForResults;
+    globalThis.placeChecklistSlotAfterRiskCards = placeChecklistSlotAfterRiskCards;
 }
 
 function bindComplianceChecklistCheckboxHandlers(root) {
@@ -113,7 +175,7 @@ function renderComplianceChecklistPanel(containerId, checklist) {
     bindComplianceChecklistCheckboxHandlers(container);
 
     if (typeof initGlobalCollapsiblePanels === 'function') {
-        initGlobalCollapsiblePanels(container);
+        initGlobalCollapsiblePanels();
     }
 }
 
