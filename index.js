@@ -17,6 +17,7 @@ const {
     buildHsCodeSystemPrompt,
     normalizeCountryCode
 } = require('./lib/hscode-dual');
+const { ensureIndustryChecklist } = require('./lib/industry-checklist-baseline');
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const ALLOWED_ORIGINS = new Set([
@@ -29,11 +30,11 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260529-hscode-dual-v1';
+const FC_BUILD_ID = '20260603baseline-always';
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
-const HSCODE_CLASSIFY_MAX_TOKENS = 2200;
+const HSCODE_CLASSIFY_MAX_TOKENS = 3200;
 const { buildSessionChecklist } = require('./lib/checklist');
 
 const HSCODE_CLASSIFY_SYSTEM_PROMPT = buildHsCodeSystemPrompt();
@@ -805,7 +806,12 @@ async function callDeepSeekForHsCode(description, context = {}) {
         const content = data.choices?.[0]?.message?.content || '';
         const parsed = parseHsCodeClassificationPayload(content);
         const enriched = enrichClassification(parsed, context);
-        const aiChecklist = Array.isArray(parsed.checklist) ? parsed.checklist : [];
+        const aiChecklist = ensureIndustryChecklist(parsed.checklist, {
+            description,
+            hsCode: parsed.china_export_hscode || parsed.china_import_hscode || parsed.hscode,
+            counterpartyCountry: context.counterpartyCountry || 'US',
+            direction: context.direction || 'export'
+        });
         enriched.checklist = buildSessionChecklist({
             tags: [],
             aiChecklist,
@@ -856,13 +862,7 @@ async function handleHsCodeClassifyRequest(body, headers) {
             direction,
             counterpartyCountry
         });
-        const checklist = buildSessionChecklist({
-            tags: [],
-            aiChecklist: Array.isArray(classification.checklist) ? classification.checklist : [],
-            country: counterpartyCountry,
-            direction,
-            includeBaseline: false
-        });
+        const checklist = classification.checklist || [];
         return {
             statusCode: 200,
             headers,

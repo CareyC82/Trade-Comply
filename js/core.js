@@ -156,7 +156,7 @@ const AppState = {
     lastApiChecklist: null
 };
 
-const VALID_VIEWS = ['home', 'electronics', 'semiconductor', 'incoterm', 'result', 'kb', 'categories'];
+const VALID_VIEWS = ['home', 'electronics', 'new-energy', 'semiconductor', 'incoterm', 'result', 'kb', 'categories'];
 
 const PRECHECK_FACTORS = {
     wireless: {

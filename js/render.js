@@ -119,6 +119,15 @@ function searchProducts(query) {
     renderResults(trimmedQuery || t('allProducts'), results.tags, cases, selections);
 }
 
+function searchEnergyProducts(query) {
+    AppState.searchOrigin = 'new-energy';
+    const trimmedQuery = query ? query.trim() : '';
+    const selections = getPrecheckSelections('energy-precheck-panel');
+    const results = searchWithPrecheck(trimmedQuery, selections, search);
+    const cases = resolveCasesForMatchedTags(results.tags, results.cases, trimmedQuery);
+    renderResults(trimmedQuery || 'New energy products', results.tags, cases, selections);
+}
+
 /**
  * Render search results
  */
@@ -363,14 +372,16 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         }
     }
 
-    mountResultComplianceChecklist(tags, selectedCountry, direction);
+    mountResultComplianceChecklist(tags, selectedCountry, direction, query);
 }
 
-function mountResultComplianceChecklist(tags, selectedCountry, direction) {
+function mountResultComplianceChecklist(tags, selectedCountry, direction, query) {
     const options = {
         country: selectedCountry,
         direction,
-        includeBaseline: false
+        includeBaseline: false,
+        productQuery: query,
+        vertical: AppState.searchOrigin || 'electronics'
     };
     if (typeof mountComplianceChecklist === 'function') {
         mountComplianceChecklist('compliance-checklist-container', tags, options);

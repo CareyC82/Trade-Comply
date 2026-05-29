@@ -41,11 +41,93 @@ function collectDynamicAiChecklists(options = {}) {
     return merged;
 }
 
+const CHECKLIST_GROUP_TITLES = {
+    technical: '📦 Pre-shipment Technical & Certification Checks',
+    environmental: '🌱 Environmental & Green Registry',
+    documentation: '📑 Customs & Documentation Preparation',
+    other: '📌 Other Compliance Actions'
+};
+
+const CHECKLIST_GROUP_ORDER = [
+    CHECKLIST_GROUP_TITLES.technical,
+    CHECKLIST_GROUP_TITLES.environmental,
+    CHECKLIST_GROUP_TITLES.documentation,
+    CHECKLIST_GROUP_TITLES.other
+];
+
+function resolveChecklistGroupTitle(item) {
+    const rawPhase = [
+        item.rawPhase,
+        item.stage,
+        item.phase_name,
+        item.phaseName,
+        item.group,
+        item.section,
+        item.checklist_phase,
+        item.category,
+        item.phase,
+        item.task,
+        item.desc
+    ]
+        .filter((value) => value !== undefined && value !== null && String(value).trim())
+        .join(' ')
+        .toLowerCase();
+
+    if (
+        rawPhase.includes('tech')
+        || rawPhase.includes('pre')
+        || rawPhase.includes('certif')
+        || rawPhase.includes('技术')
+        || rawPhase.includes('出口前')
+        || rawPhase.includes('核查')
+    ) {
+        return CHECKLIST_GROUP_TITLES.technical;
+    }
+    if (
+        rawPhase.includes('environ')
+        || rawPhase.includes('green')
+        || rawPhase.includes('环保')
+        || rawPhase.includes('绿色')
+        || rawPhase.includes('recycle')
+        || rawPhase.includes('battery')
+        || rawPhase.includes('rohs')
+        || rawPhase.includes('reach')
+    ) {
+        return CHECKLIST_GROUP_TITLES.environmental;
+    }
+    if (
+        rawPhase.includes('custom')
+        || rawPhase.includes('doc')
+        || rawPhase.includes('海关')
+        || rawPhase.includes('单证')
+        || rawPhase.includes('tariff')
+        || rawPhase.includes('licen')
+        || rawPhase.includes('declar')
+    ) {
+        return CHECKLIST_GROUP_TITLES.documentation;
+    }
+    return CHECKLIST_GROUP_TITLES.other;
+}
+
+function groupChecklistForRender(items) {
+    const groups = new Map();
+    (items || []).forEach((item) => {
+        const groupTitle = resolveChecklistGroupTitle(item);
+        if (!groups.has(groupTitle)) {
+            groups.set(groupTitle, { phaseLabel: groupTitle, items: [] });
+        }
+        groups.get(groupTitle).items.push(item);
+    });
+    return CHECKLIST_GROUP_ORDER
+        .filter((title) => groups.has(title))
+        .map((title) => groups.get(title));
+}
+
 const CHECKLIST_PHASE_LABELS = {
-    technical: '📦 Pre-shipment technical & certification checks',
-    environmental: '🌱 Environmental & green-market registration',
-    documentation: '📑 Customs & documentation preparation',
-    other: '📌 Other compliance actions'
+    technical: CHECKLIST_GROUP_TITLES.technical,
+    environmental: CHECKLIST_GROUP_TITLES.environmental,
+    documentation: CHECKLIST_GROUP_TITLES.documentation,
+    other: CHECKLIST_GROUP_TITLES.other
 };
 
 function extractChecklistRawPhase(item) {
@@ -61,42 +143,16 @@ function normalizeChecklistPhaseLite(phaseOrItem) {
     if (api?.normalizePhase) {
         return api.normalizePhase(phaseOrItem);
     }
-    const raw = String(
-        typeof phaseOrItem === 'object'
-            ? extractChecklistRawPhase(phaseOrItem)
-            : (phaseOrItem || '')
-    ).trim().toLowerCase();
-    if (raw.includes('tech') || raw.includes('pre') || raw.includes('技术') || raw.includes('出口前')) {
-        return 'technical';
-    }
-    if (raw.includes('environ') || raw.includes('green') || raw.includes('环保') || raw.includes('绿色')) {
-        return 'environmental';
-    }
-    if (raw.includes('custom') || raw.includes('doc') || raw.includes('海关') || raw.includes('单证')) {
-        return 'documentation';
-    }
+    const item = typeof phaseOrItem === 'object' ? phaseOrItem : { phase: phaseOrItem };
+    const title = resolveChecklistGroupTitle(item);
+    if (title === CHECKLIST_GROUP_TITLES.technical) return 'technical';
+    if (title === CHECKLIST_GROUP_TITLES.environmental) return 'environmental';
+    if (title === CHECKLIST_GROUP_TITLES.documentation) return 'documentation';
     return 'other';
 }
 
 function groupChecklistByPhaseLite(items) {
-    const api = getChecklistApi();
-    if (api?.groupChecklistByPhase) {
-        return api.groupChecklistByPhase(items);
-    }
-    const groups = new Map();
-    (items || []).forEach((item) => {
-        const phaseKey = normalizeChecklistPhaseLite(item);
-        const phaseLabel = CHECKLIST_PHASE_LABELS[phaseKey] || CHECKLIST_PHASE_LABELS.other;
-        if (!groups.has(phaseKey)) {
-            groups.set(phaseKey, { phaseKey, phaseLabel, items: [] });
-        }
-        groups.get(phaseKey).items.push({ ...item, phase: phaseKey, phaseLabel });
-    });
-    const order = ['technical', 'environmental', 'documentation', 'other'];
-    return order
-        .filter((key) => groups.has(key))
-        .concat([...groups.keys()].filter((key) => !order.includes(key)))
-        .map((key) => groups.get(key));
+    return groupChecklistForRender(items);
 }
 
 function mergeTagChecklistsInline(tags) {
@@ -132,6 +188,151 @@ function mergeTagChecklistsInline(tags) {
     });
 }
 
+const INLINE_CHECKLIST_PHASE_TECH = 'technical';
+const INLINE_CHECKLIST_PHASE_ENV = 'environmental';
+const INLINE_CHECKLIST_PHASE_DOC = 'documentation';
+
+function inlineChecklistItem(phase, task, desc) {
+    return { phase, task, desc, source: 'inline-baseline' };
+}
+
+/** Self-contained fallback when lib/industry-checklist-baseline.js fails to load. */
+function buildInlineIndustryChecklistFallback(options = {}, seed = []) {
+    const country = String(options.country || AppState.currentCountry || 'US').trim().toUpperCase();
+    const direction = options.direction || AppState.currentDirection || 'export';
+    const productQuery = String(
+        options.productQuery
+        || AppState.lastReport?.productQuery
+        || AppState.aiContext?.product_query
+        || 'consumer trade product'
+    ).trim();
+    const text = `${productQuery} ${options.hsCode || AppState.hsContext?.chinaCode || ''}`.toLowerCase();
+    const isExport = direction !== 'import';
+    const out = Array.isArray(seed) ? [...seed] : [];
+    const seen = new Set(out.map((row) => `${row.phase}::${row.task}`.toLowerCase()));
+
+    function pushUnique(entry) {
+        const key = `${entry.phase}::${entry.task}`.toLowerCase();
+        if (seen.has(key)) {
+            return;
+        }
+        seen.add(key);
+        out.push(entry);
+    }
+
+    if (isExport && country === 'US') {
+        pushUnique(inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_TECH,
+            'Verify FCC ID conformity & technical labeling',
+            'Confirm intentional radiator FCC Part 15/18 authorization, supplier FCC ID on label, and RF exposure compliance for US market entry.'
+        ));
+    }
+    if (isExport && country === 'EU') {
+        pushUnique(inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_TECH,
+            'Complete CE Marking (RED Directive)',
+            'Verify radio equipment meets EU Radio Equipment Directive essential requirements with Declaration of Conformity and technical file.'
+        ));
+        pushUnique(inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_ENV,
+            'Submit RoHS & WEEE Compliance',
+            'Prepare RoHS substance dossier, REACH SVHC disclosures, and confirm WEEE producer registration in the destination EU member state.'
+        ));
+    }
+    if (/energy storage|battery system|ess|powerwall|8507|power bank|portable charger/.test(text)) {
+        pushUnique(inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_DOC,
+            'Obtain Class 9 Dangerous Goods maritime booking approval & UN38.3 report',
+            'Secure carrier approval for lithium batteries, UN38.3 test summary, MSDS/SDS, and proper shipping marks.'
+        ));
+    }
+    if (/gpu|ai chip|accelerator|8542|semiconductor|optical module/.test(text)) {
+        pushUnique(inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_DOC,
+            'Perform BIS ECCN & dual-use export control screening',
+            'Screen advanced computing, semiconductor, and telecom items against BIS ECCN lists, Entity List, and license requirements.'
+        ));
+    }
+
+    [
+        inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_TECH,
+            'Verify product safety & market-access conformity',
+            'Screen wireless, battery, labeling, and consumer product safety requirements for the destination market even when no export-control hit is found.'
+        ),
+        inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_ENV,
+            'Confirm battery & chemical substance compliance',
+            'Check lithium battery UN38.3, RoHS/REACH substance limits, and recycling labeling obligations where applicable.'
+        ),
+        inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_DOC,
+            'Prepare commercial invoice & conformity documentation pack',
+            'Bundle invoice, packing list, conformity certificates, and test reports for customs clearance.'
+        ),
+        inlineChecklistItem(
+            INLINE_CHECKLIST_PHASE_DOC,
+            'Validate HS classification & tariff exposure',
+            'Cross-check declared HS code against product function and screen destination tariff / trade-remedy lists before filing.'
+        )
+    ].forEach((entry) => {
+        if (out.length < 4) {
+            pushUnique(entry);
+        }
+    });
+
+    return out.slice(0, 8);
+}
+
+function finalizeChecklistRows(rows, source = 'industry') {
+    const api = getChecklistApi();
+    let checklist = Array.isArray(rows) ? rows : [];
+    if (api?.normalizeChecklist) {
+        checklist = api.normalizeChecklist(checklist, source);
+    }
+    return checklist.map((item, index) => ({
+        ...item,
+        id: String(item.id || `${item.phase || 'other'}::${item.task || index}`).slice(0, 120)
+    }));
+}
+
+function applyIndustryChecklistBaseline(checklist, options = {}) {
+    const industryApi = globalThis.TradeComplyIndustryBaseline;
+    const country = options.country || AppState.currentCountry || 'US';
+    const direction = options.direction || AppState.currentDirection || 'export';
+    const productQuery = options.productQuery
+        || AppState.lastReport?.productQuery
+        || AppState.aiContext?.product_query
+        || '';
+    const vertical = options.vertical || AppState.searchOrigin || null;
+    const seed = Array.isArray(checklist) ? checklist : [];
+
+    let ensured = seed;
+    if (industryApi?.ensureIndustryChecklist) {
+        const profile = typeof industryApi.detectProductProfile === 'function'
+            ? industryApi.detectProductProfile(productQuery, options.hsCode || AppState.hsContext?.chinaCode || '')
+            : null;
+        const safeVertical = profile?.vertical
+            || (['electronics', 'new-energy', 'semiconductor'].includes(vertical) ? vertical : null);
+
+        ensured = industryApi.ensureIndustryChecklist(seed, {
+            description: productQuery || 'consumer trade product',
+            hsCode: options.hsCode || AppState.hsContext?.chinaCode || '',
+            counterpartyCountry: country,
+            direction,
+            vertical: safeVertical
+        });
+    } else {
+        console.warn('TradeComplyIndustryBaseline not loaded — using inline checklist fallback.');
+    }
+
+    if (!Array.isArray(ensured) || ensured.length < 4) {
+        ensured = buildInlineIndustryChecklistFallback(options, ensured || []);
+    }
+
+    return finalizeChecklistRows(ensured, 'industry');
+}
+
 function buildComplianceChecklistForResults(tags, options = {}) {
     const api = getChecklistApi();
     const country = options.country || AppState.currentCountry || 'US';
@@ -139,21 +340,25 @@ function buildComplianceChecklistForResults(tags, options = {}) {
     const aiChecklist = collectDynamicAiChecklists(options);
     const includeBaseline = options.includeBaseline === true;
 
+    let checklist = [];
     if (api?.buildSessionChecklist) {
-        return api.buildSessionChecklist({
+        checklist = api.buildSessionChecklist({
             tags: tags || [],
             aiChecklist,
             country,
             direction,
             includeBaseline
         });
+    } else {
+        const fromTags = mergeTagChecklistsInline(tags);
+        if (aiChecklist.length > 0 && api?.mergeChecklists) {
+            checklist = api.mergeChecklists(fromTags, aiChecklist);
+        } else {
+            checklist = fromTags;
+        }
     }
 
-    const fromTags = mergeTagChecklistsInline(tags);
-    if (aiChecklist.length > 0 && api?.mergeChecklists) {
-        return api.mergeChecklists(fromTags, aiChecklist);
-    }
-    return fromTags;
+    return applyIndustryChecklistBaseline(checklist, options);
 }
 
 function placeChecklistSlotAfterPenaltyCases() {
@@ -188,7 +393,10 @@ function mountComplianceChecklist(containerId, tags, options = {}) {
         country: options.country || AppState.currentCountry,
         direction: options.direction || AppState.currentDirection,
         aiChecklist: options.aiChecklist,
-        includeBaseline: options.includeBaseline
+        includeBaseline: options.includeBaseline,
+        productQuery: options.productQuery,
+        vertical: options.vertical,
+        hsCode: options.hsCode
     });
     renderComplianceChecklistPanel(targetId, checklist);
     const el = document.getElementById(targetId);
@@ -205,6 +413,8 @@ if (typeof globalThis !== 'undefined') {
     globalThis.placeChecklistSlotAfterRiskCards = placeChecklistSlotAfterPenaltyCases;
     globalThis.extractChecklistFromApiPayload = extractChecklistFromApiPayload;
     globalThis.collectDynamicAiChecklists = collectDynamicAiChecklists;
+    globalThis.renderComplianceChecklistPanel = renderComplianceChecklistPanel;
+    globalThis.applyIndustryChecklistBaseline = applyIndustryChecklistBaseline;
 }
 
 function bindComplianceChecklistCheckboxHandlers(root) {
@@ -240,75 +450,103 @@ function renderComplianceChecklistPanel(containerId, checklist) {
         return;
     }
 
-    const checklistData = checklist || [];
-    console.log('Real AI Checklist Data:', checklistData);
-    console.log('Checklist phase fields:', checklistData.map((item) => ({
-        phase: item?.phase,
-        stage: item?.stage,
-        category: item?.category,
-        raw: extractChecklistRawPhase(item),
-        normalized: normalizeChecklistPhaseLite(item)
-    })));
+    try {
+        let checklistData = Array.isArray(checklist) ? checklist : [];
+        if (!checklistData.length) {
+            checklistData = applyIndustryChecklistBaseline([], {
+                country: AppState.currentCountry,
+                direction: AppState.currentDirection,
+                productQuery: AppState.lastReport?.productQuery || AppState.aiContext?.product_query,
+                vertical: AppState.searchOrigin
+            });
+        }
+        if (!checklistData.length) {
+            checklistData = finalizeChecklistRows(
+                buildInlineIndustryChecklistFallback({
+                    country: AppState.currentCountry,
+                    direction: AppState.currentDirection,
+                    productQuery: AppState.lastReport?.productQuery || AppState.aiContext?.product_query
+                }),
+                'inline-baseline'
+            );
+        }
 
-    AppState.complianceChecklist = checklistData;
+        console.log('CRITICAL - Raw AI Checklist:', checklistData);
 
-    if (!checklistData.length) {
-        container.hidden = true;
-        container.style.display = 'none';
-        container.innerHTML = '';
-        container.classList.remove('compliance-checklist-container--visible');
-        return;
-    }
+        AppState.complianceChecklist = checklistData;
 
-    container.style.display = '';
-    container.hidden = false;
+        if (!checklistData.length) {
+            container.hidden = true;
+            container.style.display = 'none';
+            container.innerHTML = '';
+            container.classList.remove('compliance-checklist-container--visible');
+            return;
+        }
 
-    const groups = groupChecklistByPhaseLite(checklistData);
+        container.removeAttribute('hidden');
+        container.style.display = '';
+        container.hidden = false;
 
-    const groupsHtml = groups.map((group) => `
-        <div class="compliance-checklist-phase">
-            <h3 class="compliance-checklist-phase-title">${escapeHtml(group.phaseLabel || group.phase || 'Other compliance actions')}</h3>
-            <ul class="compliance-checklist-items">
-                ${group.items.map((item) => {
-                    const checked = AppState.checklistChecked[item.id];
-                    const rowClass = checked
-                        ? 'compliance-checklist-item is-done'
-                        : 'compliance-checklist-item';
-                    const completedClass = checked ? ' completed' : '';
-                    return `
-                    <li class="${rowClass}" data-checklist-id="${escapeHtml(item.id)}">
-                        <label class="compliance-checklist-label">
-                            <input type="checkbox" class="compliance-checklist-checkbox" data-checklist-id="${escapeHtml(item.id)}" ${checked ? 'checked' : ''}>
-                            <span class="compliance-checklist-task${completedClass}">${escapeHtml(item.task)}</span>
-                        </label>
-                        ${item.desc ? `<p class="compliance-checklist-desc${completedClass}">${escapeHtml(item.desc)}</p>` : ''}
-                    </li>`;
-                }).join('')}
-            </ul>
-        </div>
-    `).join('');
-
-    container.hidden = false;
-    container.classList.add('compliance-checklist-container--visible');
-    container.innerHTML = `
-        <section class="compliance-checklist-panel result-category-group result-category-group--compliance-checklist collapsible-panel" aria-label="Actionable Compliance Checklist">
-            <button type="button" class="compliance-checklist-header category-group-header collapsible-header" aria-expanded="false">
-                <span class="group-icon group-icon--themed" aria-hidden="true">📋</span>
-                <span class="group-title compliance-checklist-title">Actionable Compliance Checklist</span>
-                <span class="group-count compliance-checklist-count">${checklistData.length} ${checklistData.length === 1 ? 'task' : 'tasks'}</span>
-                <span class="arrow" aria-hidden="true">▶</span>
-            </button>
-            <div class="compliance-checklist-body collapsible-body">
-                <p class="compliance-checklist-note">Grouped by compliance phase for your selected market. Check off tasks as you complete them — your selections are included in the print report.</p>
-                ${groupsHtml}
+        const groups = groupChecklistForRender(checklistData);
+        const groupsHtml = groups.map((group) => `
+            <div class="compliance-checklist-phase">
+                <h3 class="compliance-checklist-phase-title">${escapeHtml(group.phaseLabel || group.phase || 'Other compliance actions')}</h3>
+                <ul class="compliance-checklist-items">
+                    ${group.items.map((item) => {
+                        const itemId = String(item.id || item.task || 'checklist-item');
+                        const checked = AppState.checklistChecked[itemId];
+                        const rowClass = checked
+                            ? 'compliance-checklist-item is-done'
+                            : 'compliance-checklist-item';
+                        const completedClass = checked ? ' completed' : '';
+                        return `
+                        <li class="${rowClass}" data-checklist-id="${escapeHtml(itemId)}">
+                            <label class="compliance-checklist-label">
+                                <input type="checkbox" class="compliance-checklist-checkbox" data-checklist-id="${escapeHtml(itemId)}" ${checked ? 'checked' : ''}>
+                                <span class="compliance-checklist-task${completedClass}">${escapeHtml(item.task)}</span>
+                            </label>
+                            ${item.desc ? `<p class="compliance-checklist-desc${completedClass}">${escapeHtml(item.desc)}</p>` : ''}
+                        </li>`;
+                    }).join('')}
+                </ul>
             </div>
-        </section>
-    `;
+        `).join('');
 
-    bindComplianceChecklistCheckboxHandlers(container);
+        container.classList.add('compliance-checklist-container--visible');
+        container.innerHTML = `
+            <section class="compliance-checklist-panel result-category-group result-category-group--compliance-checklist collapsible-panel open" aria-label="Actionable Compliance Checklist">
+                <button type="button" class="compliance-checklist-header category-group-header collapsible-header" aria-expanded="true">
+                    <span class="group-icon group-icon--themed" aria-hidden="true">📋</span>
+                    <span class="group-title compliance-checklist-title">Actionable Compliance Checklist</span>
+                    <span class="group-count compliance-checklist-count">${checklistData.length} ${checklistData.length === 1 ? 'task' : 'tasks'}</span>
+                    <span class="arrow" aria-hidden="true">▶</span>
+                </button>
+                <div class="compliance-checklist-body collapsible-body">
+                    <p class="compliance-checklist-note">Grouped by compliance phase for your selected market. Check off tasks as you complete them — your selections are included in the print report.</p>
+                    ${groupsHtml}
+                </div>
+            </section>
+        `;
 
-    if (typeof initGlobalCollapsiblePanels === 'function') {
-        initGlobalCollapsiblePanels();
+        bindComplianceChecklistCheckboxHandlers(container);
+
+        if (typeof initGlobalCollapsiblePanels === 'function') {
+            initGlobalCollapsiblePanels();
+        }
+    } catch (error) {
+        console.error('Failed to render compliance checklist:', error);
+        if (container.dataset.checklistFallbackRetry === '1') {
+            return;
+        }
+        container.dataset.checklistFallbackRetry = '1';
+        const fallback = finalizeChecklistRows(buildInlineIndustryChecklistFallback({
+            country: AppState.currentCountry,
+            direction: AppState.currentDirection,
+            productQuery: AppState.lastReport?.productQuery || AppState.aiContext?.product_query
+        }), 'inline-baseline');
+        if (fallback.length) {
+            renderComplianceChecklistPanel(containerId, fallback);
+        }
     }
 }
 

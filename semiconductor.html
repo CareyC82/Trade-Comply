@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Semiconductor &amp; Controls | Trade Comply</title>
+    <link rel="stylesheet" href="css/style.css?v=20260527checklist-en-only">
+</head>
+<body class="category-page-body">
+    <div class="view-container category-page active">
+        <div class="category-page-top">
+            <a href="index.html" class="back-link">&larr; Back to Home</a>
+        </div>
+
+        <div class="home-header category-page-header">
+            <h1 class="home-title">Advanced Semiconductor &amp; Controls</h1>
+            <p class="home-subtitle">Pre-screen chips, high-speed optics, foundries, dual-use export limits, and entity list screening.</p>
+        </div>
+
+        <div class="direction-toggle">
+            <button id="direction-export" class="direction-btn active" type="button">Export from China</button>
+            <button id="direction-import" class="direction-btn" type="button">Import into China</button>
+        </div>
+
+        <div class="trade-country-row">
+            <label for="trade-country" class="trade-country-label">Counterparty country / region</label>
+            <select id="trade-country" class="trade-country-select" aria-label="Counterparty country or region"></select>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Enter chip, optics module, HS Code, or export control risk" id="search-input" />
+            <button class="search-btn" id="search-btn" type="button">GO</button>
+        </div>
+
+        <div id="category-quick-select-container" class="quick-select-block-slot"></div>
+
+        <div class="disclaimer-bar category-disclaimer">
+            <span>Pre-screening only. This tool cites official sources and does not provide legal advice.</span>
+        </div>
+
+        <div class="feedback-section">
+            <a href="#" class="feedback-link" id="category-feedback-trigger">💬 Can't find your product? Tell us</a>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal-box">
+            <div class="feedback-thanks" id="feedback-thanks">
+                ✅ Thanks for your feedback! We'll review it and update the database.
+            </div>
+            <div class="feedback-form" id="feedback-form">
+                <h3>Help Us Improve</h3>
+                <p style="font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:12px;">
+                    Have a product or HS Code you needed that isn't covered? Share it below and we'll research it.
+                </p>
+                <form id="user-feedback-form" method="post" novalidate>
+                    <label for="fb-product">Product or HS Code you searched</label>
+                    <input type="text" id="fb-product" name="product" placeholder="e.g. GPU accelerator, 8542.31" required>
+                    <label for="fb-message">What regulation were you looking for?</label>
+                    <textarea id="fb-message" name="message" placeholder="Tell us what compliance info you needed..."></textarea>
+                    <label for="fb-email">Your email (optional, for follow-up)</label>
+                    <input type="email" id="fb-email" name="email" placeholder="you@company.com">
+                    <div class="modal-buttons">
+                        <button type="button" class="modal-cancel" id="modal-cancel">Cancel</button>
+                        <button type="submit" class="modal-submit">Send Feedback</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a id="nav-home" class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a id="nav-incoterm" class="nav-btn nav-btn-link" href="index.html#incoterm">📦 Incoterm</a>
+        <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code<span class="nav-btn-badge">Beta</span></a>
+    </nav>
+
+    <script src="js/main.js?v=20260527checklist-en-only" data-app="category" data-category="semiconductor"></script>
+</body>
+</html>

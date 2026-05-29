@@ -4,34 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Comply</title>
-    <link rel="stylesheet" href="css/style.css?v=20260602home-tabs">
+    <link rel="stylesheet" href="css/style.css?v=20260527checklist-en-only">
 </head>
 <body>
 
 
     <div id="home-view" class="view-container active">
-        <div class="home-header">
+        <div class="home-header home-header--hub">
             <h1 class="home-title">Trade Comply</h1>
-            <p class="home-subtitle">Import/export compliance pre-checks for electronics and semiconductors. Current coverage starts with China.</p>
+            <p class="home-subtitle">Import/export compliance pre-checks from China</p>
         </div>
 
-        <div id="home-quick-select-container" class="quick-select-root home-quick-select"></div>
-
-        <p class="hub-section-label">Full pre-check modules</p>
-        <div class="hub-core-grid">
-            <div class="quick-action-card hub-core-card" id="hub-electronics">
+        <div class="hub-core-grid hub-core-grid--three">
+            <a href="electronics.html" class="quick-action-card hub-core-card hub-core-card--link" id="hub-electronics">
                 <div class="quick-action-icon">📱</div>
-                <div class="quick-action-label">Electronics Import/Export Pre-Check</div>
-                <div class="quick-action-hs">Screen wireless, battery, encryption, UAV, CCC, SRRC, and dual-use compliance signals.</div>
-                <div id="hub-electronics-stats" class="quick-action-hs hub-core-stats">Loading coverage...</div>
-            </div>
+                <div class="quick-action-label">Electronics &amp; Smart Hardware</div>
+                <div class="quick-action-hs">Screen wireless, battery, encryption, consumer devices, and local market safety approval signals.</div>
+                <div class="quick-action-hs hub-core-stats">9 categories · FCC/CE rules · Baseline checklists</div>
+            </a>
 
-            <div class="quick-action-card hub-core-card" id="hub-semiconductor">
+            <a href="new-energy.html" class="quick-action-card hub-core-card hub-core-card--link" id="hub-new-energy">
+                <div class="quick-action-icon">☀️</div>
+                <div class="quick-action-label">New Energy &amp; Clean Tech</div>
+                <div class="quick-action-hs">Pre-check PV modules, inverters, energy storage, EV chargers, UFLPA supply chain tracing, and tariff exposure.</div>
+                <div class="quick-action-hs hub-core-stats">6 categories · UFLPA tracing · Battery Passport</div>
+            </a>
+
+            <a href="semiconductor.html" class="quick-action-card hub-core-card hub-core-card--link" id="hub-semiconductor">
                 <div class="quick-action-icon">🔬</div>
-                <div class="quick-action-label">Semiconductor Trade Controls</div>
-                <div class="quick-action-hs">Pre-screen chips, equipment, foundry services, advanced packaging, and supply chain risks.</div>
-                <div class="quick-action-hs hub-core-stats">Chip controls · Foundry rules · End-use risk</div>
-            </div>
+                <div class="quick-action-label">Advanced Semiconductor &amp; Controls</div>
+                <div class="quick-action-hs">Pre-screen chips, high-speed optics, foundries, dual-use export limits, and entity list screening.</div>
+                <div class="quick-action-hs hub-core-stats">Chip controls · ECCN screening · End-use risk</div>
+            </a>
         </div>
 
         <div class="disclaimer-bar hub-disclaimer">
@@ -91,10 +95,54 @@
             <span>Latest Update: Loading...</span>
         </div>
 
-        <div id="quick-actions-container" class="quick-select-root"></div>
+        <div id="quick-actions-container" class="quick-select-block-slot"></div>
 
         <div class="feedback-section">
             <a href="#" class="feedback-link" id="feedback-trigger">💬 Can't find your product? Tell us</a>
+        </div>
+    </div>
+
+    <div id="new-energy-view" class="view-container" style="display: none;">
+        <div style="text-align:left;padding:12px 0;">
+            <a href="#" id="back-to-hub-from-energy" class="back-link">&larr; Back to Hub</a>
+        </div>
+
+        <div class="home-header">
+            <h1 class="home-title">New Energy &amp; Clean Tech</h1>
+            <p class="home-subtitle">Pre-check PV modules, inverters, energy storage, EV chargers, UFLPA supply chain tracing, and tariff exposure.</p>
+        </div>
+
+        <div class="direction-toggle">
+            <button id="direction-export-energy" class="direction-btn active">Export from China</button>
+            <button id="direction-import-energy" class="direction-btn">Import into China</button>
+        </div>
+
+        <div class="trade-country-row">
+            <label for="trade-country-energy" class="trade-country-label">Counterparty country / region</label>
+            <select id="trade-country-energy" class="trade-country-select" aria-label="Counterparty country or region"></select>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Enter PV module, inverter, HS Code, or supply chain risk" id="search-input-energy" />
+            <button class="search-btn" id="search-btn-energy">GO</button>
+        </div>
+
+        <div class="precheck-panel" id="energy-precheck-panel">
+            <div class="precheck-header">
+                <div class="precheck-title">Pre-check risk attributes</div>
+                <div class="precheck-note">Optional. Select supply chain, battery, or tariff-sensitive features.</div>
+            </div>
+            <div class="precheck-options">
+                <label class="precheck-option"><input type="checkbox" data-precheck="battery"> Lithium battery / energy storage</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="wireless"> Smart metering / Wi-Fi / IoT</label>
+                <label class="precheck-option"><input type="checkbox" data-precheck="semiconductor"> Power electronics / inverter controls</label>
+            </div>
+        </div>
+
+        <div id="energy-quick-actions-container" class="quick-select-block-slot"></div>
+
+        <div class="feedback-section">
+            <a href="#" class="feedback-link" id="energy-feedback-trigger">💬 Can't find your product? Tell us</a>
         </div>
     </div>
 
@@ -310,6 +358,6 @@
         <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code<span class="nav-btn-badge">Beta</span></a>
     </nav>
 
-    <script src="js/main.js?v=20260602home-tabs" data-app="index"></script>
+    <script src="js/main.js?v=20260527checklist-en-only" data-app="index"></script>
 </body>
 </html>

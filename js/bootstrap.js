@@ -20,7 +20,8 @@ function getInboundDeepLink() {
     return {
         query: (params.get('search') || '').trim(),
         direction: normalizeInboundDirection(params.get('direction')),
-        country: (params.get('country') || 'US').trim().toUpperCase()
+        country: (params.get('country') || 'US').trim().toUpperCase(),
+        vertical: (params.get('vertical') || 'electronics').trim().toLowerCase()
     };
 }
 
@@ -38,13 +39,16 @@ function applyInboundDirection(direction) {
     }
 }
 
-function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry) {
+function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry, inboundVertical) {
     const query = (inboundQuery || '').trim();
     if (!query) {
         return;
     }
 
-    showView('electronics', false);
+    const vertical = ['electronics', 'new-energy', 'semiconductor'].includes(inboundVertical)
+        ? inboundVertical
+        : 'electronics';
+
     applyInboundDirection(inboundDirection);
     if (typeof initTradeCountryForDirection === 'function') {
         initTradeCountryForDirection(inboundDirection, inboundCountry);
@@ -52,14 +56,33 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCount
         setTradeCountry(inboundCountry);
     }
 
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.value = query;
+    if (vertical === 'semiconductor') {
+        const searchInput = document.getElementById('search-input-semi');
+        if (searchInput) {
+            searchInput.value = query;
+        }
+        if (typeof searchSemiconductorProducts === 'function') {
+            searchSemiconductorProducts(query);
+        }
+    } else if (vertical === 'new-energy') {
+        const searchInput = document.getElementById('search-input-energy');
+        if (searchInput) {
+            searchInput.value = query;
+        }
+        if (typeof searchEnergyProducts === 'function') {
+            searchEnergyProducts(query);
+        }
+    } else {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.value = query;
+        }
+        if (typeof searchProducts === 'function') {
+            searchProducts(query);
+        }
     }
 
-    searchProducts(query);
-
-    const cleanUrl = `${window.location.pathname}#electronics`;
+    const cleanUrl = `${window.location.pathname}#result`;
     history.replaceState({ view: 'result' }, '', cleanUrl);
 }
 
@@ -76,6 +99,7 @@ async function bootstrapTradeComplyIndex() {
             query: inboundQuery,
             direction: inboundDirection,
             country: inboundCountry,
+            vertical: inboundVertical,
             hsContext: inboundHsContext
         } = inbound;
 
@@ -94,7 +118,7 @@ async function bootstrapTradeComplyIndex() {
         }
 
         if (inboundQuery) {
-            handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry);
+            handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry, inboundVertical);
             return;
         }
 

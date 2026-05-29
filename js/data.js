@@ -110,43 +110,18 @@ function renderLatestUpdate() {
 }
 
 /**
- * Render tabbed quick select on home + electronics views.
+ * Render flat Quick Select grid on the electronics pre-check view.
  */
-function renderHomeQuickSelect() {
-    const container = document.getElementById('home-quick-select-container');
-    if (!container || typeof renderQuickSelectGrid !== 'function') {
-        return;
-    }
-    renderQuickSelectGrid('home-quick-select-container', {
-        mode: 'search',
-        defaultTrack: 'consumer',
-        onSelect: ({ query }) => {
-            if (typeof showView === 'function') {
-                showView('electronics');
-            }
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.value = query;
-            }
-            if (typeof searchProducts === 'function') {
-                searchProducts(query);
-            }
-        }
-    });
-}
-
 function renderQuickActions() {
-    renderHomeQuickSelect();
-
     const container = document.getElementById('quick-actions-container');
     if (!container) {
         return;
     }
     if (typeof renderQuickSelectGrid === 'function') {
-        renderQuickSelectGrid('quick-actions-container', { mode: 'search', defaultTrack: 'consumer' });
+        renderQuickSelectGrid('quick-actions-container', { mode: 'search' });
         return;
     }
-    container.innerHTML = '<p class="product-track-fallback">Quick select unavailable — reload the page.</p>';
+    container.innerHTML = '<p class="quick-select-fallback">Quick select unavailable — reload the page.</p>';
 }
 
 /**

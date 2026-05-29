@@ -30,11 +30,15 @@ function applyView(view) {
 
     document.getElementById('home-view').style.display = safeView === 'home' ? 'block' : 'none';
     document.getElementById('electronics-view').style.display = safeView === 'electronics' ? 'block' : 'none';
+    document.getElementById('new-energy-view').style.display = safeView === 'new-energy' ? 'block' : 'none';
     document.getElementById('semiconductor-view').style.display = safeView === 'semiconductor' ? 'block' : 'none';
     if (safeView === 'semiconductor') {
         setTimeout(renderSemiQuickActions, 100);
     }
-    if ((safeView === 'electronics' || safeView === 'semiconductor')
+    if (safeView === 'new-energy' && typeof renderNewEnergyQuickSelect === 'function') {
+        setTimeout(renderNewEnergyQuickSelect, 100);
+    }
+    if ((safeView === 'electronics' || safeView === 'new-energy' || safeView === 'semiconductor')
         && typeof initTradeCountryForDirection === 'function') {
         initTradeCountryForDirection(
             AppState.currentDirection || 'export',
@@ -120,7 +124,7 @@ function resetPrecheckState() {
     AppState.complianceChecklist = [];
     AppState.checklistChecked = {};
     AppState.lastApiChecklist = null;
-    const inputsToClear = ['search-input', 'search-input-semi', 'ai-query-input', 'semi-ai-query-input'];
+    const inputsToClear = ['search-input', 'search-input-energy', 'search-input-semi', 'ai-query-input', 'semi-ai-query-input'];
     inputsToClear.forEach(id => {
         const input = document.getElementById(id);
         if (input) input.value = '';
@@ -229,13 +233,52 @@ function bindEvents() {
     addNavEvent('nav-home', 'home');
     addNavEvent('nav-incoterm', 'incoterm');
 
-    // Hub Card Events
-    document.getElementById('hub-electronics')?.addEventListener('click', () => showView('electronics'));
-    document.getElementById('hub-semiconductor')?.addEventListener('click', () => showView('semiconductor'));
+    // Hub cards navigate to dedicated category pages (electronics.html, etc.)
+
     document.getElementById('back-to-hub')?.addEventListener('click', (e) => {
         e.preventDefault();
         resetPrecheckState();
         showView('home');
+    });
+    document.getElementById('back-to-hub-from-energy')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetPrecheckState();
+        showView('home');
+    });
+
+    // New Energy Events
+    const energyExportBtn = document.getElementById('direction-export-energy');
+    const energyImportBtn = document.getElementById('direction-import-energy');
+    if (energyExportBtn) {
+        energyExportBtn.addEventListener('click', () => {
+            AppState.currentDirection = 'export';
+            energyExportBtn.classList.add('active');
+            energyImportBtn?.classList.remove('active');
+            if (typeof syncTradeCountrySelects === 'function') {
+                syncTradeCountrySelects('export');
+            }
+        });
+    }
+    if (energyImportBtn) {
+        energyImportBtn.addEventListener('click', () => {
+            AppState.currentDirection = 'import';
+            energyImportBtn.classList.add('active');
+            energyExportBtn?.classList.remove('active');
+            if (typeof syncTradeCountrySelects === 'function') {
+                syncTradeCountrySelects('import');
+            }
+        });
+    }
+    document.getElementById('search-btn-energy')?.addEventListener('click', () => {
+        const q = document.getElementById('search-input-energy')?.value;
+        if (typeof searchEnergyProducts === 'function') {
+            searchEnergyProducts(q);
+        }
+    });
+    document.getElementById('search-input-energy')?.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter' && typeof searchEnergyProducts === 'function') {
+            searchEnergyProducts(e.target.value);
+        }
     });
 
     // Semiconductor Events
@@ -290,7 +333,7 @@ function bindEvents() {
     const feedbackThanks = document.getElementById('feedback-thanks');
     const feedbackFormDiv = document.getElementById('feedback-form');
 
-    ['feedback-trigger', 'result-feedback-trigger', 'home-feedback-trigger', 'semi-feedback-trigger', 'incoterm-feedback-trigger']
+    ['feedback-trigger', 'result-feedback-trigger', 'home-feedback-trigger', 'semi-feedback-trigger', 'energy-feedback-trigger', 'incoterm-feedback-trigger']
         .forEach(id => {
             const trigger = document.getElementById(id);
             if (trigger && feedbackModal) {

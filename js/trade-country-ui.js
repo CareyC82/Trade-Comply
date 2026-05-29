@@ -50,14 +50,18 @@ function getCountryOptionsApi() {
 
 function getActiveTradeCountrySelect() {
     const electronics = document.getElementById('trade-country');
+    const energy = document.getElementById('trade-country-energy');
     const semi = document.getElementById('trade-country-semi');
     if (electronics && electronics.offsetParent !== null) {
         return electronics;
     }
+    if (energy && energy.offsetParent !== null) {
+        return energy;
+    }
     if (semi && semi.offsetParent !== null) {
         return semi;
     }
-    return electronics || semi;
+    return electronics || energy || semi;
 }
 
 function populateTradeCountrySelect(selectEl, direction, selectedCode) {
@@ -83,6 +87,7 @@ function populateTradeCountrySelect(selectEl, direction, selectedCode) {
 function syncTradeCountrySelects(direction, selectedCode) {
     const code = selectedCode || AppState.currentCountry;
     populateTradeCountrySelect(document.getElementById('trade-country'), direction, code);
+    populateTradeCountrySelect(document.getElementById('trade-country-energy'), direction, code);
     populateTradeCountrySelect(document.getElementById('trade-country-semi'), direction, code);
 }
 
@@ -102,9 +107,13 @@ function bindTradeCountryControls() {
     };
 
     const electronicsSelect = document.getElementById('trade-country');
+    const energySelect = document.getElementById('trade-country-energy');
     const semiSelect = document.getElementById('trade-country-semi');
     if (electronicsSelect) {
         electronicsSelect.addEventListener('change', onCountryChange);
+    }
+    if (energySelect) {
+        energySelect.addEventListener('change', onCountryChange);
     }
     if (semiSelect) {
         semiSelect.addEventListener('change', onCountryChange);

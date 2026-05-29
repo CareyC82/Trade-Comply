@@ -169,7 +169,9 @@ function renderHscodeChecklist(classification) {
         country: selectedCountry,
         direction: getSelectedDirection(),
         aiChecklist,
-        includeBaseline: false
+        includeBaseline: false,
+        productQuery: lastProductDescription,
+        vertical: 'electronics'
     };
 
     let checklist = [];
@@ -453,10 +455,4 @@ function bindHsCodePage() {
 
 function bootstrapTradeComplyHscode() {
     bindHsCodePage();
-    if (typeof renderQuickSelectGrid === 'function') {
-        renderQuickSelectGrid('hscode-quick-select-container', {
-            mode: 'hscode',
-            defaultTrack: 'consumer'
-        });
-    }
 }
