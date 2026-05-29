@@ -31,7 +31,16 @@ function applyView(view) {
     document.getElementById('home-view').style.display = safeView === 'home' ? 'block' : 'none';
     document.getElementById('electronics-view').style.display = safeView === 'electronics' ? 'block' : 'none';
     document.getElementById('semiconductor-view').style.display = safeView === 'semiconductor' ? 'block' : 'none';
-    if (safeView === 'semiconductor') { setTimeout(renderSemiQuickActions, 100); }
+    if (safeView === 'semiconductor') {
+        setTimeout(renderSemiQuickActions, 100);
+    }
+    if ((safeView === 'electronics' || safeView === 'semiconductor')
+        && typeof initTradeCountryForDirection === 'function') {
+        initTradeCountryForDirection(
+            AppState.currentDirection || 'export',
+            AppState.currentCountry
+        );
+    }
     document.getElementById('incoterm-view').style.display = safeView === 'incoterm' ? 'block' : 'none';
     document.getElementById('result-view').style.display = safeView === 'result' ? 'block' : 'none';
     document.getElementById('kb-view').style.display = safeView === 'kb' ? 'block' : 'none';

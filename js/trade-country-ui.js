@@ -1,6 +1,53 @@
 /**
  * Trade country <select> UI — sync with direction and AppState.
  */
+
+const FALLBACK_EXPORT_OPTIONS = [
+    { value: 'US', label: 'United States' },
+    { value: 'EU', label: 'European Union' },
+    { value: 'ASEAN', label: 'ASEAN (Vietnam / Malaysia)' },
+    { value: 'RU', label: 'Russia' },
+    { value: 'GLOBAL', label: 'Other' }
+];
+
+const FALLBACK_IMPORT_OPTIONS = [
+    { value: 'TW', label: 'Taiwan (China)' },
+    { value: 'JP', label: 'Japan' },
+    { value: 'KR', label: 'South Korea' },
+    { value: 'US', label: 'United States' },
+    { value: 'GLOBAL', label: 'Other' }
+];
+
+function getCountryOptionsApi() {
+    if (globalThis.TradeComplyCountry) {
+        return globalThis.TradeComplyCountry;
+    }
+    return {
+        getCountryOptionsForDirection(direction) {
+            return direction === 'import' ? FALLBACK_IMPORT_OPTIONS : FALLBACK_EXPORT_OPTIONS;
+        },
+        normalizeCountryCode(value) {
+            const raw = String(value || 'US').trim();
+            const map = {
+                'United States': 'US',
+                'European Union': 'EU',
+                'ASEAN (Vietnam / Malaysia)': 'ASEAN',
+                Russia: 'RU',
+                'Taiwan (China)': 'TW',
+                Japan: 'JP',
+                'South Korea': 'KR',
+                Other: 'GLOBAL',
+                OTHER: 'GLOBAL'
+            };
+            if (map[raw]) {
+                return map[raw];
+            }
+            const upper = raw.toUpperCase();
+            return map[upper] || upper || 'US';
+        }
+    };
+}
+
 function getActiveTradeCountrySelect() {
     const electronics = document.getElementById('trade-country');
     const semi = document.getElementById('trade-country-semi');
@@ -17,17 +64,19 @@ function populateTradeCountrySelect(selectEl, direction, selectedCode) {
     if (!selectEl) {
         return;
     }
-    if (!globalThis.TradeComplyCountry) {
-        return;
-    }
-    const { getCountryOptionsForDirection, normalizeCountryCode } = globalThis.TradeComplyCountry;
-    const options = getCountryOptionsForDirection(direction);
-    const selected = normalizeCountryCode(selectedCode || AppState.currentCountry || options[0]?.value);
+
+    const api = getCountryOptionsApi();
+    const options = api.getCountryOptionsForDirection(direction);
+    const selected = api.normalizeCountryCode(
+        selectedCode || AppState.currentCountry || options[0]?.value
+    );
 
     selectEl.innerHTML = options
         .map((opt) => `<option value="${opt.value}">${opt.label}</option>`)
         .join('');
     selectEl.value = options.some((o) => o.value === selected) ? selected : options[0].value;
+    selectEl.disabled = false;
+    selectEl.removeAttribute('aria-disabled');
     AppState.currentCountry = selectEl.value;
 }
 
@@ -38,16 +87,13 @@ function syncTradeCountrySelects(direction, selectedCode) {
 }
 
 function setTradeCountry(countryCode) {
-    if (!globalThis.TradeComplyCountry) {
-        AppState.currentCountry = countryCode || 'US';
-        return;
-    }
-    const { normalizeCountryCode } = globalThis.TradeComplyCountry;
-    AppState.currentCountry = normalizeCountryCode(countryCode);
+    const api = getCountryOptionsApi();
+    AppState.currentCountry = api.normalizeCountryCode(countryCode || 'US');
     const active = getActiveTradeCountrySelect();
     if (active) {
         active.value = AppState.currentCountry;
     }
+    syncTradeCountrySelects(AppState.currentDirection || 'export', AppState.currentCountry);
 }
 
 function bindTradeCountryControls() {
