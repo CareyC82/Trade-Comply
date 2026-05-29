@@ -57,12 +57,25 @@ function bindAiQuerySectionHandlers() {
     });
 }
 
+function resolveCasesForMatchedTags(tags, cases) {
+    const direction = AppState.currentDirection || 'export';
+    const allCases = AppState.data?.cases || [];
+    let resolved = Array.isArray(cases) ? [...cases] : [];
+    const enrichApi = globalThis.TradeComplyMatchedResults;
+    if (enrichApi?.collectCasesForMatchedTags && enrichApi?.mergeCasesById) {
+        const linked = enrichApi.collectCasesForMatchedTags(tags, allCases, direction);
+        resolved = enrichApi.mergeCasesById(resolved, linked);
+    }
+    return resolved;
+}
+
 function searchProducts(query) {
     AppState.searchOrigin = 'electronics';
     const trimmedQuery = query ? query.trim() : '';
     const selections = getPrecheckSelections('precheck-panel');
     const results = searchWithPrecheck(trimmedQuery, selections, search);
-    renderResults(trimmedQuery || t('allProducts'), results.tags, results.cases, selections);
+    const cases = resolveCasesForMatchedTags(results.tags, results.cases);
+    renderResults(trimmedQuery || t('allProducts'), results.tags, cases, selections);
 }
 
 /**
@@ -70,6 +83,7 @@ function searchProducts(query) {
  */
 function renderResults(query, tags, cases, precheckSelections = []) {
     showView('result');
+    cases = resolveCasesForMatchedTags(tags, cases);
     // 清空旧的 AI 结果
     removeAiBox();
 

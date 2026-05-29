@@ -1,6 +1,14 @@
+function withDataCacheBust(url) {
+    const build = globalThis.TradeComplyBuild || '';
+    if (!build || !url || /\?/.test(url)) {
+        return url;
+    }
+    return `${url}?v=${encodeURIComponent(build)}`;
+}
+
 async function fetchJsonSafe(url, fallbackValue = []) {
     try {
-        const response = await fetch(url);
+        const response = await fetch(withDataCacheBust(url));
         if (!response.ok) throw new Error(`Status: ${response.status}`);
         return await response.json();
     } catch (err) {

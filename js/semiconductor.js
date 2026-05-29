@@ -45,12 +45,17 @@ function searchSemiconductor(query) {
         }
         return a.tag_type === 'MATCHED' ? -1 : 1;
     });
-    const matchedCases = allCases.filter(caseItem => {
+    let matchedCases = allCases.filter(caseItem => {
         const cd = caseItem.direction || 'both'; if (cd !== 'both' && cd !== currentDirection) return false;
         if (!query || !query.trim()) { const ck = (caseItem.related_keywords || []).map(k => k.toLowerCase()); return ck.some(kw => allSemiKeywords.includes(kw)); }
         const lowerQuery = query.toLowerCase(); const ck = (caseItem.related_keywords || []).map(k => k.toLowerCase());
         return ck.some(kw => lowerQuery.includes(kw) || kw.includes(lowerQuery));
     });
+    const enrichApi = globalThis.TradeComplyMatchedResults;
+    if (enrichApi?.collectCasesForMatchedTags && enrichApi?.mergeCasesById) {
+        const linked = enrichApi.collectCasesForMatchedTags(matchedTags, allCases, currentDirection);
+        matchedCases = enrichApi.mergeCasesById(matchedCases, linked);
+    }
     return { tags: matchedTags, cases: matchedCases };
 }
 

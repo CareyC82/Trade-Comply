@@ -3,7 +3,8 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode"></script>
  */
 (function () {
-    const BUILD = '20260601cases';
+    const BUILD = '20260602fix';
+    globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const app = entryScript?.dataset?.app
         || (/\/hscode\.html/i.test(window.location.pathname) ? 'hscode' : 'index');

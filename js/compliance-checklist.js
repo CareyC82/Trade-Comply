@@ -41,6 +41,29 @@ function collectDynamicAiChecklists(options = {}) {
     return merged;
 }
 
+function mergeTagChecklistsInline(tags, country, direction) {
+    const merged = [];
+    (tags || []).forEach((tag) => {
+        const list = tag.checklist;
+        if (!Array.isArray(list)) {
+            return;
+        }
+        list.forEach((item) => {
+            if (item && item.task) {
+                merged.push({ ...item, source: item.source || tag.tag_id || 'tag' });
+            }
+        });
+    });
+    if (merged.length === 0) {
+        return [];
+    }
+    const api = getChecklistApi();
+    if (api?.normalizeChecklist) {
+        return api.normalizeChecklist(merged);
+    }
+    return merged;
+}
+
 function buildComplianceChecklistForResults(tags, options = {}) {
     const api = getChecklistApi();
     const country = options.country || AppState.currentCountry || 'US';
@@ -48,17 +71,21 @@ function buildComplianceChecklistForResults(tags, options = {}) {
     const aiChecklist = collectDynamicAiChecklists(options);
     const includeBaseline = options.includeBaseline === true;
 
-    if (!api) {
-        return [];
+    if (api?.buildSessionChecklist) {
+        return api.buildSessionChecklist({
+            tags: tags || [],
+            aiChecklist,
+            country,
+            direction,
+            includeBaseline
+        });
     }
 
-    return api.buildSessionChecklist({
-        tags: tags || [],
-        aiChecklist,
-        country,
-        direction,
-        includeBaseline
-    });
+    const fromTags = mergeTagChecklistsInline(tags, country, direction);
+    if (aiChecklist.length > 0 && api?.mergeChecklists) {
+        return api.mergeChecklists(fromTags, aiChecklist);
+    }
+    return fromTags;
 }
 
 function placeChecklistSlotAfterPenaltyCases() {

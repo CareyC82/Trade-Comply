@@ -1301,7 +1301,12 @@ button.report-action-link {
 
 /* Cases Container */
 #cases-container {
-    margin-top: 24px;
+    margin-top: 10px;
+}
+
+#cases-container:not(:empty),
+#compliance-checklist-container.compliance-checklist-container--visible {
+    scroll-margin-top: 12px;
 }
 
 /* Incoterm Tabs */
