@@ -110,37 +110,18 @@ function renderLatestUpdate() {
 }
 
 /**
- * Render quick action cards (利用 DocumentFragment 提升性能)
+ * Render tabbed quick select grid (replaces flat quick-actions.json list on index).
  */
 function renderQuickActions() {
     const container = document.getElementById('quick-actions-container');
-    if (!container) return;
-
-    const actions = AppState.data.quickActions || [];
-    container.innerHTML = '';
-
-    const sortedActions = [...actions].sort((a, b) => (a.order || 999) - (b.order || 999));
-    const fragment = document.createDocumentFragment();
-
-    sortedActions.forEach(action => {
-        const card = document.createElement('div');
-        card.className = 'quick-action-card';
-        // 必须转义避免XSS
-        card.innerHTML = `
-            <div class="quick-action-icon">${escapeHtml(action.icon)}</div>
-            <div class="quick-action-label">${escapeHtml(action.label)}</div>
-            <div class="quick-action-hs">${escapeHtml(action.hs_code)}</div>
-        `;
-        
-        card.addEventListener('click', () => {
-            document.getElementById('search-input').value = action.query_text;
-            searchProducts(action.query_text);
-        });
-
-        fragment.appendChild(card);
-    });
-    
-    container.appendChild(fragment);
+    if (!container) {
+        return;
+    }
+    if (typeof renderQuickSelectGrid === 'function') {
+        renderQuickSelectGrid('quick-actions-container', { mode: 'search', defaultTrack: 'consumer' });
+        return;
+    }
+    container.innerHTML = '<p class="product-track-fallback">Quick select unavailable — reload the page.</p>';
 }
 
 /**

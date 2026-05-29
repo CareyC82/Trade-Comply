@@ -767,21 +767,145 @@ button.report-action-link {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 0;
 }
 
-.quick-action-card {
+.quick-action-card,
+.quick-select-card {
     background-color: var(--color-bg);
     border-radius: 12px;
     padding: 16px;
     box-shadow: 0 2px 8px var(--color-card-shadow);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid rgba(26, 58, 92, 0.06);
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
 }
 
-.quick-action-card:hover {
+button.quick-select-card {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-bg);
+}
+
+.quick-action-card:hover,
+.quick-select-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--color-card-shadow);
+    border-color: rgba(26, 58, 92, 0.14);
+}
+
+.quick-action-card:focus-visible,
+.quick-select-card:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Tabbed Quick Select — three commercial tracks */
+.quick-select-root,
+.hscode-quick-select-slot {
+    margin-bottom: 24px;
+}
+
+.product-track-shell {
+    background: linear-gradient(165deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(26, 58, 92, 0.08);
+    border-radius: 16px;
+    padding: 18px 16px 20px;
+    box-shadow: 0 4px 18px rgba(26, 58, 92, 0.06);
+}
+
+.product-track-header {
+    margin-bottom: 14px;
+}
+
+.product-track-title {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.product-track-subtitle {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+}
+
+.product-track-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 4px;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+}
+
+.product-track-tab {
+    flex: 1 1 200px;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
+    font-family: inherit;
+    text-align: left;
+}
+
+.product-track-tab:hover {
+    color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.product-track-tab.is-active {
+    background: var(--color-bg);
+    color: var(--color-primary);
+    border-color: rgba(26, 58, 92, 0.12);
+    box-shadow: 0 2px 10px rgba(26, 58, 92, 0.08);
+}
+
+.product-track-panels {
+    position: relative;
+    min-height: 120px;
+}
+
+.product-track-panel {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    pointer-events: none;
+}
+
+.product-track-panel.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.product-track-panel.is-leaving {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.hscode-quick-select-slot .product-track-shell {
+    margin-top: 4px;
+}
+
+.product-track-fallback {
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    padding: 16px;
 }
 
 .quick-action-icon {
@@ -2279,6 +2403,18 @@ button.report-action-link {
     .hub-core-grid .hub-core-card {
         min-height: auto;
         padding: 22px 18px;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .product-track-tab {
+        flex: 1 1 100%;
+    }
+
+    .product-track-shell {
+        padding: 14px 12px 16px;
     }
 }
 

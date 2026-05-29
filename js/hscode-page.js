@@ -453,4 +453,10 @@ function bindHsCodePage() {
 
 function bootstrapTradeComplyHscode() {
     bindHsCodePage();
+    if (typeof renderQuickSelectGrid === 'function') {
+        renderQuickSelectGrid('hscode-quick-select-container', {
+            mode: 'hscode',
+            defaultTrack: 'consumer'
+        });
+    }
 }

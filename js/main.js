@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode"></script>
  */
 (function () {
-    const BUILD = '20260602phase-fix';
+    const BUILD = '20260602quick-tabs';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const app = entryScript?.dataset?.app
@@ -20,6 +20,7 @@
         'js/country-render.js',
         'js/catalog.js',
         'js/data.js',
+        'js/quick-select-grid.js',
         'lib/matched-results.js',
         'js/search.js',
         'js/compliance-checklist.js',
@@ -42,6 +43,7 @@
         'lib/trade-country.js',
         'lib/checklist.js',
         'lib/hscode-dual.js',
+        'js/quick-select-grid.js',
         'js/compliance-checklist.js',
         'js/hscode-page.js'
     ];
