@@ -14,7 +14,8 @@ const {
     listPendingItems,
     approvePendingItem,
     rejectPendingItem,
-    loadQueue
+    loadQueue,
+    getDataPaths
 } = require('../lib/data-review');
 const {
     maybeTriggerPublishSyncAfterApprove,
@@ -24,6 +25,7 @@ const {
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
 const PASSWORD = process.env.ADMIN_REVIEW_PASSWORD || '';
+const ADMIN_BUILD_ID = '20260529-risk-signal-v2';
 
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -101,12 +103,25 @@ function serveStatic(req, res) {
 }
 
 async function handleApi(req, res) {
+    const urlPath = req.url.split('?')[0];
+
+    if (req.method === 'GET' && urlPath === '/api/review/health') {
+        const dataPaths = getDataPaths();
+        sendJson(res, 200, {
+            ok: true,
+            build: ADMIN_BUILD_ID,
+            project_root: ROOT,
+            data_paths: dataPaths,
+            supported_kinds: ['tag', 'case', 'risk_signal'],
+            password_required: Boolean(PASSWORD)
+        });
+        return;
+    }
+
     if (!isAuthorized(req)) {
         sendJson(res, 401, { ok: false, error: 'Unauthorized. Set Authorization: Bearer <ADMIN_REVIEW_PASSWORD>.' });
         return;
     }
-
-    const urlPath = req.url.split('?')[0];
 
     if (req.method === 'GET' && urlPath === '/api/review/pending') {
         const items = listPendingItems();
@@ -136,8 +151,21 @@ async function handleApi(req, res) {
         }
 
         if (urlPath.endsWith('/approve')) {
-            const result = await approvePendingItem(pendingId);
+            let result;
+            try {
+                result = approvePendingItem(pendingId);
+            } catch (error) {
+                sendJson(res, 500, { ok: false, error: error.message });
+                return;
+            }
             if (result.ok) {
+                const dataPaths = getDataPaths();
+                result.written_paths = {
+                    tags: dataPaths.prodTags,
+                    cases: dataPaths.prodCases,
+                    queue: dataPaths.queue,
+                    catalog: path.join(dataPaths.root, 'data', 'catalog.json')
+                };
                 const sync = await maybeTriggerPublishSyncAfterApprove({ pendingId });
                 result.sync = sync;
             }
@@ -185,9 +213,14 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
+    const dataPaths = getDataPaths();
     if (!PASSWORD) {
         console.warn('WARNING: ADMIN_REVIEW_PASSWORD is not set. All API calls will be rejected.');
         console.warn('Example: ADMIN_REVIEW_PASSWORD=your-secret node scripts/admin-server.js');
     }
     console.log(`Review admin listening on http://127.0.0.1:${PORT}/admin.html`);
+    console.log(`Build: ${ADMIN_BUILD_ID}`);
+    console.log(`Project root: ${ROOT}`);
+    console.log(`Writes to: ${dataPaths.prodTags}`);
+    console.log(`Pending queue: ${dataPaths.queue}`);
 });

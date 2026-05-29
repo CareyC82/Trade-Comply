@@ -29,13 +29,20 @@ flowchart LR
 
 ### 1. 启动本地审核服务（仅监听 127.0.0.1）
 
+**重要：** 若 8787 端口已有旧进程，Approve 可能失败（不支持 `risk_signal` 或缺少 publish-sync）。请先重启：
+
 ```bash
 cd /path/to/Chinacomply
 export ADMIN_REVIEW_PASSWORD='你的强密码'
-node scripts/admin-server.js
+npm run restart:admin
+# 或: bash scripts/restart-admin-server.sh
 ```
 
-浏览器打开：<http://127.0.0.1:8787/admin.html>
+浏览器打开：<http://127.0.0.1:8787/admin.html>（**不要**用 `file://` 打开）
+
+登录后应看到 `build 20260529-risk-signal-v2`。Approve 请求发往：
+
+`POST http://127.0.0.1:8787/api/review/approve`（Body: `{ "pending_id": "..." }`）
 
 ### 2. 在审核台操作
 

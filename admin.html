@@ -167,6 +167,19 @@
             }
         }
 
+        async function verifyApiHealth() {
+            const base = getApiBase();
+            const response = await fetch(`${base}/api/review/health`);
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.ok) {
+                throw new Error(data.error || `Health check failed (${response.status})`);
+            }
+            if (!Array.isArray(data.supported_kinds) || !data.supported_kinds.includes('risk_signal')) {
+                throw new Error('审核服务版本过旧，不支持 risk_signal。请重启: node scripts/admin-server.js');
+            }
+            return data;
+        }
+
         async function apiFetch(path, options = {}) {
             const base = getApiBase();
             const headers = {
@@ -274,6 +287,9 @@
                     body: JSON.stringify({ pending_id: pendingId })
                 });
                 statusBar.textContent = result.message || '操作成功';
+                if (result.written_paths) {
+                    statusBar.textContent += ` · 已写入 tags.json / catalog.json / queue.json`;
+                }
                 await loadPending();
             } catch (err) {
                 statusBar.classList.add('error');
@@ -294,7 +310,7 @@
             setToken('');
         }
 
-        document.getElementById('btn-login').addEventListener('click', () => {
+        document.getElementById('btn-login').addEventListener('click', async () => {
             const token = passwordInput.value.trim();
             if (!token) {
                 alert('请输入审核密码');
@@ -302,7 +318,13 @@
             }
             localStorage.setItem(API_BASE_KEY, apiBaseInput.value.trim());
             setToken(token);
-            showReview();
+            try {
+                const health = await verifyApiHealth();
+                statusBar.textContent = `已连接 · build ${health.build || 'unknown'}`;
+                showReview();
+            } catch (err) {
+                alert(`无法连接审核 API：${err.message}\n\n请确认已运行:\nADMIN_REVIEW_PASSWORD=你的密码 node scripts/admin-server.js`);
+            }
         });
 
         async function publishSync() {
@@ -316,6 +338,10 @@
                     body: JSON.stringify({ dispatch: true })
                 });
                 statusBar.textContent = result.message || '推送完成';
+                if (!result.pushed && (result.message || '').includes('No publish-path')) {
+                    statusBar.classList.add('error');
+                    statusBar.textContent += ' · 若已批准，请在终端执行: git push origin main';
+                }
             } catch (err) {
                 statusBar.classList.add('error');
                 statusBar.textContent = `推送失败: ${err.message}。请在终端运行: npm run publish:reviewed -- --dispatch`;

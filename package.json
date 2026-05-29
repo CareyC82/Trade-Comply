@@ -14,6 +14,7 @@
     "pipeline:global:offline": "python3 pipeline/pipeline.py --offline",
     "dev:preview": "python3 -m http.server 8000",
     "dev:admin": "node scripts/admin-server.js",
+    "restart:admin": "bash scripts/restart-admin-server.sh",
     "publish:reviewed": "node scripts/publish-reviewed-data.js",
     "guardrail:prod": "node scripts/check-prod-guardrail.js",
     "validate:pending": "node scripts/validate-pending-queue.js"
