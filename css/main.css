@@ -2670,11 +2670,54 @@ button.feedback-link:hover {
     margin-bottom: 8px;
 }
 
+.hscode-dual-codes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+@media (min-width: 640px) {
+    .hscode-dual-codes {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.hscode-code-card {
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(26, 58, 92, 0.14);
+    background: var(--color-bg-secondary);
+}
+
+.hscode-code-card--china {
+    border-left: 4px solid #de2910;
+}
+
+.hscode-code-card--counterparty {
+    border-left: 4px solid var(--color-accent);
+}
+
+.hscode-code-card[hidden] {
+    display: none !important;
+}
+
+.hscode-result-code--secondary {
+    font-size: 1.65rem;
+}
+
+.hscode-hs6-hint {
+    margin: 0 0 14px;
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+}
+
 .hscode-result-code-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
+    margin-bottom: 8px;
 }
 
 .hscode-check-risks-btn {

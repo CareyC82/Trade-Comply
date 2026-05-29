@@ -11,6 +11,12 @@ const {
     isComplianceFeedbackQuery
 } = require('./compliance-feedback-codec');
 const { parseHsCodeClassificationPayload } = require('./lib/parse-model-json');
+const {
+    enrichClassification,
+    buildHsCodeUserPrompt,
+    buildHsCodeSystemPrompt,
+    normalizeCountryCode
+} = require('./lib/hscode-dual');
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const ALLOWED_ORIGINS = new Set([
@@ -23,20 +29,13 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260528-hscode-v3';
+const FC_BUILD_ID = '20260529-hscode-dual-v1';
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
 const HSCODE_CLASSIFY_MAX_TOKENS = 1200;
 
-const HSCODE_CLASSIFY_SYSTEM_PROMPT = `You are a professional Customs Tariff Specialist with 20 years of experience in China Customs HS Code classification. Analyze the user's product description strictly based on the Harmonized System (HS) General Interpretative Rules (GIR).
-You MUST return a valid JSON object ONLY. Do not include any introductory text or markdown code blocks. The JSON structure must be exactly as follows:
-{
-  "hscode": "The 6-digit or 10-digit HS Code",
-  "official_name": "Official standard customs commodity name in English",
-  "confidence": "e.g., 95%",
-  "reasoning": "Detailed technical classification justification in English. Must cite specific GIR rules (e.g., GIR 1, GIR 6) and analyze based on material, function, and intended use."
-}`;
+const HSCODE_CLASSIFY_SYSTEM_PROMPT = buildHsCodeSystemPrompt();
 const MAX_CONTEXT_TAGS = 8;
 const MAX_CONTEXT_CASES = 3;
 const MAX_FIELD_LENGTH = 500;
@@ -770,7 +769,7 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
-async function callDeepSeekForHsCode(description) {
+async function callDeepSeekForHsCode(description, context = {}) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -785,7 +784,7 @@ async function callDeepSeekForHsCode(description) {
                 model: 'deepseek-chat',
                 messages: [
                     { role: 'system', content: HSCODE_CLASSIFY_SYSTEM_PROMPT },
-                    { role: 'user', content: `Classify the following product for China Customs HS Code purposes:\n\n${description}` }
+                    { role: 'user', content: buildHsCodeUserPrompt(description, context) }
                 ],
                 temperature: 0.1,
                 max_tokens: HSCODE_CLASSIFY_MAX_TOKENS,
@@ -803,7 +802,8 @@ async function callDeepSeekForHsCode(description) {
 
         const data = await response.json();
         const content = data.choices?.[0]?.message?.content || '';
-        return parseHsCodeClassificationPayload(content);
+        const parsed = parseHsCodeClassificationPayload(content);
+        return enrichClassification(parsed, context);
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
@@ -812,6 +812,10 @@ async function callDeepSeekForHsCode(description) {
 
 async function handleHsCodeClassifyRequest(body, headers) {
     const description = typeof body.description === 'string' ? body.description.trim() : '';
+    const direction = body.direction === 'import' ? 'import' : 'export';
+    const counterpartyCountry = normalizeCountryCode(
+        body.counterparty_country || body.country || 'US'
+    );
 
     if (!description) {
         return {
@@ -838,13 +842,20 @@ async function handleHsCodeClassifyRequest(body, headers) {
     }
 
     try {
-        const classification = await callDeepSeekForHsCode(description);
+        const classification = await callDeepSeekForHsCode(description, {
+            direction,
+            counterpartyCountry
+        });
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 ok: true,
-                classification
+                classification,
+                trade_context: {
+                    direction,
+                    counterparty_country: counterpartyCountry
+                }
             })
         };
     } catch (error) {

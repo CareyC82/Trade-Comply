@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI HS Code Classifier | Trade Comply</title>
-    <link rel="stylesheet" href="css/main.css?v=20260528-hscode3">
+    <link rel="stylesheet" href="css/main.css?v=20260529-hscode-dual">
 </head>
 <body class="hscode-page-body">
     <div class="hscode-page view-container active">
@@ -57,13 +57,20 @@
         <section id="hscode-result" class="hscode-result" hidden aria-live="polite">
             <h2 class="hscode-result-heading">Classification Result</h2>
 
-            <div class="hscode-result-row hscode-result-row--code">
-                <div class="hscode-result-row-label">💡 Recommended HS Code</div>
-                <div class="hscode-result-code-row">
-                    <div id="hscode-result-code" class="hscode-result-code">—</div>
-                    <button type="button" id="hscode-check-risks-btn" class="hscode-check-risks-btn">Check Risks</button>
+            <div class="hscode-dual-codes" id="hscode-dual-codes">
+                <div class="hscode-code-card hscode-code-card--china">
+                    <div id="hscode-china-label" class="hscode-result-row-label">🇨🇳 China Export HS Code</div>
+                    <div id="hscode-china-code" class="hscode-result-code">—</div>
+                </div>
+                <div class="hscode-code-card hscode-code-card--counterparty" id="hscode-counterparty-card">
+                    <div id="hscode-counterparty-label" class="hscode-result-row-label">🇺🇸 United States Import HTS Code</div>
+                    <div id="hscode-counterparty-code" class="hscode-result-code hscode-result-code--secondary">—</div>
                 </div>
             </div>
+            <div class="hscode-result-code-row">
+                <button type="button" id="hscode-check-risks-btn" class="hscode-check-risks-btn">Check Risks</button>
+            </div>
+            <p id="hscode-hs6-hint" class="hscode-hs6-hint" hidden></p>
 
             <div class="hscode-result-row">
                 <div class="hscode-result-row-label">📝 Official Commodity Name</div>
@@ -89,6 +96,7 @@
     </nav>
 
     <script src="lib/trade-country.js?v=20260529"></script>
+    <script src="lib/hscode-dual.js?v=20260529"></script>
     <script>
     (function () {
         const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run?action=hscode_classify';
@@ -98,6 +106,7 @@
         let lastClassifyAt = 0;
         let classifyInFlight = false;
         let lastHsCode = '';
+        let lastHs6 = '';
         let selectedDirection = 'export';
         let selectedCountry = 'US';
 
@@ -185,25 +194,75 @@
         }
 
         function buildComplianceUrl(hscode) {
+            const digits = String(hscode || '').replace(/\D/g, '');
+            const search = lastHs6 || (digits.length >= 6 ? digits.slice(0, 6) : digits);
             const params = new URLSearchParams();
-            params.set('search', hscode);
+            params.set('search', search);
             params.set('direction', getSelectedDirection());
             params.set('country', selectedCountry || 'US');
             return `index.html?${params.toString()}`;
+        }
+
+        function enrichResultClient(classification) {
+            if (globalThis.TradeComplyHsDual) {
+                return globalThis.TradeComplyHsDual.enrichClassification(classification, {
+                    direction: getSelectedDirection(),
+                    counterpartyCountry: selectedCountry
+                });
+            }
+            return classification;
         }
 
         function renderResult(classification) {
             const panel = document.getElementById('hscode-result');
             if (!panel) return;
 
-            const hs = String(classification.hscode || '').trim();
-            const name = String(classification.official_name || '').trim();
-            const confidence = String(classification.confidence || '—').trim();
-            const reasoning = String(classification.reasoning || '').trim();
+            const enriched = enrichResultClient(classification);
+            const chinaCode = String(enriched.china_code || enriched.hscode || '').trim();
+            const counterpartyCode = String(enriched.counterparty_code || '').trim();
+            const name = String(enriched.official_name || '').trim();
+            const confidence = String(enriched.confidence || '—').trim();
+            const reasoning = String(enriched.reasoning || '').trim();
+            const hs6 = String(enriched.hs6 || '').trim();
 
-            lastHsCode = hs;
+            lastHsCode = chinaCode || counterpartyCode;
+            lastHs6 = hs6 || (globalThis.TradeComplyHsDual
+                ? globalThis.TradeComplyHsDual.extractHs6(lastHsCode)
+                : String(lastHsCode).replace(/\D/g, '').slice(0, 6));
 
-            document.getElementById('hscode-result-code').textContent = hs || '—';
+            const chinaLabelEl = document.getElementById('hscode-china-label');
+            const chinaCodeEl = document.getElementById('hscode-china-code');
+            const counterpartyLabelEl = document.getElementById('hscode-counterparty-label');
+            const counterpartyCodeEl = document.getElementById('hscode-counterparty-code');
+            const counterpartyCard = document.getElementById('hscode-counterparty-card');
+            const hs6Hint = document.getElementById('hscode-hs6-hint');
+
+            if (chinaLabelEl) {
+                chinaLabelEl.textContent = enriched.china_code_label || '🇨🇳 China Export HS Code';
+            }
+            if (chinaCodeEl) {
+                chinaCodeEl.textContent = chinaCode || '—';
+            }
+            if (counterpartyLabelEl) {
+                counterpartyLabelEl.textContent = enriched.counterparty_code_label || 'Counterparty code';
+            }
+            if (counterpartyCodeEl) {
+                counterpartyCodeEl.textContent = counterpartyCode || '—';
+            }
+            if (counterpartyCard) {
+                counterpartyCard.hidden = !counterpartyCode;
+            }
+            if (hs6Hint) {
+                if (hs6 && globalThis.TradeComplyHsDual) {
+                    const hs6Display = globalThis.TradeComplyHsDual.formatHs6Display(hs6);
+                    hs6Hint.hidden = false;
+                    hs6Hint.textContent = `Harmonized subheading (HS-6): ${hs6Display}`;
+                } else {
+                    hs6Hint.hidden = true;
+                    hs6Hint.textContent = '';
+                }
+            }
+
             document.getElementById('hscode-result-name').textContent = name || '—';
             document.getElementById('hscode-result-confidence').textContent = confidence || '—';
             document.getElementById('hscode-result-reasoning').textContent = reasoning || '—';
@@ -265,7 +324,9 @@
                     },
                     body: JSON.stringify({
                         action: 'hscode_classify',
-                        description
+                        description,
+                        direction: getSelectedDirection(),
+                        counterparty_country: selectedCountry
                     }),
                     signal: controller.signal
                 });

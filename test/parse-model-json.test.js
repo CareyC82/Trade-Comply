@@ -21,6 +21,22 @@ describe('parse-model-json', () => {
         assert.equal(parsed.official_name, 'Battery');
     });
 
+    it('parses dual-country HS fields', () => {
+        const text = JSON.stringify({
+            hscode: '8542.39.00.00',
+            hs6: '854239',
+            china_export_hscode: '8542.39.00.00',
+            destination_import_code: '8542.39.00.00',
+            destination_country: 'US',
+            official_name: 'ICs',
+            reasoning: 'GIR 1.'
+        });
+        const parsed = parseHsCodeClassificationPayload(text);
+        assert.equal(parsed.china_export_hscode, '8542.39.00.00');
+        assert.equal(parsed.destination_import_code, '8542.39.00.00');
+        assert.equal(parsed.hs6, '854239');
+    });
+
     it('extracts outer object when surrounded by prose', () => {
         const text = 'Sure! {"hscode":"9617001900","official_name":"Electrodes","confidence":"80%","reasoning":"GIR 6."} Thanks.';
         const parsed = parseHsCodeClassificationPayload(text);
