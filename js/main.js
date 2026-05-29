@@ -1,117 +1,97 @@
-loadIncotermData();
-
 /**
- * Deep-link from hscode.html: index.html?search=81099000&direction=import
- * Must read query BEFORE any history.replaceState that strips URL params.
- * Parser lives in lib/deep-link.js (global TradeComplyDeepLink).
+ * Single application entry — loads modules in order, then boots the active page.
+ * HTML pages only need: <script src="js/main.js" data-app="index|hscode"></script>
  */
-function normalizeInboundDirection(value) {
-    if (globalThis.TradeComplyDeepLink) {
-        return globalThis.TradeComplyDeepLink.normalizeInboundDirection(value);
-    }
-    const normalized = (value || '').trim().toLowerCase();
-    return normalized === 'import' ? 'import' : 'export';
-}
+(function () {
+    const BUILD = '20260531mod';
+    const entryScript = document.currentScript;
+    const app = entryScript?.dataset?.app
+        || (/\/hscode\.html/i.test(window.location.pathname) ? 'hscode' : 'index');
 
-function getInboundDeepLink() {
-    if (globalThis.TradeComplyDeepLink) {
-        return globalThis.TradeComplyDeepLink.getInboundDeepLinkFromSearch(window.location.search);
-    }
-    const params = new URLSearchParams(window.location.search);
-    return {
-        query: (params.get('search') || '').trim(),
-        direction: normalizeInboundDirection(params.get('direction')),
-        country: (params.get('country') || 'US').trim().toUpperCase()
-    };
-}
+    const INDEX_MODULES = [
+        'js/core.js',
+        'lib/country-registry.js',
+        'lib/trade-country.js',
+        'lib/checklist.js',
+        'lib/deep-link.js',
+        'js/tag-enrich.js',
+        'js/trade-country-ui.js',
+        'js/country-render.js',
+        'js/catalog.js',
+        'js/data.js',
+        'js/search.js',
+        'js/compliance-checklist.js',
+        'js/precheck.js',
+        'js/trust-boundary.js',
+        'js/ai.js',
+        'js/render.js',
+        'js/feedback.js',
+        'compliance-feedback-codec.js',
+        'js/policy-correction.js',
+        'js/navigation.js',
+        'js/semiconductor.js',
+        'js/incoterm.js',
+        'js/bootstrap.js'
+    ];
 
-function applyInboundDirection(direction) {
-    const safeDirection = normalizeInboundDirection(direction);
-    setDirection(safeDirection);
+    const HSCODE_MODULES = [
+        'js/core.js',
+        'lib/country-registry.js',
+        'lib/trade-country.js',
+        'lib/checklist.js',
+        'lib/hscode-dual.js',
+        'js/compliance-checklist.js',
+        'js/hscode-page.js'
+    ];
 
-    const exportBtn = document.getElementById('direction-export');
-    const importBtn = document.getElementById('direction-import');
-
-    if (safeDirection === 'import') {
-        importBtn?.click();
-    } else {
-        exportBtn?.click();
-    }
-}
-
-function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry) {
-    const query = (inboundQuery || '').trim();
-    if (!query) {
-        return;
-    }
-
-    showView('electronics', false);
-    applyInboundDirection(inboundDirection);
-    if (typeof initTradeCountryForDirection === 'function') {
-        initTradeCountryForDirection(inboundDirection, inboundCountry);
-    } else if (inboundCountry) {
-        setTradeCountry(inboundCountry);
+    function withVersion(path) {
+        return `${path}?v=${BUILD}`;
     }
 
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.value = query;
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = withVersion(src);
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error(`Failed to load ${src}`));
+            document.head.appendChild(script);
+        });
     }
 
-    searchProducts(query);
-
-    const cleanUrl = `${window.location.pathname}#electronics`;
-    history.replaceState({ view: 'result' }, '', cleanUrl);
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        if (typeof initGlobalCollapsiblePanels === 'function') {
-            initGlobalCollapsiblePanels();
-        }
-
-        await initData();
-
-        const inbound = getInboundDeepLink();
-        const {
-            query: inboundQuery,
-            direction: inboundDirection,
-            country: inboundCountry,
-            hsContext: inboundHsContext
-        } = inbound;
-
-        bindEvents();
-        applyUiStrings();
-
-        if (typeof bindTradeCountryControls === 'function') {
-            bindTradeCountryControls();
-        }
-        if (typeof initTradeCountryForDirection === 'function') {
-            initTradeCountryForDirection(AppState.currentDirection || 'export', inboundCountry);
-        }
-
-        if (inboundHsContext && (inboundHsContext.chinaCode || inboundHsContext.counterpartyCode)) {
-            AppState.hsContext = inboundHsContext;
-        }
-
-        if (inboundQuery) {
-            handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry);
-            return;
-        }
-
-        initViewHistory();
-
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.value = '';
-        }
-    } catch (error) {
-        console.error('Trade Comply init failed:', error);
-        if (typeof bindEvents === 'function') {
-            bindEvents();
-        }
-        if (typeof initGlobalCollapsiblePanels === 'function') {
-            initGlobalCollapsiblePanels();
+    async function loadModules(paths) {
+        for (const path of paths) {
+            await loadScript(path);
         }
     }
-});
+
+    function onDocumentReady(callback) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', callback);
+        } else {
+            callback();
+        }
+    }
+
+    async function start() {
+        try {
+            const modules = app === 'hscode' ? HSCODE_MODULES : INDEX_MODULES;
+            await loadModules(modules);
+
+            onDocumentReady(() => {
+                if (app === 'hscode') {
+                    if (typeof bootstrapTradeComplyHscode === 'function') {
+                        bootstrapTradeComplyHscode();
+                    }
+                    return;
+                }
+                if (typeof bootstrapTradeComplyIndex === 'function') {
+                    bootstrapTradeComplyIndex();
+                }
+            });
+        } catch (error) {
+            console.error('Trade Comply module load failed:', error);
+        }
+    }
+
+    start();
+}());

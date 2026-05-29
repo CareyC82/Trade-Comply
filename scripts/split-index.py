@@ -74,7 +74,7 @@ def main():
 
     new_html = []
     new_html.extend(head)
-    new_html.append('    <link rel="stylesheet" href="css/main.css">\n')
+    new_html.append('    <link rel="stylesheet" href="css/style.css">\n')
     new_html.extend(body_middle)
     new_html.append(script_tags)
     new_html.extend(tail)
