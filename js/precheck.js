@@ -341,7 +341,7 @@ function createReportPayload(query, tags, cases, precheckSelections) {
     const country = AppState.currentCountry || 'US';
     const hs = AppState.hsContext || {};
     const checklist = typeof buildComplianceChecklistForResults === 'function'
-        ? buildComplianceChecklistForResults(tags, { country, direction })
+        ? buildComplianceChecklistForResults(tags, { country, direction, includeBaseline: false })
         : [];
     if (typeof buildComplianceChecklistForResults === 'function') {
         AppState.complianceChecklist = checklist;

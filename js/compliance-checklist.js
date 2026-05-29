@@ -6,43 +6,59 @@ function getChecklistApi() {
     return globalThis.TradeComplyChecklist || null;
 }
 
-/** Minimal US export fallback if checklist.js fails to load (stale cache). */
-const FALLBACK_US_EXPORT_CHECKLIST = [
-    { phase: '技术核查', task: 'FCC Part 15 / Part 18 RF conformity', desc: 'Confirm FCC IDs and RF conformity for wireless features.' },
-    { phase: '技术核查', task: 'Section 301 & HTS tariff exposure', desc: 'Map HTS line against Section 301 and additional duties.' },
-    { phase: '单证准备', task: 'BIS / Entity List screening pack', desc: 'Run restricted party and export control screening.' }
-];
+function extractChecklistFromApiPayload(payload) {
+    if (!payload || typeof payload !== 'object') {
+        return [];
+    }
+    const candidates = [
+        payload.checklist,
+        payload.check_list,
+        payload.data?.checklist,
+        payload.response?.checklist,
+        payload.classification?.checklist
+    ];
+    for (const candidate of candidates) {
+        if (Array.isArray(candidate) && candidate.length > 0) {
+            return candidate;
+        }
+    }
+    return [];
+}
+
+function collectDynamicAiChecklists(options = {}) {
+    const buckets = [
+        options.aiChecklist,
+        AppState.lastApiChecklist,
+        AppState.hsContext?.checklist,
+        AppState.aiContext?.checklist
+    ];
+    const merged = [];
+    buckets.forEach((entry) => {
+        if (Array.isArray(entry)) {
+            merged.push(...entry);
+        }
+    });
+    return merged;
+}
 
 function buildComplianceChecklistForResults(tags, options = {}) {
     const api = getChecklistApi();
     const country = options.country || AppState.currentCountry || 'US';
     const direction = options.direction || AppState.currentDirection || 'export';
-    const aiChecklist = options.aiChecklist
-        || AppState.hsContext?.checklist
-        || [];
+    const aiChecklist = collectDynamicAiChecklists(options);
+    const includeBaseline = options.includeBaseline === true;
 
-    if (api) {
-        const items = api.buildSessionChecklist({
-            tags: tags || [],
-            aiChecklist: Array.isArray(aiChecklist) ? aiChecklist : [],
-            country,
-            direction,
-            includeBaseline: options.includeBaseline !== false
-        });
-        if (items.length > 0) {
-            return items;
-        }
+    if (!api) {
+        return [];
     }
 
-    if (direction === 'export' && country === 'US') {
-        return FALLBACK_US_EXPORT_CHECKLIST.map((item, index) => ({
-            id: `${item.phase}::${item.task}`,
-            ...item,
-            source: 'fallback'
-        }));
-    }
-
-    return [];
+    return api.buildSessionChecklist({
+        tags: tags || [],
+        aiChecklist,
+        country,
+        direction,
+        includeBaseline
+    });
 }
 
 function placeChecklistSlotAfterRiskCards() {
@@ -87,6 +103,8 @@ if (typeof globalThis !== 'undefined') {
     globalThis.mountComplianceChecklist = mountComplianceChecklist;
     globalThis.buildComplianceChecklistForResults = buildComplianceChecklistForResults;
     globalThis.placeChecklistSlotAfterRiskCards = placeChecklistSlotAfterRiskCards;
+    globalThis.extractChecklistFromApiPayload = extractChecklistFromApiPayload;
+    globalThis.collectDynamicAiChecklists = collectDynamicAiChecklists;
 }
 
 function bindComplianceChecklistCheckboxHandlers(root) {
@@ -126,16 +144,25 @@ function renderComplianceChecklistPanel(containerId, checklist) {
 
     if (!checklist || checklist.length === 0) {
         container.hidden = true;
+        container.style.display = 'none';
         container.innerHTML = '';
+        container.classList.remove('compliance-checklist-container--visible');
         return;
     }
 
+    container.style.display = '';
+    container.hidden = false;
+
     const api = getChecklistApi();
-    const groups = api ? api.groupChecklistByPhase(checklist) : [{ phase: '其他', items: checklist }];
+    const groups = api ? api.groupChecklistByPhase(checklist) : [{
+        phaseKey: '其他',
+        phaseLabel: '📌 其他合规行动',
+        items: checklist
+    }];
 
     const groupsHtml = groups.map((group) => `
         <div class="compliance-checklist-phase">
-            <h3 class="compliance-checklist-phase-title">${escapeHtml(group.phase)}</h3>
+            <h3 class="compliance-checklist-phase-title">${escapeHtml(group.phaseLabel || group.phase || '其他')}</h3>
             <ul class="compliance-checklist-items">
                 ${group.items.map((item) => {
                     const checked = AppState.checklistChecked[item.id];
@@ -200,7 +227,7 @@ function buildReportChecklistRowsHtml(items) {
     return (items || []).map((item) => `
         <tr class="checklist-print-row avoid-page-break">
             <td class="checklist-print-box">${item.checked ? '[x]' : '[ ]'}</td>
-            <td class="checklist-print-phase">${escapeHtml(item.phase)}</td>
+            <td class="checklist-print-phase">${escapeHtml(item.phaseLabel || item.phase)}</td>
             <td class="checklist-print-task">
                 <strong>${escapeHtml(item.task)}</strong>
                 ${item.desc ? `<div class="checklist-print-desc">${escapeHtml(item.desc)}</div>` : ''}

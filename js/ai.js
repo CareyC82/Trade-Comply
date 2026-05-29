@@ -66,6 +66,22 @@ function updateAiButtonState(isLoading) {
 function handleAiResponse(data) {
     updateAiButtonState(false);
 
+    const dynamicChecklist = typeof extractChecklistFromApiPayload === 'function'
+        ? extractChecklistFromApiPayload(data)
+        : (Array.isArray(data.checklist) ? data.checklist : []);
+
+    if (dynamicChecklist.length > 0) {
+        AppState.lastApiChecklist = dynamicChecklist;
+        if (typeof mountComplianceChecklist === 'function') {
+            mountComplianceChecklist('compliance-checklist-container', [], {
+                aiChecklist: dynamicChecklist,
+                country: AppState.currentCountry,
+                direction: AppState.currentDirection,
+                includeBaseline: false
+            });
+        }
+    }
+
     if (data.response && data.response.trim()) {
         removeAiBox();
         createAiBox(data.response, data.grounding || null);

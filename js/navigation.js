@@ -119,6 +119,7 @@ function handlePopState(event) {
 function resetPrecheckState() {
     AppState.complianceChecklist = [];
     AppState.checklistChecked = {};
+    AppState.lastApiChecklist = null;
     const inputsToClear = ['search-input', 'search-input-semi', 'ai-query-input', 'semi-ai-query-input'];
     inputsToClear.forEach(id => {
         const input = document.getElementById(id);

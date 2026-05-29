@@ -168,7 +168,8 @@ function renderHscodeChecklist(classification) {
     const options = {
         country: selectedCountry,
         direction: getSelectedDirection(),
-        aiChecklist
+        aiChecklist,
+        includeBaseline: false
     };
 
     let checklist = [];
@@ -187,6 +188,9 @@ function renderHscodeChecklist(classification) {
         }
     }
 
+    if (aiChecklist.length > 0) {
+        AppState.lastApiChecklist = aiChecklist;
+    }
     AppState.complianceChecklist = checklist;
     AppState.checklistChecked = AppState.checklistChecked || {};
     AppState.hsContext = {

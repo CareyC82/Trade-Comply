@@ -805,12 +805,13 @@ async function callDeepSeekForHsCode(description, context = {}) {
         const content = data.choices?.[0]?.message?.content || '';
         const parsed = parseHsCodeClassificationPayload(content);
         const enriched = enrichClassification(parsed, context);
+        const aiChecklist = Array.isArray(parsed.checklist) ? parsed.checklist : [];
         enriched.checklist = buildSessionChecklist({
             tags: [],
-            aiChecklist: enriched.checklist || parsed.checklist || [],
+            aiChecklist,
             country: context.counterpartyCountry || 'US',
             direction: context.direction || 'export',
-            includeBaseline: true
+            includeBaseline: false
         });
         return enriched;
     } catch (error) {
@@ -857,10 +858,10 @@ async function handleHsCodeClassifyRequest(body, headers) {
         });
         const checklist = buildSessionChecklist({
             tags: [],
-            aiChecklist: classification.checklist || [],
+            aiChecklist: Array.isArray(classification.checklist) ? classification.checklist : [],
             country: counterpartyCountry,
             direction,
-            includeBaseline: true
+            includeBaseline: false
         });
         return {
             statusCode: 200,

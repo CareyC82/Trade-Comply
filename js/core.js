@@ -152,7 +152,8 @@ const AppState = {
     aiContext: null,
     hsContext: null,
     complianceChecklist: [],
-    checklistChecked: {}
+    checklistChecked: {},
+    lastApiChecklist: null
 };
 
 const VALID_VIEWS = ['home', 'electronics', 'semiconductor', 'incoterm', 'result', 'kb', 'categories'];

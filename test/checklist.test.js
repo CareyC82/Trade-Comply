@@ -7,26 +7,46 @@ const {
 } = require('../lib/checklist');
 
 describe('checklist', () => {
-    it('loads US export baseline tasks in Node', () => {
+    it('does not inject country baseline unless explicitly enabled', () => {
         const items = buildSessionChecklist({
             tags: [],
             aiChecklist: [],
             country: 'US',
-            direction: 'export'
+            direction: 'export',
+            includeBaseline: false
         });
-        assert.ok(items.length >= 3);
-        assert.ok(items.some((i) => /FCC|301|BIS/i.test(i.task)));
+        assert.equal(items.length, 0);
     });
 
-    it('merges AI and baseline items for KR import', () => {
+    it('maps English phase labels for display', () => {
+        const { getPhaseDisplayLabel, normalizePhase } = require('../lib/checklist');
+        assert.equal(normalizePhase('technical'), '技术核查');
+        assert.match(getPhaseDisplayLabel('environmental'), /环保/);
+        assert.match(getPhaseDisplayLabel('documentation'), /单证/);
+    });
+
+    it('merges AI checklist items for KR import', () => {
         const items = buildSessionChecklist({
             tags: [],
-            aiChecklist: [{ phase: '技术核查', task: 'KC trace', desc: 'Verify KC cert' }],
+            aiChecklist: [{ phase: 'technical', task: 'KC trace', desc: 'Verify KC cert' }],
             country: 'KR',
-            direction: 'import'
+            direction: 'import',
+            includeBaseline: false
         });
-        assert.ok(items.length >= 2);
-        assert.ok(items.some((i) => i.task.includes('KC')));
+        assert.equal(items.length, 1);
+        assert.equal(items[0].phase, '技术核查');
+        assert.ok(items[0].phaseLabel.includes('技术与资质'));
+    });
+
+    it('can opt in to country baseline when needed', () => {
+        const items = buildSessionChecklist({
+            tags: [],
+            aiChecklist: [],
+            country: 'US',
+            direction: 'export',
+            includeBaseline: true
+        });
+        assert.ok(items.length >= 3);
     });
 
     it('collects checklist from matching tags only', () => {

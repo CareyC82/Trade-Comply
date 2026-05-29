@@ -310,7 +310,11 @@ function renderResults(query, tags, cases, precheckSelections = []) {
 }
 
 function mountResultComplianceChecklist(tags, selectedCountry, direction) {
-    const options = { country: selectedCountry, direction };
+    const options = {
+        country: selectedCountry,
+        direction,
+        includeBaseline: false
+    };
     if (typeof mountComplianceChecklist === 'function') {
         mountComplianceChecklist('compliance-checklist-container', tags, options);
         return;
