@@ -144,88 +144,61 @@ function search(query) {
         return orderA - orderB;
     });
 
-    // Search cases by keywords, HS codes, and related tags
-    let matchedCases = cases.map(caseItem => {
+    const caseScoreFn = globalThis.TradeComplyMatchedResults?.scoreCaseAgainstQuery;
+
+    // Search cases by query relevance, HS codes, and related tags
+    let matchedCases = cases.map((caseItem) => {
         const caseDirection = caseItem.direction || 'both';
         if (caseDirection !== 'both' && caseDirection !== currentDirection) {
             return { case: caseItem, score: 0 };
         }
-        if (!query || !query.trim()) {
-            return { case: caseItem, score: 1 };
-        }
-        
-        const queryLower = query.toLowerCase();
-        const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
-        const caseKeywords = caseItem.related_keywords || [];
-        const relatedTags = caseItem.related_tags || [];
-        
-        // Calculate keyword match score
-        let score = 0;
-        let exactPhraseMatch = false;
-        caseKeywords.forEach(keyword => {
-            const keywordLower = keyword.toLowerCase();
-            if (keywordLower === queryLower) {
-                // Exact phrase match - highest score
-                score += 10;
-                exactPhraseMatch = true;
-            } else if (queryWords.includes(keywordLower)) {
-                // Exact word match
-                score += 5;
-            } else if (queryLower.includes(keywordLower) || keywordLower.includes(queryLower)) {
-                // Partial match - check if query words are in keyword
-                let wordMatches = 0;
-                queryWords.forEach(word => {
-                    if (keywordLower.includes(word)) {
-                        wordMatches++;
-                    }
-                });
-                // Give more points for multiple word matches in a keyword
-                if (wordMatches > 0) {
-                    score += wordMatches * 2; // 2 points per matching word
-                } else {
-                    score += 1; // At least 1 point for partial match
-                }
-            }
-        });
-        
-        // For multi-word queries, filter out low-scoring matches
-        if (queryWords.length > 1 && score > 0 && score < 4) {
-            score = 0; // Reject if only minor partial matches
-        }
-        
-        // HS code matching
-        const isHSCode = /^\d{4,6}(\.\d{1,4})?$/.test(query);
+
+        let score = caseScoreFn
+            ? caseScoreFn(caseItem, query)
+            : 0;
+
+        const isHSCode = query && /^\d{4,6}(\.\d{1,4})?$/.test(query.trim());
         if (isHSCode) {
+            const queryLower = query.toLowerCase();
             const normalizedInput = query.replace(/\./g, '');
-            const hsMatch = relatedTags.some(tagId => {
-                const tag = tags.find(t => t.tag_id.toLowerCase() === tagId.toLowerCase());
-                if (!tag || !tag.related_hs_codes) return false;
-                return tag.related_hs_codes.some(code => {
+            const relatedTags = caseItem.related_tags || [];
+            const hsMatch = relatedTags.some((tagId) => {
+                const tag = tags.find((t) => t.tag_id.toLowerCase() === tagId.toLowerCase());
+                if (!tag || !tag.related_hs_codes) {
+                    return false;
+                }
+                return tag.related_hs_codes.some((code) => {
                     const normalizedCode = code.replace(/\./g, '');
-                    return normalizedCode.startsWith(normalizedInput) || normalizedInput.startsWith(normalizedCode);
+                    return normalizedCode.startsWith(normalizedInput)
+                        || normalizedInput.startsWith(normalizedCode);
                 });
             });
             if (hsMatch) {
                 score += 10;
             }
-            
             const summaryLower = (caseItem.summary || '').toLowerCase();
             if (summaryLower.includes(queryLower)) {
                 score += 5;
             }
         }
-        
-        return { case: caseItem, score: score };
-    }).filter(item => item.score > 0).sort((a, b) => b.score - a.score).map(item => item.case);
+
+        return { case: caseItem, score };
+    }).filter((item) => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((item) => item.case);
 
     const enrichApi = globalThis.TradeComplyMatchedResults;
     if (enrichApi?.collectCasesForMatchedTags && enrichApi?.mergeCasesById) {
         const linkedCases = enrichApi.collectCasesForMatchedTags(
             matchedTags,
             cases,
-            currentDirection
+            currentDirection,
+            query
         );
         matchedCases = enrichApi.mergeCasesById(matchedCases, linkedCases);
+        if (enrichApi.filterCasesByQueryRelevance) {
+            matchedCases = enrichApi.filterCasesByQueryRelevance(matchedCases, query);
+        }
     }
 
     return { tags: matchedTags, cases: matchedCases };

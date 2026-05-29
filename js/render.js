@@ -57,14 +57,17 @@ function bindAiQuerySectionHandlers() {
     });
 }
 
-function resolveCasesForMatchedTags(tags, cases) {
+function resolveCasesForMatchedTags(tags, cases, query = '') {
     const direction = AppState.currentDirection || 'export';
     const allCases = AppState.data?.cases || [];
     let resolved = Array.isArray(cases) ? [...cases] : [];
     const enrichApi = globalThis.TradeComplyMatchedResults;
     if (enrichApi?.collectCasesForMatchedTags && enrichApi?.mergeCasesById) {
-        const linked = enrichApi.collectCasesForMatchedTags(tags, allCases, direction);
+        const linked = enrichApi.collectCasesForMatchedTags(tags, allCases, direction, query);
         resolved = enrichApi.mergeCasesById(resolved, linked);
+        if (enrichApi.filterCasesByQueryRelevance) {
+            resolved = enrichApi.filterCasesByQueryRelevance(resolved, query);
+        }
         return resolved;
     }
 
@@ -100,7 +103,11 @@ function resolveCasesForMatchedTags(tags, cases) {
             }
         });
     });
-    return [...byId.values()];
+    resolved = [...byId.values()];
+    if (enrichApi?.filterCasesByQueryRelevance) {
+        return enrichApi.filterCasesByQueryRelevance(resolved, query);
+    }
+    return resolved;
 }
 
 function searchProducts(query) {
@@ -108,7 +115,7 @@ function searchProducts(query) {
     const trimmedQuery = query ? query.trim() : '';
     const selections = getPrecheckSelections('precheck-panel');
     const results = searchWithPrecheck(trimmedQuery, selections, search);
-    const cases = resolveCasesForMatchedTags(results.tags, results.cases);
+    const cases = resolveCasesForMatchedTags(results.tags, results.cases, trimmedQuery);
     renderResults(trimmedQuery || t('allProducts'), results.tags, cases, selections);
 }
 
@@ -117,7 +124,7 @@ function searchProducts(query) {
  */
 function renderResults(query, tags, cases, precheckSelections = []) {
     showView('result');
-    cases = resolveCasesForMatchedTags(tags, cases);
+    cases = resolveCasesForMatchedTags(tags, cases, query);
     // 清空旧的 AI 结果
     removeAiBox();
 

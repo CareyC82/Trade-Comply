@@ -53,8 +53,16 @@ function searchSemiconductor(query) {
     });
     const enrichApi = globalThis.TradeComplyMatchedResults;
     if (enrichApi?.collectCasesForMatchedTags && enrichApi?.mergeCasesById) {
-        const linked = enrichApi.collectCasesForMatchedTags(matchedTags, allCases, currentDirection);
+        const linked = enrichApi.collectCasesForMatchedTags(
+            matchedTags,
+            allCases,
+            currentDirection,
+            query
+        );
         matchedCases = enrichApi.mergeCasesById(matchedCases, linked);
+        if (enrichApi.filterCasesByQueryRelevance) {
+            matchedCases = enrichApi.filterCasesByQueryRelevance(matchedCases, query);
+        }
     }
     return { tags: matchedTags, cases: matchedCases };
 }
