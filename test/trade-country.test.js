@@ -3,6 +3,8 @@ const assert = require('node:assert/strict');
 const {
     normalizeCountryCode,
     getCountryOptionsForDirection,
+    countryMatchesSelection,
+    filterTagsForSelectedCountry,
     countryPriorityScore,
     getTagCountryBadgeCode,
     analyzeCountryCoverage,
@@ -22,6 +24,23 @@ describe('trade-country', () => {
         const tag = { country: 'US', tag_type: 'MATCHED' };
         const other = { country: 'JP', tag_type: 'MATCHED' };
         assert.ok(countryPriorityScore(tag, 'US') > countryPriorityScore(other, 'US'));
+    });
+
+    it('filters out non-selected countries but keeps GLOBAL baseline', () => {
+        const tags = [
+            { tag_id: 'CL-KR-001', country: 'KR' },
+            { tag_id: 'CL-JP-001', country: 'JP' },
+            { tag_id: 'CL-TW-001', country: 'TW' },
+            { tag_id: 'CL-GLOBAL-001', country: 'GLOBAL' }
+        ];
+        const filtered = filterTagsForSelectedCountry(tags, 'KR');
+        assert.deepEqual(filtered.map((t) => t.tag_id), ['CL-KR-001', 'CL-GLOBAL-001']);
+        assert.equal(countryMatchesSelection({ country: 'JP' }, 'KR'), false);
+    });
+
+    it('uses tag_id regional prefix when country field is wrong', () => {
+        assert.equal(countryMatchesSelection({ tag_id: 'CL-TW-001', country: 'GLOBAL' }, 'KR'), false);
+        assert.equal(countryMatchesSelection({ tag_id: 'CL-KR-001', country: 'GLOBAL' }, 'KR'), true);
     });
 
     it('normalizes aliases', () => {

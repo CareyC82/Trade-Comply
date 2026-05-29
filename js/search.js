@@ -115,6 +115,12 @@ function search(query) {
     const selectedCountry = AppState.currentCountry || 'US';
     const countryApi = globalThis.TradeComplyCountry;
 
+    if (countryApi?.filterTagsForSelectedCountry) {
+        matchedTags = countryApi.filterTagsForSelectedCountry(matchedTags, selectedCountry);
+    } else if (countryApi?.countryMatchesSelection) {
+        matchedTags = matchedTags.filter((tag) => countryApi.countryMatchesSelection(tag, selectedCountry));
+    }
+
     // Sort: country match first, then risk level, then legacy order
     matchedTags.sort((a, b) => {
         const countryA = countryApi ? countryApi.countryPriorityScore(a, selectedCountry) : 0;
@@ -242,6 +248,27 @@ function mergeById(items, getId) {
     });
 }
 
+function applyCountryFilterToSearchResults(results) {
+    const selectedCountry = AppState.currentCountry || 'US';
+    const countryApi = globalThis.TradeComplyCountry;
+    if (countryApi?.filterTagsForSelectedCountry) {
+        return {
+            ...results,
+            tags: countryApi.filterTagsForSelectedCountry(results.tags, selectedCountry)
+        };
+    }
+    const selected = String(selectedCountry || 'US').trim().toUpperCase();
+    return {
+        ...results,
+        tags: (results.tags || []).filter((tag) => {
+            const code = String(tag.country || 'GLOBAL').trim().toUpperCase();
+            const regional = /^CL-(TW|JP|KR|RU|ASEAN)-/i.exec(tag.tag_id || '');
+            const effective = regional ? regional[1].toUpperCase() : code;
+            return effective === selected || effective === 'GLOBAL';
+        })
+    };
+}
+
 function searchWithPrecheck(query, selections, searchFn = search) {
     const trimmedQuery = query ? query.trim() : '';
     const keywordOnlyQuery = buildPrecheckQuery('', selections);
@@ -251,5 +278,5 @@ function searchWithPrecheck(query, selections, searchFn = search) {
         tags: mergeById([...baseResults.tags, ...precheckResults.tags], tag => tag.tag_id),
         cases: mergeById([...baseResults.cases, ...precheckResults.cases], caseItem => caseItem.case_id)
     };
-    return allResults;
+    return applyCountryFilterToSearchResults(allResults);
 }

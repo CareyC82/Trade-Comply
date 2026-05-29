@@ -25,7 +25,26 @@ function searchSemiconductor(query) {
     }
     const currentDirection = AppState.currentDirection || 'export';
     matchedTags = matchedTags.filter(tag => { const td = tag.direction || 'both'; return td === 'both' || td === currentDirection; });
-    matchedTags.sort((a, b) => { if (a.tag_type === b.tag_type) return (a.display_order || 999) - (b.display_order || 999); return a.tag_type === 'MATCHED' ? -1 : 1; });
+
+    const selectedCountry = AppState.currentCountry || 'US';
+    const countryApi = globalThis.TradeComplyCountry;
+    if (countryApi?.filterTagsForSelectedCountry) {
+        matchedTags = countryApi.filterTagsForSelectedCountry(matchedTags, selectedCountry);
+    } else if (countryApi?.countryMatchesSelection) {
+        matchedTags = matchedTags.filter((tag) => countryApi.countryMatchesSelection(tag, selectedCountry));
+    }
+
+    matchedTags.sort((a, b) => {
+        const countryA = countryApi ? countryApi.countryPriorityScore(a, selectedCountry) : 0;
+        const countryB = countryApi ? countryApi.countryPriorityScore(b, selectedCountry) : 0;
+        if (countryB !== countryA) {
+            return countryB - countryA;
+        }
+        if (a.tag_type === b.tag_type) {
+            return (a.display_order || 999) - (b.display_order || 999);
+        }
+        return a.tag_type === 'MATCHED' ? -1 : 1;
+    });
     const matchedCases = allCases.filter(caseItem => {
         const cd = caseItem.direction || 'both'; if (cd !== 'both' && cd !== currentDirection) return false;
         if (!query || !query.trim()) { const ck = (caseItem.related_keywords || []).map(k => k.toLowerCase()); return ck.some(kw => allSemiKeywords.includes(kw)); }

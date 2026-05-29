@@ -75,6 +75,11 @@ function renderResults(query, tags, cases, precheckSelections = []) {
 
     const direction = AppState.currentDirection || 'export';
     const selectedCountry = AppState.currentCountry || 'US';
+    if (typeof applyCountryFilterToSearchResults === 'function') {
+        const filtered = applyCountryFilterToSearchResults({ tags, cases });
+        tags = filtered.tags;
+        cases = filtered.cases;
+    }
     const countryApi = globalThis.TradeComplyCountry;
     const selectedCountryLabel = countryApi
         ? countryApi.getCountryLabel(selectedCountry)
