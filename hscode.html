@@ -353,6 +353,14 @@
                 console.error('HS classify failed:', error);
                 if (error.name === 'AbortError') {
                     showError('Request timed out. Please try again or shorten the description.');
+                } else if (
+                    error.name === 'TypeError'
+                    || /failed to fetch/i.test(error.message || '')
+                ) {
+                    showError(
+                        'Cannot reach the HS classification API (server offline or CORS blocked). '
+                        + 'If you just deployed, wait 2–3 minutes for Alibaba FC to restart, then retry.'
+                    );
                 } else {
                     showError(error.message || 'Classification failed. Please try again.');
                 }

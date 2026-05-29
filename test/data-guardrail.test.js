@@ -19,10 +19,17 @@ describe('data-guardrail', () => {
         assert.equal(result.value.country, 'US');
     });
 
-    it('rejects invalid country', () => {
-        const result = validateDataSchema({ ...VALID_SIGNAL, country: 'OTHER' }, 'risk_signal');
-        assert.equal(result.ok, false);
-        assert.ok(result.errors.some((e) => e.includes('country')));
+    it('maps Other label to GLOBAL country code', () => {
+        const result = validateDataSchema({ ...VALID_SIGNAL, country: 'Other' }, 'risk_signal');
+        assert.equal(result.ok, true);
+        assert.equal(result.value.country, 'GLOBAL');
+    });
+
+    it('accepts Russia and Taiwan canonical codes', () => {
+        const ru = validateDataSchema({ ...VALID_SIGNAL, country: 'RU' }, 'risk_signal');
+        const tw = validateDataSchema({ ...VALID_SIGNAL, country: 'TW', direction: 'import' }, 'risk_signal');
+        assert.equal(ru.ok, true);
+        assert.equal(tw.ok, true);
     });
 
     it('rejects empty hs_code', () => {

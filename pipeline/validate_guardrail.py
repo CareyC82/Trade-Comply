@@ -5,7 +5,9 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Tuple
 
-ALLOWED_COUNTRIES = frozenset({"US", "EU", "JP", "KR", "ASEAN", "GLOBAL"})
+from country_registry import load_registry, normalize_country_code
+
+ALLOWED_COUNTRIES = frozenset(load_registry().get("canonical_codes", []))
 ALLOWED_DIRECTIONS = frozenset({"export", "import"})
 ALLOWED_RISK_LEVELS = frozenset({"High", "Medium", "Low"})
 INVALID_HS = frozenset({"", "ALL", "00000000", "N/A", "NA", "NONE", "UNKNOWN"})
@@ -37,8 +39,7 @@ HALLUCINATION_PATTERNS = [
 
 
 def _normalize_country(value: Any) -> str:
-    raw = str(value or "").strip().upper()
-    return COUNTRY_ALIASES.get(raw, raw)
+    return normalize_country_code(value)
 
 
 def _contains_hallucination(text: Any) -> bool:

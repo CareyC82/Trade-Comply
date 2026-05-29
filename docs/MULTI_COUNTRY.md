@@ -35,7 +35,9 @@ python3 pipeline/pipeline.py
 python3 pipeline/pipeline.py --offline
 ```
 
-Flow: **CCPIT/MOFCOM alerts** + **US BIS** → structure → `data/pending_data/pipeline_batch.json` → `node scripts/ingest-pipeline-batch.js` → GitHub Issue.
+Flow: **CCPIT/MOFCOM alerts** + **US BIS** → structure → guardrail → auto-publish to `data/tags.json`.
+
+Country codes are defined in `data/country-registry.json` (aligned with frontend `<select>` options: US, EU, ASEAN, RU, TW, JP, KR, GLOBAL).
 
 ## Local test
 

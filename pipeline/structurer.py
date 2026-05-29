@@ -9,14 +9,18 @@ import urllib.request
 from datetime import datetime, timezone
 from typing import List
 
-DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
+from country_registry import (
+    build_structurer_system_prompt,
+    build_user_context,
+    normalize_country_code,
+)
 
-COUNTRY_PATTERN = re.compile(r"\b(US|EU|ASEAN|RU|TW|JP|KR|GLOBAL)\b", re.I)
+DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
 
 
 def _heuristic_structure(item: dict) -> dict:
     text = f"{item.get('title', '')} {item.get('body', '')}"
-    country = item.get("default_country") or "GLOBAL"
+    country = normalize_country_code(item.get("default_country") or "GLOBAL")
     if re.search(r"欧盟|EU|European", text, re.I):
         country = "EU"
     elif re.search(r"美国|U\.S\.|United States|BIS|Entity List", text, re.I):
@@ -59,30 +63,17 @@ def _heuristic_structure(item: dict) -> dict:
 
 
 def _deepseek_structure(item: dict, api_key: str) -> dict:
+    user_payload = build_user_context(item)
     prompt = {
         "model": "deepseek-chat",
         "messages": [
             {
                 "role": "system",
-                "content": (
-                    "You are a trade compliance data engineer. Return ONE JSON object with keys: "
-                    "hs_code, direction (export|import), country (US|EU|ASEAN|JP|KR|GLOBAL only), "
-                    "risk_level (High|Medium|Low), source, content_en, content_zh. English content_en, "
-                    "Chinese content_zh. No markdown."
-                ),
+                "content": build_structurer_system_prompt(),
             },
             {
                 "role": "user",
-                "content": json.dumps(
-                    {
-                        "title": item.get("title"),
-                        "body": item.get("body"),
-                        "source_org": item.get("source_org"),
-                        "default_country": item.get("default_country"),
-                        "default_direction": item.get("default_direction"),
-                    },
-                    ensure_ascii=False,
-                ),
+                "content": json.dumps(user_payload, ensure_ascii=False),
             },
         ],
         "temperature": 0.1,
@@ -104,6 +95,7 @@ def _deepseek_structure(item: dict, api_key: str) -> dict:
 
     content = payload["choices"][0]["message"]["content"]
     parsed = json.loads(content)
+    parsed["country"] = normalize_country_code(parsed.get("country"))
     parsed.setdefault("source", item.get("source_org"))
     parsed.setdefault("source_url", item.get("source_url"))
     parsed.setdefault("pipeline_source", item.get("scraper", "pipeline"))

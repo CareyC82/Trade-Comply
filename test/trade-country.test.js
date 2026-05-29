@@ -27,6 +27,8 @@ describe('trade-country', () => {
     it('normalizes aliases', () => {
         assert.equal(normalizeCountryCode('united states'), 'US');
         assert.equal(normalizeCountryCode('Taiwan'), 'TW');
+        assert.equal(normalizeCountryCode('Other'), 'GLOBAL');
+        assert.equal(normalizeCountryCode('OTHER'), 'GLOBAL');
     });
 
     it('maps GLOBAL rules to CN badge for export baseline', () => {

@@ -15,6 +15,9 @@ mkdir -p "$PKG_DIR/data" "$PKG_DIR/js" "$PKG_DIR/lib"
 
 cp "$ROOT/index.js" "$PKG_DIR/"
 cp "$ROOT/lib/parse-model-json.js" "$PKG_DIR/lib/"
+cp "$ROOT/lib/country-registry.js" "$PKG_DIR/lib/"
+cp "$ROOT/lib/hscode-dual.js" "$PKG_DIR/lib/"
+cp "$ROOT/data/country-registry.json" "$PKG_DIR/data/"
 cp "$ROOT/compliance-feedback-codec.js" "$PKG_DIR/"
 cp "$ROOT/feedback-store.js" "$PKG_DIR/"
 cp "$ROOT/supabase-feedback.js" "$PKG_DIR/"
@@ -28,13 +31,31 @@ cp "$ROOT/data/catalog.json" "$PKG_DIR/data/"
 
 (
   cd "$PKG_DIR"
-  zip -r "$ZIP" index.js lib/parse-model-json.js compliance-feedback-codec.js feedback-store.js supabase-feedback.js js/catalog.js data/tags.json data/cases.json data/categories.json data/catalog.schema.json data/scope-keywords.json data/catalog.json
+  zip -r "$ZIP" \
+    index.js \
+    lib/parse-model-json.js \
+    lib/country-registry.js \
+    lib/hscode-dual.js \
+    compliance-feedback-codec.js \
+    feedback-store.js \
+    supabase-feedback.js \
+    js/catalog.js \
+    data/tags.json \
+    data/cases.json \
+    data/categories.json \
+    data/catalog.schema.json \
+    data/scope-keywords.json \
+    data/catalog.json \
+    data/country-registry.json
 )
 
-if ! unzip -l "$ZIP" | grep -q 'compliance-feedback-codec.js'; then
-  echo "ERROR: fc-deploy.zip is missing compliance-feedback-codec.js" >&2
-  exit 1
-fi
+ZIP_LIST="$(unzip -l "$ZIP")"
+for required in compliance-feedback-codec.js lib/hscode-dual.js lib/country-registry.js data/country-registry.json; do
+  if ! printf '%s\n' "$ZIP_LIST" | grep -Fq "$required"; then
+    echo "ERROR: fc-deploy.zip is missing $required" >&2
+    exit 1
+  fi
+done
 
 echo "Created: $ZIP"
 unzip -l "$ZIP"

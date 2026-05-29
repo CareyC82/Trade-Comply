@@ -18,6 +18,7 @@
     "restart:admin": "bash scripts/restart-admin-server.sh",
     "publish:reviewed": "node scripts/publish-reviewed-data.js",
     "guardrail:prod": "node scripts/check-prod-guardrail.js",
-    "validate:pending": "node scripts/validate-pending-queue.js"
+    "validate:pending": "node scripts/validate-pending-queue.js",
+    "seed:regional-baselines": "node scripts/ensure-regional-baseline-tags.js && node scripts/build-catalog.js"
   }
 }

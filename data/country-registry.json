@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-29T00:00:00.000Z",
+  "canonical_codes": ["US", "EU", "ASEAN", "RU", "TW", "JP", "KR", "GLOBAL"],
+  "export_options": [
+    { "value": "US", "label": "United States" },
+    { "value": "EU", "label": "European Union" },
+    { "value": "ASEAN", "label": "ASEAN (Vietnam / Malaysia)" },
+    { "value": "RU", "label": "Russia" },
+    { "value": "GLOBAL", "label": "Other" }
+  ],
+  "import_options": [
+    { "value": "TW", "label": "Taiwan (China)" },
+    { "value": "JP", "label": "Japan" },
+    { "value": "KR", "label": "South Korea" },
+    { "value": "US", "label": "United States" },
+    { "value": "GLOBAL", "label": "Other" }
+  ],
+  "label_to_code": {
+    "United States": "US",
+    "European Union": "EU",
+    "ASEAN (Vietnam / Malaysia)": "ASEAN",
+    "Russia": "RU",
+    "Taiwan (China)": "TW",
+    "Japan": "JP",
+    "South Korea": "KR",
+    "Other": "GLOBAL"
+  },
+  "aliases": {
+    "USA": "US",
+    "UNITED STATES": "US",
+    "U.S.": "US",
+    "EUROPE": "EU",
+    "EUROPEAN UNION": "EU",
+    "VIETNAM": "ASEAN",
+    "MALAYSIA": "ASEAN",
+    "SOUTHEAST ASIA": "ASEAN",
+    "RUSSIA": "RU",
+    "RUSSIAN FEDERATION": "RU",
+    "TAIWAN": "TW",
+    "TAIWAN (CHINA)": "TW",
+    "JAPAN": "JP",
+    "KOREA": "KR",
+    "SOUTH KOREA": "KR",
+    "REPUBLIC OF KOREA": "KR",
+    "OTHER": "GLOBAL",
+    "OTHERS": "GLOBAL",
+    "GLOBAL": "GLOBAL",
+    "CN": "GLOBAL",
+    "CHINA": "GLOBAL"
+  },
+  "compliance_focus": {
+    "RU": {
+      "priority": "high",
+      "export": "Screen dual-use export controls, international sanctions red lines, and electronic component embargo risk for Russia-bound shipments.",
+      "import": "Verify Russia-origin items against sanctions and restricted party lists before China import."
+    },
+    "TW": {
+      "priority": "high",
+      "import": "Screen Taiwan-origin semiconductor equipment, wafer technology, and special cross-strait technology licensing requirements.",
+      "export": "Assess cross-strait technology transfer restrictions for Taiwan-related electronics."
+    },
+    "ASEAN": {
+      "priority": "high",
+      "export": "Emphasize rules of origin compliance and transshipment / anti-circumvention risk for Vietnam and Malaysia routes.",
+      "import": "Check ASEAN origin documentation and re-export control for electronics supply chains."
+    },
+    "US": {
+      "priority": "medium",
+      "export": "Include US HTS alignment, Section 301 / BIS export control, and entity list exposure.",
+      "import": "Review US-origin technology licensing and re-export conditions."
+    },
+    "EU": {
+      "priority": "medium",
+      "export": "Include EU TARIC alignment, CBAM reporting, and dual-use export screening.",
+      "import": "Check EU-origin controlled technology and REACH-related obligations where relevant."
+    },
+    "JP": {
+      "priority": "medium",
+      "import": "Screen Japan-origin semiconductor manufacturing equipment and controlled technology items.",
+      "export": "Assess Japan market access and export notification for high-tech goods."
+    },
+    "KR": {
+      "priority": "medium",
+      "import": "Screen Korea-origin semiconductor equipment, memory ICs, and export-licensed technologies.",
+      "export": "Assess Korea outbound licensing for advanced electronics."
+    },
+    "GLOBAL": {
+      "priority": "low",
+      "export": "Apply general China export compliance baseline when no specific destination rule matches.",
+      "import": "Apply general China import baseline for unspecified origins."
+    }
+  }
+}
