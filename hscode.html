@@ -95,8 +95,9 @@
         <span id="nav-hscode" class="nav-btn active" aria-current="page">🔍 HS Code<span class="nav-btn-badge">Beta</span></span>
     </nav>
 
-    <script src="lib/trade-country.js?v=20260529"></script>
-    <script src="lib/hscode-dual.js?v=20260529"></script>
+    <script src="lib/country-registry.js?v=20260529d"></script>
+    <script src="lib/trade-country.js?v=20260529d"></script>
+    <script src="lib/hscode-dual.js?v=20260529d"></script>
     <script>
     (function () {
         const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run?action=hscode_classify';
@@ -153,17 +154,41 @@
             return selectedDirection === 'import' ? 'import' : 'export';
         }
 
+        const FALLBACK_EXPORT_OPTIONS = [
+            { value: 'US', label: 'United States' },
+            { value: 'EU', label: 'European Union' },
+            { value: 'ASEAN', label: 'ASEAN (Vietnam / Malaysia)' },
+            { value: 'RU', label: 'Russia' },
+            { value: 'GLOBAL', label: 'Other' }
+        ];
+        const FALLBACK_IMPORT_OPTIONS = [
+            { value: 'TW', label: 'Taiwan (China)' },
+            { value: 'JP', label: 'Japan' },
+            { value: 'KR', label: 'South Korea' },
+            { value: 'US', label: 'United States' },
+            { value: 'GLOBAL', label: 'Other' }
+        ];
+
         function populateHscodeCountrySelect(direction) {
             const select = document.getElementById('hscode-trade-country');
-            if (!select || !globalThis.TradeComplyCountry) {
+            if (!select) {
                 return;
             }
-            const { getCountryOptionsForDirection, normalizeCountryCode } = globalThis.TradeComplyCountry;
-            const options = getCountryOptionsForDirection(direction);
-            const selected = normalizeCountryCode(selectedCountry);
+
+            let options = direction === 'import' ? FALLBACK_IMPORT_OPTIONS : FALLBACK_EXPORT_OPTIONS;
+            let normalize = (value) => String(value || 'US').trim().toUpperCase();
+
+            if (globalThis.TradeComplyCountry) {
+                const api = globalThis.TradeComplyCountry;
+                options = api.getCountryOptionsForDirection(direction);
+                normalize = api.normalizeCountryCode;
+            }
+
+            const selected = normalize(selectedCountry);
             select.innerHTML = options.map((opt) => `<option value="${opt.value}">${opt.label}</option>`).join('');
             select.value = options.some((o) => o.value === selected) ? selected : options[0].value;
             selectedCountry = select.value;
+            select.disabled = false;
         }
 
         function bindDirectionToggle() {
