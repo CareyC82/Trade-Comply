@@ -4,7 +4,8 @@
 
 | Workflow | Trigger | Role |
 |----------|---------|------|
-| [policy-tracker.yml](../.github/workflows/policy-tracker.yml) | Daily 02:00 CST | Stage AI results → `pending_data` only; open review Issue |
+| [policy-tracker.yml](../.github/workflows/policy-tracker.yml) | Daily 02:00 CST | Auto-publish validated tags; guardrail Issue on failures |
+| [global-compliance-pipeline.yml](../.github/workflows/global-compliance-pipeline.yml) | Daily 02:00 CST | Scrape + structure + auto-publish risk signals |
 | [ci-guardrail.yml](../.github/workflows/ci-guardrail.yml) | Push / PR to `main` | Block bot prod writes; validate queue; unit tests |
 | [catalog.yml](../.github/workflows/catalog.yml) | Push / PR | Catalog schema + artifact freshness |
 | [deploy-fc.yml](../.github/workflows/deploy-fc.yml) | Push to FC paths / manual | Deploy Alibaba FC with bundled `data/*.json` |

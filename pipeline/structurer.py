@@ -66,7 +66,7 @@ def _deepseek_structure(item: dict, api_key: str) -> dict:
                 "role": "system",
                 "content": (
                     "You are a trade compliance data engineer. Return ONE JSON object with keys: "
-                    "hs_code, direction (export|import), country (US|EU|ASEAN|RU|TW|JP|KR|GLOBAL|OTHER), "
+                    "hs_code, direction (export|import), country (US|EU|ASEAN|JP|KR|GLOBAL only), "
                     "risk_level (High|Medium|Low), source, content_en, content_zh. English content_en, "
                     "Chinese content_zh. No markdown."
                 ),

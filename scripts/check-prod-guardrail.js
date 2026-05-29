@@ -99,13 +99,19 @@ function main() {
 
     const isBot = BOT_ACTORS.has(actor) || actor.endsWith('[bot]');
     const adminPublish = commitMessage.includes('[admin-publish]');
+    const autoPublish = commitMessage.includes('[auto-publish]');
 
-    if (isBot && !adminPublish) {
+    if (isBot && !adminPublish && !autoPublish) {
         console.error('ERROR: Automated actor attempted to modify production data:');
         prodTouched.forEach(file => console.error(`  - ${file}`));
-        console.error('Automation may only write to data/pending_data/ and data/inbox/.');
-        console.error('Use [admin-publish] only on human/admin commits.');
+        console.error('Automation may only write to data/pending_data/, data/pending_data.json, and data/inbox/.');
+        console.error('Use [auto-publish] for validated pipeline commits or [admin-publish] for human override.');
         process.exit(1);
+    }
+
+    if (isBot && autoPublish) {
+        console.log('Prod guardrail: automated pipeline publish allowed ([auto-publish]).');
+        process.exit(0);
     }
 
     if (!isBot && adminPublish) {

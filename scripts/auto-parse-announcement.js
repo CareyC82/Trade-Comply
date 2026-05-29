@@ -16,7 +16,7 @@ const { spawnSync } = require('child_process');
 const ROOT = path.join(__dirname, '..');
 const DEFAULT_INPUT = path.join(__dirname, 'fixtures', 'mock_news.txt');
 const TAGS_PATH = path.join(ROOT, 'data', 'tags.json');
-const { stagePendingItems } = require(path.join(ROOT, 'lib', 'data-review'));
+const { autoPublishBatch } = require(path.join(ROOT, 'lib', 'auto-publish'));
 const SCHEMA_PATH = path.join(ROOT, 'data', 'catalog.schema.json');
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const TIMEOUT_MS = 90000;
@@ -64,7 +64,7 @@ function printHelp() {
 
 Options:
   --input <path>   Announcement text file (default: scripts/fixtures/mock_news.txt)
-  --apply          Stage accepted tags into data/pending_data/queue.json (human review required)
+  --apply          Auto-publish accepted tags to production (guardrail intercepts failures)
   --dry-run        Preview only; do not write (default when --apply is omitted)
   --offline        Use scripts/fixtures/<input>.response.json instead of DeepSeek
   --help           Show this help
@@ -455,13 +455,12 @@ function runNodeScript(relativePath, args = []) {
     }
 }
 
-function stageTagsForReview(acceptedTags, meta) {
-    const { staged, skipped } = stagePendingItems({
+function autoPublishTags(acceptedTags, meta) {
+    return autoPublishBatch({
         tags: acceptedTags,
         meta,
         source: 'policy-tracker'
     });
-    return { staged, skipped };
 }
 
 async function main() {
@@ -523,35 +522,36 @@ async function main() {
     console.log('\nPre-write catalog validation passed.');
 
     if (options.dryRun) {
-        console.log('\nDry run only. Re-run with --apply to stage tags in data/pending_data/queue.json.');
+        console.log('\nDry run only. Re-run with --apply to auto-publish tags to production.');
         console.log(JSON.stringify(accepted, null, 2));
         return;
     }
 
     const announcementSource = path.basename(options.input);
-    const { staged, skipped: stageSkipped } = stageTagsForReview(accepted, {
+    const publishResult = autoPublishTags(accepted, {
         announcement_file: announcementSource,
         analysis_summary: modelResult.analysis_summary || ''
     });
 
-    console.log(`\nStaged ${staged.length} tag(s) for human review (pending_data).`);
-    staged.forEach(item => {
-        console.log(`  + ${item.pending_id} — ${item.payload.tag_id}: ${item.payload.short_description}`);
+    console.log(`\nAuto-published ${publishResult.counts.published_tags} tag(s) to production.`);
+    publishResult.published.tags.forEach((tagId) => {
+        console.log(`  + ${tagId}`);
     });
-
-    if (stageSkipped.length > 0) {
-        console.log(`\nNot staged (duplicate or invalid): ${stageSkipped.length}`);
-        stageSkipped.forEach(entry => {
-            console.log(`  - ${entry.reason || entry.tag_id || entry.case_id || 'unknown'}`);
+    if (publishResult.counts.intercepted > 0) {
+        console.log(`\nGuardrail intercepted ${publishResult.counts.intercepted} tag(s) → data/pending_data.json`);
+        publishResult.intercepted.forEach((row) => {
+            const id = row.raw?.tag_id || 'unknown';
+            console.log(`  ! ${id}: ${row.reasons.join('; ')}`);
         });
     }
 
-    if (staged.length === 0) {
-        throw new Error('No tags were staged (all duplicates or invalid).');
+    if (publishResult.counts.published_tags === 0 && publishResult.counts.intercepted === 0) {
+        throw new Error('No tags were published (all duplicates or empty batch).');
     }
 
-    console.log('\nOpen admin.html via: node scripts/admin-server.js');
-    console.log('Production data/tags.json is unchanged until you approve.');
+    if (publishResult.catalog_warning) {
+        console.warn(`\nWARN: catalog rebuild: ${publishResult.catalog_warning}`);
+    }
 
     console.log('\nRunning catalog validation...');
     runNodeScript('scripts/validate-catalog.js');

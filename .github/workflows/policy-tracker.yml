@@ -28,31 +28,36 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Fetch announcements and parse with DeepSeek
+      - name: Fetch announcements and parse with DeepSeek (auto-publish)
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: node scripts/run-policy-tracker.js
 
-      - name: Commit and push if staging queue or manifest changed
+      - name: Commit and push auto-published data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/pending_data/queue.json data/inbox/manifest.json
+          git add \
+            data/tags.json \
+            data/cases.json \
+            data/catalog.json \
+            data/pending_data.json \
+            data/inbox/manifest.json
 
           if git diff --staged --quiet; then
             echo "No policy tracker changes to commit."
             exit 0
           fi
 
-          if git diff --staged --name-only | grep -q '^data/pending_data/queue.json$'; then
-            git commit -m "chore: stage AI policy updates for human review"
+          if git diff --staged --name-only | grep -Eq '^data/(tags|cases|catalog)\.json$'; then
+            git commit -m "auto-data: daily policy tracker update [auto-publish]"
           else
             git commit -m "chore: update policy fetch manifest"
           fi
           git push
 
-      - name: Create pending review GitHub Issue
+      - name: Create guardrail cleanup GitHub Issue
         if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/create-pending-review-issue.js
+        run: node scripts/create-guardrail-issue.js

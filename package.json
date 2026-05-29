@@ -12,6 +12,7 @@
     "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js",
     "pipeline:global": "python3 pipeline/pipeline.py",
     "pipeline:global:offline": "python3 pipeline/pipeline.py --offline",
+    "pipeline:publish": "node scripts/auto-publish-pipeline.js",
     "dev:preview": "python3 -m http.server 8000",
     "dev:admin": "node scripts/admin-server.js",
     "restart:admin": "bash scripts/restart-admin-server.sh",
