@@ -8,6 +8,7 @@ on:
       - "lib/hscode-dual.js"
       - "lib/industry-checklist-baseline.js"
       - "lib/checklist.js"
+      - "lib/fc-deps.js"
       - "lib/country-registry.js"
       - "lib/parse-model-json.js"
       - "data/country-registry.json"
@@ -82,5 +83,10 @@ jobs:
             echo "FC_HTTP_URL secret not set; skipping smoke test."
             exit 0
           fi
-          curl -fsS "$FC_URL" | grep -q "Service Online"
-          echo "FC smoke test passed."
+          BASE="${FC_URL%/}"
+          HTTP_CODE="$(curl -sS -o /tmp/fc-health.json -w "%{http_code}" "${BASE}?health=feedback" || true)"
+          echo "Health HTTP ${HTTP_CODE}:"
+          cat /tmp/fc-health.json || true
+          test "$HTTP_CODE" = "200"
+          grep -q '"ok":true' /tmp/fc-health.json
+          echo "FC smoke test passed (health endpoint)."

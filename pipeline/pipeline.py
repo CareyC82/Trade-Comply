@@ -25,6 +25,7 @@ GUARDRAIL_REPORT_PATH = ROOT / "data" / "pending_data" / "guardrail_report.json"
 
 
 def main() -> int:
+    print("=== CRON JOB START: 凌晨2点全球海关规则数据抓取开始 (global-compliance-pipeline) ===")
     parser = argparse.ArgumentParser(description="Trade Comply global compliance pipeline")
     parser.add_argument("--offline", action="store_true", help="Use fixture scraper output only")
     parser.add_argument("--dry-run", action="store_true", help="Structure + guardrail only; skip Node publish")
@@ -77,13 +78,13 @@ def main() -> int:
     )
 
     if args.dry_run:
-        print("Dry run: skipping Node auto-publish.")
+        print("=== CRON JOB SUCCESS: Dry run 完成（未发布） ===")
         return 0
 
     if not passed and intercepted:
         print("All signals intercepted by guardrail; running Node to record pending_data.json.")
     elif not passed:
-        print("No signals to publish.")
+        print("=== CRON JOB SUCCESS: 无通过护栏的信号，管道正常结束 ===")
         return 0
 
     publish_script = ROOT / "scripts" / "auto-publish-pipeline.js"
@@ -92,7 +93,7 @@ def main() -> int:
         print("WARN: Node auto-publish script failed; batch file is still available.")
         return result.returncode
 
-    print("Pipeline completed (auto-publish).")
+    print("=== CRON JOB SUCCESS: 成功洗入最新规则数据 (global-compliance-pipeline) ===")
     return 0
 
 

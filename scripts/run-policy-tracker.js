@@ -44,6 +44,7 @@ function runNodeScript(scriptRelativePath, args = [], { allowExitCodes = [] } = 
 }
 
 function main() {
+    console.log('=== CRON JOB START: 凌晨2点政策公告抓取与解析 (GitHub Actions policy-tracker) ===');
     const options = parseArgs(process.argv.slice(2));
 
     if (options.offline) {
@@ -57,7 +58,7 @@ function main() {
         if (status !== 0) {
             process.exit(status);
         }
-        console.log('Policy tracker completed in offline mode.');
+        console.log('=== CRON JOB SUCCESS: 政策追踪离线模式完成 ===');
         return;
     }
 
@@ -66,7 +67,7 @@ function main() {
     });
 
     if (fetchStatus === 10) {
-        console.log('Policy tracker finished: no new relevant announcements.');
+        console.log('=== CRON JOB SUCCESS: 无新公告，政策追踪正常结束 ===');
         return;
     }
 
@@ -77,12 +78,13 @@ function main() {
     ];
 
     runNodeScript('scripts/auto-parse-announcement.js', parseArgsList);
-    console.log('Policy tracker completed successfully.');
+    console.log('=== CRON JOB SUCCESS: 成功洗入最新规则数据 (policy-tracker) ===');
 }
 
 try {
     main();
 } catch (error) {
+    console.error('=== CRON JOB FAILED: policy-tracker ===');
     console.error(`ERROR: ${error.message}`);
     process.exit(1);
 }

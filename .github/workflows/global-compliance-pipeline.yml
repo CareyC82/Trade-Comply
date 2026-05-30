@@ -42,11 +42,13 @@ jobs:
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
+          echo "=== CRON JOB START: 凌晨2点全球合规管道 (GitHub Actions, 非阿里云 FC) ==="
           if [ "${{ github.event.inputs.offline }}" = "true" ]; then
             python3 pipeline/pipeline.py --offline
           else
             python3 pipeline/pipeline.py || python3 pipeline/pipeline.py --offline
           fi
+          echo "=== CRON JOB WORKFLOW STEP DONE: global-compliance-pipeline ==="
 
       - name: Commit auto-published production data
         run: |

@@ -118,6 +118,7 @@ async function fetchSource(source) {
 }
 
 async function main() {
+    console.log('=== CRON JOB START: 政策源网页抓取 (fetch-policy-news) ===');
     const options = parseArgs(process.argv.slice(2));
     const config = readJson(options.config);
     const manifestPath = path.resolve(ROOT, config.manifest_path || 'data/inbox/manifest.json');
@@ -174,7 +175,7 @@ async function main() {
     writeJson(manifestPath, manifest);
 
     if (changedBlocks.length === 0) {
-        console.log('No new relevant policy content detected.');
+        console.log('=== CRON JOB SUCCESS: 无新相关政策内容 (fetch-policy-news) ===');
         process.exitCode = fetchErrors > 0 && fetchErrors === enabledSources.length ? 1 : 10;
         return;
     }
@@ -189,9 +190,11 @@ async function main() {
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, `${combined}\n`, 'utf8');
     console.log(`Wrote inbox file: ${path.relative(ROOT, outputPath)} (${changedBlocks.length} source block(s))`);
+    console.log('=== CRON JOB SUCCESS: 政策公告已写入 inbox，等待 DeepSeek 解析 ===');
 }
 
 main().catch(error => {
+    console.error('=== CRON JOB FAILED: fetch-policy-news ===');
     console.error(`ERROR: ${error.message}`);
     process.exit(1);
 });

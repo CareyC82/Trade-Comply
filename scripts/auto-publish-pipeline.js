@@ -12,6 +12,7 @@ const BATCH_PATH = path.join(ROOT, 'data', 'pending_data', 'pipeline_batch.json'
 const GUARDRAIL_REPORT_PATH = path.join(ROOT, 'data', 'pending_data', 'guardrail_report.json');
 
 function main() {
+    console.log('=== CRON JOB: Node 自动发布批次 (auto-publish-pipeline) ===');
     if (!fs.existsSync(BATCH_PATH)) {
         console.log('No pipeline batch file; nothing to publish.');
         return;
@@ -84,11 +85,14 @@ function main() {
     if (result.counts.published_tags === 0 && totalIntercepted > 0 && signals.length === 0) {
         process.exit(2);
     }
+
+    console.log('=== CRON JOB SUCCESS: auto-publish-pipeline 完成 ===');
 }
 
 try {
     main();
 } catch (error) {
+    console.error('=== CRON JOB FAILED: auto-publish-pipeline ===');
     console.error(`ERROR: ${error.message}`);
     process.exit(1);
 }

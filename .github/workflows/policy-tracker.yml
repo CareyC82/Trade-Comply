@@ -31,7 +31,10 @@ jobs:
       - name: Fetch announcements and parse with DeepSeek (auto-publish)
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: node scripts/run-policy-tracker.js
+        run: |
+          echo "=== CRON JOB START: 凌晨2点政策追踪 (GitHub Actions, 非阿里云 FC) ==="
+          node scripts/run-policy-tracker.js
+          echo "=== CRON JOB WORKFLOW STEP DONE: policy-tracker ==="
 
       - name: Commit and push auto-published data
         run: |

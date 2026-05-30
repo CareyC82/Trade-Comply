@@ -10,14 +10,11 @@ const {
     extractComplianceFeedbackPayload,
     isComplianceFeedbackQuery
 } = require('./compliance-feedback-codec');
-const { parseHsCodeClassificationPayload } = require('./lib/parse-model-json');
 const {
-    enrichClassification,
-    buildHsCodeUserPrompt,
-    buildHsCodeSystemPrompt,
-    normalizeCountryCode
-} = require('./lib/hscode-dual');
-const { ensureIndustryChecklist } = require('./lib/industry-checklist-baseline');
+    loadFcLibModules,
+    getHsCodeSystemPrompt,
+    bundleIncompleteResponse
+} = require('./lib/fc-deps');
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const ALLOWED_ORIGINS = new Set([
@@ -30,14 +27,11 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260603baseline-always';
+const FC_BUILD_ID = '20260530fc-bundle-fix';
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
 const HSCODE_CLASSIFY_MAX_TOKENS = 3200;
-const { buildSessionChecklist } = require('./lib/checklist');
-
-const HSCODE_CLASSIFY_SYSTEM_PROMPT = buildHsCodeSystemPrompt();
 const MAX_CONTEXT_TAGS = 8;
 const MAX_CONTEXT_CASES = 3;
 const MAX_FIELD_LENGTH = 500;
@@ -131,6 +125,7 @@ function loadRuleLibrary() {
 }
 
 loadRuleLibrary();
+console.log(`=== FC RUNTIME READY: Trade Comply index.js build=${FC_BUILD_ID} ===`);
 
 function checkSearchRange(query) {
     return queryMatchesScope(query, SCOPE_KEYWORD_LIST);
@@ -771,7 +766,7 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
-async function callDeepSeekForHsCode(description, context = {}) {
+async function callDeepSeekForHsCode(description, context = {}, fcLibs) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -785,8 +780,8 @@ async function callDeepSeekForHsCode(description, context = {}) {
             body: JSON.stringify({
                 model: 'deepseek-chat',
                 messages: [
-                    { role: 'system', content: HSCODE_CLASSIFY_SYSTEM_PROMPT },
-                    { role: 'user', content: buildHsCodeUserPrompt(description, context) }
+                    { role: 'system', content: getHsCodeSystemPrompt() },
+                    { role: 'user', content: fcLibs.buildHsCodeUserPrompt(description, context) }
                 ],
                 temperature: 0.1,
                 max_tokens: HSCODE_CLASSIFY_MAX_TOKENS,
@@ -804,15 +799,15 @@ async function callDeepSeekForHsCode(description, context = {}) {
 
         const data = await response.json();
         const content = data.choices?.[0]?.message?.content || '';
-        const parsed = parseHsCodeClassificationPayload(content);
-        const enriched = enrichClassification(parsed, context);
-        const aiChecklist = ensureIndustryChecklist(parsed.checklist, {
+        const parsed = fcLibs.parseHsCodeClassificationPayload(content);
+        const enriched = fcLibs.enrichClassification(parsed, context);
+        const aiChecklist = fcLibs.ensureIndustryChecklist(parsed.checklist, {
             description,
             hsCode: parsed.china_export_hscode || parsed.china_import_hscode || parsed.hscode,
             counterpartyCountry: context.counterpartyCountry || 'US',
             direction: context.direction || 'export'
         });
-        enriched.checklist = buildSessionChecklist({
+        enriched.checklist = fcLibs.buildSessionChecklist({
             tags: [],
             aiChecklist,
             country: context.counterpartyCountry || 'US',
@@ -827,9 +822,17 @@ async function callDeepSeekForHsCode(description, context = {}) {
 }
 
 async function handleHsCodeClassifyRequest(body, headers) {
+    let fcLibs;
+    try {
+        fcLibs = loadFcLibModules();
+    } catch (bundleError) {
+        console.error('HS classify bundle error:', bundleError.message);
+        return bundleIncompleteResponse(headers);
+    }
+
     const description = typeof body.description === 'string' ? body.description.trim() : '';
     const direction = body.direction === 'import' ? 'import' : 'export';
-    const counterpartyCountry = normalizeCountryCode(
+    const counterpartyCountry = fcLibs.normalizeCountryCode(
         body.counterparty_country || body.country || 'US'
     );
 
@@ -861,7 +864,7 @@ async function handleHsCodeClassifyRequest(body, headers) {
         const classification = await callDeepSeekForHsCode(description, {
             direction,
             counterpartyCountry
-        });
+        }, fcLibs);
         const checklist = classification.checklist || [];
         return {
             statusCode: 200,
