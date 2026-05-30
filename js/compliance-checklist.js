@@ -493,8 +493,6 @@ function renderComplianceChecklistPanel(containerId, checklist) {
             });
         }
 
-        console.log('CRITICAL - Raw AI Checklist:', checklistData);
-
         AppState.complianceChecklist = checklistData;
 
         if (!checklistData.length) {
@@ -574,10 +572,14 @@ function renderComplianceChecklistPanel(containerId, checklist) {
 }
 
 function getChecklistForReport() {
-    return (AppState.complianceChecklist || []).map((item) => ({
-        ...item,
-        checked: Boolean(AppState.checklistChecked[item.id])
-    }));
+    return (AppState.complianceChecklist || []).map((item) => {
+        const itemId = String(item.id || item.task || 'checklist-item');
+        return {
+            ...item,
+            id: itemId,
+            checked: Boolean(AppState.checklistChecked[itemId])
+        };
+    });
 }
 
 function buildFlowLabel(direction, countryCode) {
@@ -661,10 +663,14 @@ function buildEnterpriseReportForPrint(baseReport = {}) {
 
     let checklist = [];
     if (Array.isArray(baseReport.checklist) && baseReport.checklist.length) {
-        checklist = baseReport.checklist.map((item) => ({
-            ...item,
-            checked: Boolean(AppState.checklistChecked?.[item.id])
-        }));
+        checklist = baseReport.checklist.map((item) => {
+            const itemId = String(item.id || item.task || 'checklist-item');
+            return {
+                ...item,
+                id: itemId,
+                checked: Boolean(AppState.checklistChecked?.[itemId])
+            };
+        });
     } else if (typeof getChecklistForReport === 'function') {
         checklist = getChecklistForReport();
     }

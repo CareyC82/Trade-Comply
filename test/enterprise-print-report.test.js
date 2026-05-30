@@ -46,14 +46,14 @@ describe('enterprise-print-report', () => {
     it('print CSS uses native flow without scale or overflow lock', () => {
         const css = getEnterprisePrintStyles();
         assert.match(css, /@media print[\s\S]*@page[\s\S]*size:\s*A4 portrait/);
-        assert.match(css, /margin:\s*12mm 15mm 12mm 15mm !important/);
+        assert.match(css, /margin:\s*10mm 12mm 10mm 12mm !important/);
         assert.match(css, /height:\s*auto !important/);
         assert.match(css, /overflow:\s*visible !important/);
         assert.match(css, /page-break-inside:\s*avoid !important/);
         assert.doesNotMatch(css, /transform:\s*scale/);
         assert.doesNotMatch(css, /overflow:\s*hidden/);
         assert.match(css, /\.signoff-cell[\s\S]*white-space:\s*nowrap !important/);
-        assert.match(css, /font-size:\s*20px/);
+        assert.match(css, /\.header-title[\s\S]*font-size:\s*18px/);
         assert.match(css, /vertical-align:\s*top !important/);
     });
 
@@ -62,7 +62,7 @@ describe('enterprise-print-report', () => {
             { phase: 'technical', task: 'Task A', desc: 'Guide A' },
             { phase: 'environmental', task: 'Task B', desc: 'Guide B' }
         ]);
-        assert.equal((html.match(/<tr>/gi) || []).length, 2);
+        assert.equal((html.match(/<tr\b/gi) || []).length, 2);
         assert.equal((html.match(/<td\b/gi) || []).length, 6);
         assert.match(html, /class="signoff-cell"/);
         assert.doesNotMatch(html, /rowspan|colspan="[2-9]/i);

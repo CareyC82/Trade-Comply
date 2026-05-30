@@ -409,10 +409,14 @@ function createReportPayload(query, tags, cases, precheckSelections) {
         counterpartyHsLabel,
         officialName: hs.officialName || '',
         checklist: checklist.length
-            ? checklist.map((item) => ({
-                ...item,
-                checked: Boolean(AppState.checklistChecked?.[item.id])
-            }))
+            ? checklist.map((item) => {
+                const itemId = String(item.id || item.task || 'checklist-item');
+                return {
+                    ...item,
+                    id: itemId,
+                    checked: Boolean(AppState.checklistChecked?.[itemId])
+                };
+            })
             : (typeof getChecklistForReport === 'function' ? getChecklistForReport() : []),
         vertical,
         riskSummaries: (tags || []).slice(0, 12).map(tag => ({
