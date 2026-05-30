@@ -27,7 +27,8 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260530fc-bundle-fix';
+const FC_BUILD_ID = '20260530test-crawl';
+const { runPolicyCrawlTest } = require('./lib/policy-crawl');
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
@@ -766,6 +767,73 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
+function isTestCrawlRequest(method, path, queryParams) {
+    if (method !== 'GET' && method !== 'POST') {
+        return false;
+    }
+    const normalized = normalizePath(path);
+    if (normalized === '/test-crawl') {
+        return true;
+    }
+    return queryParams.action === 'test_crawl' || queryParams.action === 'test-crawl';
+}
+
+function authorizeTestCrawl(queryParams) {
+    const secret = String(process.env.TEST_CRAWL_SECRET || '').trim();
+    if (!secret) {
+        return true;
+    }
+    const provided = String(queryParams.key || queryParams.secret || '').trim();
+    return provided === secret;
+}
+
+async function handleTestCrawlRequest(event, headers) {
+    const queryParams = getQueryParams(event);
+    if (!authorizeTestCrawl(queryParams)) {
+        console.warn('TEST CRAWL rejected: missing or invalid TEST_CRAWL_SECRET');
+        return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({
+                ok: false,
+                error: 'Forbidden. Pass ?key=<TEST_CRAWL_SECRET> when TEST_CRAWL_SECRET is configured on FC.'
+            })
+        };
+    }
+
+    console.log('=== TEST CRAWL: manual trigger via /test-crawl ===');
+    const dataDir = path.join(__dirname, 'data');
+    const persist = queryParams.persist === '1' || queryParams.persist === 'true';
+
+    try {
+        const result = await runPolicyCrawlTest({
+            dataDir,
+            persist,
+            previewChars: 1000
+        });
+        return {
+            statusCode: result.ok ? 200 : 502,
+            headers,
+            body: JSON.stringify({
+                ...result,
+                build: FC_BUILD_ID,
+                hint: 'Check Alibaba FC function logs for CRON JOB START / PREVIEW lines.'
+            })
+        };
+    } catch (error) {
+        console.error('=== TEST CRAWL FAILED ===', error.message);
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({
+                ok: false,
+                error: error.message,
+                build: FC_BUILD_ID
+            })
+        };
+    }
+}
+
 async function callDeepSeekForHsCode(description, context = {}, fcLibs) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -934,8 +1002,10 @@ exports.handler = async (rawEvent) => {
         return { statusCode: 204, headers };
     }
 
+    const queryParamsEarly = getQueryParams(event);
+
     if (method === 'GET') {
-        const health = getQueryParams(event).health;
+        const health = queryParamsEarly.health;
         if (health === 'feedback') {
             return {
                 statusCode: 200,
@@ -943,10 +1013,14 @@ exports.handler = async (rawEvent) => {
                 body: JSON.stringify({
                     ok: true,
                     build: FC_BUILD_ID,
-                    features: ['compliance_feedback', 'feedback', 'ai', 'hscode_classify']
+                    features: ['compliance_feedback', 'feedback', 'ai', 'hscode_classify', 'test_crawl']
                 })
             };
         }
+    }
+
+    if (isTestCrawlRequest(method, path, queryParamsEarly)) {
+        return handleTestCrawlRequest(event, headers);
     }
 
     if (method === 'GET' && path === '/visitors') {
@@ -969,7 +1043,11 @@ exports.handler = async (rawEvent) => {
     }
 
     const query = typeof body.query === 'string' ? body.query.trim() : '';
-    const queryParams = getQueryParams(event);
+    const queryParams = queryParamsEarly;
+
+    if (isTestCrawlRequest(method, path, queryParams)) {
+        return handleTestCrawlRequest(event, headers);
+    }
 
     if (isHsCodeClassifyRequest(body, event) || (method === 'POST' && isHsCodeClassifyPath(path))) {
         if (!body.description && queryParams.description) {

@@ -131,9 +131,11 @@
                 <div class="status-bar" id="status-bar">加载中…</div>
                 <div class="row">
                     <button type="button" class="btn-ghost" id="btn-refresh">刷新列表</button>
+                    <button type="button" class="btn-primary" id="btn-test-crawl">立即测试抓取</button>
                     <button type="button" class="btn-primary" id="btn-publish-sync">推送到 GitHub（三路径同步）</button>
                     <button type="button" class="btn-ghost" id="btn-logout">退出</button>
                 </div>
+                <pre id="crawl-test-log" class="hidden" style="margin-top:12px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;max-height:280px;overflow:auto;white-space:pre-wrap;"></pre>
                 <p class="meta" style="margin-top:10px">日常数据已由 02:00 流水线自动发布。此页仅用于 legacy 队列或紧急 override；手动发布后执行 <code>npm run publish:reviewed -- --dispatch</code></p>
             </div>
             <div id="pending-list"></div>
@@ -348,7 +350,41 @@
             }
         }
 
+        async function runTestCrawl() {
+            const logEl = document.getElementById('crawl-test-log');
+            logEl.classList.remove('hidden');
+            logEl.textContent = '=== 正在触发抓取（与凌晨 policy-tracker 相同逻辑）===\n';
+            statusBar.textContent = '抓取测试中…';
+            statusBar.classList.remove('error');
+            try {
+                const result = await apiFetch('/api/test-crawl?persist=1');
+                const lines = [
+                    result.message || (result.ok ? 'OK' : 'Failed'),
+                    `changed: ${result.changed_count ?? 0}, errors: ${result.fetch_errors ?? 0}`,
+                    '',
+                    ...(result.sources || []).map((s) => {
+                        if (!s.ok) {
+                            return `[FAIL] ${s.id}: ${s.error}`;
+                        }
+                        return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id} relevant=${s.relevant}\n${s.preview || ''}`;
+                    })
+                ];
+                logEl.textContent = lines.join('\n\n');
+                statusBar.textContent = result.ok
+                    ? `抓取完成 · ${result.changed_count} 条新相关内容`
+                    : `抓取异常 · 见下方日志`;
+                if (!result.ok) {
+                    statusBar.classList.add('error');
+                }
+            } catch (err) {
+                statusBar.classList.add('error');
+                statusBar.textContent = `抓取失败: ${err.message}`;
+                logEl.textContent += `\nERROR: ${err.message}`;
+            }
+        }
+
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
+        document.getElementById('btn-test-crawl').addEventListener('click', runTestCrawl);
         document.getElementById('btn-publish-sync').addEventListener('click', publishSync);
         document.getElementById('btn-logout').addEventListener('click', showLogin);
 

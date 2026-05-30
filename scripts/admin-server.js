@@ -113,8 +113,33 @@ async function handleApi(req, res) {
             project_root: ROOT,
             data_paths: dataPaths,
             supported_kinds: ['tag', 'case', 'risk_signal'],
-            password_required: Boolean(PASSWORD)
+            password_required: Boolean(PASSWORD),
+            test_crawl: '/api/test-crawl (GET/POST, same auth as review)'
         });
+        return;
+    }
+
+    if (urlPath === '/api/test-crawl' && (req.method === 'GET' || req.method === 'POST')) {
+        if (!isAuthorized(req)) {
+            sendJson(res, 401, { ok: false, error: 'Unauthorized. Use review password Bearer token.' });
+            return;
+        }
+        try {
+            const { runPolicyCrawlTest } = require('../lib/policy-crawl');
+            const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
+            const persist = url.searchParams.get('persist') === '1';
+            console.log('=== TEST CRAWL: admin-server manual trigger ===');
+            const result = await runPolicyCrawlTest({
+                dataDir: path.join(ROOT, 'data'),
+                persist,
+                previewChars: 1200,
+                label: 'admin-test-crawl'
+            });
+            sendJson(res, result.ok ? 200 : 502, result);
+        } catch (error) {
+            console.error('=== TEST CRAWL FAILED ===', error.message);
+            sendJson(res, 500, { ok: false, error: error.message });
+        }
         return;
     }
 
