@@ -29,6 +29,10 @@ const ALLOWED_ORIGINS = new Set([
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
 const FC_BUILD_ID = '20260530test-crawl-v2';
 const { runGlobalCrawlTest, ENGINE_BUILD_ID: GLOBAL_ENGINE_BUILD } = require('./lib/global-crawl-engine');
+const {
+    authorizeTestCrawlAccess,
+    logTestCrawlUnauthorized
+} = require('./lib/test-crawl-auth');
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
@@ -778,25 +782,29 @@ function isTestCrawlRequest(method, path, queryParams) {
     return queryParams.action === 'test_crawl' || queryParams.action === 'test-crawl';
 }
 
-function authorizeTestCrawl(queryParams) {
-    const secret = String(process.env.TEST_CRAWL_SECRET || '').trim();
-    if (!secret) {
-        return true;
-    }
-    const provided = String(queryParams.key || queryParams.secret || '').trim();
-    return provided === secret;
-}
-
 async function handleTestCrawlRequest(event, headers) {
     const queryParams = getQueryParams(event);
-    if (!authorizeTestCrawl(queryParams)) {
-        console.warn('TEST CRAWL rejected: missing or invalid TEST_CRAWL_SECRET');
+    const auth = authorizeTestCrawlAccess({
+        query: queryParams,
+        headers: event.headers
+    });
+    if (!auth.ok) {
+        const requestMeta = getRequestMeta(event);
+        logTestCrawlUnauthorized({
+            reason: auth.reason,
+            method: requestMeta.method,
+            path: requestMeta.path,
+            ip: getHeaderValue(event.headers, 'x-forwarded-for')
+                || getHeaderValue(event.headers, 'x-real-ip'),
+            credential_source: auth.credential_source
+        });
         return {
             statusCode: 403,
             headers,
             body: JSON.stringify({
                 ok: false,
-                error: 'Forbidden. Pass ?key=<TEST_CRAWL_SECRET> when TEST_CRAWL_SECRET is configured on FC.'
+                error: 'Forbidden. Test crawl requires a configured secret and valid credentials.',
+                reason: auth.reason
             })
         };
     }

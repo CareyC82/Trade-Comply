@@ -24,6 +24,10 @@ const {
 
 const ROOT = path.join(__dirname, '..');
 const { loadLocalEnvFiles } = require('../lib/load-local-env');
+const {
+    authorizeTestCrawlAccess,
+    logTestCrawlUnauthorized
+} = require('../lib/test-crawl-auth');
 let envFiles = loadLocalEnvFiles(ROOT);
 
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
@@ -142,8 +146,26 @@ async function handleApi(req, res) {
     }
 
     if (urlPath === '/api/test-crawl' && (req.method === 'GET' || req.method === 'POST')) {
-        if (!isAuthorized(req)) {
-            sendJson(res, 401, { ok: false, error: 'Unauthorized. Use review password Bearer token.' });
+        refreshLocalEnv();
+        const requestUrl = new URL(req.url, `http://127.0.0.1:${PORT}`);
+        const crawlAuth = authorizeTestCrawlAccess({
+            query: Object.fromEntries(requestUrl.searchParams.entries()),
+            headers: req.headers,
+            bearerToken: getBearerToken(req)
+        });
+        if (!crawlAuth.ok) {
+            logTestCrawlUnauthorized({
+                reason: crawlAuth.reason,
+                method: req.method,
+                path: urlPath,
+                ip: req.socket?.remoteAddress,
+                credential_source: crawlAuth.credential_source
+            });
+            sendJson(res, 403, {
+                ok: false,
+                error: 'Forbidden. Configure TEST_CRAWL_SECRET or ADMIN_REVIEW_PASSWORD in .env.local and send a matching Bearer token or ?key=.',
+                reason: crawlAuth.reason
+            });
             return;
         }
         try {
@@ -165,8 +187,7 @@ async function handleApi(req, res) {
                 parsePersistQueryFlag,
                 buildCrawlTelemetry
             } = require('../lib/global-compliance-crawler');
-            const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
-            const persist = parsePersistQueryFlag(url.searchParams);
+            const persist = parsePersistQueryFlag(requestUrl.searchParams);
             console.log(`${LOG_PREFIX} [INFO] -> /api/test-crawl persist=${persist}`);
             const result = await runGlobalCrawlTest({
                 dataDir: path.join(ROOT, 'data'),
