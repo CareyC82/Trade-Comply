@@ -377,6 +377,12 @@
                             + '然后用 http://127.0.0.1:8787/admin.html 打开（不要用 8000 端口打开本页）。'
                         );
                     }
+                    if (!health.got_scraping) {
+                        throw new Error(
+                            '未安装 got-scraping（海关总署 TLS 指纹抓取）。请在项目根目录执行: npm ci\n'
+                            + '然后重新运行 npm run restart:admin'
+                        );
+                    }
                 }
                 const result = await apiFetch(crawlPath, { method: 'GET' });
                 const lines = [
@@ -388,8 +394,9 @@
                             const tag = s.optional ? 'WARN' : 'FAIL';
                             return `[${tag}] ${s.id}: ${s.error}`;
                         }
+                        const transport = s.transport ? ` via ${s.transport}` : '';
                         const note = s.stealth_note ? `\n(${s.stealth_note})` : (s.from_cache ? '\n(from manifest cache)' : '');
-                        return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id} relevant=${s.relevant}${note}\n${s.preview || ''}`;
+                        return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id}${transport} relevant=${s.relevant}${note}\n${s.preview || ''}`;
                     })
                 ];
                 logEl.textContent = `${logEl.textContent}\n${lines.join('\n\n')}`;

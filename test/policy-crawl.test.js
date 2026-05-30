@@ -20,9 +20,10 @@ describe('policy-crawl', () => {
         assert.equal(isGacSource(source), true);
         assert.equal(usesStealthProfile(source), true);
         const headers = buildFetchHeaders(source);
-        assert.match(headers['User-Agent'], /Chrome\/120/);
+        assert.match(headers['User-Agent'], /Chrome\/124/);
+        assert.ok(headers['Sec-Ch-Ua']);
         assert.equal(headers.Referer, 'https://www.customs.gov.cn/');
-        assert.equal(headers.Connection, 'keep-alive');
-        assert.match(headers.Accept, /image\/webp/);
+        assert.match(headers.Accept, /image\/avif/);
+        assert.match(headers['Sec-Ch-Ua'], /Chromium/);
     });
 });

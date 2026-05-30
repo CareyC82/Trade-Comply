@@ -21,5 +21,8 @@
     "guardrail:prod": "node scripts/check-prod-guardrail.js",
     "validate:pending": "node scripts/validate-pending-queue.js",
     "seed:regional-baselines": "node scripts/ensure-regional-baseline-tags.js && node scripts/build-catalog.js"
+  },
+  "dependencies": {
+    "got-scraping": "^4.2.1"
   }
 }

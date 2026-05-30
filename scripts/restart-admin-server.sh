@@ -18,5 +18,9 @@ if [ -z "${ADMIN_REVIEW_PASSWORD:-}" ]; then
 fi
 
 cd "$ROOT"
-echo "Starting admin server (build 20260530-gac-stealth-v1)..."
+if [ ! -d node_modules/got-scraping ]; then
+  echo "Installing npm deps (got-scraping for GAC TLS fingerprint)..."
+  npm ci
+fi
+echo "Starting admin server (build 20260530-gac-got-scraping-v1)..."
 exec node scripts/admin-server.js
