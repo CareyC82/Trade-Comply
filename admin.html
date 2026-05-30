@@ -123,7 +123,7 @@
             <div class="row">
                 <button type="button" class="btn-primary" id="btn-login">进入审核台</button>
             </div>
-            <p class="meta" style="margin-top:12px">请先运行：<code>ADMIN_REVIEW_PASSWORD=xxx node scripts/admin-server.js</code></p>
+            <p class="meta" style="margin-top:12px">本地测试请先运行：<code>ADMIN_REVIEW_PASSWORD=xxx node scripts/admin-server.js</code><br>API 地址填 <code>http://127.0.0.1:8787</code>（不要填阿里云 FC 域名；FC 测试请用浏览器打开 <code>/test-crawl</code>）。</p>
         </div>
 
         <div id="review-panel" class="hidden">
@@ -182,6 +182,14 @@
             return data;
         }
 
+        function isRemoteFcApiBase(base) {
+            return /fcapp\.run|tradecoai-agent/i.test(base || '');
+        }
+
+        function resolveTestCrawlPath(base) {
+            return isRemoteFcApiBase(base) ? '/test-crawl?persist=1' : '/api/test-crawl?persist=1';
+        }
+
         async function apiFetch(path, options = {}) {
             const base = getApiBase();
             const headers = {
@@ -192,7 +200,8 @@
             const response = await fetch(`${base}${path}`, { ...options, headers });
             const data = await response.json().catch(() => ({}));
             if (!response.ok) {
-                throw new Error(data.error || data.message || `HTTP ${response.status}`);
+                const detail = data.error || data.message || `HTTP ${response.status}`;
+                throw new Error(`${detail} (${path})`);
             }
             return data;
         }

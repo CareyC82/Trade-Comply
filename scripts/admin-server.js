@@ -25,7 +25,7 @@ const {
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
 const PASSWORD = process.env.ADMIN_REVIEW_PASSWORD || '';
-const ADMIN_BUILD_ID = '20260529-risk-signal-v2';
+const ADMIN_BUILD_ID = '20260530-test-crawl-v1';
 
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -248,4 +248,5 @@ server.listen(PORT, '127.0.0.1', () => {
     console.log(`Project root: ${ROOT}`);
     console.log(`Writes to: ${dataPaths.prodTags}`);
     console.log(`Pending queue: ${dataPaths.queue}`);
+    console.log('Manual crawl test: GET/POST http://127.0.0.1:' + PORT + '/api/test-crawl?persist=1');
 });

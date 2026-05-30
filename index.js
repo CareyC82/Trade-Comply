@@ -27,7 +27,7 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
-const FC_BUILD_ID = '20260530test-crawl';
+const FC_BUILD_ID = '20260530test-crawl-v2';
 const { runPolicyCrawlTest } = require('./lib/policy-crawl');
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
@@ -772,7 +772,7 @@ function isTestCrawlRequest(method, path, queryParams) {
         return false;
     }
     const normalized = normalizePath(path);
-    if (normalized === '/test-crawl') {
+    if (normalized === '/test-crawl' || normalized === '/api/test-crawl') {
         return true;
     }
     return queryParams.action === 'test_crawl' || queryParams.action === 'test-crawl';
