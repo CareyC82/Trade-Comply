@@ -1,0 +1,57 @@
+'use strict';
+
+const { describe, it } = require('node:test');
+const assert = require('node:assert/strict');
+const {
+    templateComplianceCard,
+    templateResultSummary,
+    templateEmptyResultsMessage
+} = require('../js/render-templates');
+
+describe('render-templates', () => {
+    it('renders compliance card from pre-escaped view model only', () => {
+        const html = templateComplianceCard({
+            matchRibbonHtml: '',
+            tagTypeClass: 'matched',
+            tagTypeLabelHtml: 'MATCHED',
+            riskBadgeHtml: '',
+            regulatoryBadgeHtml: '<span class="regulatory-body-badge">[US-BIS]</span>',
+            countryCodeBadgeHtml: '',
+            cardLabelHtml: 'Test policy',
+            scopePillHtml: '',
+            cardHintHtml: '',
+            auditTrailHtml: '<section class="policy-audit-trail"></section>',
+            bodyTitleHtml: 'GLPOL: Title',
+            bodyDescHtml: 'Summary',
+            exemptionsHtml: '',
+            riskScenariosHtml: '',
+            hsCodeLabelHtml: 'HS Code',
+            hsCodesHtml: '8541.40',
+            legacySourceHtml: ''
+        });
+        assert.match(html, /\[US-BIS\]/);
+        assert.match(html, /policy-audit-trail/);
+        assert.doesNotMatch(html, /tag\.description/);
+    });
+
+    it('renders result summary without raw query injection', () => {
+        const html = templateResultSummary({
+            directionTextHtml: 'Export from China',
+            countryLabelHtml: 'United States',
+            foundRegulationsHtml: 'Found',
+            tagCount: 3,
+            regulationsForHtml: 'regulations for',
+            queryHtml: '&lt;script&gt;',
+            roleFocusHtml: 'destination focus'
+        });
+        assert.match(html, /&lt;script&gt;/);
+        assert.match(html, /result-count/);
+    });
+
+    it('renders empty state variant styles', () => {
+        const out = templateEmptyResultsMessage({ variant: 'out_of_range', messageHtml: 'Out of scope' });
+        const none = templateEmptyResultsMessage({ variant: 'no_results', messageHtml: 'No results' });
+        assert.match(out, /line-height: 1.6/);
+        assert.doesNotMatch(none, /line-height: 1.6/);
+    });
+});

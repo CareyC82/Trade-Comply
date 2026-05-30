@@ -62,7 +62,7 @@ Near-term priorities:
 - Product name and HS Code search.
 - Export/import direction toggle.
 - **Multi-country counterparty panel** (US / EU / ASEAN / RU / TW / JP / KR) with deep-link from HS classifier.
-- **Global compliance pipeline** (CCPIT/MOFCOM-style alerts + US BIS) → `pending_data` → human review.
+- **Global compliance crawler** (MOFCOM, GAC, BIS, CBP, EUR-Lex) → DeepSeek `refineWithAI` → hash-gated `tags.json` (see [Data Review SOP](docs/DATA_REVIEW.md)).
 - Electronics and semiconductor category indexes.
 - Official-source compliance cards.
 - Penalty case library.
@@ -93,54 +93,89 @@ http://localhost:8000
 
 ## Developer Workflow & Data Review SOP
 
-### Local dual services
+Full operator guide (中文 + diagrams): **[docs/DATA_REVIEW.md](docs/DATA_REVIEW.md)** · shortcut: [DATA_REVIEW.md](DATA_REVIEW.md)
+
+### Two layers (no conflict)
+
+| Layer | Who runs it | What happens |
+|-------|-------------|--------------|
+| **Automated (Cron)** | GitHub Actions ~02:00 CST | Global crawl + `refineWithAI` → hash-gated writes to a **staging workspace** (CI copy of `tags.json` / manifest). Bot may auto-push with `[auto-publish]` after catalog build. Legacy parser rows go to **`data/pending_data/queue.json`**. |
+| **Manual Review Panel** | Administrator on `admin.html` | **Test crawl** locally, **Approve/Reject** queue items, then **Push to GitHub** after catalog validation. |
+
+### Local services
 
 | Service | Command | URL | Purpose |
 |---------|---------|-----|---------|
-| **Site preview (Pages)** | `npm run dev:preview` or `python3 -m http.server 8000` | http://localhost:8000 | User-facing `index.html`, loads **production** JSON |
-| **Review admin API** | `ADMIN_REVIEW_PASSWORD='secret' npm run dev:admin` | http://127.0.0.1:8787/admin.html | Human review of **pending** queue |
+| **Site preview** | `npm run dev:preview` or `python3 -m http.server 8000` | http://localhost:8000 | Static site; reads committed prod JSON |
+| **Review admin API** | `npm run restart:admin` | http://127.0.0.1:8787/admin.html | Manual Review Panel (not the public site port) |
 
-Environment variables:
+Create **`.env.local`** from `.env.example` (`ADMIN_REVIEW_PASSWORD`, `DEEPSEEK_API_KEY`).
 
-| Variable | Where | Purpose |
-|----------|-------|---------|
-| `ADMIN_REVIEW_PASSWORD` | Local admin server | Bearer token for `/api/review/*` |
-| `ADMIN_REVIEW_PORT` | Optional (default `8787`) | Admin listen port |
-| `DEEPSEEK_API_KEY` | FC / policy tracker CI | AI parsing & HS classify |
-| `GITHUB_TOKEN` | CI + optional local publish | Issues, `repository_dispatch`, git push |
-| `AUTO_PUBLISH_SYNC=1` | Optional on admin server | Auto git push after each Approve |
-| `PUBLISH_DISPATCH=1` | With publish | Trigger `sync-prod-deploy` → redeploy FC |
+| Variable | Purpose |
+|----------|---------|
+| `ADMIN_REVIEW_PASSWORD` | Bearer token for `/api/review/*` and `/api/test-crawl` |
+| `DEEPSEEK_API_KEY` | Global crawler AI refiner (local test + Cron) |
+| `GITHUB_TOKEN` | Push + optional `repository_dispatch` for FC sync |
+| `AUTO_PUBLISH_SYNC=1` | Optional: auto git push after each queue Approve |
 
-Alibaba FC (production API) secrets are configured in GitHub Actions (`deploy-fc.yml`), not in the static site.
+### 1) Cron — automated crawl & AI refine (staging)
 
-### Standard review iron law
+Workflows (see [policy-tracker.yml](.github/workflows/policy-tracker.yml)):
 
-1. **`git pull origin main`** — sync remote `pending_data` written by the 02:00 policy tracker.
-2. **Review locally** — http://127.0.0.1:8787/admin.html → Approve / Reject each item.
-3. **Publish in one shot** — after all approvals, push **all three paths together** (never partial):
+1. **`GLOBAL_CRAWL_SOURCES`** — fetch official MOFCOM / GAC / BIS / CBP / EUR-Lex pages.
+2. **`refineWithAI()`** — English-only regulatory JSON; non-relevant noise skipped.
+3. **Hash-gated upsert** — catalog-valid `tag_id` values (`CL-GLPOL-*`) into `data/tags.json` on the runner.
+4. **`npm run build:catalog`** (via pipeline) — validate `tag_id` / `case_id` patterns.
+5. **Optional bot push** — commit `[auto-publish]` to `main` when CI succeeds.
+
+Parallel: [global-compliance-pipeline.yml](.github/workflows/global-compliance-pipeline.yml) ingests Python risk signals; guardrail failures land in `data/pending_data.json`.
+
+Local dry-run (no git push):
 
 ```bash
-npm run build:catalog    # if not already rebuilt by approve
+npm run fetch:global:pipeline   # same engine as Cron
+```
+
+### 2) Manual Review Panel — administrator workflow
+
+Open http://127.0.0.1:8787/admin.html (API base `http://127.0.0.1:8787`).
+
+| Action | Effect |
+|--------|--------|
+| **立即测试抓取** (`/api/test-crawl?persist=1`) | Runs the **same** global crawler on your machine; updates **local** `data/tags.json` only. Terminal shows `[GLOBAL-CRAWL]` logs; response includes `{ changed, errors }`. Does **not** push to GitHub. |
+| **Approve / Reject** | Processes **`data/pending_data/queue.json`** (legacy / parser staging). Approve merges into local prod JSON. |
+| **推送到 GitHub** | Calls publish-sync → **`build-catalog.js --check`** (full catalog validation) → then commits and pushes prod paths with **`[admin-publish]`**. |
+
+CLI equivalent after local review:
+
+```bash
+npm run build:catalog
 npm run publish:reviewed -- --dispatch
 ```
 
-This commits and pushes:
+**Must push together** (never partial):
 
-- `data/tags.json` (and `data/cases.json` if changed)
+- `data/tags.json`
+- `data/cases.json` (if changed)
 - `data/catalog.json`
 - `data/pending_data/queue.json`
 
-Commit messages must include **`[admin-publish]`** for production data changes (CI guardrail).
+`--dispatch` triggers [sync-prod-deploy.yml](.github/workflows/sync-prod-deploy.yml) so GitHub Pages and Alibaba FC use the same JSON.
 
-4. **GitHub Pages** updates from the push automatically. **`--dispatch`** triggers [Sync Prod Deploy](.github/workflows/sync-prod-deploy.yml) to redeploy FC with the same JSON.
+### Recommended daily flow
 
-### Automation boundaries (CI guardrail)
+1. **`git pull origin main`** — pick up overnight `[auto-publish]` Cron commits.
+2. Optionally **立即测试抓取** to verify sources after URL or config changes.
+3. **Approve** any rows still in `pending_data/queue.json`.
+4. When ready for users to see changes: **推送到 GitHub** or `npm run publish:reviewed -- --dispatch`.
 
-- **Policy tracker (bot)** may only write `data/pending_data/queue.json` and `data/inbox/*`.
-- **Production files** (`data/tags.json`, `data/cases.json`, `data/catalog.json`) must not be modified by automation; only human/admin commits with `[admin-publish]`.
-- When staging adds items, an Issue is opened: `🚨 [Action Required] Daily Regulatory Update Pending Review - YYYY-MM-DD`.
+### CI guardrails
 
-See [docs/DATA_REVIEW.md](docs/DATA_REVIEW.md) and [docs/ENGINEERING.md](docs/ENGINEERING.md).
+- Bot prod writes require **`[auto-publish]`** in the commit message (Cron).
+- Human prod writes require **`[admin-publish]`** (panel or CLI).
+- Invalid `tag_id` formats (e.g. legacy `CL-GLOBAL-CN-SEMI-EXP`) fail `build-catalog.js` until migrated to `CL-GLPOL-*`.
+
+See [docs/ENGINEERING.md](docs/ENGINEERING.md).
 
 ### Tests
 

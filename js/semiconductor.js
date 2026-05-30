@@ -72,7 +72,7 @@ function searchSemiconductorProducts(query) {
     const trimmedQuery = query ? query.trim() : '';
     const selections = getPrecheckSelections('semi-precheck-panel');
     const results = searchWithPrecheck(trimmedQuery, selections, searchSemiconductor);
-    renderResults(trimmedQuery || 'Semiconductor products', results.tags, results.cases, selections);
+    renderResults(trimmedQuery || t('semiconductorProducts'), results.tags, results.cases, selections);
 }
 
 function renderSemiQuickActions() {
