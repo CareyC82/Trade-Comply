@@ -361,12 +361,24 @@
 
         async function runTestCrawl() {
             const logEl = document.getElementById('crawl-test-log');
+            const base = getApiBase().replace(/\/$/, '');
+            const crawlPath = resolveTestCrawlPath(base);
             logEl.classList.remove('hidden');
-            logEl.textContent = '=== 正在触发抓取（与凌晨 policy-tracker 相同逻辑）===\n';
+            logEl.textContent = `=== 正在触发抓取 ===\n请求: ${base}${crawlPath}\n`;
             statusBar.textContent = '抓取测试中…';
             statusBar.classList.remove('error');
             try {
-                const result = await apiFetch('/api/test-crawl?persist=1');
+                if (!isRemoteFcApiBase(base)) {
+                    const health = await fetch(`${base}/api/review/health`).then((r) => r.json()).catch(() => ({}));
+                    if (!health.test_crawl) {
+                        throw new Error(
+                            '本地审核 API 未启动或版本过旧。请在项目目录执行:\n'
+                            + 'ADMIN_REVIEW_PASSWORD=你的密码 npm run restart:admin\n'
+                            + '然后用 http://127.0.0.1:8787/admin.html 打开（不要用 8000 端口打开本页）。'
+                        );
+                    }
+                }
+                const result = await apiFetch(crawlPath, { method: 'GET' });
                 const lines = [
                     result.message || (result.ok ? 'OK' : 'Failed'),
                     `changed: ${result.changed_count ?? 0}, errors: ${result.fetch_errors ?? 0}`,
@@ -378,10 +390,10 @@
                         return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id} relevant=${s.relevant}\n${s.preview || ''}`;
                     })
                 ];
-                logEl.textContent = lines.join('\n\n');
+                logEl.textContent = `${logEl.textContent}\n${lines.join('\n\n')}`;
                 statusBar.textContent = result.ok
-                    ? `抓取完成 · ${result.changed_count} 条新相关内容`
-                    : `抓取异常 · 见下方日志`;
+                    ? `抓取完成 · ${result.changed_count ?? 0} 条新相关内容`
+                    : `抓取异常 · 见下方日志与终端`;
                 if (!result.ok) {
                     statusBar.classList.add('error');
                 }

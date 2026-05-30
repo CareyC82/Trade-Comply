@@ -102,8 +102,14 @@ function serveStatic(req, res) {
     fs.createReadStream(filePath).pipe(res);
 }
 
+function normalizeApiPath(url) {
+    const raw = String(url || '').split('?')[0];
+    const trimmed = raw.replace(/\/+$/, '') || '/';
+    return trimmed;
+}
+
 async function handleApi(req, res) {
-    const urlPath = req.url.split('?')[0];
+    const urlPath = normalizeApiPath(req.url);
 
     if (req.method === 'GET' && urlPath === '/api/review/health') {
         const dataPaths = getDataPaths();
