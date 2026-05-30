@@ -15,10 +15,21 @@
       "label": "GAC customs notices",
       "url": "http://www.customs.gov.cn/customs/302249/302270/index.html",
       "fallback_url": "http://www.customs.gov.cn/",
-      "referer": "http://www.customs.gov.cn/",
+      "warmup_url": "http://www.customs.gov.cn/",
+      "referer": "https://www.customs.gov.cn/",
+      "stealth": true,
+      "waf_heavy": true,
+      "pre_fetch_delay_sec": [3, 7],
       "optional": true,
+      "use_manifest_cache": true,
       "enabled": true,
-      "max_chars": 12000
+      "max_chars": 12000,
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Connection": "keep-alive"
+      }
     }
   ]
 }

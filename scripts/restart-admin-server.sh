@@ -18,5 +18,5 @@ if [ -z "${ADMIN_REVIEW_PASSWORD:-}" ]; then
 fi
 
 cd "$ROOT"
-echo "Starting admin server (build 20260530-test-crawl-v1)..."
+echo "Starting admin server (build 20260530-gac-stealth-v1)..."
 exec node scripts/admin-server.js

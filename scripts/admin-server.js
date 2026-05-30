@@ -25,7 +25,7 @@ const {
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
 const PASSWORD = process.env.ADMIN_REVIEW_PASSWORD || '';
-const ADMIN_BUILD_ID = '20260530-test-crawl-v1';
+const ADMIN_BUILD_ID = '20260530-gac-stealth-v1';
 
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',

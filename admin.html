@@ -388,7 +388,8 @@
                             const tag = s.optional ? 'WARN' : 'FAIL';
                             return `[${tag}] ${s.id}: ${s.error}`;
                         }
-                        return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id} relevant=${s.relevant}\n${s.preview || ''}`;
+                        const note = s.stealth_note ? `\n(${s.stealth_note})` : (s.from_cache ? '\n(from manifest cache)' : '');
+                        return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id} relevant=${s.relevant}${note}\n${s.preview || ''}`;
                     })
                 ];
                 logEl.textContent = `${logEl.textContent}\n${lines.join('\n\n')}`;
