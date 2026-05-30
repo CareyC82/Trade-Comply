@@ -385,7 +385,8 @@
                     '',
                     ...(result.sources || []).map((s) => {
                         if (!s.ok) {
-                            return `[FAIL] ${s.id}: ${s.error}`;
+                            const tag = s.optional ? 'WARN' : 'FAIL';
+                            return `[${tag}] ${s.id}: ${s.error}`;
                         }
                         return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id} relevant=${s.relevant}\n${s.preview || ''}`;
                     })
