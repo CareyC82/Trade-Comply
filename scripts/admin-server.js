@@ -3,7 +3,7 @@
  * Local review API for admin.html (password-protected).
  *
  * Usage:
- *   ADMIN_REVIEW_PASSWORD=your-secret node scripts/admin-server.js
+ *   ADMIN_ROUTES_ENABLED=1 ADMIN_REVIEW_PASSWORD=your-secret node scripts/admin-server.js
  *   open http://127.0.0.1:8787/admin.html
  */
 
@@ -21,17 +21,22 @@ const {
     maybeTriggerPublishSyncAfterApprove,
     publishReviewedDataToGit
 } = require('../lib/publish-sync');
+const {
+    PRIMARY_ADMIN_HEADER,
+    authorizeAdminRouteAccess,
+    isProtectedAdminPath,
+    logUnauthorizedAdminAccess,
+    buildAdminForbiddenPayload,
+    resolveClientIpFromRequest,
+    areAdminRoutesEnabled,
+    getConfiguredAdminSecrets
+} = require('../lib/admin-route-security');
 
 const ROOT = path.join(__dirname, '..');
 const { loadLocalEnvFiles } = require('../lib/load-local-env');
-const {
-    authorizeTestCrawlAccess,
-    logTestCrawlUnauthorized
-} = require('../lib/test-crawl-auth');
 let envFiles = loadLocalEnvFiles(ROOT);
 
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
-const PASSWORD = process.env.ADMIN_REVIEW_PASSWORD || '';
 const ADMIN_BUILD_ID = '20260603-global-compliance-crawler-v1';
 const LOG_PREFIX = '[GLOBAL-CRAWL]';
 
@@ -62,11 +67,23 @@ function getBearerToken(req) {
     return match ? match[1].trim() : '';
 }
 
-function isAuthorized(req) {
-    if (!PASSWORD) {
-        return false;
-    }
-    return getBearerToken(req) === PASSWORD;
+function buildAdminAuthContext(req, queryParams = {}) {
+    return {
+        query: queryParams,
+        headers: req.headers,
+        bearerToken: getBearerToken(req)
+    };
+}
+
+function denyAdminRoute(req, res, auth, urlPath) {
+    logUnauthorizedAdminAccess({
+        reason: auth.reason,
+        method: req.method,
+        path: urlPath,
+        ip: resolveClientIpFromRequest(req),
+        credential_source: auth.credential_source
+    });
+    sendJson(res, 403, buildAdminForbiddenPayload(auth));
 }
 
 function readBody(req) {
@@ -122,173 +139,190 @@ function normalizeApiPath(url) {
     return trimmed;
 }
 
-async function handleApi(req, res) {
-    const urlPath = normalizeApiPath(req.url);
+function parseRequestQuery(req) {
+    const requestUrl = new URL(req.url, `http://127.0.0.1:${PORT}`);
+    return Object.fromEntries(requestUrl.searchParams.entries());
+}
 
-    if (req.method === 'GET' && urlPath === '/api/review/health') {
-        const dataPaths = getDataPaths();
-        sendJson(res, 200, {
-            ok: true,
-            build: ADMIN_BUILD_ID,
-            project_root: ROOT,
-            data_paths: dataPaths,
-            supported_kinds: ['tag', 'case', 'risk_signal'],
-            password_required: Boolean(PASSWORD),
-            test_crawl: '/api/test-crawl (GET/POST, global crawl engine)',
-            engine: 'global-crawl-engine',
-            engine_build: ADMIN_BUILD_ID,
-            got_scraping: Boolean(require('fs').existsSync(path.join(ROOT, 'node_modules', 'got-scraping'))),
-            deepseek_configured: refreshLocalEnv(),
+async function handleReviewHealth(req, res, urlPath) {
+    const dataPaths = getDataPaths();
+    sendJson(res, 200, {
+        ok: true,
+        build: ADMIN_BUILD_ID,
+        project_root: ROOT,
+        data_paths: dataPaths,
+        supported_kinds: ['tag', 'case', 'risk_signal'],
+        admin_routes_enabled: areAdminRoutesEnabled(),
+        secrets_configured: getConfiguredAdminSecrets().length > 0,
+        test_crawl: '/api/test-crawl (GET/POST, global crawl engine)',
+        engine: 'global-crawl-engine',
+        engine_build: ADMIN_BUILD_ID,
+        got_scraping: Boolean(require('fs').existsSync(path.join(ROOT, 'node_modules', 'got-scraping'))),
+        deepseek_configured: refreshLocalEnv(),
+        env_files_loaded: envFiles,
+        env_local_exists: fs.existsSync(path.join(ROOT, '.env.local'))
+    });
+}
+
+async function handleTestCrawl(req, res, queryParams) {
+    if (!refreshLocalEnv()) {
+        sendJson(res, 400, {
+            ok: false,
+            error: 'DEEPSEEK_API_KEY is not configured. Create .env.local from .env.example, set DEEPSEEK_API_KEY=sk-..., then refresh this page or restart: npm run restart:admin',
+            changed: 0,
+            errors: 0,
+            deepseek_configured: false,
             env_files_loaded: envFiles,
             env_local_exists: fs.existsSync(path.join(ROOT, '.env.local'))
         });
         return;
     }
+    const {
+        runGlobalCrawlTest,
+        ENGINE_BUILD_ID,
+        parsePersistQueryFlag,
+        buildCrawlTelemetry
+    } = require('../lib/global-compliance-crawler');
+    const requestUrl = new URL(req.url, `http://127.0.0.1:${PORT}`);
+    const persist = parsePersistQueryFlag(requestUrl.searchParams);
+    console.log(`${LOG_PREFIX} [INFO] -> /api/test-crawl persist=${persist}`);
+    const result = await runGlobalCrawlTest({
+        dataDir: path.join(ROOT, 'data'),
+        persist,
+        label: 'admin-test-crawl'
+    });
+    const telemetry = buildCrawlTelemetry(result);
+    const status = result.ok ? 200 : (telemetry.errors > 0 ? 502 : 200);
+    sendJson(res, status, {
+        ...result,
+        changed: telemetry.changed,
+        errors: telemetry.errors,
+        telemetry,
+        engine_build: ENGINE_BUILD_ID
+    });
+}
 
-    if (urlPath === '/api/test-crawl' && (req.method === 'GET' || req.method === 'POST')) {
-        refreshLocalEnv();
-        const requestUrl = new URL(req.url, `http://127.0.0.1:${PORT}`);
-        const crawlAuth = authorizeTestCrawlAccess({
-            query: Object.fromEntries(requestUrl.searchParams.entries()),
-            headers: req.headers,
-            bearerToken: getBearerToken(req)
-        });
-        if (!crawlAuth.ok) {
-            logTestCrawlUnauthorized({
-                reason: crawlAuth.reason,
-                method: req.method,
-                path: urlPath,
-                ip: req.socket?.remoteAddress,
-                credential_source: crawlAuth.credential_source
-            });
-            sendJson(res, 403, {
-                ok: false,
-                error: 'Forbidden. Configure TEST_CRAWL_SECRET or ADMIN_REVIEW_PASSWORD in .env.local and send a matching Bearer token or ?key=.',
-                reason: crawlAuth.reason
-            });
-            return;
-        }
+async function handleReviewPending(req, res) {
+    const items = listPendingItems();
+    const queue = loadQueue();
+    sendJson(res, 200, {
+        ok: true,
+        updated_at: queue.updated_at,
+        count: items.length,
+        items
+    });
+}
+
+async function handleReviewApproveReject(req, res, urlPath) {
+    let body;
+    try {
+        body = await readBody(req);
+    } catch (error) {
+        sendJson(res, 400, { ok: false, error: error.message });
+        return;
+    }
+
+    const pendingId = typeof body.pending_id === 'string' ? body.pending_id.trim() : '';
+    if (!pendingId) {
+        sendJson(res, 400, { ok: false, error: 'pending_id is required' });
+        return;
+    }
+
+    if (urlPath.endsWith('/approve')) {
+        let result;
         try {
-            if (!refreshLocalEnv()) {
-                sendJson(res, 400, {
-                    ok: false,
-                    error: 'DEEPSEEK_API_KEY is not configured. Create .env.local from .env.example, set DEEPSEEK_API_KEY=sk-..., then refresh this page or restart: npm run restart:admin',
-                    changed: 0,
-                    errors: 0,
-                    deepseek_configured: false,
-                    env_files_loaded: envFiles,
-                    env_local_exists: fs.existsSync(path.join(ROOT, '.env.local'))
-                });
-                return;
-            }
-            const {
-                runGlobalCrawlTest,
-                ENGINE_BUILD_ID,
-                parsePersistQueryFlag,
-                buildCrawlTelemetry
-            } = require('../lib/global-compliance-crawler');
-            const persist = parsePersistQueryFlag(requestUrl.searchParams);
-            console.log(`${LOG_PREFIX} [INFO] -> /api/test-crawl persist=${persist}`);
-            const result = await runGlobalCrawlTest({
-                dataDir: path.join(ROOT, 'data'),
-                persist,
-                label: 'admin-test-crawl'
-            });
-            const telemetry = buildCrawlTelemetry(result);
-            const status = result.ok ? 200 : (telemetry.errors > 0 ? 502 : 200);
-            sendJson(res, status, {
-                ...result,
-                changed: telemetry.changed,
-                errors: telemetry.errors,
-                telemetry,
-                engine_build: ENGINE_BUILD_ID
-            });
+            result = approvePendingItem(pendingId);
         } catch (error) {
-            console.error('[GLOBAL-CRAWL] [FAIL] /api/test-crawl', error.message);
-            sendJson(res, 500, { ok: false, error: error.message, engine_build: ADMIN_BUILD_ID });
-        }
-        return;
-    }
-
-    if (!isAuthorized(req)) {
-        sendJson(res, 401, { ok: false, error: 'Unauthorized. Set Authorization: Bearer <ADMIN_REVIEW_PASSWORD>.' });
-        return;
-    }
-
-    if (req.method === 'GET' && urlPath === '/api/review/pending') {
-        const items = listPendingItems();
-        const queue = loadQueue();
-        sendJson(res, 200, {
-            ok: true,
-            updated_at: queue.updated_at,
-            count: items.length,
-            items
-        });
-        return;
-    }
-
-    if (req.method === 'POST' && (urlPath === '/api/review/approve' || urlPath === '/api/review/reject')) {
-        let body;
-        try {
-            body = await readBody(req);
-        } catch (error) {
-            sendJson(res, 400, { ok: false, error: error.message });
+            sendJson(res, 500, { ok: false, error: error.message });
             return;
         }
-
-        const pendingId = typeof body.pending_id === 'string' ? body.pending_id.trim() : '';
-        if (!pendingId) {
-            sendJson(res, 400, { ok: false, error: 'pending_id is required' });
-            return;
+        if (result.ok) {
+            const dataPaths = getDataPaths();
+            result.written_paths = {
+                tags: dataPaths.prodTags,
+                cases: dataPaths.prodCases,
+                queue: dataPaths.queue,
+                catalog: path.join(dataPaths.root, 'data', 'catalog.json')
+            };
+            const sync = await maybeTriggerPublishSyncAfterApprove({ pendingId });
+            result.sync = sync;
         }
-
-        if (urlPath.endsWith('/approve')) {
-            let result;
-            try {
-                result = approvePendingItem(pendingId);
-            } catch (error) {
-                sendJson(res, 500, { ok: false, error: error.message });
-                return;
-            }
-            if (result.ok) {
-                const dataPaths = getDataPaths();
-                result.written_paths = {
-                    tags: dataPaths.prodTags,
-                    cases: dataPaths.prodCases,
-                    queue: dataPaths.queue,
-                    catalog: path.join(dataPaths.root, 'data', 'catalog.json')
-                };
-                const sync = await maybeTriggerPublishSyncAfterApprove({ pendingId });
-                result.sync = sync;
-            }
-            sendJson(res, result.ok ? 200 : 400, result);
-            return;
-        }
-
-        const result = rejectPendingItem(pendingId);
         sendJson(res, result.ok ? 200 : 400, result);
         return;
     }
 
-    if (req.method === 'POST' && urlPath === '/api/review/publish-sync') {
-        try {
-            const body = await readBody(req);
-            const dispatch = body.dispatch === true || process.env.PUBLISH_DISPATCH === '1';
-            const result = await publishReviewedDataToGit({ dispatch });
-            sendJson(res, 200, result);
-        } catch (error) {
-            sendJson(res, 400, { ok: false, error: error.message });
-        }
+    const result = rejectPendingItem(pendingId);
+    sendJson(res, result.ok ? 200 : 400, result);
+}
+
+async function handlePublishSync(req, res) {
+    try {
+        const body = await readBody(req);
+        const dispatch = body.dispatch === true || process.env.PUBLISH_DISPATCH === '1';
+        const result = await publishReviewedDataToGit({ dispatch });
+        sendJson(res, 200, result);
+    } catch (error) {
+        sendJson(res, 400, { ok: false, error: error.message });
+    }
+}
+
+async function handleApi(req, res) {
+    refreshLocalEnv();
+    const urlPath = normalizeApiPath(req.url);
+    const queryParams = parseRequestQuery(req);
+
+    if (!isProtectedAdminPath(urlPath, req.method, queryParams)) {
+        sendJson(res, 404, { ok: false, error: 'Not found' });
         return;
     }
 
-    sendJson(res, 404, { ok: false, error: 'Not found' });
+    const auth = authorizeAdminRouteAccess(buildAdminAuthContext(req, queryParams));
+    if (!auth.ok) {
+        denyAdminRoute(req, res, auth, urlPath);
+        return;
+    }
+
+    try {
+        if (req.method === 'GET' && urlPath === '/api/review/health') {
+            await handleReviewHealth(req, res, urlPath);
+            return;
+        }
+
+        if (urlPath === '/api/test-crawl' && (req.method === 'GET' || req.method === 'POST')) {
+            await handleTestCrawl(req, res, queryParams);
+            return;
+        }
+
+        if (req.method === 'GET' && urlPath === '/api/review/pending') {
+            await handleReviewPending(req, res);
+            return;
+        }
+
+        if (req.method === 'POST' && (urlPath === '/api/review/approve' || urlPath === '/api/review/reject')) {
+            await handleReviewApproveReject(req, res, urlPath);
+            return;
+        }
+
+        if (req.method === 'POST' && urlPath === '/api/review/publish-sync') {
+            await handlePublishSync(req, res);
+            return;
+        }
+
+        sendJson(res, 403, {
+            ok: false,
+            error: 'Forbidden. This administrative endpoint is not available.',
+            reason: 'route_not_implemented'
+        });
+    } catch (error) {
+        console.error('[admin-server] route error', urlPath, error.message);
+        sendJson(res, 500, { ok: false, error: error.message, engine_build: ADMIN_BUILD_ID });
+    }
 }
 
 const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', `Content-Type, Authorization, ${PRIMARY_ADMIN_HEADER}`);
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
@@ -306,16 +340,20 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, '127.0.0.1', () => {
     const dataPaths = getDataPaths();
-    if (!PASSWORD) {
-        console.warn('WARNING: ADMIN_REVIEW_PASSWORD is not set. All API calls will be rejected.');
-        console.warn('Example: ADMIN_REVIEW_PASSWORD=your-secret node scripts/admin-server.js');
+    if (!areAdminRoutesEnabled()) {
+        console.warn('WARNING: ADMIN_ROUTES_ENABLED is not set. All /api/* admin routes return 403 until enabled.');
+        console.warn('Add ADMIN_ROUTES_ENABLED=1 to .env.local (npm run restart:admin sets this).');
+    }
+    if (getConfiguredAdminSecrets().length === 0) {
+        console.warn('WARNING: TEST_CRAWL_SECRET / ADMIN_REVIEW_PASSWORD not set. Admin API will reject all requests.');
+        console.warn('Example: ADMIN_REVIEW_PASSWORD=your-secret ADMIN_ROUTES_ENABLED=1 npm run dev:admin');
     }
     console.log(`Review admin listening on http://127.0.0.1:${PORT}/admin.html`);
     console.log(`Build: ${ADMIN_BUILD_ID}`);
     console.log(`Project root: ${ROOT}`);
     console.log(`Writes to: ${dataPaths.prodTags}`);
     console.log(`Pending queue: ${dataPaths.queue}`);
-    console.log('Manual crawl test: GET/POST http://127.0.0.1:' + PORT + '/api/test-crawl?persist=1');
+    console.log(`Admin gate: header ${PRIMARY_ADMIN_HEADER} or ?secret= (also Bearer for compatibility)`);
     if (envFiles.length > 0) {
         console.log(`Loaded env: ${envFiles.join(', ')}`);
     }

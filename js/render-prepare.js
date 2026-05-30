@@ -332,7 +332,9 @@ function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
             direction,
             includeBaseline: false,
             productQuery: query,
-            vertical: AppState.searchOrigin || 'electronics'
+            vertical: ['electronics', 'new-energy', 'semiconductor'].includes(AppState.searchOrigin)
+                ? AppState.searchOrigin
+                : undefined
         }
     };
 }

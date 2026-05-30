@@ -1,94 +1,30 @@
-function withDataCacheBust(url) {
-    const build = globalThis.TradeComplyBuild || '';
-    if (!build || !url || /\?/.test(url)) {
-        return url;
-    }
-    return `${url}?v=${encodeURIComponent(build)}`;
-}
-
-async function fetchJsonSafe(url, fallbackValue = []) {
-    try {
-        const response = await fetch(withDataCacheBust(url));
-        if (!response.ok) throw new Error(`Status: ${response.status}`);
-        return await response.json();
-    } catch (err) {
-        console.warn(`⚠️ Failed to load ${url}, using fallback value. Error:`, err);
-        return fallbackValue;
-    }
+function showDataLoadingPlaceholders() {
+    const loadingHtml = templateDataLoadingIndicator();
+    mountHtml(document.getElementById('quick-actions-container'), loadingHtml);
+    mountHtml(document.getElementById('kb-categories-container'), loadingHtml);
 }
 
 /**
- * Initialize data loading
+ * Initialize data loading (fetch + AppState hydration; rendering in separate functions).
  */
 async function initData() {
-    // 显示加载提示
-    const loadingHtml = `<div style="text-align: center; padding: 40px; color: #666;">
-        <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
-        <div>Loading data...</div>
-    </div>`;
-    document.getElementById('quick-actions-container').innerHTML = loadingHtml;
-    const kbContainer = document.getElementById('kb-categories-container');
-    if (kbContainer) kbContainer.innerHTML = loadingHtml;
-    
-    // 使用独立 Catch 提高容错性
+    showDataLoadingPlaceholders();
+
     try {
-        const [tags, cases, quickActions, kb, categories, updates, catalogSchema, scopeConfig, catalogArtifact] = await Promise.all([
-            fetchJsonSafe('data/tags.json', []),
-            fetchJsonSafe('data/cases.json', []),
-            fetchJsonSafe('data/quick-actions.json', []),
-            fetchJsonSafe('data/knowledge-base.json', { categories: [] }),
-            fetchJsonSafe('data/categories.json', []),
-            fetchJsonSafe('data/updates.json', []),
-            fetchJsonSafe('data/catalog.schema.json', {}),
-            fetchJsonSafe('data/scope-keywords.json', {}),
-            fetchJsonSafe('data/catalog.json', null)
-        ]);
+        const bundle = await loadApplicationDataBundle();
+        hydrateAppStateFromBundle(bundle);
 
-        const enrichedTags = (tags || []).map((tag) => {
-            if (typeof enrichTagForCountryPanel === 'function') {
-                return enrichTagForCountryPanel(tag);
-            }
-            return tag;
-        });
-
-        AppState.data = { 
-            tags: enrichedTags, 
-            cases, 
-            categories,
-            updates,
-            quickActions, 
-            knowledgeBase: kb,
-            catalogSchema,
-            scopeConfig
-        };
-
-        let catalog = Catalog.hydrateScopeCatalog(catalogArtifact);
-        if (!catalog || !catalog.keywordList.length) {
-            catalog = Catalog.buildScopeCatalog({
-                tags: enrichedTags,
-                cases,
-                categories,
-                scopeConfig,
-                catalogSchema
-            });
-            console.warn('catalog.json unavailable or empty; built scope catalog at runtime.');
-        }
-
-        AppState.catalog = catalog;
-        
         renderQuickActions();
         renderKnowledgeBase();
         renderCategories();
         renderLatestUpdate();
         updateHubStats();
     } catch (err) {
-        // 这个 catch 现在主要是防患未然（极少触发）
         console.error('Critical data load error:', err);
-        const errorHtml = `<div style="text-align: center; padding: 40px; color: #e74c3c;">
-            <div style="font-size: 24px; margin-bottom: 10px;">⚠️</div>
-            <div>Application error. Please refresh the page.</div>
-        </div>`;
-        document.getElementById('quick-actions-container').innerHTML = errorHtml;
+        mountHtml(
+            document.getElementById('quick-actions-container'),
+            templateDataLoadError()
+        );
     }
 }
 

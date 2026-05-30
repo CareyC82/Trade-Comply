@@ -1,0 +1,44 @@
+/**
+ * Search actions — run indexing + delegate to results orchestration (no DOM templates).
+ */
+'use strict';
+
+function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
+    AppState.setSearchOrigin(origin);
+    const trimmedQuery = query ? query.trim() : '';
+    const selections = getPrecheckSelections(precheckPanelId);
+    const results = searchWithPrecheck(trimmedQuery, selections, search);
+    const displayQuery = trimmedQuery || fallbackLabel || t('allProducts');
+
+    AppState.setLastSearch({
+        query: displayQuery,
+        tagCount: results.tags.length,
+        caseCount: results.cases.length
+    });
+
+    renderResults(displayQuery, results.tags, results.cases, selections);
+}
+
+function searchProducts(query) {
+    runProductSearch({
+        query,
+        origin: 'electronics',
+        precheckPanelId: 'precheck-panel',
+        fallbackLabel: t('allProducts')
+    });
+}
+
+function searchEnergyProducts(query) {
+    runProductSearch({
+        query,
+        origin: 'new-energy',
+        precheckPanelId: 'energy-precheck-panel',
+        fallbackLabel: t('newEnergyProducts')
+    });
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.runProductSearch = runProductSearch;
+    globalThis.searchProducts = searchProducts;
+    globalThis.searchEnergyProducts = searchEnergyProducts;
+}

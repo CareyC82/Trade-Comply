@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category"></script>
  */
 (function () {
-    const BUILD = '20260527checklist-collapsed';
+    const BUILD = '20260530print-native';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -24,10 +24,15 @@
     const app = detectApp();
 
     const INDEX_MODULES = [
+        'js/app-state.js',
+        'js/dom-mount.js',
         'js/core.js',
         'lib/country-registry.js',
         'lib/trade-country.js',
         'lib/checklist.js',
+        'lib/checklist-industry-segment.js',
+        'lib/actionable-checklist.js',
+        'lib/enterprise-print-report.js',
         'lib/industry-checklist-baseline.js',
         'lib/deep-link.js',
         'js/tag-enrich.js',
@@ -35,43 +40,61 @@
         'js/country-render.js',
         'js/global-policy-audit.js',
         'js/catalog.js',
+        'js/data-templates.js',
+        'js/data-service.js',
         'js/quick-select-grid.js',
         'js/data.js',
         'lib/matched-results.js',
+        'lib/pre-screen-report.js',
         'js/search.js',
         'js/compliance-checklist.js',
         'js/precheck.js',
+        'js/pre-screen-report-templates.js',
+        'js/pre-screen-report-panel.js',
         'js/trust-boundary.js',
         'js/ai.js',
         'js/render-templates.js',
         'js/render-prepare.js',
+        'js/render-mount.js',
+        'js/ai-query-bindings.js',
+        'js/search-actions.js',
+        'js/render-results.js',
         'js/render.js',
         'js/feedback.js',
         'compliance-feedback-codec.js',
         'js/policy-correction.js',
         'js/navigation.js',
         'js/semiconductor.js',
+        'js/industry-scenario-presets.js',
         'js/incoterm.js',
         'js/bootstrap.js'
     ];
 
     const HSCODE_MODULES = [
+        'js/app-state.js',
+        'js/dom-mount.js',
         'js/core.js',
         'lib/country-registry.js',
         'lib/trade-country.js',
         'lib/checklist.js',
         'lib/hscode-dual.js',
+        'lib/checklist-industry-segment.js',
+        'lib/actionable-checklist.js',
+        'lib/enterprise-print-report.js',
         'lib/industry-checklist-baseline.js',
         'js/compliance-checklist.js',
         'js/hscode-page.js'
     ];
 
     const CATEGORY_MODULES = [
+        'js/app-state.js',
+        'js/dom-mount.js',
         'js/core.js',
         'lib/country-registry.js',
         'lib/trade-country.js',
         'js/trade-country-ui.js',
         'js/quick-select-grid.js',
+        'js/industry-scenario-presets.js',
         'js/feedback.js',
         'compliance-feedback-codec.js',
         'js/category-page.js'

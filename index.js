@@ -30,9 +30,16 @@ const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
 const FC_BUILD_ID = '20260530test-crawl-v2';
 const { runGlobalCrawlTest, ENGINE_BUILD_ID: GLOBAL_ENGINE_BUILD } = require('./lib/global-crawl-engine');
 const {
-    authorizeTestCrawlAccess,
-    logTestCrawlUnauthorized
-} = require('./lib/test-crawl-auth');
+    authorizeAdminRouteAccess,
+    areAdminRoutesEnabled,
+    isProtectedAdminPath,
+    isTestCrawlPath,
+    logUnauthorizedAdminAccess,
+    buildAdminForbiddenPayload,
+    resolveClientIpFromHeaders
+} = require('./lib/admin-route-security');
+const { buildPreScreenReport } = require('./lib/pre-screen-report');
+const { getCountryLabel } = require('./lib/country-registry');
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
@@ -690,7 +697,7 @@ function buildCorsHeaders(event) {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': resolveAllowedOrigin(event),
         'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Admin-Secret'
     };
 }
 
@@ -771,44 +778,129 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
-function isTestCrawlRequest(method, path, queryParams) {
-    if (method !== 'GET' && method !== 'POST') {
-        return false;
-    }
-    const normalized = normalizePath(path);
-    if (normalized === '/test-crawl' || normalized === '/api/test-crawl') {
-        return true;
-    }
-    return queryParams.action === 'test_crawl' || queryParams.action === 'test-crawl';
+function extractBearerTokenFromEvent(event) {
+    const authHeader = getHeaderValue(event.headers, 'authorization');
+    const match = authHeader.match(/^Bearer\s+(.+)$/i);
+    return match ? match[1].trim() : '';
 }
 
-async function handleTestCrawlRequest(event, headers) {
+function enforceAdminRouteGate(event, headers) {
     const queryParams = getQueryParams(event);
-    const auth = authorizeTestCrawlAccess({
+    const requestMeta = getRequestMeta(event);
+    const auth = authorizeAdminRouteAccess({
         query: queryParams,
-        headers: event.headers
+        headers: event.headers,
+        bearerToken: extractBearerTokenFromEvent(event)
     });
-    if (!auth.ok) {
-        const requestMeta = getRequestMeta(event);
-        logTestCrawlUnauthorized({
-            reason: auth.reason,
-            method: requestMeta.method,
-            path: requestMeta.path,
-            ip: getHeaderValue(event.headers, 'x-forwarded-for')
-                || getHeaderValue(event.headers, 'x-real-ip'),
-            credential_source: auth.credential_source
-        });
-        return {
-            statusCode: 403,
-            headers,
-            body: JSON.stringify({
-                ok: false,
-                error: 'Forbidden. Test crawl requires a configured secret and valid credentials.',
-                reason: auth.reason
-            })
-        };
+    if (auth.ok) {
+        return null;
     }
+    logUnauthorizedAdminAccess({
+        reason: auth.reason,
+        method: requestMeta.method,
+        path: requestMeta.path,
+        ip: resolveClientIpFromHeaders(event.headers) || 'unknown',
+        credential_source: auth.credential_source
+    });
+    return {
+        statusCode: 403,
+        headers,
+        body: JSON.stringify(buildAdminForbiddenPayload(auth))
+    };
+}
 
+function loadProdTagsForReport() {
+    const tagsPath = path.join(__dirname, 'data', 'tags.json');
+    if (!fs.existsSync(tagsPath)) {
+        return [];
+    }
+    return JSON.parse(fs.readFileSync(tagsPath, 'utf8'));
+}
+
+function resolveReportTagsFromBody(body) {
+    const allTags = loadProdTagsForReport();
+    const ctx = body.context && typeof body.context === 'object' ? body.context : {};
+    const ids = Array.isArray(ctx.tag_ids) ? ctx.tag_ids.filter(Boolean) : [];
+    if (ids.length > 0) {
+        const idSet = new Set(ids);
+        return allTags.filter((tag) => idSet.has(tag.tag_id));
+    }
+    const query = String(body.product_query || body.query || '').trim().toLowerCase();
+    if (!query) {
+        return [];
+    }
+    return allTags.filter((tag) => {
+        const blob = `${tag.short_name || ''} ${tag.description || ''} ${tag.content_en || ''}`.toLowerCase();
+        return blob.includes(query);
+    }).slice(0, 12);
+}
+
+function buildServerPrecheckProfile(body, tags) {
+    let risk = 'low';
+    for (const tag of tags) {
+        const blob = `${tag.category || ''} ${tag.description || ''} ${tag.short_description || ''}`.toLowerCase();
+        if (blob.includes('export control') || blob.includes('semiconductor') || blob.includes('dual-use')) {
+            risk = 'high';
+        } else if (blob.includes('battery') || blob.includes('wireless') || blob.includes('encryption')) {
+            if (risk !== 'high') {
+                risk = 'medium';
+            }
+        }
+    }
+    const direction = String(body.direction || body.context?.direction || 'export').toLowerCase();
+    if (risk === 'high' && direction === 'export') {
+        risk = 'review_required';
+    }
+    return {
+        risk,
+        signals: [],
+        nextChecks: [
+            'Confirm HS code, product description, and end-use statements against the commercial invoice.'
+        ],
+        riskReason: tags.length
+            ? 'Matched production rules from the Trade Comply library for this product screen.'
+            : '',
+        matchedRuleCount: tags.length
+    };
+}
+
+function handlePreScreenReportRequest(body, headers) {
+    const tags = resolveReportTagsFromBody(body);
+    const direction = String(body.direction || body.context?.direction || 'export').toLowerCase();
+    const destination = String(body.destination || body.context?.counterparty_country || body.context?.country || 'US').toUpperCase();
+    const destinationLabel = getCountryLabel(destination) || destination;
+    const directionLabel = direction === 'import' ? 'Import into China' : 'Export from China';
+    const precheckSelections = (Array.isArray(body.precheck_attributes) ? body.precheck_attributes : [])
+        .filter((id) => typeof id === 'string')
+        .map((id) => ({ id, label: id }));
+
+    const report = buildPreScreenReport({
+        productQuery: body.product_query || body.query || '',
+        tags,
+        cases: [],
+        precheckSelections,
+        profile: buildServerPrecheckProfile(body, tags),
+        directionRaw: direction,
+        directionLabel,
+        destination,
+        destinationLabel,
+        flowLabel: `${directionLabel} → ${destinationLabel}`,
+        synthesisMethod: body.synthesis === 'llm' ? 'llm_enhanced' : 'structured_rules'
+    });
+
+    return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+            ok: true,
+            build: FC_BUILD_ID,
+            report
+        })
+    };
+}
+
+async function executeTestCrawlRequest(event, headers) {
+    const queryParams = getQueryParams(event);
     const dataDir = path.join(__dirname, 'data');
     const persist = queryParams.persist === '1' || queryParams.persist === 'true';
 
@@ -877,11 +969,17 @@ async function callDeepSeekForHsCode(description, context = {}, fcLibs) {
         const content = data.choices?.[0]?.message?.content || '';
         const parsed = fcLibs.parseHsCodeClassificationPayload(content);
         const enriched = fcLibs.enrichClassification(parsed, context);
+        const industryBaseline = require('./lib/industry-checklist-baseline');
+        const profile = industryBaseline.detectProductProfile(
+            description,
+            parsed.china_export_hscode || parsed.china_import_hscode || parsed.hscode || ''
+        );
         const aiChecklist = fcLibs.ensureIndustryChecklist(parsed.checklist, {
             description,
             hsCode: parsed.china_export_hscode || parsed.china_import_hscode || parsed.hscode,
             counterpartyCountry: context.counterpartyCountry || 'US',
-            direction: context.direction || 'export'
+            direction: context.direction || 'export',
+            vertical: profile.vertical
         });
         enriched.checklist = fcLibs.buildSessionChecklist({
             tags: [],
@@ -1015,20 +1113,39 @@ exports.handler = async (rawEvent) => {
     if (method === 'GET') {
         const health = queryParamsEarly.health;
         if (health === 'feedback') {
+            const features = ['compliance_feedback', 'feedback', 'ai', 'hscode_classify'];
+            if (areAdminRoutesEnabled()) {
+                features.push('test_crawl');
+            }
             return {
                 statusCode: 200,
                 headers,
                 body: JSON.stringify({
                     ok: true,
                     build: FC_BUILD_ID,
-                    features: ['compliance_feedback', 'feedback', 'ai', 'hscode_classify', 'test_crawl']
+                    features
                 })
             };
         }
     }
 
-    if (isTestCrawlRequest(method, path, queryParamsEarly)) {
-        return handleTestCrawlRequest(event, headers);
+    if (isProtectedAdminPath(path, method, queryParamsEarly)) {
+        const denied = enforceAdminRouteGate(event, headers);
+        if (denied) {
+            return denied;
+        }
+        if (isTestCrawlPath(path, method, queryParamsEarly)) {
+            return executeTestCrawlRequest(event, headers);
+        }
+        return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({
+                ok: false,
+                error: 'Forbidden. This administrative endpoint is not available.',
+                reason: 'route_not_implemented'
+            })
+        };
     }
 
     if (method === 'GET' && path === '/visitors') {
@@ -1053,8 +1170,27 @@ exports.handler = async (rawEvent) => {
     const query = typeof body.query === 'string' ? body.query.trim() : '';
     const queryParams = queryParamsEarly;
 
-    if (isTestCrawlRequest(method, path, queryParams)) {
-        return handleTestCrawlRequest(event, headers);
+    if (isProtectedAdminPath(path, method, queryParams)) {
+        const denied = enforceAdminRouteGate(event, headers);
+        if (denied) {
+            return denied;
+        }
+        if (isTestCrawlPath(path, method, queryParams)) {
+            return executeTestCrawlRequest(event, headers);
+        }
+        return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({
+                ok: false,
+                error: 'Forbidden. This administrative endpoint is not available.',
+                reason: 'route_not_implemented'
+            })
+        };
+    }
+
+    if (body.action === 'pre_screen_report') {
+        return handlePreScreenReportRequest(body, headers);
     }
 
     if (isHsCodeClassifyRequest(body, event) || (method === 'POST' && isHsCodeClassifyPath(path))) {

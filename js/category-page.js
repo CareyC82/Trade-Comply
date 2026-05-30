@@ -137,6 +137,10 @@ function bootstrapCategoryPage() {
     bindCategorySearch();
     bindCategoryFeedback();
 
+    if (typeof initIndustryScenarioPills === 'function') {
+        initIndustryScenarioPills();
+    }
+
     if (typeof renderQuickSelectGrid === 'function') {
         renderQuickSelectGrid('category-quick-select-container', {
             mode: 'category',

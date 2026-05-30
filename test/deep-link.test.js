@@ -45,4 +45,17 @@ describe('deep-link', () => {
         const plan = buildInboundSearchPlan('?direction=import');
         assert.equal(plan.shouldRun, false);
     });
+
+    it('reads precheck ids and panel for semiconductor vertical', () => {
+        const link = getInboundDeepLinkFromSearch(
+            '?search=gpu&vertical=semiconductor&precheck=ai_chip,semiconductor'
+        );
+        assert.deepEqual(link.precheck, ['ai_chip', 'semiconductor']);
+
+        const plan = buildInboundSearchPlan(
+            '?search=gpu&vertical=semiconductor&precheck=ai_chip,semiconductor'
+        );
+        assert.equal(plan.precheckPanelId, 'semi-precheck-panel');
+        assert.deepEqual(plan.precheck, ['ai_chip', 'semiconductor']);
+    });
 });

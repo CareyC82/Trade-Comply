@@ -45,6 +45,17 @@ describe('industry-checklist-baseline', () => {
         assert.ok(items.some((item) => /ad\/cvd/i.test(item.task)));
     });
 
+    it('does not inject FCC for new-energy lithium battery sessions', () => {
+        const merged = ensureIndustryChecklist([], {
+            description: 'lithium battery equipment air freight IATA UN38.3',
+            country: 'US',
+            direction: 'export',
+            vertical: 'new-energy'
+        });
+        const haystack = merged.map((item) => `${item.task} ${item.desc}`).join(' ');
+        assert.doesNotMatch(haystack, /fcc/i);
+    });
+
     it('ensures minimum checklist when AI returns empty array', () => {
         const merged = ensureIndustryChecklist([], {
             description: 'smart speaker wifi',

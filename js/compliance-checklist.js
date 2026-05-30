@@ -1,9 +1,45 @@
 /**
  * Compliance To-Do Checklist UI + enterprise print report helpers.
  */
+(function initComplianceChecklistModule(global) {
+    'use strict';
 
 function getChecklistApi() {
     return globalThis.TradeComplyChecklist || null;
+}
+
+function getChecklistSegmentApi() {
+    return globalThis.TradeComplyChecklistSegment || null;
+}
+
+function resolveChecklistVerticalForSession(options = {}) {
+    const segmentApi = getChecklistSegmentApi();
+    const productQuery = options.productQuery
+        || AppState.lastReport?.productQuery
+        || AppState.aiContext?.product_query
+        || '';
+    if (segmentApi?.resolveChecklistVertical) {
+        return segmentApi.resolveChecklistVertical({
+            vertical: options.vertical,
+            searchOrigin: AppState.searchOrigin,
+            description: productQuery,
+            hsCode: options.hsCode || AppState.hsContext?.chinaCode || '',
+            forceVertical: options.forceVertical === true
+        });
+    }
+    if (['electronics', 'new-energy', 'semiconductor'].includes(options.vertical)) {
+        return options.vertical;
+    }
+    return 'electronics';
+}
+
+function filterChecklistRowsForSession(items, options = {}) {
+    const vertical = resolveChecklistVerticalForSession(options);
+    const segmentApi = getChecklistSegmentApi();
+    if (segmentApi?.filterChecklistForVertical) {
+        return segmentApi.filterChecklistForVertical(items, vertical);
+    }
+    return items || [];
 }
 
 function extractChecklistFromApiPayload(payload) {
@@ -196,92 +232,95 @@ function inlineChecklistItem(phase, task, desc) {
     return { phase, task, desc, source: 'inline-baseline' };
 }
 
-/** Self-contained fallback when lib/industry-checklist-baseline.js fails to load. */
-function buildInlineIndustryChecklistFallback(options = {}, seed = []) {
-    const country = String(options.country || AppState.currentCountry || 'US').trim().toUpperCase();
-    const direction = options.direction || AppState.currentDirection || 'export';
-    const productQuery = String(
-        options.productQuery
-        || AppState.lastReport?.productQuery
-        || AppState.aiContext?.product_query
-        || 'consumer trade product'
-    ).trim();
-    const text = `${productQuery} ${options.hsCode || AppState.hsContext?.chinaCode || ''}`.toLowerCase();
-    const isExport = direction !== 'import';
-    const out = Array.isArray(seed) ? [...seed] : [];
-    const seen = new Set(out.map((row) => `${row.phase}::${row.task}`.toLowerCase()));
-
-    function pushUnique(entry) {
-        const key = `${entry.phase}::${entry.task}`.toLowerCase();
+function mergeActionableAndSupplemental(baseRows, supplementalRows) {
+    const seen = new Set();
+    const merged = [];
+    [...(baseRows || []), ...(supplementalRows || [])].forEach((row) => {
+        const task = String(row?.task || row?.title || '').trim();
+        if (!task) {
+            return;
+        }
+        const key = `${row.phase || 'other'}::${task}`.toLowerCase();
         if (seen.has(key)) {
             return;
         }
         seen.add(key);
-        out.push(entry);
-    }
+        merged.push(row);
+    });
+    return merged.slice(0, 8);
+}
 
-    if (isExport && country === 'US') {
-        pushUnique(inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_TECH,
-            'Verify FCC ID conformity & technical labeling',
-            'Confirm intentional radiator FCC Part 15/18 authorization, supplier FCC ID on label, and RF exposure compliance for US market entry.'
-        ));
+function runGetActionableChecklist(industry, context) {
+    const getter = globalThis.TradeComplyActionableChecklist?.getActionableChecklist
+        || globalThis.getActionableChecklist;
+    if (typeof getter === 'function') {
+        return getter(industry, context);
     }
-    if (isExport && country === 'EU') {
-        pushUnique(inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_TECH,
-            'Complete CE Marking (RED Directive)',
-            'Verify radio equipment meets EU Radio Equipment Directive essential requirements with Declaration of Conformity and technical file.'
-        ));
-        pushUnique(inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_ENV,
-            'Submit RoHS & WEEE Compliance',
-            'Prepare RoHS substance dossier, REACH SVHC disclosures, and confirm WEEE producer registration in the destination EU member state.'
-        ));
-    }
-    if (/energy storage|battery system|ess|powerwall|8507|power bank|portable charger/.test(text)) {
-        pushUnique(inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_DOC,
-            'Obtain Class 9 Dangerous Goods maritime booking approval & UN38.3 report',
-            'Secure carrier approval for lithium batteries, UN38.3 test summary, MSDS/SDS, and proper shipping marks.'
-        ));
-    }
-    if (/gpu|ai chip|accelerator|8542|semiconductor|optical module/.test(text)) {
-        pushUnique(inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_DOC,
-            'Perform BIS ECCN & dual-use export control screening',
-            'Screen advanced computing, semiconductor, and telecom items against BIS ECCN lists, Entity List, and license requirements.'
-        ));
-    }
+    return [];
+}
 
-    [
+function buildActionableChecklistBase(options = {}) {
+    const resolvedVertical = resolveChecklistVerticalForSession(options);
+    const context = {
+        country: options.country || AppState.currentCountry || 'US',
+        direction: options.direction || AppState.currentDirection || 'export',
+        productQuery: options.productQuery
+            || AppState.lastReport?.productQuery
+            || AppState.aiContext?.product_query
+            || ''
+    };
+    let rows = runGetActionableChecklist(resolvedVertical, context);
+    if (!rows.length && resolvedVertical !== 'electronics') {
+        rows = runGetActionableChecklist('electronics', context);
+    }
+    if (!rows.length) {
+        rows = buildInlineActionableChecklistFallback(resolvedVertical, context);
+    }
+    return rows;
+}
+
+/** Last-resort rows when actionable-checklist.js failed to load in the browser. */
+function buildInlineActionableChecklistFallback(industry, context = {}) {
+    const phaseDoc = 'documentation';
+    const phaseEnv = 'environmental';
+    const shared = [
         inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_TECH,
-            'Verify product safety & market-access conformity',
-            'Screen wireless, battery, labeling, and consumer product safety requirements for the destination market even when no export-control hit is found.'
-        ),
-        inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_ENV,
-            'Confirm battery & chemical substance compliance',
-            'Check lithium battery UN38.3, RoHS/REACH substance limits, and recycling labeling obligations where applicable.'
-        ),
-        inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_DOC,
+            phaseDoc,
             'Prepare commercial invoice & conformity documentation pack',
             'Bundle invoice, packing list, conformity certificates, and test reports for customs clearance.'
         ),
         inlineChecklistItem(
-            INLINE_CHECKLIST_PHASE_DOC,
+            phaseDoc,
             'Validate HS classification & tariff exposure',
             'Cross-check declared HS code against product function and screen destination tariff / trade-remedy lists before filing.'
         )
-    ].forEach((entry) => {
-        if (out.length < 4) {
-            pushUnique(entry);
-        }
-    });
-
-    return out.slice(0, 8);
+    ];
+    if (industry === 'new-energy') {
+        return [
+            inlineChecklistItem(
+                phaseEnv,
+                'Confirm battery & chemical substance compliance',
+                'Check lithium battery UN38.3, MSDS/SDS reports, RoHS/REACH substance limits, and battery recycling labeling obligations.'
+            ),
+            inlineChecklistItem(
+                phaseDoc,
+                'Obtain air-freight dangerous goods approval (IATA DGR / UN38.3)',
+                'Secure carrier acceptance for lithium batteries; attach UN38.3 summary, proper marks, and shipper declaration.'
+            ),
+            ...shared
+        ];
+    }
+    if (industry === 'semiconductor') {
+        return [
+            inlineChecklistItem(
+                phaseDoc,
+                'Review BIS ECCN classification & export controls',
+                'Screen advanced computing, semiconductor, and telecom items against BIS ECCN lists, Entity List, and license requirements.'
+            ),
+            ...shared
+        ];
+    }
+    return shared;
 }
 
 function finalizeChecklistRows(rows, source = 'industry') {
@@ -297,68 +336,72 @@ function finalizeChecklistRows(rows, source = 'industry') {
 }
 
 function applyIndustryChecklistBaseline(checklist, options = {}) {
-    const industryApi = globalThis.TradeComplyIndustryBaseline;
-    const country = options.country || AppState.currentCountry || 'US';
-    const direction = options.direction || AppState.currentDirection || 'export';
-    const productQuery = options.productQuery
-        || AppState.lastReport?.productQuery
-        || AppState.aiContext?.product_query
-        || '';
-    const vertical = options.vertical || AppState.searchOrigin || null;
-    const seed = Array.isArray(checklist) ? checklist : [];
-
-    let ensured = seed;
-    if (industryApi?.ensureIndustryChecklist) {
-        const profile = typeof industryApi.detectProductProfile === 'function'
-            ? industryApi.detectProductProfile(productQuery, options.hsCode || AppState.hsContext?.chinaCode || '')
-            : null;
-        const safeVertical = profile?.vertical
-            || (['electronics', 'new-energy', 'semiconductor'].includes(vertical) ? vertical : null);
-
-        ensured = industryApi.ensureIndustryChecklist(seed, {
-            description: productQuery || 'consumer trade product',
-            hsCode: options.hsCode || AppState.hsContext?.chinaCode || '',
-            counterpartyCountry: country,
-            direction,
-            vertical: safeVertical
-        });
-    } else {
-        console.warn('TradeComplyIndustryBaseline not loaded — using inline checklist fallback.');
-    }
-
-    if (!Array.isArray(ensured) || ensured.length < 4) {
-        ensured = buildInlineIndustryChecklistFallback(options, ensured || []);
-    }
-
-    return finalizeChecklistRows(ensured, 'industry');
+    return buildComplianceChecklistForResults([], {
+        ...options,
+        supplementalOnly: Array.isArray(checklist) ? checklist : []
+    });
 }
 
 function buildComplianceChecklistForResults(tags, options = {}) {
     const api = getChecklistApi();
     const country = options.country || AppState.currentCountry || 'US';
     const direction = options.direction || AppState.currentDirection || 'export';
+    const productQuery = options.productQuery
+        || AppState.lastReport?.productQuery
+        || AppState.aiContext?.product_query
+        || '';
+    const resolvedVertical = resolveChecklistVerticalForSession({
+        vertical: options.vertical,
+        productQuery,
+        hsCode: options.hsCode,
+        forceVertical: options.forceVertical
+    });
     const aiChecklist = collectDynamicAiChecklists(options);
-    const includeBaseline = options.includeBaseline === true;
 
-    let checklist = [];
-    if (api?.buildSessionChecklist) {
-        checklist = api.buildSessionChecklist({
-            tags: tags || [],
-            aiChecklist,
-            country,
-            direction,
-            includeBaseline
-        });
-    } else {
-        const fromTags = mergeTagChecklistsInline(tags);
-        if (aiChecklist.length > 0 && api?.mergeChecklists) {
-            checklist = api.mergeChecklists(fromTags, aiChecklist);
+    let supplemental = Array.isArray(options.supplementalOnly) ? options.supplementalOnly : [];
+    if (!options.supplementalOnly) {
+        if (api?.buildSessionChecklist) {
+            supplemental = api.buildSessionChecklist({
+                tags: tags || [],
+                aiChecklist,
+                country,
+                direction,
+                includeBaseline: false,
+                vertical: resolvedVertical
+            });
         } else {
-            checklist = fromTags;
+            supplemental = mergeTagChecklistsInline(tags);
+            if (aiChecklist.length > 0 && api?.mergeChecklists) {
+                supplemental = api.mergeChecklists(supplemental, aiChecklist);
+            }
         }
     }
 
-    return applyIndustryChecklistBaseline(checklist, options);
+    supplemental = filterChecklistRowsForSession(supplemental, {
+        vertical: resolvedVertical,
+        productQuery
+    });
+
+    const base = buildActionableChecklistBase({
+        vertical: resolvedVertical,
+        country,
+        direction,
+        productQuery,
+        hsCode: options.hsCode
+    });
+
+    let merged = mergeActionableAndSupplemental(base, supplemental);
+    if (!merged.length) {
+        merged = buildActionableChecklistBase({
+            vertical: resolvedVertical,
+            country,
+            direction,
+            productQuery,
+            hsCode: options.hsCode
+        });
+    }
+
+    return finalizeChecklistRows(merged, 'actionable');
 }
 
 function placeChecklistSlotAfterPenaltyCases() {
@@ -406,17 +449,6 @@ function mountComplianceChecklist(containerId, tags, options = {}) {
     return checklist;
 }
 
-if (typeof globalThis !== 'undefined') {
-    globalThis.mountComplianceChecklist = mountComplianceChecklist;
-    globalThis.buildComplianceChecklistForResults = buildComplianceChecklistForResults;
-    globalThis.placeChecklistSlotAfterPenaltyCases = placeChecklistSlotAfterPenaltyCases;
-    globalThis.placeChecklistSlotAfterRiskCards = placeChecklistSlotAfterPenaltyCases;
-    globalThis.extractChecklistFromApiPayload = extractChecklistFromApiPayload;
-    globalThis.collectDynamicAiChecklists = collectDynamicAiChecklists;
-    globalThis.renderComplianceChecklistPanel = renderComplianceChecklistPanel;
-    globalThis.applyIndustryChecklistBaseline = applyIndustryChecklistBaseline;
-}
-
 function bindComplianceChecklistCheckboxHandlers(root) {
     const scope = root || document;
     scope.querySelectorAll('.compliance-checklist-checkbox').forEach((input) => {
@@ -453,22 +485,12 @@ function renderComplianceChecklistPanel(containerId, checklist) {
     try {
         let checklistData = Array.isArray(checklist) ? checklist : [];
         if (!checklistData.length) {
-            checklistData = applyIndustryChecklistBaseline([], {
+            checklistData = buildComplianceChecklistForResults([], {
                 country: AppState.currentCountry,
                 direction: AppState.currentDirection,
                 productQuery: AppState.lastReport?.productQuery || AppState.aiContext?.product_query,
                 vertical: AppState.searchOrigin
             });
-        }
-        if (!checklistData.length) {
-            checklistData = finalizeChecklistRows(
-                buildInlineIndustryChecklistFallback({
-                    country: AppState.currentCountry,
-                    direction: AppState.currentDirection,
-                    productQuery: AppState.lastReport?.productQuery || AppState.aiContext?.product_query
-                }),
-                'inline-baseline'
-            );
         }
 
         console.log('CRITICAL - Raw AI Checklist:', checklistData);
@@ -539,11 +561,12 @@ function renderComplianceChecklistPanel(containerId, checklist) {
             return;
         }
         container.dataset.checklistFallbackRetry = '1';
-        const fallback = finalizeChecklistRows(buildInlineIndustryChecklistFallback({
+        const fallback = buildComplianceChecklistForResults([], {
             country: AppState.currentCountry,
             direction: AppState.currentDirection,
-            productQuery: AppState.lastReport?.productQuery || AppState.aiContext?.product_query
-        }), 'inline-baseline');
+            productQuery: AppState.lastReport?.productQuery || AppState.aiContext?.product_query,
+            vertical: AppState.searchOrigin
+        });
         if (fallback.length) {
             renderComplianceChecklistPanel(containerId, fallback);
         }
@@ -558,176 +581,195 @@ function getChecklistForReport() {
 }
 
 function buildFlowLabel(direction, countryCode) {
-    const api = globalThis.TradeComplyCountry;
+    const countryApi = global.TradeComplyCountry;
     const dir = direction === 'import' ? 'import' : 'export';
-    const countryLabel = api ? api.getCountryLabel(countryCode) : countryCode;
+    const countryLabel = countryApi ? countryApi.getCountryLabel(countryCode) : countryCode;
     if (dir === 'import') {
         return `CN ← ${countryLabel}`;
     }
     return `CN → ${countryLabel}`;
 }
 
+function getEnterprisePrintApi() {
+    return global.TradeComplyEnterprisePrint || null;
+}
+
 function buildReportChecklistRowsHtml(items) {
+    const printApi = getEnterprisePrintApi();
+    if (printApi?.buildEnterprisePrintChecklistRowsHtml) {
+        return printApi.buildEnterprisePrintChecklistRowsHtml(items);
+    }
     return (items || []).map((item) => `
-        <tr class="checklist-print-row avoid-page-break">
-            <td class="checklist-print-box">${item.checked ? '[x]' : '[ ]'}</td>
-            <td class="checklist-print-phase">${escapeHtml(item.phaseLabel || item.phase)}</td>
-            <td class="checklist-print-task">
-                <strong>${escapeHtml(item.task)}</strong>
-                ${item.desc ? `<div class="checklist-print-desc">${escapeHtml(item.desc)}</div>` : ''}
-            </td>
-            <td class="checklist-print-signoff">
-                <div class="signoff-line">Sign-off: _______________</div>
-                <div class="signoff-line">Date: _______________</div>
-            </td>
+        <tr class="checklist-print-row">
+            <td class="checklist-print-box"><span class="print-check">${item.checked ? '&#9745;' : '&#9744;'}</span></td>
+            <td class="checklist-print-phase">${escapeHtml(item.phase || '')}</td>
+            <td class="checklist-print-task"><strong>${escapeHtml(item.task)}</strong></td>
+            <td class="checklist-print-signoff"></td>
         </tr>
     `).join('');
 }
 
-function buildEnterpriseReportHtml(report) {
-    const flow = escapeHtml(report.flowLabel || '');
-    const chinaHs = escapeHtml(report.chinaHsCode || '—');
-    const counterpartyHs = escapeHtml(report.counterpartyHsCode || '—');
-    const riskCards = (report.riskSummaries || []).map((card) => `
-        <div class="report-risk-card avoid-page-break">
-            <div class="report-risk-card-head">
-                <span class="report-risk-type">${escapeHtml(card.type)}</span>
-                <span class="report-risk-level">${escapeHtml(card.riskLevel)}</span>
-            </div>
-            <div class="report-risk-title">${escapeHtml(card.title)}</div>
-            <div class="report-risk-desc">${escapeHtml(card.description)}</div>
-        </div>
-    `).join('');
-
-    const checklistRows = buildReportChecklistRowsHtml(report.checklist || []);
-
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Trade Comply Enterprise Pre-Check Report</title>
-    <style>
-        @page { margin: 14mm; }
-        * { box-sizing: border-box; }
-        body { font-family: "Segoe UI", Arial, sans-serif; color: #243447; margin: 0; padding: 24px; font-size: 12px; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        h1 { color: #1A3A5C; font-size: 22px; margin: 0 0 6px; }
-        h2 { color: #1A3A5C; font-size: 15px; border-bottom: 1px solid #dde3ea; padding-bottom: 6px; margin: 22px 0 10px; }
-        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin: 12px 0 18px; }
-        .meta-item strong { color: #1A3A5C; }
-        .flow-pill { display: inline-block; background: #1A3A5C; color: #fff; padding: 4px 12px; border-radius: 999px; font-weight: 700; }
-        .hs-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; }
-        .hs-box { border: 1px solid #dde3ea; border-radius: 8px; padding: 10px; }
-        .hs-code { font-size: 16px; font-weight: 700; color: #1A3A5C; font-family: ui-monospace, monospace; }
-        .notice { color: #666; font-size: 11px; margin-top: 8px; }
-        .report-risk-card { border: 1px solid #dde3ea; border-left: 4px solid #E8A817; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
-        .report-risk-card-head { display: flex; gap: 8px; margin-bottom: 4px; }
-        .report-risk-type { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; }
-        .report-risk-level { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #fff4e5; color: #9a6700; }
-        .report-risk-title { font-weight: 700; color: #1A3A5C; }
-        .checklist-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        .checklist-table th, .checklist-table td { border: 1px solid #dde3ea; padding: 8px; vertical-align: top; text-align: left; }
-        .checklist-table th { background: #f5f7fa; color: #1A3A5C; font-size: 11px; }
-        .checklist-print-box { width: 28px; text-align: center; font-size: 14px; font-weight: 700; }
-        .checklist-print-phase { width: 88px; font-size: 11px; color: #555; }
-        .checklist-print-signoff { width: 140px; font-size: 10px; color: #666; }
-        .signoff-line { margin: 6px 0; }
-        .avoid-page-break { page-break-inside: avoid; break-inside: avoid; }
-        .no-screen { display: none; }
-        @media print {
-            body { padding: 0; }
-        }
-    </style>
-</head>
-<body>
-    <h1>Enterprise Compliance Pre-Check Report</h1>
-    <div class="meta-grid">
-        <div class="meta-item"><strong>Trade flow:</strong> <span class="flow-pill">${flow}</span></div>
-        <div class="meta-item"><strong>Generated:</strong> ${escapeHtml(report.generatedAtLabel || '')}</div>
-        <div class="meta-item"><strong>Product / query:</strong> ${escapeHtml(report.productQuery || '')}</div>
-        <div class="meta-item"><strong>Pre-check risk:</strong> ${escapeHtml(report.riskLabel || '')}</div>
-    </div>
-    <div class="hs-pair avoid-page-break">
-        <div class="hs-box"><div>China HS (10-digit)</div><div class="hs-code">${chinaHs}</div></div>
-        <div class="hs-box"><div>${escapeHtml(report.counterpartyHsLabel || 'Counterparty HS')}</div><div class="hs-code">${counterpartyHs}</div></div>
-    </div>
-    <p class="notice">Preliminary screening only — not legal or customs advice. Verify with licensed professionals before filing.</p>
-
-    <h2>Identified Regulatory Risks</h2>
-    ${riskCards || '<p>No matched regulatory signals in this session.</p>'}
-
-    <h2>Actionable Compliance Checklist</h2>
-    <table class="checklist-table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Phase</th>
-                <th>Task &amp; guidance</th>
-                <th>Sign-off / Date</th>
-            </tr>
-        </thead>
-        <tbody>${checklistRows || '<tr><td colspan="4">No checklist items generated.</td></tr>'}</tbody>
-    </table>
-</body>
-</html>`;
+function getPrintEscapeHtml() {
+    if (typeof global.escapeHtml === 'function') {
+        return global.escapeHtml;
+    }
+    if (typeof escapeHtml === 'function') {
+        return escapeHtml;
+    }
+    const printApi = getEnterprisePrintApi();
+    if (printApi?.escapeHtmlForPrint) {
+        return printApi.escapeHtmlForPrint;
+    }
+    return (text) => String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
-function removePrintFrame() {
-    const frame = document.getElementById('tc-print-frame');
-    if (frame) {
-        frame.remove();
+/** Back-compat: delegate to fluid A4 document builder when available */
+function buildEnterpriseReportHtmlCompat(report, esc, printApi) {
+    if (printApi?.assembleEnterprisePrintDocument) {
+        return printApi.assembleEnterprisePrintDocument(report, esc);
     }
+    if (printApi?.buildEnterprisePrintHtml) {
+        return printApi.buildEnterprisePrintHtml(report, esc);
+    }
+    return '';
+}
+
+function buildEnterpriseReportHtml(report) {
+    const printApi = getEnterprisePrintApi();
+    const esc = getPrintEscapeHtml();
+    if (printApi?.assembleEnterprisePrintDocument) {
+        return printApi.assembleEnterprisePrintDocument(report, esc);
+    }
+    if (printApi?.buildEnterprisePrintHtml) {
+        return printApi.buildEnterprisePrintHtml(report, esc);
+    }
+    return buildEnterpriseReportHtmlCompat(report, esc, printApi);
+}
+
+function buildEnterpriseReportForPrint(baseReport = {}) {
+    const productQuery = baseReport.productQuery
+        || AppState.lastReport?.productQuery
+        || '';
+    const vertical = resolveChecklistVerticalForSession({
+        vertical: baseReport.vertical,
+        productQuery
+    });
+
+    let checklist = [];
+    if (Array.isArray(baseReport.checklist) && baseReport.checklist.length) {
+        checklist = baseReport.checklist.map((item) => ({
+            ...item,
+            checked: Boolean(AppState.checklistChecked?.[item.id])
+        }));
+    } else if (typeof getChecklistForReport === 'function') {
+        checklist = getChecklistForReport();
+    }
+
+    if (!checklist.length && typeof buildComplianceChecklistForResults === 'function') {
+        checklist = buildComplianceChecklistForResults([], {
+            productQuery,
+            vertical,
+            country: baseReport.country || AppState.currentCountry,
+            direction: baseReport.directionRaw || AppState.currentDirection
+        });
+    }
+
+    if (!checklist.length) {
+        checklist = finalizeChecklistRows(
+            buildActionableChecklistBase({
+                vertical,
+                productQuery,
+                country: baseReport.country || AppState.currentCountry,
+                direction: baseReport.directionRaw || AppState.currentDirection
+            }),
+            'actionable-print-fallback'
+        );
+    }
+
+    const printApi = getEnterprisePrintApi();
+    const executiveSummary = printApi?.getExecutiveSummary
+        ? printApi.getExecutiveSummary(printApi.resolvePrintIndustry
+            ? printApi.resolvePrintIndustry({ ...baseReport, vertical })
+            : vertical)
+        : (printApi?.buildExecutiveSummaryForEnterpriseReport
+            ? printApi.buildExecutiveSummaryForEnterpriseReport({ ...baseReport, vertical, checklist })
+            : '');
+
+    return {
+        ...baseReport,
+        vertical,
+        checklist,
+        executiveSummary,
+        generatedAtLabel: baseReport.generatedAtLabel
+            || (typeof formatReportDate === 'function' && baseReport.generatedAt
+                ? formatReportDate(baseReport.generatedAt)
+                : '')
+    };
 }
 
 /**
- * Print via hidden iframe (no pop-up window — works when blockers are on).
+ * Delegates to TradeComplyEnterprisePrint.print (popup sandbox + iframe fallback).
  */
 function printEnterprisePrecheckReport(report) {
+    const printApi = getEnterprisePrintApi();
+    const industry = printApi?.resolvePrintIndustry
+        ? printApi.resolvePrintIndustry(report)
+        : (report.vertical || report.industry || '');
+
+    if (printApi?.print) {
+        const ok = printApi.print(report, industry);
+        if (ok !== false) {
+            return;
+        }
+    }
+
+    if (printApi?.printEnterprisePrecheckReport) {
+        const ok = printApi.printEnterprisePrecheckReport(report, industry);
+        if (ok !== false) {
+            return;
+        }
+    }
+
     const html = buildEnterpriseReportHtml(report);
-    removePrintFrame();
+    if (!html || !String(html).includes('report-container')) {
+        console.error('Enterprise print HTML empty. TradeComplyEnterprisePrint=', global.TradeComplyEnterprisePrint);
+        window.alert('Print module did not load. Please hard-refresh (Cmd+Shift+R) and try again.');
+        return;
+    }
 
     const iframe = document.createElement('iframe');
     iframe.id = 'tc-print-frame';
-    iframe.setAttribute('aria-hidden', 'true');
-    iframe.setAttribute('title', 'Compliance pre-check print report');
-    iframe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;border:0;opacity:0;pointer-events:none;z-index:-1;';
-
-    let printStarted = false;
-    const runPrint = () => {
-        if (printStarted) {
-            return;
-        }
-        printStarted = true;
-
-        const win = iframe.contentWindow;
-        if (!win) {
-            window.alert('Could not open the print dialog. Please try again.');
-            removePrintFrame();
-            return;
-        }
-        try {
-            win.focus();
-            win.print();
-        } catch (error) {
-            console.error('Print failed:', error);
-            window.alert('Could not open the print dialog. Please try again.');
-        }
-        setTimeout(removePrintFrame, 120000);
-    };
-
-    iframe.onload = () => setTimeout(runPrint, 200);
+    iframe.style.cssText = 'position:fixed;left:0;top:0;width:210mm;min-height:400px;border:0;opacity:0;pointer-events:none;z-index:-1;';
     document.body.appendChild(iframe);
-
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (!doc) {
-        window.alert('Could not prepare the print report. Please try again.');
-        removePrintFrame();
-        return;
-    }
+    const doc = iframe.contentDocument;
     doc.open();
     doc.write(html);
     doc.close();
-
-    if (doc.readyState === 'complete') {
-        setTimeout(runPrint, 250);
-    }
+    setTimeout(() => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        setTimeout(() => iframe.remove(), 120000);
+    }, 250);
 }
+
+    global.mountComplianceChecklist = mountComplianceChecklist;
+    global.buildComplianceChecklistForResults = buildComplianceChecklistForResults;
+    global.placeChecklistSlotAfterPenaltyCases = placeChecklistSlotAfterPenaltyCases;
+    global.placeChecklistSlotAfterRiskCards = placeChecklistSlotAfterPenaltyCases;
+    global.extractChecklistFromApiPayload = extractChecklistFromApiPayload;
+    global.collectDynamicAiChecklists = collectDynamicAiChecklists;
+    global.renderComplianceChecklistPanel = renderComplianceChecklistPanel;
+    global.applyIndustryChecklistBaseline = applyIndustryChecklistBaseline;
+    global.resolveChecklistVerticalForSession = resolveChecklistVerticalForSession;
+    global.filterChecklistRowsForSession = filterChecklistRowsForSession;
+    global.buildEnterpriseReportForPrint = buildEnterpriseReportForPrint;
+    global.buildEnterpriseReportHtml = buildEnterpriseReportHtml;
+    global.printEnterprisePrecheckReport = printEnterprisePrecheckReport;
+    global.getEnterprisePrintApi = getEnterprisePrintApi;
+    global.buildFlowLabel = buildFlowLabel;
+    global.getChecklistForReport = getChecklistForReport;
+}(typeof globalThis !== 'undefined' ? globalThis : window));

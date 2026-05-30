@@ -50,6 +50,11 @@ const UI_STRINGS = {
     auditTrailEffectiveDate: "Policy Effective Date",
     auditTrailOfficialSource: "View Official Source Statement",
     auditTrailNotAvailable: "Not available",
+    auditTrailSourceType: "Source type",
+    auditTrailJurisdiction: "Jurisdiction",
+    auditTrailEffectiveStatus: "Effective status",
+    auditTrailReviewStatus: "Review status",
+    auditTrailConfidence: "AI confidence",
     referenceSources: "Reference Sources:",
     searching: "Searching...",
     aiSearch: "AI Search:",
@@ -66,6 +71,14 @@ const UI_STRINGS = {
     exemptionsLabel: "Exemptions",
     riskScenariosLabel: "Risk Scenarios",
     resultRoleFocus: "{role} focus",
+    preScreenReportTitle: "Compliance Pre-Screening Report",
+    preScreenRiskLevel: "Risk level rating",
+    preScreenTriggerReason: "Trigger reason",
+    preScreenMissingInfo: "Missing information checklist",
+    preScreenVerificationObjects: "Recommended verification objects",
+    preScreenOfficialSources: "Official authoritative sources",
+    preScreenDisclaimerTitle: "Legal disclaimer",
+    preScreenViewRules: "View detailed rule cards ↓",
     categoriesTitle: "Product Categories",
     categoriesSummary: "📋 <strong>{total}</strong> categories across <strong>{groups}</strong> groups. Tap any category to search instantly.",
     kbSearchPlaceholder: "Search regulations...",
@@ -147,30 +160,7 @@ function checkSearchRange(query) {
     return Catalog.queryMatchesScope(query, AppState.catalog.keywordList);
 }
 
-// === 避免污染全局变量，放入统一命名空间 ===
-const AppState = {
-    data: {
-        tags: [],
-        cases: [],
-        quickActions: [],
-        knowledgeBase: {},
-        categories: [],
-        updates: [],
-        catalogSchema: {},
-        scopeConfig: {}
-    },
-    catalog: null,
-    currentDirection: 'export',
-    currentCountry: 'US',
-    currentView: 'home',
-    searchOrigin: 'electronics',
-    lastReport: null,
-    aiContext: null,
-    hsContext: null,
-    complianceChecklist: [],
-    checklistChecked: {},
-    lastApiChecklist: null
-};
+// AppState: see js/app-state.js (loaded before this file). Use window.AppState only.
 
 const VALID_VIEWS = ['home', 'electronics', 'new-energy', 'semiconductor', 'incoterm', 'result', 'kb', 'categories'];
 
@@ -288,16 +278,6 @@ function applyUiStrings() {
     if (navHsCode) {
         navHsCode.innerHTML = `🔍 ${t('navHsCode')}<span class="nav-btn-badge">Beta</span>`;
     }
-    
-    // 更新返回按钮
-    const backBtns = document.querySelectorAll('.back-btn');
-    backBtns.forEach(btn => {
-        if (btn.id === 'back-to-home-from-cat') {
-            btn.innerHTML = t('backArrow');
-        } else {
-            btn.innerHTML = t('back');
-        }
-    });
     
     // 更新警告横幅
     const warningBanner = document.querySelector('.warning-banner p');
@@ -428,6 +408,7 @@ function escapeHtml(text) {
     div.textContent = String(text);
     return div.innerHTML;
 }
+globalThis.escapeHtml = escapeHtml;
 
 // === XSS防护：净化 URL，防止 javascript: 伪协议 ===
 function sanitizeUrl(url) {

@@ -135,6 +135,27 @@ function resolveEffectiveDate(tag) {
     return tag.effective_date || tracker.published_at || tracker.effective_date || '';
 }
 
+function resolveAuditField(tag, key) {
+    const tracker = tag.policy_tracker || {};
+    return tag[key] ?? tracker[key] ?? '';
+}
+
+function formatConfidenceScore(value) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
+        return '';
+    }
+    const pct = num <= 1 ? Math.round(num * 100) : Math.round(num);
+    return `${pct}%`;
+}
+
+function formatAuditLabel(value) {
+    if (!value) {
+        return '';
+    }
+    return String(value).replace(/_/g, ' ');
+}
+
 function buildRegulatoryBodyBadgeHtml(tag) {
     if (!isGlobalPolicyTag(tag)) {
         return '';
@@ -143,6 +164,47 @@ function buildRegulatoryBodyBadgeHtml(tag) {
     const title = typeof escapeHtml === 'function' ? escapeHtml(meta.label) : meta.label;
     const badge = typeof escapeHtml === 'function' ? escapeHtml(meta.badge) : meta.badge;
     return `<span class="regulatory-body-badge regulatory-body-badge--${meta.cssClass}" title="${title}">[${badge}]</span>`;
+}
+
+function resolveReportJurisdiction(tag) {
+    const jurisdiction = resolveAuditField(tag, 'jurisdiction');
+    if (jurisdiction) {
+        return String(jurisdiction).trim().toUpperCase();
+    }
+    const country = String(tag.country || '').trim().toUpperCase();
+    if (country && country !== 'GLOBAL') {
+        return country;
+    }
+    const meta = getRegulatoryBodyMeta(tag);
+    const badge = String(meta.badge || '').toUpperCase();
+    if (badge.startsWith('CN-')) {
+        return 'CN';
+    }
+    if (badge.startsWith('US-')) {
+        return 'US';
+    }
+    if (badge.startsWith('EU-')) {
+        return 'EU';
+    }
+    return 'GLOBAL';
+}
+
+function formatReportRiskAuditLine(tag) {
+    if (!tag || typeof tag !== 'object') {
+        return '';
+    }
+    const jurisdiction = resolveReportJurisdiction(tag);
+    const verifiedRaw = resolveLastVerifiedTimestamp(tag);
+    let verifiedLabel = 'Pending';
+    if (verifiedRaw) {
+        const parsed = new Date(verifiedRaw);
+        if (!Number.isNaN(parsed.getTime())) {
+            verifiedLabel = parsed.toISOString().slice(0, 10);
+        } else {
+            verifiedLabel = String(verifiedRaw).slice(0, 10);
+        }
+    }
+    return `Source Jurisdiction: [${jurisdiction}] | Verified: ${verifiedLabel}`;
 }
 
 function buildGlobalPolicyAuditTrailHtml(tag) {
@@ -161,10 +223,20 @@ function buildGlobalPolicyAuditTrailHtml(tag) {
     const effectiveLabel = typeof t === 'function' ? t('auditTrailEffectiveDate') : 'Policy Effective Date';
     const auditTitle = typeof t === 'function' ? t('auditTrailTitle') : 'Audit Trail';
     const officialBtn = typeof t === 'function' ? t('auditTrailOfficialSource') : 'View Official Source Statement';
+    const sourceTypeLabel = typeof t === 'function' ? t('auditTrailSourceType') : 'Source type';
+    const jurisdictionLabel = typeof t === 'function' ? t('auditTrailJurisdiction') : 'Jurisdiction';
+    const effectiveStatusLabel = typeof t === 'function' ? t('auditTrailEffectiveStatus') : 'Effective status';
+    const reviewStatusLabel = typeof t === 'function' ? t('auditTrailReviewStatus') : 'Review status';
+    const confidenceLabel = typeof t === 'function' ? t('auditTrailConfidence') : 'AI confidence';
 
     const esc = typeof escapeHtml === 'function' ? escapeHtml : (v) => String(v ?? '');
     const lastVerifiedDisplay = lastVerified ? esc(formatAuditDateTime(lastVerified)) : esc(na);
     const effectiveDisplay = effectiveDate ? esc(formatEffectiveDate(effectiveDate)) : esc(na);
+    const sourceType = resolveAuditField(tag, 'source_type');
+    const jurisdiction = resolveAuditField(tag, 'jurisdiction');
+    const effectiveStatus = resolveAuditField(tag, 'effective_status');
+    const reviewStatus = resolveAuditField(tag, 'review_status');
+    const confidence = formatConfidenceScore(resolveAuditField(tag, 'confidence_score'));
 
     const officialLink = sourceUrl && typeof sanitizeUrl === 'function'
         ? `<a class="policy-official-source-btn" href="${sanitizeUrl(sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(officialBtn)}</a>`
@@ -185,6 +257,26 @@ function buildGlobalPolicyAuditTrailHtml(tag) {
                     <dt>${esc(effectiveLabel)}</dt>
                     <dd><time datetime="${esc(effectiveDate || '')}">${effectiveDisplay}</time></dd>
                 </div>
+                <div class="policy-audit-trail-row">
+                    <dt>${esc(sourceTypeLabel)}</dt>
+                    <dd>${sourceType ? esc(formatAuditLabel(sourceType)) : esc(na)}</dd>
+                </div>
+                <div class="policy-audit-trail-row">
+                    <dt>${esc(jurisdictionLabel)}</dt>
+                    <dd>${jurisdiction ? esc(jurisdiction) : esc(na)}</dd>
+                </div>
+                <div class="policy-audit-trail-row">
+                    <dt>${esc(effectiveStatusLabel)}</dt>
+                    <dd>${effectiveStatus ? esc(formatAuditLabel(effectiveStatus)) : esc(na)}</dd>
+                </div>
+                <div class="policy-audit-trail-row">
+                    <dt>${esc(reviewStatusLabel)}</dt>
+                    <dd>${reviewStatus ? esc(formatAuditLabel(reviewStatus)) : esc(na)}</dd>
+                </div>
+                <div class="policy-audit-trail-row">
+                    <dt>${esc(confidenceLabel)}</dt>
+                    <dd>${confidence ? esc(confidence) : esc(na)}</dd>
+                </div>
             </dl>
             ${officialLink}
         </section>
@@ -196,6 +288,8 @@ if (typeof globalThis !== 'undefined') {
     globalThis.buildRegulatoryBodyBadgeHtml = buildRegulatoryBodyBadgeHtml;
     globalThis.buildGlobalPolicyAuditTrailHtml = buildGlobalPolicyAuditTrailHtml;
     globalThis.resolveRegulatoryBodyId = resolveRegulatoryBodyId;
+    globalThis.formatReportRiskAuditLine = formatReportRiskAuditLine;
+    globalThis.resolveReportJurisdiction = resolveReportJurisdiction;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -206,6 +300,8 @@ if (typeof module !== 'undefined' && module.exports) {
         buildGlobalPolicyAuditTrailHtml,
         getRegulatoryBodyMeta,
         formatAuditDateTime,
-        formatEffectiveDate
+        formatEffectiveDate,
+        formatReportRiskAuditLine,
+        resolveReportJurisdiction
     };
 }

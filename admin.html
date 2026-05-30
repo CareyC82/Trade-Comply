@@ -169,9 +169,21 @@
             }
         }
 
+        function buildAdminHeaders(extra = {}) {
+            const token = getToken();
+            return {
+                'Content-Type': 'application/json',
+                'X-Admin-Secret': token,
+                Authorization: `Bearer ${token}`,
+                ...extra
+            };
+        }
+
         async function verifyApiHealth() {
             const base = getApiBase();
-            const response = await fetch(`${base}/api/review/health`);
+            const response = await fetch(`${base}/api/review/health`, {
+                headers: buildAdminHeaders()
+            });
             const data = await response.json().catch(() => ({}));
             if (!response.ok || !data.ok) {
                 throw new Error(data.error || `Health check failed (${response.status})`);
@@ -192,17 +204,16 @@
 
         async function apiFetch(path, options = {}) {
             const base = getApiBase();
-            const headers = {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${getToken()}`,
-                ...(options.headers || {})
-            };
+            const headers = buildAdminHeaders(options.headers || {});
             const response = await fetch(`${base}${path}`, { ...options, headers });
             const data = await response.json().catch(() => ({}));
-            if (response.status === 401) {
+            if (response.status === 401 || response.status === 403) {
                 setToken('');
                 showLogin();
-                throw new Error('Session expired or wrong password. Log in again with your current ADMIN_REVIEW_PASSWORD.');
+                const hint = data.reason === 'routes_disabled'
+                    ? 'Admin routes are disabled. Set ADMIN_ROUTES_ENABLED=1 in .env.local and restart: npm run restart:admin'
+                    : 'Session expired or wrong password. Log in again with your current ADMIN_REVIEW_PASSWORD.';
+                throw new Error(hint);
             }
             if (!response.ok) {
                 const detail = data.error || data.message || `HTTP ${response.status}`;

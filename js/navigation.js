@@ -153,14 +153,6 @@ function resetPrecheckState() {
 }
 
 /**
- * Go back to previous view
- */
-function goBack() {
-    resetPrecheckState();
-    history.back();
-}
-
-/**
  * Bind event listeners
  */
 function bindEvents() {
@@ -226,25 +218,11 @@ function bindEvents() {
         });
     };
 
-    document.getElementById('back-to-home')?.addEventListener('click', goBack);
-    document.getElementById('back-to-home-from-kb')?.addEventListener('click', goBack);
-    document.getElementById('back-to-home-from-cat')?.addEventListener('click', goBack);
     document.getElementById('download-report-btn')?.addEventListener('click', downloadPrecheckReport);
     addNavEvent('nav-home', 'home');
     addNavEvent('nav-incoterm', 'incoterm');
 
     // Hub cards navigate to dedicated category pages (electronics.html, etc.)
-
-    document.getElementById('back-to-hub')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        resetPrecheckState();
-        showView('home');
-    });
-    document.getElementById('back-to-hub-from-energy')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        resetPrecheckState();
-        showView('home');
-    });
 
     // New Energy Events
     const energyExportBtn = document.getElementById('direction-export-energy');
@@ -282,7 +260,6 @@ function bindEvents() {
     });
 
     // Semiconductor Events
-    document.getElementById('back-to-hub-from-semi')?.addEventListener('click', (e) => { e.preventDefault(); resetPrecheckState(); showView('home'); });
     const semiExportBtn = document.getElementById('direction-export-semi');
     const semiImportBtn = document.getElementById('direction-import-semi');
     if (semiExportBtn) {
@@ -311,11 +288,6 @@ function bindEvents() {
     // Incoterm Events
     document.getElementById('tab-find')?.addEventListener('click', () => switchIncotermTab('find'));
     document.getElementById('tab-calc')?.addEventListener('click', () => switchIncotermTab('calc'));
-    document.getElementById('back-to-hub-from-incoterm')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        resetPrecheckState();
-        showView('home');
-    });
 
     const viewCasesBtn = document.getElementById('view-cases-btn');
     if (viewCasesBtn) {

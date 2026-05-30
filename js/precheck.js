@@ -340,8 +340,22 @@ function createReportPayload(query, tags, cases, precheckSelections) {
     const direction = AppState.currentDirection || 'export';
     const country = AppState.currentCountry || 'US';
     const hs = AppState.hsContext || {};
+    const vertical = globalThis.TradeComplyChecklistSegment?.resolveChecklistVertical
+        ? globalThis.TradeComplyChecklistSegment.resolveChecklistVertical({
+            description: query,
+            searchOrigin: AppState.searchOrigin
+        })
+        : (['electronics', 'new-energy', 'semiconductor'].includes(AppState.searchOrigin)
+            ? AppState.searchOrigin
+            : 'electronics');
     const checklist = typeof buildComplianceChecklistForResults === 'function'
-        ? buildComplianceChecklistForResults(tags, { country, direction, includeBaseline: false })
+        ? buildComplianceChecklistForResults(tags, {
+            country,
+            direction,
+            includeBaseline: false,
+            productQuery: query,
+            vertical
+        })
         : [];
     if (typeof buildComplianceChecklistForResults === 'function') {
         AppState.complianceChecklist = checklist;
@@ -351,8 +365,31 @@ function createReportPayload(query, tags, cases, precheckSelections) {
     const counterpartyHsLabel = hs.counterpartyHsLabel
         || (countryApi ? `${countryApi.getCountryLabel(country)} HS` : 'Counterparty HS');
 
+    const preScreenReport = globalThis.TradeComplyPreScreenReport?.buildPreScreenReport
+        ? globalThis.TradeComplyPreScreenReport.buildPreScreenReport({
+            productQuery: query,
+            tags: tags || [],
+            cases: cases || [],
+            precheckSelections: precheckSelections || [],
+            profile: {
+                ...profile,
+                selectedAttributeLabels: (precheckSelections || []).map((item) => item.label)
+            },
+            directionRaw: direction,
+            directionLabel: direction === 'export' ? t('exportTitle') : t('importTitle'),
+            destination: country,
+            destinationLabel: countryApi ? countryApi.getCountryLabel(country) : country,
+            flowLabel: typeof buildFlowLabel === 'function'
+                ? buildFlowLabel(direction, country)
+                : `${direction} ${country}`,
+            origin: 'CN',
+            hsContext: hs
+        })
+        : null;
+
     return {
         productQuery: query,
+        preScreenReport,
         direction: direction === 'export' ? t('exportTitle') : t('importTitle'),
         directionRaw: direction,
         country,
@@ -371,12 +408,21 @@ function createReportPayload(query, tags, cases, precheckSelections) {
         counterpartyHsCode: hs.counterpartyCode || '',
         counterpartyHsLabel,
         officialName: hs.officialName || '',
-        checklist: typeof getChecklistForReport === 'function' ? getChecklistForReport() : checklist,
+        checklist: checklist.length
+            ? checklist.map((item) => ({
+                ...item,
+                checked: Boolean(AppState.checklistChecked?.[item.id])
+            }))
+            : (typeof getChecklistForReport === 'function' ? getChecklistForReport() : []),
+        vertical,
         riskSummaries: (tags || []).slice(0, 12).map(tag => ({
             type: tag.tag_type || 'CHECK',
             riskLevel: tag.risk_level || 'Medium',
             title: tag.short_name || tag.tag_id || '',
-            description: tag.short_description || tag.description || ''
+            description: tag.short_description || tag.description || '',
+            auditLine: typeof formatReportRiskAuditLine === 'function'
+                ? formatReportRiskAuditLine(tag)
+                : ''
         })),
         trustBoundaryHtml: buildTrustBoundaryReportHtml(trustBoundary),
         tags: (tags || []).map(tag => ({
@@ -594,13 +640,18 @@ function downloadPrecheckReport() {
     }
 
     try {
-        const report = {
-            ...AppState.lastReport,
-            checklist: typeof getChecklistForReport === 'function'
-                ? getChecklistForReport()
-                : AppState.lastReport.checklist,
-            generatedAtLabel: formatReportDate(AppState.lastReport.generatedAt)
-        };
+        const report = typeof buildEnterpriseReportForPrint === 'function'
+            ? buildEnterpriseReportForPrint({
+                ...AppState.lastReport,
+                generatedAtLabel: formatReportDate(AppState.lastReport.generatedAt)
+            })
+            : {
+                ...AppState.lastReport,
+                checklist: typeof getChecklistForReport === 'function'
+                    ? getChecklistForReport()
+                    : AppState.lastReport.checklist,
+                generatedAtLabel: formatReportDate(AppState.lastReport.generatedAt)
+            };
 
         if (typeof printEnterprisePrecheckReport === 'function') {
             printEnterprisePrecheckReport(report);

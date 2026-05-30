@@ -47,6 +47,23 @@ describe('policy-ai-filter', () => {
         assert.deepEqual(out.impact_countries, ['CN', 'US']);
         assert.equal(out.direction, 'EXPORT');
         assert.equal(out.industry, 'Semiconductor');
+        assert.equal(out.effective_status, 'active');
+        assert.equal(out.confidence_score, 0.5);
+    });
+
+    it('normalizes effective_status and confidence_score from AI JSON', () => {
+        const out = normalizePolicyAiFilter({
+            relevant: true,
+            impact_countries: ['US'],
+            direction: 'EXPORT',
+            industry: 'Electronics',
+            summary_en: 'Rule takes effect next quarter.',
+            effective_status: 'pending_effective',
+            confidence_score: 87
+        }, { sourceCountry: 'US', sourceType: 'export' });
+
+        assert.equal(out.effective_status, 'pending_effective');
+        assert.equal(out.confidence_score, 0.87);
     });
 
     it('forces None industry and empty countries when not relevant', () => {
@@ -84,8 +101,10 @@ describe('policy-ai-filter', () => {
             offline: true,
             offlineFixturePath: fixturePath
         });
-        assert.equal(out.relevant, false);
+        assert.equal(out.relevant, true);
         assert.equal(out.method, 'offline-fixture');
+        assert.equal(out.confidence_score, 0.88);
+        assert.equal(out.effective_status, 'active');
     });
 
     it('refineGlobalPolicyAnnouncement delegates to refineWithAI', async () => {

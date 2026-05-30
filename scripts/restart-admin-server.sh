@@ -29,6 +29,8 @@ if [ -z "${ADMIN_REVIEW_PASSWORD:-}" ]; then
   exit 1
 fi
 
+export ADMIN_ROUTES_ENABLED="${ADMIN_ROUTES_ENABLED:-1}"
+
 cd "$ROOT"
 if [ ! -d node_modules/got-scraping ]; then
   echo "Installing npm deps (got-scraping for GAC TLS fingerprint)..."

@@ -25,21 +25,7 @@ function getInboundDeepLink() {
     };
 }
 
-function applyInboundDirection(direction) {
-    const safeDirection = normalizeInboundDirection(direction);
-    setDirection(safeDirection);
-
-    const exportBtn = document.getElementById('direction-export');
-    const importBtn = document.getElementById('direction-import');
-
-    if (safeDirection === 'import') {
-        importBtn?.click();
-    } else {
-        exportBtn?.click();
-    }
-}
-
-function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry, inboundVertical) {
+function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry, inboundVertical, inboundPrecheck) {
     const query = (inboundQuery || '').trim();
     if (!query) {
         return;
@@ -49,30 +35,53 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCount
         ? inboundVertical
         : 'electronics';
 
-    applyInboundDirection(inboundDirection);
+    const panelId = globalThis.TradeComplyDeepLink?.getPrecheckPanelIdForVertical
+        ? globalThis.TradeComplyDeepLink.getPrecheckPanelIdForVertical(vertical)
+        : (vertical === 'semiconductor'
+            ? 'semi-precheck-panel'
+            : vertical === 'new-energy'
+                ? 'energy-precheck-panel'
+                : 'precheck-panel');
+
+    if (typeof applyScenarioDirection === 'function') {
+        applyScenarioDirection(vertical, inboundDirection);
+    }
+
     if (typeof initTradeCountryForDirection === 'function') {
         initTradeCountryForDirection(inboundDirection, inboundCountry);
-    } else if (inboundCountry) {
+    } else if (inboundCountry && typeof setTradeCountry === 'function') {
         setTradeCountry(inboundCountry);
     }
 
-    if (vertical === 'semiconductor') {
-        const searchInput = document.getElementById('search-input-semi');
-        if (searchInput) {
-            searchInput.value = query;
+    if (Array.isArray(inboundPrecheck) && inboundPrecheck.length && typeof applyPrecheckSelections === 'function') {
+        applyPrecheckSelections(panelId, inboundPrecheck);
+    }
+
+    if (typeof showView === 'function') {
+        showView(vertical, false);
+    }
+
+    requestAnimationFrame(() => {
+        if (vertical === 'semiconductor') {
+            const searchInput = document.getElementById('search-input-semi');
+            if (searchInput) {
+                searchInput.value = query;
+            }
+            if (typeof searchSemiconductorProducts === 'function') {
+                searchSemiconductorProducts(query);
+            }
+            return;
         }
-        if (typeof searchSemiconductorProducts === 'function') {
-            searchSemiconductorProducts(query);
+        if (vertical === 'new-energy') {
+            const searchInput = document.getElementById('search-input-energy');
+            if (searchInput) {
+                searchInput.value = query;
+            }
+            if (typeof searchEnergyProducts === 'function') {
+                searchEnergyProducts(query);
+            }
+            return;
         }
-    } else if (vertical === 'new-energy') {
-        const searchInput = document.getElementById('search-input-energy');
-        if (searchInput) {
-            searchInput.value = query;
-        }
-        if (typeof searchEnergyProducts === 'function') {
-            searchEnergyProducts(query);
-        }
-    } else {
         const searchInput = document.getElementById('search-input');
         if (searchInput) {
             searchInput.value = query;
@@ -80,7 +89,7 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCount
         if (typeof searchProducts === 'function') {
             searchProducts(query);
         }
-    }
+    });
 
     const cleanUrl = `${window.location.pathname}#result`;
     history.replaceState({ view: 'result' }, '', cleanUrl);
@@ -100,6 +109,7 @@ async function bootstrapTradeComplyIndex() {
             direction: inboundDirection,
             country: inboundCountry,
             vertical: inboundVertical,
+            precheck: inboundPrecheck,
             hsContext: inboundHsContext
         } = inbound;
 
@@ -118,11 +128,21 @@ async function bootstrapTradeComplyIndex() {
         }
 
         if (inboundQuery) {
-            handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry, inboundVertical);
+            handleInboundSearchFromUrl(
+                inboundQuery,
+                inboundDirection,
+                inboundCountry,
+                inboundVertical,
+                inboundPrecheck
+            );
             return;
         }
 
         initViewHistory();
+
+        if (typeof initIndustryScenarioPills === 'function') {
+            initIndustryScenarioPills();
+        }
 
         const searchInput = document.getElementById('search-input');
         if (searchInput) {

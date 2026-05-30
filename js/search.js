@@ -213,6 +213,21 @@ function getPrecheckSelections(panelId = 'precheck-panel') {
         .map(id => ({ id, ...PRECHECK_FACTORS[id] }));
 }
 
+function applyPrecheckSelections(panelId, precheckIds = []) {
+    const panel = panelId ? document.getElementById(panelId) : null;
+    const scope = panel || document;
+    const wanted = new Set((precheckIds || []).filter(Boolean));
+    scope.querySelectorAll('input[data-precheck]').forEach((input) => {
+        if (!panel || panel.contains(input)) {
+            input.checked = wanted.has(input.dataset.precheck);
+        }
+    });
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.applyPrecheckSelections = applyPrecheckSelections;
+}
+
 function buildPrecheckQuery(query, selections) {
     const parts = [query || ''];
     selections.forEach(item => {

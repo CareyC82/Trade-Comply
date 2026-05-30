@@ -60,7 +60,10 @@ describe('global-policy-matrix', () => {
             impact_countries: ['US', 'EU'],
             direction: 'EXPORT',
             industry: 'Semiconductor',
-            summary_en: 'BIS expands export controls on advanced computing chips.'
+            summary_en: 'BIS expands export controls on advanced computing chips.',
+            effective_status: 'active',
+            confidence_score: 0.91,
+            evaluated_at: '2026-05-28T12:00:00.000Z'
         };
         const fetchPayload = {
             rawText: 'Advanced computing export rule 2026-05-28',
@@ -77,6 +80,12 @@ describe('global-policy-matrix', () => {
         assert.equal(tags.length, 2);
         for (const tag of tags) {
             assert.match(tag.tag_id, CATALOG_PATTERN);
+            assert.equal(tag.review_status, 'ai_verified');
+            assert.equal(tag.jurisdiction, 'US');
+            assert.equal(tag.source_type, 'ministry_announcement');
+            assert.equal(tag.effective_status, 'active');
+            assert.equal(tag.confidence_score, 0.91);
+            assert.ok(tag.last_verified_at);
         }
 
         const second = applyRoutesToTags(tags, routes, manifestRoutes);

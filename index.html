@@ -52,10 +52,6 @@
     </div>
 
     <div id="electronics-view" class="view-container">
-        <div style="text-align:left;padding:12px 0;">
-            <a href="#" id="back-to-hub" class="back-link">&larr; Back to Hub</a>
-        </div>
-
         <div class="home-header">
             <h1 class="home-title">Electronics Import/Export Pre-Check</h1>
             <p class="home-subtitle">Screen China import and export compliance signals for electronics, wireless devices, batteries, encryption, and UAV products.</p>
@@ -75,6 +71,8 @@
             <input type="text" class="search-input" placeholder="Enter product, HS Code, or risk feature" id="search-input" />
             <button class="search-btn" id="search-btn">GO</button>
         </div>
+
+        <div id="electronics-industry-scenario-pills" class="industry-scenario-strip"></div>
 
         <div class="precheck-panel" id="precheck-panel">
             <div class="precheck-header">
@@ -103,10 +101,6 @@
     </div>
 
     <div id="new-energy-view" class="view-container" style="display: none;">
-        <div style="text-align:left;padding:12px 0;">
-            <a href="#" id="back-to-hub-from-energy" class="back-link">&larr; Back to Hub</a>
-        </div>
-
         <div class="home-header">
             <h1 class="home-title">New Energy &amp; Clean Tech</h1>
             <p class="home-subtitle">Pre-check PV modules, inverters, energy storage, EV chargers, UFLPA supply chain tracing, and tariff exposure.</p>
@@ -126,6 +120,8 @@
             <input type="text" class="search-input" placeholder="Enter PV module, inverter, HS Code, or supply chain risk" id="search-input-energy" />
             <button class="search-btn" id="search-btn-energy">GO</button>
         </div>
+
+        <div id="new-energy-industry-scenario-pills" class="industry-scenario-strip"></div>
 
         <div class="precheck-panel" id="energy-precheck-panel">
             <div class="precheck-header">
@@ -147,13 +143,13 @@
     </div>
 
     <div id="result-view" class="view-container">
-        <button id="back-to-home" class="back-btn">&lt; Back</button>
-
         <div class="warning-banner">
             <p>The following is a preliminary risk screen based on official regulatory citations. NOT legal advice.</p>
         </div>
 
         <div id="ai-query-section" class="result-ai-section"></div>
+
+        <div id="pre-screen-report-container" class="pre-screen-report-slot" hidden aria-live="polite"></div>
 
         <div id="trust-boundary-container"></div>
 
@@ -184,8 +180,6 @@
     </div>
 
     <div id="kb-view" class="view-container">
-        <button id="back-to-home-from-kb" class="back-btn">&lt; Back</button>
-
         <div class="kb-search">
             <input type="text" class="search-input" placeholder="Search regulations..." id="kb-search-input" />
         </div>
@@ -195,9 +189,6 @@
     </div>
 
     <div id="semiconductor-view" class="view-container" style="display: none;">
-        <div style="text-align:left;padding:12px 0;">
-            <a href="#" id="back-to-hub-from-semi" class="back-link">&larr; Back to Hub</a>
-        </div>
         <div class="home-header">
             <h1 class="home-title">Semiconductor Trade Controls</h1>
             <p class="home-subtitle">Pre-screen China import/export control signals for chips, equipment, foundry services, and advanced manufacturing.</p>
@@ -216,6 +207,9 @@
             <input type="text" class="search-input" placeholder="Enter chip, equipment, HS Code, or risk feature" id="search-input-semi" />
             <button class="search-btn" id="search-btn-semi">GO</button>
         </div>
+
+        <div id="semiconductor-industry-scenario-pills" class="industry-scenario-strip"></div>
+
         <div class="precheck-panel" id="semi-precheck-panel">
             <div class="precheck-header">
                 <div class="precheck-title">Pre-check risk attributes</div>
@@ -251,9 +245,6 @@
     </div>
 
     <div id="incoterm-view" class="view-container" style="display:none;">
-        <div style="padding:12px 0;">
-            <a href="#" id="back-to-hub-from-incoterm" class="back-link">&larr; Back to Hub</a>
-        </div>
         <div class="home-header">
             <h1 class="home-title">📦 Incoterm Compliance Check</h1>
             <p class="home-subtitle">Find the right Incoterm and verify your customs values.</p>
@@ -278,7 +269,6 @@
 
     <div id="categories-view" class="view-container">
         <div class="header-bar" style="display:flex; align-items:center; gap: 16px; margin: 20px 0;">
-            <button id="back-to-home-from-cat" class="back-btn" style="margin:0;">&larr; Back</button>
             <h2 style="color: var(--color-primary); font-size: 1.5rem;">Product Categories</h2>
         </div>
 
@@ -358,6 +348,6 @@
         <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code<span class="nav-btn-badge">Beta</span></a>
     </nav>
 
-    <script src="js/main.js?v=20260527checklist-collapsed" data-app="index"></script>
+    <script src="js/main.js?v=20260530print-native" data-app="index"></script>
 </body>
 </html>

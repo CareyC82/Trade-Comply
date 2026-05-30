@@ -4,7 +4,7 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const {
     authorizeTestCrawlAccess,
-    getConfiguredSecrets
+    getConfiguredAdminSecrets
 } = require('../lib/test-crawl-auth');
 
 describe('test-crawl-auth', () => {
@@ -13,6 +13,8 @@ describe('test-crawl-auth', () => {
     beforeEach(() => {
         envBackup.TEST_CRAWL_SECRET = process.env.TEST_CRAWL_SECRET;
         envBackup.ADMIN_REVIEW_PASSWORD = process.env.ADMIN_REVIEW_PASSWORD;
+        envBackup.ADMIN_ROUTES_ENABLED = process.env.ADMIN_ROUTES_ENABLED;
+        process.env.ADMIN_ROUTES_ENABLED = '1';
     });
 
     afterEach(() => {
@@ -25,10 +27,18 @@ describe('test-crawl-auth', () => {
         }
     });
 
+    it('denies when admin routes are disabled', () => {
+        process.env.ADMIN_ROUTES_ENABLED = '0';
+        process.env.TEST_CRAWL_SECRET = 'test-secret';
+        const result = authorizeTestCrawlAccess({ query: { secret: 'test-secret' } });
+        assert.equal(result.ok, false);
+        assert.equal(result.reason, 'routes_disabled');
+    });
+
     it('denies when no secrets are configured', () => {
         delete process.env.TEST_CRAWL_SECRET;
         delete process.env.ADMIN_REVIEW_PASSWORD;
-        assert.equal(getConfiguredSecrets().length, 0);
+        assert.equal(getConfiguredAdminSecrets().length, 0);
         const result = authorizeTestCrawlAccess({ query: { key: 'anything' } });
         assert.equal(result.ok, false);
         assert.equal(result.reason, 'secrets_not_configured');
