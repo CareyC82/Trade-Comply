@@ -28,7 +28,7 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 const DEFAULT_ALLOWED_ORIGIN = 'https://careyc82.github.io';
 const FC_BUILD_ID = '20260530test-crawl-v2';
-const { runPolicyCrawlTest } = require('./lib/policy-crawl');
+const { runGlobalCrawlTest, ENGINE_BUILD_ID: GLOBAL_ENGINE_BUILD } = require('./lib/global-crawl-engine');
 const MAX_QUERY_LENGTH = 500;
 const MAX_HSCODE_DESCRIPTION_LENGTH = 2000;
 const TIMEOUT_MS = 30000;
@@ -801,15 +801,14 @@ async function handleTestCrawlRequest(event, headers) {
         };
     }
 
-    console.log('=== TEST CRAWL: manual trigger via /test-crawl ===');
     const dataDir = path.join(__dirname, 'data');
     const persist = queryParams.persist === '1' || queryParams.persist === 'true';
 
     try {
-        const result = await runPolicyCrawlTest({
+        const result = await runGlobalCrawlTest({
             dataDir,
             persist,
-            previewChars: 1000
+            label: 'fc-test-crawl'
         });
         return {
             statusCode: result.ok ? 200 : 502,
@@ -817,7 +816,8 @@ async function handleTestCrawlRequest(event, headers) {
             body: JSON.stringify({
                 ...result,
                 build: FC_BUILD_ID,
-                hint: 'Check Alibaba FC function logs for CRON JOB START / PREVIEW lines.'
+                engine_build: GLOBAL_ENGINE_BUILD,
+                hint: 'Check FC logs for [GLOBAL-CRAWL] lines.'
             })
         };
     } catch (error) {

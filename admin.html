@@ -158,7 +158,7 @@
         }
 
         function getToken() {
-            return sessionStorage.getItem(STORAGE_KEY) || '';
+            return (sessionStorage.getItem(STORAGE_KEY) || '').trim();
         }
 
         function setToken(token) {
@@ -199,6 +199,11 @@
             };
             const response = await fetch(`${base}${path}`, { ...options, headers });
             const data = await response.json().catch(() => ({}));
+            if (response.status === 401) {
+                setToken('');
+                showLogin();
+                throw new Error('Session expired or wrong password. Log in again with your current ADMIN_REVIEW_PASSWORD.');
+            }
             if (!response.ok) {
                 const detail = data.error || data.message || `HTTP ${response.status}`;
                 throw new Error(`${detail} (${path})`);
@@ -309,10 +314,12 @@
             }
         }
 
-        function showReview() {
+        function showReview(skipInitialLoad = false) {
             loginPanel.classList.add('hidden');
             reviewPanel.classList.remove('hidden');
-            loadPending();
+            if (!skipInitialLoad) {
+                loadPending();
+            }
         }
 
         function showLogin() {
@@ -370,7 +377,7 @@
             try {
                 if (!isRemoteFcApiBase(base)) {
                     const health = await fetch(`${base}/api/review/health`).then((r) => r.json()).catch(() => ({}));
-                    if (!health.test_crawl) {
+                    if (!health.test_crawl || health.engine !== 'global-crawl-engine') {
                         throw new Error(
                             '本地审核 API 未启动或版本过旧。请在项目目录执行:\n'
                             + 'ADMIN_REVIEW_PASSWORD=你的密码 npm run restart:admin\n'
@@ -378,30 +385,44 @@
                         );
                     }
                     if (!health.got_scraping) {
+                        logEl.textContent += '提示: 未检测到 got-scraping，将使用 fetch 回退。建议在项目根目录执行 npm ci 后 Ctrl+C 重启 admin。\n';
+                    }
+                    if (!health.deepseek_configured) {
                         throw new Error(
-                            '未安装 got-scraping（海关总署 TLS 指纹抓取）。请在项目根目录执行: npm ci\n'
-                            + '然后重新运行 npm run restart:admin'
+                            'DEEPSEEK_API_KEY 未配置。请在项目根目录创建 .env.local（参考 .env.example），'
+                            + '写入 DEEPSEEK_API_KEY=sk-... 后执行 npm run restart:admin。'
+                            + '否则所有源都会显示 no-api-key 且 changed=0。'
                         );
                     }
                 }
                 const result = await apiFetch(crawlPath, { method: 'GET' });
                 const lines = [
                     result.message || (result.ok ? 'OK' : 'Failed'),
-                    `changed: ${result.changed_count ?? 0}, errors: ${result.fetch_errors ?? 0}`,
+                    `changed: ${result.changed ?? result.changed_count ?? 0}, errors: ${result.errors ?? result.fetch_errors ?? 0}`,
                     '',
                     ...(result.sources || []).map((s) => {
+                        if (s.skipped) {
+                            const method = s.ai_filter_method || 'AI filter';
+                            return `[SKIP] ${s.id}: non-relevant (${method})`;
+                        }
                         if (!s.ok) {
                             const tag = s.optional ? 'WARN' : 'FAIL';
                             return `[${tag}] ${s.id}: ${s.error}`;
                         }
                         const transport = s.transport ? ` via ${s.transport}` : '';
+                        const ai = s.ai_relevant != null
+                            ? `\nAI: relevant=${s.ai_relevant} industry=${s.ai_industry || 'None'} `
+                                + `direction=${s.ai_direction || 'BOTH'} `
+                                + `impact=${(s.ai_impact_countries || []).join(',') || 'n/a'}`
+                                + `${s.ai_summary_en ? `\n${s.ai_summary_en}` : ''}`
+                            : '';
                         const note = s.stealth_note ? `\n(${s.stealth_note})` : (s.from_cache ? '\n(from manifest cache)' : '');
-                        return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id}${transport} relevant=${s.relevant}${note}\n${s.preview || ''}`;
+                        return `[${s.changed ? 'CHANGED' : 'OK'}] ${s.id}${transport} relevant=${s.relevant}${ai}${note}\n${s.preview || ''}`;
                     })
                 ];
                 logEl.textContent = `${logEl.textContent}\n${lines.join('\n\n')}`;
                 statusBar.textContent = result.ok
-                    ? `抓取完成 · ${result.changed_count ?? 0} 条新相关内容`
+                    ? `抓取完成 · ${result.changed ?? result.changed_count ?? 0} 条新相关内容`
                     : `抓取异常 · 见下方日志与终端`;
                 if (!result.ok) {
                     statusBar.classList.add('error');
@@ -422,9 +443,24 @@
             apiBaseInput.value = localStorage.getItem(API_BASE_KEY);
         }
 
-        if (getToken()) {
-            showReview();
+        async function bootstrapSession() {
+            if (!getToken()) {
+                return;
+            }
+            try {
+                const health = await verifyApiHealth();
+                await apiFetch('/api/review/pending');
+                statusBar.textContent = `Connected · build ${health.build || 'unknown'} · engine ${health.engine || '—'}`;
+                showReview(true);
+                await loadPending();
+            } catch (err) {
+                setToken('');
+                showLogin();
+                alert(`请重新登录：${err.message}`);
+            }
         }
+
+        bootstrapSession();
     </script>
 </body>
 </html>

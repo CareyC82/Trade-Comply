@@ -1,0 +1,44 @@
+'use strict';
+
+const { describe, it } = require('node:test');
+const assert = require('node:assert/strict');
+const {
+    GLOBAL_CRAWL_SOURCES,
+    getEnabledGlobalSources
+} = require('../lib/global-crawl-sources');
+
+const REQUIRED_KEYS = ['id', 'country', 'type', 'url', 'method'];
+
+describe('global-crawl-sources', () => {
+    it('defines five configuration-driven sources', () => {
+        assert.equal(GLOBAL_CRAWL_SOURCES.length, 5);
+        const ids = GLOBAL_CRAWL_SOURCES.map((row) => row.id);
+        assert.deepEqual(ids, ['zh-mofcom', 'zh-gac', 'us-bis', 'us-cbp', 'eu-lex']);
+    });
+
+    it('each entry has required global fields', () => {
+        for (const entry of GLOBAL_CRAWL_SOURCES) {
+            for (const key of REQUIRED_KEYS) {
+                assert.ok(entry[key], `${entry.id} missing ${key}`);
+            }
+            assert.match(entry.country, /^(CN|US|EU)$/);
+            assert.match(entry.type, /^(import|export|both)$/);
+            assert.match(entry.method, /^(fetch|got-scraping)$/);
+        }
+    });
+
+    it('uses specified official URLs', () => {
+        const byId = Object.fromEntries(GLOBAL_CRAWL_SOURCES.map((row) => [row.id, row]));
+        assert.equal(byId['zh-mofcom'].url, 'https://www.mofcom.gov.cn/zwgk/zcfb/');
+        assert.equal(byId['zh-gac'].method, 'got-scraping');
+        assert.equal(byId['us-cbp'].url, 'https://www.cbp.gov/trade/automated/newsflash');
+        assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/homepage.html?ihcl=en');
+    });
+
+    it('getEnabledGlobalSources filters disabled rows', () => {
+        const disabled = getEnabledGlobalSources([
+            { id: 'x', country: 'US', type: 'both', url: 'https://example.com', method: 'fetch', enabled: false }
+        ]);
+        assert.equal(disabled.length, 0);
+    });
+});

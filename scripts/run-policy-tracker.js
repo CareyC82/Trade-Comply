@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Orchestrate policy tracking: fetch announcements -> DeepSeek parse -> merge tags -> rebuild catalog.
+ * Orchestrate policy tracking: fetch -> LLM relevance filter -> inbox -> DeepSeek parse -> merge tags.
  *
  * Usage:
  *   DEEPSEEK_API_KEY=sk-... node scripts/run-policy-tracker.js
@@ -62,23 +62,8 @@ function main() {
         return;
     }
 
-    const fetchStatus = runNodeScript('scripts/fetch-policy-news.js', [], {
-        allowExitCodes: [10]
-    });
-
-    if (fetchStatus === 10) {
-        console.log('=== CRON JOB SUCCESS: 无新公告，政策追踪正常结束 ===');
-        return;
-    }
-
-    const parseArgsList = [
-        '--apply',
-        '--input',
-        path.relative(ROOT, INBOX_PATH)
-    ];
-
-    runNodeScript('scripts/auto-parse-announcement.js', parseArgsList);
-    console.log('=== CRON JOB SUCCESS: 成功洗入最新规则数据 (policy-tracker) ===');
+    runNodeScript('scripts/fetch-global-pipeline.js', []);
+    console.log('=== CRON JOB SUCCESS: global crawl engine finished (policy-tracker) ===');
 }
 
 try {

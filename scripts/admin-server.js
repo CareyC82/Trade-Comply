@@ -23,9 +23,19 @@ const {
 } = require('../lib/publish-sync');
 
 const ROOT = path.join(__dirname, '..');
+const { loadLocalEnvFiles } = require('../lib/load-local-env');
+let envFiles = loadLocalEnvFiles(ROOT);
+
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
 const PASSWORD = process.env.ADMIN_REVIEW_PASSWORD || '';
-const ADMIN_BUILD_ID = '20260530-gac-got-scraping-v1';
+const ADMIN_BUILD_ID = '20260603-global-compliance-crawler-v1';
+const LOG_PREFIX = '[GLOBAL-CRAWL]';
+
+/** Re-read .env.local / .env so keys work without restart after file is created. */
+function refreshLocalEnv() {
+    envFiles = loadLocalEnvFiles(ROOT);
+    return Boolean(String(process.env.DEEPSEEK_API_KEY || '').trim());
+}
 
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -120,8 +130,13 @@ async function handleApi(req, res) {
             data_paths: dataPaths,
             supported_kinds: ['tag', 'case', 'risk_signal'],
             password_required: Boolean(PASSWORD),
-            test_crawl: '/api/test-crawl (GET/POST, same auth as review)',
-            got_scraping: Boolean(require('fs').existsSync(path.join(ROOT, 'node_modules', 'got-scraping')))
+            test_crawl: '/api/test-crawl (GET/POST, global crawl engine)',
+            engine: 'global-crawl-engine',
+            engine_build: ADMIN_BUILD_ID,
+            got_scraping: Boolean(require('fs').existsSync(path.join(ROOT, 'node_modules', 'got-scraping'))),
+            deepseek_configured: refreshLocalEnv(),
+            env_files_loaded: envFiles,
+            env_local_exists: fs.existsSync(path.join(ROOT, '.env.local'))
         });
         return;
     }
@@ -132,20 +147,44 @@ async function handleApi(req, res) {
             return;
         }
         try {
-            const { runPolicyCrawlTest } = require('../lib/policy-crawl');
+            if (!refreshLocalEnv()) {
+                sendJson(res, 400, {
+                    ok: false,
+                    error: 'DEEPSEEK_API_KEY is not configured. Create .env.local from .env.example, set DEEPSEEK_API_KEY=sk-..., then refresh this page or restart: npm run restart:admin',
+                    changed: 0,
+                    errors: 0,
+                    deepseek_configured: false,
+                    env_files_loaded: envFiles,
+                    env_local_exists: fs.existsSync(path.join(ROOT, '.env.local'))
+                });
+                return;
+            }
+            const {
+                runGlobalCrawlTest,
+                ENGINE_BUILD_ID,
+                parsePersistQueryFlag,
+                buildCrawlTelemetry
+            } = require('../lib/global-compliance-crawler');
             const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
-            const persist = url.searchParams.get('persist') === '1';
-            console.log('=== TEST CRAWL: admin-server manual trigger ===');
-            const result = await runPolicyCrawlTest({
+            const persist = parsePersistQueryFlag(url.searchParams);
+            console.log(`${LOG_PREFIX} [INFO] -> /api/test-crawl persist=${persist}`);
+            const result = await runGlobalCrawlTest({
                 dataDir: path.join(ROOT, 'data'),
                 persist,
-                previewChars: 1200,
                 label: 'admin-test-crawl'
             });
-            sendJson(res, result.ok ? 200 : 502, result);
+            const telemetry = buildCrawlTelemetry(result);
+            const status = result.ok ? 200 : (telemetry.errors > 0 ? 502 : 200);
+            sendJson(res, status, {
+                ...result,
+                changed: telemetry.changed,
+                errors: telemetry.errors,
+                telemetry,
+                engine_build: ENGINE_BUILD_ID
+            });
         } catch (error) {
-            console.error('=== TEST CRAWL FAILED ===', error.message);
-            sendJson(res, 500, { ok: false, error: error.message });
+            console.error('[GLOBAL-CRAWL] [FAIL] /api/test-crawl', error.message);
+            sendJson(res, 500, { ok: false, error: error.message, engine_build: ADMIN_BUILD_ID });
         }
         return;
     }
@@ -256,4 +295,12 @@ server.listen(PORT, '127.0.0.1', () => {
     console.log(`Writes to: ${dataPaths.prodTags}`);
     console.log(`Pending queue: ${dataPaths.queue}`);
     console.log('Manual crawl test: GET/POST http://127.0.0.1:' + PORT + '/api/test-crawl?persist=1');
+    if (envFiles.length > 0) {
+        console.log(`Loaded env: ${envFiles.join(', ')}`);
+    }
+    if (refreshLocalEnv()) {
+        console.log('DEEPSEEK_API_KEY: configured (AI filter active)');
+    } else {
+        console.warn('DEEPSEEK_API_KEY: NOT SET — create .env.local from .env.example, then npm run restart:admin');
+    }
 });
