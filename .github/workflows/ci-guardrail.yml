@@ -38,5 +38,8 @@ jobs:
       - name: Verify catalog artifact is fresh
         run: node scripts/build-catalog.js --check
 
+      - name: Verify FC package boots
+        run: bash scripts/package-fc.sh
+
       - name: Unit tests
         run: npm test

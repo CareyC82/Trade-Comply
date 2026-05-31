@@ -353,7 +353,7 @@ server.listen(PORT, '127.0.0.1', () => {
     console.log(`Project root: ${ROOT}`);
     console.log(`Writes to: ${dataPaths.prodTags}`);
     console.log(`Pending queue: ${dataPaths.queue}`);
-    console.log(`Admin gate: header ${PRIMARY_ADMIN_HEADER} or ?secret= (also Bearer for compatibility)`);
+    console.log(`Admin gate: header ${PRIMARY_ADMIN_HEADER} or Authorization: Bearer`);
     if (envFiles.length > 0) {
         console.log(`Loaded env: ${envFiles.join(', ')}`);
     }

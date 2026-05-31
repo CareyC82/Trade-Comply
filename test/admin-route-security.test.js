@@ -58,12 +58,12 @@ describe('admin-route-security', () => {
         assert.equal(result.matched_secret, 'TEST_CRAWL_SECRET');
     });
 
-    it('accepts ?secret= query parameter', () => {
+    it('rejects query-string secrets', () => {
         process.env.ADMIN_ROUTES_ENABLED = '1';
         process.env.ADMIN_REVIEW_PASSWORD = 'admin-pass';
         const result = authorizeAdminRouteAccess({ query: { secret: 'admin-pass' } });
-        assert.equal(result.ok, true);
-        assert.equal(result.credential_source, 'query:secret');
+        assert.equal(result.ok, false);
+        assert.equal(result.reason, 'missing_credential');
     });
 
     it('detects protected admin paths including debug', () => {

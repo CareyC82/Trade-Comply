@@ -30,7 +30,7 @@ describe('test-crawl-auth', () => {
     it('denies when admin routes are disabled', () => {
         process.env.ADMIN_ROUTES_ENABLED = '0';
         process.env.TEST_CRAWL_SECRET = 'test-secret';
-        const result = authorizeTestCrawlAccess({ query: { secret: 'test-secret' } });
+        const result = authorizeTestCrawlAccess({ headers: { 'X-Admin-Secret': 'test-secret' } });
         assert.equal(result.ok, false);
         assert.equal(result.reason, 'routes_disabled');
     });
@@ -51,9 +51,9 @@ describe('test-crawl-auth', () => {
         assert.equal(result.reason, 'missing_credential');
     });
 
-    it('allows matching TEST_CRAWL_SECRET via query key', () => {
+    it('allows matching TEST_CRAWL_SECRET via X-Admin-Secret', () => {
         process.env.TEST_CRAWL_SECRET = 'test-secret';
-        const result = authorizeTestCrawlAccess({ query: { key: 'test-secret' } });
+        const result = authorizeTestCrawlAccess({ headers: { 'X-Admin-Secret': 'test-secret' } });
         assert.equal(result.ok, true);
         assert.equal(result.matched_secret, 'TEST_CRAWL_SECRET');
     });
@@ -67,7 +67,7 @@ describe('test-crawl-auth', () => {
 
     it('denies invalid credential', () => {
         process.env.TEST_CRAWL_SECRET = 'test-secret';
-        const result = authorizeTestCrawlAccess({ query: { key: 'wrong' } });
+        const result = authorizeTestCrawlAccess({ headers: { 'X-Admin-Secret': 'wrong' } });
         assert.equal(result.ok, false);
         assert.equal(result.reason, 'invalid_credential');
     });

@@ -1149,13 +1149,16 @@ exports.handler = async (rawEvent) => {
     }
 
     if (method === 'GET' && path === '/visitors') {
-        const now = Date.now();
-        const today = Math.floor(Math.random() * 30) + Math.floor(now / 3600000) % 10;
-        const total = Math.floor(Math.random() * 50) + 280 + Math.floor(now / 86400000) * 2;
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify({ today, total })
+            body: JSON.stringify({
+                ok: false,
+                today: null,
+                total: null,
+                source: 'not_configured',
+                message: 'Visitor metrics are not configured.'
+            })
         };
     }
 
