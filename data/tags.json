@@ -344,6 +344,47 @@
     ]
   },
   {
+    "tag_id": "CL-CAM-001",
+    "category": "COMPULSORY_CERT",
+    "category_label": "Compulsory Certification",
+    "tag_type": "MATCHED",
+    "short_name": "[IP Camera]",
+    "short_description": "IP/network cameras require CCC, SRRC, encryption, and dual-use screening",
+    "description": "IP cameras, network cameras, CCTV cameras, smart security cameras, and camera-plus-network-storage products exported from China should be screened for CCC/product-safety applicability, SRRC if they contain Wi-Fi/Bluetooth/radio modules, commercial encryption controls if they transmit or store encrypted video, and dual-use triggers if they include thermal imaging, night vision, AI tracking, or surveillance-grade functions.",
+    "source_citation": "CNCA CCC Product Catalog; MIIT SRRC Radio Equipment Approval; Commercial Encryption Import/Export Control Lists",
+    "source_url": "https://www.cnca.gov.cn/",
+    "effective_date": "2024-01-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8525.80",
+      "8525.89"
+    ],
+    "related_keywords": [
+      "ip camera",
+      "network camera",
+      "security camera",
+      "cctv",
+      "surveillance camera",
+      "smart camera",
+      "camera network storage",
+      "network storage camera",
+      "edge storage camera",
+      "poe camera",
+      "nvr camera",
+      "video analytics camera",
+      "ip camera network storage"
+    ],
+    "exemptions": "Simple wired cameras without wireless, encryption, night vision, thermal imaging, or AI tracking functions may only require ordinary product classification review.",
+    "risk_scenarios": "Products combining camera capture, network transmission, storage encryption, facial or object recognition, infrared or night vision, or long-range wireless modules may trigger multiple reviews instead of a single CCC check.",
+    "display_order": 5,
+    "direction": "export",
+    "related_cases": [
+      "CASE-001",
+      "CASE-002",
+      "CASE-020"
+    ]
+  },
+  {
     "tag_id": "CL-CCC-008",
     "category": "COMPULSORY_CERT",
     "category_label": "Compulsory Certification",
@@ -724,6 +765,46 @@
     "direction": "export",
     "related_cases": [
       "CASE-004"
+    ]
+  },
+  {
+    "tag_id": "CL-UAV-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "MATCHED",
+    "short_name": "[Consumer UAV]",
+    "short_description": "Consumer drones under 2kg still require UAV export-control pre-check",
+    "description": "Consumer or commercial UAVs under 2kg may still require screening before export from China when they include cameras, GPS/autonomous flight, wireless video links, lithium batteries, or payload interfaces. Confirm whether the product falls within UAV temporary export controls, the Dual-Use Items Export Control List, end-user/end-use restrictions, SRRC/radio requirements, and lithium battery transport rules.",
+    "source_citation": "MOFCOM and GAC UAV temporary export control announcements; Dual-Use Items Export Control List",
+    "source_url": "https://www.mofcom.gov.cn/",
+    "effective_date": "2024-12-01",
+    "status": "ACTIVE",
+    "related_hs_codes": [
+      "8525.80",
+      "8525.89",
+      "8806",
+      "8807"
+    ],
+    "related_keywords": [
+      "drone uav under 2kg",
+      "drone under 2kg",
+      "uav under 2kg",
+      "consumer drone",
+      "commercial drone",
+      "camera drone",
+      "gps drone",
+      "quadcopter",
+      "aerial imaging drone",
+      "mini drone",
+      "lightweight drone"
+    ],
+    "exemptions": "Toy drones under 250g without cameras, data transmission, payload interfaces, autonomous navigation, or military end-use indicators may be outside the higher-risk control scope.",
+    "risk_scenarios": "A low-weight drone can still become controlled if it has long endurance, autonomous route planning, thermal or night-vision payloads, encrypted video transmission, or a restricted end user or destination.",
+    "display_order": 6,
+    "direction": "export",
+    "related_cases": [
+      "CASE-004",
+      "CASE-020"
     ]
   },
   {

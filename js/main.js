@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category"></script>
  */
 (function () {
-    const BUILD = '20260531enterprise-report-print-fix2';
+    const BUILD = '20260531quick-select-coverage';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
