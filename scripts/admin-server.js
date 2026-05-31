@@ -21,6 +21,7 @@ const {
     maybeTriggerPublishSyncAfterApprove,
     publishReviewedDataToGit
 } = require('../lib/publish-sync');
+const { buildCrawlSummary } = require('../lib/crawl-summary');
 const {
     PRIMARY_ADMIN_HEADER,
     authorizeAdminRouteAccess,
@@ -213,6 +214,10 @@ async function handleReviewPending(req, res) {
     });
 }
 
+async function handleReviewCrawlSummary(req, res) {
+    sendJson(res, 200, buildCrawlSummary(ROOT));
+}
+
 async function handleReviewApproveReject(req, res, urlPath) {
     let body;
     try {
@@ -295,6 +300,11 @@ async function handleApi(req, res) {
 
         if (req.method === 'GET' && urlPath === '/api/review/pending') {
             await handleReviewPending(req, res);
+            return;
+        }
+
+        if (req.method === 'GET' && urlPath === '/api/review/crawl-summary') {
+            await handleReviewCrawlSummary(req, res);
             return;
         }
 

@@ -35,6 +35,13 @@ describe('policy-ai-filter', () => {
         assert.match(digest, /出口管制/);
     });
 
+    it('keeps consultation drafts for AI relevance review', () => {
+        const text = '关于无人机出口管制规则公开征求意见的通知 2026-05-30 民用无人机 两用物项 出口管制';
+        const digest = extractAnnouncementDigest(text);
+        assert.match(digest, /征求意见/);
+        assert.match(digest, /无人机/);
+    });
+
     it('normalizes impact_countries to CN US EU only', () => {
         const out = normalizePolicyAiFilter({
             relevant: true,

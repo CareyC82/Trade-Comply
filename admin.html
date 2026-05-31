@@ -105,6 +105,46 @@
         .desc { margin: 10px 0; font-size: 0.92rem; }
         .hs-list { font-size: 0.85rem; color: var(--muted); }
         .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 12px 0 16px;
+        }
+        .summary-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.12);
+        }
+        .summary-card strong { display: block; font-size: 1.25rem; }
+        .summary-card span { color: var(--muted); font-size: 0.78rem; }
+        .crawl-section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 18px 0 10px;
+        }
+        .crawl-section-title h3 { margin: 0; font-size: 0.95rem; }
+        .crawl-list {
+            display: grid;
+            gap: 10px;
+        }
+        .crawl-entry {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.12);
+        }
+        .crawl-entry h4 { margin: 6px 0; font-size: 0.94rem; }
+        .crawl-entry p { margin: 6px 0; }
+        .crawl-entry a { color: #93c5fd; }
+        .badge.relevant { background: #123d2a; color: #86efac; }
+        .badge.noise { background: #2d3340; color: var(--muted); }
+        .badge.high { background: #451a1a; color: #fca5a5; }
+        .badge.medium { background: #3b2f1e; color: #fcd34d; }
+        .badge.low { background: #123d2a; color: #86efac; }
         #login-panel { max-width: 420px; }
         .hidden { display: none !important; }
     </style>
@@ -138,6 +178,16 @@
                 <pre id="crawl-test-log" class="hidden" style="margin-top:12px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;max-height:280px;overflow:auto;white-space:pre-wrap;"></pre>
                 <p class="meta" style="margin-top:10px">日常数据已由 02:00 流水线自动发布。此页仅用于 legacy 队列或紧急 override；手动发布后执行 <code>npm run publish:reviewed -- --dispatch</code></p>
             </div>
+            <div class="panel">
+                <div class="crawl-section-title">
+                    <div>
+                        <h2 style="margin:0 0 4px">每日抓取内容</h2>
+                        <p class="meta" style="margin:0">展示最近一次 02:00/02:05 自动抓取、AI 判断和已写入数据。</p>
+                    </div>
+                    <button type="button" class="btn-ghost" id="btn-refresh-crawl-summary">刷新抓取内容</button>
+                </div>
+                <div id="crawl-summary">加载中…</div>
+            </div>
             <div id="pending-list"></div>
         </div>
     </div>
@@ -150,6 +200,7 @@
         const reviewPanel = document.getElementById('review-panel');
         const statusBar = document.getElementById('status-bar');
         const pendingList = document.getElementById('pending-list');
+        const crawlSummary = document.getElementById('crawl-summary');
         const apiBaseInput = document.getElementById('api-base');
         const passwordInput = document.getElementById('password');
 
@@ -268,6 +319,92 @@
             return div.innerHTML;
         }
 
+        function formatDateTime(value) {
+            if (!value) return '—';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+            return date.toLocaleString('zh-CN');
+        }
+
+        function renderSourceFetch(source) {
+            const badge = source.relevant
+                ? '<span class="badge relevant">RELEVANT</span>'
+                : '<span class="badge noise">NOISE / NO CHANGE</span>';
+            const summary = source.ai_summary_en || source.preview || 'No preview available.';
+            const fetchedUrl = source.fetched_url || source.url || '';
+            return `
+                <article class="crawl-entry">
+                    <div>${badge} <span class="meta">${escapeHtml(source.id || '')} · ${escapeHtml(source.ai_method || '')}</span></div>
+                    <h4>${escapeHtml(source.label || source.id || 'Source')}</h4>
+                    <p class="desc">${escapeHtml(summary)}</p>
+                    <p class="meta">抓取时间: ${formatDateTime(source.fetched_at)} · 最近变化: ${formatDateTime(source.last_changed_at)} · ${escapeHtml(source.ai_industry || 'None')}</p>
+                    ${fetchedUrl ? `<p class="meta"><a href="${escapeHtml(fetchedUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(fetchedUrl)}</a></p>` : ''}
+                </article>
+            `;
+        }
+
+        function renderPipelineSignal(signal) {
+            const risk = String(signal.risk_level || 'medium').toLowerCase();
+            const sourceUrl = signal.source_url || '';
+            return `
+                <article class="crawl-entry">
+                    <div>
+                        <span class="badge ${risk}">${escapeHtml(signal.risk_level || 'Medium')}</span>
+                        <span class="meta">${escapeHtml(signal.country || 'GLOBAL')} · ${escapeHtml(signal.direction || '')} · HS ${escapeHtml(signal.hs_code || '—')}</span>
+                    </div>
+                    <h4>${escapeHtml(signal.source || signal.pipeline_source || 'Pipeline signal')}</h4>
+                    <p class="desc">${escapeHtml(signal.content_en || signal.content_zh || '')}</p>
+                    <p class="meta">抓取时间: ${formatDateTime(signal.fetched_at)} · 来源: ${escapeHtml(signal.pipeline_source || '')}</p>
+                    ${sourceUrl ? `<p class="meta"><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceUrl)}</a></p>` : ''}
+                </article>
+            `;
+        }
+
+        function renderPublishedRoute(route) {
+            const sourceUrl = route.source_url || '';
+            return `
+                <article class="crawl-entry">
+                    <div>
+                        <span class="badge tag">PUBLISHED</span>
+                        <span class="meta">${escapeHtml(route.tag_id || '')} · ${escapeHtml(route.impact_country || '')} · ${escapeHtml(route.direction || '')}</span>
+                    </div>
+                    <h4>${escapeHtml(route.source_id || 'Published route')} · ${escapeHtml(route.industry || '')}</h4>
+                    <p class="desc">${escapeHtml(route.summary_en || '')}</p>
+                    <p class="meta">写入时间: ${formatDateTime(route.updated_at)} · 发布日期: ${escapeHtml(route.published_at || '—')}</p>
+                    ${sourceUrl ? `<p class="meta"><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceUrl)}</a></p>` : ''}
+                </article>
+            `;
+        }
+
+        async function loadCrawlSummary() {
+            if (!crawlSummary) return;
+            crawlSummary.innerHTML = '<p class="meta">正在加载抓取摘要…</p>';
+            try {
+                const data = await apiFetch('/api/review/crawl-summary');
+                const counts = data.counts || {};
+                const sources = data.source_fetches || [];
+                const signals = data.pipeline_signals || [];
+                const routes = data.published_routes || [];
+                crawlSummary.innerHTML = `
+                    <div class="summary-grid">
+                        <div class="summary-card"><strong>${counts.source_fetches ?? 0}</strong><span>官网源抓取</span></div>
+                        <div class="summary-card"><strong>${counts.relevant_sources ?? 0}</strong><span>AI 判定相关源</span></div>
+                        <div class="summary-card"><strong>${counts.pipeline_signals ?? 0}</strong><span>结构化风险信号</span></div>
+                        <div class="summary-card"><strong>${counts.published_routes ?? 0}</strong><span>已写入政策路线</span></div>
+                    </div>
+                    <p class="meta">Inbox 更新: ${formatDateTime(data.inbox_updated_at)} · Global manifest 更新: ${formatDateTime(data.global_manifest_updated_at)} · Pipeline run: ${formatDateTime(data.pipeline_run)}</p>
+                    <div class="crawl-section-title"><h3>结构化出的新风险信号</h3><span class="meta">${signals.length} 条</span></div>
+                    <div class="crawl-list">${signals.length ? signals.slice(0, 12).map(renderPipelineSignal).join('') : '<div class="empty">暂无 pipeline_batch 信号。</div>'}</div>
+                    <div class="crawl-section-title"><h3>已写入线上标签的政策路线</h3><span class="meta">${routes.length} 条</span></div>
+                    <div class="crawl-list">${routes.length ? routes.slice(0, 12).map(renderPublishedRoute).join('') : '<div class="empty">暂无已发布路线。</div>'}</div>
+                    <div class="crawl-section-title"><h3>官网源抓取状态</h3><span class="meta">${sources.length} 个源</span></div>
+                    <div class="crawl-list">${sources.length ? sources.map(renderSourceFetch).join('') : '<div class="empty">暂无源抓取记录。</div>'}</div>
+                `;
+            } catch (err) {
+                crawlSummary.innerHTML = `<div class="empty">抓取摘要加载失败：${escapeHtml(err.message)}</div>`;
+            }
+        }
+
         async function loadPending() {
             statusBar.classList.remove('error');
             statusBar.textContent = '加载待审核列表…';
@@ -328,6 +465,7 @@
         function showReview(skipInitialLoad = false) {
             loginPanel.classList.add('hidden');
             reviewPanel.classList.remove('hidden');
+            loadCrawlSummary();
             if (!skipInitialLoad) {
                 loadPending();
             }
@@ -435,6 +573,7 @@
                 statusBar.textContent = result.ok
                     ? `抓取完成 · ${result.changed ?? result.changed_count ?? 0} 条新相关内容`
                     : `抓取异常 · 见下方日志与终端`;
+                await loadCrawlSummary();
                 if (!result.ok) {
                     statusBar.classList.add('error');
                 }
@@ -446,6 +585,7 @@
         }
 
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
+        document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
         document.getElementById('btn-test-crawl').addEventListener('click', runTestCrawl);
         document.getElementById('btn-publish-sync').addEventListener('click', publishSync);
         document.getElementById('btn-logout').addEventListener('click', showLogin);
