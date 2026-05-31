@@ -22,6 +22,19 @@ describe('actionable-checklist', () => {
         assert.match(haystack, /confirm battery & chemical substance compliance/i);
         assert.match(haystack, /un38\.3|msds|battery recycling/i);
         assert.match(haystack, /air-freight|iata/i);
+        assert.doesNotMatch(haystack, /ul\s*9540/i);
+        assert.doesNotMatch(haystack, /grid interconnection/i);
+    });
+
+    it('keeps ESS-specific tasks conditional for energy storage systems', () => {
+        const items = getActionableChecklist('new-energy', {
+            country: 'US',
+            direction: 'export',
+            productQuery: 'BESS energy storage system lithium battery cabinet for US deployment'
+        });
+        const haystack = items.map((row) => `${row.task} ${row.desc}`).join(' ');
+        assert.match(haystack, /ul\s*9540/i);
+        assert.match(haystack, /grid interconnection/i);
     });
 
     it('returns BIS ECCN tasks for semiconductor', () => {

@@ -11,7 +11,11 @@ const {
     buildEnterprisePrintHtml,
     sanitizePrintCellText,
     shortenPhaseForPrint,
-    getEnterprisePrintStyles
+    getEnterprisePrintStyles,
+    inferLithiumBatteryTransportCode,
+    buildLithiumBatteryTransportNote,
+    resolveRiskCardSource,
+    normalizeLithiumBatteryRiskDescription
 } = require('../lib/enterprise-print-report');
 
 describe('enterprise-print-report', () => {
@@ -28,7 +32,8 @@ describe('enterprise-print-report', () => {
             productQuery: 'lithium battery equipment air freight IATA UN38.3',
             vertical: 'new-energy'
         });
-        assert.equal(summary, NEW_ENERGY_EXECUTIVE_SUMMARY);
+        assert.match(summary, /Medium-Risk flags under international IATA/);
+        assert.match(summary, /UN3481/);
     });
 
     it('print HTML includes executive summary and report container', () => {
@@ -41,6 +46,55 @@ describe('enterprise-print-report', () => {
         assert.match(html, /report-container/);
         assert.match(html, /Executive Summary/);
         assert.match(html, /Medium-Risk flags under international IATA/);
+    });
+
+    it('uses explicit HS missing-state text instead of dash placeholders', () => {
+        const html = buildEnterprisePrintHtml({
+            vertical: 'new-energy',
+            productQuery: 'lithium battery equipment air freight',
+            flowLabel: 'CN → US',
+            checklist: []
+        });
+        assert.match(html, /Not provided - classification required/);
+        assert.doesNotMatch(html, /<div class="hs-code-print">—<\/div>/);
+    });
+
+    it('infers UN3481 for lithium batteries in equipment', () => {
+        const report = { productQuery: 'lithium battery equipment air freight IATA UN38.3 dangerous goods' };
+        assert.equal(inferLithiumBatteryTransportCode(report), 'UN3481');
+        assert.match(buildLithiumBatteryTransportNote(report), /contained in equipment/i);
+        assert.equal(
+            normalizeLithiumBatteryRiskDescription('Lithium batteries require UN3480 dangerous goods documentation', report),
+            'Lithium batteries require UN3481 dangerous goods documentation'
+        );
+    });
+
+    it('prints official source labels or URLs on risk cards', () => {
+        const html = buildEnterprisePrintHtml({
+            vertical: 'new-energy',
+            productQuery: 'lithium battery equipment air freight',
+            riskSummaries: [{
+                type: 'MATCHED',
+                description: 'Lithium batteries require UN3480 dangerous goods documentation',
+                auditLine: 'Source Jurisdiction: [GLOBAL] | Verified: 2026-05-31',
+                sourceUrl: 'https://www.iata.org/en/programs/cargo/dgr/lithium-batteries/',
+                sourceCitation: 'IATA lithium battery guidance'
+            }],
+            checklist: []
+        });
+        assert.match(html, /UN3481 dangerous goods documentation/);
+        assert.match(html, /Official Source:/);
+        assert.match(html, /IATA lithium battery guidance/);
+        assert.match(html, /https:\/\/www\.iata\.org/);
+    });
+
+    it('adds IATA source fallback for lithium battery air-freight risks', () => {
+        const source = resolveRiskCardSource(
+            { description: 'Lithium batteries require UN3480 dangerous goods documentation' },
+            { productQuery: 'lithium battery equipment air freight IATA UN38.3' }
+        );
+        assert.equal(source.label, 'IATA lithium battery guidance');
+        assert.match(source.url, /iata\.org/);
     });
 
     it('print CSS uses native flow without scale or overflow lock', () => {

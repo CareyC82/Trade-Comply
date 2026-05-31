@@ -2,7 +2,7 @@
  * Trade country <select> UI — sync with direction and AppState.
  */
 
-const FALLBACK_EXPORT_OPTIONS = [
+const TRADE_COUNTRY_UI_FALLBACK_EXPORT_OPTIONS = [
     { value: 'US', label: 'United States' },
     { value: 'EU', label: 'European Union' },
     { value: 'ASEAN', label: 'ASEAN (Vietnam / Malaysia)' },
@@ -10,7 +10,7 @@ const FALLBACK_EXPORT_OPTIONS = [
     { value: 'GLOBAL', label: 'Other' }
 ];
 
-const FALLBACK_IMPORT_OPTIONS = [
+const TRADE_COUNTRY_UI_FALLBACK_IMPORT_OPTIONS = [
     { value: 'TW', label: 'Taiwan (China)' },
     { value: 'JP', label: 'Japan' },
     { value: 'KR', label: 'South Korea' },
@@ -24,7 +24,7 @@ function getCountryOptionsApi() {
     }
     return {
         getCountryOptionsForDirection(direction) {
-            return direction === 'import' ? FALLBACK_IMPORT_OPTIONS : FALLBACK_EXPORT_OPTIONS;
+            return direction === 'import' ? TRADE_COUNTRY_UI_FALLBACK_IMPORT_OPTIONS : TRADE_COUNTRY_UI_FALLBACK_EXPORT_OPTIONS;
         },
         normalizeCountryCode(value) {
             const raw = String(value || 'US').trim();

@@ -426,7 +426,10 @@ function createReportPayload(query, tags, cases, precheckSelections) {
             description: tag.short_description || tag.description || '',
             auditLine: typeof formatReportRiskAuditLine === 'function'
                 ? formatReportRiskAuditLine(tag)
-                : ''
+                : '',
+            sourceUrl: tag.source_url || '',
+            sourceCitation: tag.source_citation || tag.source || '',
+            sourceLabel: tag.source_citation || tag.source || tag.source_url || ''
         })),
         trustBoundaryHtml: buildTrustBoundaryReportHtml(trustBoundary),
         tags: (tags || []).map(tag => ({
@@ -570,32 +573,6 @@ ${report.nextChecks.length ? `<p style="page-break-inside:avoid;break-inside:avo
 </html>`;
 }
 
-const HTML2PDF_URL = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js';
-let html2PdfLoaderPromise = null;
-
-function loadHtml2Pdf() {
-    if (window.html2pdf) {
-        return Promise.resolve(window.html2pdf);
-    }
-    if (!html2PdfLoaderPromise) {
-        html2PdfLoaderPromise = new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = HTML2PDF_URL;
-            script.async = true;
-            script.onload = () => {
-                if (window.html2pdf) {
-                    resolve(window.html2pdf);
-                    return;
-                }
-                reject(new Error('html2pdf failed to load'));
-            };
-            script.onerror = () => reject(new Error('html2pdf script unavailable'));
-            document.head.appendChild(script);
-        });
-    }
-    return html2PdfLoaderPromise;
-}
-
 function waitForReportFrame(iframe) {
     return new Promise((resolve) => {
         const finish = () => {
@@ -657,9 +634,10 @@ function downloadPrecheckReport() {
                 generatedAtLabel: formatReportDate(AppState.lastReport.generatedAt)
             };
 
-        if (typeof printEnterprisePrecheckReport === 'function') {
-            printEnterprisePrecheckReport(report);
+        if (typeof printEnterprisePrecheckReport !== 'function') {
+            throw new Error('Enterprise print report module is not available.');
         }
+        printEnterprisePrecheckReport(report);
     } catch (error) {
         console.error('Print report failed:', error);
         window.alert('Could not open the print report. Please try again.');
@@ -669,4 +647,8 @@ function downloadPrecheckReport() {
             btn.textContent = originalLabel;
         }
     }
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.downloadPrecheckReport = downloadPrecheckReport;
 }

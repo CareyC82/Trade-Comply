@@ -58,14 +58,14 @@ function getSelectedDirection() {
     return selectedDirection === 'import' ? 'import' : 'export';
 }
 
-const FALLBACK_EXPORT_OPTIONS = [
+const HSCODE_FALLBACK_EXPORT_OPTIONS = [
     { value: 'US', label: 'United States' },
     { value: 'EU', label: 'European Union' },
     { value: 'ASEAN', label: 'ASEAN (Vietnam / Malaysia)' },
     { value: 'RU', label: 'Russia' },
     { value: 'GLOBAL', label: 'Other' }
 ];
-const FALLBACK_IMPORT_OPTIONS = [
+const HSCODE_FALLBACK_IMPORT_OPTIONS = [
     { value: 'TW', label: 'Taiwan (China)' },
     { value: 'JP', label: 'Japan' },
     { value: 'KR', label: 'South Korea' },
@@ -79,7 +79,7 @@ function populateHscodeCountrySelect(direction) {
         return;
     }
 
-    let options = direction === 'import' ? FALLBACK_IMPORT_OPTIONS : FALLBACK_EXPORT_OPTIONS;
+    let options = direction === 'import' ? HSCODE_FALLBACK_IMPORT_OPTIONS : HSCODE_FALLBACK_EXPORT_OPTIONS;
     let normalize = (value) => String(value || 'US').trim().toUpperCase();
 
     if (globalThis.TradeComplyCountry) {
