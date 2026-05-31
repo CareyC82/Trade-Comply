@@ -276,7 +276,7 @@ function applyUiStrings() {
     if (navIncoterm) navIncoterm.textContent = `📦 ${t('navIncoterm')}`;
     const navHsCode = document.getElementById('nav-hscode');
     if (navHsCode) {
-        navHsCode.innerHTML = `🔍 ${t('navHsCode')}<span class="nav-btn-badge">Beta</span>`;
+        navHsCode.textContent = `🔍 ${t('navHsCode')}`;
     }
     
     // 更新警告横幅
