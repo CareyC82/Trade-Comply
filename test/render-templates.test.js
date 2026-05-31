@@ -55,3 +55,33 @@ describe('render-templates', () => {
         assert.doesNotMatch(none, /line-height: 1.6/);
     });
 });
+
+describe('pre-screen-report templates', () => {
+    it('renders the report as a closed collapsible panel', () => {
+        require('../js/pre-screen-report-templates');
+        const html = globalThis.templatePreScreenReportPanel({
+            titleHtml: 'Compliance Pre-Screening Report',
+            metaHtml: 'CN -> United States',
+            riskLabelHtml: 'Risk level rating',
+            riskLevelHtml: 'CRITICAL',
+            riskLevelClass: 'critical',
+            executiveSummaryHtml: 'Summary',
+            triggerTitleHtml: 'Trigger reason',
+            triggerReasonHtml: 'Reason',
+            missingTitleHtml: 'Missing information',
+            missingListHtml: '<ul></ul>',
+            verifyTitleHtml: 'Verification objects',
+            verifyListHtml: '<ul></ul>',
+            sourcesTitleHtml: 'Official sources',
+            sourcesBlockHtml: '<ul></ul>',
+            disclaimerTitleHtml: 'Disclaimer',
+            disclaimerHtml: 'Not legal advice.',
+            actionsHtml: ''
+        });
+
+        assert.match(html, /pre-screen-report collapsible-panel/);
+        assert.match(html, /collapsible-header" aria-expanded="false"/);
+        assert.match(html, /pre-screen-report__body collapsible-body/);
+        assert.doesNotMatch(html, /collapsible-panel open/);
+    });
+});

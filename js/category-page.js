@@ -53,7 +53,7 @@ function buildCategorySearchUrl(query, direction, country, vertical) {
     return `index.html?${params.toString()}`;
 }
 
-function redirectCategorySearch(query) {
+function redirectCategorySearch(query, verticalOverride) {
     const config = CATEGORY_PAGE_CONFIG[getCategoryPageKey()];
     if (!config) {
         return;
@@ -63,7 +63,10 @@ function redirectCategorySearch(query) {
         : 'export';
     const countrySelect = document.getElementById('trade-country');
     const country = countrySelect?.value || 'US';
-    const url = buildCategorySearchUrl(query, direction, country, config.vertical);
+    const vertical = ['electronics', 'new-energy', 'semiconductor'].includes(verticalOverride)
+        ? verticalOverride
+        : config.vertical;
+    const url = buildCategorySearchUrl(query, direction, country, vertical);
     window.location.href = url;
 }
 
@@ -146,7 +149,7 @@ function bootstrapCategoryPage() {
             mode: 'category',
             vertical: config.vertical,
             cards: config.cards(),
-            onSelect: ({ query }) => redirectCategorySearch(query)
+            onSelect: ({ query, vertical }) => redirectCategorySearch(query, vertical)
         });
     }
 }

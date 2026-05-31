@@ -5,8 +5,8 @@
 
 function templatePreScreenReportPanel(vm) {
     return `
-        <article class="pre-screen-report" aria-label="${vm.titleHtml}">
-            <header class="pre-screen-report__header">
+        <article class="pre-screen-report collapsible-panel" aria-label="${vm.titleHtml}">
+            <button type="button" class="pre-screen-report__header collapsible-header" aria-expanded="false">
                 <div class="pre-screen-report__heading">
                     <h2 class="pre-screen-report__title">${vm.titleHtml}</h2>
                     <p class="pre-screen-report__meta">${vm.metaHtml}</p>
@@ -15,29 +15,32 @@ function templatePreScreenReportPanel(vm) {
                     <span class="pre-screen-report__risk-label">${vm.riskLabelHtml}</span>
                     <span class="psr-risk-badge psr-risk-badge--${vm.riskLevelClass}">${vm.riskLevelHtml}</span>
                 </div>
-            </header>
-            <p class="pre-screen-report__executive">${vm.executiveSummaryHtml}</p>
-            <section class="pre-screen-report__section">
-                <h3 class="pre-screen-report__section-title">${vm.triggerTitleHtml}</h3>
-                <p class="pre-screen-report__prose">${vm.triggerReasonHtml}</p>
-            </section>
-            <section class="pre-screen-report__section">
-                <h3 class="pre-screen-report__section-title">${vm.missingTitleHtml}</h3>
-                ${vm.missingListHtml}
-            </section>
-            <section class="pre-screen-report__section">
-                <h3 class="pre-screen-report__section-title">${vm.verifyTitleHtml}</h3>
-                ${vm.verifyListHtml}
-            </section>
-            <section class="pre-screen-report__section">
-                <h3 class="pre-screen-report__section-title">${vm.sourcesTitleHtml}</h3>
-                ${vm.sourcesBlockHtml}
-            </section>
-            <footer class="pre-screen-report__disclaimer">
-                <h3 class="pre-screen-report__section-title">${vm.disclaimerTitleHtml}</h3>
-                <p class="pre-screen-report__disclaimer-text">${vm.disclaimerHtml}</p>
-            </footer>
-            ${vm.actionsHtml}
+                <span class="arrow" aria-hidden="true">▶</span>
+            </button>
+            <div class="pre-screen-report__body collapsible-body">
+                <p class="pre-screen-report__executive">${vm.executiveSummaryHtml}</p>
+                <section class="pre-screen-report__section">
+                    <h3 class="pre-screen-report__section-title">${vm.triggerTitleHtml}</h3>
+                    <p class="pre-screen-report__prose">${vm.triggerReasonHtml}</p>
+                </section>
+                <section class="pre-screen-report__section">
+                    <h3 class="pre-screen-report__section-title">${vm.missingTitleHtml}</h3>
+                    ${vm.missingListHtml}
+                </section>
+                <section class="pre-screen-report__section">
+                    <h3 class="pre-screen-report__section-title">${vm.verifyTitleHtml}</h3>
+                    ${vm.verifyListHtml}
+                </section>
+                <section class="pre-screen-report__section">
+                    <h3 class="pre-screen-report__section-title">${vm.sourcesTitleHtml}</h3>
+                    ${vm.sourcesBlockHtml}
+                </section>
+                <footer class="pre-screen-report__disclaimer">
+                    <h3 class="pre-screen-report__section-title">${vm.disclaimerTitleHtml}</h3>
+                    <p class="pre-screen-report__disclaimer-text">${vm.disclaimerHtml}</p>
+                </footer>
+                ${vm.actionsHtml}
+            </div>
         </article>
     `;
 }

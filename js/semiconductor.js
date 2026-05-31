@@ -2,6 +2,21 @@ function getSemiconductorScopeKeywords() {
     return AppState.catalog?.semiconductorKeywords || [];
 }
 
+function isCrossDomainControlQuery(query) {
+    const normalized = String(query || '').toLowerCase();
+    return [
+        'drone',
+        'uav',
+        'ip camera',
+        'network camera',
+        'security camera',
+        'cctv',
+        'surveillance camera',
+        'industrial robot',
+        'robot arm'
+    ].some((keyword) => normalized.includes(keyword));
+}
+
 // ==================== 半导体搜索模块 ====================
 function searchSemiconductor(query) {
     const allTags = AppState.data.tags || [];
@@ -32,6 +47,10 @@ function searchSemiconductor(query) {
         matchedTags = countryApi.filterTagsForSelectedCountry(matchedTags, selectedCountry);
     } else if (countryApi?.countryMatchesSelection) {
         matchedTags = matchedTags.filter((tag) => countryApi.countryMatchesSelection(tag, selectedCountry));
+    }
+
+    if (matchedTags.length === 0 && isCrossDomainControlQuery(query) && typeof search === 'function') {
+        return search(query);
     }
 
     matchedTags.sort((a, b) => {
@@ -107,4 +126,3 @@ function renderSemiQuickActions() {
         container.appendChild(card);
     });
 }
-

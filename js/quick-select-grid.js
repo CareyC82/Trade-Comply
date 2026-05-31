@@ -26,14 +26,14 @@ const NEW_ENERGY_QUICK_SELECT_CARDS = [
 const SEMICONDUCTOR_HUB_QUICK_SELECT_CARDS = [
     { icon: '⚡', label: 'GPU AI Chip Accelerator', hs_code: '8542.31', query_text: 'gpu ai accelerator chip', description: 'High-performance GPU or AI accelerator IC with HBM memory, advanced packaging, and export-controlled compute thresholds.' },
     { icon: '🔌', label: 'Optical Module', hs_code: '8517.70', query_text: 'optical transceiver module', description: 'High-speed optical transceiver or interconnect module for data center, telecom, or silicon photonics links.' },
-    { icon: '🛸', label: 'Drone under 2kg', hs_code: '8525.89', query_text: 'drone uav under 2kg', description: 'Consumer or commercial UAV under 2 kg with camera, GPS, wireless link, and lithium battery for aerial imaging.' },
+    { icon: '🛸', label: 'Drone under 2kg', hs_code: '8525.89', query_text: 'drone uav under 2kg', vertical: 'electronics', description: 'Consumer or commercial UAV under 2 kg with camera, GPS, wireless link, and lithium battery for aerial imaging.' },
     { icon: '🦾', label: 'Industrial Robot', hs_code: '8479.50', query_text: 'industrial robot arm', description: 'Programmable industrial robot arm with servo controllers, sensors, and safety-rated motion systems for manufacturing.' },
-    { icon: '📹', label: 'IP Camera w/ Storage', hs_code: '8525.89', query_text: 'ip camera network storage', description: 'Network IP camera with onboard or edge storage, PoE, encryption, and video analytics for surveillance use.' }
+    { icon: '📹', label: 'IP Camera w/ Storage', hs_code: '8525.89', query_text: 'ip camera network storage', vertical: 'electronics', description: 'Network IP camera with onboard or edge storage, PoE, encryption, and video analytics for surveillance use.' }
 ];
 
 function buildQuickSelectCardHtml(card) {
     return `
-        <button type="button" class="quick-action-card quick-select-card" data-query="${escapeHtml(card.query_text)}" data-description="${escapeHtml(card.description || card.query_text)}" data-hs="${escapeHtml(card.hs_code)}" aria-label="${escapeHtml(card.label)}">
+        <button type="button" class="quick-action-card quick-select-card" data-query="${escapeHtml(card.query_text)}" data-description="${escapeHtml(card.description || card.query_text)}" data-hs="${escapeHtml(card.hs_code)}" data-vertical="${escapeHtml(card.vertical || '')}" aria-label="${escapeHtml(card.label)}">
             <div class="quick-action-icon" aria-hidden="true">${escapeHtml(card.icon)}</div>
             <div class="quick-action-label">${escapeHtml(card.label)}</div>
             <div class="quick-action-hs">${escapeHtml(card.hs_code)}</div>
@@ -98,6 +98,7 @@ function initQuickSelectGrid(containerId, options = {}) {
                     query,
                     description,
                     hs_code: card.dataset.hs || '',
+                    vertical: card.dataset.vertical || '',
                     label: card.querySelector('.quick-action-label')?.textContent || ''
                 });
                 return;

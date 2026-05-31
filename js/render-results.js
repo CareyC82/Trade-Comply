@@ -70,6 +70,10 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         query,
         viewModel.checklistOptions
     );
+
+    requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
 }
 
 if (typeof globalThis !== 'undefined') {
