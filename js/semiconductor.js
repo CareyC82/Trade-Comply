@@ -19,6 +19,10 @@ function isCrossDomainControlQuery(query) {
 
 // ==================== 半导体搜索模块 ====================
 function searchSemiconductor(query) {
+    if (isCrossDomainControlQuery(query) && typeof search === 'function') {
+        return search(query);
+    }
+
     const allTags = AppState.data.tags || [];
     const allCases = AppState.data.cases || [];
     const allSemiKeywords = getSemiconductorScopeKeywords();
@@ -47,10 +51,6 @@ function searchSemiconductor(query) {
         matchedTags = countryApi.filterTagsForSelectedCountry(matchedTags, selectedCountry);
     } else if (countryApi?.countryMatchesSelection) {
         matchedTags = matchedTags.filter((tag) => countryApi.countryMatchesSelection(tag, selectedCountry));
-    }
-
-    if (matchedTags.length === 0 && isCrossDomainControlQuery(query) && typeof search === 'function') {
-        return search(query);
     }
 
     matchedTags.sort((a, b) => {

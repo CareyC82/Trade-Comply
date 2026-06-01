@@ -59,7 +59,7 @@ describe('trade-country', () => {
         const tags = [{ country: 'GLOBAL' }, { country: 'GLOBAL' }];
         const coverage = analyzeCountryCoverage(tags, 'US', 'export');
         const message = buildCountryContextMessage(coverage);
-        assert.match(message, /No United States-specific destination/i);
+        assert.match(message, /No product-specific United States destination rule matched yet/i);
         assert.match(message, /2 China export baseline/i);
     });
 });
