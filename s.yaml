@@ -20,10 +20,10 @@ resources:
       environmentVariables:
         DEEPSEEK_API_KEY: ${env(DEEPSEEK_API_KEY)}
         # Optional: persist feedback JSON to OSS (otherwise logged to CloudWatch only)
-        OSS_BUCKET: ${env(OSS_BUCKET, '')}
-        OSS_REGION: ${env(OSS_REGION, cn-shenzhen)}
-        OSS_ACCESS_KEY_ID: ${env(OSS_ACCESS_KEY_ID, '')}
-        OSS_ACCESS_KEY_SECRET: ${env(OSS_ACCESS_KEY_SECRET, '')}
-        OSS_FEEDBACK_PREFIX: ${env(OSS_FEEDBACK_PREFIX, feedback)}
-        SUPABASE_URL: ${env(SUPABASE_URL, '')}
-        SUPABASE_KEY: ${env(SUPABASE_KEY, '')}
+        OSS_BUCKET: ${env(OSS_BUCKET)}
+        OSS_REGION: ${env(OSS_REGION)}
+        OSS_ACCESS_KEY_ID: ${env(OSS_ACCESS_KEY_ID)}
+        OSS_ACCESS_KEY_SECRET: ${env(OSS_ACCESS_KEY_SECRET)}
+        OSS_FEEDBACK_PREFIX: ${env(OSS_FEEDBACK_PREFIX)}
+        SUPABASE_URL: ${env(SUPABASE_URL)}
+        SUPABASE_KEY: ${env(SUPABASE_KEY)}

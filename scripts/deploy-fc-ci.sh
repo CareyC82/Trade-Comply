@@ -17,6 +17,22 @@ ACCESS_KEY_SECRET="$(trim_secret "${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-${OSS_ACCES
 DEEPSEEK_API_KEY="$(trim_secret "${DEEPSEEK_API_KEY:-}")"
 FC_FUNCTION_NAME="${FC_FUNCTION_NAME:-tradecomply_ai_agent}"
 FC_REGION="${FC_REGION:-cn-shenzhen}"
+OSS_BUCKET="$(trim_secret "${OSS_BUCKET:-}")"
+OSS_REGION="$(trim_secret "${OSS_REGION:-cn-shenzhen}")"
+OSS_ACCESS_KEY_ID="$(trim_secret "${OSS_ACCESS_KEY_ID:-}")"
+OSS_ACCESS_KEY_SECRET="$(trim_secret "${OSS_ACCESS_KEY_SECRET:-}")"
+OSS_FEEDBACK_PREFIX="$(trim_secret "${OSS_FEEDBACK_PREFIX:-feedback}")"
+SUPABASE_URL="$(trim_secret "${SUPABASE_URL:-}")"
+SUPABASE_KEY="$(trim_secret "${SUPABASE_KEY:-}")"
+
+export DEEPSEEK_API_KEY
+export OSS_BUCKET
+export OSS_REGION
+export OSS_ACCESS_KEY_ID
+export OSS_ACCESS_KEY_SECRET
+export OSS_FEEDBACK_PREFIX
+export SUPABASE_URL
+export SUPABASE_KEY
 
 preflight() {
   local missing=()
