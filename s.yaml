@@ -12,10 +12,10 @@ resources:
       region: ${vars.region}
       functionName: tradecomply_ai_agent
       description: Trade Comply grounded AI proxy and structured feedback storage
-      runtime: nodejs18
+      runtime: nodejs20
       handler: index.handler
-      memorySize: 256
-      timeout: 60
+      memorySize: 512
+      timeout: 120
       code: ./fc-package
       environmentVariables:
         DEEPSEEK_API_KEY: ${env(DEEPSEEK_API_KEY)}
