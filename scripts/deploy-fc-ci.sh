@@ -17,15 +17,12 @@ ACCESS_KEY_SECRET="$(trim_secret "${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-${OSS_ACCES
 DEEPSEEK_API_KEY="$(trim_secret "${DEEPSEEK_API_KEY:-}")"
 FC_FUNCTION_NAME="${FC_FUNCTION_NAME:-tradecomply_ai_agent}"
 FC_REGION="${FC_REGION:-cn-shenzhen}"
-FC_CODE_OSS_BUCKET="$(trim_secret "${FC_CODE_OSS_BUCKET:-${OSS_BUCKET:-}}")"
-FC_CODE_OSS_PREFIX="$(trim_secret "${FC_CODE_OSS_PREFIX:-fc-code}")"
 
 preflight() {
   local missing=()
   if [ -z "$ACCESS_KEY_ID" ]; then missing+=("ALIBABA_CLOUD_ACCESS_KEY_ID or OSS_ACCESS_KEY_ID"); fi
   if [ -z "$ACCESS_KEY_SECRET" ]; then missing+=("ALIBABA_CLOUD_ACCESS_KEY_SECRET or OSS_ACCESS_KEY_SECRET"); fi
   if [ -z "$DEEPSEEK_API_KEY" ]; then missing+=("DEEPSEEK_API_KEY"); fi
-  if [ -z "$FC_CODE_OSS_BUCKET" ]; then missing+=("FC_CODE_OSS_BUCKET or OSS_BUCKET"); fi
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "ERROR: Missing required GitHub secrets:" >&2
@@ -38,7 +35,6 @@ preflight() {
   echo "Preflight OK."
   echo "Function: ${FC_FUNCTION_NAME}"
   echo "Region: ${FC_REGION}"
-  echo "Code OSS bucket: ${FC_CODE_OSS_BUCKET}"
 }
 
 build_package() {
@@ -47,90 +43,44 @@ build_package() {
 }
 
 install_aliyun_cli() {
-  if command -v aliyun >/dev/null 2>&1; then
-    echo "Aliyun CLI already installed: $(aliyun version)"
+  if command -v s >/dev/null 2>&1; then
+    echo "Serverless Devs already installed: $(s -v)"
   else
-    echo "Installing Aliyun CLI..."
-    curl -fsSL https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz -o /tmp/aliyun-cli.tgz
-    tar -xzf /tmp/aliyun-cli.tgz -C /tmp
-    chmod +x /tmp/aliyun
-    sudo mv /tmp/aliyun /usr/local/bin/aliyun
-    aliyun version
-  fi
-
-  if ! aliyun plugin list 2>/dev/null | grep -q 'aliyun-cli-fc'; then
-    echo "Installing Aliyun FC plugin (required for fc update-function)..."
-    aliyun plugin install --name aliyun-cli-fc
-  else
-    echo "Aliyun FC plugin already installed."
+    echo "Installing Serverless Devs CLI..."
+    npm install -g @serverless-devs/s
+    s -v
   fi
 }
 
 configure_aliyun_cli() {
-  aliyun configure set \
-    --profile default \
-    --mode AK \
-    --region "$FC_REGION" \
-    --access-key-id "$ACCESS_KEY_ID" \
-    --access-key-secret "$ACCESS_KEY_SECRET"
-  echo "Aliyun CLI configured for region ${FC_REGION}."
+  s config add \
+    -a default \
+    --AccessKeyID "$ACCESS_KEY_ID" \
+    --AccessKeySecret "$ACCESS_KEY_SECRET" \
+    -f
+  echo "Serverless Devs configured with default Alibaba Cloud access."
 }
 
 verify_fc_access() {
-  echo "Verifying FC API access for ${FC_FUNCTION_NAME} (${FC_REGION})..."
-  if ! aliyun fc get-function \
-    --function-name "$FC_FUNCTION_NAME" \
-    --region "$FC_REGION" \
-    --quiet 2>&1; then
-    echo "ERROR: Cannot read function '${FC_FUNCTION_NAME}' in region '${FC_REGION}'." >&2
-    echo "Check GitHub secrets (no extra spaces/newlines) and RAM policy on the deploy user:" >&2
-    echo "  - AliyunFCFullAccess (recommended), or at least fc:GetFunction + fc:UpdateFunction" >&2
+  echo "Verifying Serverless Devs project access for ${FC_FUNCTION_NAME} (${FC_REGION})..."
+  if ! s info -y; then
+    echo "ERROR: Cannot read Serverless Devs project info." >&2
+    echo "Check GitHub secrets and RAM policy on the deploy user:" >&2
+    echo "  - AliyunFCFullAccess (recommended), or equivalent FC read/update permissions" >&2
     exit 1
   fi
-  echo "FC access OK."
+  echo "Serverless Devs access OK."
 }
 
 deploy_function() {
-  if [ ! -f fc-deploy.zip ]; then
-    echo "ERROR: fc-deploy.zip not found. Run package-fc.sh first." >&2
+  if [ ! -d fc-package ]; then
+    echo "ERROR: fc-package not found. Run package-fc.sh first." >&2
     exit 1
   fi
 
-  if [ -z "$FC_CODE_OSS_BUCKET" ]; then
-    echo "ERROR: FC_CODE_OSS_BUCKET or OSS_BUCKET is required for FC code upload." >&2
-    echo "The deployment uses OSS because passing zipFile base64 to aliyun fc can exceed OS argument limits." >&2
-    exit 1
-  fi
-
-  local object_name
-  local short_sha
-  short_sha="${GITHUB_SHA:-local}"
-  short_sha="${short_sha:0:12}"
-  object_name="${FC_CODE_OSS_PREFIX%/}/${FC_FUNCTION_NAME}-${short_sha}.zip"
-  echo "Uploading code package ($(wc -c < fc-deploy.zip) bytes) to oss://${FC_CODE_OSS_BUCKET}/${object_name}..."
-  aliyun ossutil cp \
-    fc-deploy.zip \
-    "oss://${FC_CODE_OSS_BUCKET}/${object_name}" \
-    -e "oss-${FC_REGION}.aliyuncs.com"
-
-  local oss_key_id="${OSS_ACCESS_KEY_ID:-$ACCESS_KEY_ID}"
-  local oss_key_secret="${OSS_ACCESS_KEY_SECRET:-$ACCESS_KEY_SECRET}"
-
-  echo "Updating FC function code and environment variables..."
-  if ! aliyun fc update-function \
-    --function-name "$FC_FUNCTION_NAME" \
-    --region "$FC_REGION" \
-    --code "ossBucketName=${FC_CODE_OSS_BUCKET},ossObjectName=${object_name}" \
-    --environment-variables \
-      "DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}" \
-      "OSS_BUCKET=${OSS_BUCKET:-}" \
-      "OSS_REGION=${OSS_REGION:-cn-shenzhen}" \
-      "OSS_ACCESS_KEY_ID=${oss_key_id}" \
-      "OSS_ACCESS_KEY_SECRET=${oss_key_secret}" \
-      "OSS_FEEDBACK_PREFIX=${OSS_FEEDBACK_PREFIX:-feedback}" \
-      "SUPABASE_URL=${SUPABASE_URL:-}" \
-      "SUPABASE_KEY=${SUPABASE_KEY:-}"; then
-    echo "ERROR: fc update-function failed (see Aliyun error above)." >&2
+  echo "Deploying FC function with Serverless Devs..."
+  if ! s deploy -y; then
+    echo "ERROR: Serverless Devs deploy failed (see error above)." >&2
     exit 1
   fi
 

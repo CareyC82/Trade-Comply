@@ -44,26 +44,21 @@ jobs:
         env:
           ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
           ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
-          FC_CODE_OSS_BUCKET: ${{ secrets.FC_CODE_OSS_BUCKET }}
-          FC_CODE_OSS_PREFIX: ${{ secrets.FC_CODE_OSS_PREFIX }}
           OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
           OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
-          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: bash scripts/deploy-fc-ci.sh preflight
 
       - name: Build FC package
         run: bash scripts/deploy-fc-ci.sh build
 
-      - name: Install Aliyun CLI
+      - name: Install Serverless Devs CLI
         run: bash scripts/deploy-fc-ci.sh install-cli
 
       - name: Deploy to Alibaba Cloud FC
         env:
           ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
           ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
-          FC_CODE_OSS_BUCKET: ${{ secrets.FC_CODE_OSS_BUCKET }}
-          FC_CODE_OSS_PREFIX: ${{ secrets.FC_CODE_OSS_PREFIX }}
           OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
           OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
