@@ -17,12 +17,15 @@ ACCESS_KEY_SECRET="$(trim_secret "${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-${OSS_ACCES
 DEEPSEEK_API_KEY="$(trim_secret "${DEEPSEEK_API_KEY:-}")"
 FC_FUNCTION_NAME="${FC_FUNCTION_NAME:-tradecomply_ai_agent}"
 FC_REGION="${FC_REGION:-cn-shenzhen}"
+FC_CODE_OSS_BUCKET="$(trim_secret "${FC_CODE_OSS_BUCKET:-${OSS_BUCKET:-}}")"
+FC_CODE_OSS_PREFIX="$(trim_secret "${FC_CODE_OSS_PREFIX:-fc-code}")"
 
 preflight() {
   local missing=()
   if [ -z "$ACCESS_KEY_ID" ]; then missing+=("ALIBABA_CLOUD_ACCESS_KEY_ID or OSS_ACCESS_KEY_ID"); fi
   if [ -z "$ACCESS_KEY_SECRET" ]; then missing+=("ALIBABA_CLOUD_ACCESS_KEY_SECRET or OSS_ACCESS_KEY_SECRET"); fi
   if [ -z "$DEEPSEEK_API_KEY" ]; then missing+=("DEEPSEEK_API_KEY"); fi
+  if [ -z "$FC_CODE_OSS_BUCKET" ]; then missing+=("FC_CODE_OSS_BUCKET or OSS_BUCKET"); fi
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "ERROR: Missing required GitHub secrets:" >&2
@@ -35,6 +38,7 @@ preflight() {
   echo "Preflight OK."
   echo "Function: ${FC_FUNCTION_NAME}"
   echo "Region: ${FC_REGION}"
+  echo "Code OSS bucket: ${FC_CODE_OSS_BUCKET}"
 }
 
 build_package() {
@@ -92,9 +96,22 @@ deploy_function() {
     exit 1
   fi
 
-  local zip_b64
-  zip_b64="$(base64 -w0 fc-deploy.zip)"
-  echo "Prepared code payload ($(wc -c < fc-deploy.zip) bytes zip, ${#zip_b64} base64 chars)."
+  if [ -z "$FC_CODE_OSS_BUCKET" ]; then
+    echo "ERROR: FC_CODE_OSS_BUCKET or OSS_BUCKET is required for FC code upload." >&2
+    echo "The deployment uses OSS because passing zipFile base64 to aliyun fc can exceed OS argument limits." >&2
+    exit 1
+  fi
+
+  local object_name
+  local short_sha
+  short_sha="${GITHUB_SHA:-local}"
+  short_sha="${short_sha:0:12}"
+  object_name="${FC_CODE_OSS_PREFIX%/}/${FC_FUNCTION_NAME}-${short_sha}.zip"
+  echo "Uploading code package ($(wc -c < fc-deploy.zip) bytes) to oss://${FC_CODE_OSS_BUCKET}/${object_name}..."
+  aliyun ossutil cp \
+    fc-deploy.zip \
+    "oss://${FC_CODE_OSS_BUCKET}/${object_name}" \
+    -e "oss-${FC_REGION}.aliyuncs.com"
 
   local oss_key_id="${OSS_ACCESS_KEY_ID:-$ACCESS_KEY_ID}"
   local oss_key_secret="${OSS_ACCESS_KEY_SECRET:-$ACCESS_KEY_SECRET}"
@@ -103,7 +120,7 @@ deploy_function() {
   if ! aliyun fc update-function \
     --function-name "$FC_FUNCTION_NAME" \
     --region "$FC_REGION" \
-    --code "zipFile=${zip_b64}" \
+    --code "ossBucketName=${FC_CODE_OSS_BUCKET},ossObjectName=${object_name}" \
     --environment-variables \
       "DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}" \
       "OSS_BUCKET=${OSS_BUCKET:-}" \
