@@ -78,6 +78,7 @@ function bindCategoryDirectionToggle() {
     }
 
     exportBtn.addEventListener('click', () => {
+        AppState.currentDirection = 'export';
         exportBtn.classList.add('active');
         importBtn.classList.remove('active');
         if (typeof syncTradeCountrySelects === 'function') {
@@ -86,6 +87,7 @@ function bindCategoryDirectionToggle() {
     });
 
     importBtn.addEventListener('click', () => {
+        AppState.currentDirection = 'import';
         importBtn.classList.add('active');
         exportBtn.classList.remove('active');
         if (typeof syncTradeCountrySelects === 'function') {

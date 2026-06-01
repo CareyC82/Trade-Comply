@@ -64,6 +64,32 @@ function getActiveTradeCountrySelect() {
     return electronics || energy || semi;
 }
 
+function getActiveTradeDirection() {
+    const buttonPairs = [
+        ['direction-export', 'direction-import'],
+        ['direction-export-energy', 'direction-import-energy'],
+        ['direction-export-semi', 'direction-import-semi']
+    ];
+
+    for (const [exportId, importId] of buttonPairs) {
+        const exportBtn = document.getElementById(exportId);
+        const importBtn = document.getElementById(importId);
+        const groupVisible = (exportBtn && exportBtn.offsetParent !== null)
+            || (importBtn && importBtn.offsetParent !== null);
+        if (!groupVisible) {
+            continue;
+        }
+        if (importBtn?.classList.contains('active')) {
+            return 'import';
+        }
+        if (exportBtn?.classList.contains('active')) {
+            return 'export';
+        }
+    }
+
+    return AppState.currentDirection === 'import' ? 'import' : 'export';
+}
+
 function populateTradeCountrySelect(selectEl, direction, selectedCode) {
     if (!selectEl) {
         return;
@@ -85,10 +111,12 @@ function populateTradeCountrySelect(selectEl, direction, selectedCode) {
 }
 
 function syncTradeCountrySelects(direction, selectedCode) {
+    const tradeDirection = direction === 'import' ? 'import' : 'export';
+    AppState.currentDirection = tradeDirection;
     const code = selectedCode || AppState.currentCountry;
-    populateTradeCountrySelect(document.getElementById('trade-country'), direction, code);
-    populateTradeCountrySelect(document.getElementById('trade-country-energy'), direction, code);
-    populateTradeCountrySelect(document.getElementById('trade-country-semi'), direction, code);
+    populateTradeCountrySelect(document.getElementById('trade-country'), tradeDirection, code);
+    populateTradeCountrySelect(document.getElementById('trade-country-energy'), tradeDirection, code);
+    populateTradeCountrySelect(document.getElementById('trade-country-semi'), tradeDirection, code);
 }
 
 function setTradeCountry(countryCode) {
@@ -98,7 +126,7 @@ function setTradeCountry(countryCode) {
     if (active) {
         active.value = AppState.currentCountry;
     }
-    syncTradeCountrySelects(AppState.currentDirection || 'export', AppState.currentCountry);
+    syncTradeCountrySelects(getActiveTradeDirection(), AppState.currentCountry);
 }
 
 function bindTradeCountryControls() {
