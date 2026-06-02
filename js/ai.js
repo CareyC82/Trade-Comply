@@ -30,7 +30,16 @@ async function callAiAssistant(query) {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+            let errorMessage = `API error: ${response.status}`;
+            try {
+                const errorPayload = await response.json();
+                if (errorPayload?.error) {
+                    errorMessage = errorPayload.error;
+                }
+            } catch (parseError) {
+                // Keep the status-based message when the server error is not JSON.
+            }
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
@@ -39,7 +48,13 @@ async function callAiAssistant(query) {
         clearTimeout(timeoutId);
         console.error('API Error:', error);
         removeAiBox();
-        createAiBox(t('aiError'), null);
+        const fallback = t('aiError');
+        const isNetworkError = error.name === 'AbortError'
+            || /failed to fetch|network|cors/i.test(error.message || '');
+        const diagnostic = isNetworkError
+            ? `${fallback} The AI service may be blocked by browser network/CORS settings.`
+            : `${fallback} ${error.message || ''}`.trim();
+        createAiBox(diagnostic, null);
         updateAiButtonState(false);
     }
 }
