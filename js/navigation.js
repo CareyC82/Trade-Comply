@@ -28,10 +28,15 @@ function getViewHash(view) {
 function applyView(view) {
     const safeView = VALID_VIEWS.includes(view) ? view : 'home';
 
-    document.getElementById('home-view').style.display = safeView === 'home' ? 'block' : 'none';
-    document.getElementById('electronics-view').style.display = safeView === 'electronics' ? 'block' : 'none';
-    document.getElementById('new-energy-view').style.display = safeView === 'new-energy' ? 'block' : 'none';
-    document.getElementById('semiconductor-view').style.display = safeView === 'semiconductor' ? 'block' : 'none';
+    VALID_VIEWS.forEach((name) => {
+        const el = document.getElementById(`${name}-view`);
+        if (!el) {
+            return;
+        }
+        const isActive = name === safeView;
+        el.style.display = isActive ? 'block' : 'none';
+        el.classList.toggle('active', isActive);
+    });
     if (safeView === 'semiconductor') {
         setTimeout(renderSemiQuickActions, 100);
     }
@@ -45,10 +50,6 @@ function applyView(view) {
             AppState.currentCountry
         );
     }
-    document.getElementById('incoterm-view').style.display = safeView === 'incoterm' ? 'block' : 'none';
-    document.getElementById('result-view').style.display = safeView === 'result' ? 'block' : 'none';
-    document.getElementById('kb-view').style.display = safeView === 'kb' ? 'block' : 'none';
-    document.getElementById('categories-view').style.display = safeView === 'categories' ? 'block' : 'none';
     window.scrollTo(0, 0);
 
     AppState.currentView = safeView;
@@ -79,8 +80,8 @@ function showView(view, pushHistory = true) {
         if (pushHistory) {
             history.pushState({ view: targetView }, '', getViewHash(targetView));
         }
-        applyView(targetView);
     }
+    applyView(targetView);
 }
 
 /**

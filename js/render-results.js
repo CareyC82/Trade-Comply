@@ -34,16 +34,15 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         renderPreScreenReportPanel('pre-screen-report-container', preScreenReport);
     }
 
-    renderPrecheckSummary('precheck-summary-container', precheckSelections, tags);
+    const precheckSummaryContainer = document.getElementById('precheck-summary-container');
+    if (precheckSummaryContainer) {
+        precheckSummaryContainer.innerHTML = '';
+    }
 
-    renderTrustBoundary('trust-boundary-container', {
-        query,
-        direction: viewModel.direction,
-        tags,
-        cases,
-        precheckSelections,
-        profile: viewModel.precheckProfile
-    });
+    const trustBoundaryContainer = document.getElementById('trust-boundary-container');
+    if (trustBoundaryContainer) {
+        trustBoundaryContainer.innerHTML = '';
+    }
 
     renderAiQuerySection(
         document.getElementById('ai-query-section'),
@@ -70,6 +69,11 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         query,
         viewModel.checklistOptions
     );
+    const checklistContainer = document.getElementById('compliance-checklist-container');
+    const resultCardsContainer = document.getElementById('result-cards-container');
+    if (checklistContainer && resultCardsContainer && checklistContainer.compareDocumentPosition(resultCardsContainer) !== Node.DOCUMENT_POSITION_FOLLOWING) {
+        resultCardsContainer.parentNode?.insertBefore(checklistContainer, resultCardsContainer);
+    }
 
     requestAnimationFrame(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });

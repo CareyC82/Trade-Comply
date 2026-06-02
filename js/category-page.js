@@ -43,6 +43,7 @@ function getCategoryPageKey() {
 
 function buildCategorySearchUrl(query, direction, country, vertical) {
     const params = new URLSearchParams();
+    params.set('appv', globalThis.TradeComplyBuild || 'current');
     const trimmed = (query || '').trim();
     if (trimmed) {
         params.set('search', trimmed);

@@ -161,6 +161,7 @@ function applyScenarioDirection(vertical, direction) {
 
 function buildIndustryScenarioSearchUrl(scenario) {
     const params = new URLSearchParams();
+    params.set('appv', globalThis.TradeComplyBuild || 'current');
     params.set('search', (scenario.query || '').trim());
     params.set('direction', scenario.direction === 'import' ? 'import' : 'export');
     params.set('country', scenario.country || 'US');
