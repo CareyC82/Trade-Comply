@@ -4,6 +4,7 @@
 
 const ELECTRONICS_QUICK_SELECT_CARDS = [
     { icon: '📱', label: 'Smart Phone', hs_code: '8517.13', query_text: 'smartphone 5G cellular', description: 'Smartphone with cellular modem, touchscreen, Wi-Fi/Bluetooth, lithium battery, and encrypted storage for consumer mobile use.' },
+    { icon: '💻', label: 'Tablet Computer', hs_code: '8471.30', query_text: 'tablet computer wifi', description: 'Tablet computer with touchscreen, Wi-Fi/Bluetooth, lithium battery, USB charging, and encrypted storage for consumer or business use.' },
     { icon: '🔊', label: 'Smart Speaker w/ WiFi', hs_code: '8518.22', query_text: 'smart speaker wifi', description: 'Smart speaker with integrated Wi-Fi, voice assistant microphone array, amplifier, and mains power supply for home audio.' },
     { icon: '🎧', label: 'TWS Earbuds', hs_code: '8518.30', query_text: 'earbuds bluetooth battery', description: 'True wireless stereo earbuds with Bluetooth, in-ear batteries, charging case, and USB charging dock.' },
     { icon: '⌚', label: 'Smart Watch', hs_code: '8517.62', query_text: 'smart watch bluetooth', description: 'Smartwatch with Bluetooth, heart-rate sensor, GPS, touchscreen, and rechargeable lithium battery.' },

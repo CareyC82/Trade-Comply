@@ -61,6 +61,13 @@ describe('product intelligence', () => {
         assert.equal(enhanced.profile.vertical, 'new-energy');
     });
 
+    it('expands tablet descriptions into wireless, battery, and encryption terms', () => {
+        const enhanced = buildEnhancedProductQuery('tablet computer wifi');
+        assert.equal(enhanced.profile.vertical, 'electronics');
+        assert.match(enhanced.query, /tablet computer/i);
+        assert.match(enhanced.query, /battery|encryption|bluetooth/i);
+    });
+
     it('merges inferred precheck selections without requiring manual checkbox input', () => {
         const prepared = prepareIntelligentSearch('drone with encrypted video link and lithium battery', [], FACTORS);
         assert.ok(prepared.selections.some((item) => item.id === 'uav'));

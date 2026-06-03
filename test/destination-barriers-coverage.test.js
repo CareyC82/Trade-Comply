@@ -4,6 +4,7 @@ const tags = require('../data/tags.json');
 
 const DESTINATION_QUERIES = [
     'smart speaker wifi',
+    'tablet computer wifi',
     'ip camera network storage',
     'drone uav under 2kg',
     'solar panel photovoltaic',

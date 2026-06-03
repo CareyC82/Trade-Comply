@@ -45,4 +45,11 @@ describe('quick-select product coverage', () => {
         assert.ok(matchedIds.includes('CL-DU-002'));
         assert.ok(matchedIds.length >= 4);
     });
+
+    it('keeps tablet computer from rendering as no regulations', () => {
+        const matchedIds = matchExportTags('tablet computer wifi');
+        assert.ok(matchedIds.includes('CL-CCC-002'));
+        assert.ok(matchedIds.includes('CL-USMARKET-001'));
+        assert.ok(matchedIds.length >= 3);
+    });
 });
