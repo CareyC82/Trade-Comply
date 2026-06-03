@@ -65,6 +65,12 @@ describe('pre-screen-report templates', () => {
             riskLabelHtml: 'Risk level rating',
             riskLevelHtml: 'CRITICAL',
             riskLevelClass: 'critical',
+            riskToneHtml: 'Stop / legal review required',
+            riskSentenceHtml: 'This screen indicates critical pre-check risk.',
+            matchedCountHtml: '3',
+            topTriggersHtml: '<div class="psr-trigger-list"></div>',
+            riskDriversHtml: '<div class="psr-driver-chips"></div>',
+            actionPlanHtml: '<ol class="psr-next-steps"></ol>',
             executiveSummaryHtml: 'Summary',
             triggerTitleHtml: 'Trigger reason',
             triggerReasonHtml: 'Reason',
@@ -73,15 +79,18 @@ describe('pre-screen-report templates', () => {
             verifyTitleHtml: 'Verification objects',
             verifyListHtml: '<ul></ul>',
             sourcesTitleHtml: 'Official sources',
+            sourceCountHtml: '2',
+            sourceSummaryHtml: 'US BIS',
             sourcesBlockHtml: '<ul></ul>',
             disclaimerTitleHtml: 'Disclaimer',
             disclaimerHtml: 'Not legal advice.',
-            actionsHtml: ''
+            scopeNoteHtml: 'Scope note'
         });
 
-        assert.match(html, /pre-screen-report collapsible-panel/);
+        assert.match(html, /pre-screen-report pre-screen-report--dashboard collapsible-panel/);
         assert.match(html, /collapsible-header" aria-expanded="false"/);
         assert.match(html, /pre-screen-report__body collapsible-body/);
         assert.doesNotMatch(html, /collapsible-panel open/);
+        assert.doesNotMatch(html, />undefined</);
     });
 });

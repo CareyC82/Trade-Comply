@@ -278,3 +278,18 @@ function searchWithPrecheck(query, selections, searchFn = search) {
     };
     return applyCountryFilterToSearchResults(allResults);
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        detectInputType,
+        matchByHSCode,
+        matchByProductName,
+        search,
+        getPrecheckSelections,
+        applyPrecheckSelections,
+        buildPrecheckQuery,
+        mergeById,
+        applyCountryFilterToSearchResults,
+        searchWithPrecheck
+    };
+}

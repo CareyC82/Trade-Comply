@@ -6,8 +6,26 @@
 function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
     AppState.setSearchOrigin(origin);
     const trimmedQuery = query ? query.trim() : '';
-    const selections = getPrecheckSelections(precheckPanelId);
-    const results = searchWithPrecheck(trimmedQuery, selections, search);
+    const manualSelections = getPrecheckSelections(precheckPanelId);
+    const intelligence = globalThis.TradeComplyProductIntelligence?.prepareIntelligentSearch
+        ? globalThis.TradeComplyProductIntelligence.prepareIntelligentSearch(
+            trimmedQuery,
+            manualSelections,
+            globalThis.PRECHECK_FACTORS || PRECHECK_FACTORS,
+            {
+                direction: AppState.currentDirection || 'export',
+                country: AppState.currentCountry || 'US',
+                vertical: origin
+            }
+        )
+        : {
+            expandedQuery: trimmedQuery,
+            selections: manualSelections,
+            profile: null
+        };
+    const selections = intelligence.selections || manualSelections;
+    const searchQuery = intelligence.expandedQuery || trimmedQuery;
+    const results = searchWithPrecheck(searchQuery, selections, search);
     const displayQuery = trimmedQuery || fallbackLabel || t('allProducts');
 
     AppState.setLastSearch({
@@ -15,6 +33,7 @@ function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
         tagCount: results.tags.length,
         caseCount: results.cases.length
     });
+    AppState.productIntelligence = intelligence.profile || null;
 
     renderResults(displayQuery, results.tags, results.cases, selections);
 }

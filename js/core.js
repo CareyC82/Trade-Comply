@@ -230,6 +230,10 @@ const PRECHECK_FACTORS = {
     }
 };
 
+if (typeof globalThis !== 'undefined') {
+    globalThis.PRECHECK_FACTORS = PRECHECK_FACTORS;
+}
+
 // === UI string helper ===
 function t(key, params = {}) {
     const text = UI_STRINGS[key];

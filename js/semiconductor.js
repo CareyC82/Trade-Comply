@@ -89,8 +89,27 @@ function searchSemiconductor(query) {
 function searchSemiconductorProducts(query) {
     AppState.searchOrigin = 'semiconductor';
     const trimmedQuery = query ? query.trim() : '';
-    const selections = getPrecheckSelections('semi-precheck-panel');
-    const results = searchWithPrecheck(trimmedQuery, selections, searchSemiconductor);
+    const manualSelections = getPrecheckSelections('semi-precheck-panel');
+    const intelligence = globalThis.TradeComplyProductIntelligence?.prepareIntelligentSearch
+        ? globalThis.TradeComplyProductIntelligence.prepareIntelligentSearch(
+            trimmedQuery,
+            manualSelections,
+            globalThis.PRECHECK_FACTORS || PRECHECK_FACTORS,
+            {
+                direction: AppState.currentDirection || 'export',
+                country: AppState.currentCountry || 'US',
+                vertical: 'semiconductor'
+            }
+        )
+        : {
+            expandedQuery: trimmedQuery,
+            selections: manualSelections,
+            profile: null
+        };
+    const selections = intelligence.selections || manualSelections;
+    const searchQuery = intelligence.expandedQuery || trimmedQuery;
+    const results = searchWithPrecheck(searchQuery, selections, searchSemiconductor);
+    AppState.productIntelligence = intelligence.profile || null;
     renderResults(trimmedQuery || t('semiconductorProducts'), results.tags, results.cases, selections);
 }
 

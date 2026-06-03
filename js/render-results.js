@@ -71,8 +71,11 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     );
     const checklistContainer = document.getElementById('compliance-checklist-container');
     const resultCardsContainer = document.getElementById('result-cards-container');
-    if (checklistContainer && resultCardsContainer && checklistContainer.compareDocumentPosition(resultCardsContainer) !== Node.DOCUMENT_POSITION_FOLLOWING) {
-        resultCardsContainer.parentNode?.insertBefore(checklistContainer, resultCardsContainer);
+    if (checklistContainer && resultCardsContainer) {
+        const position = checklistContainer.compareDocumentPosition(resultCardsContainer);
+        if (!(position & Node.DOCUMENT_POSITION_FOLLOWING)) {
+            resultCardsContainer.parentNode?.insertBefore(checklistContainer, resultCardsContainer);
+        }
     }
 
     requestAnimationFrame(() => {

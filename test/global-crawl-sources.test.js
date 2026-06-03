@@ -10,10 +10,20 @@ const {
 const REQUIRED_KEYS = ['id', 'country', 'type', 'url', 'method'];
 
 describe('global-crawl-sources', () => {
-    it('defines five configuration-driven sources', () => {
-        assert.equal(GLOBAL_CRAWL_SOURCES.length, 5);
+    it('defines official configuration-driven sources across core jurisdictions', () => {
+        assert.equal(GLOBAL_CRAWL_SOURCES.length, 9);
         const ids = GLOBAL_CRAWL_SOURCES.map((row) => row.id);
-        assert.deepEqual(ids, ['zh-mofcom', 'zh-gac', 'us-bis', 'us-cbp', 'eu-lex']);
+        assert.deepEqual(ids, [
+            'zh-mofcom',
+            'zh-gac',
+            'us-bis',
+            'us-cbp',
+            'us-ustr',
+            'us-ofac',
+            'us-fcc',
+            'eu-lex',
+            'eu-trade'
+        ]);
     });
 
     it('each entry has required global fields', () => {
@@ -32,7 +42,11 @@ describe('global-crawl-sources', () => {
         assert.equal(byId['zh-mofcom'].url, 'https://www.mofcom.gov.cn/zwgk/zcfb/');
         assert.equal(byId['zh-gac'].method, 'got-scraping');
         assert.equal(byId['us-cbp'].url, 'https://www.cbp.gov/trade/automated/newsflash');
+        assert.equal(byId['us-ustr'].url, 'https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions');
+        assert.equal(byId['us-ofac'].url, 'https://ofac.treasury.gov/recent-actions');
+        assert.equal(byId['us-fcc'].url, 'https://www.fcc.gov/news-events/headlines');
         assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/homepage.html?ihcl=en');
+        assert.equal(byId['eu-trade'].url, 'https://policy.trade.ec.europa.eu/news_en');
     });
 
     it('getEnabledGlobalSources filters disabled rows', () => {

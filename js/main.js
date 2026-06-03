@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category"></script>
  */
 (function () {
-    const BUILD = '20260602compact-report';
+    const BUILD = '20260603matching-aiupdate';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -34,6 +34,7 @@
         'lib/actionable-checklist.js',
         'lib/enterprise-print-report.js',
         'lib/industry-checklist-baseline.js',
+        'lib/product-intelligence.js',
         'lib/deep-link.js',
         'js/tag-enrich.js',
         'js/trade-country-ui.js',
@@ -82,6 +83,7 @@
         'lib/actionable-checklist.js',
         'lib/enterprise-print-report.js',
         'lib/industry-checklist-baseline.js',
+        'lib/product-intelligence.js',
         'js/compliance-checklist.js',
         'js/hscode-page.js'
     ];
