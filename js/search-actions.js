@@ -25,7 +25,7 @@ function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
         };
     const selections = intelligence.selections || manualSelections;
     const searchQuery = intelligence.expandedQuery || trimmedQuery;
-    const results = searchWithPrecheck(searchQuery, selections, search);
+    const results = searchWithPrecheck(searchQuery, selections, search, trimmedQuery);
     const displayQuery = trimmedQuery || fallbackLabel || t('allProducts');
 
     AppState.setLastSearch({

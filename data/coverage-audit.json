@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-04T07:10:30.902Z",
+  "generated_at": "2026-06-04T11:58:26.667Z",
   "dimensions": {
     "destination_import": [
       {
@@ -44,17 +44,19 @@
       "country": "US",
       "label": "United States",
       "destination_import": {
-        "status": "partial",
-        "priority": "medium",
-        "tag_count": 2,
-        "case_count": 2,
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 3,
+        "case_count": 3,
         "tag_ids": [
           "CL-USCPSC-001",
-          "CL-USFCC-002"
+          "CL-USFCC-002",
+          "CL-USIMPCUST-001"
         ],
         "case_ids": [
           "CASE-US-CPSC-LITHIUM",
-          "CASE-US-FCC-EQUIPAUTH"
+          "CASE-US-FCC-EQUIPAUTH",
+          "CASE-US-IMPORT-CUSTOMS"
         ],
         "dimensions": [
           {
@@ -63,7 +65,8 @@
             "status": "covered",
             "tag_ids": [
               "CL-USCPSC-001",
-              "CL-USFCC-002"
+              "CL-USFCC-002",
+              "CL-USIMPCUST-001"
             ]
           },
           {
@@ -72,7 +75,8 @@
             "status": "covered",
             "tag_ids": [
               "CL-USCPSC-001",
-              "CL-USFCC-002"
+              "CL-USFCC-002",
+              "CL-USIMPCUST-001"
             ]
           },
           {
@@ -81,14 +85,17 @@
             "status": "covered",
             "tag_ids": [
               "CL-USCPSC-001",
-              "CL-USFCC-002"
+              "CL-USFCC-002",
+              "CL-USIMPCUST-001"
             ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-USIMPCUST-001"
+            ]
           },
           {
             "id": "labeling_consumer",
@@ -96,46 +103,51 @@
             "status": "covered",
             "tag_ids": [
               "CL-USCPSC-001",
-              "CL-USFCC-002"
+              "CL-USFCC-002",
+              "CL-USIMPCUST-001"
             ]
           }
         ],
-        "gaps": [
-          "customs_import"
-        ]
+        "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-USORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-US-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-USORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-USORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-USORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 2,
@@ -151,15 +163,17 @@
       "country": "EU",
       "label": "European Union",
       "destination_import": {
-        "status": "partial",
-        "priority": "medium",
-        "tag_count": 2,
-        "case_count": 1,
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 3,
+        "case_count": 2,
         "tag_ids": [
           "CL-EUBATT-001",
-          "CL-EUGPSR-001"
+          "CL-EUGPSR-001",
+          "CL-EUIMPCUST-001"
         ],
         "case_ids": [
+          "CASE-EU-IMPORT-CUSTOMS",
           "CASE-EU-SAFETYGATE-ELECTRONICS"
         ],
         "dimensions": [
@@ -169,7 +183,8 @@
             "status": "covered",
             "tag_ids": [
               "CL-EUBATT-001",
-              "CL-EUGPSR-001"
+              "CL-EUGPSR-001",
+              "CL-EUIMPCUST-001"
             ]
           },
           {
@@ -177,7 +192,8 @@
             "label": "Electrical safety certification",
             "status": "covered",
             "tag_ids": [
-              "CL-EUGPSR-001"
+              "CL-EUGPSR-001",
+              "CL-EUIMPCUST-001"
             ]
           },
           {
@@ -186,14 +202,17 @@
             "status": "covered",
             "tag_ids": [
               "CL-EUBATT-001",
-              "CL-EUGPSR-001"
+              "CL-EUGPSR-001",
+              "CL-EUIMPCUST-001"
             ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-EUIMPCUST-001"
+            ]
           },
           {
             "id": "labeling_consumer",
@@ -201,46 +220,51 @@
             "status": "covered",
             "tag_ids": [
               "CL-EUBATT-001",
-              "CL-EUGPSR-001"
+              "CL-EUGPSR-001",
+              "CL-EUIMPCUST-001"
             ]
           }
         ],
-        "gaps": [
-          "customs_import"
-        ]
+        "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-EUORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-EU-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-EUORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-EUORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-EUORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 0,
@@ -253,19 +277,21 @@
       "country": "DE",
       "label": "Germany",
       "destination_import": {
-        "status": "partial",
-        "priority": "medium",
-        "tag_count": 4,
-        "case_count": 3,
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 5,
+        "case_count": 4,
         "tag_ids": [
           "CL-DE-002",
           "CL-DE-003",
           "CL-DE-004",
-          "CL-DE-005"
+          "CL-DE-005",
+          "CL-DEIMPCUST-001"
         ],
         "case_ids": [
           "CASE-DE-BNETZA-2024",
           "CASE-DE-EAR-WEEE-BATTERY",
+          "CASE-DE-IMPORT-CUSTOMS",
           "CASE-DE-ZSVR-LUCID"
         ],
         "dimensions": [
@@ -277,7 +303,8 @@
               "CL-DE-002",
               "CL-DE-003",
               "CL-DE-004",
-              "CL-DE-005"
+              "CL-DE-005",
+              "CL-DEIMPCUST-001"
             ]
           },
           {
@@ -286,7 +313,8 @@
             "status": "covered",
             "tag_ids": [
               "CL-DE-002",
-              "CL-DE-003"
+              "CL-DE-003",
+              "CL-DEIMPCUST-001"
             ]
           },
           {
@@ -297,14 +325,17 @@
               "CL-DE-002",
               "CL-DE-003",
               "CL-DE-004",
-              "CL-DE-005"
+              "CL-DE-005",
+              "CL-DEIMPCUST-001"
             ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-DEIMPCUST-001"
+            ]
           },
           {
             "id": "labeling_consumer",
@@ -314,23 +345,24 @@
               "CL-DE-002",
               "CL-DE-003",
               "CL-DE-004",
-              "CL-DE-005"
+              "CL-DE-005",
+              "CL-DEIMPCUST-001"
             ]
           }
         ],
-        "gaps": [
-          "customs_import"
-        ]
+        "gaps": []
       },
       "origin_export": {
-        "status": "partial",
-        "priority": "medium",
+        "status": "strong",
+        "priority": "low",
         "tag_count": 1,
-        "case_count": 0,
+        "case_count": 1,
         "tag_ids": [
           "CL-DE-001"
         ],
-        "case_ids": [],
+        "case_ids": [
+          "CASE-DE-EXPORT-BAFA-DUALUSE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
@@ -370,16 +402,18 @@
       "country": "NL",
       "label": "Netherlands",
       "destination_import": {
-        "status": "partial",
-        "priority": "medium",
-        "tag_count": 3,
-        "case_count": 2,
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 4,
+        "case_count": 3,
         "tag_ids": [
           "CL-NL-003",
           "CL-NL-004",
-          "CL-NL-005"
+          "CL-NL-005",
+          "CL-NLIMPCUST-001"
         ],
         "case_ids": [
+          "CASE-NL-IMPORT-CUSTOMS",
           "CASE-NL-PACKAGING-VERPACT",
           "CASE-NL-WEEE-BATTERY-EPR"
         ],
@@ -391,7 +425,8 @@
             "tag_ids": [
               "CL-NL-003",
               "CL-NL-004",
-              "CL-NL-005"
+              "CL-NL-005",
+              "CL-NLIMPCUST-001"
             ]
           },
           {
@@ -399,7 +434,8 @@
             "label": "Electrical safety certification",
             "status": "covered",
             "tag_ids": [
-              "CL-NL-003"
+              "CL-NL-003",
+              "CL-NLIMPCUST-001"
             ]
           },
           {
@@ -409,14 +445,17 @@
             "tag_ids": [
               "CL-NL-003",
               "CL-NL-004",
-              "CL-NL-005"
+              "CL-NL-005",
+              "CL-NLIMPCUST-001"
             ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-NLIMPCUST-001"
+            ]
           },
           {
             "id": "labeling_consumer",
@@ -425,13 +464,12 @@
             "tag_ids": [
               "CL-NL-003",
               "CL-NL-004",
-              "CL-NL-005"
+              "CL-NL-005",
+              "CL-NLIMPCUST-001"
             ]
           }
         ],
-        "gaps": [
-          "customs_import"
-        ]
+        "gaps": []
       },
       "origin_export": {
         "status": "strong",
@@ -485,21 +523,23 @@
       "country": "SG",
       "label": "Singapore",
       "destination_import": {
-        "status": "partial",
-        "priority": "medium",
-        "tag_count": 5,
-        "case_count": 4,
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 6,
+        "case_count": 5,
         "tag_ids": [
           "CL-SG-002",
           "CL-SG-003",
           "CL-SG-004",
           "CL-SG-005",
-          "CL-SG-006"
+          "CL-SG-006",
+          "CL-SGIMPCUST-001"
         ],
         "case_ids": [
           "CASE-SG-CPSO-UNREGISTERED-APPLIANCES",
           "CASE-SG-CSA-ROUTER-CLS",
           "CASE-SG-IMDA-IMPORT-REGISTRATION",
+          "CASE-SG-IMPORT-CUSTOMS",
           "CASE-SG-SCDF-ESS-FIRECODE"
         ],
         "dimensions": [
@@ -510,7 +550,8 @@
             "tag_ids": [
               "CL-SG-002",
               "CL-SG-003",
-              "CL-SG-005"
+              "CL-SG-005",
+              "CL-SGIMPCUST-001"
             ]
           },
           {
@@ -520,7 +561,8 @@
             "tag_ids": [
               "CL-SG-003",
               "CL-SG-004",
-              "CL-SG-006"
+              "CL-SG-006",
+              "CL-SGIMPCUST-001"
             ]
           },
           {
@@ -532,14 +574,17 @@
               "CL-SG-003",
               "CL-SG-004",
               "CL-SG-005",
-              "CL-SG-006"
+              "CL-SG-006",
+              "CL-SGIMPCUST-001"
             ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-SGIMPCUST-001"
+            ]
           },
           {
             "id": "labeling_consumer",
@@ -548,13 +593,12 @@
             "tag_ids": [
               "CL-SG-003",
               "CL-SG-004",
-              "CL-SG-005"
+              "CL-SG-005",
+              "CL-SGIMPCUST-001"
             ]
           }
         ],
-        "gaps": [
-          "customs_import"
-        ]
+        "gaps": []
       },
       "origin_export": {
         "status": "strong",
@@ -689,37 +733,43 @@
         "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-MXORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-MX-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-MXORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-MXORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-MXORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 0,
@@ -802,37 +852,43 @@
         "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-VNORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-VN-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-VNORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-VNORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-VNORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 0,
@@ -915,37 +971,43 @@
         "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-MYORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-MY-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-MYORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-MYORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-MYORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 0,
@@ -1021,37 +1083,43 @@
         "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-JPORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-JP-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-JPORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-JPORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-JPORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 3,
@@ -1132,37 +1200,43 @@
         "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-KRORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-KR-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-KRORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-KRORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-KRORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 3,
@@ -1179,64 +1253,75 @@
       "country": "ASEAN",
       "label": "ASEAN",
       "destination_import": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-ASEANIMP-001"
+        ],
+        "case_ids": [
+          "CASE-ASEAN-IMPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "wireless_telecom",
             "label": "Wireless / telecom market access",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-ASEANIMP-001"
+            ]
           },
           {
             "id": "electrical_safety",
             "label": "Electrical safety certification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-ASEANIMP-001"
+            ]
           },
           {
             "id": "battery_energy",
             "label": "Battery / ESS / energy-storage safety",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-ASEANIMP-001"
+            ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-ASEANIMP-001"
+            ]
           },
           {
             "id": "labeling_consumer",
             "label": "Labeling / consumer information / product-market records",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-ASEANIMP-001"
+            ]
           }
         ],
-        "gaps": [
-          "wireless_telecom",
-          "electrical_safety",
-          "battery_energy",
-          "customs_import",
-          "labeling_consumer"
-        ]
+        "gaps": []
       },
       "origin_export": {
-        "status": "partial",
-        "priority": "medium",
-        "tag_count": 4,
-        "case_count": 0,
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 5,
+        "case_count": 1,
         "tag_ids": [
           "CL-ASEAN-001",
           "CL-ASEAN-002",
+          "CL-ASEANEXPCUST-001",
           "CL-ASEANMARKET-001",
           "CL-ASEANSOLAR-001"
         ],
-        "case_ids": [],
+        "case_ids": [
+          "CASE-ASEAN-EXPORT-CUSTOMS"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
@@ -1245,6 +1330,7 @@
             "tag_ids": [
               "CL-ASEAN-001",
               "CL-ASEAN-002",
+              "CL-ASEANEXPCUST-001",
               "CL-ASEANMARKET-001"
             ]
           },
@@ -1255,6 +1341,7 @@
             "tag_ids": [
               "CL-ASEAN-001",
               "CL-ASEAN-002",
+              "CL-ASEANEXPCUST-001",
               "CL-ASEANMARKET-001",
               "CL-ASEANSOLAR-001"
             ]
@@ -1262,13 +1349,13 @@
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-ASEANEXPCUST-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 0,
@@ -1281,84 +1368,98 @@
       "country": "RU",
       "label": "Russia",
       "destination_import": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-RUDESTIMP-001"
+        ],
+        "case_ids": [
+          "CASE-RU-IMPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "wireless_telecom",
             "label": "Wireless / telecom market access",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUDESTIMP-001"
+            ]
           },
           {
             "id": "electrical_safety",
             "label": "Electrical safety certification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUDESTIMP-001"
+            ]
           },
           {
             "id": "battery_energy",
             "label": "Battery / ESS / energy-storage safety",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUDESTIMP-001"
+            ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUDESTIMP-001"
+            ]
           },
           {
             "id": "labeling_consumer",
             "label": "Labeling / consumer information / product-market records",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUDESTIMP-001"
+            ]
           }
         ],
-        "gaps": [
-          "wireless_telecom",
-          "electrical_safety",
-          "battery_energy",
-          "customs_import",
-          "labeling_consumer"
-        ]
+        "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-RUORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-RU-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-RUORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 0,
@@ -1371,84 +1472,98 @@
       "country": "TW",
       "label": "Taiwan (China)",
       "destination_import": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-TWDESTIMP-001"
+        ],
+        "case_ids": [
+          "CASE-TW-IMPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "wireless_telecom",
             "label": "Wireless / telecom market access",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWDESTIMP-001"
+            ]
           },
           {
             "id": "electrical_safety",
             "label": "Electrical safety certification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWDESTIMP-001"
+            ]
           },
           {
             "id": "battery_energy",
             "label": "Battery / ESS / energy-storage safety",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWDESTIMP-001"
+            ]
           },
           {
             "id": "customs_import",
             "label": "Customs import declaration / tariff classification",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWDESTIMP-001"
+            ]
           },
           {
             "id": "labeling_consumer",
             "label": "Labeling / consumer information / product-market records",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWDESTIMP-001"
+            ]
           }
         ],
-        "gaps": [
-          "wireless_telecom",
-          "electrical_safety",
-          "battery_energy",
-          "customs_import",
-          "labeling_consumer"
-        ]
+        "gaps": []
       },
       "origin_export": {
-        "status": "none",
-        "priority": "high",
-        "tag_count": 0,
-        "case_count": 0,
-        "tag_ids": [],
-        "case_ids": [],
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 1,
+        "case_count": 1,
+        "tag_ids": [
+          "CL-TWORIGEXP-001"
+        ],
+        "case_ids": [
+          "CASE-TW-EXPORT-BASELINE"
+        ],
         "dimensions": [
           {
             "id": "export_control_sanctions",
             "label": "Export controls / sanctions / dual-use",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWORIGEXP-001"
+            ]
           },
           {
             "id": "origin_transshipment",
             "label": "Origin / re-export / anti-circumvention",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWORIGEXP-001"
+            ]
           },
           {
             "id": "export_customs",
             "label": "Export declaration / outbound customs",
-            "status": "gap",
-            "tag_ids": []
+            "status": "covered",
+            "tag_ids": [
+              "CL-TWORIGEXP-001"
+            ]
           }
         ],
-        "gaps": [
-          "export_control_sanctions",
-          "origin_transshipment",
-          "export_customs"
-        ]
+        "gaps": []
       },
       "origin_to_china_import": {
         "tag_count": 3,
@@ -1462,224 +1577,5 @@
       }
     }
   ],
-  "next_actions": [
-    {
-      "country": "ASEAN",
-      "label": "ASEAN",
-      "focus": "destination_import",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "wireless_telecom",
-        "electrical_safety",
-        "battery_energy",
-        "customs_import",
-        "labeling_consumer"
-      ]
-    },
-    {
-      "country": "RU",
-      "label": "Russia",
-      "focus": "destination_import",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "wireless_telecom",
-        "electrical_safety",
-        "battery_energy",
-        "customs_import",
-        "labeling_consumer"
-      ]
-    },
-    {
-      "country": "TW",
-      "label": "Taiwan (China)",
-      "focus": "destination_import",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "wireless_telecom",
-        "electrical_safety",
-        "battery_energy",
-        "customs_import",
-        "labeling_consumer"
-      ]
-    },
-    {
-      "country": "EU",
-      "label": "European Union",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "JP",
-      "label": "Japan",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "KR",
-      "label": "South Korea",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "MX",
-      "label": "Mexico",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "MY",
-      "label": "Malaysia",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "RU",
-      "label": "Russia",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "TW",
-      "label": "Taiwan (China)",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "US",
-      "label": "United States",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "VN",
-      "label": "Vietnam",
-      "focus": "origin_export",
-      "priority": "high",
-      "status": "none",
-      "gaps": [
-        "export_control_sanctions",
-        "origin_transshipment",
-        "export_customs"
-      ]
-    },
-    {
-      "country": "DE",
-      "label": "Germany",
-      "focus": "destination_import",
-      "priority": "medium",
-      "status": "partial",
-      "gaps": [
-        "customs_import"
-      ]
-    },
-    {
-      "country": "EU",
-      "label": "European Union",
-      "focus": "destination_import",
-      "priority": "medium",
-      "status": "partial",
-      "gaps": [
-        "customs_import"
-      ]
-    },
-    {
-      "country": "NL",
-      "label": "Netherlands",
-      "focus": "destination_import",
-      "priority": "medium",
-      "status": "partial",
-      "gaps": [
-        "customs_import"
-      ]
-    },
-    {
-      "country": "SG",
-      "label": "Singapore",
-      "focus": "destination_import",
-      "priority": "medium",
-      "status": "partial",
-      "gaps": [
-        "customs_import"
-      ]
-    },
-    {
-      "country": "US",
-      "label": "United States",
-      "focus": "destination_import",
-      "priority": "medium",
-      "status": "partial",
-      "gaps": [
-        "customs_import"
-      ]
-    },
-    {
-      "country": "ASEAN",
-      "label": "ASEAN",
-      "focus": "origin_export",
-      "priority": "medium",
-      "status": "partial",
-      "gaps": [
-        "export_customs"
-      ]
-    },
-    {
-      "country": "DE",
-      "label": "Germany",
-      "focus": "origin_export",
-      "priority": "medium",
-      "status": "partial",
-      "gaps": []
-    }
-  ]
+  "next_actions": []
 }

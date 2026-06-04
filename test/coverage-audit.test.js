@@ -22,10 +22,9 @@ describe('coverage audit', () => {
         }
     });
 
-    it('surfaces next-action gaps for empty or thin route sides', () => {
+    it('has no high-priority route coverage gaps after baseline seeding', () => {
         const highPriority = audit.next_actions.filter((item) => item.priority === 'high');
-        assert.ok(highPriority.some((item) => item.country === 'ASEAN' && item.focus === 'destination_import'));
-        assert.ok(highPriority.some((item) => item.country === 'JP' && item.focus === 'origin_export'));
-        assert.ok(highPriority.every((item) => item.gaps.length > 0));
+        assert.deepEqual(highPriority, []);
+        assert.equal(audit.next_actions.length, 0);
     });
 });

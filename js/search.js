@@ -87,6 +87,101 @@ function matchByProductName(query, tags) {
     return scoredTags;
 }
 
+const SEARCH_GENERIC_RELEVANCE_WORDS = new Set([
+    'and',
+    'for',
+    'from',
+    'into',
+    'with',
+    'the',
+    'this',
+    'that',
+    'under',
+    'export',
+    'import',
+    'control',
+    'controls',
+    'controlled',
+    'license',
+    'licensing',
+    'requirement',
+    'requirements',
+    'compliance',
+    'customs',
+    'declaration',
+    'classification',
+    'destination',
+    'origin',
+    'country',
+    'market',
+    'review',
+    'screen',
+    'screening',
+    'risk',
+    'goods',
+    'items',
+    'product',
+    'products',
+    'united',
+    'states',
+    'china',
+    'germany',
+    'netherlands',
+    'singapore',
+    'mexico',
+    'vietnam',
+    'malaysia',
+    'japan',
+    'korea',
+    'russia',
+    'taiwan',
+    'asean',
+    'global'
+]);
+
+function getProductRelevanceTerms(query) {
+    const raw = String(query || '').toLowerCase();
+    if (!raw || /^\d{4,6}(\.\d{1,4})?$/.test(raw.trim())) {
+        return [];
+    }
+    return Array.from(new Set(
+        raw.split(/[^a-z0-9.]+/)
+            .map((word) => word.trim())
+            .filter((word) => word.length >= 3)
+            .filter((word) => !SEARCH_GENERIC_RELEVANCE_WORDS.has(word))
+            .filter((word) => !/^\d+$/.test(word))
+    ));
+}
+
+function tagProductRelevanceText(tag) {
+    return [
+        tag?.tag_id,
+        tag?.short_name,
+        tag?.short_description,
+        tag?.description,
+        tag?.content_en,
+        tag?.category,
+        tag?.category_label,
+        ...(tag?.related_keywords || [])
+    ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function tagMatchesProductTerms(tag, productTerms) {
+    if (!productTerms || productTerms.length === 0) {
+        return true;
+    }
+    const text = tagProductRelevanceText(tag);
+    return productTerms.some((term) => text.includes(term));
+}
+
+function filterTagsByProductRelevance(tags, query) {
+    const terms = getProductRelevanceTerms(query);
+    if (terms.length === 0) {
+        return tags || [];
+    }
+    return (tags || []).filter((tag) => tagMatchesProductTerms(tag, terms));
+}
+
 /**
  * Search logic core
  */
@@ -325,13 +420,20 @@ function applyCountryFilterToSearchResults(results) {
     };
 }
 
-function searchWithPrecheck(query, selections, searchFn = search) {
+function searchWithPrecheck(query, selections, searchFn = search, relevanceQuery = query) {
     const trimmedQuery = query ? query.trim() : '';
+    const relevanceAnchor = relevanceQuery ? relevanceQuery.trim() : trimmedQuery;
     const keywordOnlyQuery = buildPrecheckQuery('', selections);
     const baseResults = trimmedQuery ? searchFn(trimmedQuery) : { tags: [], cases: [] };
     const precheckResults = keywordOnlyQuery ? searchFn(keywordOnlyQuery) : { tags: [], cases: [] };
+    const relevantBaseTags = relevanceAnchor
+        ? filterTagsByProductRelevance(baseResults.tags, relevanceAnchor)
+        : baseResults.tags;
+    const relevantPrecheckTags = relevanceAnchor
+        ? filterTagsByProductRelevance(precheckResults.tags, relevanceAnchor)
+        : precheckResults.tags;
     const allResults = !trimmedQuery && !keywordOnlyQuery ? searchFn('') : {
-        tags: mergeById([...baseResults.tags, ...precheckResults.tags], tag => tag.tag_id),
+        tags: mergeById([...relevantBaseTags, ...relevantPrecheckTags], tag => tag.tag_id),
         cases: mergeById([...baseResults.cases, ...precheckResults.cases], caseItem => caseItem.case_id)
     };
     return applyCountryFilterToSearchResults(allResults);
@@ -346,6 +448,9 @@ if (typeof module !== 'undefined' && module.exports) {
         getPrecheckSelections,
         applyPrecheckSelections,
         buildPrecheckQuery,
+        getProductRelevanceTerms,
+        tagMatchesProductTerms,
+        filterTagsByProductRelevance,
         mergeById,
         applyCountryFilterToSearchResults,
         searchWithPrecheck

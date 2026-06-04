@@ -25,11 +25,14 @@ const FACTORS = {
     destination_end_use: { label: 'End use', keywords: ['end use', 'restricted party'], nextChecks: [], signals: [], risk: 'high' }
 };
 
-function setupSearch(direction = 'export', selectedCountry = 'US') {
+function setupSearch(direction = 'export', selectedCountry = 'US', route = {}) {
     globalThis.AppState = {
         data: { tags, cases },
         currentDirection: direction,
-        currentCountry: selectedCountry
+        currentCountry: selectedCountry,
+        routeFromCountry: route.from || (direction === 'import' ? selectedCountry : 'CN'),
+        routeToCountry: route.to || (direction === 'import' ? 'CN' : selectedCountry),
+        complianceFocus: route.focus || ''
     };
     globalThis.TradeComplyCountry = country;
     globalThis.TradeComplyMatchedResults = matchedResults;
@@ -85,5 +88,21 @@ describe('product intelligence', () => {
         });
         const result = searchWithPrecheck(prepared.expandedQuery, prepared.selections, search);
         assert.ok(ids(result).includes('CL-ASEANSOLAR-001'));
+    });
+
+    it('does not let generic precheck terms pull unrelated policy cards into product results', () => {
+        setupSearch('export', 'US', { from: 'CN', to: 'US', focus: 'import' });
+        const result = searchWithPrecheck(
+            'drone uav under 2kg',
+            [{ id: 'export_control', keywords: ['export control', 'license requirements'] }],
+            search
+        );
+        const resultIds = ids(result);
+        assert.ok(resultIds.includes('CL-USMARKET-002'));
+        assert.equal(
+            result.tags.some((tag) => /syria/i.test(`${tag.short_description || ''} ${tag.description || ''}`)),
+            false
+        );
+        assert.ok(result.tags.length <= 8);
     });
 });

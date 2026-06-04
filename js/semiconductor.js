@@ -108,7 +108,16 @@ function searchSemiconductorProducts(query) {
         };
     const selections = intelligence.selections || manualSelections;
     const searchQuery = intelligence.expandedQuery || trimmedQuery;
-    const results = searchWithPrecheck(searchQuery, selections, searchSemiconductor);
+    const isCrossDomainQuery = isCrossDomainControlQuery(trimmedQuery) && typeof search === 'function';
+    const searchHandler = isCrossDomainQuery
+        ? search
+        : searchSemiconductor;
+    const results = searchWithPrecheck(
+        isCrossDomainQuery ? trimmedQuery : searchQuery,
+        selections,
+        searchHandler,
+        trimmedQuery
+    );
     AppState.productIntelligence = intelligence.profile || null;
     renderResults(trimmedQuery || t('semiconductorProducts'), results.tags, results.cases, selections);
 }
