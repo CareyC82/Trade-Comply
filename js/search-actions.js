@@ -15,6 +15,9 @@ function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
             {
                 direction: AppState.currentDirection || 'export',
                 country: AppState.currentCountry || 'US',
+                from: AppState.routeFromCountry || 'CN',
+                to: AppState.routeToCountry || 'US',
+                focus: AppState.complianceFocus || 'import',
                 vertical: origin
             }
         )

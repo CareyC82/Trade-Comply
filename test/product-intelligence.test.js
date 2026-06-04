@@ -79,6 +79,48 @@ describe('product intelligence', () => {
         assert.match(prepared.expandedQuery, /dual-use|UN38\.3|wireless/i);
     });
 
+    it('adds destination import terms when the selected focus is import requirements', () => {
+        const prepared = prepareIntelligentSearch('wireless router', [], FACTORS, {
+            from: 'SG',
+            to: 'US',
+            focus: 'import',
+            vertical: 'electronics'
+        });
+        assert.match(prepared.expandedQuery, /cbp|hts|fcc/i);
+        assert.doesNotMatch(prepared.expandedQuery, /strategic goods|singapore customs/i);
+        assert.deepEqual(prepared.profile.route, {
+            from: 'SG',
+            to: 'US',
+            focus: 'import',
+            direction: 'export',
+            country: 'US',
+            fromLabel: 'Singapore',
+            toLabel: 'United States'
+        });
+    });
+
+    it('adds origin export terms when the selected focus is export requirements', () => {
+        const prepared = prepareIntelligentSearch('solar panel photovoltaic', [], FACTORS, {
+            from: 'DE',
+            to: 'US',
+            focus: 'export',
+            vertical: 'new-energy'
+        });
+        assert.match(prepared.expandedQuery, /germany export|bafa|dual-use|export customs/i);
+        assert.doesNotMatch(prepared.expandedQuery, /cbp|hts/i);
+        assert.equal(prepared.profile.route.country, 'DE');
+    });
+
+    it('supports legacy direction and country context without forcing the default US route', () => {
+        const prepared = prepareIntelligentSearch('PV module for Vietnam', [], FACTORS, {
+            direction: 'export',
+            country: 'ASEAN',
+            vertical: 'new-energy'
+        });
+        assert.match(prepared.expandedQuery, /asean import|rcep|origin|customs/i);
+        assert.equal(prepared.profile.route.country, 'ASEAN');
+    });
+
     it('improves real matching for short ASEAN solar descriptions', () => {
         setupSearch('export', 'ASEAN');
         const prepared = prepareIntelligentSearch('PV module for Vietnam', [], FACTORS, {

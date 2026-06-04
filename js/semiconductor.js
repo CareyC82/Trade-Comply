@@ -98,6 +98,9 @@ function searchSemiconductorProducts(query) {
             {
                 direction: AppState.currentDirection || 'export',
                 country: AppState.currentCountry || 'US',
+                from: AppState.routeFromCountry || 'CN',
+                to: AppState.routeToCountry || 'US',
+                focus: AppState.complianceFocus || 'import',
                 vertical: 'semiconductor'
             }
         )
