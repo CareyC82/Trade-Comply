@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Trade Comply — 数据审核</title>
+    <title>TraceWize — 数据审核</title>
     <style>
         :root {
             --bg: #0f1419;
@@ -145,13 +145,103 @@
         .badge.high { background: #451a1a; color: #fca5a5; }
         .badge.medium { background: #3b2f1e; color: #fcd34d; }
         .badge.low { background: #123d2a; color: #86efac; }
+        .coverage-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .coverage-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        .coverage-table {
+            width: 100%;
+            min-width: 640px;
+            border-collapse: collapse;
+            background: rgba(0,0,0,0.12);
+        }
+        .coverage-table th,
+        .coverage-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+            font-size: 0.88rem;
+        }
+        .coverage-table th {
+            color: var(--muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: rgba(0,0,0,0.18);
+        }
+        .coverage-table tr:last-child td { border-bottom: none; }
+        .coverage-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            border-radius: 999px;
+            padding: 5px 9px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .coverage-pill.full { background: #123d2a; color: #86efac; }
+        .coverage-pill.partial { background: #1e3a5f; color: #93c5fd; }
+        .coverage-pill.baseline { background: #3b2f1e; color: #fcd34d; }
+        .coverage-pill.none { background: #451a1a; color: #fca5a5; }
+        .coverage-select {
+            width: 100%;
+            max-width: 180px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 9px;
+            background: var(--bg);
+            color: var(--text);
+            font-weight: 700;
+        }
+        .coverage-select.full { border-color: #166534; color: #86efac; }
+        .coverage-select.partial { border-color: #1e40af; color: #93c5fd; }
+        .coverage-select.baseline { border-color: #92400e; color: #fcd34d; }
+        .coverage-select.none { border-color: #7f1d1d; color: #fca5a5; }
+        .coverage-save-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .coverage-dirty {
+            color: #fcd34d;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .coverage-dirty.saved { color: #86efac; }
+        .coverage-legend {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 10px 0 0;
+        }
+        .coverage-note {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
         #login-panel { max-width: 420px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div class="wrap">
-        <h1>Trade Comply · 合规数据审核</h1>
+        <h1>TraceWize · 合规数据审核</h1>
         <p class="subtitle">待审核项来自每日 02:00 自动抓取 + AI 解析，批准后才会写入线上 <code>data/tags.json</code> / <code>data/cases.json</code>。</p>
 
         <div id="login-panel" class="panel">
@@ -188,6 +278,24 @@
                 </div>
                 <div id="crawl-summary">加载中…</div>
             </div>
+            <div class="panel">
+                <div class="coverage-toolbar">
+                    <div>
+                        <h2 style="margin:0 0 4px">Coverage Matrix</h2>
+                        <p class="meta" style="margin:0">查看每个国家/地区在目的地进口、原产地出口两个焦点下的覆盖状态。</p>
+                    </div>
+                    <div class="row" style="margin-top:0">
+                        <button type="button" class="btn-primary" id="btn-save-coverage">保存覆盖表</button>
+                        <button type="button" class="btn-ghost" id="btn-refresh-coverage">刷新覆盖表</button>
+                    </div>
+                </div>
+                <div id="coverage-summary" class="summary-grid"></div>
+                <div id="coverage-matrix-view">加载中…</div>
+                <div class="coverage-save-row">
+                    <span id="coverage-save-state" class="meta">尚未修改。</span>
+                    <span class="coverage-note">维护源文件：<code>data/coverage-matrix.json</code>。保存后仍需提交到 GitHub 才会上线。</span>
+                </div>
+            </div>
             <div id="pending-list"></div>
         </div>
     </div>
@@ -201,8 +309,12 @@
         const statusBar = document.getElementById('status-bar');
         const pendingList = document.getElementById('pending-list');
         const crawlSummary = document.getElementById('crawl-summary');
+        const coverageMatrixView = document.getElementById('coverage-matrix-view');
+        const coverageSummary = document.getElementById('coverage-summary');
+        const coverageSaveState = document.getElementById('coverage-save-state');
         const apiBaseInput = document.getElementById('api-base');
         const passwordInput = document.getElementById('password');
+        let currentCoveragePayload = null;
 
         function getApiBase() {
             return (localStorage.getItem(API_BASE_KEY) || apiBaseInput.value || '').replace(/\/$/, '');
@@ -324,6 +436,192 @@
             const date = new Date(value);
             if (Number.isNaN(date.getTime())) return value;
             return date.toLocaleString('zh-CN');
+        }
+
+        async function fetchStaticJson(path) {
+            const response = await fetch(`${path}?v=${Date.now()}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${path}`);
+            }
+            return response.json();
+        }
+
+        function getDefaultCoveragePayload() {
+            return {
+                version: 1,
+                updated_at: null,
+                levels: {},
+                matrix: { import: { GLOBAL: 'baseline' }, export: { GLOBAL: 'baseline' } }
+            };
+        }
+
+        function setCoverageSaveState(message, state = 'idle') {
+            if (!coverageSaveState) return;
+            coverageSaveState.textContent = message;
+            coverageSaveState.className = state === 'dirty'
+                ? 'coverage-dirty'
+                : state === 'saved'
+                    ? 'coverage-dirty saved'
+                    : 'meta';
+        }
+
+        function normalizeCoverageLevel(level) {
+            const safe = String(level || '').toLowerCase();
+            return ['full', 'partial', 'baseline', 'none'].includes(safe) ? safe : 'baseline';
+        }
+
+        function renderCoveragePill(level) {
+            const safe = normalizeCoverageLevel(level);
+            const label = {
+                full: 'Full',
+                partial: 'Partial',
+                baseline: 'Baseline',
+                none: 'None'
+            }[safe];
+            return `<span class="coverage-pill ${safe}">${label}</span>`;
+        }
+
+        function renderCoverageSelect(focus, code, level) {
+            const safe = normalizeCoverageLevel(level);
+            const options = ['full', 'partial', 'baseline', 'none'].map((value) => {
+                const label = {
+                    full: 'Full',
+                    partial: 'Partial',
+                    baseline: 'Baseline',
+                    none: 'None'
+                }[value];
+                return `<option value="${value}" ${value === safe ? 'selected' : ''}>${label}</option>`;
+            }).join('');
+            return `<select class="coverage-select ${safe}" data-focus="${escapeHtml(focus)}" data-code="${escapeHtml(code)}">${options}</select>`;
+        }
+
+        function countCoverageLevels(matrix) {
+            const counts = { full: 0, partial: 0, baseline: 0, none: 0 };
+            ['import', 'export'].forEach((focus) => {
+                Object.values(matrix?.[focus] || {}).forEach((level) => {
+                    counts[normalizeCoverageLevel(level)] += 1;
+                });
+            });
+            return counts;
+        }
+
+        function renderCoverageSummary(counts, updatedAt) {
+            if (!coverageSummary) return;
+            coverageSummary.innerHTML = `
+                <div class="summary-card"><strong>${counts.full}</strong><span>Full coverage</span></div>
+                <div class="summary-card"><strong>${counts.partial}</strong><span>Partial coverage</span></div>
+                <div class="summary-card"><strong>${counts.baseline}</strong><span>Baseline only</span></div>
+                <div class="summary-card"><strong>${counts.none}</strong><span>Not covered</span></div>
+                <div class="summary-card"><strong>${escapeHtml(formatDateTime(updatedAt))}</strong><span>Matrix updated</span></div>
+            `;
+        }
+
+        function renderCoverageMatrixTable(registry, coveragePayload) {
+            const matrix = coveragePayload.matrix || coveragePayload || {};
+            const routeOptions = Array.isArray(registry.route_options)
+                ? registry.route_options
+                : [];
+            const rows = routeOptions
+                .filter((country) => country.value && country.value !== 'GLOBAL')
+                .map((country) => {
+                    const importLevel = matrix.import?.[country.value] || matrix.import?.GLOBAL || 'baseline';
+                    const exportLevel = matrix.export?.[country.value] || matrix.export?.GLOBAL || 'baseline';
+                    return `
+                        <tr>
+                            <td><strong>${escapeHtml(country.label)}</strong><div class="meta">${escapeHtml(country.value)}</div></td>
+                            <td>${renderCoverageSelect('import', country.value, importLevel)}<div class="meta">Destination import requirements</div></td>
+                            <td>${renderCoverageSelect('export', country.value, exportLevel)}<div class="meta">Origin export requirements</div></td>
+                        </tr>
+                    `;
+                });
+            return `
+                <div class="coverage-table-wrap">
+                    <table class="coverage-table">
+                        <thead>
+                            <tr>
+                                <th>Country / region</th>
+                                <th>Import at destination</th>
+                                <th>Export at origin</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows.join('')}</tbody>
+                    </table>
+                </div>
+                <div class="coverage-legend">
+                    ${renderCoveragePill('full')}
+                    ${renderCoveragePill('partial')}
+                    ${renderCoveragePill('baseline')}
+                    ${renderCoveragePill('none')}
+                </div>
+            `;
+        }
+
+        function attachCoverageSelectHandlers() {
+            coverageMatrixView.querySelectorAll('.coverage-select').forEach((select) => {
+                select.addEventListener('change', () => {
+                    const level = normalizeCoverageLevel(select.value);
+                    select.className = `coverage-select ${level}`;
+                    if (!currentCoveragePayload?.matrix) {
+                        currentCoveragePayload = getDefaultCoveragePayload();
+                    }
+                    const focus = select.dataset.focus;
+                    const code = select.dataset.code;
+                    if (!currentCoveragePayload.matrix[focus]) {
+                        currentCoveragePayload.matrix[focus] = {};
+                    }
+                    currentCoveragePayload.matrix[focus][code] = level;
+                    renderCoverageSummary(countCoverageLevels(currentCoveragePayload.matrix), currentCoveragePayload.updated_at);
+                    setCoverageSaveState('有未保存修改。', 'dirty');
+                });
+            });
+        }
+
+        async function loadCoverageMatrixView() {
+            if (!coverageMatrixView) return;
+            coverageMatrixView.innerHTML = '<p class="meta">正在加载 coverage matrix…</p>';
+            if (coverageSummary) coverageSummary.innerHTML = '';
+            setCoverageSaveState('正在加载覆盖表…');
+            try {
+                const [registry, coveragePayload] = await Promise.all([
+                    fetchStaticJson('data/country-registry.json'),
+                    apiFetch('/api/review/coverage-matrix').catch(() => fetchStaticJson('data/coverage-matrix.json'))
+                ]);
+                currentCoveragePayload = {
+                    ...getDefaultCoveragePayload(),
+                    ...coveragePayload,
+                    matrix: {
+                        ...getDefaultCoveragePayload().matrix,
+                        ...(coveragePayload.matrix || coveragePayload || {})
+                    }
+                };
+                const matrix = currentCoveragePayload.matrix || {};
+                renderCoverageSummary(countCoverageLevels(matrix), currentCoveragePayload.updated_at);
+                coverageMatrixView.innerHTML = renderCoverageMatrixTable(registry, currentCoveragePayload);
+                attachCoverageSelectHandlers();
+                setCoverageSaveState('覆盖表已加载。');
+            } catch (err) {
+                coverageMatrixView.innerHTML = `<div class="empty">覆盖表加载失败：${escapeHtml(err.message)}</div>`;
+                setCoverageSaveState('覆盖表加载失败。');
+            }
+        }
+
+        async function saveCoverageMatrix() {
+            if (!currentCoveragePayload?.matrix) {
+                alert('覆盖表还没有加载完成。');
+                return;
+            }
+            setCoverageSaveState('正在保存覆盖表…');
+            try {
+                const result = await apiFetch('/api/review/coverage-matrix', {
+                    method: 'POST',
+                    body: JSON.stringify({ matrix: currentCoveragePayload.matrix })
+                });
+                currentCoveragePayload = result.payload || currentCoveragePayload;
+                renderCoverageSummary(countCoverageLevels(currentCoveragePayload.matrix), currentCoveragePayload.updated_at);
+                setCoverageSaveState(`已保存：${formatDateTime(currentCoveragePayload.updated_at)}`, 'saved');
+            } catch (err) {
+                setCoverageSaveState(`保存失败：${err.message}`, 'dirty');
+            }
         }
 
         function renderSourceFetch(source) {
@@ -466,6 +764,7 @@
             loginPanel.classList.add('hidden');
             reviewPanel.classList.remove('hidden');
             loadCrawlSummary();
+            loadCoverageMatrixView();
             if (!skipInitialLoad) {
                 loadPending();
             }
@@ -586,6 +885,8 @@
 
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
+        document.getElementById('btn-refresh-coverage').addEventListener('click', loadCoverageMatrixView);
+        document.getElementById('btn-save-coverage').addEventListener('click', saveCoverageMatrix);
         document.getElementById('btn-test-crawl').addEventListener('click', runTestCrawl);
         document.getElementById('btn-publish-sync').addEventListener('click', publishSync);
         document.getElementById('btn-logout').addEventListener('click', showLogin);

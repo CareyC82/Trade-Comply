@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260603tablet-electronics">
+    <link rel="stylesheet" href="css/style.css?v=20260604hscode-route-no-focus">
 </head>
 <body>
 
@@ -60,22 +60,29 @@
             <p class="home-subtitle">Screen China import and export compliance signals for electronics, wireless devices, batteries, encryption, and UAV products.</p>
         </div>
 
-        <div class="direction-toggle">
-            <button id="direction-export" class="direction-btn active">Export from China</button>
-            <button id="direction-import" class="direction-btn">Import into China</button>
-        </div>
-
-        <div class="trade-country-row">
-            <label for="trade-country" class="trade-country-label">Counterparty country / region</label>
-            <select id="trade-country" class="trade-country-select" aria-label="Counterparty country or region"></select>
-        </div>
+        <section class="trade-route-panel" aria-label="Trade route">
+            <div class="trade-route-title">Trade route</div>
+            <div class="trade-route-grid">
+                <div class="trade-country-row">
+                    <label for="route-from" class="trade-country-label">From</label>
+                    <select id="route-from" class="trade-country-select" data-route-country="from" data-default-country="CN" aria-label="Export origin country or region"></select>
+                </div>
+                <div class="trade-country-row">
+                    <label for="route-to" class="trade-country-label">To</label>
+                    <select id="route-to" class="trade-country-select" data-route-country="to" data-default-country="US" aria-label="Import destination country or region"></select>
+                </div>
+            </div>
+            <div class="trade-route-title trade-route-title--focus">Compliance focus</div>
+            <div class="direction-toggle compliance-focus-toggle">
+                <button id="direction-export" class="direction-btn active" data-compliance-focus="import">Import requirements at destination</button>
+                <button id="direction-import" class="direction-btn" data-compliance-focus="export">Export requirements at origin</button>
+            </div>
+        </section>
 
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Enter product, HS Code, or risk feature" id="search-input" />
             <button class="search-btn" id="search-btn">GO</button>
         </div>
-
-        <div id="electronics-industry-scenario-pills" class="industry-scenario-strip"></div>
 
         <div class="precheck-panel" id="precheck-panel">
             <div class="precheck-header">
@@ -109,22 +116,29 @@
             <p class="home-subtitle">Pre-check PV modules, inverters, energy storage, EV chargers, UFLPA supply chain tracing, and tariff exposure.</p>
         </div>
 
-        <div class="direction-toggle">
-            <button id="direction-export-energy" class="direction-btn active">Export from China</button>
-            <button id="direction-import-energy" class="direction-btn">Import into China</button>
-        </div>
-
-        <div class="trade-country-row">
-            <label for="trade-country-energy" class="trade-country-label">Counterparty country / region</label>
-            <select id="trade-country-energy" class="trade-country-select" aria-label="Counterparty country or region"></select>
-        </div>
+        <section class="trade-route-panel" aria-label="Trade route">
+            <div class="trade-route-title">Trade route</div>
+            <div class="trade-route-grid">
+                <div class="trade-country-row">
+                    <label for="route-from-energy" class="trade-country-label">From</label>
+                    <select id="route-from-energy" class="trade-country-select" data-route-country="from" data-default-country="CN" aria-label="Export origin country or region"></select>
+                </div>
+                <div class="trade-country-row">
+                    <label for="route-to-energy" class="trade-country-label">To</label>
+                    <select id="route-to-energy" class="trade-country-select" data-route-country="to" data-default-country="US" aria-label="Import destination country or region"></select>
+                </div>
+            </div>
+            <div class="trade-route-title trade-route-title--focus">Compliance focus</div>
+            <div class="direction-toggle compliance-focus-toggle">
+                <button id="direction-export-energy" class="direction-btn active" data-compliance-focus="import">Import requirements at destination</button>
+                <button id="direction-import-energy" class="direction-btn" data-compliance-focus="export">Export requirements at origin</button>
+            </div>
+        </section>
 
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Enter PV module, inverter, HS Code, or supply chain risk" id="search-input-energy" />
             <button class="search-btn" id="search-btn-energy">GO</button>
         </div>
-
-        <div id="new-energy-industry-scenario-pills" class="industry-scenario-strip"></div>
 
         <div class="precheck-panel" id="energy-precheck-panel">
             <div class="precheck-header">
@@ -196,22 +210,29 @@
             <h1 class="home-title">Semiconductor Trade Controls</h1>
             <p class="home-subtitle">Pre-screen China import/export control signals for chips, equipment, foundry services, and advanced manufacturing.</p>
         </div>
-        <div class="direction-toggle">
-            <button id="direction-export-semi" class="direction-btn active">Export from China</button>
-            <button id="direction-import-semi" class="direction-btn">Import into China</button>
-        </div>
-
-        <div class="trade-country-row">
-            <label for="trade-country-semi" class="trade-country-label">Counterparty country / region</label>
-            <select id="trade-country-semi" class="trade-country-select" aria-label="Counterparty country or region"></select>
-        </div>
+        <section class="trade-route-panel" aria-label="Trade route">
+            <div class="trade-route-title">Trade route</div>
+            <div class="trade-route-grid">
+                <div class="trade-country-row">
+                    <label for="route-from-semi" class="trade-country-label">From</label>
+                    <select id="route-from-semi" class="trade-country-select" data-route-country="from" data-default-country="CN" aria-label="Export origin country or region"></select>
+                </div>
+                <div class="trade-country-row">
+                    <label for="route-to-semi" class="trade-country-label">To</label>
+                    <select id="route-to-semi" class="trade-country-select" data-route-country="to" data-default-country="US" aria-label="Import destination country or region"></select>
+                </div>
+            </div>
+            <div class="trade-route-title trade-route-title--focus">Compliance focus</div>
+            <div class="direction-toggle compliance-focus-toggle">
+                <button id="direction-export-semi" class="direction-btn active" data-compliance-focus="import">Import requirements at destination</button>
+                <button id="direction-import-semi" class="direction-btn" data-compliance-focus="export">Export requirements at origin</button>
+            </div>
+        </section>
 
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Enter chip, equipment, HS Code, or risk feature" id="search-input-semi" />
             <button class="search-btn" id="search-btn-semi">GO</button>
         </div>
-
-        <div id="semiconductor-industry-scenario-pills" class="industry-scenario-strip"></div>
 
         <div class="precheck-panel" id="semi-precheck-panel">
             <div class="precheck-header">
@@ -351,6 +372,6 @@
         <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code</a>
     </nav>
 
-    <script src="js/main.js?v=20260603tablet-electronics" data-app="index"></script>
+    <script src="js/main.js?v=20260604hscode-route-no-focus" data-app="index"></script>
 </body>
 </html>

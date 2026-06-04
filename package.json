@@ -5,6 +5,7 @@
     "test": "node --test test/**/*.test.js",
     "validate:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js",
     "build:catalog": "bash scripts/with-node.sh node scripts/build-catalog.js",
+    "build:coverage-audit": "bash scripts/with-node.sh node scripts/build-coverage-audit.js",
     "check:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js && bash scripts/with-node.sh node scripts/build-catalog.js --check",
     "summarize:feedback": "bash scripts/with-node.sh node scripts/summarize-feedback.js",
     "parse:announcement": "bash scripts/with-node.sh node scripts/auto-parse-announcement.js",

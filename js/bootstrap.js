@@ -21,11 +21,14 @@ function getInboundDeepLink() {
         query: (params.get('search') || '').trim(),
         direction: normalizeInboundDirection(params.get('direction')),
         country: (params.get('country') || 'US').trim().toUpperCase(),
+        routeFrom: (params.get('from') || 'CN').trim().toUpperCase(),
+        routeTo: (params.get('to') || params.get('country') || 'US').trim().toUpperCase(),
+        focus: (params.get('focus') || 'import').trim().toLowerCase(),
         vertical: (params.get('vertical') || 'electronics').trim().toLowerCase()
     };
 }
 
-function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry, inboundVertical, inboundPrecheck) {
+function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCountry, inboundVertical, inboundPrecheck, inboundRoute = null) {
     const query = (inboundQuery || '').trim();
     if (!query) {
         return;
@@ -45,6 +48,12 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCount
 
     if (typeof applyScenarioDirection === 'function') {
         applyScenarioDirection(vertical, inboundDirection);
+    }
+
+    if (inboundRoute && typeof initRouteControls === 'function') {
+        const route = initRouteControls(inboundRoute.from, inboundRoute.to, inboundRoute.focus);
+        inboundDirection = route.direction;
+        inboundCountry = route.country;
     }
 
     if (typeof initTradeCountryForDirection === 'function') {
@@ -108,6 +117,9 @@ async function bootstrapTradeComplyIndex() {
             query: inboundQuery,
             direction: inboundDirection,
             country: inboundCountry,
+            routeFrom: inboundRouteFrom,
+            routeTo: inboundRouteTo,
+            focus: inboundFocus,
             vertical: inboundVertical,
             precheck: inboundPrecheck,
             hsContext: inboundHsContext
@@ -122,6 +134,9 @@ async function bootstrapTradeComplyIndex() {
         if (typeof initTradeCountryForDirection === 'function') {
             initTradeCountryForDirection(AppState.currentDirection || 'export', inboundCountry);
         }
+        if (typeof initRouteControls === 'function') {
+            initRouteControls(inboundRouteFrom || 'CN', inboundRouteTo || inboundCountry || 'US', inboundFocus || 'import');
+        }
 
         if (inboundHsContext && (inboundHsContext.chinaCode || inboundHsContext.counterpartyCode)) {
             AppState.hsContext = inboundHsContext;
@@ -133,16 +148,13 @@ async function bootstrapTradeComplyIndex() {
                 inboundDirection,
                 inboundCountry,
                 inboundVertical,
-                inboundPrecheck
+                inboundPrecheck,
+                { from: inboundRouteFrom, to: inboundRouteTo, focus: inboundFocus }
             );
             return;
         }
 
         initViewHistory();
-
-        if (typeof initIndustryScenarioPills === 'function') {
-            initIndustryScenarioPills();
-        }
 
         const searchInput = document.getElementById('search-input');
         if (searchInput) {

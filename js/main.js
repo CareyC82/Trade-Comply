@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category"></script>
  */
 (function () {
-    const BUILD = '20260603tablet-electronics';
+    const BUILD = '20260604hscode-route-no-focus';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -66,7 +66,6 @@
         'js/policy-correction.js',
         'js/navigation.js',
         'js/semiconductor.js',
-        'js/industry-scenario-presets.js',
         'js/incoterm.js',
         'js/bootstrap.js'
     ];
@@ -77,6 +76,7 @@
         'js/core.js',
         'lib/country-registry.js',
         'lib/trade-country.js',
+        'js/trade-country-ui.js',
         'lib/checklist.js',
         'lib/hscode-dual.js',
         'lib/checklist-industry-segment.js',
@@ -96,7 +96,6 @@
         'lib/trade-country.js',
         'js/trade-country-ui.js',
         'js/quick-select-grid.js',
-        'js/industry-scenario-presets.js',
         'js/feedback.js',
         'compliance-feedback-codec.js',
         'js/category-page.js'

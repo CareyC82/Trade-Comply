@@ -31,7 +31,9 @@ function resolveCasesForMatchedTags(tags, cases, query = '') {
         if (enrichApi.filterCasesByQueryRelevance) {
             resolved = enrichApi.filterCasesByQueryRelevance(resolved, query);
         }
-        return resolved;
+        return enrichApi.filterCasesForMatchedTags
+            ? enrichApi.filterCasesForMatchedTags(resolved, tags)
+            : resolved;
     }
 
     const tagIds = new Set((tags || []).map((tag) => tag?.tag_id).filter(Boolean));
@@ -68,9 +70,11 @@ function resolveCasesForMatchedTags(tags, cases, query = '') {
     });
     resolved = [...byId.values()];
     if (enrichApi?.filterCasesByQueryRelevance) {
-        return enrichApi.filterCasesByQueryRelevance(resolved, query);
+        resolved = enrichApi.filterCasesByQueryRelevance(resolved, query);
     }
-    return resolved;
+    return enrichApi?.filterCasesForMatchedTags
+        ? enrichApi.filterCasesForMatchedTags(resolved, tags)
+        : resolved;
 }
 
 function applyCountryFilterToResults(tags, cases) {
@@ -107,6 +111,22 @@ function prepareCountryContext(selectedCountry, direction) {
 }
 
 function prepareResultSummaryViewModel(query, tagCount, context) {
+    const route = context.routeContext;
+    if (route?.fromLabel && route?.toLabel) {
+        const isExportFocus = route.focus === 'export';
+        return {
+            routeLineHtml: escapeHtml(isExportFocus
+                ? `Export from ${route.fromLabel} to ${route.toLabel}`
+                : `Import into ${route.toLabel} from ${route.fromLabel}`),
+            directionTextHtml: escapeHtml(isExportFocus ? `Export from ${route.fromLabel}` : `Import into ${route.toLabel}`),
+            countryLabelHtml: escapeHtml(isExportFocus ? route.toLabel : route.fromLabel),
+            foundRegulationsHtml: escapeHtml(t('foundRegulations')),
+            tagCount,
+            regulationsForHtml: escapeHtml(t('regulationsFor')),
+            queryHtml: escapeHtml(query),
+            roleFocusHtml: escapeHtml(isExportFocus ? 'origin export focus' : 'destination import focus')
+        };
+    }
     const directionText = context.direction === 'export' ? t('exportTitle') : t('importTitle');
     return {
         directionTextHtml: escapeHtml(directionText),
@@ -291,7 +311,14 @@ function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
     cases = filtered.cases;
 
     const countryContext = prepareCountryContext(selectedCountry, direction);
-    const renderContext = { selectedCountry, direction, ...countryContext };
+    const routeContext = globalThis.TradeComplyCountry?.getRouteContext
+        ? globalThis.TradeComplyCountry.getRouteContext({
+            from: AppState.routeFromCountry || 'CN',
+            to: AppState.routeToCountry || selectedCountry || 'US',
+            focus: AppState.complianceFocus || 'import'
+        })
+        : null;
+    const renderContext = { selectedCountry, direction, routeContext, ...countryContext };
     const precheckProfile = buildPrecheckProfile(precheckSelections, tags);
     const browseAll = isBrowseAllQuery(query);
     const showPolicyCorrection = !browseAll;
@@ -309,7 +336,7 @@ function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
         direction,
         selectedCountry,
         renderContext,
-        resultSummary: prepareResultSummaryViewModel(query, tags.length, { direction, ...countryContext }),
+        resultSummary: prepareResultSummaryViewModel(query, tags.length, { direction, routeContext, ...countryContext }),
         aiQuerySection: prepareAiQuerySectionViewModel(tags.length),
         showAiAssistant: !browseAll || precheckSelections.length > 0,
         showPolicyCorrection,

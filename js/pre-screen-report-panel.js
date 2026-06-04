@@ -10,9 +10,21 @@ function preparePreScreenReportContext(query, tags, cases, precheckSelections) {
     const countryApi = globalThis.TradeComplyCountry;
     const destinationLabel = countryApi ? countryApi.getCountryLabel(destination) : destination;
     const directionLabel = direction === 'import' ? t('importTitle') : t('exportTitle');
+    const route = countryApi?.getRouteContext
+        ? countryApi.getRouteContext({
+            from: AppState.routeFromCountry || 'CN',
+            to: AppState.routeToCountry || destination || 'US',
+            focus: AppState.complianceFocus || 'import'
+        })
+        : null;
     const flowLabel = typeof buildFlowLabel === 'function'
         ? buildFlowLabel(direction, destination)
         : `${directionLabel} → ${destinationLabel}`;
+    const routeFlowLabel = route
+        ? (route.focus === 'export'
+            ? `Export from ${route.fromLabel} to ${route.toLabel}`
+            : `Import into ${route.toLabel} from ${route.fromLabel}`)
+        : flowLabel;
 
     return {
         productQuery: query,
@@ -28,8 +40,9 @@ function preparePreScreenReportContext(query, tags, cases, precheckSelections) {
         directionLabel,
         destination,
         destinationLabel,
-        flowLabel,
-        origin: 'CN',
+        flowLabel: routeFlowLabel,
+        origin: route?.from || 'CN',
+        route,
         hsContext: AppState.hsContext || {}
     };
 }

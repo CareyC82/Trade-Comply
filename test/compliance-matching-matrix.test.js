@@ -21,23 +21,29 @@ const PRODUCTS = [
 const EXPORT_MARKETS = ['US', 'EU', 'ASEAN', 'RU'];
 const IMPORT_ORIGINS = ['US', 'TW', 'JP', 'KR', 'GLOBAL'];
 
-function setupSearch(direction, selectedCountry) {
+function setupSearch(direction, selectedCountry, route = {}) {
     globalThis.AppState = {
         data: { tags, cases },
         currentDirection: direction,
-        currentCountry: selectedCountry
+        currentCountry: selectedCountry,
+        routeFromCountry: route.from || (direction === 'import' ? selectedCountry : 'CN'),
+        routeToCountry: route.to || (direction === 'import' ? 'CN' : selectedCountry),
+        complianceFocus: route.focus || ''
     };
     globalThis.TradeComplyCountry = country;
     globalThis.TradeComplyMatchedResults = matchedResults;
 }
 
-function runSearch(query, direction, selectedCountry) {
-    setupSearch(direction, selectedCountry);
+function runSearch(query, direction, selectedCountry, focus = '', route = {}) {
+    setupSearch(direction, selectedCountry, { ...route, focus });
+    if (focus) {
+        globalThis.AppState.complianceFocus = focus;
+    }
     return search(query);
 }
 
 function effectiveCountry(tag) {
-    const regional = /^CL-(TW|JP|KR|RU|ASEAN)-/i.exec(String(tag.tag_id || ''));
+    const regional = /^CL-(TW|JP|KR|RU|VN|MY|ASEAN)-/i.exec(String(tag.tag_id || ''));
     if (regional) {
         return country.normalizeCountryCode(regional[1]);
     }
@@ -147,5 +153,49 @@ describe('compliance matching matrix', () => {
                 `expected ${expectedTagId} for China import from ${origin}`
             );
         }
+    });
+
+    it('uses route_focus so destination-import rules do not appear as origin-export rules', () => {
+        const mxImport = runSearch('ev charger', 'export', 'MX', 'import');
+        assert.ok(ids(mxImport).includes('CL-MX-001'), 'expected Mexico NOM import rule');
+
+        const mxExport = runSearch('ev charger', 'export', 'MX', 'export');
+        assert.equal(
+            ids(mxExport).includes('CL-MX-001'),
+            false,
+            'Mexico NOM import rule should not appear for origin export focus'
+        );
+    });
+
+    it('does not include China baseline rules for non-China origin export focus', () => {
+        const result = runSearch('solar panel photovoltaic', 'export', 'DE', 'export', { from: 'DE', to: 'US' });
+        assert.equal(
+            result.tags.some((tag) => effectiveCountry(tag) === 'GLOBAL'),
+            false,
+            'Germany origin export focus should not include China baseline rules'
+        );
+    });
+
+    it('does not include unrelated China cases for non-China origin export focus', () => {
+        const result = runSearch('solar panel photovoltaic', 'export', 'DE', 'export', { from: 'DE', to: 'US' });
+        assert.deepEqual(
+            result.cases.map((caseItem) => caseItem.case_id),
+            [],
+            'Germany origin export focus should not show China or unlinked penalty cases'
+        );
+    });
+
+    it('keeps Vietnam and Malaysia import rules as independent countries', () => {
+        const vietnam = runSearch('wireless router wifi telecom equipment', 'export', 'VN', 'import', { from: 'CN', to: 'VN' });
+        assert.ok(ids(vietnam).includes('CL-VN-001'), 'expected Vietnam MIC rule');
+        assert.equal(ids(vietnam).includes('CL-MY-001'), false, 'Vietnam route should not include Malaysia SIRIM rule');
+        assert.ok(vietnam.cases.some((caseItem) => caseItem.case_id === 'CASE-VN-MIC-ICT'));
+        assert.equal(vietnam.cases.some((caseItem) => caseItem.case_id === 'CASE-MY-SIRIM-MCMC'), false);
+
+        const malaysia = runSearch('wireless router wifi telecom equipment', 'export', 'MY', 'import', { from: 'CN', to: 'MY' });
+        assert.ok(ids(malaysia).includes('CL-MY-001'), 'expected Malaysia SIRIM rule');
+        assert.equal(ids(malaysia).includes('CL-VN-001'), false, 'Malaysia route should not include Vietnam MIC rule');
+        assert.ok(malaysia.cases.some((caseItem) => caseItem.case_id === 'CASE-MY-SIRIM-MCMC'));
+        assert.equal(malaysia.cases.some((caseItem) => caseItem.case_id === 'CASE-VN-MIC-ICT'), false);
     });
 });

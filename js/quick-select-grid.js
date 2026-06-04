@@ -11,8 +11,7 @@ const ELECTRONICS_QUICK_SELECT_CARDS = [
     { icon: '🚗', label: 'Dash Camera', hs_code: '8525.89', query_text: 'dash cam wifi', description: 'Vehicle dash camera with Wi-Fi, GPS logging, loop recording, G-sensor, and microSD storage.' },
     { icon: '🥽', label: 'VR Headset', hs_code: '8528.52', query_text: 'vr headset wifi', description: 'Virtual reality headset with displays, IMU sensors, optional Wi-Fi/Bluetooth, and tethered or standalone compute module.' },
     { icon: '🖨️', label: '3D Printer', hs_code: '8485.20', query_text: '3d printer fdm', description: 'Desktop FDM 3D printer with heated bed, stepper motors, control board, and extruder for prototyping.' },
-    { icon: '🛴', label: 'E-Scooter', hs_code: '8711.60', query_text: 'electric scooter battery', description: 'Electric kick scooter with lithium battery pack, hub motor, deck controller, and folding frame for personal mobility.' },
-    { icon: '⚡', label: 'EV Charger', hs_code: '8504.40', query_text: 'ev charger ac wallbox', description: 'AC electric vehicle wallbox charger with Type 2 connector, smart metering, and Wi-Fi app control for home charging.' }
+    { icon: '🛴', label: 'E-Scooter', hs_code: '8711.60', query_text: 'electric scooter battery', description: 'Electric kick scooter with lithium battery pack, hub motor, deck controller, and folding frame for personal mobility.' }
 ];
 
 const NEW_ENERGY_QUICK_SELECT_CARDS = [
@@ -140,6 +139,7 @@ function renderNewEnergyQuickSelect() {
 
 if (typeof globalThis !== 'undefined') {
     globalThis.ELECTRONICS_QUICK_SELECT_CARDS = ELECTRONICS_QUICK_SELECT_CARDS;
+    globalThis.NEW_ENERGY_QUICK_SELECT_CARDS = NEW_ENERGY_QUICK_SELECT_CARDS;
     globalThis.SEMICONDUCTOR_HUB_QUICK_SELECT_CARDS = SEMICONDUCTOR_HUB_QUICK_SELECT_CARDS;
     globalThis.renderQuickSelectGrid = renderQuickSelectGrid;
     globalThis.initQuickSelectGrid = initQuickSelectGrid;

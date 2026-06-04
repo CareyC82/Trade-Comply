@@ -5,7 +5,9 @@
 const TRADE_COUNTRY_UI_FALLBACK_EXPORT_OPTIONS = [
     { value: 'US', label: 'United States' },
     { value: 'EU', label: 'European Union' },
-    { value: 'ASEAN', label: 'ASEAN (Vietnam / Malaysia)' },
+    { value: 'VN', label: 'Vietnam' },
+    { value: 'MY', label: 'Malaysia' },
+    { value: 'ASEAN', label: 'ASEAN' },
     { value: 'RU', label: 'Russia' },
     { value: 'GLOBAL', label: 'Other' }
 ];
@@ -14,7 +16,27 @@ const TRADE_COUNTRY_UI_FALLBACK_IMPORT_OPTIONS = [
     { value: 'TW', label: 'Taiwan (China)' },
     { value: 'JP', label: 'Japan' },
     { value: 'KR', label: 'South Korea' },
+    { value: 'VN', label: 'Vietnam' },
+    { value: 'MY', label: 'Malaysia' },
     { value: 'US', label: 'United States' },
+    { value: 'GLOBAL', label: 'Other' }
+];
+
+const TRADE_COUNTRY_UI_FALLBACK_ROUTE_OPTIONS = [
+    { value: 'CN', label: 'China' },
+    { value: 'US', label: 'United States' },
+    { value: 'DE', label: 'Germany' },
+    { value: 'NL', label: 'Netherlands' },
+    { value: 'SG', label: 'Singapore' },
+    { value: 'MX', label: 'Mexico' },
+    { value: 'VN', label: 'Vietnam' },
+    { value: 'MY', label: 'Malaysia' },
+    { value: 'ASEAN', label: 'ASEAN' },
+    { value: 'EU', label: 'European Union' },
+    { value: 'RU', label: 'Russia' },
+    { value: 'TW', label: 'Taiwan (China)' },
+    { value: 'JP', label: 'Japan' },
+    { value: 'KR', label: 'South Korea' },
     { value: 'GLOBAL', label: 'Other' }
 ];
 
@@ -26,11 +48,22 @@ function getCountryOptionsApi() {
         getCountryOptionsForDirection(direction) {
             return direction === 'import' ? TRADE_COUNTRY_UI_FALLBACK_IMPORT_OPTIONS : TRADE_COUNTRY_UI_FALLBACK_EXPORT_OPTIONS;
         },
+        getRouteOptions() {
+            return TRADE_COUNTRY_UI_FALLBACK_ROUTE_OPTIONS;
+        },
         normalizeCountryCode(value) {
             const raw = String(value || 'US').trim();
             const map = {
+                China: 'CN',
                 'United States': 'US',
+                Germany: 'DE',
+                Netherlands: 'NL',
+                Singapore: 'SG',
+                Mexico: 'MX',
+                Vietnam: 'VN',
+                Malaysia: 'MY',
                 'European Union': 'EU',
+                ASEAN: 'ASEAN',
                 'ASEAN (Vietnam / Malaysia)': 'ASEAN',
                 Russia: 'RU',
                 'Taiwan (China)': 'TW',
@@ -44,6 +77,14 @@ function getCountryOptionsApi() {
             }
             const upper = raw.toUpperCase();
             return map[upper] || upper || 'US';
+        },
+        getRouteContext(input = {}) {
+            const focus = input.focus === 'export' ? 'export' : 'import';
+            const from = this.normalizeCountryCode(input.from || 'CN');
+            const to = this.normalizeCountryCode(input.to || 'US');
+            const direction = focus === 'import' || from === 'CN' ? 'export' : (to === 'CN' ? 'import' : 'export');
+            const country = focus === 'import' ? to : (from === 'CN' ? to : from);
+            return { from, to, focus, direction, country };
         }
     };
 }
@@ -90,6 +131,17 @@ function getActiveTradeDirection() {
     return AppState.currentDirection === 'import' ? 'import' : 'export';
 }
 
+function getActiveRouteSelect(kind) {
+    const selector = `[data-route-country="${kind}"]`;
+    const selects = Array.from(document.querySelectorAll(selector));
+    return selects.find((select) => select.offsetParent !== null) || selects[0] || null;
+}
+
+function getActiveFocusButton() {
+    const buttons = Array.from(document.querySelectorAll('[data-compliance-focus].active'));
+    return buttons.find((button) => button.offsetParent !== null) || buttons[0] || null;
+}
+
 function populateTradeCountrySelect(selectEl, direction, selectedCode) {
     if (!selectEl) {
         return;
@@ -108,6 +160,67 @@ function populateTradeCountrySelect(selectEl, direction, selectedCode) {
     selectEl.disabled = false;
     selectEl.removeAttribute('aria-disabled');
     AppState.currentCountry = selectEl.value;
+}
+
+function populateRouteSelect(selectEl, selectedCode) {
+    if (!selectEl) {
+        return;
+    }
+
+    const api = getCountryOptionsApi();
+    const options = typeof api.getRouteOptions === 'function'
+        ? api.getRouteOptions()
+        : TRADE_COUNTRY_UI_FALLBACK_ROUTE_OPTIONS;
+    const selected = api.normalizeCountryCode(selectedCode || selectEl.dataset.defaultCountry || options[0]?.value);
+
+    selectEl.innerHTML = options
+        .map((opt) => `<option value="${opt.value}">${opt.label}</option>`)
+        .join('');
+    selectEl.value = options.some((o) => o.value === selected) ? selected : options[0].value;
+    selectEl.disabled = false;
+    selectEl.removeAttribute('aria-disabled');
+}
+
+function applyRouteState(fromCountry, toCountry, focus) {
+    const api = getCountryOptionsApi();
+    const route = typeof api.getRouteContext === 'function'
+        ? api.getRouteContext({ from: fromCountry, to: toCountry, focus })
+        : {
+            from: api.normalizeCountryCode(fromCountry || 'CN'),
+            to: api.normalizeCountryCode(toCountry || 'US'),
+            focus: focus === 'export' ? 'export' : 'import',
+            direction: focus === 'export' ? 'export' : 'export',
+            country: api.normalizeCountryCode(toCountry || 'US')
+        };
+
+    AppState.routeFromCountry = route.from;
+    AppState.routeToCountry = route.to;
+    AppState.complianceFocus = route.focus;
+    AppState.currentDirection = route.direction;
+    AppState.currentCountry = route.country;
+    return route;
+}
+
+function refreshRouteControls(route) {
+    const fromSelects = document.querySelectorAll('[data-route-country="from"]');
+    const toSelects = document.querySelectorAll('[data-route-country="to"]');
+    fromSelects.forEach((select) => populateRouteSelect(select, route?.from || AppState.routeFromCountry || 'CN'));
+    toSelects.forEach((select) => populateRouteSelect(select, route?.to || AppState.routeToCountry || 'US'));
+
+    const focus = route?.focus || AppState.complianceFocus || 'import';
+    document.querySelectorAll('[data-compliance-focus]').forEach((button) => {
+        button.classList.toggle('active', button.dataset.complianceFocus === focus);
+    });
+}
+
+function syncRouteControls(fromCountry, toCountry, focus) {
+    const route = applyRouteState(
+        fromCountry || AppState.routeFromCountry || 'CN',
+        toCountry || AppState.routeToCountry || 'US',
+        focus || AppState.complianceFocus || 'import'
+    );
+    refreshRouteControls(route);
+    return route;
 }
 
 function syncTradeCountrySelects(direction, selectedCode) {
@@ -146,8 +259,32 @@ function bindTradeCountryControls() {
     if (semiSelect) {
         semiSelect.addEventListener('change', onCountryChange);
     }
+
+    const onRouteChange = () => {
+        const from = getActiveRouteSelect('from')?.value || AppState.routeFromCountry || 'CN';
+        const to = getActiveRouteSelect('to')?.value || AppState.routeToCountry || 'US';
+        syncRouteControls(from, to, AppState.complianceFocus || 'import');
+    };
+
+    document.querySelectorAll('[data-route-country]').forEach((select) => {
+        select.addEventListener('change', onRouteChange);
+    });
+
+    document.querySelectorAll('[data-compliance-focus]').forEach((button) => {
+        button.addEventListener('click', () => {
+            syncRouteControls(
+                getActiveRouteSelect('from')?.value || AppState.routeFromCountry || 'CN',
+                getActiveRouteSelect('to')?.value || AppState.routeToCountry || 'US',
+                button.dataset.complianceFocus
+            );
+        });
+    });
 }
 
 function initTradeCountryForDirection(direction, countryFromUrl) {
     syncTradeCountrySelects(direction, countryFromUrl);
+}
+
+function initRouteControls(fromCountry = 'CN', toCountry = 'US', focus = 'import') {
+    return syncRouteControls(fromCountry, toCountry, focus);
 }

@@ -2,6 +2,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const {
     collectCasesForMatchedTags,
+    filterCasesForMatchedTags,
     mergeCasesById,
     scoreCaseAgainstQuery,
     filterCasesByQueryRelevance
@@ -69,5 +70,16 @@ describe('matched-results', () => {
             [{ case_id: 'CASE-050', title: 'b' }, { case_id: 'CASE-051', title: 'c' }]
         );
         assert.equal(merged.length, 2);
+    });
+
+    it('keeps only cases linked to currently visible matched tags', () => {
+        const visibleTags = [{ tag_id: 'CL-DE-001' }];
+        const cases = [
+            { case_id: 'CASE-DE-001', related_tags: ['CL-DE-001'] },
+            { case_id: 'CASE-CN-001', related_tags: ['CL-CN-001'] },
+            { case_id: 'CASE-UNLINKED', related_tags: [] }
+        ];
+        const filtered = filterCasesForMatchedTags(cases, visibleTags);
+        assert.deepEqual(filtered.map((caseItem) => caseItem.case_id), ['CASE-DE-001']);
     });
 });

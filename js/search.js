@@ -112,19 +112,60 @@ function search(query) {
         return tagDirection === 'both' || tagDirection === currentDirection;
     });
 
+    const currentFocus = AppState.complianceFocus === 'export' ? 'export'
+        : AppState.complianceFocus === 'import' ? 'import'
+            : '';
+    if (currentFocus) {
+        matchedTags = matchedTags.filter((tag) => {
+            const tagFocus = tag.route_focus || tag.compliance_focus || '';
+            return !tagFocus || tagFocus === currentFocus;
+        });
+    }
+
     const selectedCountry = AppState.currentCountry || 'US';
     const countryApi = globalThis.TradeComplyCountry;
+    const routeContext = {
+        from: AppState.routeFromCountry || 'CN',
+        to: AppState.routeToCountry || selectedCountry || 'US',
+        focus: AppState.complianceFocus || ''
+    };
 
     if (countryApi?.filterTagsForSelectedCountry) {
-        matchedTags = countryApi.filterTagsForSelectedCountry(matchedTags, selectedCountry);
+        matchedTags = countryApi.filterTagsForSelectedCountry(matchedTags, selectedCountry, routeContext);
     } else if (countryApi?.countryMatchesSelection) {
-        matchedTags = matchedTags.filter((tag) => countryApi.countryMatchesSelection(tag, selectedCountry));
+        matchedTags = matchedTags.filter((tag) => countryApi.countryMatchesSelection(tag, selectedCountry, routeContext));
+    }
+
+    if (
+        countryApi?.normalizeCountryCode?.(selectedCountry) === 'ASEAN'
+        && currentFocus === 'import'
+        && query
+    ) {
+        const queryLower = String(query).toLowerCase();
+        const wantsVietnam = /\b(vietnam|viet nam|vn)\b/.test(queryLower);
+        const wantsMalaysia = /\b(malaysia|my)\b/.test(queryLower);
+        if (wantsVietnam !== wantsMalaysia) {
+            matchedTags = matchedTags.filter((tag) => {
+                const tagText = [
+                    tag.tag_id,
+                    tag.short_name,
+                    tag.short_description,
+                    tag.description,
+                    ...(tag.related_keywords || [])
+                ].filter(Boolean).join(' ').toLowerCase();
+                const isVietnamSpecific = /\b(vietnam|viet nam|vn|vnta|qcvn)\b/.test(tagText);
+                const isMalaysiaSpecific = /\b(malaysia|my|mcmc|sirim)\b/.test(tagText);
+                if (wantsVietnam && isMalaysiaSpecific && !isVietnamSpecific) return false;
+                if (wantsMalaysia && isVietnamSpecific && !isMalaysiaSpecific) return false;
+                return true;
+            });
+        }
     }
 
     // Sort: country match first, then risk level, then legacy order
     matchedTags.sort((a, b) => {
-        const countryA = countryApi ? countryApi.countryPriorityScore(a, selectedCountry) : 0;
-        const countryB = countryApi ? countryApi.countryPriorityScore(b, selectedCountry) : 0;
+        const countryA = countryApi ? countryApi.countryPriorityScore(a, selectedCountry, routeContext) : 0;
+        const countryB = countryApi ? countryApi.countryPriorityScore(b, selectedCountry, routeContext) : 0;
         if (countryB !== countryA) {
             return countryB - countryA;
         }
@@ -199,6 +240,9 @@ function search(query) {
         if (enrichApi.filterCasesByQueryRelevance) {
             matchedCases = enrichApi.filterCasesByQueryRelevance(matchedCases, query);
         }
+        if (enrichApi.filterCasesForMatchedTags) {
+            matchedCases = enrichApi.filterCasesForMatchedTags(matchedCases, matchedTags);
+        }
     }
 
     return { tags: matchedTags, cases: matchedCases };
@@ -249,21 +293,35 @@ function mergeById(items, getId) {
 function applyCountryFilterToSearchResults(results) {
     const selectedCountry = AppState.currentCountry || 'US';
     const countryApi = globalThis.TradeComplyCountry;
+    const routeContext = {
+        from: AppState.routeFromCountry || 'CN',
+        to: AppState.routeToCountry || selectedCountry || 'US',
+        focus: AppState.complianceFocus || ''
+    };
+    const enrichApi = globalThis.TradeComplyMatchedResults;
     if (countryApi?.filterTagsForSelectedCountry) {
+        const filteredTags = countryApi.filterTagsForSelectedCountry(results.tags, selectedCountry, routeContext);
         return {
             ...results,
-            tags: countryApi.filterTagsForSelectedCountry(results.tags, selectedCountry)
+            tags: filteredTags,
+            cases: enrichApi?.filterCasesForMatchedTags
+                ? enrichApi.filterCasesForMatchedTags(results.cases, filteredTags)
+                : results.cases
         };
     }
     const selected = String(selectedCountry || 'US').trim().toUpperCase();
+    const filteredTags = (results.tags || []).filter((tag) => {
+        const code = String(tag.country || 'GLOBAL').trim().toUpperCase();
+        const regional = /^CL-(TW|JP|KR|RU|ASEAN)-/i.exec(tag.tag_id || '');
+        const effective = regional ? regional[1].toUpperCase() : code;
+        return effective === selected || effective === 'GLOBAL';
+    });
     return {
         ...results,
-        tags: (results.tags || []).filter((tag) => {
-            const code = String(tag.country || 'GLOBAL').trim().toUpperCase();
-            const regional = /^CL-(TW|JP|KR|RU|ASEAN)-/i.exec(tag.tag_id || '');
-            const effective = regional ? regional[1].toUpperCase() : code;
-            return effective === selected || effective === 'GLOBAL';
-        })
+        tags: filteredTags,
+        cases: enrichApi?.filterCasesForMatchedTags
+            ? enrichApi.filterCasesForMatchedTags(results.cases, filteredTags)
+            : results.cases
     };
 }
 

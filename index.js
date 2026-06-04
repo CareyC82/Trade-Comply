@@ -1006,8 +1006,18 @@ async function handleHsCodeClassifyRequest(body, headers) {
 
     const description = typeof body.description === 'string' ? body.description.trim() : '';
     const direction = body.direction === 'import' ? 'import' : 'export';
+    const routeFromCountry = fcLibs.normalizeCountryCode(
+        body.route_from_country || body.origin_country || (direction === 'import' ? body.counterparty_country : 'CN')
+    );
+    const routeToCountry = fcLibs.normalizeCountryCode(
+        body.route_to_country || body.destination_country || (direction === 'import' ? 'CN' : body.counterparty_country || body.country || 'US')
+    );
+    const complianceFocus = body.compliance_focus === 'export' ? 'export' : 'import';
     const counterpartyCountry = fcLibs.normalizeCountryCode(
-        body.counterparty_country || body.country || 'US'
+        body.counterparty_country
+        || body.country
+        || (complianceFocus === 'export' ? routeFromCountry : routeToCountry)
+        || 'US'
     );
 
     if (!description) {
@@ -1037,7 +1047,10 @@ async function handleHsCodeClassifyRequest(body, headers) {
     try {
         const classification = await callDeepSeekForHsCode(description, {
             direction,
-            counterpartyCountry
+            counterpartyCountry,
+            fromCountry: routeFromCountry,
+            toCountry: routeToCountry,
+            focus: complianceFocus
         }, fcLibs);
         const checklist = classification.checklist || [];
         return {
@@ -1051,7 +1064,10 @@ async function handleHsCodeClassifyRequest(body, headers) {
                 },
                 trade_context: {
                     direction,
-                    counterparty_country: counterpartyCountry
+                    counterparty_country: counterpartyCountry,
+                    route_from_country: routeFromCountry,
+                    route_to_country: routeToCountry,
+                    compliance_focus: complianceFocus
                 }
             })
         };

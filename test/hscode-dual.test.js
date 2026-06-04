@@ -5,7 +5,9 @@ const {
     formatUsHtsCode,
     formatCounterpartyHsCode,
     enrichClassification,
-    buildCrossBorderNote
+    buildCrossBorderNote,
+    buildHsCodeUserPrompt,
+    buildHsCodeSystemPrompt
 } = require('../lib/hscode-dual');
 
 describe('hscode-dual', () => {
@@ -43,5 +45,43 @@ describe('hscode-dual', () => {
         const note = buildCrossBorderNote('854239', 'US', 'HTS');
         assert.match(note, /8542\.39/);
         assert.match(note, /Section 301/i);
+    });
+
+    it('labels non-China trade routes by origin and destination', () => {
+        const result = enrichClassification(
+            {
+                hscode: '850440',
+                official_name: 'Static converters',
+                confidence: '90%',
+                reasoning: 'Classified under heading 8504.'
+            },
+            {
+                direction: 'export',
+                counterpartyCountry: 'DE',
+                fromCountry: 'DE',
+                toCountry: 'US',
+                focus: 'export'
+            }
+        );
+
+        assert.match(result.china_code_label, /Germany Export/i);
+        assert.match(result.counterparty_code_label, /United States Import HTS/i);
+        assert.equal(result.origin_country, 'DE');
+        assert.equal(result.destination_country, 'US');
+        assert.equal(result.china_export_hscode, '');
+    });
+
+    it('builds route-aware HS prompt for global routes', () => {
+        const prompt = buildHsCodeUserPrompt('solar inverter', {
+            direction: 'export',
+            counterpartyCountry: 'US',
+            fromCountry: 'DE',
+            toCountry: 'US',
+            focus: 'export'
+        });
+        assert.match(prompt, /origin_country: DE/);
+        assert.match(prompt, /destination_country: US/);
+        assert.match(prompt, /compliance_focus: origin export requirements/);
+        assert.match(buildHsCodeSystemPrompt(), /DE, NL, SG, MX/);
     });
 });

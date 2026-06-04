@@ -253,8 +253,12 @@ function applyUiStrings() {
     updateElementText('home-subtitle', t('subtitle'));
     
     // 更新方向切换按钮
-    updateElementText('direction-export', t('export'));
-    updateElementText('direction-import', t('import'));
+    if (!document.getElementById('direction-export')?.dataset.complianceFocus) {
+        updateElementText('direction-export', t('export'));
+    }
+    if (!document.getElementById('direction-import')?.dataset.complianceFocus) {
+        updateElementText('direction-import', t('import'));
+    }
     
     // 更新搜索框和按钮
     const searchInput = document.getElementById('search-input');

@@ -50,6 +50,14 @@ function applyView(view) {
             AppState.currentCountry
         );
     }
+    if ((safeView === 'electronics' || safeView === 'new-energy' || safeView === 'semiconductor')
+        && typeof initRouteControls === 'function') {
+        initRouteControls(
+            AppState.routeFromCountry || 'CN',
+            AppState.routeToCountry || AppState.currentCountry || 'US',
+            AppState.complianceFocus || 'import'
+        );
+    }
     window.scrollTo(0, 0);
 
     AppState.currentView = safeView;

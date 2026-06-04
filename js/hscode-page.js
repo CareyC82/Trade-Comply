@@ -12,6 +12,9 @@ let lastHsCode = '';
 let lastHs6 = '';
 let selectedDirection = 'export';
 let selectedCountry = 'US';
+let selectedFromCountry = 'CN';
+let selectedToCountry = 'US';
+let selectedComplianceFocus = 'import';
 let lastClassification = null;
 let lastProductDescription = '';
 
@@ -55,71 +58,73 @@ function hideResult() {
 }
 
 function getSelectedDirection() {
-    return selectedDirection === 'import' ? 'import' : 'export';
+    return getSelectedRouteContext().direction;
 }
 
-const HSCODE_FALLBACK_EXPORT_OPTIONS = [
-    { value: 'US', label: 'United States' },
-    { value: 'EU', label: 'European Union' },
-    { value: 'ASEAN', label: 'ASEAN (Vietnam / Malaysia)' },
-    { value: 'RU', label: 'Russia' },
-    { value: 'GLOBAL', label: 'Other' }
-];
-const HSCODE_FALLBACK_IMPORT_OPTIONS = [
-    { value: 'TW', label: 'Taiwan (China)' },
-    { value: 'JP', label: 'Japan' },
-    { value: 'KR', label: 'South Korea' },
-    { value: 'US', label: 'United States' },
-    { value: 'GLOBAL', label: 'Other' }
-];
-
-function populateHscodeCountrySelect(direction) {
-    const select = document.getElementById('hscode-trade-country');
-    if (!select) {
-        return;
+function getSelectedRouteContext() {
+    const api = globalThis.TradeComplyCountry;
+    if (api?.getRouteContext) {
+        return api.getRouteContext({
+            from: selectedFromCountry,
+            to: selectedToCountry,
+            focus: selectedComplianceFocus
+        });
     }
+    const focus = selectedComplianceFocus === 'export' ? 'export' : 'import';
+    const from = String(selectedFromCountry || 'CN').trim().toUpperCase();
+    const to = String(selectedToCountry || 'US').trim().toUpperCase();
+    return {
+        from,
+        to,
+        focus,
+        direction: focus === 'import' || from === 'CN' ? 'export' : (to === 'CN' ? 'import' : 'export'),
+        country: focus === 'import' ? to : (from === 'CN' ? to : from),
+        fromLabel: from,
+        toLabel: to
+    };
+}
 
-    let options = direction === 'import' ? HSCODE_FALLBACK_IMPORT_OPTIONS : HSCODE_FALLBACK_EXPORT_OPTIONS;
-    let normalize = (value) => String(value || 'US').trim().toUpperCase();
+function applyHscodeRouteState(fromCountry, toCountry, focus) {
+    const route = typeof syncRouteControls === 'function'
+        ? syncRouteControls(fromCountry, toCountry, focus)
+        : getSelectedRouteContext();
 
-    if (globalThis.TradeComplyCountry) {
-        const api = globalThis.TradeComplyCountry;
-        options = api.getCountryOptionsForDirection(direction);
-        normalize = api.normalizeCountryCode;
-    }
+    selectedFromCountry = route.from;
+    selectedToCountry = route.to;
+    selectedComplianceFocus = route.focus;
+    selectedDirection = route.direction;
+    selectedCountry = route.country;
 
-    const selected = normalize(selectedCountry);
-    select.innerHTML = options.map((opt) => `<option value="${opt.value}">${opt.label}</option>`).join('');
-    select.value = options.some((o) => o.value === selected) ? selected : options[0].value;
-    selectedCountry = select.value;
-    select.disabled = false;
+    AppState.routeFromCountry = route.from;
+    AppState.routeToCountry = route.to;
+    AppState.complianceFocus = route.focus;
+    AppState.currentDirection = route.direction;
+    AppState.currentCountry = route.country;
+
+    document.querySelectorAll('[data-compliance-focus]').forEach((button) => {
+        button.classList.toggle('active', button.dataset.complianceFocus === route.focus);
+    });
+
+    return route;
 }
 
 function bindDirectionToggle() {
-    const exportBtn = document.getElementById('hscode-direction-export');
-    const importBtn = document.getElementById('hscode-direction-import');
-    const countrySelect = document.getElementById('hscode-trade-country');
-    if (!exportBtn || !importBtn) {
-        return;
-    }
+    const params = new URLSearchParams(window.location.search || '');
+    selectedFromCountry = params.get('from') || selectedFromCountry;
+    selectedToCountry = params.get('to') || params.get('country') || selectedToCountry;
+    selectedComplianceFocus = params.get('focus') || 'import';
 
-    const applyDirection = (direction) => {
-        selectedDirection = direction === 'import' ? 'import' : 'export';
-        exportBtn.classList.toggle('active', selectedDirection === 'export');
-        importBtn.classList.toggle('active', selectedDirection === 'import');
-        populateHscodeCountrySelect(selectedDirection);
+    const syncFromControls = () => {
+        const from = document.querySelector('[data-route-country="from"]')?.value || selectedFromCountry || 'CN';
+        const to = document.querySelector('[data-route-country="to"]')?.value || selectedToCountry || 'US';
+        applyHscodeRouteState(from, to, selectedComplianceFocus || 'import');
     };
 
-    exportBtn.addEventListener('click', () => applyDirection('export'));
-    importBtn.addEventListener('click', () => applyDirection('import'));
+    document.querySelectorAll('[data-route-country]').forEach((select) => {
+        select.addEventListener('change', syncFromControls);
+    });
 
-    if (countrySelect) {
-        countrySelect.addEventListener('change', () => {
-            selectedCountry = countrySelect.value;
-        });
-    }
-
-    populateHscodeCountrySelect(selectedDirection);
+    applyHscodeRouteState(selectedFromCountry, selectedToCountry, selectedComplianceFocus);
 }
 
 function buildComplianceUrl(hscode) {
@@ -129,6 +134,9 @@ function buildComplianceUrl(hscode) {
     params.set('search', search);
     params.set('direction', getSelectedDirection());
     params.set('country', selectedCountry || 'US');
+    params.set('from', selectedFromCountry || 'CN');
+    params.set('to', selectedToCountry || 'US');
+    params.set('focus', selectedComplianceFocus || 'import');
     if (lastClassification) {
         const china = lastClassification.china_code || lastClassification.hscode || '';
         const cp = lastClassification.counterparty_code || '';
@@ -207,12 +215,10 @@ function renderHscodeChecklist(classification) {
 
 function buildHscodePrintReport() {
     const countryApi = globalThis.TradeComplyCountry;
-    const countryLabel = countryApi
-        ? countryApi.getCountryLabel(selectedCountry)
-        : selectedCountry;
+    const route = getSelectedRouteContext();
     const flowLabel = typeof buildFlowLabel === 'function'
         ? buildFlowLabel(getSelectedDirection(), selectedCountry)
-        : `CN → ${countryLabel}`;
+        : `${route.fromLabel || route.from} → ${route.toLabel || route.to}`;
     return {
         productQuery: lastClassification?.official_name || lastProductDescription || 'HS classification',
         flowLabel,
@@ -239,7 +245,10 @@ function enrichResultClient(classification) {
     if (globalThis.TradeComplyHsDual) {
         return globalThis.TradeComplyHsDual.enrichClassification(classification, {
             direction: getSelectedDirection(),
-            counterpartyCountry: selectedCountry
+            counterpartyCountry: selectedCountry,
+            fromCountry: selectedFromCountry,
+            toCountry: selectedToCountry,
+            focus: selectedComplianceFocus
         });
     }
     return classification;
@@ -367,7 +376,12 @@ async function classifyProduct() {
                 action: 'hscode_classify',
                 description,
                 direction: getSelectedDirection(),
-                counterparty_country: selectedCountry
+                counterparty_country: selectedCountry,
+                route_from_country: selectedFromCountry,
+                route_to_country: selectedToCountry,
+                compliance_focus: selectedComplianceFocus,
+                origin_country: selectedFromCountry,
+                destination_country: selectedToCountry
             }),
             signal: controller.signal
         });

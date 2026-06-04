@@ -14,7 +14,12 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     mountResultSummary(document.querySelector('.result-summary p'), viewModel.resultSummary);
 
     if (typeof renderCountryContextBanner === 'function') {
-        renderCountryContextBanner(tags, viewModel.selectedCountry, viewModel.direction);
+        renderCountryContextBanner(
+            tags,
+            viewModel.selectedCountry,
+            viewModel.direction,
+            viewModel.renderContext?.routeContext
+        );
     }
 
     const preScreenReport = typeof orchestratePreScreenReport === 'function'

@@ -1,39 +1,178 @@
 {
   "version": 1,
   "updated_at": "2026-05-29T00:00:00.000Z",
-  "canonical_codes": ["US", "EU", "ASEAN", "RU", "TW", "JP", "KR", "GLOBAL"],
+  "canonical_codes": [
+    "CN",
+    "US",
+    "EU",
+    "DE",
+    "NL",
+    "SG",
+    "MX",
+    "VN",
+    "MY",
+    "ASEAN",
+    "RU",
+    "TW",
+    "JP",
+    "KR",
+    "GLOBAL"
+  ],
+  "route_options": [
+    {
+      "value": "CN",
+      "label": "China"
+    },
+    {
+      "value": "US",
+      "label": "United States"
+    },
+    {
+      "value": "DE",
+      "label": "Germany"
+    },
+    {
+      "value": "NL",
+      "label": "Netherlands"
+    },
+    {
+      "value": "SG",
+      "label": "Singapore"
+    },
+    {
+      "value": "MX",
+      "label": "Mexico"
+    },
+    {
+      "value": "VN",
+      "label": "Vietnam"
+    },
+    {
+      "value": "MY",
+      "label": "Malaysia"
+    },
+    {
+      "value": "ASEAN",
+      "label": "ASEAN"
+    },
+    {
+      "value": "EU",
+      "label": "European Union"
+    },
+    {
+      "value": "RU",
+      "label": "Russia"
+    },
+    {
+      "value": "TW",
+      "label": "Taiwan (China)"
+    },
+    {
+      "value": "JP",
+      "label": "Japan"
+    },
+    {
+      "value": "KR",
+      "label": "South Korea"
+    },
+    {
+      "value": "GLOBAL",
+      "label": "Other"
+    }
+  ],
   "export_options": [
-    { "value": "US", "label": "United States" },
-    { "value": "EU", "label": "European Union" },
-    { "value": "ASEAN", "label": "ASEAN (Vietnam / Malaysia)" },
-    { "value": "RU", "label": "Russia" },
-    { "value": "GLOBAL", "label": "Other" }
+    {
+      "value": "US",
+      "label": "United States"
+    },
+    {
+      "value": "EU",
+      "label": "European Union"
+    },
+    {
+      "value": "VN",
+      "label": "Vietnam"
+    },
+    {
+      "value": "MY",
+      "label": "Malaysia"
+    },
+    {
+      "value": "ASEAN",
+      "label": "ASEAN"
+    },
+    {
+      "value": "RU",
+      "label": "Russia"
+    },
+    {
+      "value": "GLOBAL",
+      "label": "Other"
+    }
   ],
   "import_options": [
-    { "value": "TW", "label": "Taiwan (China)" },
-    { "value": "JP", "label": "Japan" },
-    { "value": "KR", "label": "South Korea" },
-    { "value": "US", "label": "United States" },
-    { "value": "GLOBAL", "label": "Other" }
+    {
+      "value": "TW",
+      "label": "Taiwan (China)"
+    },
+    {
+      "value": "JP",
+      "label": "Japan"
+    },
+    {
+      "value": "KR",
+      "label": "South Korea"
+    },
+    {
+      "value": "VN",
+      "label": "Vietnam"
+    },
+    {
+      "value": "MY",
+      "label": "Malaysia"
+    },
+    {
+      "value": "US",
+      "label": "United States"
+    },
+    {
+      "value": "GLOBAL",
+      "label": "Other"
+    }
   ],
   "label_to_code": {
     "United States": "US",
+    "China": "CN",
+    "Germany": "DE",
+    "Netherlands": "NL",
+    "Singapore": "SG",
+    "Mexico": "MX",
     "European Union": "EU",
     "ASEAN (Vietnam / Malaysia)": "ASEAN",
     "Russia": "RU",
     "Taiwan (China)": "TW",
     "Japan": "JP",
     "South Korea": "KR",
-    "Other": "GLOBAL"
+    "Other": "GLOBAL",
+    "Vietnam": "VN",
+    "Malaysia": "MY"
   },
   "aliases": {
     "USA": "US",
     "UNITED STATES": "US",
     "U.S.": "US",
+    "CN": "CN",
+    "CHINA": "CN",
+    "GERMANY": "DE",
+    "DEUTSCHLAND": "DE",
+    "NETHERLANDS": "NL",
+    "HOLLAND": "NL",
+    "SINGAPORE": "SG",
+    "MEXICO": "MX",
     "EUROPE": "EU",
     "EUROPEAN UNION": "EU",
-    "VIETNAM": "ASEAN",
-    "MALAYSIA": "ASEAN",
+    "VIETNAM": "VN",
+    "MALAYSIA": "MY",
     "SOUTHEAST ASIA": "ASEAN",
     "RUSSIA": "RU",
     "RUSSIAN FEDERATION": "RU",
@@ -46,18 +185,25 @@
     "OTHER": "GLOBAL",
     "OTHERS": "GLOBAL",
     "GLOBAL": "GLOBAL",
-    "CN": "GLOBAL",
-    "CHINA": "GLOBAL"
+    "VIET NAM": "VN",
+    "VN": "VN",
+    "MY": "MY"
   },
   "market_themes": {
     "US": "FCC certification (Part 15/18); Section 301 tariff risk; BIS export controls & Entity List",
     "EU": "CE/RED conformity; RoHS & REACH; WEEE producer responsibility; EU TARIC alignment",
+    "DE": "EU single market requirements; CE/RED, RoHS/REACH, WEEE, and German market surveillance",
+    "NL": "EU single market requirements; CE/RED, RoHS/REACH, WEEE, and Dutch customs/logistics checks",
+    "SG": "Singapore IMDA telecom approval, safety standards, strategic goods controls, and re-export screening",
+    "MX": "Mexico NOM standards, customs valuation/origin, IMMEX exposure, and USMCA route sensitivity",
     "ASEAN": "Rules of origin (Form E/RCEP); transshipment & anti-circumvention for Vietnam/Malaysia routes",
     "RU": "Dual-use controls; international sanctions red lines; embargoed electronic components",
     "TW": "Cross-strait semiconductor licensing; special technology transfer permits",
     "JP": "PSE electrical safety; TELEC radio approval; Japan-origin fab equipment import controls",
     "KR": "KC unified national certification; Korea-origin memory/semiconductor screening",
-    "GLOBAL": "General China import/export baseline; CCC/SRRC/CEL where applicable"
+    "GLOBAL": "General China import/export baseline; CCC/SRRC/CEL where applicable",
+    "VN": "Vietnam MIC ICT/radio conformity, MOIT energy labeling, customs classification, and battery/ESS import checks",
+    "MY": "Malaysia MCMC/SIRIM telecom approval, ST electrical safety COA, customs classification, and battery/ESS import checks"
   },
   "compliance_focus": {
     "RU": {
@@ -85,6 +231,26 @@
       "export": "Include EU TARIC alignment, CBAM reporting, and dual-use export screening.",
       "import": "Check EU-origin controlled technology and REACH-related obligations where relevant."
     },
+    "DE": {
+      "priority": "medium",
+      "export": "Apply EU export controls plus Germany-specific customs and market-surveillance checks where relevant.",
+      "import": "Review Germany-origin technology, CE/RoHS/REACH evidence, and EU dual-use re-export conditions."
+    },
+    "NL": {
+      "priority": "medium",
+      "export": "Apply EU export controls plus Netherlands logistics, transit, and customs documentation checks.",
+      "import": "Review Netherlands-origin or EU-transit goods for EU compliance evidence and re-export conditions."
+    },
+    "SG": {
+      "priority": "medium",
+      "export": "Screen Singapore strategic goods controls, IMDA telecom approval, and re-export requirements.",
+      "import": "Check Singapore-origin electronics for strategic-goods, telecom, and safety documentation."
+    },
+    "MX": {
+      "priority": "medium",
+      "export": "Screen Mexico NOM, customs/origin, and USMCA supply-chain implications for outbound shipments.",
+      "import": "Check Mexico-origin electronics for NOM evidence, origin documentation, and customs valuation support."
+    },
     "JP": {
       "priority": "medium",
       "import": "Screen Japan-origin semiconductor manufacturing equipment and controlled technology items.",
@@ -99,6 +265,16 @@
       "priority": "low",
       "export": "Apply general China export compliance baseline when no specific destination rule matches.",
       "import": "Apply general China import baseline for unspecified origins."
+    },
+    "VN": {
+      "priority": "medium",
+      "export": "Screen Vietnam origin, export documentation, and ASEAN transshipment/origin exposure where relevant.",
+      "import": "Check Vietnam MIC ICT/radio conformity, MOIT energy labeling, customs classification, and battery/ESS import requirements."
+    },
+    "MY": {
+      "priority": "medium",
+      "export": "Screen Malaysia origin, export documentation, and ASEAN transshipment/origin exposure where relevant.",
+      "import": "Check Malaysia MCMC/SIRIM telecom approval, ST electrical safety COA, customs classification, and battery/ESS import requirements."
     }
   }
 }

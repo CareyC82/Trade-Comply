@@ -41,7 +41,22 @@ function getCategoryPageKey() {
     return 'electronics';
 }
 
-function buildCategorySearchUrl(query, direction, country, vertical) {
+function getCategoryRouteSelection() {
+    if (typeof syncRouteControls === 'function') {
+        return syncRouteControls(
+            (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('from')?.value : document.querySelector('[data-route-country="from"]')?.value) || 'CN',
+            (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('to')?.value : document.querySelector('[data-route-country="to"]')?.value) || 'US',
+            (typeof getActiveFocusButton === 'function' ? getActiveFocusButton()?.dataset.complianceFocus : document.querySelector('[data-compliance-focus].active')?.dataset.complianceFocus) || 'import'
+        );
+    }
+    const focus = document.getElementById('direction-import')?.classList.contains('active') ? 'export' : 'import';
+    const from = document.querySelector('[data-route-country="from"]')?.value || 'CN';
+    const to = document.querySelector('[data-route-country="to"]')?.value || 'US';
+    const country = focus === 'import' ? to : from;
+    return { from, to, focus, direction: focus === 'export' ? 'export' : 'export', country };
+}
+
+function buildCategorySearchUrl(query, direction, country, vertical, routeContext = null) {
     const params = new URLSearchParams();
     params.set('appv', globalThis.TradeComplyBuild || 'current');
     const trimmed = (query || '').trim();
@@ -50,6 +65,11 @@ function buildCategorySearchUrl(query, direction, country, vertical) {
     }
     params.set('direction', direction === 'import' ? 'import' : 'export');
     params.set('country', country || 'US');
+    if (routeContext) {
+        params.set('from', routeContext.from || 'CN');
+        params.set('to', routeContext.to || 'US');
+        params.set('focus', routeContext.focus === 'export' ? 'export' : 'import');
+    }
     params.set('vertical', vertical || 'electronics');
     return `index.html?${params.toString()}`;
 }
@@ -59,15 +79,11 @@ function redirectCategorySearch(query, verticalOverride) {
     if (!config) {
         return;
     }
-    const direction = document.getElementById('direction-import')?.classList.contains('active')
-        ? 'import'
-        : 'export';
-    const countrySelect = document.getElementById('trade-country');
-    const country = countrySelect?.value || 'US';
+    const route = getCategoryRouteSelection();
     const vertical = ['electronics', 'new-energy', 'semiconductor'].includes(verticalOverride)
         ? verticalOverride
         : config.vertical;
-    const url = buildCategorySearchUrl(query, direction, country, vertical);
+    const url = buildCategorySearchUrl(query, route.direction, route.country, vertical, route);
     window.location.href = url;
 }
 
@@ -79,21 +95,21 @@ function bindCategoryDirectionToggle() {
     }
 
     exportBtn.addEventListener('click', () => {
-        AppState.currentDirection = 'export';
+        const route = typeof syncRouteControls === 'function'
+            ? syncRouteControls(undefined, undefined, 'import')
+            : null;
+        AppState.currentDirection = route?.direction || 'export';
         exportBtn.classList.add('active');
         importBtn.classList.remove('active');
-        if (typeof syncTradeCountrySelects === 'function') {
-            syncTradeCountrySelects('export');
-        }
     });
 
     importBtn.addEventListener('click', () => {
-        AppState.currentDirection = 'import';
+        const route = typeof syncRouteControls === 'function'
+            ? syncRouteControls(undefined, undefined, 'export')
+            : null;
+        AppState.currentDirection = route?.direction || 'export';
         importBtn.classList.add('active');
         exportBtn.classList.remove('active');
-        if (typeof syncTradeCountrySelects === 'function') {
-            syncTradeCountrySelects('import');
-        }
     });
 }
 
@@ -138,14 +154,13 @@ function bootstrapCategoryPage() {
     if (typeof initTradeCountryForDirection === 'function') {
         initTradeCountryForDirection('export', 'US');
     }
+    if (typeof initRouteControls === 'function') {
+        initRouteControls('CN', 'US', 'import');
+    }
 
     bindCategoryDirectionToggle();
     bindCategorySearch();
     bindCategoryFeedback();
-
-    if (typeof initIndustryScenarioPills === 'function') {
-        initIndustryScenarioPills();
-    }
 
     if (typeof renderQuickSelectGrid === 'function') {
         renderQuickSelectGrid('category-quick-select-container', {

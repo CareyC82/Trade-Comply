@@ -34,7 +34,8 @@ async function loadApplicationDataBundle() {
         updates,
         catalogSchema,
         scopeConfig,
-        catalogArtifact
+        catalogArtifact,
+        coverageMatrix
     ] = await Promise.all([
         fetchJsonSafe('data/tags.json', []),
         fetchJsonSafe('data/cases.json', []),
@@ -44,8 +45,13 @@ async function loadApplicationDataBundle() {
         fetchJsonSafe('data/updates.json', []),
         fetchJsonSafe('data/catalog.schema.json', {}),
         fetchJsonSafe('data/scope-keywords.json', {}),
-        fetchJsonSafe('data/catalog.json', null)
+        fetchJsonSafe('data/catalog.json', null),
+        fetchJsonSafe('data/coverage-matrix.json', null)
     ]);
+
+    if (coverageMatrix && globalThis.TradeComplyCountryRegistry?.setCoverageMatrix) {
+        globalThis.TradeComplyCountryRegistry.setCoverageMatrix(coverageMatrix);
+    }
 
     const enrichedTags = (tags || []).map((tag) => {
         if (typeof enrichTagForCountryPanel === 'function') {

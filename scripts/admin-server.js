@@ -40,6 +40,8 @@ let envFiles = loadLocalEnvFiles(ROOT);
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
 const ADMIN_BUILD_ID = '20260603-global-compliance-crawler-v1';
 const LOG_PREFIX = '[GLOBAL-CRAWL]';
+const COVERAGE_MATRIX_PATH = path.join(ROOT, 'data', 'coverage-matrix.json');
+const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
 function refreshLocalEnv() {
@@ -218,6 +220,93 @@ async function handleReviewCrawlSummary(req, res) {
     sendJson(res, 200, buildCrawlSummary(ROOT));
 }
 
+function readJsonFile(filePath, fallback = {}) {
+    try {
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (error) {
+        return fallback;
+    }
+}
+
+function getAllowedCoverageCodes() {
+    const registry = readJsonFile(path.join(ROOT, 'data', 'country-registry.json'), {});
+    const routeOptions = Array.isArray(registry.route_options) ? registry.route_options : [];
+    return new Set([
+        ...routeOptions.map((row) => row?.value).filter(Boolean),
+        'GLOBAL'
+    ]);
+}
+
+function normalizeCoveragePayload(body) {
+    const source = body?.matrix && typeof body.matrix === 'object' ? body.matrix : body;
+    if (!source || typeof source !== 'object') {
+        throw new Error('matrix object is required');
+    }
+    const allowedCodes = getAllowedCoverageCodes();
+    const out = { import: {}, export: {} };
+
+    ['import', 'export'].forEach((focus) => {
+        const focusMatrix = source[focus];
+        if (!focusMatrix || typeof focusMatrix !== 'object' || Array.isArray(focusMatrix)) {
+            throw new Error(`${focus} matrix is required`);
+        }
+        Object.entries(focusMatrix).forEach(([rawCode, rawLevel]) => {
+            const code = String(rawCode || '').trim().toUpperCase();
+            const level = String(rawLevel || '').trim().toLowerCase();
+            if (!allowedCodes.has(code)) {
+                throw new Error(`Unsupported coverage country code: ${code}`);
+            }
+            if (!COVERAGE_LEVELS.has(level)) {
+                throw new Error(`Unsupported coverage level for ${focus}.${code}: ${rawLevel}`);
+            }
+            out[focus][code] = level;
+        });
+        if (!out[focus].GLOBAL) {
+            out[focus].GLOBAL = 'baseline';
+        }
+    });
+
+    return out;
+}
+
+async function handleCoverageMatrix(req, res) {
+    if (req.method === 'GET') {
+        sendJson(res, 200, readJsonFile(COVERAGE_MATRIX_PATH, {
+            version: 1,
+            updated_at: null,
+            matrix: { import: { GLOBAL: 'baseline' }, export: { GLOBAL: 'baseline' } }
+        }));
+        return;
+    }
+
+    if (req.method !== 'POST') {
+        sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+        return;
+    }
+
+    let body;
+    try {
+        body = await readBody(req);
+        const current = readJsonFile(COVERAGE_MATRIX_PATH, { version: 1, levels: {} });
+        const matrix = normalizeCoveragePayload(body);
+        const payload = {
+            version: Number(current.version || 1),
+            updated_at: new Date().toISOString(),
+            levels: current.levels || {},
+            matrix
+        };
+        fs.writeFileSync(COVERAGE_MATRIX_PATH, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+        sendJson(res, 200, {
+            ok: true,
+            message: 'Coverage matrix saved',
+            path: COVERAGE_MATRIX_PATH,
+            payload
+        });
+    } catch (error) {
+        sendJson(res, 400, { ok: false, error: error.message });
+    }
+}
+
 async function handleReviewApproveReject(req, res, urlPath) {
     let body;
     try {
@@ -305,6 +394,11 @@ async function handleApi(req, res) {
 
         if (req.method === 'GET' && urlPath === '/api/review/crawl-summary') {
             await handleReviewCrawlSummary(req, res);
+            return;
+        }
+
+        if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/api/review/coverage-matrix') {
+            await handleCoverageMatrix(req, res);
             return;
         }
 

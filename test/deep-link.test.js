@@ -25,6 +25,15 @@ describe('deep-link', () => {
         assert.equal(link.country, 'US');
     });
 
+    it('reads route countries and compliance focus from query string', () => {
+        const link = getInboundDeepLinkFromSearch(
+            '?search=tablet&from=NL&to=US&focus=import&direction=export&country=US'
+        );
+        assert.equal(link.routeFrom, 'NL');
+        assert.equal(link.routeTo, 'US');
+        assert.equal(link.focus, 'import');
+    });
+
     it('supports legacy hs + autoSearch deep link', () => {
         const link = getInboundDeepLinkFromSearch('?hs=854140&autoSearch=1&direction=export');
         assert.equal(link.query, '854140');

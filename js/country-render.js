@@ -48,7 +48,7 @@ function buildTagCountryDisplayMeta(tag, selectedCountry, direction) {
     };
 }
 
-function renderCountryContextBanner(tags, selectedCountry, direction) {
+function renderCountryContextBanner(tags, selectedCountry, direction, routeContext = null) {
     const banner = document.getElementById('country-context-banner');
     if (!banner) {
         return;
@@ -63,19 +63,29 @@ function renderCountryContextBanner(tags, selectedCountry, direction) {
 
     const coverage = api.analyzeCountryCoverage(tags, selectedCountry, direction);
     const message = api.buildCountryContextMessage(coverage);
-    if (!message) {
+    const indicator = typeof api.buildCoverageIndicator === 'function'
+        ? api.buildCoverageIndicator(coverage, routeContext)
+        : null;
+    if (!message && !indicator) {
         banner.hidden = true;
         banner.innerHTML = '';
         return;
     }
 
+    const level = indicator?.level || (coverage.exactCount > 0 ? 'partial' : 'baseline');
     const variant = coverage.exactCount > 0 ? 'country-context-banner--matched' : 'country-context-banner--fallback';
-    banner.className = `country-context-banner ${variant}`;
+    const metaText = indicator
+        ? `Route-specific matches: ${indicator.exactCount} · Baseline matches: ${indicator.baselineCount}`
+        : message;
+    banner.className = `country-context-banner ${variant} country-context-banner--${level}`;
     banner.hidden = false;
     banner.innerHTML = `
-        <span class="country-context-banner__icon" aria-hidden="true">🌐</span>
-        <span class="country-context-banner__text">${escapeHtml(message)}</span>
-        <span class="country-context-banner__meta">Selected ${escapeHtml(coverage.roleLabel)}: <strong>${escapeHtml(coverage.selectedLabel)}</strong></span>
+        <span class="coverage-badge coverage-badge--${escapeHtml(level)}">${escapeHtml(indicator?.label || 'Coverage')}</span>
+        <span class="country-context-banner__text">
+            <strong>${escapeHtml(indicator?.routeLine || `Selected ${coverage.roleLabel}: ${coverage.selectedLabel}`)}</strong>
+            <span>${escapeHtml(indicator?.message || message)}</span>
+        </span>
+        <span class="country-context-banner__meta">${escapeHtml(metaText)}</span>
     `;
 }
 
