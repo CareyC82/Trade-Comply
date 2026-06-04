@@ -1,6 +1,6 @@
 # Trade Comply
 
-Import/export compliance pre-checks for electronics and semiconductors. Current coverage starts with China.
+Global import/export compliance pre-checks for electronics and semiconductor supply chains.
 
 This is a free, front-end-first pre-screening tool for companies that ship, source, import, export, or support cross-border trade in electronics, semiconductors, wireless devices, batteries, UAV-related products, and advanced manufacturing items.
 

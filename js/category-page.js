@@ -62,6 +62,7 @@ function buildCategorySearchUrl(query, direction, country, vertical, routeContex
     const trimmed = (query || '').trim();
     if (trimmed) {
         params.set('search', trimmed);
+        params.set('autoSearch', '1');
     }
     params.set('direction', direction === 'import' ? 'import' : 'export');
     params.set('country', country || 'US');
@@ -71,7 +72,7 @@ function buildCategorySearchUrl(query, direction, country, vertical, routeContex
         params.set('focus', routeContext.focus === 'export' ? 'export' : 'import');
     }
     params.set('vertical', vertical || 'electronics');
-    return `index.html?${params.toString()}`;
+    return `index.html?${params.toString()}#result`;
 }
 
 function redirectCategorySearch(query, verticalOverride) {

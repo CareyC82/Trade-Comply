@@ -1,7 +1,7 @@
 // === English UI strings ===
 const UI_STRINGS = {
     title: "TraceWize",
-    subtitle: "Import/export compliance pre-checks for electronics and semiconductors. Current coverage starts with China.",
+    subtitle: "Global import/export compliance pre-checks for electronics and semiconductor supply chains.",
     export: "Export from China",
     import: "Import into China",
     searchPlaceholder: "Enter product, HS Code, or risk feature",
