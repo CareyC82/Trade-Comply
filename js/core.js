@@ -376,7 +376,21 @@ const CATEGORY_THEME = {
     OTHER: { class: 'other', icon: '📦' }
 };
 
-function getCategoryTheme(categoryCode) {
+const CATEGORY_LABEL_THEME_RULES = [
+    { pattern: /battery|ess|energy storage/, theme: { class: 'battery-ess', icon: '🔋' } },
+    { pattern: /destination barrier/, theme: { class: 'destination-barrier', icon: '🚧' } },
+    { pattern: /import regulation|import control|trade remed|tariff|ad\/cvd/, theme: { class: 'import-regulation', icon: '📦' } },
+    { pattern: /compliance standard|standard/, theme: { class: 'compliance-standard', icon: '📘' } },
+    { pattern: /product compliance|product safety/, theme: { class: 'product-compliance', icon: '📄' } },
+    { pattern: /ev charger|wallbox|charging/, theme: { class: 'ev-charger', icon: '🔌' } },
+    { pattern: /optical|laser/, theme: { class: 'optical-laser', icon: '🔦' } },
+    { pattern: /drone|uav|uas|unmanned aircraft/, theme: { class: 'drone-uav', icon: '🛩️' } }
+];
+
+function getCategoryTheme(categoryCode, categoryLabel = '') {
+    const normalizedLabel = String(categoryLabel || '').toLowerCase();
+    const labelTheme = CATEGORY_LABEL_THEME_RULES.find((rule) => rule.pattern.test(normalizedLabel));
+    if (labelTheme) return labelTheme.theme;
     return CATEGORY_THEME[categoryCode] || CATEGORY_THEME.OTHER;
 }
 

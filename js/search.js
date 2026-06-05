@@ -166,12 +166,77 @@ function tagProductRelevanceText(tag) {
     ].filter(Boolean).join(' ').toLowerCase();
 }
 
+function isDroneSpecificTag(tag) {
+    const text = [
+        tag?.tag_id,
+        tag?.category_label,
+        tag?.short_name,
+        tag?.short_description
+    ].filter(Boolean).join(' ').toLowerCase();
+    return /\b(drone|uav|uas|unmanned aircraft|quadcopter)\b/.test(text);
+}
+
+function queryHasDroneIntent(productTerms) {
+    const terms = new Set(productTerms || []);
+    return ['drone', 'uav', 'uas', 'quadcopter'].some((term) => terms.has(term));
+}
+
 function tagMatchesProductTerms(tag, productTerms) {
     if (!productTerms || productTerms.length === 0) {
         return true;
     }
+    if (isDroneSpecificTag(tag) && !queryHasDroneIntent(productTerms)) {
+        return false;
+    }
     const text = tagProductRelevanceText(tag);
-    return productTerms.some((term) => text.includes(term));
+    const currentAppState = typeof AppState !== 'undefined' ? AppState : null;
+    const normalizedQuery = String(currentAppState?.lastSearchRelevanceQuery || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const keywords = (tag?.related_keywords || []).map((keyword) => String(keyword || '').toLowerCase().trim());
+    if (normalizedQuery && keywords.some((keyword) => keyword.length >= 5 && normalizedQuery.includes(keyword))) {
+        return true;
+    }
+    const matches = productTerms.filter((term) => text.includes(term));
+    if (productTerms.length >= 3) {
+        return matches.length >= 2;
+    }
+    return matches.length > 0;
+}
+
+function scoreTagProductRelevance(tag, query) {
+    const normalizedQuery = String(query || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const terms = getProductRelevanceTerms(query);
+    if (!normalizedQuery || terms.length === 0) {
+        return 0;
+    }
+
+    const text = tagProductRelevanceText(tag);
+    const keywords = (tag?.related_keywords || []).map((keyword) => String(keyword || '').toLowerCase());
+    let score = 0;
+
+    if (keywords.includes(normalizedQuery)) {
+        score += 80;
+    } else if (text.includes(normalizedQuery)) {
+        score += 60;
+    }
+
+    const matchedTerms = terms.filter((term) => text.includes(term));
+    score += matchedTerms.length * 12;
+    if (matchedTerms.length === terms.length) {
+        score += 35;
+    }
+
+    keywords.forEach((keyword) => {
+        if (!keyword) return;
+        terms.forEach((term) => {
+            if (keyword === term) {
+                score += 10;
+            } else if (keyword.includes(term)) {
+                score += 4;
+            }
+        });
+    });
+
+    return score;
 }
 
 function filterTagsByProductRelevance(tags, query) {
@@ -179,7 +244,49 @@ function filterTagsByProductRelevance(tags, query) {
     if (terms.length === 0) {
         return tags || [];
     }
+    if (typeof AppState !== 'undefined') {
+        AppState.lastSearchRelevanceQuery = query;
+    }
     return (tags || []).filter((tag) => tagMatchesProductTerms(tag, terms));
+}
+
+function buildCurrentRouteContext(selectedCountry = 'US') {
+    return {
+        from: AppState.routeFromCountry || 'CN',
+        to: AppState.routeToCountry || selectedCountry || 'US',
+        focus: AppState.complianceFocus || ''
+    };
+}
+
+function sortTagsForDisplay(tags, selectedCountry = 'US', routeContext = {}, query = '') {
+    const countryApi = globalThis.TradeComplyCountry;
+    const riskOrder = { High: 3, Medium: 2, Low: 1 };
+    return [...(tags || [])].sort((a, b) => {
+        const countryA = countryApi ? countryApi.countryPriorityScore(a, selectedCountry, routeContext) : 0;
+        const countryB = countryApi ? countryApi.countryPriorityScore(b, selectedCountry, routeContext) : 0;
+        if (countryB !== countryA) {
+            return countryB - countryA;
+        }
+
+        const relevanceA = scoreTagProductRelevance(a, query);
+        const relevanceB = scoreTagProductRelevance(b, query);
+        if (relevanceB !== relevanceA) {
+            return relevanceB - relevanceA;
+        }
+
+        const riskA = riskOrder[a.risk_level] || 1;
+        const riskB = riskOrder[b.risk_level] || 1;
+        if (riskB !== riskA) {
+            return riskB - riskA;
+        }
+
+        const typeOrderA = a.tag_type === 'MATCHED' ? 1 : 0;
+        const typeOrderB = b.tag_type === 'MATCHED' ? 1 : 0;
+        if (typeOrderB !== typeOrderA) return typeOrderB - typeOrderA;
+        const orderA = a.display_order || a.order || 999;
+        const orderB = b.display_order || b.order || 999;
+        return orderA - orderB;
+    });
 }
 
 /**
@@ -219,11 +326,7 @@ function search(query) {
 
     const selectedCountry = AppState.currentCountry || 'US';
     const countryApi = globalThis.TradeComplyCountry;
-    const routeContext = {
-        from: AppState.routeFromCountry || 'CN',
-        to: AppState.routeToCountry || selectedCountry || 'US',
-        focus: AppState.complianceFocus || ''
-    };
+    const routeContext = buildCurrentRouteContext(selectedCountry);
 
     if (countryApi?.filterTagsForSelectedCountry) {
         matchedTags = countryApi.filterTagsForSelectedCountry(matchedTags, selectedCountry, routeContext);
@@ -257,28 +360,7 @@ function search(query) {
         }
     }
 
-    // Sort: country match first, then risk level, then legacy order
-    matchedTags.sort((a, b) => {
-        const countryA = countryApi ? countryApi.countryPriorityScore(a, selectedCountry, routeContext) : 0;
-        const countryB = countryApi ? countryApi.countryPriorityScore(b, selectedCountry, routeContext) : 0;
-        if (countryB !== countryA) {
-            return countryB - countryA;
-        }
-
-        const riskOrder = { High: 3, Medium: 2, Low: 1 };
-        const riskA = riskOrder[a.risk_level] || 1;
-        const riskB = riskOrder[b.risk_level] || 1;
-        if (riskB !== riskA) {
-            return riskB - riskA;
-        }
-
-        const typeOrderA = a.tag_type === 'MATCHED' ? 1 : 0;
-        const typeOrderB = b.tag_type === 'MATCHED' ? 1 : 0;
-        if (typeOrderB !== typeOrderA) return typeOrderB - typeOrderA;
-        const orderA = a.display_order || a.order || 999;
-        const orderB = b.display_order || b.order || 999;
-        return orderA - orderB;
-    });
+    matchedTags = sortTagsForDisplay(matchedTags, selectedCountry, routeContext, query);
 
     const caseScoreFn = globalThis.TradeComplyMatchedResults?.scoreCaseAgainstQuery;
 
@@ -388,11 +470,7 @@ function mergeById(items, getId) {
 function applyCountryFilterToSearchResults(results) {
     const selectedCountry = AppState.currentCountry || 'US';
     const countryApi = globalThis.TradeComplyCountry;
-    const routeContext = {
-        from: AppState.routeFromCountry || 'CN',
-        to: AppState.routeToCountry || selectedCountry || 'US',
-        focus: AppState.complianceFocus || ''
-    };
+    const routeContext = buildCurrentRouteContext(selectedCountry);
     const enrichApi = globalThis.TradeComplyMatchedResults;
     if (countryApi?.filterTagsForSelectedCountry) {
         const filteredTags = countryApi.filterTagsForSelectedCountry(results.tags, selectedCountry, routeContext);
@@ -436,7 +514,13 @@ function searchWithPrecheck(query, selections, searchFn = search, relevanceQuery
         tags: mergeById([...relevantBaseTags, ...relevantPrecheckTags], tag => tag.tag_id),
         cases: mergeById([...baseResults.cases, ...precheckResults.cases], caseItem => caseItem.case_id)
     };
-    return applyCountryFilterToSearchResults(allResults);
+    const filtered = applyCountryFilterToSearchResults(allResults);
+    const selectedCountry = AppState.currentCountry || 'US';
+    const routeContext = buildCurrentRouteContext(selectedCountry);
+    return {
+        ...filtered,
+        tags: sortTagsForDisplay(filtered.tags, selectedCountry, routeContext, relevanceAnchor)
+    };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -449,8 +533,10 @@ if (typeof module !== 'undefined' && module.exports) {
         applyPrecheckSelections,
         buildPrecheckQuery,
         getProductRelevanceTerms,
+        scoreTagProductRelevance,
         tagMatchesProductTerms,
         filterTagsByProductRelevance,
+        sortTagsForDisplay,
         mergeById,
         applyCountryFilterToSearchResults,
         searchWithPrecheck

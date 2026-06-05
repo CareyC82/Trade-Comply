@@ -3,13 +3,6 @@
  */
 function setDirection(direction) {
     AppState.currentDirection = direction;
-    const exportBtn = document.getElementById('direction-export');
-    const importBtn = document.getElementById('direction-import');
-    
-    if (exportBtn && importBtn) {
-        exportBtn.classList.toggle('active', direction === 'export');
-        importBtn.classList.toggle('active', direction === 'import');
-    }
 
     if (typeof syncTradeCountrySelects === 'function') {
         syncTradeCountrySelects(direction);
@@ -55,7 +48,7 @@ function applyView(view) {
         initRouteControls(
             AppState.routeFromCountry || 'CN',
             AppState.routeToCountry || AppState.currentCountry || 'US',
-            AppState.complianceFocus || 'import'
+            AppState.complianceFocus || ''
         );
     }
     window.scrollTo(0, 0);
@@ -189,12 +182,6 @@ function bindEvents() {
         bindCollapsiblePanels(resultView);
     }
 
-    // Direction toggle
-    const exportBtn = document.getElementById('direction-export');
-    if (exportBtn) exportBtn.addEventListener('click', () => setDirection('export'));
-    const importBtn = document.getElementById('direction-import');
-    if (importBtn) importBtn.addEventListener('click', () => setDirection('import'));
-
     if (typeof bindTradeCountryControls === 'function') {
         bindTradeCountryControls();
     }
@@ -234,28 +221,6 @@ function bindEvents() {
     // Hub cards navigate to dedicated category pages (electronics.html, etc.)
 
     // New Energy Events
-    const energyExportBtn = document.getElementById('direction-export-energy');
-    const energyImportBtn = document.getElementById('direction-import-energy');
-    if (energyExportBtn) {
-        energyExportBtn.addEventListener('click', () => {
-            AppState.currentDirection = 'export';
-            energyExportBtn.classList.add('active');
-            energyImportBtn?.classList.remove('active');
-            if (typeof syncTradeCountrySelects === 'function') {
-                syncTradeCountrySelects('export');
-            }
-        });
-    }
-    if (energyImportBtn) {
-        energyImportBtn.addEventListener('click', () => {
-            AppState.currentDirection = 'import';
-            energyImportBtn.classList.add('active');
-            energyExportBtn?.classList.remove('active');
-            if (typeof syncTradeCountrySelects === 'function') {
-                syncTradeCountrySelects('import');
-            }
-        });
-    }
     document.getElementById('search-btn-energy')?.addEventListener('click', () => {
         const q = document.getElementById('search-input-energy')?.value;
         if (typeof searchEnergyProducts === 'function') {
@@ -269,28 +234,6 @@ function bindEvents() {
     });
 
     // Semiconductor Events
-    const semiExportBtn = document.getElementById('direction-export-semi');
-    const semiImportBtn = document.getElementById('direction-import-semi');
-    if (semiExportBtn) {
-        semiExportBtn.addEventListener('click', () => {
-            AppState.currentDirection = 'export';
-            semiExportBtn.classList.add('active');
-            semiImportBtn?.classList.remove('active');
-            if (typeof syncTradeCountrySelects === 'function') {
-                syncTradeCountrySelects('export');
-            }
-        });
-    }
-    if (semiImportBtn) {
-        semiImportBtn.addEventListener('click', () => {
-            AppState.currentDirection = 'import';
-            semiImportBtn.classList.add('active');
-            semiExportBtn?.classList.remove('active');
-            if (typeof syncTradeCountrySelects === 'function') {
-                syncTradeCountrySelects('import');
-            }
-        });
-    }
     document.getElementById('search-btn-semi')?.addEventListener('click', () => { const q = document.getElementById('search-input-semi')?.value; searchSemiconductorProducts(q); });
     document.getElementById('search-input-semi')?.addEventListener('keyup', (e) => { if (e.key === 'Enter') { const q = e.target.value; searchSemiconductorProducts(q); } });
 

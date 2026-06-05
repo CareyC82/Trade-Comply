@@ -42,18 +42,24 @@ function getCategoryPageKey() {
 }
 
 function getCategoryRouteSelection() {
+    const from = (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('from')?.value : document.querySelector('[data-route-country="from"]')?.value) || 'CN';
+    const to = (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('to')?.value : document.querySelector('[data-route-country="to"]')?.value) || 'US';
+    const selectedFocus = (typeof getActiveFocusButton === 'function' ? getActiveFocusButton()?.dataset.complianceFocus : document.querySelector('[data-compliance-focus].active')?.dataset.complianceFocus) || AppState.complianceFocus || '';
     if (typeof syncRouteControls === 'function') {
-        return syncRouteControls(
-            (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('from')?.value : document.querySelector('[data-route-country="from"]')?.value) || 'CN',
-            (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('to')?.value : document.querySelector('[data-route-country="to"]')?.value) || 'US',
-            (typeof getActiveFocusButton === 'function' ? getActiveFocusButton()?.dataset.complianceFocus : document.querySelector('[data-compliance-focus].active')?.dataset.complianceFocus) || 'import'
-        );
+        if (selectedFocus) {
+            return syncRouteControls(from, to, selectedFocus);
+        }
+        const api = typeof getCountryOptionsApi === 'function' ? getCountryOptionsApi() : null;
+        if (api?.getRouteContext) {
+            return {
+                ...api.getRouteContext({ from, to, focus: 'import' }),
+                hasSelectedFocus: false
+            };
+        }
     }
     const focus = document.getElementById('direction-import')?.classList.contains('active') ? 'export' : 'import';
-    const from = document.querySelector('[data-route-country="from"]')?.value || 'CN';
-    const to = document.querySelector('[data-route-country="to"]')?.value || 'US';
     const country = focus === 'import' ? to : from;
-    return { from, to, focus, direction: focus === 'export' ? 'export' : 'export', country };
+    return { from, to, focus, direction: focus === 'export' ? 'export' : 'export', country, hasSelectedFocus: Boolean(selectedFocus) };
 }
 
 function buildCategorySearchUrl(query, direction, country, vertical, routeContext = null) {
@@ -69,7 +75,9 @@ function buildCategorySearchUrl(query, direction, country, vertical, routeContex
     if (routeContext) {
         params.set('from', routeContext.from || 'CN');
         params.set('to', routeContext.to || 'US');
-        params.set('focus', routeContext.focus === 'export' ? 'export' : 'import');
+        if (routeContext.hasSelectedFocus !== false) {
+            params.set('focus', routeContext.focus === 'export' ? 'export' : 'import');
+        }
     }
     params.set('vertical', vertical || 'electronics');
     return `index.html?${params.toString()}#result`;
@@ -96,6 +104,7 @@ function bindCategoryDirectionToggle() {
     }
 
     exportBtn.addEventListener('click', () => {
+        AppState.complianceFocusSelected = true;
         const route = typeof syncRouteControls === 'function'
             ? syncRouteControls(undefined, undefined, 'import')
             : null;
@@ -105,6 +114,7 @@ function bindCategoryDirectionToggle() {
     });
 
     importBtn.addEventListener('click', () => {
+        AppState.complianceFocusSelected = true;
         const route = typeof syncRouteControls === 'function'
             ? syncRouteControls(undefined, undefined, 'export')
             : null;
@@ -156,7 +166,10 @@ function bootstrapCategoryPage() {
         initTradeCountryForDirection('export', 'US');
     }
     if (typeof initRouteControls === 'function') {
-        initRouteControls('CN', 'US', 'import');
+        initRouteControls('CN', 'US', '');
+    }
+    if (typeof clearUnselectedComplianceFocus === 'function') {
+        clearUnselectedComplianceFocus();
     }
 
     bindCategoryDirectionToggle();

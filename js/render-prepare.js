@@ -262,7 +262,7 @@ function prepareComplianceCardViewModel(tag, context) {
 }
 
 function prepareCategoryGroupViewModel(group, context) {
-    const theme = getCategoryTheme(group.categoryCode);
+    const theme = getCategoryTheme(group.categoryCode, group.category);
     const ruleCount = group.tags.length;
     return {
         groupClass: `result-category-group category-group collapsible-panel result-category-group--${theme.class}`,

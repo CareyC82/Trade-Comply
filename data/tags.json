@@ -10543,5 +10543,278 @@
     "related_cases": [],
     "display_order": 50,
     "pipeline_source": "bis"
+  },
+  {
+    "tag_id": "CL-USDRONE-001",
+    "category": "COMPLIANCE_STD",
+    "category_label": "Drone / UAV Compliance",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[US FAA Remote ID / UAS]",
+    "short_description": "US-bound drones should be screened for FAA Remote ID, registration, and operational compliance signals.",
+    "description": "Drones and unmanned aircraft systems marketed, imported, or operated in the United States should be checked for FAA Remote ID requirements, registration pathways, operating limitations, labeling/user-documentation expectations, FCC radio authorization overlap, battery safety, and restricted end-use or restricted-party exposure.",
+    "content_en": "US-bound drones and UAVs should be checked for FAA Remote ID, registration pathways, operating limitations, FCC radio overlap, battery safety, and restricted end-use exposure before import or sale.",
+    "content_zh": "进入美国市场的无人机/UAV 应检查 FAA Remote ID、注册路径、运行限制、FCC 无线重叠要求、电池安全及最终用途风险。",
+    "source_citation": "FAA Remote Identification of Drones / UAS registration guidance",
+    "source_url": "https://www.faa.gov/uas/getting_started/remote_id",
+    "effective_date": "2026-06-05",
+    "status": "ACTIVE",
+    "direction": "export",
+    "country": "US",
+    "route_focus": "import",
+    "risk_level": "Medium",
+    "hs_code": "8525",
+    "related_hs_codes": [
+      "8525",
+      "8526",
+      "8806",
+      "8507",
+      "8517"
+    ],
+    "related_keywords": [
+      "us",
+      "united states",
+      "drone",
+      "uav",
+      "uas",
+      "unmanned aircraft",
+      "quadcopter",
+      "camera drone",
+      "remote id",
+      "faa",
+      "registration",
+      "broadcast module",
+      "standard remote id",
+      "fcc",
+      "radio control",
+      "surveillance",
+      "end use"
+    ],
+    "related_cases": [
+      "CASE-US-DRONE-REMOTE-ID"
+    ],
+    "display_order": 2,
+    "pipeline_source": "manual-route-depth",
+    "checklist": [
+      {
+        "id": "Drone compliance::Confirm FAA Remote ID scope",
+        "phase": "Drone compliance",
+        "task": "Confirm FAA Remote ID scope",
+        "desc": "Check whether the drone is a standard Remote ID aircraft, requires a broadcast module, or falls into an exception before US import or sale.",
+        "source": "official-source"
+      },
+      {
+        "id": "Drone compliance::Align FCC and battery evidence",
+        "phase": "Drone compliance",
+        "task": "Align FCC and battery evidence",
+        "desc": "Match radio module FCC authorization, battery safety/transport evidence, labels, and user documents to the imported model.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-USESS-001",
+    "category": "COMPLIANCE_STD",
+    "category_label": "Battery / ESS Safety",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[US ESS UL / Fire Code]",
+    "short_description": "US-bound energy storage systems require battery safety, UL, fire-code, and installation review.",
+    "description": "Energy storage systems, battery cabinets, and lithium battery systems imported or installed in the United States should be checked for UL 9540/9540A evidence, NFPA 855 / fire-code acceptance, UN38.3 transport documents, hazardous-material handling, local permitting, labeling, and installation documentation.",
+    "content_en": "US-bound energy storage systems should be checked for UL 9540/9540A evidence, NFPA 855 or local fire-code acceptance, UN38.3 transport documents, hazardous-material handling, labels, and installation files.",
+    "content_zh": "进入美国的储能系统应检查 UL 9540/9540A、NFPA 855/当地消防规范、UN38.3、危险品运输、标签和安装资料。",
+    "source_citation": "UL 9540 / NFPA 855 energy storage system safety baseline",
+    "source_url": "https://www.nfpa.org/codes-and-standards/nfpa-855-standard-development/855",
+    "effective_date": "2026-06-05",
+    "status": "ACTIVE",
+    "direction": "export",
+    "country": "US",
+    "route_focus": "import",
+    "risk_level": "Medium",
+    "hs_code": "8507",
+    "related_hs_codes": [
+      "8507",
+      "8504",
+      "8537",
+      "8541"
+    ],
+    "related_keywords": [
+      "us",
+      "united states",
+      "energy storage",
+      "energy storage system",
+      "ess",
+      "battery system",
+      "battery cabinet",
+      "battery pack",
+      "lithium battery",
+      "lithium-ion battery",
+      "bess",
+      "ul 9540",
+      "ul 9540a",
+      "nfpa 855",
+      "fire code",
+      "thermal runaway",
+      "un38.3",
+      "hazmat",
+      "dangerous goods"
+    ],
+    "related_cases": [
+      "CASE-US-ESS-UL-FIRECODE"
+    ],
+    "display_order": 2,
+    "pipeline_source": "manual-route-depth",
+    "checklist": [
+      {
+        "id": "ESS safety::Confirm UL 9540/9540A evidence",
+        "phase": "ESS safety",
+        "task": "Confirm UL 9540/9540A evidence",
+        "desc": "Collect system certification, cell/module test evidence, thermal-runaway data, and model coverage for the imported ESS configuration.",
+        "source": "official-source"
+      },
+      {
+        "id": "ESS safety::Prepare fire-code and transport file",
+        "phase": "ESS safety",
+        "task": "Prepare fire-code and transport file",
+        "desc": "Align NFPA/local fire-code documents, installation manual, SDS, UN38.3, packaging, and hazardous-material shipping papers.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-EUOPTICAL-001",
+    "category": "COMPLIANCE_STD",
+    "category_label": "Optical / Laser Safety",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[EU Optical Transceiver / Laser Safety]",
+    "short_description": "EU-bound optical transceivers and laser telecom modules require CE, RoHS, and laser-safety documentation review.",
+    "description": "Optical transceivers, laser modules, and telecom optical components placed on the EU market should be checked for CE conformity evidence where applicable, RoHS substance restrictions, EMC safety documentation, laser-product safety labeling such as IEC/EN 60825-1, importer/economic-operator details, and technical-file retention.",
+    "content_en": "EU-bound optical transceivers and laser telecom modules should be checked for CE technical files, RoHS, EMC/safety evidence, IEC/EN 60825-1 laser labeling, importer details, and record retention.",
+    "content_zh": "进入欧盟的光模块、光收发器和激光通信模块应检查 CE 技术文件、RoHS、EMC/安全资料、IEC/EN 60825-1 激光标签、进口商信息和资料留存。",
+    "source_citation": "European Commission CE/RoHS framework and IEC/EN 60825-1 laser product safety baseline",
+    "source_url": "https://single-market-economy.ec.europa.eu/single-market/ce-marking_en",
+    "effective_date": "2026-06-05",
+    "status": "ACTIVE",
+    "direction": "export",
+    "country": "EU",
+    "route_focus": "import",
+    "risk_level": "Medium",
+    "hs_code": "8517",
+    "related_hs_codes": [
+      "8517",
+      "8541",
+      "8542",
+      "9030"
+    ],
+    "related_keywords": [
+      "eu",
+      "european union",
+      "optical transceiver",
+      "optical module",
+      "laser module",
+      "telecom module",
+      "fiber optic",
+      "silicon photonics",
+      "sfp",
+      "qsfp",
+      "coherent optical module",
+      "laser safety",
+      "iec 60825",
+      "en 60825",
+      "ce",
+      "rohs",
+      "emc",
+      "technical file"
+    ],
+    "related_cases": [
+      "CASE-EU-OPTICAL-LASER-SAFETY"
+    ],
+    "display_order": 2,
+    "pipeline_source": "manual-route-depth",
+    "checklist": [
+      {
+        "id": "Optical safety::Confirm laser classification and label",
+        "phase": "Optical safety",
+        "task": "Confirm laser classification and label",
+        "desc": "Confirm IEC/EN 60825-1 laser class, warning label, datasheet, and module marking for the optical transceiver.",
+        "source": "official-source"
+      },
+      {
+        "id": "EU market access::Collect CE/RoHS technical file",
+        "phase": "EU market access",
+        "task": "Collect CE/RoHS technical file",
+        "desc": "Prepare CE/RoHS/EMC evidence, EU importer or economic-operator details, declaration files, and retention records.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-DEEV-001",
+    "category": "COMPLIANCE_STD",
+    "category_label": "EV Charger Compliance",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[DE EV Charger / Wallbox]",
+    "short_description": "Germany-bound EV chargers and wallboxes require CE, grid-interface, calibration, and installation documentation review.",
+    "description": "EV chargers, wallboxes, and charging stations placed on the German market should be checked for CE/LVD/EMC/RED evidence where applicable, German-language installation instructions, WEEE/BattDG/LUCID overlap, grid-interface or network-operator requirements, calibration/metering obligations where payment or metered billing is involved, and installer documentation.",
+    "content_en": "Germany-bound EV chargers and wallboxes should be checked for CE/LVD/EMC/RED evidence, German installation documents, WEEE/BattDG/LUCID overlap, grid-interface requirements, metering/calibration obligations, and installer files.",
+    "content_zh": "进入德国的 EV 充电器/Wallbox 应检查 CE/LVD/EMC/RED、德文安装资料、WEEE/BattDG/LUCID、并网要求、计量校准义务和安装文件。",
+    "source_citation": "Bundesnetzagentur / German market surveillance and charging-infrastructure compliance baseline",
+    "source_url": "https://www.bundesnetzagentur.de/marktueberwachungprodukte.html?nn=666514",
+    "effective_date": "2026-06-05",
+    "status": "ACTIVE",
+    "direction": "export",
+    "country": "DE",
+    "route_focus": "import",
+    "risk_level": "Medium",
+    "hs_code": "8504",
+    "related_hs_codes": [
+      "8504",
+      "8537",
+      "8543",
+      "8517"
+    ],
+    "related_keywords": [
+      "germany",
+      "de",
+      "ev charger",
+      "wallbox",
+      "charging station",
+      "electric vehicle charger",
+      "ac charger",
+      "dc charger",
+      "charging pile",
+      "grid connection",
+      "netzanschluss",
+      "calibration",
+      "metering",
+      "mess- und eichrecht",
+      "ce",
+      "lvd",
+      "emc",
+      "red",
+      "weee",
+      "battdg",
+      "lucid",
+      "installation manual"
+    ],
+    "related_cases": [
+      "CASE-DE-EV-WALLBOX-COMPLIANCE"
+    ],
+    "display_order": 1,
+    "pipeline_source": "manual-route-depth",
+    "checklist": [
+      {
+        "id": "EV charger::Confirm CE and installation file",
+        "phase": "EV charger",
+        "task": "Confirm CE and installation file",
+        "desc": "Collect CE/LVD/EMC/RED evidence, model coverage, German-language installation manual, and safety labels.",
+        "source": "official-source"
+      },
+      {
+        "id": "EV charger::Check grid and metering obligations",
+        "phase": "EV charger",
+        "task": "Check grid and metering obligations",
+        "desc": "Review grid-interface, network-operator, metering/calibration, WEEE/BattDG/LUCID, and installer documentation requirements.",
+        "source": "official-source"
+      }
+    ]
   }
 ]

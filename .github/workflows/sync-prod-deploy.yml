@@ -31,6 +31,7 @@ jobs:
           node scripts/validate-catalog.js
           node scripts/build-catalog.js --check
           node scripts/validate-pending-queue.js
+          npm run audit:search-quality
 
       - name: Dispatch FC deploy workflow
         uses: actions/github-script@v7

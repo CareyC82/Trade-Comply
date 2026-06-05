@@ -49,6 +49,12 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: bash scripts/deploy-fc-ci.sh preflight
 
+      - name: Unit tests
+        run: npm test
+
+      - name: Search quality audit
+        run: npm run audit:search-quality
+
       - name: Build FC package
         run: bash scripts/deploy-fc-ci.sh build
 

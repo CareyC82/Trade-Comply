@@ -183,14 +183,17 @@ function populateRouteSelect(selectEl, selectedCode) {
 
 function applyRouteState(fromCountry, toCountry, focus) {
     const api = getCountryOptionsApi();
-    const route = typeof api.getRouteContext === 'function'
+    const selectedFocus = focus === 'export' || focus === 'import' ? focus : '';
+    const normalizedFrom = api.normalizeCountryCode(fromCountry || 'CN');
+    const normalizedTo = api.normalizeCountryCode(toCountry || 'US');
+    const route = selectedFocus && typeof api.getRouteContext === 'function'
         ? api.getRouteContext({ from: fromCountry, to: toCountry, focus })
         : {
-            from: api.normalizeCountryCode(fromCountry || 'CN'),
-            to: api.normalizeCountryCode(toCountry || 'US'),
-            focus: focus === 'export' ? 'export' : 'import',
-            direction: focus === 'export' ? 'export' : 'export',
-            country: api.normalizeCountryCode(toCountry || 'US')
+            from: normalizedFrom,
+            to: normalizedTo,
+            focus: selectedFocus,
+            direction: AppState.currentDirection || 'export',
+            country: selectedFocus === 'export' ? normalizedFrom : normalizedTo
         };
 
     AppState.routeFromCountry = route.from;
@@ -207,9 +210,21 @@ function refreshRouteControls(route) {
     fromSelects.forEach((select) => populateRouteSelect(select, route?.from || AppState.routeFromCountry || 'CN'));
     toSelects.forEach((select) => populateRouteSelect(select, route?.to || AppState.routeToCountry || 'US'));
 
-    const focus = route?.focus || AppState.complianceFocus || 'import';
+    const focus = route?.focus || AppState.complianceFocus || '';
     document.querySelectorAll('[data-compliance-focus]').forEach((button) => {
-        button.classList.toggle('active', button.dataset.complianceFocus === focus);
+        button.classList.toggle(
+            'active',
+            Boolean(AppState.complianceFocusSelected && focus) && button.dataset.complianceFocus === focus
+        );
+    });
+}
+
+function clearUnselectedComplianceFocus() {
+    if (AppState.complianceFocusSelected) {
+        return;
+    }
+    document.querySelectorAll('[data-compliance-focus].active').forEach((button) => {
+        button.classList.remove('active');
     });
 }
 
@@ -217,9 +232,10 @@ function syncRouteControls(fromCountry, toCountry, focus) {
     const route = applyRouteState(
         fromCountry || AppState.routeFromCountry || 'CN',
         toCountry || AppState.routeToCountry || 'US',
-        focus || AppState.complianceFocus || 'import'
+        focus || AppState.complianceFocus || ''
     );
     refreshRouteControls(route);
+    clearUnselectedComplianceFocus();
     return route;
 }
 
@@ -263,7 +279,7 @@ function bindTradeCountryControls() {
     const onRouteChange = () => {
         const from = getActiveRouteSelect('from')?.value || AppState.routeFromCountry || 'CN';
         const to = getActiveRouteSelect('to')?.value || AppState.routeToCountry || 'US';
-        syncRouteControls(from, to, AppState.complianceFocus || 'import');
+        syncRouteControls(from, to, AppState.complianceFocus || '');
     };
 
     document.querySelectorAll('[data-route-country]').forEach((select) => {
@@ -272,6 +288,7 @@ function bindTradeCountryControls() {
 
     document.querySelectorAll('[data-compliance-focus]').forEach((button) => {
         button.addEventListener('click', () => {
+            AppState.complianceFocusSelected = true;
             syncRouteControls(
                 getActiveRouteSelect('from')?.value || AppState.routeFromCountry || 'CN',
                 getActiveRouteSelect('to')?.value || AppState.routeToCountry || 'US',
@@ -285,6 +302,6 @@ function initTradeCountryForDirection(direction, countryFromUrl) {
     syncTradeCountrySelects(direction, countryFromUrl);
 }
 
-function initRouteControls(fromCountry = 'CN', toCountry = 'US', focus = 'import') {
+function initRouteControls(fromCountry = 'CN', toCountry = 'US', focus = '') {
     return syncRouteControls(fromCountry, toCountry, focus);
 }
