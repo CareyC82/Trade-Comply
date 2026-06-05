@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category"></script>
  */
 (function () {
-    const BUILD = '20260605-focus-no-default';
+    const BUILD = '20260605-route-placeholders';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();

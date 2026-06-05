@@ -42,8 +42,8 @@ function getCategoryPageKey() {
 }
 
 function getCategoryRouteSelection() {
-    const from = (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('from')?.value : document.querySelector('[data-route-country="from"]')?.value) || 'CN';
-    const to = (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('to')?.value : document.querySelector('[data-route-country="to"]')?.value) || 'US';
+    const from = (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('from')?.value : document.querySelector('[data-route-country="from"]')?.value) || '';
+    const to = (typeof getActiveRouteSelect === 'function' ? getActiveRouteSelect('to')?.value : document.querySelector('[data-route-country="to"]')?.value) || '';
     const selectedFocus = (typeof getActiveFocusButton === 'function' ? getActiveFocusButton()?.dataset.complianceFocus : document.querySelector('[data-compliance-focus].active')?.dataset.complianceFocus) || AppState.complianceFocus || '';
     if (typeof syncRouteControls === 'function') {
         if (selectedFocus) {
@@ -52,7 +52,9 @@ function getCategoryRouteSelection() {
         const api = typeof getCountryOptionsApi === 'function' ? getCountryOptionsApi() : null;
         if (api?.getRouteContext) {
             return {
-                ...api.getRouteContext({ from, to, focus: 'import' }),
+                ...api.getRouteContext({ from: from || 'CN', to: to || 'US', focus: 'import' }),
+                from,
+                to,
                 hasSelectedFocus: false
             };
         }
@@ -73,8 +75,12 @@ function buildCategorySearchUrl(query, direction, country, vertical, routeContex
     params.set('direction', direction === 'import' ? 'import' : 'export');
     params.set('country', country || 'US');
     if (routeContext) {
-        params.set('from', routeContext.from || 'CN');
-        params.set('to', routeContext.to || 'US');
+        if (routeContext.from) {
+            params.set('from', routeContext.from);
+        }
+        if (routeContext.to) {
+            params.set('to', routeContext.to);
+        }
         if (routeContext.hasSelectedFocus !== false) {
             params.set('focus', routeContext.focus === 'export' ? 'export' : 'import');
         }
@@ -166,7 +172,7 @@ function bootstrapCategoryPage() {
         initTradeCountryForDirection('export', 'US');
     }
     if (typeof initRouteControls === 'function') {
-        initRouteControls('CN', 'US', '');
+        initRouteControls('', '', '');
     }
     if (typeof clearUnselectedComplianceFocus === 'function') {
         clearUnselectedComplianceFocus();

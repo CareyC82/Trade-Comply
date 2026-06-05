@@ -142,9 +142,11 @@ async function bootstrapTradeComplyIndex() {
             initTradeCountryForDirection(AppState.currentDirection || 'export', inboundCountry);
         }
         if (typeof initRouteControls === 'function') {
+            const hasExplicitRouteFrom = inboundParams.has('from');
+            const hasExplicitRouteTo = inboundParams.has('to');
             initRouteControls(
-                inboundRouteFrom || 'CN',
-                inboundRouteTo || inboundCountry || 'US',
+                hasExplicitRouteFrom ? inboundRouteFrom : '',
+                hasExplicitRouteTo ? inboundRouteTo : '',
                 hasExplicitInboundFocus ? inboundFocus : ''
             );
         }

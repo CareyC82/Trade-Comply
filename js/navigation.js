@@ -46,8 +46,8 @@ function applyView(view) {
     if ((safeView === 'electronics' || safeView === 'new-energy' || safeView === 'semiconductor')
         && typeof initRouteControls === 'function') {
         initRouteControls(
-            AppState.routeFromCountry || 'CN',
-            AppState.routeToCountry || AppState.currentCountry || 'US',
+            AppState.routeFromCountry || '',
+            AppState.routeToCountry || '',
             AppState.complianceFocus || ''
         );
     }
