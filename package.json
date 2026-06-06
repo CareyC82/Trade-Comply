@@ -14,6 +14,8 @@
     "fetch:policy-news": "bash scripts/with-node.sh node scripts/fetch-policy-news.js",
     "fetch:global": "node scripts/fetch-global-sources.js",
     "fetch:global:pipeline": "node scripts/fetch-global-pipeline.js",
+    "update:duty-rates:us": "node scripts/update-us-duty-rates.js",
+    "update:duty-rates:us:dry-run": "node scripts/update-us-duty-rates.js --dry-run",
     "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js",
     "pipeline:global": "python3 pipeline/pipeline.py",
     "pipeline:global:offline": "python3 pipeline/pipeline.py --offline",

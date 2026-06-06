@@ -1,9 +1,9 @@
 /**
  * Single application entry — loads modules in order, then boots the active page.
- * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category"></script>
+ * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry"></script>
  */
 (function () {
-    const BUILD = '20260605-route-placeholders';
+    const BUILD = '20260606-post-entry-value';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -14,6 +14,9 @@
         }
         if (/\/hscode\.html/i.test(path)) {
             return 'hscode';
+        }
+        if (/\/post-entry\.html/i.test(path)) {
+            return 'post-entry';
         }
         if (/\/electronics\.html/i.test(path) || /\/new-energy\.html/i.test(path) || /\/semiconductor\.html/i.test(path)) {
             return 'category';
@@ -101,6 +104,17 @@
         'js/category-page.js'
     ];
 
+    const POST_ENTRY_MODULES = [
+        'js/app-state.js',
+        'js/dom-mount.js',
+        'js/core.js',
+        'lib/country-registry.js',
+        'js/feedback.js',
+        'compliance-feedback-codec.js',
+        'lib/post-entry-value.js',
+        'js/post-entry-page.js'
+    ];
+
     function withVersion(src) {
         return `${src}?v=${BUILD}`;
     }
@@ -167,6 +181,8 @@
             let modules = INDEX_MODULES;
             if (app === 'hscode') {
                 modules = HSCODE_MODULES;
+            } else if (app === 'post-entry') {
+                modules = POST_ENTRY_MODULES;
             } else if (app === 'category') {
                 modules = CATEGORY_MODULES;
             }
@@ -186,6 +202,12 @@
                     bindCategoryFeedbackModal();
                     if (typeof bootstrapCategoryPage === 'function') {
                         bootstrapCategoryPage();
+                    }
+                    return;
+                }
+                if (app === 'post-entry') {
+                    if (typeof bootstrapPostEntryPage === 'function') {
+                        bootstrapPostEntryPage();
                     }
                     return;
                 }

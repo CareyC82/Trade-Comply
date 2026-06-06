@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Entry Value Check | TraceWize</title>
+    <link rel="stylesheet" href="css/style.css?v=20260606-post-entry-value">
+</head>
+<body class="post-entry-page-body">
+    <main class="post-entry-page view-container active">
+        <header class="post-entry-header">
+            <div class="home-header post-entry-home-header">
+                <h1 class="home-title post-entry-page-title">🧾 Post-Entry Value Check</h1>
+            </div>
+        </header>
+
+        <div class="disclaimer-bar post-entry-disclaimer">
+            <span>Confirm HS Code accuracy first. Entry date, Incoterm, and cost allocation can change customs value, rebate base, and correction risk.</span>
+        </div>
+
+        <form id="post-entry-form" class="post-entry-form" autocomplete="off" novalidate>
+            <section class="post-entry-section">
+                <h2 class="post-entry-section-title">Trade route and declaration</h2>
+                <div class="post-entry-grid post-entry-grid--two">
+                    <label class="post-entry-field" for="post-entry-origin-country">
+                        <span>From country / region</span>
+                        <select id="post-entry-origin-country" class="post-entry-input" required></select>
+                    </label>
+                    <label class="post-entry-field" for="post-entry-import-country">
+                        <span>To country / region</span>
+                        <select id="post-entry-import-country" class="post-entry-input" required></select>
+                    </label>
+                </div>
+                <div class="post-entry-focus-block">
+                    <span class="post-entry-focus-label">Post-entry focus</span>
+                    <div class="post-entry-focus-toggle" role="group" aria-label="Post-entry focus">
+                        <button type="button" class="post-entry-focus-btn" data-post-entry-focus="export">Export-side review at origin</button>
+                        <button type="button" class="post-entry-focus-btn" data-post-entry-focus="import">Import-side review at destination</button>
+                    </div>
+                </div>
+                <div class="post-entry-grid post-entry-grid--two">
+                    <label class="post-entry-field" for="post-entry-date">
+                        <span>Entry date</span>
+                        <span class="post-entry-date-segments" aria-label="Entry date in MM / DD / YY format">
+                            <input id="post-entry-date-month" class="post-entry-date-part" type="text" inputmode="numeric" placeholder="MM" maxlength="2" autocomplete="off" aria-label="Entry month">
+                            <span class="post-entry-date-separator">/</span>
+                            <input id="post-entry-date-day" class="post-entry-date-part" type="text" inputmode="numeric" placeholder="DD" maxlength="2" autocomplete="off" aria-label="Entry day">
+                            <span class="post-entry-date-separator">/</span>
+                            <input id="post-entry-date-year" class="post-entry-date-part" type="text" inputmode="numeric" placeholder="YY" maxlength="2" autocomplete="off" aria-label="Entry year">
+                        </span>
+                        <input id="post-entry-date" type="hidden" required>
+                    </label>
+                    <label class="post-entry-field" for="post-entry-hs-code">
+                        <span>Declared HS code</span>
+                        <input id="post-entry-hs-code" class="post-entry-input" type="text" inputmode="numeric" placeholder="e.g. 850760" required>
+                    </label>
+                </div>
+            </section>
+
+            <section class="post-entry-section">
+                <h2 class="post-entry-section-title">Declared value inputs</h2>
+                <div class="post-entry-grid post-entry-grid--three">
+                    <label class="post-entry-field" for="post-entry-incoterm">
+                        <span>Incoterm</span>
+                        <select id="post-entry-incoterm" class="post-entry-input" required>
+                            <option value="">Select Incoterm</option>
+                            <option value="EXW">EXW</option>
+                            <option value="FCA">FCA</option>
+                            <option value="FOB">FOB</option>
+                            <option value="CFR">CFR</option>
+                            <option value="CPT">CPT</option>
+                            <option value="CIF">CIF</option>
+                            <option value="CIP">CIP</option>
+                            <option value="DAP">DAP</option>
+                            <option value="DDP">DDP</option>
+                        </select>
+                    </label>
+                    <label class="post-entry-field" for="post-entry-currency">
+                        <span>Currency</span>
+                        <select id="post-entry-currency" class="post-entry-input" required>
+                            <option value="USD">USD</option>
+                            <option value="CNY">CNY</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                            <option value="JPY">JPY</option>
+                            <option value="KRW">KRW</option>
+                            <option value="SGD">SGD</option>
+                            <option value="MXN">MXN</option>
+                            <option value="VND">VND</option>
+                            <option value="MYR">MYR</option>
+                        </select>
+                    </label>
+                    <label class="post-entry-field" for="post-entry-declared-amount">
+                        <span>Declared amount</span>
+                        <input id="post-entry-declared-amount" class="post-entry-input" type="number" min="0" step="0.01" placeholder="0.00" required>
+                    </label>
+                    <label class="post-entry-field" for="post-entry-freight">
+                        <span>Freight</span>
+                        <input id="post-entry-freight" class="post-entry-input" type="number" min="0" step="0.01" placeholder="0.00">
+                    </label>
+                    <label class="post-entry-field" for="post-entry-insurance">
+                        <span>Insurance</span>
+                        <input id="post-entry-insurance" class="post-entry-input" type="number" min="0" step="0.01" placeholder="0.00">
+                    </label>
+                    <label class="post-entry-field" for="post-entry-other-charges">
+                        <span>Other dutiable charges</span>
+                        <input id="post-entry-other-charges" class="post-entry-input" type="number" min="0" step="0.01" placeholder="0.00">
+                    </label>
+                    <label class="post-entry-field" for="post-entry-declared-duty">
+                        <span>Declared duty paid</span>
+                        <input id="post-entry-declared-duty" class="post-entry-input" type="number" min="0" step="0.01" placeholder="Optional">
+                    </label>
+                </div>
+            </section>
+
+            <div id="post-entry-error" class="post-entry-error" hidden role="alert"></div>
+            <button type="submit" class="post-entry-submit-btn">Run Value Check</button>
+        </form>
+    </main>
+
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a id="nav-home" class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a id="nav-incoterm" class="nav-btn nav-btn-link" href="index.html#incoterm">📦 Incoterm</a>
+        <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code</a>
+        <span id="nav-post-entry" class="nav-btn active" aria-current="page">🧾 Post-Entry</span>
+    </nav>
+
+    <script src="js/main.js?v=20260606-post-entry-value" data-app="post-entry"></script>
+</body>
+</html>

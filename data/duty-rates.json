@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-06-06",
+  "status": "indicative_precheck",
+  "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
+  "rules": [
+    {
+      "id": "US-CN-850760-LIB-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "850760"
+      ],
+      "label": "US import lithium-ion battery signal",
+      "base_rate": 0.034,
+      "additional_rate": 0.075,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.075,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 China additional duty signal",
+      "confidence": "Indicative",
+      "source_note": "Pre-check benchmark. Verify exact HTS and active exclusions with HTSUS / USTR before filing.",
+      "last_checked_at": "2026-06-06T11:27:25.644Z",
+      "source_hts": "85076000",
+      "source_rate_text": "3.4%",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=850760&to=85076099&format=JSON&styles=false"
+    },
+    {
+      "id": "US-CN-ELECTRONICS-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "8517",
+        "8525",
+        "8528",
+        "8543"
+      ],
+      "label": "US import electronics signal",
+      "base_rate": 0.019,
+      "additional_rate": 0.075,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.075,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 China additional duty signal",
+      "confidence": "Indicative",
+      "source_note": "Pre-check benchmark for common electronics categories; verify exact HTS line.",
+      "last_checked_at": "2026-06-06T11:27:28.272Z",
+      "source_hts": "8543100000",
+      "source_rate_text": "1.9%",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8543&to=854399&format=JSON&styles=false"
+    },
+    {
+      "id": "US-CN-8541-SOLAR-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "8541"
+      ],
+      "label": "US import solar / photovoltaic signal",
+      "base_rate": 0,
+      "additional_rate": 0.25,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.25,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        },
+        {
+          "type": "ad_cvd",
+          "label": "AD/CVD case-scope screening",
+          "rate": null,
+          "basis": "case_scope",
+          "status": "flag_only",
+          "source": "US Commerce / CBP AD-CVD case scope required"
+        }
+      ],
+      "trade_remedy": "Section 301 and possible AD/CVD screening signal",
+      "confidence": "Indicative",
+      "source_note": "Solar products may require separate AD/CVD and origin-route review.",
+      "last_checked_at": "2026-06-06T11:27:28.832Z",
+      "source_hts": "8541410000",
+      "source_rate_text": "Free",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8541&to=854199&format=JSON&styles=false"
+    },
+    {
+      "id": "US-CN-8542-SEMICONDUCTOR-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "8542"
+      ],
+      "label": "US import semiconductor signal",
+      "base_rate": 0,
+      "additional_rate": 0.25,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.25,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 / advanced electronics tariff-screening signal",
+      "confidence": "Indicative",
+      "source_note": "Verify exact HTS line and technology-control overlap.",
+      "last_checked_at": "2026-06-06T11:27:29.376Z",
+      "source_hts": "8542330001",
+      "source_rate_text": "Free",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8542&to=854299&format=JSON&styles=false"
+    },
+    {
+      "id": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
+      "import_country": "CN",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "850760",
+        "8517",
+        "8525",
+        "8528",
+        "8541",
+        "8542",
+        "8543"
+      ],
+      "label": "China import electronics VAT/duty review signal",
+      "base_rate": 0.08,
+      "additional_rate": 0.13,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "China import VAT estimate",
+          "rate": 0.13,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "China import VAT estimate; verify official tariff line"
+        }
+      ],
+      "trade_remedy": "Import VAT and MFN duty estimate; confirm exact tariff line",
+      "confidence": "Indicative",
+      "source_note": "Pre-check benchmark only; confirm exact China tariff and VAT treatment."
+    }
+  ],
+  "last_usitc_sync_at": "2026-06-06T11:27:29.376Z",
+  "last_usitc_sync": {
+    "ok": true,
+    "changes": [
+      {
+        "rule": "US-CN-ELECTRONICS-INDICATIVE",
+        "prefix": "8543",
+        "old_base_rate": 0,
+        "new_base_rate": 0.019,
+        "source_hts": "8543100000",
+        "source_rate_text": "1.9%"
+      }
+    ],
+    "errors": []
+  }
+}

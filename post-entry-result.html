@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Entry Result | TraceWize</title>
+    <link rel="stylesheet" href="css/style.css?v=20260606-post-entry-result">
+</head>
+<body class="post-entry-page-body">
+    <main id="post-entry-result-page" class="post-entry-page view-container active">
+        <header class="post-entry-header">
+            <div class="home-header post-entry-home-header">
+                <h1 class="home-title post-entry-page-title">🧾 Post-Entry Review Result</h1>
+            </div>
+        </header>
+        <section id="post-entry-empty-result" class="post-entry-empty-result" hidden>
+            <h2>No review result found</h2>
+            <p>Run a Post-Entry Check first, then the result will open here.</p>
+            <a class="post-entry-submit-btn post-entry-empty-action" href="post-entry.html">Start Post-Entry Check</a>
+        </section>
+
+        <section id="post-entry-result" class="post-entry-result post-entry-result--standalone" hidden aria-live="polite">
+            <div class="post-entry-result-header">
+                <div>
+                    <h2 class="post-entry-result-title">Value Review Result</h2>
+                    <p id="post-entry-result-subtitle" class="post-entry-result-subtitle">Estimated from entered Incoterm and cost components.</p>
+                    <p id="post-entry-result-route" class="post-entry-result-route"></p>
+                </div>
+                <span id="post-entry-risk-badge" class="post-entry-risk-badge">Review</span>
+            </div>
+
+            <div class="post-entry-result-grid">
+                <div class="post-entry-metric-card">
+                    <span id="post-entry-customs-value-label" class="post-entry-metric-label">Customs dutiable value</span>
+                    <strong id="post-entry-customs-value">—</strong>
+                </div>
+                <div class="post-entry-metric-card">
+                    <span id="post-entry-rebate-base-label" class="post-entry-metric-label">Export rebate base</span>
+                    <strong id="post-entry-rebate-base">—</strong>
+                </div>
+                <div class="post-entry-metric-card">
+                    <span id="post-entry-difference-label" class="post-entry-metric-label">Difference vs declared</span>
+                    <strong id="post-entry-difference">—</strong>
+                </div>
+                <div class="post-entry-metric-card" data-import-only>
+                    <span class="post-entry-metric-label">Estimated import duty</span>
+                    <strong id="post-entry-estimated-duty">—</strong>
+                </div>
+                <div class="post-entry-metric-card" data-import-only>
+                    <span class="post-entry-metric-label">Add-on duty</span>
+                    <strong id="post-entry-addon-duty">—</strong>
+                </div>
+                <div class="post-entry-metric-card" data-import-only>
+                    <span class="post-entry-metric-label">Duty gap</span>
+                    <strong id="post-entry-duty-gap">—</strong>
+                </div>
+            </div>
+
+            <div class="post-entry-explanation-card">
+                <h3>Key conclusion</h3>
+                <p id="post-entry-explanation">—</p>
+            </div>
+
+            <div class="post-entry-insight-grid">
+                <div class="post-entry-insight-card">
+                    <span class="post-entry-insight-kicker">Value logic</span>
+                    <p id="post-entry-valuation-method">—</p>
+                </div>
+                <div class="post-entry-insight-card">
+                    <span class="post-entry-insight-kicker">Duty impact</span>
+                    <p id="post-entry-duty-impact">—</p>
+                </div>
+                <div class="post-entry-insight-card">
+                    <span class="post-entry-insight-kicker">Compliance impact</span>
+                    <p id="post-entry-compliance-meaning">—</p>
+                </div>
+                <div class="post-entry-insight-card">
+                    <span class="post-entry-insight-kicker">Action</span>
+                    <p id="post-entry-recommended-action">—</p>
+                </div>
+            </div>
+
+            <div class="post-entry-checklist-card">
+                <h3>Evidence to keep</h3>
+                <ul id="post-entry-evidence-list"></ul>
+            </div>
+
+            <div class="feedback-section post-entry-feedback-section">
+                <a href="#" class="feedback-link" id="post-entry-feedback-trigger">💬 Can't find your product? Tell us</a>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal-box">
+            <div class="feedback-thanks" id="feedback-thanks">
+                ✅ Thanks for your feedback! We'll review it and update the database.
+            </div>
+            <div class="feedback-form" id="feedback-form">
+                <h3>Help Us Improve</h3>
+                <p style="font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:12px;">
+                    Have a product or HS Code you needed that isn't covered? Share it below and we'll research it.
+                </p>
+                <form id="user-feedback-form" method="post" novalidate>
+                    <label for="fb-product">Product or HS Code you searched</label>
+                    <input type="text" id="fb-product" name="product" placeholder="e.g. smart ring, 8517.62" required>
+
+                    <label for="fb-message">What regulation were you looking for?</label>
+                    <textarea id="fb-message" name="message" placeholder="Tell us what compliance info you needed..."></textarea>
+
+                    <label for="fb-email">Your email (optional, for follow-up)</label>
+                    <input type="email" id="fb-email" name="email" placeholder="you@company.com">
+
+                    <div class="modal-buttons">
+                        <button type="button" class="modal-cancel" id="modal-cancel">Cancel</button>
+                        <button type="submit" class="modal-submit">Send Feedback</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a id="nav-home" class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a id="nav-incoterm" class="nav-btn nav-btn-link" href="index.html#incoterm">📦 Incoterm</a>
+        <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code</a>
+        <span id="nav-post-entry" class="nav-btn active" aria-current="page">🧾 Post-Entry</span>
+    </nav>
+
+    <script src="js/main.js?v=20260606-post-entry-result" data-app="post-entry"></script>
+</body>
+</html>
