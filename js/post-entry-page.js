@@ -145,6 +145,55 @@
         });
     }
 
+    function getSourceStatusLabel(status) {
+        const labels = {
+            official_source_checked: 'Official source checked',
+            indicative: 'Indicative',
+            scope_check_required: 'Scope check required',
+            flag_only: 'Scope check required',
+            not_covered: 'Not covered',
+            review_basis: 'Review basis'
+        };
+        return labels[status] || 'Indicative';
+    }
+
+    function renderSourceList(id, items) {
+        const list = $(id);
+        if (!list) return;
+        list.innerHTML = '';
+        const rows = Array.isArray(items) && items.length ? items : [{
+            label: 'Rate source',
+            status: 'not_covered',
+            source: 'No source attached',
+            detail: 'Confirm the official tariff line before filing.'
+        }];
+        rows.forEach((item) => {
+            const row = document.createElement('div');
+            row.className = 'post-entry-source-row';
+
+            const main = document.createElement('div');
+            main.className = 'post-entry-source-main';
+            const title = document.createElement('strong');
+            title.textContent = item.label || 'Rate source';
+            const detail = document.createElement('span');
+            detail.textContent = [item.source, item.detail].filter(Boolean).join(' · ') || 'Confirm official source.';
+            main.append(title, detail);
+
+            const status = document.createElement(item.url ? 'a' : 'span');
+            status.className = `post-entry-source-status post-entry-source-status--${item.status || 'indicative'}`;
+            status.textContent = getSourceStatusLabel(item.status);
+            if (item.url) {
+                status.href = item.url;
+                status.target = '_blank';
+                status.rel = 'noopener noreferrer';
+                status.title = 'Open source';
+            }
+
+            row.append(main, status);
+            list.appendChild(row);
+        });
+    }
+
     function buildChargeList(result) {
         const charges = [];
         if (result.freight > 0) charges.push('freight');
@@ -174,6 +223,33 @@
             return `Export filing value appears higher than the declared amount by ${formatMoney(difference, currency)} after adding export-side charges.`;
         }
         return `No export filing value gap is visible from the entered ${result.incoterm} cost components.`;
+    }
+
+    function buildImportTopConclusion(result, dutyImpact, currency) {
+        if (!dutyImpact.covered) {
+            if (result.difference > 0) {
+                return `Value gap detected: ${formatMoney(result.difference, currency)}. Duty rate is not covered yet, so confirm official tariff before correction.`;
+            }
+            return 'No duty estimate available for this route / HS yet. Confirm official tariff before filing or correction.';
+        }
+        if (dutyImpact.dutyVariance > 0.01) {
+            return `Potential duty shortfall: ${formatMoney(dutyImpact.dutyVariance, currency)}. Review before entry correction.`;
+        }
+        if (dutyImpact.dutyVariance < -0.01) {
+            return `Declared duty may be higher than estimate by ${formatMoney(Math.abs(dutyImpact.dutyVariance), currency)}. Check overpayment or rate basis.`;
+        }
+        if (result.difference > 0.01) {
+            return `Value gap detected: ${formatMoney(result.difference, currency)}. Duty estimate is aligned with entered duty.`;
+        }
+        return 'No obvious duty shortfall from the entered value, duty amount, and stored rate basis.';
+    }
+
+    function buildExportTopConclusion(result, currency) {
+        const difference = result.exportRebateBase - result.declaredAmount;
+        if (Math.abs(difference) > 0.01) {
+            return `Export filing value gap: ${formatMoney(difference, currency)}. Review before export declaration correction.`;
+        }
+        return 'No obvious export filing value gap from the entered Incoterm and charges.';
     }
 
     function buildValuationLogic(result, currency, focus) {
@@ -270,6 +346,7 @@
                     difference: `${formatMoney(exportDifference, currency)} (${formatPercent(exportDiffPercent)})`
                 },
                 importMetrics: null,
+                topConclusion: buildExportTopConclusion(result, currency),
                 conclusion: buildExportConclusion(result, currency),
                 insights: {
                     valuation: buildValuationLogic(result, currency, focus),
@@ -277,6 +354,13 @@
                     compliance: exportReview.complianceMeaning,
                     action: exportReview.action
                 },
+                sourceBreakdown: [{
+                    label: exportReview.label || 'Export filing review',
+                    status: exportReview.covered ? 'review_basis' : 'not_covered',
+                    source: focus === 'export' ? 'Stored export-side post-entry rule' : 'Stored post-entry rule',
+                    detail: exportReview.impact || 'Confirm export declaration requirements for the origin country.',
+                    url: ''
+                }],
                 evidence: exportReview.evidence
             };
         }
@@ -297,6 +381,7 @@
                 addOnDuty: dutyImpact.covered ? formatMoney(dutyImpact.addOnDuty, currency) : '—',
                 dutyGap: dutyImpact.covered ? formatMoney(dutyImpact.dutyVariance, currency) : '—'
             },
+            topConclusion: buildImportTopConclusion(result, dutyImpact, currency),
             conclusion: buildPrimaryConclusion(result, currency),
             insights: {
                 valuation: buildValuationLogic(result, currency, focus),
@@ -306,6 +391,7 @@
                     ? dutyImpact.action
                     : valueApi.buildRecommendedAction(result, context)
             },
+            sourceBreakdown: dutyImpact.sourceBreakdown || [],
             evidence: valueApi.buildEvidenceList(context)
         };
     }
@@ -317,6 +403,13 @@
         if (subtitle) subtitle.textContent = snapshot.subtitle || 'Post-entry review result.';
         const route = $('post-entry-result-route');
         if (route) route.textContent = snapshot.route || '';
+        const decisionStrip = $('post-entry-decision-strip');
+        if (decisionStrip) {
+            const tone = snapshot.risk?.tone || 'medium';
+            decisionStrip.className = `post-entry-decision-strip post-entry-decision-strip--${tone}`;
+        }
+        const decisionText = $('post-entry-decision-text');
+        if (decisionText) decisionText.textContent = snapshot.topConclusion || snapshot.conclusion || 'Review required.';
         if (snapshot.labels) {
             const customLabel = $('post-entry-customs-value-label');
             const rebateLabel = $('post-entry-rebate-base-label');
@@ -338,6 +431,7 @@
         $('post-entry-duty-impact').textContent = snapshot.insights?.duty || '—';
         $('post-entry-compliance-meaning').textContent = snapshot.insights?.compliance || '—';
         $('post-entry-recommended-action').textContent = snapshot.insights?.action || '—';
+        renderSourceList('post-entry-source-list', snapshot.sourceBreakdown || []);
         renderList('post-entry-evidence-list', snapshot.evidence || []);
         setRiskBadge(snapshot.risk || { level: 'Review', tone: 'medium' });
         const resultSection = $('post-entry-result');

@@ -117,6 +117,8 @@ test('calculates indicative duty impact for US imports from China', () => {
     assert.equal(Number(duty.estimatedDuty.toFixed(2)), 231.08);
     assert.equal(duty.addOnLayers[0].type, 'section_301');
     assert.match(duty.tradeRemedy, /Section 301/);
+    assert.ok(duty.sourceBreakdown.some(source => source.label === 'Base duty' && source.status === 'official_source_checked'));
+    assert.ok(duty.sourceBreakdown.some(source => /Section 301/.test(source.label) && source.status === 'indicative'));
 });
 
 test('keeps AD/CVD as a flag-only add-on layer', () => {
@@ -134,6 +136,7 @@ test('keeps AD/CVD as a flag-only add-on layer', () => {
     assert.equal(duty.addOnLayers.some(layer => layer.type === 'section_301' && layer.amount === 2500), true);
     assert.equal(duty.flagOnlyLayers.some(layer => layer.type === 'ad_cvd'), true);
     assert.equal(duty.estimatedDuty, 2500);
+    assert.ok(duty.sourceBreakdown.some(source => /AD\/CVD/.test(source.label) && source.status === 'scope_check_required'));
 });
 
 test('loads duty rules from maintainable data file', () => {
@@ -155,6 +158,7 @@ test('returns explicit not covered duty result for unknown route', () => {
 
     assert.equal(duty.covered, false);
     assert.match(duty.conclusion, /cannot be estimated/);
+    assert.equal(duty.sourceBreakdown[0].status, 'not_covered');
 });
 
 test('builds US export-side post-entry review without treating it as import duty', () => {
