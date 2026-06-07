@@ -17,10 +17,10 @@ test('duty-rate table covers priority import markets', () => {
     const summary = summarizeDutyRateCoverage(dutyRates);
     const markets = new Set(summary.countries.map(country => country.import_country));
 
-    ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR'].forEach((country) => {
+    ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
         assert.equal(markets.has(country), true, `${country} should have post-entry duty-rate coverage`);
     });
-    assert.ok(summary.rule_count >= 12);
+    assert.ok(summary.rule_count >= 16);
 });
 
 test('priority Post-Entry sample set has no coverage failures', () => {
@@ -39,6 +39,14 @@ test('US samples preserve official and scope-review source statuses', () => {
     assert.ok(battery.source_statuses.includes('official_source_checked'));
     assert.ok(battery.source_statuses.includes('indicative'));
     assert.ok(solar.source_statuses.includes('scope_check_required'));
+});
+
+test('Russia sample keeps sanctions scope as a review-only flag', () => {
+    const result = runDutyRateHealthCheck();
+    const russia = result.samples.find(sample => sample.id === 'PE-RU-CN-ELECTRONICS-851762');
+
+    assert.ok(russia.source_statuses.includes('indicative'));
+    assert.ok(russia.source_statuses.includes('scope_check_required'));
 });
 
 test('non-US benchmark samples stay marked as indicative, not official', () => {

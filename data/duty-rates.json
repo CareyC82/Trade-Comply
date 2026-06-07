@@ -392,6 +392,150 @@
       "source_url": "https://www.customs.go.kr/english/main.do"
     },
     {
+      "id": "VN-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "VN",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Vietnam import electronics VAT / duty signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Vietnam import VAT benchmark",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Vietnam Customs tariff / VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Vietnam import VAT benchmark; verify HS code, preferential tariff, MIC/MOIT product requirements, and entry-date VAT policy.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Vietnam benchmark only. VAT and preferential duty can change by product, origin, and entry date.",
+      "source_hts": "VN electronics benchmark",
+      "source_rate_text": "Benchmark: duty depends on tariff line + VAT placeholder",
+      "source_url": "https://www.customs.gov.vn/"
+    },
+    {
+      "id": "MY-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "MY",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Malaysia import electronics SST / duty signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "sales_tax",
+          "label": "Malaysia sales tax benchmark",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Royal Malaysian Customs Department SST benchmark"
+        }
+      ],
+      "trade_remedy": "Malaysia sales tax benchmark; verify customs duty, SST exemption, SIRIM/MCMC approvals, and preferential origin.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Malaysia benchmark only. SST, duty, and exemptions vary by tariff line and product.",
+      "source_hts": "MY electronics benchmark",
+      "source_rate_text": "Benchmark: SST 10%; customs duty depends on tariff line",
+      "source_url": "https://mysst.customs.gov.my/"
+    },
+    {
+      "id": "TW-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "TW",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Taiwan import electronics business tax signal",
+      "base_rate": 0,
+      "additional_rate": 0.05,
+      "add_on_layers": [
+        {
+          "type": "business_tax",
+          "label": "Taiwan import business tax benchmark",
+          "rate": 0.05,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Taiwan Customs / Ministry of Finance benchmark"
+        }
+      ],
+      "trade_remedy": "Taiwan import business tax benchmark; verify tariff code, commodity inspection, telecom approvals, and origin treatment.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Taiwan benchmark only. Confirm exact customs duty and business tax basis before filing.",
+      "source_hts": "TW electronics benchmark",
+      "source_rate_text": "Benchmark: 5% business tax; customs duty depends on tariff line",
+      "source_url": "https://web.customs.gov.tw/"
+    },
+    {
+      "id": "RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "RU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Russia import electronics VAT / EAEU duty signal",
+      "base_rate": 0.05,
+      "additional_rate": 0.2,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Russia import VAT benchmark",
+          "rate": 0.2,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Russia / EAEU tariff and VAT benchmark"
+        },
+        {
+          "type": "sanctions_scope",
+          "label": "Sanctions / restricted-party scope screening",
+          "rate": null,
+          "basis": "case_scope",
+          "status": "flag_only",
+          "source": "Russia-route sanctions and export-control scope review required"
+        }
+      ],
+      "trade_remedy": "Russia import VAT and EAEU duty benchmark; restricted-party, sanctions, and export-control scope review may override ordinary entry economics.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Russia benchmark only. Confirm EAEU tariff line, VAT basis, sanctions, restricted party, and licensing status.",
+      "source_hts": "RU electronics benchmark",
+      "source_rate_text": "Benchmark: EAEU duty placeholder + 20% VAT; sanctions scope required",
+      "source_url": "https://customs.gov.ru/"
+    },
+    {
       "id": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
       "import_country": "CN",
       "origin_country": "*",
