@@ -197,6 +197,7 @@ async function updateUsRules({ dryRun = false } = {}) {
                     rule.base_rate = rate.baseRate;
                 }
                 rule.last_checked_at = new Date().toISOString();
+                rule.source_status = 'official_source_checked';
                 rule.source_hts = rate.hts;
                 rule.source_rate_text = rate.rateText;
                 rule.source_url = buildExportUrl(prefix, `${normalizeHs(prefix)}99`);
@@ -221,6 +222,40 @@ async function updateUsRules({ dryRun = false } = {}) {
     return payload.last_usitc_sync;
 }
 
+function summarizeDutyRateCoverage(payload = readJson(DUTY_RATES_PATH)) {
+    const rules = payload.rules || [];
+    const countries = new Map();
+    for (const rule of rules) {
+        const country = rule.import_country || 'UNKNOWN';
+        const current = countries.get(country) || {
+            import_country: country,
+            rule_count: 0,
+            hs_prefixes: new Set(),
+            official_source_count: 0,
+            indicative_count: 0
+        };
+        current.rule_count += 1;
+        (rule.hs_prefixes || []).forEach(prefix => current.hs_prefixes.add(prefix));
+        if (rule.source_status === 'official_source_checked') {
+            current.official_source_count += 1;
+        } else {
+            current.indicative_count += 1;
+        }
+        countries.set(country, current);
+    }
+
+    return {
+        updated_at: payload.updated_at || '',
+        last_usitc_sync_at: payload.last_usitc_sync_at || '',
+        country_count: countries.size,
+        rule_count: rules.length,
+        countries: Array.from(countries.values()).map(item => ({
+            ...item,
+            hs_prefixes: Array.from(item.hs_prefixes).sort()
+        })).sort((a, b) => a.import_country.localeCompare(b.import_country))
+    };
+}
+
 async function main() {
     const dryRun = process.argv.includes('--dry-run');
     const result = await updateUsRules({ dryRun });
@@ -242,5 +277,6 @@ module.exports = {
     extractHtsNumber,
     extractGeneralRate,
     chooseMostSpecificRate,
-    updateUsRules
+    updateUsRules,
+    summarizeDutyRateCoverage
 };

@@ -26,6 +26,7 @@
       ],
       "trade_remedy": "Section 301 China additional duty signal",
       "confidence": "Indicative",
+      "source_status": "official_source_checked",
       "source_note": "Pre-check benchmark. Verify exact HTS and active exclusions with HTSUS / USTR before filing.",
       "last_checked_at": "2026-06-06T11:27:25.644Z",
       "source_hts": "85076000",
@@ -57,6 +58,7 @@
       ],
       "trade_remedy": "Section 301 China additional duty signal",
       "confidence": "Indicative",
+      "source_status": "official_source_checked",
       "source_note": "Pre-check benchmark for common electronics categories; verify exact HTS line.",
       "last_checked_at": "2026-06-06T11:27:28.272Z",
       "source_hts": "8543100000",
@@ -93,6 +95,7 @@
       ],
       "trade_remedy": "Section 301 and possible AD/CVD screening signal",
       "confidence": "Indicative",
+      "source_status": "official_source_checked",
       "source_note": "Solar products may require separate AD/CVD and origin-route review.",
       "last_checked_at": "2026-06-06T11:27:28.832Z",
       "source_hts": "8541410000",
@@ -121,11 +124,272 @@
       ],
       "trade_remedy": "Section 301 / advanced electronics tariff-screening signal",
       "confidence": "Indicative",
+      "source_status": "official_source_checked",
       "source_note": "Verify exact HTS line and technology-control overlap.",
       "last_checked_at": "2026-06-06T11:27:29.376Z",
       "source_hts": "8542330001",
       "source_rate_text": "Free",
       "source_url": "https://hts.usitc.gov/reststop/exportList?from=8542&to=854299&format=JSON&styles=false"
+    },
+    {
+      "id": "US-CN-847130-TABLET-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "847130"
+      ],
+      "label": "US import tablet / portable ADP signal",
+      "base_rate": 0,
+      "additional_rate": 0.075,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.075,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 China additional duty signal",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Pre-check benchmark for tablet / portable ADP imports. Verify exact 10-digit HTS and active exclusions.",
+      "source_hts": "847130",
+      "source_rate_text": "Benchmark: base duty often free; Section 301 may apply by origin/scope",
+      "source_url": "https://hts.usitc.gov/"
+    },
+    {
+      "id": "EU-CN-850440-EVCHARGER-INDICATIVE",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "850440"
+      ],
+      "label": "EU import EV charger / converter signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus member-state VAT benchmark; verify TARIC code, origin, and VAT member state.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "EU import benchmark only. VAT varies by member state and exact tariff code.",
+      "source_hts": "850440",
+      "source_rate_text": "Benchmark: duty 2.7% + VAT placeholder",
+      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en"
+    },
+    {
+      "id": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Germany import electronics / new energy signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify TARIC code and import VAT treatment.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Germany benchmark uses EU customs framework and local VAT. Confirm exact TARIC line.",
+      "source_hts": "EU electronics benchmark",
+      "source_rate_text": "Benchmark: duty 2.7% + Germany VAT placeholder",
+      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en"
+    },
+    {
+      "id": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Netherlands import electronics / new energy signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify TARIC code and import VAT treatment.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Netherlands benchmark uses EU customs framework and local VAT. Confirm exact TARIC line.",
+      "source_hts": "EU electronics benchmark",
+      "source_rate_text": "Benchmark: duty 2.7% + Netherlands VAT placeholder",
+      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en"
+    },
+    {
+      "id": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "SG",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Singapore import electronics GST signal",
+      "base_rate": 0,
+      "additional_rate": 0.09,
+      "add_on_layers": [
+        {
+          "type": "import_gst",
+          "label": "Singapore import GST benchmark",
+          "rate": 0.09,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Singapore Customs GST benchmark"
+        }
+      ],
+      "trade_remedy": "Singapore generally applies GST on imports; confirm exact customs value and any dutiable-goods treatment.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Singapore benchmark for common electronics imports. Confirm GST and dutiable-goods treatment.",
+      "source_hts": "SG electronics benchmark",
+      "source_rate_text": "Benchmark: 0% customs duty + 9% GST",
+      "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/"
+    },
+    {
+      "id": "MX-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "MX",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Mexico import electronics VAT / IGI signal",
+      "base_rate": 0,
+      "additional_rate": 0.16,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Mexico import VAT benchmark",
+          "rate": 0.16,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Mexico tariff / VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Mexico import VAT benchmark; verify TIGIE tariff line, NOM labeling/safety requirements, and any preferential origin claim.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Mexico benchmark only. Confirm TIGIE duty, VAT, NOM, and origin preference before filing.",
+      "source_hts": "MX electronics benchmark",
+      "source_rate_text": "Benchmark: VAT 16%; IGI depends on tariff line",
+      "source_url": "https://www.snice.gob.mx/"
+    },
+    {
+      "id": "JP-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "JP",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Japan import electronics consumption tax signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "consumption_tax",
+          "label": "Japan consumption tax benchmark",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Japan Customs tariff / consumption tax benchmark"
+        }
+      ],
+      "trade_remedy": "Japan consumption tax benchmark; verify tariff schedule, PSE/telecom product requirements, and valuation treatment.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Japan benchmark only. Confirm exact tariff and consumption tax treatment.",
+      "source_hts": "JP electronics benchmark",
+      "source_rate_text": "Benchmark: 0% duty for many electronics + 10% consumption tax",
+      "source_url": "https://www.customs.go.jp/english/tariff/"
+    },
+    {
+      "id": "KR-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "import_country": "KR",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8528",
+        "8541",
+        "8542"
+      ],
+      "label": "Korea import electronics VAT signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Korea import VAT benchmark",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "Korea Customs tariff / VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Korea import VAT benchmark; verify tariff schedule, KC/product approvals, and origin preference.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Korea benchmark only. Confirm exact tariff and VAT treatment.",
+      "source_hts": "KR electronics benchmark",
+      "source_rate_text": "Benchmark: 0% duty for many electronics + 10% VAT",
+      "source_url": "https://www.customs.go.kr/english/main.do"
     },
     {
       "id": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
