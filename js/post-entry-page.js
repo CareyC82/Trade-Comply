@@ -148,13 +148,63 @@
     function getSourceStatusLabel(status) {
         const labels = {
             official_source_checked: 'Official source checked',
-            indicative: 'Indicative',
+            indicative: 'Benchmark estimate',
             scope_check_required: 'Scope check required',
             flag_only: 'Scope check required',
             not_covered: 'Not covered',
             review_basis: 'Review basis'
         };
         return labels[status] || 'Indicative';
+    }
+
+    function getSourceStatusHelp(status) {
+        const labels = {
+            official_source_checked: 'Pulled from an official tariff source and stored with the rate basis.',
+            indicative: 'Useful for pre-check math, but not a final official tariff lookup.',
+            scope_check_required: 'The amount depends on case scope, exclusion, origin, or product-specific facts.',
+            flag_only: 'The amount depends on case scope, exclusion, origin, or product-specific facts.',
+            not_covered: 'No maintained local rate exists for this route and HS prefix yet.',
+            review_basis: 'Value logic is available; local filing correction rules still need confirmation.'
+        };
+        return labels[status] || labels.indicative;
+    }
+
+    function getSourceCoverageLevel(items = []) {
+        const statuses = new Set(items.map(item => item.status));
+        if (statuses.has('not_covered')) return 'not_covered';
+        if (statuses.has('scope_check_required') || statuses.has('flag_only')) return 'scope_check_required';
+        if (statuses.size && Array.from(statuses).every(status => status === 'official_source_checked')) {
+            return 'official_source_checked';
+        }
+        if (statuses.has('official_source_checked')) return 'mixed';
+        return statuses.has('review_basis') ? 'review_basis' : 'indicative';
+    }
+
+    function buildRateBasisText(items = []) {
+        if (!items.length) return 'No rate source attached';
+        const labels = items.slice(0, 2).map(item => item.label || item.source || 'Rate source');
+        const suffix = items.length > 2 ? ` + ${items.length - 2} more` : '';
+        return `${labels.join(' + ')}${suffix}`;
+    }
+
+    function buildCoverageNote(items = []) {
+        const level = getSourceCoverageLevel(items);
+        if (level === 'official_source_checked') {
+            return 'Rate basis: official tariff source checked. Still confirm entry-date applicability before filing.';
+        }
+        if (level === 'mixed') {
+            return 'Rate basis: official base rate plus benchmark add-ons. Confirm Chapter 99, exclusions, and entry-date scope.';
+        }
+        if (level === 'scope_check_required') {
+            return 'Rate basis: includes case-scope flags. The value estimate is useful, but AD/CVD or product-scope review may change the final duty.';
+        }
+        if (level === 'not_covered') {
+            return 'Rate basis: not covered yet. Use the value math only, then confirm the official tariff line.';
+        }
+        if (level === 'review_basis') {
+            return 'Rate basis: export filing value logic only. Confirm local correction rules before filing.';
+        }
+        return 'Rate basis: benchmark estimate. Confirm the official tariff line before filing or correction.';
     }
 
     function renderSourceList(id, items) {
@@ -187,6 +237,8 @@
                 status.target = '_blank';
                 status.rel = 'noopener noreferrer';
                 status.title = 'Open source';
+            } else {
+                status.title = getSourceStatusHelp(item.status);
             }
 
             row.append(main, status);
@@ -226,6 +278,7 @@
     }
 
     function buildImportTopConclusion(result, dutyImpact, currency) {
+        const basis = buildRateBasisText(dutyImpact.sourceBreakdown || []);
         if (!dutyImpact.covered) {
             if (result.difference > 0) {
                 return `Value gap detected: ${formatMoney(result.difference, currency)}. Duty rate is not covered yet, so confirm official tariff before correction.`;
@@ -233,15 +286,15 @@
             return 'No duty estimate available for this route / HS yet. Confirm official tariff before filing or correction.';
         }
         if (dutyImpact.dutyVariance > 0.01) {
-            return `Potential duty shortfall: ${formatMoney(dutyImpact.dutyVariance, currency)}. Review before entry correction.`;
+            return `Potential duty shortfall: ${formatMoney(dutyImpact.dutyVariance, currency)}. Rate basis: ${basis}.`;
         }
         if (dutyImpact.dutyVariance < -0.01) {
-            return `Declared duty may be higher than estimate by ${formatMoney(Math.abs(dutyImpact.dutyVariance), currency)}. Check overpayment or rate basis.`;
+            return `Declared duty may be higher than estimate by ${formatMoney(Math.abs(dutyImpact.dutyVariance), currency)}. Rate basis: ${basis}.`;
         }
         if (result.difference > 0.01) {
-            return `Value gap detected: ${formatMoney(result.difference, currency)}. Duty estimate is aligned with entered duty.`;
+            return `Value gap detected: ${formatMoney(result.difference, currency)}. Rate basis: ${basis}.`;
         }
-        return 'No obvious duty shortfall from the entered value, duty amount, and stored rate basis.';
+        return `No obvious duty shortfall. Rate basis: ${basis}.`;
     }
 
     function buildExportTopConclusion(result, currency) {
@@ -361,6 +414,9 @@
                     detail: exportReview.impact || 'Confirm export declaration requirements for the origin country.',
                     url: ''
                 }],
+                coverageNote: buildCoverageNote([{
+                    status: exportReview.covered ? 'review_basis' : 'not_covered'
+                }]),
                 evidence: exportReview.evidence
             };
         }
@@ -392,6 +448,7 @@
                     : valueApi.buildRecommendedAction(result, context)
             },
             sourceBreakdown: dutyImpact.sourceBreakdown || [],
+            coverageNote: buildCoverageNote(dutyImpact.sourceBreakdown || []),
             evidence: valueApi.buildEvidenceList(context)
         };
     }
@@ -410,6 +467,8 @@
         }
         const decisionText = $('post-entry-decision-text');
         if (decisionText) decisionText.textContent = snapshot.topConclusion || snapshot.conclusion || 'Review required.';
+        const coverageNote = $('post-entry-coverage-note');
+        if (coverageNote) coverageNote.textContent = snapshot.coverageNote || buildCoverageNote(snapshot.sourceBreakdown || []);
         if (snapshot.labels) {
             const customLabel = $('post-entry-customs-value-label');
             const rebateLabel = $('post-entry-rebate-base-label');
