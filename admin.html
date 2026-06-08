@@ -235,6 +235,34 @@
             font-size: 0.8rem;
             margin-top: 10px;
         }
+        .duty-status-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 10px 0 14px;
+        }
+        .duty-source-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
+        }
+        .duty-source-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.12);
+        }
+        .duty-source-card h4 {
+            margin: 8px 0 6px;
+            font-size: 0.94rem;
+        }
+        .duty-source-card p { margin: 6px 0; }
+        .duty-source-card a { color: #93c5fd; }
+        .badge.auto_updatable { background: #123d2a; color: #86efac; }
+        .badge.benchmark_updatable { background: #164e63; color: #67e8f9; }
+        .badge.updater_candidate { background: #1e3a5f; color: #93c5fd; }
+        .badge.official_link { background: #3b2f1e; color: #fcd34d; }
+        .badge.benchmark { background: #451a1a; color: #fca5a5; }
         #login-panel { max-width: 420px; }
         .hidden { display: none !important; }
     </style>
@@ -279,6 +307,16 @@
                 <div id="crawl-summary">加载中…</div>
             </div>
             <div class="panel">
+                <div class="crawl-section-title">
+                    <div>
+                        <h2 style="margin:0 0 4px">Duty-rate source status</h2>
+                        <p class="meta" style="margin:0">只读状态：哪些国家税率已能自动同步，哪些仍是官方链接/本地 benchmark。</p>
+                    </div>
+                    <button type="button" class="btn-ghost" id="btn-refresh-duty-rates">刷新税率源状态</button>
+                </div>
+                <div id="duty-rate-status">加载中…</div>
+            </div>
+            <div class="panel">
                 <div class="coverage-toolbar">
                     <div>
                         <h2 style="margin:0 0 4px">Coverage Matrix</h2>
@@ -309,6 +347,7 @@
         const statusBar = document.getElementById('status-bar');
         const pendingList = document.getElementById('pending-list');
         const crawlSummary = document.getElementById('crawl-summary');
+        const dutyRateStatus = document.getElementById('duty-rate-status');
         const coverageMatrixView = document.getElementById('coverage-matrix-view');
         const coverageSummary = document.getElementById('coverage-summary');
         const coverageSaveState = document.getElementById('coverage-save-state');
@@ -316,8 +355,15 @@
         const passwordInput = document.getElementById('password');
         let currentCoveragePayload = null;
 
+        function getCurrentAdminOrigin() {
+            if (/^(127\.0\.0\.1|localhost)$/.test(window.location.hostname) && window.location.port === '8787') {
+                return window.location.origin;
+            }
+            return '';
+        }
+
         function getApiBase() {
-            return (localStorage.getItem(API_BASE_KEY) || apiBaseInput.value || '').replace(/\/$/, '');
+            return (getCurrentAdminOrigin() || localStorage.getItem(API_BASE_KEY) || apiBaseInput.value || '').replace(/\/$/, '');
         }
 
         function getToken() {
@@ -674,6 +720,75 @@
             `;
         }
 
+        function formatCountryList(countries) {
+            return Array.isArray(countries) && countries.length ? countries.join(', ') : '—';
+        }
+
+        function renderDutySource(source) {
+            const status = String(source.source_status || 'benchmark');
+            const statusLabel = {
+                auto_updatable: 'AUTO',
+                benchmark_updatable: 'BENCHMARK AUTO',
+                updater_candidate: 'CANDIDATE',
+                official_link: 'OFFICIAL LINK',
+                benchmark: 'BENCHMARK'
+            }[status] || status.toUpperCase();
+            const command = source.update_command
+                ? `<p class="meta">更新命令: <code>${escapeHtml(source.update_command)}</code></p>`
+                : '';
+            const official = source.official_url
+                ? `<p class="meta"><a href="${escapeHtml(source.official_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.official_url)}</a></p>`
+                : '';
+            return `
+                <article class="duty-source-card">
+                    <div><span class="badge ${escapeHtml(status)}">${escapeHtml(statusLabel)}</span> <span class="meta">${escapeHtml(source.country || '')}</span></div>
+                    <h4>${escapeHtml(source.name || source.country || 'Duty-rate source')}</h4>
+                    <p class="desc">${escapeHtml(source.current_scope || '')}</p>
+                    <p class="meta">Priority: ${escapeHtml(source.maintenance_priority || '—')}</p>
+                    <p class="meta">Reason: ${escapeHtml(source.status_reason || '—')}</p>
+                    <p class="meta">Authority: ${escapeHtml(source.authority || '—')}</p>
+                    <p class="meta">Next: ${escapeHtml(source.next_action || '—')}</p>
+                    ${command}
+                    ${official}
+                </article>
+            `;
+        }
+
+        async function loadDutyRateStatus() {
+            if (!dutyRateStatus) return;
+            dutyRateStatus.innerHTML = '<p class="meta">正在加载税率源状态…</p>';
+            try {
+                const data = await apiFetch('/api/review/duty-rates');
+                const summary = data.duty_rate_summary || {};
+                const roadmap = data.source_roadmap_summary || {};
+                const statusCounts = roadmap.status_counts || {};
+                const sources = Array.isArray(data.sources) ? data.sources : [];
+                const failures = Array.isArray(data.failures) ? data.failures : [];
+                dutyRateStatus.innerHTML = `
+                    <div class="summary-grid">
+                        <div class="summary-card"><strong>${summary.rule_count ?? 0}</strong><span>Maintained duty rules</span></div>
+                        <div class="summary-card"><strong>${summary.country_count ?? 0}</strong><span>Covered import markets</span></div>
+                        <div class="summary-card"><strong>${data.sample_count ?? 0}</strong><span>Regression samples</span></div>
+                        <div class="summary-card"><strong>${roadmap.source_count ?? sources.length}</strong><span>Tracked sources</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(data.duty_rates_updated_at || '—')}</strong><span>Duty data updated</span></div>
+                    </div>
+                    <div class="duty-status-row">
+                        <span class="badge auto_updatable">Auto: ${escapeHtml(formatCountryList(roadmap.auto_updatable))}</span>
+                        <span class="badge benchmark_updatable">Benchmark updater: ${escapeHtml(formatCountryList(roadmap.benchmark_updatable))}</span>
+                        <span class="badge updater_candidate">Candidate: ${escapeHtml(formatCountryList(roadmap.updater_candidates))}</span>
+                        <span class="badge official_link">Official link: ${statusCounts.official_link || 0}</span>
+                        <span class="badge benchmark">Benchmark: ${statusCounts.benchmark || 0}</span>
+                    </div>
+                    <p class="meta">Roadmap 更新: ${escapeHtml(data.source_roadmap_updated_at || '—')} · Health: ${data.ok ? 'OK' : 'Needs review'}</p>
+                    ${failures.length ? `<div class="empty">税率源检查有 ${failures.length} 个问题：${escapeHtml(failures.map(f => `${f.id}: ${(f.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
+                    <div class="crawl-section-title"><h3>Source roadmap</h3><span class="meta">${sources.length} 个源</span></div>
+                    <div class="duty-source-grid">${sources.length ? sources.map(renderDutySource).join('') : '<div class="empty">暂无税率源配置。</div>'}</div>
+                `;
+            } catch (err) {
+                dutyRateStatus.innerHTML = `<div class="empty">税率源状态加载失败：${escapeHtml(err.message)}</div>`;
+            }
+        }
+
         async function loadCrawlSummary() {
             if (!crawlSummary) return;
             crawlSummary.innerHTML = '<p class="meta">正在加载抓取摘要…</p>';
@@ -764,6 +879,7 @@
             loginPanel.classList.add('hidden');
             reviewPanel.classList.remove('hidden');
             loadCrawlSummary();
+            loadDutyRateStatus();
             loadCoverageMatrixView();
             if (!skipInitialLoad) {
                 loadPending();
@@ -885,13 +1001,17 @@
 
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
+        document.getElementById('btn-refresh-duty-rates').addEventListener('click', loadDutyRateStatus);
         document.getElementById('btn-refresh-coverage').addEventListener('click', loadCoverageMatrixView);
         document.getElementById('btn-save-coverage').addEventListener('click', saveCoverageMatrix);
         document.getElementById('btn-test-crawl').addEventListener('click', runTestCrawl);
         document.getElementById('btn-publish-sync').addEventListener('click', publishSync);
         document.getElementById('btn-logout').addEventListener('click', showLogin);
 
-        if (localStorage.getItem(API_BASE_KEY)) {
+        if (getCurrentAdminOrigin()) {
+            apiBaseInput.value = getCurrentAdminOrigin();
+            localStorage.setItem(API_BASE_KEY, getCurrentAdminOrigin());
+        } else if (localStorage.getItem(API_BASE_KEY)) {
             apiBaseInput.value = localStorage.getItem(API_BASE_KEY);
         }
 

@@ -41,6 +41,8 @@ const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
 const ADMIN_BUILD_ID = '20260603-global-compliance-crawler-v1';
 const LOG_PREFIX = '[GLOBAL-CRAWL]';
 const COVERAGE_MATRIX_PATH = path.join(ROOT, 'data', 'coverage-matrix.json');
+const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
+const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
@@ -228,6 +230,25 @@ function readJsonFile(filePath, fallback = {}) {
     }
 }
 
+function buildDutyRateStatusPayload() {
+    const { runDutyRateHealthCheck } = require('./check-duty-rates');
+    const health = runDutyRateHealthCheck();
+    const sourcesPayload = readJsonFile(DUTY_RATE_SOURCES_PATH, { sources: [] });
+    const dutyPayload = readJsonFile(DUTY_RATES_PATH, { rules: [] });
+    return {
+        ...health,
+        generated_at: new Date().toISOString(),
+        duty_rates_updated_at: dutyPayload.updated_at || null,
+        source_roadmap_updated_at: sourcesPayload.updated_at || null,
+        source_roadmap_notes: sourcesPayload.notes || '',
+        sources: Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : []
+    };
+}
+
+async function handleDutyRateStatus(req, res) {
+    sendJson(res, 200, buildDutyRateStatusPayload());
+}
+
 function getAllowedCoverageCodes() {
     const registry = readJsonFile(path.join(ROOT, 'data', 'country-registry.json'), {});
     const routeOptions = Array.isArray(registry.route_options) ? registry.route_options : [];
@@ -397,6 +418,11 @@ async function handleApi(req, res) {
             return;
         }
 
+        if (req.method === 'GET' && urlPath === '/api/review/duty-rates') {
+            await handleDutyRateStatus(req, res);
+            return;
+        }
+
         if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/api/review/coverage-matrix') {
             await handleCoverageMatrix(req, res);
             return;
@@ -423,47 +449,63 @@ async function handleApi(req, res) {
     }
 }
 
-const server = http.createServer(async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', `Content-Type, Authorization, ${PRIMARY_ADMIN_HEADER}`);
+function createAdminServer() {
+    return http.createServer(async (req, res) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', `Content-Type, Authorization, ${PRIMARY_ADMIN_HEADER}`);
 
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        res.end();
-        return;
-    }
+        if (req.method === 'OPTIONS') {
+            res.writeHead(204);
+            res.end();
+            return;
+        }
 
-    if (req.url.startsWith('/api/')) {
-        await handleApi(req, res);
-        return;
-    }
+        if (req.url.startsWith('/api/')) {
+            await handleApi(req, res);
+            return;
+        }
 
-    serveStatic(req, res);
-});
+        serveStatic(req, res);
+    });
+}
 
-server.listen(PORT, '127.0.0.1', () => {
-    const dataPaths = getDataPaths();
-    if (!areAdminRoutesEnabled()) {
-        console.warn('WARNING: ADMIN_ROUTES_ENABLED is not set. All /api/* admin routes return 403 until enabled.');
-        console.warn('Add ADMIN_ROUTES_ENABLED=1 to .env.local (npm run restart:admin sets this).');
-    }
-    if (getConfiguredAdminSecrets().length === 0) {
-        console.warn('WARNING: TEST_CRAWL_SECRET / ADMIN_REVIEW_PASSWORD not set. Admin API will reject all requests.');
-        console.warn('Example: ADMIN_REVIEW_PASSWORD=your-secret ADMIN_ROUTES_ENABLED=1 npm run dev:admin');
-    }
-    console.log(`Review admin listening on http://127.0.0.1:${PORT}/admin.html`);
-    console.log(`Build: ${ADMIN_BUILD_ID}`);
-    console.log(`Project root: ${ROOT}`);
-    console.log(`Writes to: ${dataPaths.prodTags}`);
-    console.log(`Pending queue: ${dataPaths.queue}`);
-    console.log(`Admin gate: header ${PRIMARY_ADMIN_HEADER} or Authorization: Bearer`);
-    if (envFiles.length > 0) {
-        console.log(`Loaded env: ${envFiles.join(', ')}`);
-    }
-    if (refreshLocalEnv()) {
-        console.log('DEEPSEEK_API_KEY: configured (AI filter active)');
-    } else {
-        console.warn('DEEPSEEK_API_KEY: NOT SET — create .env.local from .env.example, then npm run restart:admin');
-    }
-});
+function startAdminServer() {
+    const server = createAdminServer();
+    server.listen(PORT, '127.0.0.1', () => {
+        const dataPaths = getDataPaths();
+        if (!areAdminRoutesEnabled()) {
+            console.warn('WARNING: ADMIN_ROUTES_ENABLED is not set. All /api/* admin routes return 403 until enabled.');
+            console.warn('Add ADMIN_ROUTES_ENABLED=1 to .env.local (npm run restart:admin sets this).');
+        }
+        if (getConfiguredAdminSecrets().length === 0) {
+            console.warn('WARNING: TEST_CRAWL_SECRET / ADMIN_REVIEW_PASSWORD not set. Admin API will reject all requests.');
+            console.warn('Example: ADMIN_REVIEW_PASSWORD=your-secret ADMIN_ROUTES_ENABLED=1 npm run dev:admin');
+        }
+        console.log(`Review admin listening on http://127.0.0.1:${PORT}/admin.html`);
+        console.log(`Build: ${ADMIN_BUILD_ID}`);
+        console.log(`Project root: ${ROOT}`);
+        console.log(`Writes to: ${dataPaths.prodTags}`);
+        console.log(`Pending queue: ${dataPaths.queue}`);
+        console.log(`Admin gate: header ${PRIMARY_ADMIN_HEADER} or Authorization: Bearer`);
+        if (envFiles.length > 0) {
+            console.log(`Loaded env: ${envFiles.join(', ')}`);
+        }
+        if (refreshLocalEnv()) {
+            console.log('DEEPSEEK_API_KEY: configured (AI filter active)');
+        } else {
+            console.warn('DEEPSEEK_API_KEY: NOT SET — create .env.local from .env.example, then npm run restart:admin');
+        }
+    });
+    return server;
+}
+
+if (require.main === module) {
+    startAdminServer();
+}
+
+module.exports = {
+    buildDutyRateStatusPayload,
+    createAdminServer,
+    startAdminServer
+};

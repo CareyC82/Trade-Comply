@@ -87,6 +87,7 @@ function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
         source_count: rows.length,
         status_counts: statusCounts,
         auto_updatable: rows.filter(source => source.source_status === 'auto_updatable').map(source => source.country),
+        benchmark_updatable: rows.filter(source => source.source_status === 'benchmark_updatable').map(source => source.country),
         updater_candidates: rows.filter(source => source.source_status === 'updater_candidate').map(source => source.country),
         official_link_only: rows.filter(source => source.source_status === 'official_link').map(source => source.country),
         benchmark_only: rows.filter(source => source.source_status === 'benchmark').map(source => source.country),

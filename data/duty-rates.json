@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-06",
+  "updated_at": "2026-06-08",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -181,11 +181,12 @@
       ],
       "trade_remedy": "EU customs duty plus member-state VAT benchmark; verify TARIC code, origin, and VAT member state.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "EU import benchmark only. VAT varies by member state and exact tariff code.",
-      "source_hts": "850440",
-      "source_rate_text": "Benchmark: duty 2.7% + VAT placeholder",
-      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en"
+      "source_status": "benchmark_source_checked",
+      "source_note": "EU TARIC benchmark metadata refreshed locally. Verify exact TARIC code, origin preference, and import VAT member state before filing.",
+      "source_hts": "850440 benchmark",
+      "source_rate_text": "Benchmark: 2.7% common customs duty; VAT depends on member state",
+      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "last_checked_at": "2026-06-08T07:29:58.714Z"
     },
     {
       "id": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -215,11 +216,12 @@
       ],
       "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify TARIC code and import VAT treatment.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Germany benchmark uses EU customs framework and local VAT. Confirm exact TARIC line.",
-      "source_hts": "EU electronics benchmark",
-      "source_rate_text": "Benchmark: duty 2.7% + Germany VAT placeholder",
-      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en"
+      "source_status": "benchmark_source_checked",
+      "source_note": "Germany benchmark refreshed from maintained EU duty + Germany VAT table. Verify exact TARIC code and VAT treatment.",
+      "source_hts": "EU electronics benchmark / Germany VAT",
+      "source_rate_text": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "last_checked_at": "2026-06-08T07:29:58.714Z"
     },
     {
       "id": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -249,11 +251,12 @@
       ],
       "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify TARIC code and import VAT treatment.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Netherlands benchmark uses EU customs framework and local VAT. Confirm exact TARIC line.",
-      "source_hts": "EU electronics benchmark",
-      "source_rate_text": "Benchmark: duty 2.7% + Netherlands VAT placeholder",
-      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en"
+      "source_status": "benchmark_source_checked",
+      "source_note": "Netherlands benchmark refreshed from maintained EU duty + Netherlands VAT table. Verify exact TARIC code and VAT treatment.",
+      "source_hts": "EU electronics benchmark / Netherlands VAT",
+      "source_rate_text": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "last_checked_at": "2026-06-08T07:29:58.714Z"
     },
     {
       "id": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -283,11 +286,12 @@
       ],
       "trade_remedy": "Singapore generally applies GST on imports; confirm exact customs value and any dutiable-goods treatment.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Singapore benchmark for common electronics imports. Confirm GST and dutiable-goods treatment.",
+      "source_status": "benchmark_source_checked",
+      "source_note": "Singapore benchmark refreshed locally. Verify exact HS code, GST value basis, and whether the goods are dutiable before filing.",
       "source_hts": "SG electronics benchmark",
       "source_rate_text": "Benchmark: 0% customs duty + 9% GST",
-      "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/"
+      "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+      "last_checked_at": "2026-06-08T07:30:02.986Z"
     },
     {
       "id": "MX-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -577,6 +581,134 @@
         "new_base_rate": 0.019,
         "source_hts": "8543100000",
         "source_rate_text": "1.9%"
+      }
+    ],
+    "errors": []
+  },
+  "last_eu_taric_benchmark_sync_at": "2026-06-08T07:29:58.714Z",
+  "last_eu_taric_benchmark_sync": {
+    "ok": true,
+    "dry_run": false,
+    "writes_official_machine_rates": false,
+    "changes": [
+      {
+        "rule": "EU-CN-850440-EVCHARGER-INDICATIVE",
+        "import_country": "EU",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "EU import benchmark only. VAT varies by member state and exact tariff code.",
+            "new_value": "EU TARIC benchmark metadata refreshed locally. Verify exact TARIC code, origin preference, and import VAT member state before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "850440",
+            "new_value": "850440 benchmark"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: duty 2.7% + VAT placeholder",
+            "new_value": "Benchmark: 2.7% common customs duty; VAT depends on member state"
+          },
+          {
+            "field": "last_checked_at",
+            "new_value": "2026-06-08T07:29:58.714Z"
+          }
+        ]
+      },
+      {
+        "rule": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "import_country": "DE",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark uses EU customs framework and local VAT. Confirm exact TARIC line.",
+            "new_value": "Germany benchmark refreshed from maintained EU duty + Germany VAT table. Verify exact TARIC code and VAT treatment."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "EU electronics benchmark",
+            "new_value": "EU electronics benchmark / Germany VAT"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: duty 2.7% + Germany VAT placeholder",
+            "new_value": "Benchmark: 2.7% EU duty + 19% Germany VAT"
+          },
+          {
+            "field": "last_checked_at",
+            "new_value": "2026-06-08T07:29:58.714Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark uses EU customs framework and local VAT. Confirm exact TARIC line.",
+            "new_value": "Netherlands benchmark refreshed from maintained EU duty + Netherlands VAT table. Verify exact TARIC code and VAT treatment."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "EU electronics benchmark",
+            "new_value": "EU electronics benchmark / Netherlands VAT"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: duty 2.7% + Netherlands VAT placeholder",
+            "new_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT"
+          },
+          {
+            "field": "last_checked_at",
+            "new_value": "2026-06-08T07:29:58.714Z"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "last_sg_customs_benchmark_sync_at": "2026-06-08T07:30:02.986Z",
+  "last_sg_customs_benchmark_sync": {
+    "ok": true,
+    "dry_run": false,
+    "writes_official_machine_rates": false,
+    "changes": [
+      {
+        "rule": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "import_country": "SG",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Singapore benchmark for common electronics imports. Confirm GST and dutiable-goods treatment.",
+            "new_value": "Singapore benchmark refreshed locally. Verify exact HS code, GST value basis, and whether the goods are dutiable before filing."
+          },
+          {
+            "field": "last_checked_at",
+            "new_value": "2026-06-08T07:30:02.986Z"
+          }
+        ]
       }
     ],
     "errors": []

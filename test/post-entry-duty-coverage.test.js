@@ -49,13 +49,17 @@ test('Russia sample keeps sanctions scope as a review-only flag', () => {
     assert.ok(russia.source_statuses.includes('scope_check_required'));
 });
 
-test('non-US benchmark samples stay marked as indicative, not official', () => {
+test('non-US benchmark samples stay non-official', () => {
     const result = runDutyRateHealthCheck();
     const nonUsSamples = result.samples.filter(sample => !sample.id.startsWith('PE-US-'));
 
     assert.ok(nonUsSamples.length > 0);
     nonUsSamples.forEach((sample) => {
-        assert.ok(sample.source_statuses.includes('indicative'), `${sample.id} should remain indicative`);
+        assert.equal(
+            sample.source_statuses.includes('indicative') || sample.source_statuses.includes('benchmark_source_checked'),
+            true,
+            `${sample.id} should remain indicative or benchmark-checked`
+        );
         assert.equal(sample.source_statuses.includes('official_source_checked'), false, `${sample.id} should not be official`);
     });
 });
