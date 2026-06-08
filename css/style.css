@@ -4715,6 +4715,117 @@ button.feedback-link:hover {
     line-height: 1.4;
 }
 
+.post-entry-confidence-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 13px 15px;
+    border-radius: 11px;
+    border: 1px solid rgba(26, 58, 92, 0.12);
+    background: #fff;
+}
+
+.post-entry-confidence-card--official {
+    border-color: rgba(46, 125, 50, 0.24);
+    background: rgba(46, 125, 50, 0.05);
+}
+
+.post-entry-confidence-card--benchmark,
+.post-entry-confidence-card--mixed,
+.post-entry-confidence-card--indicative {
+    border-color: rgba(232, 168, 23, 0.26);
+    background: rgba(232, 168, 23, 0.07);
+}
+
+.post-entry-confidence-card--scope {
+    border-color: rgba(183, 28, 28, 0.24);
+    background: rgba(183, 28, 28, 0.05);
+}
+
+.post-entry-confidence-card--not-covered,
+.post-entry-confidence-card--review {
+    border-color: rgba(26, 58, 92, 0.12);
+    background: var(--color-bg-secondary);
+}
+
+.post-entry-confidence-kicker {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.post-entry-confidence-card strong {
+    display: block;
+    margin-top: 3px;
+    color: var(--color-primary);
+    font-size: 0.98rem;
+}
+
+.post-entry-confidence-card p {
+    margin: 5px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.post-entry-confidence-chips {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+    flex-wrap: wrap;
+    max-width: 360px;
+}
+
+.post-entry-confidence-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.post-entry-confidence-chip--official_source_checked,
+.post-entry-source-status--official_source_checked {
+    background: rgba(46, 125, 50, 0.12);
+    color: var(--color-success);
+}
+
+.post-entry-confidence-chip--benchmark_source_checked,
+.post-entry-source-status--benchmark_source_checked {
+    background: rgba(14, 116, 144, 0.12);
+    color: #0e7490;
+}
+
+.post-entry-confidence-chip--indicative,
+.post-entry-confidence-chip--review_basis,
+.post-entry-source-status--indicative,
+.post-entry-source-status--review_basis {
+    background: rgba(232, 168, 23, 0.16);
+    color: #8a5a00;
+}
+
+.post-entry-confidence-chip--scope_check_required,
+.post-entry-confidence-chip--flag_only,
+.post-entry-source-status--scope_check_required,
+.post-entry-source-status--flag_only {
+    background: rgba(183, 28, 28, 0.1);
+    color: var(--color-danger-text);
+}
+
+.post-entry-confidence-chip--not_covered,
+.post-entry-source-status--not_covered {
+    background: rgba(26, 58, 92, 0.08);
+    color: var(--color-text-secondary);
+}
+
 .post-entry-result-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -4832,28 +4943,6 @@ button.feedback-link:hover {
     white-space: nowrap;
 }
 
-.post-entry-source-status--official_source_checked {
-    background: rgba(46, 125, 50, 0.12);
-    color: var(--color-success);
-}
-
-.post-entry-source-status--indicative,
-.post-entry-source-status--review_basis {
-    background: rgba(232, 168, 23, 0.16);
-    color: #8a5a00;
-}
-
-.post-entry-source-status--scope_check_required,
-.post-entry-source-status--flag_only {
-    background: rgba(183, 28, 28, 0.1);
-    color: var(--color-danger-text);
-}
-
-.post-entry-source-status--not_covered {
-    background: rgba(26, 58, 92, 0.08);
-    color: var(--color-text-secondary);
-}
-
 .post-entry-insight-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -4922,10 +5011,16 @@ button.feedback-link:hover {
 }
 
 @media (max-width: 620px) {
+    .post-entry-confidence-card,
     .post-entry-source-header,
     .post-entry-source-row {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .post-entry-confidence-chips {
+        justify-content: flex-start;
+        max-width: none;
     }
 
     .post-entry-source-header span {

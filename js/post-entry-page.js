@@ -148,6 +148,7 @@
     function getSourceStatusLabel(status) {
         const labels = {
             official_source_checked: 'Official source checked',
+            benchmark_source_checked: 'Benchmark checked',
             indicative: 'Benchmark estimate',
             scope_check_required: 'Scope check required',
             flag_only: 'Scope check required',
@@ -160,6 +161,7 @@
     function getSourceStatusHelp(status) {
         const labels = {
             official_source_checked: 'Pulled from an official tariff source and stored with the rate basis.',
+            benchmark_source_checked: 'Matched to a maintained local benchmark and official source roadmap, but not a live official tariff lookup.',
             indicative: 'Useful for pre-check math, but not a final official tariff lookup.',
             scope_check_required: 'The amount depends on case scope, exclusion, origin, or product-specific facts.',
             flag_only: 'The amount depends on case scope, exclusion, origin, or product-specific facts.',
@@ -177,7 +179,70 @@
             return 'official_source_checked';
         }
         if (statuses.has('official_source_checked')) return 'mixed';
+        if (statuses.has('benchmark_source_checked')) return 'benchmark_source_checked';
         return statuses.has('review_basis') ? 'review_basis' : 'indicative';
+    }
+
+    function countSourceStatuses(items = []) {
+        return items.reduce((counts, item) => {
+            const status = item.status || 'indicative';
+            counts[status] = (counts[status] || 0) + 1;
+            return counts;
+        }, {});
+    }
+
+    function buildRateConfidence(items = []) {
+        const rows = Array.isArray(items) ? items : [];
+        const level = getSourceCoverageLevel(rows);
+        const counts = countSourceStatuses(rows);
+        const chips = Object.entries(counts)
+            .filter(([, count]) => count > 0)
+            .map(([status, count]) => ({
+                status,
+                label: `${getSourceStatusLabel(status)} · ${count}`
+            }));
+        const map = {
+            official_source_checked: {
+                tone: 'official',
+                label: 'Official checked',
+                summary: 'Base rate is backed by a maintained official tariff source. Still confirm entry-date applicability and product scope before filing.'
+            },
+            benchmark_source_checked: {
+                tone: 'benchmark',
+                label: 'Benchmark checked',
+                summary: 'Rate math uses a maintained local benchmark and source roadmap. Treat it as a strong pre-check, not a live official tariff lookup.'
+            },
+            mixed: {
+                tone: 'mixed',
+                label: 'Mixed source basis',
+                summary: 'Some rate components are official-checked, while add-ons or taxes remain benchmark or indicative. Verify the non-official layers before amendment.'
+            },
+            scope_check_required: {
+                tone: 'scope',
+                label: 'Scope review required',
+                summary: 'At least one duty layer depends on case scope, exclusion, origin, sanctions, or product-specific facts. Do not use the estimate as the final duty bill.'
+            },
+            not_covered: {
+                tone: 'not-covered',
+                label: 'Rate not covered',
+                summary: 'No maintained route / HS rate exists yet. Use the value math only and confirm the official tariff line separately.'
+            },
+            review_basis: {
+                tone: 'review',
+                label: 'Review basis only',
+                summary: 'This result provides filing-value review logic, not destination import duty math.'
+            },
+            indicative: {
+                tone: 'indicative',
+                label: 'Indicative only',
+                summary: 'The rate is useful for screening, but it is not official-checked. Confirm the destination tariff and tax treatment before filing.'
+            }
+        };
+        return {
+            ...(map[level] || map.indicative),
+            level,
+            chips: chips.length ? chips : [{ status: level, label: getSourceStatusLabel(level) }]
+        };
     }
 
     function buildRateBasisText(items = []) {
@@ -194,6 +259,9 @@
         }
         if (level === 'mixed') {
             return 'Rate basis: official base rate plus benchmark add-ons. Confirm Chapter 99, exclusions, and entry-date scope.';
+        }
+        if (level === 'benchmark_source_checked') {
+            return 'Rate basis: maintained benchmark checked. Useful for pre-check decisions, but verify the official tariff line before filing.';
         }
         if (level === 'scope_check_required') {
             return 'Rate basis: includes case-scope flags. The value estimate is useful, but AD/CVD or product-scope review may change the final duty.';
@@ -278,7 +346,9 @@
     }
 
     function buildImportTopConclusion(result, dutyImpact, currency) {
-        const basis = buildRateBasisText(dutyImpact.sourceBreakdown || []);
+        const sourceBreakdown = dutyImpact.sourceBreakdown || [];
+        const confidence = buildRateConfidence(sourceBreakdown);
+        const basis = buildRateBasisText(sourceBreakdown);
         if (!dutyImpact.covered) {
             if (result.difference > 0) {
                 return `Value gap detected: ${formatMoney(result.difference, currency)}. Duty rate is not covered yet, so confirm official tariff before correction.`;
@@ -286,15 +356,15 @@
             return 'No duty estimate available for this route / HS yet. Confirm official tariff before filing or correction.';
         }
         if (dutyImpact.dutyVariance > 0.01) {
-            return `Potential duty shortfall: ${formatMoney(dutyImpact.dutyVariance, currency)}. Rate basis: ${basis}.`;
+            return `Potential duty shortfall: ${formatMoney(dutyImpact.dutyVariance, currency)}. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
         }
         if (dutyImpact.dutyVariance < -0.01) {
-            return `Declared duty may be higher than estimate by ${formatMoney(Math.abs(dutyImpact.dutyVariance), currency)}. Rate basis: ${basis}.`;
+            return `Declared duty may be higher than estimate by ${formatMoney(Math.abs(dutyImpact.dutyVariance), currency)}. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
         }
         if (result.difference > 0.01) {
-            return `Value gap detected: ${formatMoney(result.difference, currency)}. Rate basis: ${basis}.`;
+            return `Value gap detected: ${formatMoney(result.difference, currency)}. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
         }
-        return `No obvious duty shortfall. Rate basis: ${basis}.`;
+        return `No obvious duty shortfall. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
     }
 
     function buildExportTopConclusion(result, currency) {
@@ -417,6 +487,9 @@
                 coverageNote: buildCoverageNote([{
                     status: exportReview.covered ? 'review_basis' : 'not_covered'
                 }]),
+                rateConfidence: buildRateConfidence([{
+                    status: exportReview.covered ? 'review_basis' : 'not_covered'
+                }]),
                 evidence: exportReview.evidence
             };
         }
@@ -449,8 +522,30 @@
             },
             sourceBreakdown: dutyImpact.sourceBreakdown || [],
             coverageNote: buildCoverageNote(dutyImpact.sourceBreakdown || []),
+            rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
             evidence: valueApi.buildEvidenceList(context)
         };
+    }
+
+    function renderRateConfidence(confidence) {
+        const card = $('post-entry-confidence-card');
+        if (!card) return;
+        const safe = confidence || buildRateConfidence([]);
+        card.className = `post-entry-confidence-card post-entry-confidence-card--${safe.tone || 'indicative'}`;
+        const label = $('post-entry-confidence-label');
+        const summary = $('post-entry-confidence-summary');
+        const chips = $('post-entry-confidence-chips');
+        if (label) label.textContent = safe.label || 'Indicative only';
+        if (summary) summary.textContent = safe.summary || '';
+        if (chips) {
+            chips.innerHTML = '';
+            (safe.chips || []).forEach((chip) => {
+                const el = document.createElement('span');
+                el.className = `post-entry-confidence-chip post-entry-confidence-chip--${chip.status || 'indicative'}`;
+                el.textContent = chip.label || getSourceStatusLabel(chip.status);
+                chips.appendChild(el);
+            });
+        }
     }
 
     function renderReviewSnapshot(snapshot) {
@@ -469,6 +564,7 @@
         if (decisionText) decisionText.textContent = snapshot.topConclusion || snapshot.conclusion || 'Review required.';
         const coverageNote = $('post-entry-coverage-note');
         if (coverageNote) coverageNote.textContent = snapshot.coverageNote || buildCoverageNote(snapshot.sourceBreakdown || []);
+        renderRateConfidence(snapshot.rateConfidence || buildRateConfidence(snapshot.sourceBreakdown || []));
         if (snapshot.labels) {
             const customLabel = $('post-entry-customs-value-label');
             const rebateLabel = $('post-entry-rebate-base-label');
