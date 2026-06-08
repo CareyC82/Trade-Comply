@@ -19,6 +19,7 @@ const {
 
 const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
+const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const SAMPLES_PATH = path.join(ROOT, 'data', 'post-entry-samples.json');
 
 function readJson(filePath) {
@@ -68,19 +69,56 @@ function runSample(sample) {
     };
 }
 
+function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
+    const coveredCountries = new Set((dutySummary.countries || []).map(item => item.import_country));
+    const rows = sourcesPayload.sources || [];
+    const missingCoverage = rows
+        .filter(source => !coveredCountries.has(source.country))
+        .map(source => source.country);
+    const missingRoadmap = (dutySummary.countries || [])
+        .filter(country => !rows.some(source => source.country === country.import_country))
+        .map(country => country.import_country);
+    const statusCounts = rows.reduce((counts, source) => {
+        counts[source.source_status] = (counts[source.source_status] || 0) + 1;
+        return counts;
+    }, {});
+
+    return {
+        source_count: rows.length,
+        status_counts: statusCounts,
+        auto_updatable: rows.filter(source => source.source_status === 'auto_updatable').map(source => source.country),
+        updater_candidates: rows.filter(source => source.source_status === 'updater_candidate').map(source => source.country),
+        official_link_only: rows.filter(source => source.source_status === 'official_link').map(source => source.country),
+        benchmark_only: rows.filter(source => source.source_status === 'benchmark').map(source => source.country),
+        missing_coverage: missingCoverage,
+        missing_roadmap: missingRoadmap
+    };
+}
+
 function runDutyRateHealthCheck() {
     const dutyPayload = readJson(DUTY_RATES_PATH);
+    const sourcesPayload = readJson(DUTY_RATE_SOURCES_PATH);
     const samplesPayload = readJson(SAMPLES_PATH);
     const samples = samplesPayload.samples || [];
     const sampleResults = samples.map(runSample);
     const failures = sampleResults.filter(result => result.failures.length);
+    const dutySummary = summarizeDutyRateCoverage(dutyPayload);
+    const sourceRoadmap = summarizeSourceRoadmap(sourcesPayload, dutySummary);
+    const sourceFailures = [];
+    if (sourceRoadmap.missing_coverage.length) {
+        sourceFailures.push(`source roadmap includes countries without duty rules: ${sourceRoadmap.missing_coverage.join(', ')}`);
+    }
+    if (sourceRoadmap.missing_roadmap.length) {
+        sourceFailures.push(`duty rules include countries missing source roadmap: ${sourceRoadmap.missing_roadmap.join(', ')}`);
+    }
 
     return {
-        ok: failures.length === 0,
-        duty_rate_summary: summarizeDutyRateCoverage(dutyPayload),
+        ok: failures.length === 0 && sourceFailures.length === 0,
+        duty_rate_summary: dutySummary,
+        source_roadmap_summary: sourceRoadmap,
         sample_count: samples.length,
         failed_sample_count: failures.length,
-        failures,
+        failures: failures.concat(sourceFailures.map(error => ({ id: 'source-roadmap', failures: [error] }))),
         samples: sampleResults
     };
 }
@@ -97,5 +135,6 @@ if (require.main === module) {
 
 module.exports = {
     runDutyRateHealthCheck,
-    runSample
+    runSample,
+    summarizeSourceRoadmap
 };
