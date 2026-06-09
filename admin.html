@@ -276,6 +276,26 @@
             margin: 0 0 6px;
             font-size: 0.98rem;
         }
+        .duty-sync-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .duty-sync-mini-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.12);
+        }
+        .duty-sync-mini-card strong {
+            display: block;
+            font-size: 1.1rem;
+        }
+        .duty-sync-mini-card span {
+            color: var(--muted);
+            font-size: 0.75rem;
+        }
         .duty-exception-list {
             margin: 8px 0 0;
             padding-left: 18px;
@@ -778,11 +798,13 @@
             `;
         }
 
-        function renderDutySyncStatus(syncStatus = {}) {
+        function renderDutySyncStatus(syncStatus = {}, roadmap = {}) {
             const status = String(syncStatus.status || 'not_run');
             const counts = syncStatus.counts || {};
             const exceptions = Array.isArray(syncStatus.exceptions) ? syncStatus.exceptions : [];
             const autoApplied = Array.isArray(syncStatus.auto_applied) ? syncStatus.auto_applied : [];
+            const officialLinkOnly = Array.isArray(roadmap.official_link_only) ? roadmap.official_link_only : [];
+            const benchmarkOnly = Array.isArray(roadmap.benchmark_only) ? roadmap.benchmark_only : [];
             const statusLabel = status === 'ok'
                 ? '税率自动同步正常'
                 : status === 'exceptions'
@@ -796,10 +818,22 @@
             const exceptionList = exceptions.length
                 ? `<ul class="duty-exception-list">${exceptions.slice(0, 5).map(item => `<li>${escapeHtml(item.source || 'source')}: ${escapeHtml(item.reason || item.type || 'Needs attention')}</li>`).join('')}</ul>`
                 : '';
+            const nextAction = exceptions.length
+                ? '只看异常项；正常源不需要人工确认。'
+                : officialLinkOnly.length
+                    ? `下一批可自动化候选：${officialLinkOnly.slice(0, 4).join(', ')}`
+                    : '所有配置源都有自动或 benchmark 更新路径。';
             return `
                 <div class="duty-sync-banner ${escapeHtml(status)}">
                     <h3>${escapeHtml(statusLabel)}</h3>
                     <p class="meta" style="margin:0">${escapeHtml(summary)} · Last run: ${escapeHtml(formatDateTime(syncStatus.updated_at))}</p>
+                    <div class="duty-sync-mini-grid">
+                        <div class="duty-sync-mini-card"><strong>${counts.sources_auto_applied ?? autoApplied.length}</strong><span>自动同步源</span></div>
+                        <div class="duty-sync-mini-card"><strong>${counts.exceptions ?? exceptions.length}</strong><span>异常提醒</span></div>
+                        <div class="duty-sync-mini-card"><strong>${officialLinkOnly.length}</strong><span>仅官方链接源</span></div>
+                        <div class="duty-sync-mini-card"><strong>${benchmarkOnly.length}</strong><span>本地 benchmark 源</span></div>
+                    </div>
+                    <p class="meta" style="margin:10px 0 0">${escapeHtml(nextAction)}</p>
                     ${exceptionList}
                 </div>
             `;
@@ -817,7 +851,7 @@
                 const failures = Array.isArray(data.failures) ? data.failures : [];
                 const syncStatus = data.duty_rate_sync_status || {};
                 dutyRateStatus.innerHTML = `
-                    ${renderDutySyncStatus(syncStatus)}
+                    ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">
                         <div class="summary-card"><strong>${summary.rule_count ?? 0}</strong><span>Maintained duty rules</span></div>
                         <div class="summary-card"><strong>${summary.country_count ?? 0}</strong><span>Covered import markets</span></div>

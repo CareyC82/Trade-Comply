@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated_at": null,
-  "started_at": null,
-  "finished_at": null,
-  "status": "not_run",
+  "updated_at": "2026-06-09T06:41:09.282Z",
+  "started_at": "2026-06-09T06:41:03.305Z",
+  "finished_at": "2026-06-09T06:41:09.282Z",
+  "status": "exceptions",
   "policy": {
     "safe_updates_auto_applied": true,
     "manual_review_required": false,
@@ -11,14 +11,192 @@
     "material_rate_change_threshold": 0.03
   },
   "counts": {
-    "sources_checked": 0,
-    "sources_auto_applied": 0,
-    "total_changes": 0,
-    "total_rate_changes": 0,
-    "exceptions": 0
+    "sources_checked": 4,
+    "sources_auto_applied": 3,
+    "total_changes": 7,
+    "total_rate_changes": 2,
+    "exceptions": 1
   },
-  "auto_applied": [],
-  "exceptions": [],
-  "runs": [],
-  "health": null
+  "auto_applied": [
+    {
+      "source": "EU TARIC benchmark",
+      "mode": "benchmark",
+      "change_count": 3,
+      "rate_change_count": 0
+    },
+    {
+      "source": "Singapore Customs benchmark",
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0
+    },
+    {
+      "source": "Mexico SNICE benchmark",
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0
+    }
+  ],
+  "exceptions": [
+    {
+      "source": "USITC",
+      "severity": "high",
+      "type": "source_or_parse_error",
+      "reason": "USITC duty-rate updater reported 1 error(s).",
+      "details": [
+        {
+          "rule": "US-CN-ELECTRONICS-INDICATIVE",
+          "error": "Multiple HS prefixes in one duty rule returned different official base rates. Split this rule before auto-applying official rates.",
+          "rates": [
+            0,
+            0.019
+          ],
+          "prefixes": [
+            "8517",
+            "8543"
+          ]
+        }
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "source": "USITC",
+      "ok": false,
+      "applied": false,
+      "mode": "official-dry-run",
+      "change_count": 2,
+      "rate_change_count": 2,
+      "error_count": 1,
+      "changes": [
+        {
+          "rule": "US-CN-ELECTRONICS-INDICATIVE",
+          "prefix": "8517",
+          "old_base_rate": 0.019,
+          "new_base_rate": 0,
+          "source_hts": "8517110000",
+          "source_rate_text": "Free"
+        },
+        {
+          "rule": "US-CN-ELECTRONICS-INDICATIVE",
+          "prefix": "8543",
+          "old_base_rate": 0,
+          "new_base_rate": 0.019,
+          "source_hts": "8543100000",
+          "source_rate_text": "1.9%"
+        }
+      ],
+      "errors": [
+        {
+          "rule": "US-CN-ELECTRONICS-INDICATIVE",
+          "error": "Multiple HS prefixes in one duty rule returned different official base rates. Split this rule before auto-applying official rates.",
+          "rates": [
+            0,
+            0.019
+          ],
+          "prefixes": [
+            "8517",
+            "8543"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "EU TARIC benchmark",
+      "ok": true,
+      "applied": true,
+      "mode": "benchmark",
+      "change_count": 3,
+      "rate_change_count": 0,
+      "error_count": 0,
+      "changes": [
+        {
+          "rule": "EU-CN-850440-EVCHARGER-INDICATIVE",
+          "import_country": "EU",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-08T07:29:58.714Z",
+              "new_value": "2026-06-09T06:41:09.265Z"
+            }
+          ]
+        },
+        {
+          "rule": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+          "import_country": "DE",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-08T07:29:58.714Z",
+              "new_value": "2026-06-09T06:41:09.265Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-08T07:29:58.714Z",
+              "new_value": "2026-06-09T06:41:09.265Z"
+            }
+          ]
+        }
+      ],
+      "errors": []
+    },
+    {
+      "source": "Singapore Customs benchmark",
+      "ok": true,
+      "applied": true,
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0,
+      "error_count": 0,
+      "changes": [
+        {
+          "rule": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+          "import_country": "SG",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-08T07:30:02.986Z",
+              "new_value": "2026-06-09T06:41:09.267Z"
+            }
+          ]
+        }
+      ],
+      "errors": []
+    },
+    {
+      "source": "Mexico SNICE benchmark",
+      "ok": true,
+      "applied": true,
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0,
+      "error_count": 0,
+      "changes": [
+        {
+          "rule": "MX-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+          "import_country": "MX",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-09T06:38:06.317Z",
+              "new_value": "2026-06-09T06:41:09.269Z"
+            }
+          ]
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "health": {
+    "ok": true,
+    "sample_count": 13,
+    "failed_sample_count": 0,
+    "failures": []
+  }
 }

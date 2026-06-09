@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-08",
+  "updated_at": "2026-06-09",
   "notes": "Operational roadmap for Post-Entry duty-rate sources. Source status controls product trust wording: auto_updatable means a maintained script can refresh official machine-readable rates; benchmark_updatable means a maintained script can refresh local benchmark metadata but the rate remains indicative; official_link means an official source is identified but not machine-refreshed yet; benchmark means local pre-check math only.",
   "sources": [
     {
@@ -84,14 +84,14 @@
       "authority": "SNICE / Mexico customs framework",
       "official_url": "https://www.snice.gob.mx/",
       "machine_readable": false,
-      "source_status": "official_link",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P2",
-      "status_reason": "Official source identified, but TIGIE tariff-line data is not wired into an updater yet.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "status_reason": "Official source identified. Local benchmark metadata can refresh automatically while exact TIGIE extraction remains pending.",
+      "updater_script": "scripts/update-mx-duty-rates.js",
+      "update_command": "npm run update:duty-rates:mx",
+      "last_sync_field": "last_mx_snice_benchmark_sync_at",
       "current_scope": "Benchmark VAT plus TIGIE tariff-line review reminder.",
-      "next_action": "Research machine-readable TIGIE source before automatic updates."
+      "next_action": "Keep benchmark updater running; research machine-readable TIGIE source before official automatic rates."
     },
     {
       "country": "JP",

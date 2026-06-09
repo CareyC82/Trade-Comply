@@ -11,6 +11,7 @@ const path = require('path');
 const { updateUsRules } = require('./update-us-duty-rates');
 const { updateEuRules } = require('./update-eu-duty-rates');
 const { updateSingaporeRules } = require('./update-sg-duty-rates');
+const { updateMexicoRules } = require('./update-mx-duty-rates');
 const { runDutyRateHealthCheck } = require('./check-duty-rates');
 
 const ROOT = path.join(__dirname, '..');
@@ -81,6 +82,50 @@ function buildExceptionsForRun(run, { threshold = MATERIAL_RATE_CHANGE_THRESHOLD
     return exceptions;
 }
 
+function findMultiPrefixRateConflicts(run) {
+    const changes = Array.isArray(run?.changes) ? run.changes : [];
+    const grouped = changes.reduce((map, change) => {
+        if (!change?.rule || !Object.prototype.hasOwnProperty.call(change, 'new_base_rate')) {
+            return map;
+        }
+        const row = map.get(change.rule) || [];
+        row.push(change);
+        map.set(change.rule, row);
+        return map;
+    }, new Map());
+    return Array.from(grouped.entries())
+        .map(([rule, rows]) => {
+            const rates = Array.from(new Set(rows.map(row => Number(row.new_base_rate)).filter(Number.isFinite)));
+            return rates.length > 1 ? { rule, rates, changes: rows } : null;
+        })
+        .filter(Boolean);
+}
+
+function appendMultiPrefixConflicts(run) {
+    const conflicts = findMultiPrefixRateConflicts(run);
+    if (!conflicts.length) {
+        return { run, conflicts };
+    }
+    const errors = [
+        ...(run.errors || []),
+        ...conflicts.map(conflict => ({
+            rule: conflict.rule,
+            error: 'Multiple HS prefixes in one duty rule returned different official base rates. Split this rule before auto-applying official rates.',
+            rates: conflict.rates,
+            prefixes: conflict.changes.map(change => change.prefix)
+        }))
+    ];
+    return {
+        conflicts,
+        run: {
+            ...run,
+            ok: false,
+            error_count: errors.length,
+            errors
+        }
+    };
+}
+
 function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt } = {}) {
     const autoApplied = runs.filter(run => run.applied);
     const exceptions = runs.flatMap(run => buildExceptionsForRun(run));
@@ -136,10 +181,11 @@ async function runAutoDutyRateSync({ dryRun = false, skipOfficialUs = false } = 
 
     if (!skipOfficialUs) {
         const usDryRun = await updateUsRules({ dryRun: true });
-        const usDrySummary = buildRunSummary('USITC', usDryRun, {
+        const rawUsDrySummary = buildRunSummary('USITC', usDryRun, {
             applied: false,
             mode: 'official-dry-run'
         });
+        const { run: usDrySummary } = appendMultiPrefixConflicts(rawUsDrySummary);
         if (usDrySummary.ok && !dryRun) {
             const usApplied = await updateUsRules({ dryRun: false });
             runs.push(buildRunSummary('USITC', usApplied, {
@@ -159,6 +205,12 @@ async function runAutoDutyRateSync({ dryRun = false, skipOfficialUs = false } = 
 
     const sgResult = updateSingaporeRules({ dryRun });
     runs.push(buildRunSummary('Singapore Customs benchmark', sgResult, {
+        applied: !dryRun,
+        mode: 'benchmark'
+    }));
+
+    const mxResult = updateMexicoRules({ dryRun });
+    runs.push(buildRunSummary('Mexico SNICE benchmark', mxResult, {
         applied: !dryRun,
         mode: 'benchmark'
     }));
@@ -204,6 +256,8 @@ module.exports = {
     isMaterialRateChange,
     buildRunSummary,
     buildExceptionsForRun,
+    findMultiPrefixRateConflicts,
+    appendMultiPrefixConflicts,
     buildSyncStatusPayload,
     runAutoDutyRateSync
 };

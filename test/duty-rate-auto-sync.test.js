@@ -6,6 +6,8 @@ const {
     isMaterialRateChange,
     buildRunSummary,
     buildExceptionsForRun,
+    findMultiPrefixRateConflicts,
+    appendMultiPrefixConflicts,
     buildSyncStatusPayload
 } = require('../scripts/auto-sync-duty-rates');
 
@@ -73,4 +75,31 @@ test('source failures and material rate changes become admin-visible exceptions'
     assert.equal(payload.status, 'exceptions');
     assert.equal(payload.counts.exceptions, 2);
     assert.equal(payload.exceptions.some(item => item.type === 'material_rate_change' && item.auto_applied), true);
+});
+
+test('conflicting official rates inside one multi-prefix rule block auto-apply', () => {
+    const run = buildRunSummary('USITC', {
+        ok: true,
+        changes: [
+            { rule: 'US-CN-ELECTRONICS-INDICATIVE', prefix: '8517', old_base_rate: 0.019, new_base_rate: 0 },
+            { rule: 'US-CN-ELECTRONICS-INDICATIVE', prefix: '8543', old_base_rate: 0, new_base_rate: 0.019 }
+        ],
+        errors: []
+    }, {
+        applied: false,
+        mode: 'official-dry-run'
+    });
+    const conflicts = findMultiPrefixRateConflicts(run);
+    const wrapped = appendMultiPrefixConflicts(run).run;
+
+    assert.equal(conflicts.length, 1);
+    assert.equal(wrapped.ok, false);
+    assert.equal(wrapped.errors[0].rule, 'US-CN-ELECTRONICS-INDICATIVE');
+
+    const payload = buildSyncStatusPayload({
+        runs: [wrapped],
+        health: { ok: true, sample_count: 1, failed_sample_count: 0, failures: [] }
+    });
+    assert.equal(payload.status, 'exceptions');
+    assert.match(payload.exceptions[0].reason, /USITC duty-rate updater reported/);
 });
