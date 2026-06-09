@@ -41,6 +41,25 @@ test('US samples preserve official and scope-review source statuses', () => {
     assert.ok(solar.source_statuses.includes('scope_check_required'));
 });
 
+test('US electronics duty rules stay split by HS prefix for official sync', () => {
+    const requiredPrefixes = ['8517', '8525', '8528', '8543'];
+    const usRules = (dutyRates.rules || []).filter(rule => (
+        rule.import_country === 'US'
+        && rule.origin_country === 'CN'
+        && (rule.hs_prefixes || []).some(prefix => requiredPrefixes.includes(prefix))
+    ));
+    const prefixes = new Map();
+
+    usRules.forEach((rule) => {
+        assert.equal(rule.hs_prefixes.length, 1, `${rule.id} should have one HS prefix`);
+        prefixes.set(rule.hs_prefixes[0], rule);
+    });
+    requiredPrefixes.forEach((prefix) => {
+        assert.ok(prefixes.has(prefix), `US ${prefix} duty rule should exist`);
+        assert.equal(prefixes.get(prefix).source_status, 'official_source_checked');
+    });
+});
+
 test('Russia sample keeps sanctions scope as a review-only flag', () => {
     const result = runDutyRateHealthCheck();
     const russia = result.samples.find(sample => sample.id === 'PE-RU-CN-ELECTRONICS-851762');

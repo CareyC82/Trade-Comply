@@ -28,22 +28,106 @@
       "confidence": "Indicative",
       "source_status": "official_source_checked",
       "source_note": "Pre-check benchmark. Verify exact HTS and active exclusions with HTSUS / USTR before filing.",
-      "last_checked_at": "2026-06-06T11:27:25.644Z",
+      "last_checked_at": "2026-06-09T13:42:44.774Z",
       "source_hts": "85076000",
       "source_rate_text": "3.4%",
       "source_url": "https://hts.usitc.gov/reststop/exportList?from=850760&to=85076099&format=JSON&styles=false"
     },
     {
-      "id": "US-CN-ELECTRONICS-INDICATIVE",
+      "id": "US-CN-8517-TELECOM-INDICATIVE",
       "import_country": "US",
       "origin_country": "CN",
       "hs_prefixes": [
-        "8517",
-        "8525",
-        "8528",
+        "8517"
+      ],
+      "label": "US import telecom / network equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.075,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.075,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 China additional duty signal",
+      "confidence": "Indicative",
+      "source_status": "official_source_checked",
+      "source_note": "Pre-check benchmark for telecom/network equipment; verify exact HTS line and active exclusions.",
+      "last_checked_at": "2026-06-09T13:42:45.342Z",
+      "source_hts": "8517110000",
+      "source_rate_text": "Free",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8517&to=851799&format=JSON&styles=false"
+    },
+    {
+      "id": "US-CN-8525-CAMERA-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "8525"
+      ],
+      "label": "US import camera / transmission equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.075,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.075,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 China additional duty signal",
+      "confidence": "Indicative",
+      "source_status": "official_source_checked",
+      "source_note": "Pre-check benchmark for cameras/transmission equipment; verify exact HTS line and active exclusions.",
+      "last_checked_at": "2026-06-09T13:42:46.046Z",
+      "source_hts": "8525501000",
+      "source_rate_text": "Free",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8525&to=852599&format=JSON&styles=false"
+    },
+    {
+      "id": "US-CN-8528-DISPLAY-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "8528"
+      ],
+      "label": "US import display / monitor equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.075,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.075,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 China additional duty signal",
+      "confidence": "Indicative",
+      "source_status": "official_source_checked",
+      "source_note": "Pre-check benchmark for display/monitor equipment; verify exact HTS line and active exclusions.",
+      "last_checked_at": "2026-06-09T13:42:46.801Z",
+      "source_hts": "8528420000",
+      "source_rate_text": "Free",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8528&to=852899&format=JSON&styles=false"
+    },
+    {
+      "id": "US-CN-8543-ELECTRONICS-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
         "8543"
       ],
-      "label": "US import electronics signal",
+      "label": "US import other electrical machines signal",
       "base_rate": 0.019,
       "additional_rate": 0.075,
       "add_on_layers": [
@@ -59,8 +143,8 @@
       "trade_remedy": "Section 301 China additional duty signal",
       "confidence": "Indicative",
       "source_status": "official_source_checked",
-      "source_note": "Pre-check benchmark for common electronics categories; verify exact HTS line.",
-      "last_checked_at": "2026-06-06T11:27:28.272Z",
+      "source_note": "Pre-check benchmark for other electrical machines; verify exact HTS line and active exclusions.",
+      "last_checked_at": "2026-06-09T13:42:47.391Z",
       "source_hts": "8543100000",
       "source_rate_text": "1.9%",
       "source_url": "https://hts.usitc.gov/reststop/exportList?from=8543&to=854399&format=JSON&styles=false"
@@ -97,7 +181,7 @@
       "confidence": "Indicative",
       "source_status": "official_source_checked",
       "source_note": "Solar products may require separate AD/CVD and origin-route review.",
-      "last_checked_at": "2026-06-06T11:27:28.832Z",
+      "last_checked_at": "2026-06-09T13:42:48.011Z",
       "source_hts": "8541410000",
       "source_rate_text": "Free",
       "source_url": "https://hts.usitc.gov/reststop/exportList?from=8541&to=854199&format=JSON&styles=false"
@@ -126,7 +210,7 @@
       "confidence": "Indicative",
       "source_status": "official_source_checked",
       "source_note": "Verify exact HTS line and technology-control overlap.",
-      "last_checked_at": "2026-06-06T11:27:29.376Z",
+      "last_checked_at": "2026-06-09T13:42:48.707Z",
       "source_hts": "8542330001",
       "source_rate_text": "Free",
       "source_url": "https://hts.usitc.gov/reststop/exportList?from=8542&to=854299&format=JSON&styles=false"
@@ -153,11 +237,12 @@
       ],
       "trade_remedy": "Section 301 China additional duty signal",
       "confidence": "Indicative",
-      "source_status": "indicative",
+      "source_status": "official_source_checked",
       "source_note": "Pre-check benchmark for tablet / portable ADP imports. Verify exact 10-digit HTS and active exclusions.",
-      "source_hts": "847130",
-      "source_rate_text": "Benchmark: base duty often free; Section 301 may apply by origin/scope",
-      "source_url": "https://hts.usitc.gov/"
+      "source_hts": "8471300100",
+      "source_rate_text": "Free",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=847130&to=84713099&format=JSON&styles=false",
+      "last_checked_at": "2026-06-09T13:42:49.316Z"
     },
     {
       "id": "EU-CN-850440-EVCHARGER-INDICATIVE",
@@ -186,7 +271,7 @@
       "source_hts": "850440 benchmark",
       "source_rate_text": "Benchmark: 2.7% common customs duty; VAT depends on member state",
       "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-09T06:41:09.265Z"
+      "last_checked_at": "2026-06-09T13:42:49.318Z"
     },
     {
       "id": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -221,7 +306,7 @@
       "source_hts": "EU electronics benchmark / Germany VAT",
       "source_rate_text": "Benchmark: 2.7% EU duty + 19% Germany VAT",
       "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-09T06:41:09.265Z"
+      "last_checked_at": "2026-06-09T13:42:49.318Z"
     },
     {
       "id": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -256,7 +341,7 @@
       "source_hts": "EU electronics benchmark / Netherlands VAT",
       "source_rate_text": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
       "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-09T06:41:09.265Z"
+      "last_checked_at": "2026-06-09T13:42:49.318Z"
     },
     {
       "id": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -291,7 +376,7 @@
       "source_hts": "SG electronics benchmark",
       "source_rate_text": "Benchmark: 0% customs duty + 9% GST",
       "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-      "last_checked_at": "2026-06-09T06:41:09.267Z"
+      "last_checked_at": "2026-06-09T13:42:49.320Z"
     },
     {
       "id": "MX-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -326,7 +411,7 @@
       "source_hts": "MX electronics benchmark",
       "source_rate_text": "Benchmark: VAT 16%; IGI depends on TIGIE tariff line",
       "source_url": "https://www.snice.gob.mx/",
-      "last_checked_at": "2026-06-09T06:41:09.269Z"
+      "last_checked_at": "2026-06-09T13:42:49.322Z"
     },
     {
       "id": "JP-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -571,22 +656,13 @@
       "source_note": "Pre-check benchmark only; confirm exact China tariff and VAT treatment."
     }
   ],
-  "last_usitc_sync_at": "2026-06-06T11:27:29.376Z",
+  "last_usitc_sync_at": "2026-06-09T13:42:49.317Z",
   "last_usitc_sync": {
     "ok": true,
-    "changes": [
-      {
-        "rule": "US-CN-ELECTRONICS-INDICATIVE",
-        "prefix": "8543",
-        "old_base_rate": 0,
-        "new_base_rate": 0.019,
-        "source_hts": "8543100000",
-        "source_rate_text": "1.9%"
-      }
-    ],
+    "changes": [],
     "errors": []
   },
-  "last_eu_taric_benchmark_sync_at": "2026-06-09T06:41:09.265Z",
+  "last_eu_taric_benchmark_sync_at": "2026-06-09T13:42:49.318Z",
   "last_eu_taric_benchmark_sync": {
     "ok": true,
     "dry_run": false,
@@ -598,8 +674,8 @@
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-08T07:29:58.714Z",
-            "new_value": "2026-06-09T06:41:09.265Z"
+            "old_value": "2026-06-09T06:41:09.265Z",
+            "new_value": "2026-06-09T13:42:49.318Z"
           }
         ]
       },
@@ -609,8 +685,8 @@
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-08T07:29:58.714Z",
-            "new_value": "2026-06-09T06:41:09.265Z"
+            "old_value": "2026-06-09T06:41:09.265Z",
+            "new_value": "2026-06-09T13:42:49.318Z"
           }
         ]
       },
@@ -620,15 +696,15 @@
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-08T07:29:58.714Z",
-            "new_value": "2026-06-09T06:41:09.265Z"
+            "old_value": "2026-06-09T06:41:09.265Z",
+            "new_value": "2026-06-09T13:42:49.318Z"
           }
         ]
       }
     ],
     "errors": []
   },
-  "last_sg_customs_benchmark_sync_at": "2026-06-09T06:41:09.267Z",
+  "last_sg_customs_benchmark_sync_at": "2026-06-09T13:42:49.320Z",
   "last_sg_customs_benchmark_sync": {
     "ok": true,
     "dry_run": false,
@@ -640,15 +716,15 @@
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-08T07:30:02.986Z",
-            "new_value": "2026-06-09T06:41:09.267Z"
+            "old_value": "2026-06-09T06:41:09.267Z",
+            "new_value": "2026-06-09T13:42:49.320Z"
           }
         ]
       }
     ],
     "errors": []
   },
-  "last_mx_snice_benchmark_sync_at": "2026-06-09T06:41:09.269Z",
+  "last_mx_snice_benchmark_sync_at": "2026-06-09T13:42:49.322Z",
   "last_mx_snice_benchmark_sync": {
     "ok": true,
     "dry_run": false,
@@ -660,8 +736,8 @@
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-09T06:38:06.317Z",
-            "new_value": "2026-06-09T06:41:09.269Z"
+            "old_value": "2026-06-09T06:41:09.269Z",
+            "new_value": "2026-06-09T13:42:49.322Z"
           }
         ]
       }

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-09T06:41:09.282Z",
-  "started_at": "2026-06-09T06:41:03.305Z",
-  "finished_at": "2026-06-09T06:41:09.282Z",
-  "status": "exceptions",
+  "updated_at": "2026-06-09T13:42:49.349Z",
+  "started_at": "2026-06-09T13:42:38.604Z",
+  "finished_at": "2026-06-09T13:42:49.349Z",
+  "status": "ok",
   "policy": {
     "safe_updates_auto_applied": true,
     "manual_review_required": false,
@@ -12,12 +12,18 @@
   },
   "counts": {
     "sources_checked": 4,
-    "sources_auto_applied": 3,
-    "total_changes": 7,
-    "total_rate_changes": 2,
-    "exceptions": 1
+    "sources_auto_applied": 4,
+    "total_changes": 5,
+    "total_rate_changes": 0,
+    "exceptions": 0
   },
   "auto_applied": [
+    {
+      "source": "USITC",
+      "mode": "official",
+      "change_count": 0,
+      "rate_change_count": 0
+    },
     {
       "source": "EU TARIC benchmark",
       "mode": "benchmark",
@@ -37,69 +43,18 @@
       "rate_change_count": 0
     }
   ],
-  "exceptions": [
-    {
-      "source": "USITC",
-      "severity": "high",
-      "type": "source_or_parse_error",
-      "reason": "USITC duty-rate updater reported 1 error(s).",
-      "details": [
-        {
-          "rule": "US-CN-ELECTRONICS-INDICATIVE",
-          "error": "Multiple HS prefixes in one duty rule returned different official base rates. Split this rule before auto-applying official rates.",
-          "rates": [
-            0,
-            0.019
-          ],
-          "prefixes": [
-            "8517",
-            "8543"
-          ]
-        }
-      ]
-    }
-  ],
+  "exceptions": [],
   "runs": [
     {
       "source": "USITC",
-      "ok": false,
-      "applied": false,
-      "mode": "official-dry-run",
-      "change_count": 2,
-      "rate_change_count": 2,
-      "error_count": 1,
-      "changes": [
-        {
-          "rule": "US-CN-ELECTRONICS-INDICATIVE",
-          "prefix": "8517",
-          "old_base_rate": 0.019,
-          "new_base_rate": 0,
-          "source_hts": "8517110000",
-          "source_rate_text": "Free"
-        },
-        {
-          "rule": "US-CN-ELECTRONICS-INDICATIVE",
-          "prefix": "8543",
-          "old_base_rate": 0,
-          "new_base_rate": 0.019,
-          "source_hts": "8543100000",
-          "source_rate_text": "1.9%"
-        }
-      ],
-      "errors": [
-        {
-          "rule": "US-CN-ELECTRONICS-INDICATIVE",
-          "error": "Multiple HS prefixes in one duty rule returned different official base rates. Split this rule before auto-applying official rates.",
-          "rates": [
-            0,
-            0.019
-          ],
-          "prefixes": [
-            "8517",
-            "8543"
-          ]
-        }
-      ]
+      "ok": true,
+      "applied": true,
+      "mode": "official",
+      "change_count": 0,
+      "rate_change_count": 0,
+      "error_count": 0,
+      "changes": [],
+      "errors": []
     },
     {
       "source": "EU TARIC benchmark",
@@ -116,8 +71,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-08T07:29:58.714Z",
-              "new_value": "2026-06-09T06:41:09.265Z"
+              "old_value": "2026-06-09T06:41:09.265Z",
+              "new_value": "2026-06-09T13:42:49.318Z"
             }
           ]
         },
@@ -127,8 +82,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-08T07:29:58.714Z",
-              "new_value": "2026-06-09T06:41:09.265Z"
+              "old_value": "2026-06-09T06:41:09.265Z",
+              "new_value": "2026-06-09T13:42:49.318Z"
             }
           ]
         },
@@ -138,8 +93,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-08T07:29:58.714Z",
-              "new_value": "2026-06-09T06:41:09.265Z"
+              "old_value": "2026-06-09T06:41:09.265Z",
+              "new_value": "2026-06-09T13:42:49.318Z"
             }
           ]
         }
@@ -161,8 +116,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-08T07:30:02.986Z",
-              "new_value": "2026-06-09T06:41:09.267Z"
+              "old_value": "2026-06-09T06:41:09.267Z",
+              "new_value": "2026-06-09T13:42:49.320Z"
             }
           ]
         }
@@ -184,8 +139,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-09T06:38:06.317Z",
-              "new_value": "2026-06-09T06:41:09.269Z"
+              "old_value": "2026-06-09T06:41:09.269Z",
+              "new_value": "2026-06-09T13:42:49.322Z"
             }
           ]
         }
