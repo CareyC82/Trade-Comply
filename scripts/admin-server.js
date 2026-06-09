@@ -43,6 +43,7 @@ const LOG_PREFIX = '[GLOBAL-CRAWL]';
 const COVERAGE_MATRIX_PATH = path.join(ROOT, 'data', 'coverage-matrix.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
+const DUTY_RATE_SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
@@ -235,12 +236,20 @@ function buildDutyRateStatusPayload() {
     const health = runDutyRateHealthCheck();
     const sourcesPayload = readJsonFile(DUTY_RATE_SOURCES_PATH, { sources: [] });
     const dutyPayload = readJsonFile(DUTY_RATES_PATH, { rules: [] });
+    const syncStatus = readJsonFile(DUTY_RATE_SYNC_STATUS_PATH, {
+        status: 'not_run',
+        updated_at: null,
+        counts: {},
+        exceptions: [],
+        auto_applied: []
+    });
     return {
         ...health,
         generated_at: new Date().toISOString(),
         duty_rates_updated_at: dutyPayload.updated_at || null,
         source_roadmap_updated_at: sourcesPayload.updated_at || null,
         source_roadmap_notes: sourcesPayload.notes || '',
+        duty_rate_sync_status: syncStatus,
         sources: Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : []
     };
 }

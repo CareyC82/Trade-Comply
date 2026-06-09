@@ -20,6 +20,8 @@
     "update:duty-rates:eu:dry-run": "node scripts/update-eu-duty-rates.js --dry-run",
     "update:duty-rates:sg": "node scripts/update-sg-duty-rates.js",
     "update:duty-rates:sg:dry-run": "node scripts/update-sg-duty-rates.js --dry-run",
+    "sync:duty-rates:auto": "node scripts/auto-sync-duty-rates.js",
+    "sync:duty-rates:auto:dry-run": "node scripts/auto-sync-duty-rates.js --dry-run",
     "check:duty-rates": "node scripts/check-duty-rates.js",
     "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js",
     "pipeline:global": "python3 pipeline/pipeline.py",

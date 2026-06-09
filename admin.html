@@ -258,6 +258,30 @@
         }
         .duty-source-card p { margin: 6px 0; }
         .duty-source-card a { color: #93c5fd; }
+        .duty-sync-banner {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 10px 0 14px;
+            background: rgba(34,197,94,0.08);
+        }
+        .duty-sync-banner.exceptions {
+            background: rgba(245,158,11,0.10);
+            border-color: rgba(245,158,11,0.45);
+        }
+        .duty-sync-banner.not_run {
+            background: rgba(59,130,246,0.08);
+        }
+        .duty-sync-banner h3 {
+            margin: 0 0 6px;
+            font-size: 0.98rem;
+        }
+        .duty-exception-list {
+            margin: 8px 0 0;
+            padding-left: 18px;
+            color: #fcd34d;
+            font-size: 0.84rem;
+        }
         .badge.auto_updatable { background: #123d2a; color: #86efac; }
         .badge.benchmark_updatable { background: #164e63; color: #67e8f9; }
         .badge.updater_candidate { background: #1e3a5f; color: #93c5fd; }
@@ -754,6 +778,33 @@
             `;
         }
 
+        function renderDutySyncStatus(syncStatus = {}) {
+            const status = String(syncStatus.status || 'not_run');
+            const counts = syncStatus.counts || {};
+            const exceptions = Array.isArray(syncStatus.exceptions) ? syncStatus.exceptions : [];
+            const autoApplied = Array.isArray(syncStatus.auto_applied) ? syncStatus.auto_applied : [];
+            const statusLabel = status === 'ok'
+                ? '税率自动同步正常'
+                : status === 'exceptions'
+                    ? '税率同步有异常提醒'
+                    : '税率自动同步尚未运行';
+            const summary = status === 'ok'
+                ? `已自动同步 ${counts.sources_auto_applied ?? autoApplied.length} 个源，${counts.total_changes ?? 0} 项更新，0 个异常。`
+                : status === 'exceptions'
+                    ? `已自动处理可安全更新；发现 ${counts.exceptions ?? exceptions.length} 个异常提醒。`
+                    : '等待下一次 daily duty-rate sync 生成状态。';
+            const exceptionList = exceptions.length
+                ? `<ul class="duty-exception-list">${exceptions.slice(0, 5).map(item => `<li>${escapeHtml(item.source || 'source')}: ${escapeHtml(item.reason || item.type || 'Needs attention')}</li>`).join('')}</ul>`
+                : '';
+            return `
+                <div class="duty-sync-banner ${escapeHtml(status)}">
+                    <h3>${escapeHtml(statusLabel)}</h3>
+                    <p class="meta" style="margin:0">${escapeHtml(summary)} · Last run: ${escapeHtml(formatDateTime(syncStatus.updated_at))}</p>
+                    ${exceptionList}
+                </div>
+            `;
+        }
+
         async function loadDutyRateStatus() {
             if (!dutyRateStatus) return;
             dutyRateStatus.innerHTML = '<p class="meta">正在加载税率源状态…</p>';
@@ -764,7 +815,9 @@
                 const statusCounts = roadmap.status_counts || {};
                 const sources = Array.isArray(data.sources) ? data.sources : [];
                 const failures = Array.isArray(data.failures) ? data.failures : [];
+                const syncStatus = data.duty_rate_sync_status || {};
                 dutyRateStatus.innerHTML = `
+                    ${renderDutySyncStatus(syncStatus)}
                     <div class="summary-grid">
                         <div class="summary-card"><strong>${summary.rule_count ?? 0}</strong><span>Maintained duty rules</span></div>
                         <div class="summary-card"><strong>${summary.country_count ?? 0}</strong><span>Covered import markets</span></div>

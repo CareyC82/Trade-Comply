@@ -12,6 +12,9 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(payload.duty_rate_summary.rule_count > 0, true);
     assert.equal(payload.duty_rate_summary.country_count > 0, true);
     assert.equal(Array.isArray(payload.sources), true);
+    assert.equal(typeof payload.duty_rate_sync_status, 'object');
+    assert.equal(payload.duty_rate_sync_status.policy.manual_review_required, false);
+    assert.equal(Array.isArray(payload.duty_rate_sync_status.exceptions), true);
     assert.equal(payload.sources.some(source => source.country === 'US' && source.source_status === 'auto_updatable'), true);
     assert.equal(payload.source_roadmap_summary.auto_updatable.includes('US'), true);
     assert.equal(payload.source_roadmap_summary.missing_coverage.length, 0);
