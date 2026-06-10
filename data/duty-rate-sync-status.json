@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-09T20:19:43.936Z",
-  "started_at": "2026-06-09T20:19:39.266Z",
-  "finished_at": "2026-06-09T20:19:43.936Z",
+  "updated_at": "2026-06-10T20:43:36.878Z",
+  "started_at": "2026-06-10T20:43:32.120Z",
+  "finished_at": "2026-06-10T20:43:36.878Z",
   "status": "ok",
   "policy": {
     "safe_updates_auto_applied": true,
@@ -11,9 +11,9 @@
     "material_rate_change_threshold": 0.03
   },
   "counts": {
-    "sources_checked": 4,
-    "sources_auto_applied": 4,
-    "total_changes": 5,
+    "sources_checked": 6,
+    "sources_auto_applied": 6,
+    "total_changes": 25,
     "total_rate_changes": 0,
     "exceptions": 0
   },
@@ -27,7 +27,7 @@
     {
       "source": "EU TARIC benchmark",
       "mode": "benchmark",
-      "change_count": 3,
+      "change_count": 21,
       "rate_change_count": 0
     },
     {
@@ -38,6 +38,18 @@
     },
     {
       "source": "Mexico SNICE benchmark",
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0
+    },
+    {
+      "source": "Japan Customs benchmark",
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0
+    },
+    {
+      "source": "Korea Customs benchmark",
       "mode": "benchmark",
       "change_count": 1,
       "rate_change_count": 0
@@ -61,40 +73,259 @@
       "ok": true,
       "applied": true,
       "mode": "benchmark",
-      "change_count": 3,
+      "change_count": 21,
       "rate_change_count": 0,
       "error_count": 0,
       "changes": [
         {
           "rule": "EU-CN-850440-EVCHARGER-INDICATIVE",
           "import_country": "EU",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-09T13:42:49.318Z",
-              "new_value": "2026-06-09T20:19:43.802Z"
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
             }
           ]
         },
         {
-          "rule": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+          "rule": "EU-GLOBAL-847130-TABLET-IMPORT-SCOPE",
+          "import_country": "EU",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "EU-GLOBAL-850760-BATTERY-IMPORT-OFFICIAL",
+          "import_country": "EU",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "EU-GLOBAL-8517-TELECOM-IMPORT-OFFICIAL",
+          "import_country": "EU",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "EU-GLOBAL-8528-DISPLAY-IMPORT-SCOPE",
+          "import_country": "EU",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "EU-GLOBAL-8541-SOLAR-IMPORT-OFFICIAL",
+          "import_country": "EU",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "EU-GLOBAL-8542-SEMICONDUCTOR-IMPORT-OFFICIAL",
+          "import_country": "EU",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
           "import_country": "DE",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-09T13:42:49.318Z",
-              "new_value": "2026-06-09T20:19:43.802Z"
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
             }
           ]
         },
         {
-          "rule": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
-          "import_country": "NL",
+          "rule": "DE-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+          "import_country": "DE",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-09T13:42:49.318Z",
-              "new_value": "2026-06-09T20:19:43.802Z"
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+          "import_country": "DE",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "DE-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+          "import_country": "DE",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+          "import_country": "DE",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "DE-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+          "import_country": "DE",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "DE-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+          "import_country": "DE",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
+            }
+          ]
+        },
+        {
+          "rule": "NL-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+          "import_country": "NL",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T06:25:02.441Z",
+              "new_value": "2026-06-10T20:43:36.853Z"
             }
           ]
         }
@@ -116,8 +347,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-09T13:42:49.320Z",
-              "new_value": "2026-06-09T20:19:43.803Z"
+              "old_value": "2026-06-09T20:19:43.803Z",
+              "new_value": "2026-06-10T20:43:36.855Z"
             }
           ]
         }
@@ -139,8 +370,54 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-09T13:42:49.322Z",
-              "new_value": "2026-06-09T20:19:43.804Z"
+              "old_value": "2026-06-09T20:19:43.804Z",
+              "new_value": "2026-06-10T20:43:36.855Z"
+            }
+          ]
+        }
+      ],
+      "errors": []
+    },
+    {
+      "source": "Japan Customs benchmark",
+      "ok": true,
+      "applied": true,
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0,
+      "error_count": 0,
+      "changes": [
+        {
+          "rule": "JP-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+          "import_country": "JP",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T07:50:00.000Z",
+              "new_value": "2026-06-10T20:43:36.856Z"
+            }
+          ]
+        }
+      ],
+      "errors": []
+    },
+    {
+      "source": "Korea Customs benchmark",
+      "ok": true,
+      "applied": true,
+      "mode": "benchmark",
+      "change_count": 1,
+      "rate_change_count": 0,
+      "error_count": 0,
+      "changes": [
+        {
+          "rule": "KR-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+          "import_country": "KR",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-10T07:50:00.000Z",
+              "new_value": "2026-06-10T20:43:36.857Z"
             }
           ]
         }
@@ -150,7 +427,7 @@
   ],
   "health": {
     "ok": true,
-    "sample_count": 13,
+    "sample_count": 14,
     "failed_sample_count": 0,
     "failures": []
   }
