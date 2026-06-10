@@ -452,21 +452,25 @@ function refreshVatLayer(rule, benchmark) {
 
 function applyBenchmarkToRule(rule, benchmark, checkedAt) {
     const changes = [];
-    if (Number(rule.base_rate) !== benchmark.base_rate) {
+    const protectedSourceStatus = ['official_source_checked', 'scope_check_required'].includes(rule.source_status);
+
+    if (!protectedSourceStatus && Number(rule.base_rate) !== benchmark.base_rate) {
         changes.push({ field: 'base_rate', old_value: rule.base_rate, new_value: benchmark.base_rate });
         rule.base_rate = benchmark.base_rate;
     }
     refreshVatLayer(rule, benchmark);
 
-    const updates = {
-        source_status: 'benchmark_source_checked',
-        confidence: 'Indicative',
-        source_note: benchmark.source_note,
-        source_hts: benchmark.source_hts,
-        source_rate_text: benchmark.source_rate_text,
-        source_url: EU_TARIC_URL,
-        last_checked_at: checkedAt
-    };
+    const updates = protectedSourceStatus
+        ? { last_checked_at: checkedAt }
+        : {
+            source_status: 'benchmark_source_checked',
+            confidence: 'Indicative',
+            source_note: benchmark.source_note,
+            source_hts: benchmark.source_hts,
+            source_rate_text: benchmark.source_rate_text,
+            source_url: EU_TARIC_URL,
+            last_checked_at: checkedAt
+        };
     Object.entries(updates).forEach(([field, value]) => {
         if (rule[field] !== value) {
             changes.push({ field, old_value: rule[field], new_value: value });

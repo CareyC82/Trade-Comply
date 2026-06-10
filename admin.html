@@ -768,6 +768,26 @@
             return Array.isArray(countries) && countries.length ? countries.join(', ') : '—';
         }
 
+        function renderDutySourceGradeSummary(sources = []) {
+            const sourceGrade = {
+                auto_updatable: 'Official auto',
+                benchmark_updatable: 'Benchmark auto',
+                updater_candidate: 'Candidate',
+                official_link: 'Official link',
+                benchmark: 'Benchmark only'
+            };
+            const rows = sources.map(source => `
+                <div class="duty-sync-mini-card">
+                    <strong>${escapeHtml(source.country || '—')}</strong>
+                    <span>${escapeHtml(sourceGrade[source.source_status] || source.source_status || 'Unknown')}</span>
+                </div>
+            `).join('');
+            return `
+                <div class="crawl-section-title"><h3>Source grade by market</h3><span class="meta">${sources.length} 个市场</span></div>
+                <div class="duty-sync-mini-grid">${rows || '<div class="empty">暂无税率源等级。</div>'}</div>
+            `;
+        }
+
         function renderDutySource(source) {
             const status = String(source.source_status || 'benchmark');
             const statusLabel = {
@@ -859,6 +879,7 @@
                         <div class="summary-card"><strong>${roadmap.source_count ?? sources.length}</strong><span>Tracked sources</span></div>
                         <div class="summary-card"><strong>${escapeHtml(data.duty_rates_updated_at || '—')}</strong><span>Duty data updated</span></div>
                     </div>
+                    ${renderDutySourceGradeSummary(sources)}
                     <div class="duty-status-row">
                         <span class="badge auto_updatable">Auto: ${escapeHtml(formatCountryList(roadmap.auto_updatable))}</span>
                         <span class="badge benchmark_updatable">Benchmark updater: ${escapeHtml(formatCountryList(roadmap.benchmark_updatable))}</span>

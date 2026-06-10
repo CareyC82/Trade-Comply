@@ -35,13 +35,16 @@
                 <small id="post-entry-coverage-note" class="post-entry-coverage-note">—</small>
             </div>
 
-            <div id="post-entry-confidence-card" class="post-entry-confidence-card">
-                <div>
-                    <span class="post-entry-confidence-kicker">Rate confidence</span>
-                    <strong id="post-entry-confidence-label">—</strong>
-                    <p id="post-entry-confidence-summary">—</p>
+            <div class="post-entry-decision-grid">
+                <div id="post-entry-rate-decision" class="post-entry-rate-decision">
+                    <span id="post-entry-rate-decision-label">—</span>
+                    <strong id="post-entry-rate-decision-title">—</strong>
+                    <p id="post-entry-rate-decision-detail">—</p>
                 </div>
-                <div id="post-entry-confidence-chips" class="post-entry-confidence-chips" aria-label="Rate source confidence details"></div>
+                <div class="post-entry-action-card">
+                    <span>Next action</span>
+                    <strong id="post-entry-action-summary">—</strong>
+                </div>
             </div>
 
             <div class="post-entry-result-grid">
@@ -71,47 +74,54 @@
                 </div>
             </div>
 
-            <div class="post-entry-source-card">
-                <div class="post-entry-source-header">
-                    <h3>Rate source status</h3>
-                    <span>Official rate used when available. Exact tariff-line checks stay separate from benchmark estimates.</span>
+            <details class="post-entry-detail-panel">
+                <summary>View detailed calculation and source basis</summary>
+                <div id="post-entry-confidence-card" class="post-entry-confidence-card">
+                    <div>
+                        <span class="post-entry-confidence-kicker">Rate confidence</span>
+                        <strong id="post-entry-confidence-label">—</strong>
+                        <p id="post-entry-confidence-summary">—</p>
+                    </div>
+                    <div id="post-entry-confidence-chips" class="post-entry-confidence-chips" aria-label="Rate source confidence details"></div>
                 </div>
-                <div id="post-entry-rate-decision" class="post-entry-rate-decision">
-                    <span id="post-entry-rate-decision-label">—</span>
-                    <strong id="post-entry-rate-decision-title">—</strong>
-                    <p id="post-entry-rate-decision-detail">—</p>
-                </div>
-                <div id="post-entry-source-list" class="post-entry-source-list"></div>
-            </div>
 
-            <div class="post-entry-explanation-card">
-                <h3>Key conclusion</h3>
-                <p id="post-entry-explanation">—</p>
-            </div>
+                <div class="post-entry-source-card">
+                    <div class="post-entry-source-header">
+                        <h3>Rate source status</h3>
+                        <span>Official rate used when available. Exact tariff-line checks stay separate from benchmark estimates.</span>
+                    </div>
+                    <div id="post-entry-source-list" class="post-entry-source-list"></div>
+                </div>
 
-            <div class="post-entry-insight-grid">
-                <div class="post-entry-insight-card">
-                    <span class="post-entry-insight-kicker">Value logic</span>
-                    <p id="post-entry-valuation-method">—</p>
+                <div class="post-entry-explanation-card">
+                    <h3>Key conclusion</h3>
+                    <p id="post-entry-explanation">—</p>
                 </div>
-                <div class="post-entry-insight-card">
-                    <span class="post-entry-insight-kicker">Duty impact</span>
-                    <p id="post-entry-duty-impact">—</p>
-                </div>
-                <div class="post-entry-insight-card">
-                    <span class="post-entry-insight-kicker">Compliance impact</span>
-                    <p id="post-entry-compliance-meaning">—</p>
-                </div>
-                <div class="post-entry-insight-card">
-                    <span class="post-entry-insight-kicker">Action</span>
-                    <p id="post-entry-recommended-action">—</p>
-                </div>
-            </div>
 
-            <div class="post-entry-checklist-card">
-                <h3>Evidence to keep</h3>
-                <ul id="post-entry-evidence-list"></ul>
-            </div>
+                <div class="post-entry-insight-grid">
+                    <div class="post-entry-insight-card">
+                        <span class="post-entry-insight-kicker">Value logic</span>
+                        <p id="post-entry-valuation-method">—</p>
+                    </div>
+                    <div class="post-entry-insight-card">
+                        <span class="post-entry-insight-kicker">Duty impact</span>
+                        <p id="post-entry-duty-impact">—</p>
+                    </div>
+                    <div class="post-entry-insight-card">
+                        <span class="post-entry-insight-kicker">Compliance impact</span>
+                        <p id="post-entry-compliance-meaning">—</p>
+                    </div>
+                    <div class="post-entry-insight-card">
+                        <span class="post-entry-insight-kicker">Action</span>
+                        <p id="post-entry-recommended-action">—</p>
+                    </div>
+                </div>
+
+                <div class="post-entry-checklist-card">
+                    <h3>Evidence to keep</h3>
+                    <ul id="post-entry-evidence-list"></ul>
+                </div>
+            </details>
 
             <div class="feedback-section post-entry-feedback-section">
                 <a href="#" class="feedback-link" id="post-entry-feedback-trigger">💬 Can't find your product? Tell us</a>

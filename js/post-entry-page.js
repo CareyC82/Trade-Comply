@@ -338,6 +338,20 @@
         return 'Rate basis: benchmark estimate. Confirm the official tariff line before filing or correction.';
     }
 
+    function buildJurisdictionScopeNote(context = {}) {
+        const importCountry = String(context.importCountryCode || '').toUpperCase();
+        if (importCountry === 'EU') {
+            return 'EU TARIC duty is shown at EU level; import VAT depends on the destination member state.';
+        }
+        if (importCountry === 'DE') {
+            return 'Germany view: EU TARIC duty plus Germany VAT benchmark.';
+        }
+        if (importCountry === 'NL') {
+            return 'Netherlands view: EU TARIC duty plus Netherlands VAT benchmark.';
+        }
+        return '';
+    }
+
     function renderSourceList(id, items) {
         const list = $(id);
         if (!list) return;
@@ -686,7 +700,7 @@
                     : valueApi.buildRecommendedAction(result, context)
             },
             sourceBreakdown: dutyImpact.sourceBreakdown || [],
-            coverageNote: buildCoverageNote(dutyImpact.sourceBreakdown || []),
+            coverageNote: [buildCoverageNote(dutyImpact.sourceBreakdown || []), buildJurisdictionScopeNote(context)].filter(Boolean).join(' '),
             rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
             rateDecision: buildRateDecisionSummary(dutyImpact.sourceBreakdown || []),
             evidence: valueApi.buildEvidenceList(context)
@@ -753,6 +767,8 @@
         $('post-entry-duty-impact').textContent = snapshot.insights?.duty || '—';
         $('post-entry-compliance-meaning').textContent = snapshot.insights?.compliance || '—';
         $('post-entry-recommended-action').textContent = snapshot.insights?.action || '—';
+        const actionSummary = $('post-entry-action-summary');
+        if (actionSummary) actionSummary.textContent = snapshot.insights?.action || snapshot.conclusion || 'Keep the review result with the entry file.';
         renderCompactSourceList('post-entry-source-list', snapshot.sourceBreakdown || []);
         renderList('post-entry-evidence-list', snapshot.evidence || []);
         setRiskBadge(snapshot.risk || { level: 'Review', tone: 'medium' });

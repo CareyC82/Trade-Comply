@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-09",
+  "updated_at": "2026-06-10",
   "notes": "Operational roadmap for Post-Entry duty-rate sources. Source status controls product trust wording: auto_updatable means a maintained script can refresh official machine-readable rates; benchmark_updatable means a maintained script can refresh local benchmark metadata but the rate remains indicative; official_link means an official source is identified but not machine-refreshed yet; benchmark means local pre-check math only.",
   "sources": [
     {
@@ -100,30 +100,30 @@
       "name": "Japan Customs tariff",
       "authority": "Japan Customs",
       "official_url": "https://www.customs.go.jp/english/tariff/",
-      "machine_readable": false,
-      "source_status": "official_link",
+      "machine_readable": "candidate",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P2",
-      "status_reason": "Official tariff source identified, but downloadable/machine-readable mapping is not wired yet.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "status_reason": "Official Japan Customs source is identified; local benchmark updater refreshes consumption-tax and duty-free electronics assumptions until machine tariff parsing is wired.",
+      "updater_script": "scripts/update-jp-duty-rates.js",
+      "update_command": "npm run update:duty-rates:jp",
+      "last_sync_field": "last_jp_customs_benchmark_sync_at",
       "current_scope": "Benchmark duty plus consumption tax reminder.",
-      "next_action": "Research downloadable tariff schedule format."
+      "next_action": "Keep benchmark updater running; research downloadable Japan tariff schedule format before official automatic rates."
     },
     {
       "country": "KR",
       "name": "Korea Customs tariff / VAT",
       "authority": "Korea Customs Service",
       "official_url": "https://www.customs.go.kr/english/main.do",
-      "machine_readable": false,
-      "source_status": "official_link",
+      "machine_readable": "candidate",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P2",
-      "status_reason": "Official customs source identified, but UNI-PASS/public tariff data access is not wired yet.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "status_reason": "Official Korea Customs source is identified; local benchmark updater refreshes VAT and common electronics assumptions until UNI-PASS tariff parsing is wired.",
+      "updater_script": "scripts/update-kr-duty-rates.js",
+      "update_command": "npm run update:duty-rates:kr",
+      "last_sync_field": "last_kr_customs_benchmark_sync_at",
       "current_scope": "Benchmark duty plus VAT reminder.",
-      "next_action": "Research UNI-PASS or public tariff data access."
+      "next_action": "Keep benchmark updater running; research UNI-PASS or public tariff data access before official automatic rates."
     },
     {
       "country": "CN",

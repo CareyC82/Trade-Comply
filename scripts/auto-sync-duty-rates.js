@@ -12,6 +12,8 @@ const { updateUsRules } = require('./update-us-duty-rates');
 const { updateEuRules } = require('./update-eu-duty-rates');
 const { updateSingaporeRules } = require('./update-sg-duty-rates');
 const { updateMexicoRules } = require('./update-mx-duty-rates');
+const { updateJapanRules } = require('./update-jp-duty-rates');
+const { updateKoreaRules } = require('./update-kr-duty-rates');
 const { runDutyRateHealthCheck } = require('./check-duty-rates');
 
 const ROOT = path.join(__dirname, '..');
@@ -211,6 +213,18 @@ async function runAutoDutyRateSync({ dryRun = false, skipOfficialUs = false } = 
 
     const mxResult = updateMexicoRules({ dryRun });
     runs.push(buildRunSummary('Mexico SNICE benchmark', mxResult, {
+        applied: !dryRun,
+        mode: 'benchmark'
+    }));
+
+    const jpResult = updateJapanRules({ dryRun });
+    runs.push(buildRunSummary('Japan Customs benchmark', jpResult, {
+        applied: !dryRun,
+        mode: 'benchmark'
+    }));
+
+    const krResult = updateKoreaRules({ dryRun });
+    runs.push(buildRunSummary('Korea Customs benchmark', krResult, {
         applied: !dryRun,
         mode: 'benchmark'
     }));

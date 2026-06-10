@@ -98,6 +98,19 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
     assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
 });
 
+test('Singapore Mexico Japan and Korea import benchmarks stay source-checked', () => {
+    ['SG', 'MX', 'JP', 'KR'].forEach((country) => {
+        const rule = (dutyRates.rules || []).find(item => (
+            item.import_country === country
+            && (item.hs_prefixes || []).includes('8542')
+        ));
+
+        assert.ok(rule, `${country} electronics benchmark rule should exist`);
+        assert.equal(rule.source_status, 'benchmark_source_checked', `${country} should use benchmark source checked status`);
+        assert.ok(rule.last_checked_at, `${country} should carry checked timestamp when refreshed`);
+    });
+});
+
 test('Russia sample keeps sanctions scope as a review-only flag', () => {
     const result = runDutyRateHealthCheck();
     const russia = result.samples.find(sample => sample.id === 'PE-RU-CN-ELECTRONICS-851762');

@@ -34,6 +34,14 @@ const {
     applyMexicoBenchmarkToRule,
     probeMexicoReadiness
 } = require('../scripts/update-mx-duty-rates');
+const {
+    applyJapanBenchmarkToRule,
+    probeJapanReadiness
+} = require('../scripts/update-jp-duty-rates');
+const {
+    applyKoreaBenchmarkToRule,
+    probeKoreaReadiness
+} = require('../scripts/update-kr-duty-rates');
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const dutyRateSources = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rate-sources.json'), 'utf8'));
@@ -48,6 +56,8 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.benchmark_updatable.includes('EU'));
     assert.ok(roadmap.benchmark_updatable.includes('SG'));
     assert.ok(roadmap.benchmark_updatable.includes('MX'));
+    assert.ok(roadmap.benchmark_updatable.includes('JP'));
+    assert.ok(roadmap.benchmark_updatable.includes('KR'));
 });
 
 test('duty-rate health check reports source roadmap status', () => {
@@ -59,10 +69,12 @@ test('duty-rate health check reports source roadmap status', () => {
     assert.deepEqual(result.source_roadmap_summary.missing_roadmap, []);
 });
 
-test('EU, Singapore, and Mexico updater probes are wired as benchmark writers', async () => {
+test('EU, Singapore, Mexico, Japan, and Korea updater probes are wired as benchmark writers', async () => {
     const eu = await probeEuTaricReadiness();
     const sg = probeSingaporeReadiness();
     const mx = probeMexicoReadiness();
+    const jp = probeJapanReadiness();
+    const kr = probeKoreaReadiness();
 
     assert.equal(eu.ok, true);
     assert.equal(eu.writes_rates, true);
@@ -83,6 +95,18 @@ test('EU, Singapore, and Mexico updater probes are wired as benchmark writers', 
     assert.equal(mx.writes_official_machine_rates, false);
     assert.equal(mx.source_status, 'benchmark_updatable');
     assert.ok(mx.maintained_hs_prefixes.includes('847130'));
+
+    assert.equal(jp.ok, true);
+    assert.equal(jp.writes_rates, true);
+    assert.equal(jp.writes_official_machine_rates, false);
+    assert.equal(jp.source_status, 'benchmark_updatable');
+    assert.ok(jp.maintained_hs_prefixes.includes('8542'));
+
+    assert.equal(kr.ok, true);
+    assert.equal(kr.writes_rates, true);
+    assert.equal(kr.writes_official_machine_rates, false);
+    assert.equal(kr.source_status, 'benchmark_updatable');
+    assert.ok(kr.maintained_hs_prefixes.includes('8542'));
 });
 
 test('EU TARIC official probe parses consultation metadata without upgrading rate trust', async () => {
@@ -331,6 +355,52 @@ test('EU updater marks maintained rules as benchmark checked without official st
     assert.equal(rule.source_rate_text, 'Benchmark text');
 });
 
+test('EU benchmark updater does not downgrade official or scope-checked rates', () => {
+    const officialRule = {
+        id: 'TEST-EU-OFFICIAL',
+        import_country: 'EU',
+        base_rate: 0,
+        add_on_layers: [],
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_hts: '8542 (TARIC ERGA OMNES third-country duty)',
+        source_rate_text: 'TARIC third-country duty: 0.000%',
+        source_url: 'https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en',
+        last_checked_at: '2026-06-09T00:00:00.000Z'
+    };
+    const scopeRule = {
+        id: 'TEST-EU-SCOPE',
+        import_country: 'EU',
+        base_rate: 0,
+        add_on_layers: [],
+        source_status: 'scope_check_required',
+        confidence: 'Scope check required',
+        source_hts: '8528 (TARIC scope check required)',
+        source_rate_text: 'Exact TARIC code required before using an official EU duty rate.',
+        source_url: 'https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en',
+        last_checked_at: '2026-06-09T00:00:00.000Z'
+    };
+    const benchmark = {
+        base_rate: 0.027,
+        source_hts: '850440 benchmark',
+        source_rate_text: 'Benchmark text',
+        source_note: 'Benchmark note'
+    };
+
+    const officialChanges = applyBenchmarkToRule(officialRule, benchmark, '2026-06-10T00:00:00.000Z');
+    const scopeChanges = applyBenchmarkToRule(scopeRule, benchmark, '2026-06-10T00:00:00.000Z');
+
+    assert.deepEqual(officialChanges.map(change => change.field), ['last_checked_at']);
+    assert.equal(officialRule.base_rate, 0);
+    assert.equal(officialRule.source_status, 'official_source_checked');
+    assert.equal(officialRule.source_rate_text, 'TARIC third-country duty: 0.000%');
+
+    assert.deepEqual(scopeChanges.map(change => change.field), ['last_checked_at']);
+    assert.equal(scopeRule.base_rate, 0);
+    assert.equal(scopeRule.source_status, 'scope_check_required');
+    assert.equal(scopeRule.source_rate_text, 'Exact TARIC code required before using an official EU duty rate.');
+});
+
 test('Singapore updater keeps GST benchmark separate from official machine rates', () => {
     const rule = {
         id: 'TEST-SG',
@@ -367,4 +437,42 @@ test('Mexico updater keeps VAT benchmark separate from official machine rates', 
     assert.equal(rule.source_status, 'benchmark_source_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.16);
     assert.equal(rule.additional_rate, 0.16);
+});
+
+test('Japan updater keeps consumption tax benchmark separate from official machine rates', () => {
+    const rule = {
+        id: 'TEST-JP',
+        import_country: 'JP',
+        base_rate: 0,
+        additional_rate: 0,
+        add_on_layers: [
+            { type: 'consumption_tax', rate: 0.08, status: 'indicative' }
+        ],
+        source_status: 'indicative'
+    };
+    const changes = applyJapanBenchmarkToRule(rule, '2026-06-10T00:00:00.000Z');
+
+    assert.ok(changes.some(change => change.field === 'source_status'));
+    assert.equal(rule.source_status, 'benchmark_source_checked');
+    assert.equal(rule.add_on_layers[0].rate, 0.1);
+    assert.equal(rule.additional_rate, 0.1);
+});
+
+test('Korea updater keeps VAT benchmark separate from official machine rates', () => {
+    const rule = {
+        id: 'TEST-KR',
+        import_country: 'KR',
+        base_rate: 0,
+        additional_rate: 0,
+        add_on_layers: [
+            { type: 'import_vat', rate: 0.09, status: 'indicative' }
+        ],
+        source_status: 'indicative'
+    };
+    const changes = applyKoreaBenchmarkToRule(rule, '2026-06-10T00:00:00.000Z');
+
+    assert.ok(changes.some(change => change.field === 'source_status'));
+    assert.equal(rule.source_status, 'benchmark_source_checked');
+    assert.equal(rule.add_on_layers[0].rate, 0.1);
+    assert.equal(rule.additional_rate, 0.1);
 });
