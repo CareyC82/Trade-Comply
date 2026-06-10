@@ -246,25 +246,88 @@
     }
 
     function buildRateBasisText(items = []) {
-        if (!items.length) return 'No rate source attached';
-        const labels = items.slice(0, 2).map(item => item.label || item.source || 'Rate source');
-        const suffix = items.length > 2 ? ` + ${items.length - 2} more` : '';
-        return `${labels.join(' + ')}${suffix}`;
+        const summary = buildRateDecisionSummary(items);
+        return summary?.label || 'Rate source not covered';
+    }
+
+    function findBaseDutySource(items = []) {
+        return (items || []).find(item => /base duty/i.test(item.label || '')) || (items || [])[0] || null;
+    }
+
+    function buildRateDecisionSummary(items = []) {
+        const rows = Array.isArray(items) ? items : [];
+        const base = findBaseDutySource(rows);
+        const hasScopeCheck = rows.some(item => item.status === 'scope_check_required' || item.status === 'flag_only');
+        const officialRows = rows.filter(item => item.status === 'official_source_checked');
+        const benchmarkRows = rows.filter(item => item.status === 'benchmark_source_checked' || item.status === 'indicative');
+        const scopeRows = rows.filter(item => item.status === 'scope_check_required' || item.status === 'flag_only');
+        const reviewRows = rows.filter(item => item.status === 'review_basis');
+
+        if (hasScopeCheck) {
+            const target = scopeRows[0] || base || {};
+            return {
+                tone: 'scope',
+                label: 'Needs exact tariff line',
+                title: 'Exact HS / TARIC scope is required before using a final duty rate.',
+                detail: target.detail || target.source || 'Enter a more specific 8-10 digit HS/TARIC code to narrow the applicable rate.'
+            };
+        }
+        if (reviewRows.length) {
+            const target = reviewRows[0] || {};
+            return {
+                tone: 'mixed',
+                label: 'Export filing review',
+                title: target.detail || 'Export-side value review is available for this route.',
+                detail: 'This result checks declared value logic and correction posture. It does not calculate destination import duty.'
+            };
+        }
+        if (base?.status === 'official_source_checked') {
+            return {
+                tone: 'official',
+                label: 'Official rate used',
+                title: base.detail || 'Official base duty rate was matched for this route.',
+                detail: benchmarkRows.length
+                    ? 'Base duty is official-checked; VAT or add-on layers may still be benchmark estimates.'
+                    : 'All displayed duty-rate layers are backed by maintained official source data.'
+            };
+        }
+        if (officialRows.length) {
+            return {
+                tone: 'mixed',
+                label: 'Mixed source basis',
+                title: 'Some duty components are official-checked.',
+                detail: 'Review benchmark add-ons, taxes, or local layers before filing or correction.'
+            };
+        }
+        if (!rows.length || rows.some(item => item.status === 'not_covered')) {
+            return {
+                tone: 'not-covered',
+                label: 'Rate not covered',
+                title: 'No maintained route / HS duty rate is available yet.',
+                detail: 'Use the value calculation only, then confirm the official tariff line separately.'
+            };
+        }
+        return {
+            tone: 'benchmark',
+            label: 'Benchmark estimate',
+            title: base?.detail || 'Duty math uses a maintained benchmark estimate.',
+            detail: 'Use this for quick screening. Treat the amount as a benchmark until an official tariff source is attached.'
+        };
     }
 
     function buildCoverageNote(items = []) {
         const level = getSourceCoverageLevel(items);
         if (level === 'official_source_checked') {
-            return 'Rate basis: official tariff source checked. Still confirm entry-date applicability before filing.';
+            return 'Official rate used. Still confirm entry-date applicability before filing.';
         }
         if (level === 'mixed') {
-            return 'Rate basis: official base rate plus benchmark add-ons. Confirm Chapter 99, exclusions, and entry-date scope.';
+            return 'Official base rate plus benchmark add-ons. Confirm taxes, exclusions, and entry-date scope.';
         }
         if (level === 'benchmark_source_checked') {
-            return 'Rate basis: maintained benchmark checked. Useful for pre-check decisions, but verify the official tariff line before filing.';
+            return 'Benchmark estimate. Useful for pre-check decisions, but verify the official tariff line before filing.';
         }
         if (level === 'scope_check_required') {
-            return 'Rate basis: includes case-scope flags. The value estimate is useful, but AD/CVD or product-scope review may change the final duty.';
+            return 'Needs exact tariff line. A broader HS prefix has multiple possible duty outcomes.';
         }
         if (level === 'not_covered') {
             return 'Rate basis: not covered yet. Use the value math only, then confirm the official tariff line.';
@@ -314,6 +377,103 @@
         });
     }
 
+    function renderRateDecision(summary) {
+        const card = $('post-entry-rate-decision');
+        if (!card) return;
+        const safe = summary || buildRateDecisionSummary([]);
+        card.className = `post-entry-rate-decision post-entry-rate-decision--${safe.tone || 'benchmark'}`;
+        const label = $('post-entry-rate-decision-label');
+        const title = $('post-entry-rate-decision-title');
+        const detail = $('post-entry-rate-decision-detail');
+        if (label) label.textContent = safe.label || 'Rate decision';
+        if (title) title.textContent = safe.title || 'Review rate basis.';
+        if (detail) detail.textContent = safe.detail || '';
+    }
+
+    function compactSourceRows(items = []) {
+        const rows = Array.isArray(items) ? items : [];
+        if (!rows.length) {
+            return [{
+                label: 'Rate not covered',
+                status: 'not_covered',
+                source: 'No maintained source attached',
+                detail: 'Confirm the official tariff line before filing.'
+            }];
+        }
+        const groups = [
+            {
+                label: 'Needs exact tariff line',
+                status: 'scope_check_required',
+                rows: rows.filter(item => item.status === 'scope_check_required' || item.status === 'flag_only')
+            },
+            {
+                label: 'Official rate used',
+                status: 'official_source_checked',
+                rows: rows.filter(item => item.status === 'official_source_checked')
+            },
+            {
+                label: 'Benchmark estimate',
+                status: 'benchmark_source_checked',
+                rows: rows.filter(item => ['benchmark_source_checked', 'indicative'].includes(item.status))
+            },
+            {
+                label: 'Export filing review',
+                status: 'review_basis',
+                rows: rows.filter(item => item.status === 'review_basis')
+            },
+            {
+                label: 'Rate not covered',
+                status: 'not_covered',
+                rows: rows.filter(item => item.status === 'not_covered')
+            }
+        ];
+        return groups
+            .filter(group => group.rows.length)
+            .map((group) => {
+                const first = group.rows[0] || {};
+                let source = group.rows.map(item => item.label || item.source).filter(Boolean).slice(0, 2).join(' + ');
+                let detail = group.rows
+                    .map(item => item.detail || item.source || item.label)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .join(' · ');
+                if (group.status === 'official_source_checked') {
+                    source = 'Official tariff source';
+                    detail = first.detail || 'Official base duty rate matched for this route and HS prefix.';
+                }
+                if (group.status === 'scope_check_required') {
+                    source = 'Exact tariff-line required';
+                    detail = first.detail || 'A broader HS prefix has multiple possible rates; enter a more specific 8-10 digit code before using a final duty amount.';
+                }
+                if (group.status === 'benchmark_source_checked') {
+                    source = 'Maintained benchmark';
+                    detail = group.rows.length > 1
+                        ? `Benchmark add-ons included: ${group.rows.map(item => item.label || item.source).filter(Boolean).join(', ')}.`
+                        : (first.detail || 'Benchmark estimate used because no official route / HS rate is attached yet.');
+                }
+                if (group.status === 'review_basis') {
+                    source = 'Export-side filing logic';
+                    detail = first.detail || 'Review declared value, correction posture, and retained evidence for the origin-side filing.';
+                }
+                if (group.status === 'not_covered') {
+                    source = 'No maintained rate';
+                    detail = first.detail || 'Confirm the official tariff line before filing.';
+                }
+                const suffix = group.rows.length > 2 && group.status !== 'benchmark_source_checked' ? ` + ${group.rows.length - 2} more` : '';
+                return {
+                    label: group.label,
+                    status: group.status,
+                    source,
+                    detail: `${detail}${suffix}`,
+                    url: first.url || ''
+                };
+            });
+    }
+
+    function renderCompactSourceList(id, items) {
+        renderSourceList(id, compactSourceRows(items));
+    }
+
     function buildChargeList(result) {
         const charges = [];
         if (result.freight > 0) charges.push('freight');
@@ -356,15 +516,15 @@
             return 'No duty estimate available for this route / HS yet. Confirm official tariff before filing or correction.';
         }
         if (dutyImpact.dutyVariance > 0.01) {
-            return `Potential duty shortfall: ${formatMoney(dutyImpact.dutyVariance, currency)}. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
+            return `Potential duty shortfall: ${formatMoney(dutyImpact.dutyVariance, currency)}. ${basis}: confirm before correction.`;
         }
         if (dutyImpact.dutyVariance < -0.01) {
-            return `Declared duty may be higher than estimate by ${formatMoney(Math.abs(dutyImpact.dutyVariance), currency)}. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
+            return `Declared duty may be higher than estimate by ${formatMoney(Math.abs(dutyImpact.dutyVariance), currency)}. ${basis}: check for overpayment or double-counting.`;
         }
         if (result.difference > 0.01) {
-            return `Value gap detected: ${formatMoney(result.difference, currency)}. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
+            return `Value gap detected: ${formatMoney(result.difference, currency)}. ${basis}: use the corrected customs value for duty review.`;
         }
-        return `No obvious duty shortfall. Rate confidence: ${confidence.label}. Basis: ${basis}.`;
+        return `No obvious duty shortfall. ${confidence.label}: ${basis}.`;
     }
 
     function buildExportTopConclusion(result, currency) {
@@ -421,7 +581,7 @@
             'post-entry-difference-label': 'Export value gap'
         } : {
             'post-entry-customs-value-label': 'Customs dutiable value',
-            'post-entry-rebate-base-label': 'Export rebate base',
+            'post-entry-rebate-base-label': 'FOB reference value',
             'post-entry-difference-label': 'Difference vs declared'
         };
         Object.entries(labelMap).forEach(([id, text]) => {
@@ -447,7 +607,7 @@
                 difference: 'Export value gap'
             } : {
                 customsValue: 'Customs dutiable value',
-                rebateBase: 'Export rebate base',
+                rebateBase: 'FOB reference value',
                 difference: 'Difference vs declared'
             },
             values: {},
@@ -490,6 +650,11 @@
                 rateConfidence: buildRateConfidence([{
                     status: exportReview.covered ? 'review_basis' : 'not_covered'
                 }]),
+                rateDecision: buildRateDecisionSummary([{
+                    label: exportReview.label || 'Export filing review',
+                    status: exportReview.covered ? 'review_basis' : 'not_covered',
+                    detail: exportReview.impact || 'Confirm export declaration requirements for the origin country.'
+                }]),
                 evidence: exportReview.evidence
             };
         }
@@ -523,6 +688,7 @@
             sourceBreakdown: dutyImpact.sourceBreakdown || [],
             coverageNote: buildCoverageNote(dutyImpact.sourceBreakdown || []),
             rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
+            rateDecision: buildRateDecisionSummary(dutyImpact.sourceBreakdown || []),
             evidence: valueApi.buildEvidenceList(context)
         };
     }
@@ -565,6 +731,7 @@
         const coverageNote = $('post-entry-coverage-note');
         if (coverageNote) coverageNote.textContent = snapshot.coverageNote || buildCoverageNote(snapshot.sourceBreakdown || []);
         renderRateConfidence(snapshot.rateConfidence || buildRateConfidence(snapshot.sourceBreakdown || []));
+        renderRateDecision(snapshot.rateDecision || buildRateDecisionSummary(snapshot.sourceBreakdown || []));
         if (snapshot.labels) {
             const customLabel = $('post-entry-customs-value-label');
             const rebateLabel = $('post-entry-rebate-base-label');
@@ -586,7 +753,7 @@
         $('post-entry-duty-impact').textContent = snapshot.insights?.duty || '—';
         $('post-entry-compliance-meaning').textContent = snapshot.insights?.compliance || '—';
         $('post-entry-recommended-action').textContent = snapshot.insights?.action || '—';
-        renderSourceList('post-entry-source-list', snapshot.sourceBreakdown || []);
+        renderCompactSourceList('post-entry-source-list', snapshot.sourceBreakdown || []);
         renderList('post-entry-evidence-list', snapshot.evidence || []);
         setRiskBadge(snapshot.risk || { level: 'Review', tone: 'medium' });
         const resultSection = $('post-entry-result');

@@ -60,6 +60,44 @@ test('US electronics duty rules stay split by HS prefix for official sync', () =
     });
 });
 
+test('Germany and Netherlands EU duty rules stay split by HS prefix for TARIC sync', () => {
+    ['DE', 'NL'].forEach((country) => {
+        const rules = (dutyRates.rules || []).filter(rule => rule.import_country === country);
+        const prefixes = new Map();
+
+        rules.forEach((rule) => {
+            if ((rule.hs_prefixes || []).some(prefix => ['847130', '850440', '850760', '8517', '8528', '8541', '8542'].includes(prefix))) {
+                assert.equal(rule.hs_prefixes.length, 1, `${rule.id} should have one HS prefix`);
+                prefixes.set(rule.hs_prefixes[0], rule);
+            }
+        });
+
+        ['847130', '850440', '850760', '8517', '8528', '8541', '8542'].forEach((prefix) => {
+            assert.ok(prefixes.has(prefix), `${country} ${prefix} duty rule should exist`);
+        });
+        assert.equal(prefixes.get('850440').source_status, 'official_source_checked');
+        assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
+    });
+});
+
+test('European Union aggregate rules cover common electronics HS prefixes', () => {
+    const rules = (dutyRates.rules || []).filter(rule => rule.import_country === 'EU');
+    const prefixes = new Map();
+
+    rules.forEach((rule) => {
+        if ((rule.hs_prefixes || []).some(prefix => ['847130', '850440', '850760', '8517', '8528', '8541', '8542'].includes(prefix))) {
+            assert.equal(rule.hs_prefixes.length, 1, `${rule.id} should have one HS prefix`);
+            prefixes.set(rule.hs_prefixes[0], rule);
+        }
+    });
+
+    ['847130', '850440', '850760', '8517', '8528', '8541', '8542'].forEach((prefix) => {
+        assert.ok(prefixes.has(prefix), `EU ${prefix} duty rule should exist`);
+    });
+    assert.equal(prefixes.get('850760').source_status, 'official_source_checked');
+    assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
+});
+
 test('Russia sample keeps sanctions scope as a review-only flag', () => {
     const result = runDutyRateHealthCheck();
     const russia = result.samples.find(sample => sample.id === 'PE-RU-CN-ELECTRONICS-851762');
@@ -71,17 +109,17 @@ test('Russia sample keeps sanctions scope as a review-only flag', () => {
 test('non-US benchmark samples stay non-official except EU TARIC candidate rows', () => {
     const result = runDutyRateHealthCheck();
     const nonUsSamples = result.samples.filter(sample => !sample.id.startsWith('PE-US-'));
-    const officialEuCandidate = result.samples.find(sample => sample.id === 'PE-EU-CN-EVCHARGER-850440');
+    const officialEuSamples = result.samples.filter(sample => sample.id.startsWith('PE-EU-'));
 
     assert.ok(nonUsSamples.length > 0);
-    assert.ok(officialEuCandidate.source_statuses.includes('official_source_checked'));
+    assert.ok(officialEuSamples.some(sample => sample.source_statuses.includes('official_source_checked')));
     nonUsSamples.forEach((sample) => {
         assert.equal(
             sample.source_statuses.includes('indicative') || sample.source_statuses.includes('benchmark_source_checked'),
             true,
             `${sample.id} should remain indicative or benchmark-checked`
         );
-        if (sample.id === 'PE-EU-CN-EVCHARGER-850440') {
+        if (sample.id.startsWith('PE-EU-')) {
             return;
         }
         assert.equal(sample.source_statuses.includes('official_source_checked'), false, `${sample.id} should not be official`);

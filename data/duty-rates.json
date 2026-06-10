@@ -271,22 +271,190 @@
       "source_hts": "850440 (TARIC ERGA OMNES third-country duty)",
       "source_rate_text": "TARIC third-country duty: 0.000%",
       "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
-      "last_checked_at": "2026-06-10T03:37:48.139Z"
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
     },
     {
-      "id": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "id": "EU-GLOBAL-847130-TABLET-IMPORT-SCOPE",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130"
+      ],
+      "label": "EU import tablet / portable ADP equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
+      "source_hts": "847130 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "EU-GLOBAL-850760-BATTERY-IMPORT-OFFICIAL",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "850760"
+      ],
+      "label": "EU import lithium-ion battery equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus member-state VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because this maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "850760 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 2.700%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "EU-GLOBAL-8517-TELECOM-IMPORT-OFFICIAL",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8517"
+      ],
+      "label": "EU import telecom / network equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus member-state VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because this maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8517 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "EU-GLOBAL-8528-DISPLAY-IMPORT-SCOPE",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8528"
+      ],
+      "label": "EU import display / monitor equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "Official TARIC workbook found multiple third-country-duty rates under this prefix.",
+      "source_hts": "8528 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required; parsed ERGA OMNES third-country-duty rates include 0.000%, 2.000%, 14.000%.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "EU-GLOBAL-8541-SOLAR-IMPORT-OFFICIAL",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8541"
+      ],
+      "label": "EU import photovoltaic / semiconductor device equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus member-state VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because this maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8541 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "EU-GLOBAL-8542-SEMICONDUCTOR-IMPORT-OFFICIAL",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8542"
+      ],
+      "label": "EU import semiconductor integrated circuit equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus member-state VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because this maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8542 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
       "import_country": "DE",
       "origin_country": "*",
       "hs_prefixes": [
-        "847130",
-        "850440",
-        "850760",
-        "8517",
-        "8528",
-        "8541",
-        "8542"
+        "847130"
       ],
-      "label": "Germany import electronics / new energy signal",
+      "label": "Germany import tablet / portable ADP equipment signal",
       "base_rate": 0.027,
       "additional_rate": 0.19,
       "add_on_layers": [
@@ -299,29 +467,197 @@
           "source": "EU TARIC / Germany VAT benchmark"
         }
       ],
-      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify TARIC code and import VAT treatment.",
-      "confidence": "Indicative",
-      "source_status": "benchmark_source_checked",
-      "source_note": "Germany benchmark refreshed from maintained EU duty + Germany VAT table. Verify exact TARIC code and VAT treatment.",
-      "source_hts": "EU electronics benchmark / Germany VAT",
-      "source_rate_text": "Benchmark: 2.7% EU duty + 19% Germany VAT",
-      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-10T03:37:48.139Z"
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
+      "source_hts": "847130 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
     },
     {
-      "id": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "id": "DE-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "850440"
+      ],
+      "label": "Germany import power conversion / charger equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "850440 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "850760"
+      ],
+      "label": "Germany import lithium-ion battery equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "850760 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 2.700%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "DE-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8517"
+      ],
+      "label": "Germany import telecom / network equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8517 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8528"
+      ],
+      "label": "Germany import display / monitor equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
+      "source_hts": "8528 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required; parsed ERGA OMNES third-country-duty rates include 0.000%, 2.000%, 14.000%.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "DE-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8541"
+      ],
+      "label": "Germany import photovoltaic / semiconductor device equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8541 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "DE-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8542"
+      ],
+      "label": "Germany import semiconductor integrated circuit equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Germany VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8542 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
       "import_country": "NL",
       "origin_country": "*",
       "hs_prefixes": [
-        "847130",
-        "850440",
-        "850760",
-        "8517",
-        "8528",
-        "8541",
-        "8542"
+        "847130"
       ],
-      "label": "Netherlands import electronics / new energy signal",
+      "label": "Netherlands import tablet / portable ADP equipment signal",
       "base_rate": 0.027,
       "additional_rate": 0.21,
       "add_on_layers": [
@@ -334,14 +670,188 @@
           "source": "EU TARIC / Netherlands VAT benchmark"
         }
       ],
-      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify TARIC code and import VAT treatment.",
-      "confidence": "Indicative",
-      "source_status": "benchmark_source_checked",
-      "source_note": "Netherlands benchmark refreshed from maintained EU duty + Netherlands VAT table. Verify exact TARIC code and VAT treatment.",
-      "source_hts": "EU electronics benchmark / Netherlands VAT",
-      "source_rate_text": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
-      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-10T03:37:48.139Z"
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
+      "source_hts": "847130 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "NL-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "850440"
+      ],
+      "label": "Netherlands import power conversion / charger equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "850440 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "850760"
+      ],
+      "label": "Netherlands import lithium-ion battery equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "850760 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 2.700%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "NL-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8517"
+      ],
+      "label": "Netherlands import telecom / network equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8517 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "NL-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8528"
+      ],
+      "label": "Netherlands import display / monitor equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
+      "source_hts": "8528 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required; parsed ERGA OMNES third-country-duty rates include 0.000%, 2.000%, 14.000%.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "NL-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8541"
+      ],
+      "label": "Netherlands import photovoltaic / semiconductor device equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8541 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
+    },
+    {
+      "id": "NL-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8542"
+      ],
+      "label": "Netherlands import semiconductor integrated circuit equipment signal",
+      "base_rate": 0,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU customs duty plus Netherlands VAT benchmark; verify exact TARIC code and import VAT treatment.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "8542 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T06:25:02.441Z"
     },
     {
       "id": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -662,7 +1172,7 @@
     "changes": [],
     "errors": []
   },
-  "last_eu_taric_benchmark_sync_at": "2026-06-10T03:37:48.139Z",
+  "last_eu_taric_benchmark_sync_at": "2026-06-10T06:25:02.441Z",
   "last_eu_taric_benchmark_sync": {
     "ok": true,
     "dry_run": false,
@@ -691,9 +1201,9 @@
       },
       {
         "ok": false,
-        "rule": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "rule": "DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
         "base_rate": null,
-        "reason": "At least one HS prefix on this rule still requires exact TARIC scope, so the rule remains on benchmark status.",
+        "reason": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
         "candidates": [
           {
             "hs_prefix": "847130",
@@ -702,7 +1212,15 @@
             "base_rate": null,
             "unique_base_rates": [],
             "sample_goods_codes": []
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "DE-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "850440",
             "ok": true,
@@ -714,7 +1232,15 @@
               "8504408390",
               "8504408490"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+        "base_rate": 0.027,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "850760",
             "ok": true,
@@ -726,7 +1252,15 @@
               "8507600018",
               "8507600024"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "DE-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "8517",
             "ok": true,
@@ -738,7 +1272,15 @@
               "8517130000",
               "8517140000"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": false,
+        "rule": "DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+        "base_rate": null,
+        "reason": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
+        "candidates": [
           {
             "hs_prefix": "8528",
             "ok": false,
@@ -754,7 +1296,15 @@
               "8528490000",
               "8528520000"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "DE-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "8541",
             "ok": true,
@@ -764,7 +1314,15 @@
             "sample_goods_codes": [
               "8541000000"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "DE-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "8542",
             "ok": true,
@@ -779,9 +1337,9 @@
       },
       {
         "ok": false,
-        "rule": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "rule": "NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
         "base_rate": null,
-        "reason": "At least one HS prefix on this rule still requires exact TARIC scope, so the rule remains on benchmark status.",
+        "reason": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
         "candidates": [
           {
             "hs_prefix": "847130",
@@ -790,7 +1348,15 @@
             "base_rate": null,
             "unique_base_rates": [],
             "sample_goods_codes": []
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "NL-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "850440",
             "ok": true,
@@ -802,7 +1368,15 @@
               "8504408390",
               "8504408490"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+        "base_rate": 0.027,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "850760",
             "ok": true,
@@ -814,7 +1388,15 @@
               "8507600018",
               "8507600024"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "NL-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "8517",
             "ok": true,
@@ -826,7 +1408,15 @@
               "8517130000",
               "8517140000"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": false,
+        "rule": "NL-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+        "base_rate": null,
+        "reason": "No HS prefix on this rule produced an unambiguous official TARIC candidate.",
+        "candidates": [
           {
             "hs_prefix": "8528",
             "ok": false,
@@ -842,7 +1432,15 @@
               "8528490000",
               "8528520000"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "NL-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "8541",
             "ok": true,
@@ -852,7 +1450,15 @@
             "sample_goods_codes": [
               "8541000000"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "ok": true,
+        "rule": "NL-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
           {
             "hs_prefix": "8542",
             "ok": true,
@@ -874,32 +1480,636 @@
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-10T03:06:51.222Z",
-            "new_value": "2026-06-10T03:37:48.139Z"
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
           }
         ]
       },
       {
-        "rule": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "rule": "DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
         "import_country": "DE",
-        "mode": "benchmark",
+        "mode": "scope-check",
         "changes": [
           {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "scope_check_required"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Scope check required"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "No HS prefix on this rule produced an unambiguous official TARIC candidate."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "847130 benchmark / Germany VAT",
+            "new_value": "847130 (TARIC scope check required)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+            "new_value": "Exact TARIC code required before using an official EU duty rate."
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
             "field": "last_checked_at",
-            "old_value": "2026-06-10T03:06:51.222Z",
-            "new_value": "2026-06-10T03:37:48.139Z"
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
           }
         ]
       },
       {
-        "rule": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
-        "import_country": "NL",
-        "mode": "benchmark",
+        "rule": "DE-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+        "import_country": "DE",
+        "mode": "official-candidate",
         "changes": [
           {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "850440 benchmark / Germany VAT",
+            "new_value": "850440 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
             "field": "last_checked_at",
-            "old_value": "2026-06-10T03:06:51.222Z",
-            "new_value": "2026-06-10T03:37:48.139Z"
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+        "import_country": "DE",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "850760 benchmark / Germany VAT",
+            "new_value": "850760 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+            "new_value": "TARIC third-country duty: 2.700%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "DE-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+        "import_country": "DE",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8517 benchmark / Germany VAT",
+            "new_value": "8517 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+        "import_country": "DE",
+        "mode": "scope-check",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "scope_check_required"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Scope check required"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "No HS prefix on this rule produced an unambiguous official TARIC candidate."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8528 benchmark / Germany VAT",
+            "new_value": "8528 (TARIC scope check required)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+            "new_value": "Exact TARIC code required; parsed ERGA OMNES third-country-duty rates include 0.000%, 2.000%, 14.000%."
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "DE-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+        "import_country": "DE",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8541 benchmark / Germany VAT",
+            "new_value": "8541 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "DE-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+        "import_country": "DE",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Germany benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8542 benchmark / Germany VAT",
+            "new_value": "8542 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 19% Germany VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "mode": "scope-check",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "scope_check_required"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Scope check required"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "No HS prefix on this rule produced an unambiguous official TARIC candidate."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "847130 benchmark / Netherlands VAT",
+            "new_value": "847130 (TARIC scope check required)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+            "new_value": "Exact TARIC code required before using an official EU duty rate."
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "850440 benchmark / Netherlands VAT",
+            "new_value": "850440 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "850760 benchmark / Netherlands VAT",
+            "new_value": "850760 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+            "new_value": "TARIC third-country duty: 2.700%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8517 benchmark / Netherlands VAT",
+            "new_value": "8517 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "mode": "scope-check",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "scope_check_required"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Scope check required"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "No HS prefix on this rule produced an unambiguous official TARIC candidate."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8528 benchmark / Netherlands VAT",
+            "new_value": "8528 (TARIC scope check required)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+            "new_value": "Exact TARIC code required; parsed ERGA OMNES third-country-duty rates include 0.000%, 2.000%, 14.000%."
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8541 benchmark / Netherlands VAT",
+            "new_value": "8541 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
+          }
+        ]
+      },
+      {
+        "rule": "NL-GLOBAL-8542-SEMICONDUCTOR-IMPORT-INDICATIVE",
+        "import_country": "NL",
+        "mode": "official-candidate",
+        "changes": [
+          {
+            "field": "base_rate",
+            "old_value": 0.027,
+            "new_value": 0
+          },
+          {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official source checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Netherlands benchmark split by HS prefix; run EU TARIC updater to promote safe official candidates or mark exact TARIC scope checks.",
+            "new_value": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "8542 benchmark / Netherlands VAT",
+            "new_value": "8542 (TARIC ERGA OMNES third-country duty)"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
+            "new_value": "TARIC third-country duty: 0.000%"
+          },
+          {
+            "field": "source_url",
+            "old_value": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+            "new_value": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en"
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-10T03:37:48.139Z",
+            "new_value": "2026-06-10T06:25:02.441Z"
           }
         ]
       }

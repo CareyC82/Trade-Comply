@@ -548,6 +548,39 @@ function applyOfficialCandidateToRule(rule, candidate, checkedAt) {
     return changes;
 }
 
+function formatCandidateScopeRateText(candidate) {
+    const rows = candidate?.candidates || [];
+    const row = rows[0] || candidate || {};
+    const rates = Array.isArray(row.unique_base_rates) ? row.unique_base_rates : [];
+    if (rates.length) {
+        return `Exact TARIC code required; parsed ERGA OMNES third-country-duty rates include ${rates.map(rate => `${(rate * 100).toFixed(3)}%`).join(', ')}.`;
+    }
+    return 'Exact TARIC code required before using an official EU duty rate.';
+}
+
+function applyTaricScopeCheckToRule(rule, candidate, benchmark, checkedAt) {
+    const changes = [];
+    refreshVatLayer(rule, benchmark);
+
+    const prefix = (rule.hs_prefixes || [])[0] || '';
+    const updates = {
+        source_status: 'scope_check_required',
+        confidence: 'Scope check required',
+        source_note: candidate.reason || 'Official TARIC workbook was parsed, but this HS prefix needs a more exact TARIC code before an official rate can be used.',
+        source_hts: prefix ? `${prefix} (TARIC scope check required)` : 'TARIC scope check required',
+        source_rate_text: formatCandidateScopeRateText(candidate),
+        source_url: EU_TARIC_CONSULTATION_URL,
+        last_checked_at: checkedAt
+    };
+    Object.entries(updates).forEach(([field, value]) => {
+        if (rule[field] !== value) {
+            changes.push({ field, old_value: rule[field], new_value: value });
+            rule[field] = value;
+        }
+    });
+    return changes;
+}
+
 function compactOfficialCandidateOutcome(outcome) {
     if (!outcome) {
         return null;
@@ -594,9 +627,12 @@ function updateEuRules({ dryRun = false, taricRows = null, taricWorkbookPath = '
         if (!benchmark) continue;
         try {
             const officialCandidate = buildEuOfficialCandidateForRule(rule, parsedTaricRows);
+            const shouldApplyScopeCheck = Boolean(parsedTaricRows.length && officialCandidate && !officialCandidate.ok && (rule.hs_prefixes || []).length === 1);
             const ruleChanges = officialCandidate?.ok
                 ? applyOfficialCandidateToRule(rule, officialCandidate, checkedAt)
-                : applyBenchmarkToRule(rule, benchmark, checkedAt);
+                : shouldApplyScopeCheck
+                    ? applyTaricScopeCheckToRule(rule, officialCandidate, benchmark, checkedAt)
+                    : applyBenchmarkToRule(rule, benchmark, checkedAt);
             if (officialCandidate) {
                 candidateOutcomes.push(officialCandidate);
             }
@@ -604,7 +640,7 @@ function updateEuRules({ dryRun = false, taricRows = null, taricWorkbookPath = '
                 changes.push({
                     rule: rule.id,
                     import_country: rule.import_country,
-                    mode: officialCandidate?.ok ? 'official-candidate' : 'benchmark',
+                    mode: officialCandidate?.ok ? 'official-candidate' : shouldApplyScopeCheck ? 'scope-check' : 'benchmark',
                     changes: ruleChanges
                 });
             }
@@ -671,6 +707,8 @@ module.exports = {
     parseTaricWorkbookRows,
     buildEuOfficialCandidateForRule,
     applyOfficialCandidateToRule,
+    applyTaricScopeCheckToRule,
+    formatCandidateScopeRateText,
     compactOfficialCandidateOutcome,
     probeEuTaricFullDatabase,
     probeEuTaricOfficialSource,
