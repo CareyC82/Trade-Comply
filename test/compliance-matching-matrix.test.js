@@ -5,7 +5,7 @@ const tags = require('../data/tags.json');
 const cases = require('../data/cases.json');
 const country = require('../lib/trade-country');
 const matchedResults = require('../lib/matched-results');
-const { search } = require('../js/search');
+const { search, searchWithPrecheck } = require('../js/search');
 
 const PRODUCTS = [
     'gpu ai accelerator chip',
@@ -20,6 +20,7 @@ const PRODUCTS = [
 
 const EXPORT_MARKETS = ['US', 'EU', 'ASEAN', 'RU'];
 const IMPORT_ORIGINS = ['US', 'TW', 'JP', 'KR', 'GLOBAL'];
+const ROUTE_COUNTRIES = ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'ASEAN', 'RU', 'TW', 'JP', 'KR'];
 
 function setupSearch(direction, selectedCountry, route = {}) {
     globalThis.AppState = {
@@ -90,6 +91,18 @@ function haystack(result) {
         tag.description,
         tag.category_label
     ].filter(Boolean).join(' ')).join('\n');
+}
+
+function assertNoOppositeRouteFocus(result, expectedFocus, label) {
+    const wrong = result.tags.filter((tag) => {
+        const tagFocus = tag.route_focus || tag.compliance_focus || '';
+        return tagFocus && tagFocus !== expectedFocus;
+    });
+    assert.deepEqual(
+        wrong.map((tag) => `${tag.tag_id}:${tag.route_focus || tag.compliance_focus}`),
+        [],
+        `${label} should not include rules from the opposite route focus`
+    );
 }
 
 describe('compliance matching matrix', () => {
@@ -165,6 +178,40 @@ describe('compliance matching matrix', () => {
             false,
             'Mexico NOM import rule should not appear for origin export focus'
         );
+    });
+
+    it('keeps Japan origin-export baseline out of Japan destination-import smartphone checks', () => {
+        const result = runSearch('smartphone 5G cellular', 'export', 'JP', 'import', { from: 'US', to: 'JP' });
+        assert.ok(ids(result).includes('CL-JP-003'), 'expected Japan wireless import rule');
+        assert.equal(
+            ids(result).includes('CL-JPORIGEXP-001'),
+            false,
+            'Japan origin-export baseline should not appear for Japan destination-import focus'
+        );
+    });
+
+    it('applies route_focus after precheck result merging', () => {
+        setupSearch('export', 'JP', { from: 'US', to: 'JP', focus: 'import' });
+        const result = searchWithPrecheck('smartphone 5G cellular', [], search, 'smartphone 5G cellular');
+        assert.equal(
+            ids(result).includes('CL-JPORIGEXP-001'),
+            false,
+            'precheck merge should keep export-only Japan rules out of import focus'
+        );
+    });
+
+    it('keeps route focus clean across maintained countries and representative products', () => {
+        for (const focus of ['import', 'export']) {
+            for (const market of ROUTE_COUNTRIES) {
+                for (const product of PRODUCTS) {
+                    const route = focus === 'import'
+                        ? { from: market === 'US' ? 'CN' : 'US', to: market }
+                        : { from: market, to: market === 'US' ? 'CN' : 'US' };
+                    const result = runSearch(product, 'export', market, focus, route);
+                    assertNoOppositeRouteFocus(result, focus, `${focus} ${route.from}->${route.to} ${product}`);
+                }
+            }
+        }
     });
 
     it('does not include China baseline rules for non-China origin export focus', () => {

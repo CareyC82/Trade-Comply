@@ -55,7 +55,7 @@ function handleInboundSearchFromUrl(inboundQuery, inboundDirection, inboundCount
         const route = initRouteControls(
             inboundRoute.from,
             inboundRoute.to,
-            hasExplicitFocus ? inboundRoute.focus : ''
+            inboundRoute.focus || ''
         );
         inboundDirection = route.direction;
         inboundCountry = route.country;
@@ -168,7 +168,7 @@ async function bootstrapTradeComplyIndex() {
                 {
                     from: inboundRouteFrom,
                     to: inboundRouteTo,
-                    focus: hasExplicitInboundFocus ? inboundFocus : ''
+                    focus: inboundFocus
                 }
             );
             return;
