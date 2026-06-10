@@ -13,6 +13,7 @@ const ROOT = path.join(__dirname, '..');
 const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const JP_CUSTOMS_URL = 'https://www.customs.go.jp/english/tariff/';
+const REQUEST_TIMEOUT_MS = 15000;
 
 const JP_BENCHMARK = {
     base_rate: 0,
@@ -39,10 +40,110 @@ function getJapanDutyRules(payload = readJson(DUTY_RATES_PATH)) {
     return (payload.rules || []).filter(rule => rule.import_country === 'JP');
 }
 
-function probeJapanReadiness() {
+function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
+    return new Promise((resolve, reject) => {
+        const client = url.startsWith('http://') ? require('http') : require('https');
+        const request = client.get(url, {
+            headers: {
+                'User-Agent': 'TraceWize duty-rate updater (+https://tracewize.com)'
+            }
+        }, (response) => {
+            let body = '';
+            response.setEncoding('utf8');
+            response.on('data', chunk => {
+                body += chunk;
+            });
+            response.on('end', () => {
+                resolve({
+                    status_code: response.statusCode,
+                    body
+                });
+            });
+        });
+        request.setTimeout(timeoutMs, () => {
+            request.destroy(new Error(`Request timed out after ${timeoutMs}ms`));
+        });
+        request.on('error', reject);
+    });
+}
+
+function toAbsoluteUrl(href, baseUrl = JP_CUSTOMS_URL) {
+    try {
+        return new URL(href, baseUrl).toString();
+    } catch (error) {
+        return href;
+    }
+}
+
+function stripHtml(value = '') {
+    return String(value)
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function parseJapanTariffScheduleHtml(html = '', { baseUrl = JP_CUSTOMS_URL } = {}) {
+    const scheduleLinks = [];
+    const linkPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    let match;
+    while ((match = linkPattern.exec(html)) !== null) {
+        const label = stripHtml(match[2]);
+        if (!/\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(label)) {
+            continue;
+        }
+        scheduleLinks.push({
+            label,
+            url: toAbsoluteUrl(match[1], baseUrl)
+        });
+    }
+    const latest = scheduleLinks[0] || null;
+    return {
+        ok: /Japan'?s Tariff Schedule/i.test(html) && Boolean(latest),
+        latest_schedule_date: latest?.label || '',
+        latest_schedule_url: latest?.url || '',
+        schedule_count: scheduleLinks.length,
+        machine_parser_ready: false,
+        parser_note: latest
+            ? 'Japan Customs tariff schedule index is reachable; exact chapter/rate parsing is not auto-applied yet.'
+            : 'Japan Customs tariff schedule index did not expose a dated schedule link.'
+    };
+}
+
+async function probeJapanOfficialSource({ fetcher = fetchText } = {}) {
+    try {
+        const response = await fetcher(JP_CUSTOMS_URL);
+        const parsed = parseJapanTariffScheduleHtml(response.body || '');
+        return {
+            checked: true,
+            ok: response.status_code >= 200 && response.status_code < 400 && parsed.ok,
+            status_code: response.status_code,
+            official_url: JP_CUSTOMS_URL,
+            ...parsed
+        };
+    } catch (error) {
+        return {
+            checked: true,
+            ok: false,
+            status_code: null,
+            official_url: JP_CUSTOMS_URL,
+            latest_schedule_date: '',
+            latest_schedule_url: '',
+            schedule_count: 0,
+            machine_parser_ready: false,
+            error: error.message
+        };
+    }
+}
+
+async function probeJapanReadiness({ live = false, fetcher = fetchText } = {}) {
     const source = getSource('JP');
     const rules = getJapanDutyRules();
     const prefixes = Array.from(new Set(rules.flatMap(rule => rule.hs_prefixes || []))).sort();
+    const officialProbe = live
+        ? await probeJapanOfficialSource({ fetcher })
+        : { checked: false, ok: null, machine_parser_ready: false };
     return {
         ok: Boolean(source) && rules.length > 0 && prefixes.length > 0,
         country: 'JP',
@@ -53,6 +154,7 @@ function probeJapanReadiness() {
         maintained_hs_prefixes: prefixes,
         writes_rates: true,
         writes_official_machine_rates: false,
+        official_probe: officialProbe,
         next_action: source?.next_action || 'Add Japan source roadmap before updating.',
         status_reason: source?.status_reason || ''
     };
@@ -133,20 +235,29 @@ function updateJapanRules({ dryRun = false } = {}) {
     return payload.last_jp_customs_benchmark_sync;
 }
 
-function main() {
+async function main() {
     const dryRun = process.argv.includes('--dry-run');
     const probeOnly = process.argv.includes('--probe');
-    const result = probeOnly ? probeJapanReadiness() : updateJapanRules({ dryRun });
+    const probeLive = process.argv.includes('--probe-live');
+    const result = probeOnly || probeLive
+        ? await probeJapanReadiness({ live: probeLive })
+        : updateJapanRules({ dryRun });
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.ok ? 0 : 1);
 }
 
 if (require.main === module) {
-    main();
+    main().catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
 }
 
 module.exports = {
     JP_BENCHMARK,
+    JP_CUSTOMS_URL,
+    parseJapanTariffScheduleHtml,
+    probeJapanOfficialSource,
     probeJapanReadiness,
     updateJapanRules,
     applyJapanBenchmarkToRule

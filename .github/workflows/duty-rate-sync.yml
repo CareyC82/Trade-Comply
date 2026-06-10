@@ -30,11 +30,15 @@ jobs:
       - name: Run duty-rate auto sync
         run: npm run sync:duty-rates:auto
 
+      - name: Verify duty-rate sync output
+        run: npm test
+
       - name: Commit duty-rate sync data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
+            data/duty-rate-sources.json \
             data/duty-rates.json \
             data/duty-rate-sync-status.json
 
@@ -44,4 +48,5 @@ jobs:
           fi
 
           git commit -m "auto-data: daily duty-rate sync [auto-publish]"
+          git pull --ff-only
           git push

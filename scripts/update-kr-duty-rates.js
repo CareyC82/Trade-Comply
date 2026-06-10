@@ -13,6 +13,8 @@ const ROOT = path.join(__dirname, '..');
 const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const KR_CUSTOMS_URL = 'https://www.customs.go.kr/english/main.do';
+const KR_TARIFF_DB_URL = 'https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?mi=10806&cntntsId=5502';
+const REQUEST_TIMEOUT_MS = 15000;
 
 const KR_BENCHMARK = {
     base_rate: 0,
@@ -39,20 +41,116 @@ function getKoreaDutyRules(payload = readJson(DUTY_RATES_PATH)) {
     return (payload.rules || []).filter(rule => rule.import_country === 'KR');
 }
 
-function probeKoreaReadiness() {
+function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
+    if (typeof fetch === 'function') {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        return fetch(url, {
+            signal: controller.signal,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 TraceWize duty-rate updater (+https://tracewize.com)',
+                'Accept': 'text/html,application/xhtml+xml'
+            }
+        })
+            .then(async (response) => ({
+                status_code: response.status,
+                body: await response.text()
+            }))
+            .finally(() => clearTimeout(timer));
+    }
+    return new Promise((resolve, reject) => {
+        const client = url.startsWith('http://') ? require('http') : require('https');
+        const request = client.get(url, {
+            headers: {
+                'User-Agent': 'TraceWize duty-rate updater (+https://tracewize.com)'
+            }
+        }, (response) => {
+            let body = '';
+            response.setEncoding('utf8');
+            response.on('data', chunk => {
+                body += chunk;
+            });
+            response.on('end', () => {
+                resolve({
+                    status_code: response.statusCode,
+                    body
+                });
+            });
+        });
+        request.setTimeout(timeoutMs, () => {
+            request.destroy(new Error(`Request timed out after ${timeoutMs}ms`));
+        });
+        request.on('error', reject);
+    });
+}
+
+function stripHtml(value = '') {
+    return String(value)
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function parseKoreaTariffDbHtml(html = '') {
+    const text = stripHtml(html);
+    const hasTariffDb = /KCS\s*Tariff\s*D\/B/i.test(text);
+    const hasHsLookup = hasTariffDb || /HS\s*Code|10\s*digits|Tariff\s*Item/i.test(text);
+    return {
+        ok: hasTariffDb && hasHsLookup,
+        lookup_title: hasTariffDb ? 'KCS Tariff D/B(Inquiry)' : '',
+        supports_hs_lookup: hasHsLookup,
+        machine_parser_ready: false,
+        parser_note: hasTariffDb
+            ? 'Korea Customs tariff inquiry page is reachable; exact 10-digit tariff-line parsing is not auto-applied yet.'
+            : 'Korea Customs tariff inquiry markers were not found.'
+    };
+}
+
+async function probeKoreaOfficialSource({ fetcher = fetchText } = {}) {
+    try {
+        const response = await fetcher(KR_TARIFF_DB_URL);
+        const parsed = parseKoreaTariffDbHtml(response.body || '');
+        return {
+            checked: true,
+            ok: response.status_code >= 200 && response.status_code < 400 && parsed.ok,
+            status_code: response.status_code,
+            official_url: KR_TARIFF_DB_URL,
+            ...parsed
+        };
+    } catch (error) {
+        return {
+            checked: true,
+            ok: false,
+            status_code: null,
+            official_url: KR_TARIFF_DB_URL,
+            lookup_title: '',
+            supports_hs_lookup: false,
+            machine_parser_ready: false,
+            error: error.message
+        };
+    }
+}
+
+async function probeKoreaReadiness({ live = false, fetcher = fetchText } = {}) {
     const source = getSource('KR');
     const rules = getKoreaDutyRules();
     const prefixes = Array.from(new Set(rules.flatMap(rule => rule.hs_prefixes || []))).sort();
+    const officialProbe = live
+        ? await probeKoreaOfficialSource({ fetcher })
+        : { checked: false, ok: null, machine_parser_ready: false };
     return {
         ok: Boolean(source) && rules.length > 0 && prefixes.length > 0,
         country: 'KR',
         source_status: source?.source_status || 'missing',
-        official_url: source?.official_url || KR_CUSTOMS_URL,
+        official_url: source?.official_url || KR_TARIFF_DB_URL,
         machine_readable: source?.machine_readable || false,
         maintained_rule_count: rules.length,
         maintained_hs_prefixes: prefixes,
         writes_rates: true,
         writes_official_machine_rates: false,
+        official_probe: officialProbe,
         next_action: source?.next_action || 'Add Korea source roadmap before updating.',
         status_reason: source?.status_reason || ''
     };
@@ -133,20 +231,30 @@ function updateKoreaRules({ dryRun = false } = {}) {
     return payload.last_kr_customs_benchmark_sync;
 }
 
-function main() {
+async function main() {
     const dryRun = process.argv.includes('--dry-run');
     const probeOnly = process.argv.includes('--probe');
-    const result = probeOnly ? probeKoreaReadiness() : updateKoreaRules({ dryRun });
+    const probeLive = process.argv.includes('--probe-live');
+    const result = probeOnly || probeLive
+        ? await probeKoreaReadiness({ live: probeLive })
+        : updateKoreaRules({ dryRun });
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.ok ? 0 : 1);
 }
 
 if (require.main === module) {
-    main();
+    main().catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
 }
 
 module.exports = {
     KR_BENCHMARK,
+    KR_CUSTOMS_URL,
+    KR_TARIFF_DB_URL,
+    parseKoreaTariffDbHtml,
+    probeKoreaOfficialSource,
     probeKoreaReadiness,
     updateKoreaRules,
     applyKoreaBenchmarkToRule

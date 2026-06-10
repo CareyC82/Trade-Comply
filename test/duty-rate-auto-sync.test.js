@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const {
     MATERIAL_RATE_CHANGE_THRESHOLD,
@@ -102,4 +104,14 @@ test('conflicting official rates inside one multi-prefix rule block auto-apply',
     });
     assert.equal(payload.status, 'exceptions');
     assert.match(payload.exceptions[0].reason, /USITC duty-rate updater reported/);
+});
+
+test('GitHub duty-rate workflow runs tests before committing sync output', () => {
+    const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'duty-rate-sync.yml'), 'utf8');
+
+    assert.match(workflow, /cron:\s*"12 18 \* \* \*"/);
+    assert.match(workflow, /npm run sync:duty-rates:auto/);
+    assert.match(workflow, /npm test/);
+    assert.match(workflow, /data\/duty-rate-sources\.json/);
+    assert.match(workflow, /git pull --ff-only/);
 });

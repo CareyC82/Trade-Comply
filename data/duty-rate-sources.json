@@ -106,24 +106,26 @@
       "status_reason": "Official Japan Customs source is identified; local benchmark updater refreshes consumption-tax and duty-free electronics assumptions until machine tariff parsing is wired.",
       "updater_script": "scripts/update-jp-duty-rates.js",
       "update_command": "npm run update:duty-rates:jp",
+      "probe_command": "npm run probe:duty-rates:jp",
       "last_sync_field": "last_jp_customs_benchmark_sync_at",
-      "current_scope": "Benchmark duty plus consumption tax reminder.",
-      "next_action": "Keep benchmark updater running; research downloadable Japan tariff schedule format before official automatic rates."
+      "current_scope": "Benchmark duty plus consumption tax reminder. Live probe checks the Japan Customs dated tariff schedule index.",
+      "next_action": "Use the live probe to monitor Japan Customs tariff schedule availability; next upgrade is parsing the dated schedule by exact chapter / tariff line."
     },
     {
       "country": "KR",
       "name": "Korea Customs tariff / VAT",
       "authority": "Korea Customs Service",
-      "official_url": "https://www.customs.go.kr/english/main.do",
+      "official_url": "https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?mi=10806&cntntsId=5502",
       "machine_readable": "candidate",
       "source_status": "benchmark_updatable",
       "maintenance_priority": "P2",
-      "status_reason": "Official Korea Customs source is identified; local benchmark updater refreshes VAT and common electronics assumptions until UNI-PASS tariff parsing is wired.",
+      "status_reason": "Official Korea Customs tariff inquiry source is identified; local benchmark updater refreshes VAT and common electronics assumptions until KCS Tariff D/B parsing is wired.",
       "updater_script": "scripts/update-kr-duty-rates.js",
       "update_command": "npm run update:duty-rates:kr",
+      "probe_command": "npm run probe:duty-rates:kr",
       "last_sync_field": "last_kr_customs_benchmark_sync_at",
-      "current_scope": "Benchmark duty plus VAT reminder.",
-      "next_action": "Keep benchmark updater running; research UNI-PASS or public tariff data access before official automatic rates."
+      "current_scope": "Benchmark duty plus VAT reminder. Live probe checks Korea Customs Tariff D/B lookup availability.",
+      "next_action": "Use the live probe to monitor KCS Tariff D/B availability; next upgrade is parsing exact 10-digit HS lookup results before official automatic rates."
     },
     {
       "country": "CN",

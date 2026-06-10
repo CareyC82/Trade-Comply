@@ -36,10 +36,12 @@ const {
 } = require('../scripts/update-mx-duty-rates');
 const {
     applyJapanBenchmarkToRule,
+    parseJapanTariffScheduleHtml,
     probeJapanReadiness
 } = require('../scripts/update-jp-duty-rates');
 const {
     applyKoreaBenchmarkToRule,
+    parseKoreaTariffDbHtml,
     probeKoreaReadiness
 } = require('../scripts/update-kr-duty-rates');
 
@@ -58,6 +60,14 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.benchmark_updatable.includes('MX'));
     assert.ok(roadmap.benchmark_updatable.includes('JP'));
     assert.ok(roadmap.benchmark_updatable.includes('KR'));
+    assert.equal(
+        dutyRateSources.sources.some(source => source.country === 'JP' && source.probe_command === 'npm run probe:duty-rates:jp'),
+        true
+    );
+    assert.equal(
+        dutyRateSources.sources.some(source => source.country === 'KR' && source.probe_command === 'npm run probe:duty-rates:kr'),
+        true
+    );
 });
 
 test('duty-rate health check reports source roadmap status', () => {
@@ -73,8 +83,8 @@ test('EU, Singapore, Mexico, Japan, and Korea updater probes are wired as benchm
     const eu = await probeEuTaricReadiness();
     const sg = probeSingaporeReadiness();
     const mx = probeMexicoReadiness();
-    const jp = probeJapanReadiness();
-    const kr = probeKoreaReadiness();
+    const jp = await probeJapanReadiness();
+    const kr = await probeKoreaReadiness();
 
     assert.equal(eu.ok, true);
     assert.equal(eu.writes_rates, true);
@@ -101,12 +111,63 @@ test('EU, Singapore, Mexico, Japan, and Korea updater probes are wired as benchm
     assert.equal(jp.writes_official_machine_rates, false);
     assert.equal(jp.source_status, 'benchmark_updatable');
     assert.ok(jp.maintained_hs_prefixes.includes('8542'));
+    assert.equal(jp.official_probe.checked, false);
+    assert.equal(jp.official_probe.machine_parser_ready, false);
 
     assert.equal(kr.ok, true);
     assert.equal(kr.writes_rates, true);
     assert.equal(kr.writes_official_machine_rates, false);
     assert.equal(kr.source_status, 'benchmark_updatable');
     assert.ok(kr.maintained_hs_prefixes.includes('8542'));
+    assert.equal(kr.official_probe.checked, false);
+    assert.equal(kr.official_probe.machine_parser_ready, false);
+});
+
+test('Japan Customs live probe parses dated tariff schedule metadata only', async () => {
+    const html = `
+        <h1>Japan's Tariff Schedule</h1>
+        <a href="./2026_04_01/index.htm">April 1, 2026</a>
+        <a href="./2025_04_01/index.htm">April 1, 2025</a>
+    `;
+    const parsed = parseJapanTariffScheduleHtml(html, { baseUrl: 'https://www.customs.go.jp/english/tariff/' });
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.latest_schedule_date, 'April 1, 2026');
+    assert.equal(parsed.latest_schedule_url, 'https://www.customs.go.jp/english/tariff/2026_04_01/index.htm');
+    assert.equal(parsed.machine_parser_ready, false);
+
+    const readiness = await probeJapanReadiness({
+        live: true,
+        fetcher: async () => ({
+            status_code: 200,
+            body: html
+        })
+    });
+    assert.equal(readiness.ok, true);
+    assert.equal(readiness.official_probe.ok, true);
+    assert.equal(readiness.writes_official_machine_rates, false);
+});
+
+test('Korea Customs live probe detects tariff DB lookup without upgrading rate trust', async () => {
+    const html = `
+        <title>KCS Tariff D/B(Inquiry)</title>
+        <h1>KCS Tariff D/B(Inquiry)</h1>
+        <p>Please search by HS Code, Tariff Item, or Product Name. HS code must be 10 digits.</p>
+    `;
+    const parsed = parseKoreaTariffDbHtml(html);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.supports_hs_lookup, true);
+    assert.equal(parsed.machine_parser_ready, false);
+
+    const readiness = await probeKoreaReadiness({
+        live: true,
+        fetcher: async () => ({
+            status_code: 200,
+            body: html
+        })
+    });
+    assert.equal(readiness.ok, true);
+    assert.equal(readiness.official_probe.ok, true);
+    assert.equal(readiness.writes_official_machine_rates, false);
 });
 
 test('EU TARIC official probe parses consultation metadata without upgrading rate trust', async () => {
