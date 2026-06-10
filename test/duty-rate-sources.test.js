@@ -36,6 +36,10 @@ const {
 } = require('../scripts/update-mx-duty-rates');
 const {
     applyJapanBenchmarkToRule,
+    buildJapanOfficialRateCandidate,
+    parseJapanAdValoremRate,
+    parseJapanScheduleChapterLinks,
+    parseJapanTariffChapterRows,
     parseJapanTariffScheduleHtml,
     probeJapanReadiness
 } = require('../scripts/update-jp-duty-rates');
@@ -123,27 +127,65 @@ test('EU, Singapore, Mexico, Japan, and Korea updater probes are wired as benchm
     assert.equal(kr.official_probe.machine_parser_ready, false);
 });
 
-test('Japan Customs live probe parses dated tariff schedule metadata only', async () => {
-    const html = `
+test('Japan Customs live probe parses dated tariff schedule and chapter candidates without upgrading rate trust', async () => {
+    const indexHtml = `
         <h1>Japan's Tariff Schedule</h1>
         <a href="./2026_04_01/index.htm">April 1, 2026</a>
         <a href="./2025_04_01/index.htm">April 1, 2025</a>
     `;
-    const parsed = parseJapanTariffScheduleHtml(html, { baseUrl: 'https://www.customs.go.jp/english/tariff/' });
+    const scheduleHtml = `
+        <h1>Japan's Tariff Schedule as of April 1 2026</h1>
+        <a href="data/e_84.htm">Tariff rate</a>
+        <a href="data/e_85.htm">Tariff rate</a>
+    `;
+    const chapterHtml = `
+        <table>
+            <tr>
+                <td class="shell_var1_CSTNO">8542.31</td>
+                <td class="shell_var1_HSCODE"></td>
+                <td class="shell_var1_ITEM_NAME">Processors and controllers</td>
+                <td>Free</td>
+            </tr>
+            <tr>
+                <td class="shell_var1_CSTNO">8542.32</td>
+                <td class="shell_var1_HSCODE"></td>
+                <td class="shell_var1_ITEM_NAME">Memories</td>
+                <td>Free</td>
+            </tr>
+        </table>
+    `;
+    const parsed = parseJapanTariffScheduleHtml(indexHtml, { baseUrl: 'https://www.customs.go.jp/english/tariff/' });
     assert.equal(parsed.ok, true);
     assert.equal(parsed.latest_schedule_date, 'April 1, 2026');
     assert.equal(parsed.latest_schedule_url, 'https://www.customs.go.jp/english/tariff/2026_04_01/index.htm');
     assert.equal(parsed.machine_parser_ready, false);
 
+    const chapterLinks = parseJapanScheduleChapterLinks(scheduleHtml, { baseUrl: parsed.latest_schedule_url });
+    assert.equal(chapterLinks.some(link => link.chapter === '85' && link.url.endsWith('/data/e_85.htm')), true);
+    const rows = parseJapanTariffChapterRows(chapterHtml);
+    assert.equal(rows.length, 2);
+    assert.equal(parseJapanAdValoremRate('Free'), 0);
+    const candidate = buildJapanOfficialRateCandidate(rows, '8542');
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.status, 'official_source_candidate');
+    assert.equal(candidate.base_rate, 0);
+
     const readiness = await probeJapanReadiness({
         live: true,
-        fetcher: async () => ({
-            status_code: 200,
-            body: html
-        })
+        fetcher: async (url) => {
+            if (String(url).endsWith('/2026_04_01/index.htm')) {
+                return { status_code: 200, body: scheduleHtml };
+            }
+            if (String(url).endsWith('/data/e_85.htm')) {
+                return { status_code: 200, body: chapterHtml };
+            }
+            return { status_code: 200, body: indexHtml };
+        }
     });
     assert.equal(readiness.ok, true);
     assert.equal(readiness.official_probe.ok, true);
+    assert.equal(readiness.official_probe.chapter_links.some(link => link.chapter === '85'), true);
+    assert.equal(readiness.official_probe.prefix_candidates.some(item => item.hs_prefix === '8542' && item.status === 'official_source_candidate'), true);
     assert.equal(readiness.writes_official_machine_rates, false);
 });
 

@@ -111,16 +111,150 @@ function parseJapanTariffScheduleHtml(html = '', { baseUrl = JP_CUSTOMS_URL } = 
     };
 }
 
-async function probeJapanOfficialSource({ fetcher = fetchText } = {}) {
+function parseJapanScheduleChapterLinks(html = '', { baseUrl = JP_CUSTOMS_URL } = {}) {
+    const chapters = [];
+    const linkPattern = /<a\b[^>]*href=["']([^"']*data\/e_(\d{2})\.htm)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    let match;
+    while ((match = linkPattern.exec(html)) !== null) {
+        chapters.push({
+            chapter: match[2],
+            label: stripHtml(match[3]) || `Chapter ${match[2]}`,
+            url: toAbsoluteUrl(match[1], baseUrl)
+        });
+    }
+    return chapters;
+}
+
+function normalizeHsCode(value = '') {
+    return String(value).replace(/\D/g, '');
+}
+
+function parseJapanAdValoremRate(rateText = '') {
+    const normalized = stripHtml(rateText);
+    if (!normalized) {
+        return null;
+    }
+    if (/^free$/i.test(normalized) || /^\(free\)$/i.test(normalized)) {
+        return 0;
+    }
+    const percent = normalized.match(/(\d+(?:\.\d+)?)\s*%/);
+    if (percent) {
+        return Number(percent[1]) / 100;
+    }
+    return null;
+}
+
+function parseJapanTariffChapterRows(html = '') {
+    const rows = [];
+    const rowPattern = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gi;
+    let match;
+    while ((match = rowPattern.exec(html)) !== null) {
+        const cellPattern = /<td\b[^>]*>([\s\S]*?)<\/td>/gi;
+        const cells = [];
+        let cellMatch;
+        while ((cellMatch = cellPattern.exec(match[1])) !== null) {
+            cells.push(stripHtml(cellMatch[1]));
+        }
+        const heading = cells[0] || '';
+        const normalizedHeading = normalizeHsCode(heading);
+        if (!/^\d{4,}/.test(normalizedHeading) || cells.length < 4) {
+            continue;
+        }
+        const generalRateText = cells[3] || '';
+        rows.push({
+            hs_heading: heading,
+            hs_digits: normalizedHeading,
+            statistical_code: cells[1] || '',
+            item_name: cells[2] || '',
+            general_rate_text: generalRateText,
+            parsed_base_rate: parseJapanAdValoremRate(generalRateText)
+        });
+    }
+    return rows;
+}
+
+function buildJapanOfficialRateCandidate(chapterRows = [], prefix = '') {
+    const normalizedPrefix = normalizeHsCode(prefix);
+    const matches = chapterRows.filter(row => row.hs_digits.startsWith(normalizedPrefix));
+    const rateRows = matches.filter(row => row.general_rate_text);
+    if (!normalizedPrefix || !rateRows.length) {
+        return {
+            ok: false,
+            hs_prefix: prefix,
+            status: 'not_found',
+            reason: 'No Japan tariff rate rows matched this maintained HS prefix.',
+            match_count: matches.length,
+            rate_row_count: 0
+        };
+    }
+    const parsedRates = rateRows
+        .map(row => row.parsed_base_rate)
+        .filter(rate => Number.isFinite(rate));
+    const uniqueRates = Array.from(new Set(parsedRates)).sort((a, b) => a - b);
+    return {
+        ok: uniqueRates.length === 1 && parsedRates.length === rateRows.length,
+        hs_prefix: prefix,
+        status: uniqueRates.length === 1 && parsedRates.length === rateRows.length ? 'official_source_candidate' : 'scope_check_required',
+        base_rate: uniqueRates.length === 1 ? uniqueRates[0] : null,
+        unique_base_rates: uniqueRates,
+        match_count: matches.length,
+        rate_row_count: rateRows.length,
+        sample_rows: rateRows.slice(0, 5).map(row => ({
+            hs_heading: row.hs_heading,
+            item_name: row.item_name,
+            general_rate_text: row.general_rate_text
+        })),
+        reason: uniqueRates.length === 1 && parsedRates.length === rateRows.length
+            ? 'Japan tariff chapter rows under this prefix share one parseable general rate.'
+            : 'Japan tariff rows under this prefix require exact statistical code / rate-scope review.'
+    };
+}
+
+async function probeJapanOfficialSource({ fetcher = fetchText, maintainedPrefixes = [] } = {}) {
     try {
         const response = await fetcher(JP_CUSTOMS_URL);
         const parsed = parseJapanTariffScheduleHtml(response.body || '');
+        let chapter_links = [];
+        let prefix_candidates = [];
+        if (parsed.ok && parsed.latest_schedule_url && maintainedPrefixes.length) {
+            const scheduleResponse = await fetcher(parsed.latest_schedule_url);
+            chapter_links = parseJapanScheduleChapterLinks(scheduleResponse.body || '', {
+                baseUrl: parsed.latest_schedule_url
+            });
+            const chapterMap = new Map(chapter_links.map(link => [link.chapter, link]));
+            const rowsByChapter = new Map();
+            for (const prefix of maintainedPrefixes) {
+                const chapter = String(prefix || '').slice(0, 2);
+                const chapterLink = chapterMap.get(chapter);
+                if (!chapterLink) {
+                    prefix_candidates.push({
+                        ok: false,
+                        hs_prefix: prefix,
+                        status: 'chapter_not_found',
+                        reason: `No Japan schedule chapter link found for chapter ${chapter}.`,
+                        match_count: 0
+                    });
+                    continue;
+                }
+                if (!rowsByChapter.has(chapter)) {
+                    const chapterResponse = await fetcher(chapterLink.url);
+                    rowsByChapter.set(chapter, parseJapanTariffChapterRows(chapterResponse.body || ''));
+                }
+                prefix_candidates.push(buildJapanOfficialRateCandidate(rowsByChapter.get(chapter), prefix));
+            }
+        }
         return {
             checked: true,
             ok: response.status_code >= 200 && response.status_code < 400 && parsed.ok,
             status_code: response.status_code,
             official_url: JP_CUSTOMS_URL,
-            ...parsed
+            ...parsed,
+            chapter_links,
+            prefix_candidates,
+            machine_parser_ready: false,
+            parser_note: prefix_candidates.length
+                ? 'Japan schedule and chapter pages are parseable for candidate review; exact rates are not auto-applied yet.'
+                : parsed.parser_note
         };
     } catch (error) {
         return {
@@ -131,6 +265,8 @@ async function probeJapanOfficialSource({ fetcher = fetchText } = {}) {
             latest_schedule_date: '',
             latest_schedule_url: '',
             schedule_count: 0,
+            chapter_links: [],
+            prefix_candidates: [],
             machine_parser_ready: false,
             error: error.message
         };
@@ -142,7 +278,7 @@ async function probeJapanReadiness({ live = false, fetcher = fetchText } = {}) {
     const rules = getJapanDutyRules();
     const prefixes = Array.from(new Set(rules.flatMap(rule => rule.hs_prefixes || []))).sort();
     const officialProbe = live
-        ? await probeJapanOfficialSource({ fetcher })
+        ? await probeJapanOfficialSource({ fetcher, maintainedPrefixes: prefixes })
         : { checked: false, ok: null, machine_parser_ready: false };
     return {
         ok: Boolean(source) && rules.length > 0 && prefixes.length > 0,
@@ -257,6 +393,10 @@ module.exports = {
     JP_BENCHMARK,
     JP_CUSTOMS_URL,
     parseJapanTariffScheduleHtml,
+    parseJapanScheduleChapterLinks,
+    parseJapanTariffChapterRows,
+    parseJapanAdValoremRate,
+    buildJapanOfficialRateCandidate,
     probeJapanOfficialSource,
     probeJapanReadiness,
     updateJapanRules,

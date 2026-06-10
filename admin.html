@@ -296,6 +296,29 @@
             color: var(--muted);
             font-size: 0.75rem;
         }
+        .duty-source-grade-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.12);
+        }
+        .duty-source-grade-card strong {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .duty-source-grade-card .grade-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            margin: 6px 0;
+        }
+        .duty-source-grade-card .grade-note {
+            color: var(--muted);
+            font-size: 0.76rem;
+            line-height: 1.35;
+        }
         .duty-exception-list {
             margin: 8px 0 0;
             padding-left: 18px;
@@ -307,6 +330,8 @@
         .badge.updater_candidate { background: #1e3a5f; color: #93c5fd; }
         .badge.official_link { background: #3b2f1e; color: #fcd34d; }
         .badge.benchmark { background: #451a1a; color: #fca5a5; }
+        .badge.parser_pending { background: #312e81; color: #c4b5fd; }
+        .badge.official_reachable { background: #0f3f46; color: #67e8f9; }
         #login-panel { max-width: 420px; }
         .hidden { display: none !important; }
     </style>
@@ -770,18 +795,47 @@
 
         function renderDutySourceGradeSummary(sources = []) {
             const sourceGrade = {
-                auto_updatable: 'Official auto',
-                benchmark_updatable: 'Benchmark auto',
-                updater_candidate: 'Candidate',
-                official_link: 'Official link',
-                benchmark: 'Benchmark only'
+                auto_updatable: {
+                    label: 'Official auto',
+                    note: '机器可读官方税率源，自动同步可写入税率。'
+                },
+                benchmark_updatable: {
+                    label: 'Benchmark auto',
+                    note: '自动刷新 benchmark/官方入口状态；精确税率解析仍待完成。'
+                },
+                updater_candidate: {
+                    label: 'Candidate',
+                    note: '已识别候选源，待接入自动更新脚本。'
+                },
+                official_link: {
+                    label: 'Official link',
+                    note: '已定位官方页面，但尚未自动读取。'
+                },
+                benchmark: {
+                    label: 'Benchmark only',
+                    note: '仅本地基准，不应当作正式税率。'
+                }
             };
-            const rows = sources.map(source => `
-                <div class="duty-sync-mini-card">
+            const rows = sources.map(source => {
+                const grade = sourceGrade[source.source_status] || {
+                    label: source.source_status || 'Unknown',
+                    note: '未配置 source status。'
+                };
+                const hasProbe = Boolean(source.probe_command);
+                const parserPending = source.machine_readable === 'candidate' && source.source_status !== 'auto_updatable';
+                return `
+                <div class="duty-source-grade-card">
                     <strong>${escapeHtml(source.country || '—')}</strong>
-                    <span>${escapeHtml(sourceGrade[source.source_status] || source.source_status || 'Unknown')}</span>
+                    <div class="grade-line">
+                        <span class="badge ${escapeHtml(source.source_status || 'benchmark')}">${escapeHtml(grade.label)}</span>
+                        ${hasProbe ? '<span class="badge official_reachable">Official page probe</span>' : ''}
+                        ${parserPending ? '<span class="badge parser_pending">Parser pending</span>' : ''}
+                    </div>
+                    <div class="grade-note">${escapeHtml(grade.note)}</div>
+                    ${source.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(source.probe_command)}</code></div>` : ''}
                 </div>
-            `).join('');
+                `;
+            }).join('');
             return `
                 <div class="crawl-section-title"><h3>Source grade by market</h3><span class="meta">${sources.length} 个市场</span></div>
                 <div class="duty-sync-mini-grid">${rows || '<div class="empty">暂无税率源等级。</div>'}</div>

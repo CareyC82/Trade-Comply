@@ -108,8 +108,8 @@
       "update_command": "npm run update:duty-rates:jp",
       "probe_command": "npm run probe:duty-rates:jp",
       "last_sync_field": "last_jp_customs_benchmark_sync_at",
-      "current_scope": "Benchmark duty plus consumption tax reminder. Live probe checks the Japan Customs dated tariff schedule index.",
-      "next_action": "Use the live probe to monitor Japan Customs tariff schedule availability; next upgrade is parsing the dated schedule by exact chapter / tariff line."
+      "current_scope": "Benchmark duty plus consumption tax reminder. Live probe checks the Japan Customs dated tariff schedule and parses maintained chapter pages into official candidates without auto-applying them yet.",
+      "next_action": "Review Japan official candidates from the live probe; next upgrade is promoting candidate rates only when exact tariff-line coverage and statistical-code scope are stable."
     },
     {
       "country": "KR",
