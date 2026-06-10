@@ -26,12 +26,14 @@
       "machine_readable": "candidate",
       "source_status": "benchmark_updatable",
       "maintenance_priority": "P1",
-      "status_reason": "EU TARIC is the right authority, but this updater currently refreshes maintained benchmark metadata until a verified machine-readable TARIC parser is added.",
+      "status_reason": "EU TARIC consultation and CIRCABC full database are reachable; this updater can locate the latest import duties workbook and select official candidate rates only when ERGA OMNES third-country duty rows produce one unambiguous rate.",
       "updater_script": "scripts/update-eu-duty-rates.js",
       "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "npm run probe:duty-rates:eu",
+      "full_probe_command": "npm run probe:duty-rates:eu:full",
       "last_sync_field": "last_eu_taric_benchmark_sync_at",
       "current_scope": "Maintained EU common customs duty benchmark for covered electronics/new-energy prefixes. Member-state VAT remains separate.",
-      "next_action": "Replace benchmark table with verified TARIC machine parser once source payload mapping is stable."
+      "next_action": "Run the TARIC workbook dry-run command against Duties Import 01-99.xlsx; official candidate rates will auto-apply only when each maintained prefix has one unambiguous ERGA OMNES third-country-duty rate."
     },
     {
       "country": "DE",

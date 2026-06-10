@@ -68,17 +68,22 @@ test('Russia sample keeps sanctions scope as a review-only flag', () => {
     assert.ok(russia.source_statuses.includes('scope_check_required'));
 });
 
-test('non-US benchmark samples stay non-official', () => {
+test('non-US benchmark samples stay non-official except EU TARIC candidate rows', () => {
     const result = runDutyRateHealthCheck();
     const nonUsSamples = result.samples.filter(sample => !sample.id.startsWith('PE-US-'));
+    const officialEuCandidate = result.samples.find(sample => sample.id === 'PE-EU-CN-EVCHARGER-850440');
 
     assert.ok(nonUsSamples.length > 0);
+    assert.ok(officialEuCandidate.source_statuses.includes('official_source_checked'));
     nonUsSamples.forEach((sample) => {
         assert.equal(
             sample.source_statuses.includes('indicative') || sample.source_statuses.includes('benchmark_source_checked'),
             true,
             `${sample.id} should remain indicative or benchmark-checked`
         );
+        if (sample.id === 'PE-EU-CN-EVCHARGER-850440') {
+            return;
+        }
         assert.equal(sample.source_statuses.includes('official_source_checked'), false, `${sample.id} should not be official`);
     });
 });

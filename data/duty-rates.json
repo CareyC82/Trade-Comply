@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-09",
+  "updated_at": "2026-06-10",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -252,7 +252,7 @@
         "850440"
       ],
       "label": "EU import EV charger / converter signal",
-      "base_rate": 0.027,
+      "base_rate": 0,
       "additional_rate": 0.19,
       "add_on_layers": [
         {
@@ -265,13 +265,13 @@
         }
       ],
       "trade_remedy": "EU customs duty plus member-state VAT benchmark; verify TARIC code, origin, and VAT member state.",
-      "confidence": "Indicative",
-      "source_status": "benchmark_source_checked",
-      "source_note": "EU TARIC benchmark metadata refreshed locally. Verify exact TARIC code, origin preference, and import VAT member state before filing.",
-      "source_hts": "850440 benchmark",
-      "source_rate_text": "Benchmark: 2.7% common customs duty; VAT depends on member state",
-      "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-09T20:19:43.802Z"
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.",
+      "source_hts": "850440 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-10T03:37:48.139Z"
     },
     {
       "id": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -306,7 +306,7 @@
       "source_hts": "EU electronics benchmark / Germany VAT",
       "source_rate_text": "Benchmark: 2.7% EU duty + 19% Germany VAT",
       "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-09T20:19:43.802Z"
+      "last_checked_at": "2026-06-10T03:37:48.139Z"
     },
     {
       "id": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -341,7 +341,7 @@
       "source_hts": "EU electronics benchmark / Netherlands VAT",
       "source_rate_text": "Benchmark: 2.7% EU duty + 21% Netherlands VAT",
       "source_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "last_checked_at": "2026-06-09T20:19:43.802Z"
+      "last_checked_at": "2026-06-10T03:37:48.139Z"
     },
     {
       "id": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -662,42 +662,244 @@
     "changes": [],
     "errors": []
   },
-  "last_eu_taric_benchmark_sync_at": "2026-06-09T20:19:43.802Z",
+  "last_eu_taric_benchmark_sync_at": "2026-06-10T03:37:48.139Z",
   "last_eu_taric_benchmark_sync": {
     "ok": true,
     "dry_run": false,
-    "writes_official_machine_rates": false,
+    "writes_official_machine_rates": true,
+    "official_candidate_rows": 392,
+    "official_candidate_outcomes": [
+      {
+        "ok": true,
+        "rule": "EU-CN-850440-EVCHARGER-INDICATIVE",
+        "base_rate": 0,
+        "reason": "All maintained HS prefixes on this rule produced one consistent official TARIC candidate rate.",
+        "candidates": [
+          {
+            "hs_prefix": "850440",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8504406090",
+              "8504408390",
+              "8504408490"
+            ]
+          }
+        ]
+      },
+      {
+        "ok": false,
+        "rule": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "base_rate": null,
+        "reason": "At least one HS prefix on this rule still requires exact TARIC scope, so the rule remains on benchmark status.",
+        "candidates": [
+          {
+            "hs_prefix": "847130",
+            "ok": false,
+            "status": "no_third_country_duty_found",
+            "base_rate": null,
+            "unique_base_rates": [],
+            "sample_goods_codes": []
+          },
+          {
+            "hs_prefix": "850440",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8504406090",
+              "8504408390",
+              "8504408490"
+            ]
+          },
+          {
+            "hs_prefix": "850760",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0.027,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8507600015",
+              "8507600018",
+              "8507600024"
+            ]
+          },
+          {
+            "hs_prefix": "8517",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8517110000",
+              "8517130000",
+              "8517140000"
+            ]
+          },
+          {
+            "hs_prefix": "8528",
+            "ok": false,
+            "status": "multiple_rates_need_taric10",
+            "base_rate": null,
+            "unique_base_rates": [
+              0,
+              0.02,
+              0.14
+            ],
+            "sample_goods_codes": [
+              "8528420000",
+              "8528490000",
+              "8528520000"
+            ]
+          },
+          {
+            "hs_prefix": "8541",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8541000000"
+            ]
+          },
+          {
+            "hs_prefix": "8542",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8542000000"
+            ]
+          }
+        ]
+      },
+      {
+        "ok": false,
+        "rule": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "base_rate": null,
+        "reason": "At least one HS prefix on this rule still requires exact TARIC scope, so the rule remains on benchmark status.",
+        "candidates": [
+          {
+            "hs_prefix": "847130",
+            "ok": false,
+            "status": "no_third_country_duty_found",
+            "base_rate": null,
+            "unique_base_rates": [],
+            "sample_goods_codes": []
+          },
+          {
+            "hs_prefix": "850440",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8504406090",
+              "8504408390",
+              "8504408490"
+            ]
+          },
+          {
+            "hs_prefix": "850760",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0.027,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8507600015",
+              "8507600018",
+              "8507600024"
+            ]
+          },
+          {
+            "hs_prefix": "8517",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8517110000",
+              "8517130000",
+              "8517140000"
+            ]
+          },
+          {
+            "hs_prefix": "8528",
+            "ok": false,
+            "status": "multiple_rates_need_taric10",
+            "base_rate": null,
+            "unique_base_rates": [
+              0,
+              0.02,
+              0.14
+            ],
+            "sample_goods_codes": [
+              "8528420000",
+              "8528490000",
+              "8528520000"
+            ]
+          },
+          {
+            "hs_prefix": "8541",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8541000000"
+            ]
+          },
+          {
+            "hs_prefix": "8542",
+            "ok": true,
+            "status": "official_source_candidate",
+            "base_rate": 0,
+            "unique_base_rates": [],
+            "sample_goods_codes": [
+              "8542000000"
+            ]
+          }
+        ]
+      }
+    ],
     "changes": [
       {
         "rule": "EU-CN-850440-EVCHARGER-INDICATIVE",
         "import_country": "EU",
+        "mode": "official-candidate",
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-09T13:42:49.318Z",
-            "new_value": "2026-06-09T20:19:43.802Z"
+            "old_value": "2026-06-10T03:06:51.222Z",
+            "new_value": "2026-06-10T03:37:48.139Z"
           }
         ]
       },
       {
         "rule": "DE-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
         "import_country": "DE",
+        "mode": "benchmark",
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-09T13:42:49.318Z",
-            "new_value": "2026-06-09T20:19:43.802Z"
+            "old_value": "2026-06-10T03:06:51.222Z",
+            "new_value": "2026-06-10T03:37:48.139Z"
           }
         ]
       },
       {
         "rule": "NL-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
         "import_country": "NL",
+        "mode": "benchmark",
         "changes": [
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-09T13:42:49.318Z",
-            "new_value": "2026-06-09T20:19:43.802Z"
+            "old_value": "2026-06-10T03:06:51.222Z",
+            "new_value": "2026-06-10T03:37:48.139Z"
           }
         ]
       }
