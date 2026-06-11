@@ -1,5 +1,5 @@
 {
-  "pipeline_run": "2026-06-10T20:35:03.603119+00:00",
+  "pipeline_run": "2026-06-11T20:26:19.952844+00:00",
   "signals": [
     {
       "hs_code": "8471.30.0100",
@@ -7,43 +7,43 @@
       "country": "US",
       "risk_level": "High",
       "source": "CCPIT / MOFCOM Fair Trade Alerts",
-      "content_en": "The U.S. Trade Representative has initiated a forced labor Section 301 investigation and proposed additional tariffs on Chinese goods. This action increases the risk of import restrictions and punitive tariffs for electronics exported to the U.S. Companies must review supply chain labor practices and prepare for potential tariff hikes.",
-      "content_zh": "美国贸易代表办公室已发起强迫劳动301调查并拟加征关税，对中国输美电子产品增加进口限制和惩罚性关税风险。企业需审查供应链劳工实践，并为可能的关税上调做好准备。",
+      "content_en": "The U.S. Trade Representative has initiated a forced labor Section 301 investigation and proposed additional tariffs. This action may lead to increased scrutiny and potential import restrictions on goods linked to forced labor, particularly from Xinjiang. Exporters to the U.S. should review supply chains for any forced labor risks and prepare for possible tariff increases.",
+      "content_zh": "美国贸易代表办公室已发起强迫劳动301调查并拟加征关税。此举可能导致对涉及强迫劳动的商品（尤其是新疆产品）加强审查和进口限制。对美出口商应审查供应链中是否存在强迫劳动风险，并为可能的关税上调做好准备。",
       "checklist": [
         {
           "phase": "技术核查",
-          "task": "FCC certification review",
-          "desc": "Ensure all wireless/electronic products have valid FCC Part 15/18 certification for U.S. market access."
+          "task": "Supply chain forced labor audit",
+          "desc": "Review supply chain for any links to Xinjiang or other regions with forced labor allegations; document compliance with Uyghur Forced Labor Prevention Act."
         },
         {
-          "phase": "技术核查",
-          "task": "Section 301 tariff classification",
-          "desc": "Verify HTS codes and assess exposure to Section 301 tariff lists; consider tariff engineering if applicable."
+          "phase": "单证准备",
+          "task": "Section 301 tariff impact assessment",
+          "desc": "Evaluate current HTS classification and potential additional tariffs under Section 301; prepare for possible rate changes."
         },
         {
-          "phase": "技术核查",
+          "phase": "单证准备",
           "task": "BIS export controls screening",
-          "desc": "Screen products against BIS Entity List and export control classification (ECCN) to avoid prohibited transactions."
+          "desc": "Screen products against BIS Entity List and export control regulations; ensure no restricted items or end-uses."
         },
         {
           "phase": "环保注册",
-          "task": "Supply chain forced labor audit",
-          "desc": "Conduct due diligence on labor practices in supply chain to mitigate forced labor allegations and UFLPA risks."
+          "task": "FCC certification verification",
+          "desc": "Confirm products have valid FCC Part 15/18 certification for wireless/electronic devices; update if needed."
         },
         {
           "phase": "单证准备",
-          "task": "Prepare U.S. customs documentation",
-          "desc": "Assemble commercial invoice, packing list, and country of origin certificates with accurate tariff codes."
+          "task": "Forced labor documentation package",
+          "desc": "Prepare documentation proving no forced labor in supply chain, including supplier declarations and traceability records."
         },
         {
-          "phase": "单证准备",
-          "task": "Monitor USTR tariff updates",
-          "desc": "Track Federal Register notices for new tariff actions and adjust pricing or sourcing strategies accordingly."
+          "phase": "技术核查",
+          "task": "Entity List and restricted party screening",
+          "desc": "Run end-user and end-use checks against U.S. restricted party lists; obtain licenses if required."
         }
       ],
       "source_url": "http://www.ccpit.org/a/20260604/20260604xcbz.html",
       "pipeline_source": "ccpit",
-      "fetched_at": "2026-06-10T20:34:33.512862+00:00"
+      "fetched_at": "2026-06-11T20:25:47.818394+00:00"
     },
     {
       "hs_code": "848620",
@@ -51,38 +51,38 @@
       "country": "US",
       "risk_level": "High",
       "source": "US BIS",
-      "content_en": "Applied Materials agreed to pay $252 million penalty for illegally exporting semiconductor manufacturing equipment to China, violating BIS export controls and Entity List restrictions. This case highlights the critical need for robust export compliance programs, especially for semiconductor equipment subject to US export administration regulations (EAR).",
-      "content_zh": "应用材料公司因非法向中国出口半导体制造设备，违反BIS出口管制和实体清单限制，同意支付2.52亿美元罚款。此案凸显了半导体设备出口合规计划的必要性，特别是受美国出口管理条例（EAR）管制的设备。",
+      "content_en": "Applied Materials agreed to pay $252 million penalty for illegally exporting semiconductor manufacturing equipment to China, violating BIS export controls and Entity List restrictions. This case highlights the critical need for rigorous export compliance, especially for dual-use semiconductor equipment destined for US-sanctioned entities.",
+      "content_zh": "应用材料公司因非法向中国出口半导体制造设备，违反BIS出口管制和实体清单规定，同意支付2.52亿美元罚款。此案凸显了针对美国制裁实体出口两用半导体设备时，严格执行出口合规的紧迫性。",
       "checklist": [
         {
           "phase": "技术核查",
-          "task": "BIS出口管制分类",
+          "task": "BIS出口管制分类审查",
           "desc": "确认设备ECCN编码，评估是否受EAR管制及是否需要出口许可证。"
         },
         {
           "phase": "技术核查",
-          "task": "实体清单筛查",
-          "desc": "对最终用户和最终用途进行实体清单筛查，确保不涉及受限方。"
+          "task": "实体清单与受限方筛查",
+          "desc": "对最终用户和最终用途进行实体清单、SDN清单等筛查，确保无涉。"
         },
         {
           "phase": "单证准备",
-          "task": "最终用户声明",
-          "desc": "获取并保留最终用户和最终用途声明，确保符合BIS要求。"
+          "task": "最终用户声明与用途说明",
+          "desc": "获取并保留最终用户声明及最终用途说明文件，确保合规。"
         },
         {
           "phase": "单证准备",
-          "task": "出口许可证申请",
-          "desc": "如需要，向BIS提交出口许可证申请，并附上技术说明和交易文件。"
+          "task": "Section 301关税评估",
+          "desc": "确认HTS编码是否在301关税清单内，计算附加关税并准备申报。"
         },
         {
           "phase": "单证准备",
-          "task": "内部合规审计",
-          "desc": "定期进行出口合规内部审计，确保流程符合EAR规定。"
+          "task": "FCC合规文件准备",
+          "desc": "如设备含无线功能，确认FCC Part 15/18认证，准备供应商FCC ID。"
         }
       ],
       "source_url": "https://www.bis.gov/press-release/applied-materials-pay-252-million-penalty-bis-illegally-exporting-semiconductor-manufacturing-equipment",
       "pipeline_source": "bis",
-      "fetched_at": "2026-06-10T20:34:38.548324+00:00"
+      "fetched_at": "2026-06-11T20:25:53.641823+00:00"
     },
     {
       "hs_code": "854231",
@@ -90,8 +90,8 @@
       "country": "US",
       "risk_level": "High",
       "source": "US BIS",
-      "content_en": "The US Department of Commerce revised license review policy for semiconductors exported to China, tightening controls on advanced chips and related equipment. Exporters must align with BIS Entity List screening and Section 301 tariff exposure.",
-      "content_zh": "美国商务部修订了对华出口半导体的许可证审查政策，加强了对先进芯片及相关设备的管控。出口商必须进行BIS实体清单筛查并评估301条款关税风险。",
+      "content_en": "The Department of Commerce has revised its license review policy for semiconductors exported to China, tightening controls on advanced chips and related manufacturing equipment. Exporters must now demonstrate that shipments do not involve entities on the Entity List or contribute to China's military modernization. The policy aligns with Section 301 tariff exposure and BIS export controls.",
+      "content_zh": "美国商务部修订了对华出口半导体的许可证审查政策，加强了对先进芯片及相关制造设备的管控。出口商必须证明货物不涉及实体清单上的实体，也不会助力中国军事现代化。该政策与301条款关税风险及BIS出口管制保持一致。",
       "checklist": [
         {
           "phase": "技术核查",
@@ -110,23 +110,23 @@
         },
         {
           "phase": "技术核查",
-          "task": "Advanced chip parameter verification",
-          "desc": "Verify if the semiconductor meets the revised performance thresholds (e.g., transistor count, processing speed) subject to new license requirements."
+          "task": "Advanced chip classification",
+          "desc": "Determine if the semiconductor falls under revised BIS parameters (e.g., performance thresholds, transistor count) requiring a license."
         },
         {
           "phase": "单证准备",
-          "task": "End-use and end-user certification",
-          "desc": "Obtain signed end-use statements from US customers confirming no military or prohibited end-use."
+          "task": "End-use/end-user certification",
+          "desc": "Obtain written certification from the US consignee that the chips will not be used in military or surveillance applications."
         },
         {
           "phase": "环保注册",
-          "task": "RoHS / REACH compliance documentation",
-          "desc": "Ensure semiconductor components comply with EU RoHS and REACH if re-exported from US to EU; retain declarations."
+          "task": "RoHS/REACH compliance (if applicable)",
+          "desc": "Ensure semiconductor packaging and materials comply with EU RoHS and REACH if the product may be re-exported to the EU."
         }
       ],
       "source_url": "https://www.bis.gov/press-release/department-commerce-revises-license-review-policy-semiconductors-exported-china",
       "pipeline_source": "bis",
-      "fetched_at": "2026-06-10T20:34:43.498785+00:00"
+      "fetched_at": "2026-06-11T20:25:59.620122+00:00"
     },
     {
       "hs_code": "9303.90",
@@ -134,38 +134,28 @@
       "country": "US",
       "risk_level": "Low",
       "source": "US BIS",
-      "content_en": "The Department of Commerce rescinded a Biden-era firearms rule, restoring standard export controls for civilian firearms. This reduces licensing burdens for commercial firearms exports to the US, but exporters must still comply with ITAR and BIS regulations for dual-use items.",
-      "content_zh": "美国商务部撤销了拜登时期的枪支规则，恢复了对民用枪支的常规出口管制。这减轻了向美国出口商业枪支的许可负担，但出口商仍需遵守ITAR和BIS对两用物品的法规。",
+      "content_en": "The Department of Commerce rescinded a Biden-era rule that had restricted civilian firearms exports, restoring standard export controls. This change reduces licensing burdens for civilian firearms but requires continued compliance with BIS export regulations and entity list screening.",
+      "content_zh": "美国商务部撤销了拜登时期限制民用枪支出口的规定，恢复标准出口管制。这一变化减轻了民用枪支的许可负担，但仍需遵守BIS出口管制和实体清单筛查。",
       "checklist": [
         {
           "phase": "单证准备",
-          "task": "ITAR vs BIS classification",
-          "desc": "Confirm whether the firearm is ITAR-controlled (USML Category I) or BIS-controlled (EAR); obtain correct classification."
+          "task": "BIS出口管制筛查",
+          "desc": "对民用枪支出口进行BIS出口管制分类和实体清单筛查，确保最终用户和最终用途合规。"
         },
         {
           "phase": "单证准备",
-          "task": "Section 301 & HTS tariff exposure",
-          "desc": "Map the 10-digit HTS line against Section 301 lists and additional duties; document country of origin and value build-up."
+          "task": "Section 301关税评估",
+          "desc": "确认HS编码是否受Section 301关税影响，评估附加关税风险。"
         },
         {
           "phase": "单证准备",
-          "task": "BIS / Entity List screening pack",
-          "desc": "Run restricted party and end-use screening; retain end-user and end-use statements for controlled items."
-        },
-        {
-          "phase": "技术核查",
-          "task": "FCC Part 15 / Part 18 RF conformity",
-          "desc": "Confirm intentional radiators, modular approvals, and supplier FCC IDs for wireless electronics before US entry."
-        },
-        {
-          "phase": "环保注册",
-          "task": "State-level firearms regulations",
-          "desc": "Verify compliance with state-specific firearms import laws (e.g., California, New York) and any additional licensing."
+          "task": "HTS归类与报关",
+          "desc": "准确归类10位HTS编码，准备报关单证，确保原产地和增值信息完整。"
         }
       ],
       "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
       "pipeline_source": "bis",
-      "fetched_at": "2026-06-10T20:34:48.523147+00:00"
+      "fetched_at": "2026-06-11T20:26:03.864939+00:00"
     },
     {
       "hs_code": "8542.31",
@@ -173,8 +163,8 @@
       "country": "US",
       "risk_level": "High",
       "source": "US BIS",
-      "content_en": "The Department of Commerce has expanded the Entity List to cover affiliates of listed entities. This action broadens the scope of restricted parties, requiring enhanced due diligence for any transaction involving entities that may be owned or controlled by a listed party. Exporters must verify not only direct listings but also indirect affiliations to avoid violations.",
-      "content_zh": "美国商务部将实体清单扩展至涵盖被列实体的关联公司。此举扩大了受限方的范围，要求对涉及可能由被列方拥有或控制的实体的任何交易进行更严格的尽职调查。出口商必须核实不仅直接列名，还要核实间接关联，以避免违规。",
+      "content_en": "The Department of Commerce has expanded the Entity List to cover affiliates of listed entities. This expansion increases the risk of export violations for US-bound shipments of electronic components, particularly semiconductors. Companies must ensure that all parties in the transaction, including affiliates, are screened against the Entity List and other restricted party lists.",
+      "content_zh": "美国商务部已将实体清单扩展至涵盖被列实体的关联公司。这一扩展增加了向美国出口电子元器件（尤其是半导体）的违规风险。企业必须确保交易中的所有相关方（包括关联公司）均经过实体清单及其他受限方名单的筛查。",
       "checklist": [
         {
           "phase": "技术核查",
@@ -193,23 +183,18 @@
         },
         {
           "phase": "技术核查",
-          "task": "Affiliate entity verification",
-          "desc": "Check if any transaction party is owned or controlled by an Entity List entity; review corporate structure and ownership records."
+          "task": "Entity List affiliate check",
+          "desc": "Verify that all parties in the supply chain, including affiliates and subsidiaries, are not on the Entity List or subject to additional restrictions."
         },
         {
           "phase": "单证准备",
-          "task": "End-use/end-user certification",
-          "desc": "Obtain signed end-user and end-use certifications from all parties in the supply chain, especially for dual-use items."
-        },
-        {
-          "phase": "环保注册",
-          "task": "RoHS/REACH compliance (if applicable)",
-          "desc": "Ensure electronic components meet US RoHS-like requirements and REACH SVHC declarations for chemical substances."
+          "task": "End-use and end-user documentation",
+          "desc": "Collect and retain end-use statements and end-user certifications for all US-bound shipments of controlled items."
         }
       ],
       "source_url": "https://www.bis.gov/press-release/department-commerce-expands-entity-list-cover-affiliates-listed-entities",
       "pipeline_source": "bis",
-      "fetched_at": "2026-06-10T20:34:54.198822+00:00"
+      "fetched_at": "2026-06-11T20:26:09.402875+00:00"
     },
     {
       "hs_code": "854231",
@@ -217,8 +202,8 @@
       "country": "US",
       "risk_level": "High",
       "source": "US BIS",
-      "content_en": "The US Department of Commerce has closed a loophole in export controls for foreign-owned semiconductor fabrication facilities in China. This action expands the scope of BIS export controls, requiring licenses for certain semiconductor manufacturing equipment and technology destined to these fabs. Companies must reassess their supply chains and ensure compliance with the Entity List and Section 301 tariffs.",
-      "content_zh": "美国商务部已堵住针对中国境内外资半导体制造厂的出口管制漏洞。此举扩大了BIS出口管制范围，要求向这些工厂出口特定半导体制造设备和技术时获得许可证。企业必须重新评估其供应链，确保符合实体清单和第301条关税要求。",
+      "content_en": "The US Department of Commerce has closed a loophole that allowed foreign-owned semiconductor fabs in China to bypass export controls. This action tightens restrictions on the export of advanced semiconductor manufacturing equipment and technology to China, particularly targeting entities that may be used for military purposes. Companies must now ensure compliance with expanded BIS regulations, including Entity List screening and end-use checks.",
+      "content_zh": "美国商务部堵住了外国在华半导体工厂规避出口管制的漏洞。此举加强了对中国出口先进半导体制造设备和技术的限制，特别针对可能用于军事目的的实体。企业必须确保遵守扩大的BIS法规，包括实体清单筛查和最终用途检查。",
       "checklist": [
         {
           "phase": "技术核查",
@@ -237,23 +222,23 @@
         },
         {
           "phase": "技术核查",
-          "task": "Foreign-owned fab license determination",
-          "desc": "Identify if the semiconductor fab in China is foreign-owned and assess whether new BIS license requirements apply to your equipment or technology."
+          "task": "Entity List & military end-use check",
+          "desc": "Verify that the foreign-owned fab and its parent entities are not on the Entity List; assess military end-use risk for semiconductor equipment."
         },
         {
           "phase": "单证准备",
-          "task": "End-use and end-user certification",
-          "desc": "Obtain written end-use and end-user certifications from the Chinese fab, confirming no military or prohibited use."
+          "task": "Export license determination",
+          "desc": "Determine if a BIS export license is required under the new rule; prepare license application with technical specifications and end-use documentation."
         },
         {
           "phase": "环保注册",
-          "task": "RoHS / REACH compliance for US export",
-          "desc": "Ensure products meet US RoHS-like requirements (e.g., California RoHS) and document substance declarations."
+          "task": "RoHS / REACH compliance (if applicable)",
+          "desc": "Ensure semiconductor components meet EU RoHS and REACH requirements if re-exported to EU; maintain compliance declarations."
         }
       ],
       "source_url": "https://www.bis.gov/press-release/department-commerce-closes-export-controls-loophole-foreign-owned-semiconductor-fabs-china",
       "pipeline_source": "bis",
-      "fetched_at": "2026-06-10T20:35:00.327595+00:00"
+      "fetched_at": "2026-06-11T20:26:16.037713+00:00"
     },
     {
       "hs_code": "8471.30.0100",
@@ -261,8 +246,8 @@
       "country": "US",
       "risk_level": "Low",
       "source": "US BIS",
-      "content_en": "Commerce Eases Export Controls on Syria. This change may reduce licensing requirements for certain items, but US export controls still apply. Ensure compliance with BIS regulations and Entity List screening.",
-      "content_zh": "美国商务部放宽对叙利亚的出口管制。此变更可能减少某些物项的许可要求，但仍需遵守美国出口管制规定，并进行实体清单筛查。",
+      "content_en": "Commerce Eases Export Controls on Syria. This change may reduce licensing requirements for certain items destined to Syria, but US export controls remain in place for dual-use items. Exporters must still comply with BIS regulations and screen against the Entity List.",
+      "content_zh": "美国商务部放宽对叙利亚的出口管制。这一变化可能减少对叙利亚某些物品的许可要求，但美国对两用物品的出口管制仍然有效。出口商仍需遵守BIS规定并筛查实体清单。",
       "checklist": [
         {
           "phase": "单证准备",
@@ -282,7 +267,7 @@
       ],
       "source_url": "https://www.bis.gov/press-release/commerce-eases-export-controls-syria",
       "pipeline_source": "bis",
-      "fetched_at": "2026-06-10T20:35:03.602574+00:00"
+      "fetched_at": "2026-06-11T20:26:19.952237+00:00"
     }
   ]
 }
