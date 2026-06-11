@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry"></script>
  */
 (function () {
-    const BUILD = '20260606-post-entry-value';
+    const BUILD = '20260611-rate-trust';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
