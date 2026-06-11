@@ -258,6 +258,15 @@ async function handleDutyRateStatus(req, res) {
     sendJson(res, 200, buildDutyRateStatusPayload());
 }
 
+function buildQualityStatusPayload() {
+    const { buildQualityStatus } = require('./build-quality-status');
+    return buildQualityStatus();
+}
+
+async function handleQualityStatus(req, res) {
+    sendJson(res, 200, buildQualityStatusPayload());
+}
+
 function getAllowedCoverageCodes() {
     const registry = readJsonFile(path.join(ROOT, 'data', 'country-registry.json'), {});
     const routeOptions = Array.isArray(registry.route_options) ? registry.route_options : [];
@@ -432,6 +441,11 @@ async function handleApi(req, res) {
             return;
         }
 
+        if (req.method === 'GET' && urlPath === '/api/review/quality-status') {
+            await handleQualityStatus(req, res);
+            return;
+        }
+
         if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/api/review/coverage-matrix') {
             await handleCoverageMatrix(req, res);
             return;
@@ -515,6 +529,7 @@ if (require.main === module) {
 
 module.exports = {
     buildDutyRateStatusPayload,
+    buildQualityStatusPayload,
     createAdminServer,
     startAdminServer
 };

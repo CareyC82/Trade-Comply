@@ -319,6 +319,76 @@
             font-size: 0.76rem;
             line-height: 1.35;
         }
+        .quality-banner {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 10px 0 14px;
+            background: rgba(34,197,94,0.08);
+        }
+        .quality-banner.warn {
+            background: rgba(245,158,11,0.10);
+            border-color: rgba(245,158,11,0.45);
+        }
+        .quality-banner.fail {
+            background: rgba(239,68,68,0.10);
+            border-color: rgba(239,68,68,0.45);
+        }
+        .quality-banner h3 { margin: 0 0 6px; font-size: 0.98rem; }
+        .quality-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .quality-row {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.12);
+        }
+        .quality-row strong {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        .quality-gap-table {
+            width: 100%;
+            min-width: 720px;
+            border-collapse: collapse;
+        }
+        .quality-gap-table th,
+        .quality-gap-table td {
+            padding: 9px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+            font-size: 0.82rem;
+        }
+        .quality-gap-table th {
+            color: var(--muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: rgba(0,0,0,0.18);
+        }
+        .quality-chip-list {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .quality-chip {
+            display: inline-flex;
+            border-radius: 999px;
+            padding: 3px 7px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            background: #123d2a;
+            color: #86efac;
+        }
+        .quality-chip.missing {
+            background: #451a1a;
+            color: #fca5a5;
+        }
         .duty-exception-list {
             margin: 8px 0 0;
             padding-left: 18px;
@@ -386,6 +456,16 @@
                 <div id="duty-rate-status">加载中…</div>
             </div>
             <div class="panel">
+                <div class="crawl-section-title">
+                    <div>
+                        <h2 style="margin:0 0 4px">Quality Gate</h2>
+                        <p class="meta" style="margin:0">自动检查搜索结果是否错国家/错方向/产品不相关，以及 Post-Entry 高频 HS 税率覆盖缺口。</p>
+                    </div>
+                    <button type="button" class="btn-ghost" id="btn-refresh-quality">刷新质量检查</button>
+                </div>
+                <div id="quality-status">加载中…</div>
+            </div>
+            <div class="panel">
                 <div class="coverage-toolbar">
                     <div>
                         <h2 style="margin:0 0 4px">Coverage Matrix</h2>
@@ -417,6 +497,7 @@
         const pendingList = document.getElementById('pending-list');
         const crawlSummary = document.getElementById('crawl-summary');
         const dutyRateStatus = document.getElementById('duty-rate-status');
+        const qualityStatus = document.getElementById('quality-status');
         const coverageMatrixView = document.getElementById('coverage-matrix-view');
         const coverageSummary = document.getElementById('coverage-summary');
         const coverageSaveState = document.getElementById('coverage-save-state');
@@ -913,6 +994,120 @@
             `;
         }
 
+        function renderIssueCounts(counts = {}) {
+            const entries = Object.entries(counts);
+            if (!entries.length) {
+                return '<span class="meta">none</span>';
+            }
+            return entries
+                .map(([key, value]) => `<span class="badge medium">${escapeHtml(key)}: ${escapeHtml(value)}</span>`)
+                .join(' ');
+        }
+
+        function renderQualitySamples(samples = [], kind = 'failures') {
+            if (!samples.length) {
+                return `<div class="empty">No ${escapeHtml(kind)}.</div>`;
+            }
+            return `
+                <div class="quality-list">
+                    ${samples.slice(0, 8).map((sample) => {
+                        const issues = sample.failures || sample.warnings || [];
+                        const route = sample.route || {};
+                        const topRules = (sample.top_rules || sample.topRules || [])
+                            .slice(0, 3)
+                            .map((rule) => rule.id || rule.tag_id || '')
+                            .filter(Boolean)
+                            .join(', ');
+                        return `
+                            <article class="quality-row">
+                                <strong>${escapeHtml(sample.id || 'sample')}</strong>
+                                <div class="meta">${escapeHtml(route.from || '?')} → ${escapeHtml(route.to || '?')} · ${escapeHtml(route.focus || '')} · ${escapeHtml(sample.query || '')}</div>
+                                <div style="margin-top:6px">${issues.map((issue) => `<span class="badge high">${escapeHtml(issue)}</span>`).join(' ') || '<span class="meta">none</span>'}</div>
+                                ${topRules ? `<p class="meta">Top rules: ${escapeHtml(topRules)}</p>` : ''}
+                            </article>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function renderDutyGapMatrix(matrix = {}) {
+            const rows = Array.isArray(matrix.rows) ? matrix.rows : [];
+            if (!rows.length) {
+                return '<div class="empty">No duty-rate gap matrix available.</div>';
+            }
+            return `
+                <div class="coverage-table-wrap">
+                    <table class="quality-gap-table">
+                        <thead>
+                            <tr>
+                                <th>Import market</th>
+                                <th>Status</th>
+                                <th>Covered HS</th>
+                                <th>Missing HS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map((row) => `
+                                <tr>
+                                    <td><strong>${escapeHtml(row.market)}</strong></td>
+                                    <td>${renderCoveragePill(row.status === 'full' ? 'full' : row.status === 'partial' ? 'partial' : 'none')}</td>
+                                    <td><div class="quality-chip-list">${(row.covered || []).map((prefix) => `<span class="quality-chip">${escapeHtml(prefix)}</span>`).join('') || '<span class="meta">none</span>'}</div></td>
+                                    <td><div class="quality-chip-list">${(row.missing || []).map((prefix) => `<span class="quality-chip missing">${escapeHtml(prefix)}</span>`).join('') || '<span class="meta">none</span>'}</div></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderQualityStatus(data) {
+            const search = data.search || {};
+            const duty = data.duty || {};
+            const gap = duty.gap_matrix || {};
+            const statusClass = data.ok ? '' : search.failed ? 'fail' : 'warn';
+            const statusTitle = data.ok
+                ? 'Quality gate passed'
+                : search.failed
+                    ? 'Quality gate failed'
+                    : 'Quality gate has warnings';
+            const gapText = Number(gap.missing_total || 0) === 0
+                ? 'Priority HS coverage complete.'
+                : `${gap.missing_total} priority HS gap(s) remain.`;
+            return `
+                <div class="quality-banner ${escapeHtml(statusClass)}">
+                    <h3>${escapeHtml(statusTitle)}</h3>
+                    <p class="meta" style="margin:0">Generated: ${escapeHtml(formatDateTime(data.generated_at))} · ${escapeHtml(gapText)}</p>
+                    <div class="summary-grid">
+                        <div class="summary-card"><strong>${search.samples ?? 0}</strong><span>Search samples</span></div>
+                        <div class="summary-card"><strong>${search.failed ?? 0}</strong><span>Search failures</span></div>
+                        <div class="summary-card"><strong>${search.warned ?? 0}</strong><span>Search warnings</span></div>
+                        <div class="summary-card"><strong>${duty.sample_count ?? 0}</strong><span>Post-Entry samples</span></div>
+                        <div class="summary-card"><strong>${gap.full_count ?? 0}/${(gap.rows || []).length}</strong><span>Markets with full HS coverage</span></div>
+                    </div>
+                    <p class="meta">Failure types: ${renderIssueCounts(search.failures_by_type)}</p>
+                    <p class="meta">Warning types: ${renderIssueCounts(search.warnings_by_type)}</p>
+                </div>
+                <div class="crawl-section-title"><h3>Search quality exceptions</h3><span class="meta">${(search.failing_samples || []).length} failed · ${(search.warning_samples || []).length} warned</span></div>
+                ${renderQualitySamples(search.failing_samples || [], 'failures')}
+                ${(search.failing_samples || []).length ? '' : renderQualitySamples((search.warning_samples || []).slice(0, 5), 'warnings')}
+                <div class="crawl-section-title"><h3>Post-Entry priority HS coverage</h3><span class="meta">${gap.missing_total || 0} missing cells</span></div>
+                ${renderDutyGapMatrix(gap)}
+            `;
+        }
+
+        async function loadQualityStatus() {
+            if (!qualityStatus) return;
+            qualityStatus.innerHTML = '<p class="meta">正在运行质量检查…</p>';
+            try {
+                const data = await apiFetch('/api/review/quality-status');
+                qualityStatus.innerHTML = renderQualityStatus(data);
+            } catch (err) {
+                qualityStatus.innerHTML = `<div class="empty">质量检查加载失败：${escapeHtml(err.message)}</div>`;
+            }
+        }
+
         async function loadDutyRateStatus() {
             if (!dutyRateStatus) return;
             dutyRateStatus.innerHTML = '<p class="meta">正在加载税率源状态…</p>';
@@ -1042,6 +1237,7 @@
             reviewPanel.classList.remove('hidden');
             loadCrawlSummary();
             loadDutyRateStatus();
+            loadQualityStatus();
             loadCoverageMatrixView();
             if (!skipInitialLoad) {
                 loadPending();
@@ -1164,6 +1360,7 @@
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
         document.getElementById('btn-refresh-duty-rates').addEventListener('click', loadDutyRateStatus);
+        document.getElementById('btn-refresh-quality').addEventListener('click', loadQualityStatus);
         document.getElementById('btn-refresh-coverage').addEventListener('click', loadCoverageMatrixView);
         document.getElementById('btn-save-coverage').addEventListener('click', saveCoverageMatrix);
         document.getElementById('btn-test-crawl').addEventListener('click', runTestCrawl);

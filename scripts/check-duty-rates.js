@@ -21,6 +21,8 @@ const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const SAMPLES_PATH = path.join(ROOT, 'data', 'post-entry-samples.json');
+const PRIORITY_IMPORT_MARKETS = ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'VN', 'MY', 'TW', 'RU'];
+const PRIORITY_HS_PREFIXES = ['847130', '850440', '850760', '8517', '8525', '8528', '8541', '8542', '8543'];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -96,6 +98,39 @@ function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
     };
 }
 
+function ruleMatchesPriority(rule, market, prefix) {
+    const importCountry = String(rule.import_country || '').toUpperCase();
+    const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes.map(String) : [];
+    return importCountry === market && prefixes.includes(prefix);
+}
+
+function buildDutyRateGapMatrix(dutyPayload, {
+    markets = PRIORITY_IMPORT_MARKETS,
+    prefixes = PRIORITY_HS_PREFIXES
+} = {}) {
+    const rules = Array.isArray(dutyPayload?.rules) ? dutyPayload.rules : [];
+    const rows = markets.map((market) => {
+        const covered = prefixes.filter((prefix) => rules.some((rule) => ruleMatchesPriority(rule, market, prefix)));
+        const missing = prefixes.filter((prefix) => !covered.includes(prefix));
+        const status = missing.length === 0 ? 'full' : covered.length > 0 ? 'partial' : 'missing';
+        return {
+            market,
+            status,
+            covered,
+            missing
+        };
+    });
+    return {
+        markets,
+        prefixes,
+        full_count: rows.filter((row) => row.status === 'full').length,
+        partial_count: rows.filter((row) => row.status === 'partial').length,
+        missing_count: rows.filter((row) => row.status === 'missing').length,
+        missing_total: rows.reduce((sum, row) => sum + row.missing.length, 0),
+        rows
+    };
+}
+
 function runDutyRateHealthCheck() {
     const dutyPayload = readJson(DUTY_RATES_PATH);
     const sourcesPayload = readJson(DUTY_RATE_SOURCES_PATH);
@@ -104,6 +139,7 @@ function runDutyRateHealthCheck() {
     const sampleResults = samples.map(runSample);
     const failures = sampleResults.filter(result => result.failures.length);
     const dutySummary = summarizeDutyRateCoverage(dutyPayload);
+    const dutyGapMatrix = buildDutyRateGapMatrix(dutyPayload);
     const sourceRoadmap = summarizeSourceRoadmap(sourcesPayload, dutySummary);
     const sourceFailures = [];
     if (sourceRoadmap.missing_coverage.length) {
@@ -116,6 +152,7 @@ function runDutyRateHealthCheck() {
     return {
         ok: failures.length === 0 && sourceFailures.length === 0,
         duty_rate_summary: dutySummary,
+        duty_rate_gap_matrix: dutyGapMatrix,
         source_roadmap_summary: sourceRoadmap,
         sample_count: samples.length,
         failed_sample_count: failures.length,
@@ -135,6 +172,9 @@ if (require.main === module) {
 }
 
 module.exports = {
+    PRIORITY_IMPORT_MARKETS,
+    PRIORITY_HS_PREFIXES,
+    buildDutyRateGapMatrix,
     runDutyRateHealthCheck,
     runSample,
     summarizeSourceRoadmap

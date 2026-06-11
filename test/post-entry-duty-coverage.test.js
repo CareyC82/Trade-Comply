@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const {
+    PRIORITY_HS_PREFIXES,
     runDutyRateHealthCheck
 } = require('../scripts/check-duty-rates');
 const {
@@ -29,6 +30,18 @@ test('priority Post-Entry sample set has no coverage failures', () => {
     assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
     assert.equal(result.sample_count, samples.samples.length);
     assert.equal(result.failed_sample_count, 0);
+});
+
+test('priority Post-Entry HS matrix has no uncovered cells', () => {
+    const result = runDutyRateHealthCheck();
+    const matrix = result.duty_rate_gap_matrix;
+
+    assert.equal(matrix.missing_total, 0, JSON.stringify(matrix.rows.filter(row => row.missing.length), null, 2));
+    assert.equal(matrix.full_count, matrix.rows.length);
+    matrix.rows.forEach((row) => {
+        assert.deepEqual(row.missing, [], `${row.market} should not have missing priority HS prefixes`);
+        assert.deepEqual(row.covered, PRIORITY_HS_PREFIXES, `${row.market} should cover every priority HS prefix`);
+    });
 });
 
 test('US samples preserve official and scope-review source statuses', () => {

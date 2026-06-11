@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-10",
+  "updated_at": "2026-06-11",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -862,9 +862,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Singapore import electronics GST signal",
       "base_rate": 0,
@@ -882,7 +884,7 @@
       "trade_remedy": "Singapore generally applies GST on imports; confirm exact customs value and any dutiable-goods treatment.",
       "confidence": "Indicative",
       "source_status": "benchmark_source_checked",
-      "source_note": "Singapore benchmark refreshed locally. Verify exact HS code, GST value basis, and whether the goods are dutiable before filing.",
+      "source_note": "Singapore benchmark refreshed locally. Verify exact HS code, GST value basis, and whether the goods are dutiable before filing. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "SG electronics benchmark",
       "source_rate_text": "Benchmark: 0% customs duty + 9% GST",
       "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
@@ -897,9 +899,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Mexico import electronics VAT / IGI signal",
       "base_rate": 0,
@@ -917,7 +921,7 @@
       "trade_remedy": "Mexico import VAT benchmark; verify TIGIE tariff line, NOM labeling/safety requirements, and any preferential origin claim.",
       "confidence": "Indicative",
       "source_status": "benchmark_source_checked",
-      "source_note": "Mexico benchmark refreshed locally. Verify exact TIGIE tariff line, VAT base, NOM scope, and preferential origin before filing.",
+      "source_note": "Mexico benchmark refreshed locally. Verify exact TIGIE tariff line, VAT base, NOM scope, and preferential origin before filing. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "MX electronics benchmark",
       "source_rate_text": "Benchmark: VAT 16%; IGI depends on TIGIE tariff line",
       "source_url": "https://www.snice.gob.mx/",
@@ -932,9 +936,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Japan import electronics consumption tax signal",
       "base_rate": 0,
@@ -952,7 +958,7 @@
       "trade_remedy": "Japan consumption tax benchmark; verify tariff schedule, PSE/telecom product requirements, and valuation treatment.",
       "confidence": "Benchmark source checked",
       "source_status": "benchmark_source_checked",
-      "source_note": "Japan benchmark refreshed locally. Verify exact tariff line, consumption tax basis, and product approval scope before filing.",
+      "source_note": "Japan benchmark refreshed locally. Verify exact tariff line, consumption tax basis, and product approval scope before filing. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "JP electronics benchmark",
       "source_rate_text": "Benchmark: 0% duty for many electronics + 10% consumption tax",
       "source_url": "https://www.customs.go.jp/english/tariff/",
@@ -967,9 +973,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Korea import electronics VAT signal",
       "base_rate": 0,
@@ -987,7 +995,7 @@
       "trade_remedy": "Korea import VAT benchmark; verify tariff schedule, KC/product approvals, and origin preference.",
       "confidence": "Benchmark source checked",
       "source_status": "benchmark_source_checked",
-      "source_note": "Korea benchmark refreshed locally. Verify exact tariff line, VAT basis, KC scope, and origin preference before filing.",
+      "source_note": "Korea benchmark refreshed locally. Verify exact tariff line, VAT basis, KC scope, and origin preference before filing. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "KR electronics benchmark",
       "source_rate_text": "Benchmark: 0% duty for many electronics + 10% VAT",
       "source_url": "https://www.customs.go.kr/english/main.do",
@@ -1002,9 +1010,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Vietnam import electronics VAT / duty signal",
       "base_rate": 0,
@@ -1022,10 +1032,11 @@
       "trade_remedy": "Vietnam import VAT benchmark; verify HS code, preferential tariff, MIC/MOIT product requirements, and entry-date VAT policy.",
       "confidence": "Indicative",
       "source_status": "indicative",
-      "source_note": "Vietnam benchmark only. VAT and preferential duty can change by product, origin, and entry date.",
+      "source_note": "Vietnam benchmark only. VAT and preferential duty can change by product, origin, and entry date. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "VN electronics benchmark",
       "source_rate_text": "Benchmark: duty depends on tariff line + VAT placeholder",
-      "source_url": "https://www.customs.gov.vn/"
+      "source_url": "https://www.customs.gov.vn/",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
     },
     {
       "id": "MY-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -1036,9 +1047,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Malaysia import electronics SST / duty signal",
       "base_rate": 0,
@@ -1056,10 +1069,11 @@
       "trade_remedy": "Malaysia sales tax benchmark; verify customs duty, SST exemption, SIRIM/MCMC approvals, and preferential origin.",
       "confidence": "Indicative",
       "source_status": "indicative",
-      "source_note": "Malaysia benchmark only. SST, duty, and exemptions vary by tariff line and product.",
+      "source_note": "Malaysia benchmark only. SST, duty, and exemptions vary by tariff line and product. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "MY electronics benchmark",
       "source_rate_text": "Benchmark: SST 10%; customs duty depends on tariff line",
-      "source_url": "https://mysst.customs.gov.my/"
+      "source_url": "https://mysst.customs.gov.my/",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
     },
     {
       "id": "TW-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -1070,9 +1084,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Taiwan import electronics business tax signal",
       "base_rate": 0,
@@ -1090,10 +1106,11 @@
       "trade_remedy": "Taiwan import business tax benchmark; verify tariff code, commodity inspection, telecom approvals, and origin treatment.",
       "confidence": "Indicative",
       "source_status": "indicative",
-      "source_note": "Taiwan benchmark only. Confirm exact customs duty and business tax basis before filing.",
+      "source_note": "Taiwan benchmark only. Confirm exact customs duty and business tax basis before filing. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "TW electronics benchmark",
       "source_rate_text": "Benchmark: 5% business tax; customs duty depends on tariff line",
-      "source_url": "https://web.customs.gov.tw/"
+      "source_url": "https://web.customs.gov.tw/",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
     },
     {
       "id": "RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -1104,9 +1121,11 @@
         "850440",
         "850760",
         "8517",
+        "8525",
         "8528",
         "8541",
-        "8542"
+        "8542",
+        "8543"
       ],
       "label": "Russia import electronics VAT / EAEU duty signal",
       "base_rate": 0.05,
@@ -1132,10 +1151,11 @@
       "trade_remedy": "Russia import VAT and EAEU duty benchmark; restricted-party, sanctions, and export-control scope review may override ordinary entry economics.",
       "confidence": "Indicative",
       "source_status": "indicative",
-      "source_note": "Russia benchmark only. Confirm EAEU tariff line, VAT basis, sanctions, restricted party, and licensing status.",
+      "source_note": "Russia benchmark only. Confirm EAEU tariff line, VAT basis, sanctions, restricted party, and licensing status. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
       "source_hts": "RU electronics benchmark",
       "source_rate_text": "Benchmark: EAEU duty placeholder + 20% VAT; sanctions scope required",
-      "source_url": "https://customs.gov.ru/"
+      "source_url": "https://customs.gov.ru/",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
     },
     {
       "id": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
@@ -1166,6 +1186,239 @@
       "trade_remedy": "Import VAT and MFN duty estimate; confirm exact tariff line",
       "confidence": "Indicative",
       "source_note": "Pre-check benchmark only; confirm exact China tariff and VAT treatment."
+    },
+    {
+      "id": "US-CN-850440-POWER-CONVERSION-INDICATIVE",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "850440"
+      ],
+      "label": "US import power conversion / charger signal",
+      "base_rate": 0,
+      "additional_rate": 0.075,
+      "add_on_layers": [
+        {
+          "type": "section_301",
+          "label": "Section 301 China additional duty",
+          "rate": 0.075,
+          "basis": "customs_value",
+          "status": "indicative",
+          "source": "USTR Section 301 / HTS Chapter 99 signal"
+        }
+      ],
+      "trade_remedy": "Section 301 China additional duty signal",
+      "confidence": "Indicative",
+      "source_status": "official_source_checked",
+      "source_note": "Pre-check benchmark for power conversion equipment; verify exact 10-digit HTS and active exclusions.",
+      "source_hts": "8504400000",
+      "source_rate_text": "Free",
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=850440&to=85044099&format=JSON&styles=false",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
+    },
+    {
+      "id": "CN-GLOBAL-847130-850440-IMPORT-INDICATIVE",
+      "import_country": "CN",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440"
+      ],
+      "label": "China import portable ADP / power conversion signal",
+      "base_rate": 0.04,
+      "additional_rate": 0.13,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "China import VAT benchmark",
+          "rate": 0.13,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "China customs / VAT benchmark"
+        }
+      ],
+      "trade_remedy": "China tariff/VAT benchmark; verify exact HS code, origin preference, and VAT treatment.",
+      "confidence": "Indicative",
+      "source_status": "indicative",
+      "source_note": "Local benchmark for China import post-entry value review. Confirm exact tariff line with China Customs before filing or correction.",
+      "source_hts": "847130 / 850440",
+      "source_rate_text": "Benchmark duty + 13% VAT",
+      "source_url": "https://www.customs.gov.cn/",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
+    },
+    {
+      "id": "EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8525"
+      ],
+      "label": "EU import camera / transmission equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC scope check required for camera/transmission equipment under this maintained prefix.",
+      "source_hts": "8525 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
+    },
+    {
+      "id": "EU-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8543"
+      ],
+      "label": "EU import other electrical machines signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC scope check required for other electrical machines under this maintained prefix.",
+      "source_hts": "8543 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
+    },
+    {
+      "id": "DE-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8525"
+      ],
+      "label": "Germany import camera / transmission equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC scope check required for camera/transmission equipment under this maintained prefix.",
+      "source_hts": "8525 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
+    },
+    {
+      "id": "DE-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8543"
+      ],
+      "label": "Germany import other electrical machines signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC scope check required for other electrical machines under this maintained prefix.",
+      "source_hts": "8543 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
+    },
+    {
+      "id": "NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8525"
+      ],
+      "label": "Netherlands import camera / transmission equipment signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC scope check required for camera/transmission equipment under this maintained prefix.",
+      "source_hts": "8525 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
+    },
+    {
+      "id": "NL-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8543"
+      ],
+      "label": "Netherlands import other electrical machines signal",
+      "base_rate": 0.027,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code required before using a final EU duty rate; VAT varies by member state.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC scope check required for other electrical machines under this maintained prefix.",
+      "source_hts": "8543 (TARIC scope check required)",
+      "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-06-11T00:00:00.000Z"
     }
   ],
   "last_usitc_sync_at": "2026-06-10T20:43:36.852Z",
