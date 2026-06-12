@@ -52,9 +52,10 @@ describe('country-registry', () => {
     it('loads and overrides the maintainable coverage matrix', () => {
         assert.equal(getConfiguredCoverageLevel('US', 'import'), 'full');
         assert.equal(getConfiguredCoverageLevel('SG', 'export'), 'partial');
+        assert.equal(getConfiguredCoverageLevel('MX', 'export'), 'partial');
 
         setCoverageMatrix({ matrix: { import: { US: 'partial' }, export: { GLOBAL: 'none' } } });
         assert.equal(getConfiguredCoverageLevel('US', 'import'), 'partial');
-        assert.equal(getConfiguredCoverageLevel('MX', 'export'), 'baseline');
+        assert.equal(getConfiguredCoverageLevel('MX', 'export'), 'partial');
     });
 });

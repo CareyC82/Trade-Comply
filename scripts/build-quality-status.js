@@ -8,6 +8,9 @@ const {
 const {
     runDutyRateHealthCheck
 } = require('./check-duty-rates');
+const {
+    runPostEntryTaxCoverageCheck
+} = require('./check-post-entry-tax-coverage');
 
 function summarizeSearchAudit(searchAudit) {
     const results = Array.isArray(searchAudit?.results) ? searchAudit.results : [];
@@ -73,16 +76,37 @@ function summarizeDutyHealth(dutyHealth) {
     };
 }
 
+function summarizePostEntryTaxCoverage(taxHealth) {
+    const exportTax = taxHealth?.export_tax || {};
+    return {
+        ok: Boolean(taxHealth?.ok),
+        import_ok: Boolean(taxHealth?.import_duty?.ok),
+        export_ok: Number(exportTax.missing_total || 0) === 0
+            && (exportTax.false_official_rate_claims || []).length === 0
+            && Boolean(exportTax.cn_has_exact_hs_warning),
+        export_rule_count: exportTax.rule_count || 0,
+        export_country_count: exportTax.country_count || 0,
+        export_missing_countries: exportTax.missing_countries || [],
+        export_partial_countries: exportTax.partial_countries || [],
+        export_rate_status_counts: exportTax.rate_status_counts || {},
+        false_official_rate_claims: exportTax.false_official_rate_claims || [],
+        failures: taxHealth?.failures || []
+    };
+}
+
 function buildQualityStatus() {
     const searchAudit = runQualityAudit();
     const dutyHealth = runDutyRateHealthCheck();
+    const taxHealth = runPostEntryTaxCoverageCheck();
     const search = summarizeSearchAudit(searchAudit);
     const duty = summarizeDutyHealth(dutyHealth);
+    const postEntryTax = summarizePostEntryTaxCoverage(taxHealth);
     return {
-        ok: search.ok && duty.ok,
+        ok: search.ok && duty.ok && postEntryTax.ok,
         generated_at: new Date().toISOString(),
         search,
         duty,
+        post_entry_tax: postEntryTax,
         compact_report: formatAuditReport(searchAudit)
     };
 }
@@ -100,5 +124,6 @@ if (require.main === module) {
 module.exports = {
     buildQualityStatus,
     summarizeSearchAudit,
-    summarizeDutyHealth
+    summarizeDutyHealth,
+    summarizePostEntryTaxCoverage
 };

@@ -122,6 +122,7 @@ describe('trade-country', () => {
 
     it('shows not covered when a route has only baseline references and no maintained country coverage', () => {
         const coverage = analyzeCountryCoverage([{ country: 'GLOBAL' }, { country: 'GLOBAL' }], 'MX', 'export');
+        setCoverageMatrix({ matrix: { export: { MX: 'none' } } });
         const indicator = buildCoverageIndicator(coverage, {
             from: 'MX',
             to: 'US',
@@ -134,5 +135,6 @@ describe('trade-country', () => {
         assert.equal(indicator.label, 'Not covered yet');
         assert.equal(indicator.configuredLevel, 'none');
         assert.match(indicator.message, /Baseline references are shown below only as general context/i);
+        setCoverageMatrix(require('../data/coverage-matrix.json'));
     });
 });

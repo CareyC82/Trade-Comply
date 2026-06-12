@@ -6,7 +6,7 @@ const tags = JSON.parse(fs.readFileSync(path.join(root, 'data', 'tags.json'), 'u
 const cases = JSON.parse(fs.readFileSync(path.join(root, 'data', 'cases.json'), 'utf8'));
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'data', 'country-registry.json'), 'utf8'));
 
-const COUNTRIES = ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'ASEAN', 'RU', 'TW'];
+const COUNTRIES = ['CN', 'US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'ASEAN', 'RU', 'TW'];
 const IMPORT_DIMENSIONS = [
     {
         id: 'wireless_telecom',
@@ -65,6 +65,13 @@ function tagText(tag) {
 }
 
 function importFocusTags(country) {
+    if (country === 'CN') {
+        return tags.filter((tag) => (
+            (tag.country === 'CN' || !tag.country)
+            && ['import', 'both'].includes(tag.direction)
+            && (tag.route_focus || tag.compliance_focus || 'import') !== 'export'
+        ));
+    }
     return tags.filter((tag) => (
         tag.country === country
         && tag.direction === 'export'
@@ -73,6 +80,13 @@ function importFocusTags(country) {
 }
 
 function exportFocusTags(country) {
+    if (country === 'CN') {
+        return tags.filter((tag) => (
+            (tag.country === 'CN' || !tag.country)
+            && ['export', 'both'].includes(tag.direction)
+            && (tag.route_focus || tag.compliance_focus || 'export') !== 'import'
+        ));
+    }
     return tags.filter((tag) => (
         tag.country === country
         && tag.direction === 'export'
