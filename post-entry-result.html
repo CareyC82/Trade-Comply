@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post-Entry Result | TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260611-rate-trust">
+    <link rel="stylesheet" href="css/style.css?v=20260612-post-entry-summary">
 </head>
 <body class="post-entry-page-body">
     <main id="post-entry-result-page" class="post-entry-page view-container active">
@@ -33,6 +33,21 @@
                 <span class="post-entry-decision-kicker">Core conclusion</span>
                 <strong id="post-entry-decision-text">—</strong>
                 <small id="post-entry-coverage-note" class="post-entry-coverage-note">—</small>
+            </div>
+
+            <div class="post-entry-client-summary" aria-label="Post-entry customer summary">
+                <div class="post-entry-client-summary-card">
+                    <span>Value gap</span>
+                    <strong id="post-entry-summary-value-gap">—</strong>
+                </div>
+                <div class="post-entry-client-summary-card" data-import-only>
+                    <span>Duty gap</span>
+                    <strong id="post-entry-summary-duty-gap">—</strong>
+                </div>
+                <div class="post-entry-client-summary-card post-entry-client-summary-card--action">
+                    <span>Action</span>
+                    <strong id="post-entry-summary-action">—</strong>
+                </div>
             </div>
 
             <div class="post-entry-decision-grid">
@@ -165,6 +180,6 @@
         <span id="nav-post-entry" class="nav-btn active" aria-current="page">🧾 Post-Entry</span>
     </nav>
 
-    <script src="js/main.js?v=20260611-rate-trust" data-app="post-entry"></script>
+    <script src="js/main.js?v=20260612-post-entry-summary" data-app="post-entry"></script>
 </body>
 </html>

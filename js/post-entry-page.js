@@ -79,6 +79,37 @@
         return `${(value * 100).toFixed(1)}%`;
     }
 
+    function parseCheckedDate(value) {
+        const date = new Date(value || '');
+        return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatCheckedDate(value) {
+        const date = parseCheckedDate(value);
+        if (!date) return '';
+        return date.toISOString().slice(0, 10);
+    }
+
+    function getDaysSinceChecked(value) {
+        const date = parseCheckedDate(value);
+        if (!date) return null;
+        return Math.floor((Date.now() - date.getTime()) / 86400000);
+    }
+
+    function getCheckedStatus(value) {
+        const days = getDaysSinceChecked(value);
+        if (days === null) {
+            return {
+                stale: true,
+                label: 'Last checked: unknown'
+            };
+        }
+        return {
+            stale: days > 30,
+            label: `Last checked: ${formatCheckedDate(value)}${days > 30 ? ' · may be stale' : ''}`
+        };
+    }
+
     function normalizeDatePart(value) {
         return String(value || '').replace(/\D/g, '').slice(0, 2);
     }
@@ -345,6 +376,50 @@
         };
     }
 
+    function formatSignedMoney(value, currency) {
+        const amount = Number(value || 0);
+        if (Math.abs(amount) < 0.01) return formatMoney(0, currency);
+        const formatted = formatMoney(Math.abs(amount), currency);
+        return amount < 0 ? `-${formatted}` : formatted;
+    }
+
+    function buildClientSummary(result, dutyImpact, currency, focus, actionText) {
+        const valueDifference = focus === 'export'
+            ? result.exportRebateBase - result.declaredAmount
+            : result.difference;
+        const valueTone = Math.abs(valueDifference) > 0.01 ? 'review' : 'clear';
+        const summary = {
+            valueGap: {
+                tone: valueTone,
+                label: `${formatSignedMoney(valueDifference, currency)}${result.declaredAmount ? ` (${formatPercent(Math.abs(valueDifference) / result.declaredAmount * 100)})` : ''}`
+            },
+            dutyGap: {
+                tone: 'neutral',
+                label: focus === 'export' ? 'Not applicable' : '—'
+            },
+            action: {
+                tone: valueTone,
+                label: actionText || 'Keep support with the entry file.'
+            }
+        };
+
+        if (focus === 'import') {
+            if (!dutyImpact?.covered) {
+                summary.dutyGap = {
+                    tone: 'not-covered',
+                    label: 'Rate not covered'
+                };
+            } else {
+                const gap = Number(dutyImpact.dutyVariance || 0);
+                summary.dutyGap = {
+                    tone: Math.abs(gap) > 0.01 ? 'review' : 'clear',
+                    label: `${formatSignedMoney(gap, currency)}`
+                };
+            }
+        }
+        return summary;
+    }
+
     function buildCoverageNote(items = []) {
         const level = getSourceCoverageLevel(items);
         if (level === 'official_source_checked') {
@@ -401,7 +476,12 @@
             const title = document.createElement('strong');
             title.textContent = item.label || 'Rate source';
             const detail = document.createElement('span');
-            detail.textContent = [item.source, item.detail].filter(Boolean).join(' · ') || 'Confirm official source.';
+            const checked = getCheckedStatus(item.lastCheckedAt);
+            const detailParts = [item.source, item.detail, checked.label].filter(Boolean);
+            detail.textContent = detailParts.join(' · ') || 'Confirm official source.';
+            if (checked.stale) {
+                detail.classList.add('post-entry-source-main--stale');
+            }
             main.append(title, detail);
 
             const status = document.createElement(item.url ? 'a' : 'span');
@@ -509,6 +589,7 @@
                     status: group.status,
                     source,
                     detail: `${detail}${suffix}`,
+                    lastCheckedAt: first.lastCheckedAt || '',
                     url: first.url || ''
                 };
             });
@@ -675,6 +756,7 @@
             const exportDifference = result.exportRebateBase - result.declaredAmount;
             const exportDiffPercent = result.declaredAmount ? Math.abs(exportDifference) / result.declaredAmount * 100 : 100;
             const exportRisk = getValueGapRisk(exportDiffPercent, result.declaredAmount);
+            const exportAction = exportReview.action;
             return {
                 ...base,
                 risk: exportRisk,
@@ -690,8 +772,9 @@
                     valuation: buildValuationLogic(result, currency, focus),
                     duty: buildExportImpactText(exportReview),
                     compliance: exportReview.complianceMeaning,
-                    action: exportReview.action
+                    action: exportAction
                 },
+                clientSummary: buildClientSummary(result, null, currency, focus, exportAction),
                 sourceBreakdown: [{
                     label: exportReview.label || 'Export filing review',
                     status: exportReview.covered ? 'review_basis' : 'not_covered',
@@ -714,9 +797,12 @@
             };
         }
 
-        const dutyImpact = valueApi.calculateDutyImpact(result, context, {
+            const dutyImpact = valueApi.calculateDutyImpact(result, context, {
             declaredDuty: input.declaredDuty
         });
+        const action = dutyImpact.covered && dutyImpact.dutyVariance > 0.01
+            ? dutyImpact.action
+            : valueApi.buildRecommendedAction(result, context);
         return {
             ...base,
             risk: result.risk,
@@ -736,10 +822,9 @@
                 valuation: buildValuationLogic(result, currency, focus),
                 duty: buildDutyImpactText(dutyImpact, currency),
                 compliance: valueApi.buildComplianceMeaning(result, context),
-                action: dutyImpact.covered && dutyImpact.dutyVariance > 0.01
-                    ? dutyImpact.action
-                    : valueApi.buildRecommendedAction(result, context)
+                action
             },
+            clientSummary: buildClientSummary(result, dutyImpact, currency, focus, action),
             sourceBreakdown: dutyImpact.sourceBreakdown || [],
             coverageNote: [buildCoverageNote(dutyImpact.sourceBreakdown || []), buildJurisdictionScopeNote(context)].filter(Boolean).join(' '),
             rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
@@ -794,6 +879,22 @@
             if (customLabel) customLabel.textContent = snapshot.labels.customsValue || customLabel.textContent;
             if (rebateLabel) rebateLabel.textContent = snapshot.labels.rebateBase || rebateLabel.textContent;
             if (diffLabel) diffLabel.textContent = snapshot.labels.difference || diffLabel.textContent;
+        }
+        const summary = snapshot.clientSummary || {};
+        const valueGap = $('post-entry-summary-value-gap');
+        const dutyGap = $('post-entry-summary-duty-gap');
+        const summaryAction = $('post-entry-summary-action');
+        if (valueGap) {
+            valueGap.textContent = summary.valueGap?.label || snapshot.values?.difference || '—';
+            valueGap.parentElement.className = `post-entry-client-summary-card post-entry-client-summary-card--${summary.valueGap?.tone || 'neutral'}`;
+        }
+        if (dutyGap) {
+            dutyGap.textContent = summary.dutyGap?.label || snapshot.importMetrics?.dutyGap || (snapshot.focus === 'export' ? 'Not applicable' : '—');
+            dutyGap.parentElement.className = `post-entry-client-summary-card post-entry-client-summary-card--${summary.dutyGap?.tone || 'neutral'}`;
+        }
+        if (summaryAction) {
+            summaryAction.textContent = summary.action?.label || snapshot.insights?.action || 'Keep support with the entry file.';
+            summaryAction.parentElement.className = `post-entry-client-summary-card post-entry-client-summary-card--action post-entry-client-summary-card--${summary.action?.tone || 'neutral'}`;
         }
         $('post-entry-customs-value').textContent = snapshot.values?.customsValue || '—';
         $('post-entry-rebate-base').textContent = snapshot.values?.rebateBase || '—';

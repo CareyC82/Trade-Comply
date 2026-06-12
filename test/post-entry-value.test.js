@@ -117,7 +117,7 @@ test('calculates indicative duty impact for US imports from China', () => {
     assert.equal(Number(duty.estimatedDuty.toFixed(2)), 231.08);
     assert.equal(duty.addOnLayers[0].type, 'section_301');
     assert.match(duty.tradeRemedy, /Section 301/);
-    assert.ok(duty.sourceBreakdown.some(source => source.label === 'Base duty' && source.status === 'official_source_checked'));
+    assert.ok(duty.sourceBreakdown.some(source => source.label === 'General duty' && source.status === 'official_source_checked'));
     assert.ok(duty.sourceBreakdown.some(source => /Section 301/.test(source.label) && source.status === 'indicative'));
 });
 
@@ -137,6 +137,26 @@ test('keeps AD/CVD as a flag-only add-on layer', () => {
     assert.equal(duty.flagOnlyLayers.some(layer => layer.type === 'ad_cvd'), true);
     assert.equal(duty.estimatedDuty, 2500);
     assert.ok(duty.sourceBreakdown.some(source => /AD\/CVD/.test(source.label) && source.status === 'scope_check_required'));
+});
+
+test('splits US duty source rows into general duty, Section 301, and scope flags', () => {
+    const valueResult = calculatePostEntryValue({
+        incoterm: 'FOB',
+        declaredAmount: 10000
+    });
+    const duty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'US',
+        originCountryCode: 'CN',
+        hsCode: '854143',
+        entryDate: '2026-06-12'
+    });
+
+    const components = duty.sourceBreakdown.map(source => source.component);
+    assert.ok(components.includes('base_duty'));
+    assert.ok(components.includes('section_301'));
+    assert.ok(components.includes('ad_cvd'));
+    assert.ok(duty.sourceBreakdown.some(source => source.label === 'General duty' && source.hts));
+    assert.ok(duty.sourceBreakdown.every(source => 'lastCheckedAt' in source));
 });
 
 test('loads duty rules from maintainable data file', () => {
