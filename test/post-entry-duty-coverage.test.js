@@ -30,6 +30,36 @@ test('priority Post-Entry sample set has no coverage failures', () => {
     assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
     assert.equal(result.sample_count, samples.samples.length);
     assert.equal(result.failed_sample_count, 0);
+    assert.ok(result.sample_count >= 24, 'priority Post-Entry sample set should cover at least 24 high-frequency scenarios');
+});
+
+test('priority Post-Entry samples carry explicit source quality expectations', () => {
+    samples.samples.forEach((sample) => {
+        assert.ok(Array.isArray(sample.expect_source_statuses), `${sample.id} should declare expected source statuses`);
+        assert.ok(sample.expect_source_statuses.length > 0, `${sample.id} should declare at least one expected source status`);
+    });
+});
+
+test('priority Post-Entry samples cover common global electronics routes', () => {
+    const routeKeys = new Set(samples.samples.map(sample => (
+        `${sample.origin_country}->${sample.import_country}:${sample.hs_code}`
+    )));
+
+    [
+        'CN->US:850760',
+        'CN->US:851762',
+        'CN->US:8525',
+        'CN->EU:847130',
+        'CN->DE:850760',
+        'US->NL:8542',
+        'US->MX:850440',
+        'US->JP:851713',
+        'US->KR:851762',
+        'US->VN:847130',
+        'US->MY:850440'
+    ].forEach((key) => {
+        assert.equal(routeKeys.has(key), true, `${key} should be in priority Post-Entry samples`);
+    });
 });
 
 test('priority Post-Entry HS matrix has no uncovered cells', () => {
@@ -135,17 +165,25 @@ test('Russia sample keeps sanctions scope as a review-only flag', () => {
 test('non-US benchmark samples stay non-official except EU TARIC candidate rows', () => {
     const result = runDutyRateHealthCheck();
     const nonUsSamples = result.samples.filter(sample => !sample.id.startsWith('PE-US-'));
-    const officialEuSamples = result.samples.filter(sample => sample.id.startsWith('PE-EU-'));
+    const officialTaricSamples = result.samples.filter(sample => (
+        sample.id.startsWith('PE-EU-')
+        || sample.id.startsWith('PE-DE-')
+        || sample.id.startsWith('PE-NL-')
+    ));
 
     assert.ok(nonUsSamples.length > 0);
-    assert.ok(officialEuSamples.some(sample => sample.source_statuses.includes('official_source_checked')));
+    assert.ok(officialTaricSamples.some(sample => sample.source_statuses.includes('official_source_checked')));
     nonUsSamples.forEach((sample) => {
         assert.equal(
             sample.source_statuses.includes('indicative') || sample.source_statuses.includes('benchmark_source_checked'),
             true,
             `${sample.id} should remain indicative or benchmark-checked`
         );
-        if (sample.id.startsWith('PE-EU-')) {
+        if (
+            sample.id.startsWith('PE-EU-')
+            || sample.id.startsWith('PE-DE-')
+            || sample.id.startsWith('PE-NL-')
+        ) {
             return;
         }
         assert.equal(sample.source_statuses.includes('official_source_checked'), false, `${sample.id} should not be official`);

@@ -152,6 +152,28 @@ function buildComplianceUrl(hscode) {
     return `index.html?${params.toString()}`;
 }
 
+function buildPostEntryUrl() {
+    const params = new URLSearchParams();
+    const focus = selectedComplianceFocus || 'import';
+    const exportCode = lastClassification?.origin_export_code || lastClassification?.china_code || lastHsCode || '';
+    const importCode = lastClassification?.destination_import_code || lastClassification?.counterparty_code || lastHsCode || '';
+    const selectedCode = focus === 'export' ? exportCode : importCode;
+    const hsDigits = String(selectedCode || lastHs6 || '').replace(/\D/g, '');
+
+    params.set('from', selectedFromCountry || 'CN');
+    params.set('to', selectedToCountry || 'US');
+    params.set('focus', focus);
+    if (hsDigits) {
+        params.set('hs', hsDigits);
+    }
+    if (lastClassification?.official_name) {
+        params.set('product', lastClassification.official_name);
+    } else if (lastProductDescription) {
+        params.set('product', lastProductDescription.slice(0, 120));
+    }
+    return `post-entry.html?${params.toString()}`;
+}
+
 function ensureComplianceChecklistContainer() {
     let container = document.getElementById('compliance-checklist-container');
     if (container) {
@@ -327,6 +349,14 @@ function goToComplianceCheck() {
     window.location.href = buildComplianceUrl(lastHsCode);
 }
 
+function goToPostEntryReview() {
+    if (!lastHsCode && !lastHs6) {
+        alert('No HS Code available yet. Please run classification first.');
+        return;
+    }
+    window.location.href = buildPostEntryUrl();
+}
+
 async function classifyProduct() {
     if (classifyInFlight) {
         return;
@@ -429,6 +459,7 @@ function bindHsCodePage() {
     const form = document.getElementById('hscode-form');
     const textarea = document.getElementById('hscode-description');
     const risksBtn = document.getElementById('hscode-check-risks-btn');
+    const postEntryBtn = document.getElementById('hscode-post-entry-btn');
     const reportBtn = document.getElementById('hscode-download-report-btn');
 
     bindDirectionToggle();
@@ -442,6 +473,10 @@ function bindHsCodePage() {
 
     if (risksBtn) {
         risksBtn.addEventListener('click', goToComplianceCheck);
+    }
+
+    if (postEntryBtn) {
+        postEntryBtn.addEventListener('click', goToPostEntryReview);
     }
 
     if (reportBtn) {

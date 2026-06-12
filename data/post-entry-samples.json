@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-07",
+  "updated_at": "2026-06-12",
   "notes": "High-frequency Post-Entry Check samples used to verify value math, duty-rate coverage, and source-status behavior. Amounts are synthetic test values, not customer data.",
   "samples": [
     {
@@ -61,7 +61,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0
+      "expect_min_total_rate": 0,
+      "expect_source_statuses": [
+        "official_source_checked"
+      ]
     },
     {
       "id": "PE-EU-CN-EVCHARGER-850440",
@@ -78,7 +81,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.02
+      "expect_min_total_rate": 0.02,
+      "expect_source_statuses": [
+        "official_source_checked"
+      ]
     },
     {
       "id": "PE-EU-US-BATTERY-850760",
@@ -116,7 +122,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.09
+      "expect_min_total_rate": 0.09,
+      "expect_source_statuses": [
+        "benchmark_source_checked"
+      ]
     },
     {
       "id": "PE-MX-CN-TABLET-847130",
@@ -133,7 +142,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.16
+      "expect_min_total_rate": 0.16,
+      "expect_source_statuses": [
+        "benchmark_source_checked"
+      ]
     },
     {
       "id": "PE-JP-CN-POWER-850440",
@@ -150,7 +162,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.1
+      "expect_min_total_rate": 0.1,
+      "expect_source_statuses": [
+        "benchmark_source_checked"
+      ]
     },
     {
       "id": "PE-KR-CN-SEMICON-8542",
@@ -167,7 +182,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.1
+      "expect_min_total_rate": 0.1,
+      "expect_source_statuses": [
+        "benchmark_source_checked"
+      ]
     },
     {
       "id": "PE-CN-US-GPU-8542",
@@ -184,7 +202,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.2
+      "expect_min_total_rate": 0.2,
+      "expect_source_statuses": [
+        "indicative"
+      ]
     },
     {
       "id": "PE-VN-CN-ROUTER-851762",
@@ -201,7 +222,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.1
+      "expect_min_total_rate": 0.1,
+      "expect_source_statuses": [
+        "indicative"
+      ]
     },
     {
       "id": "PE-MY-CN-BATTERY-850760",
@@ -218,7 +242,10 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.1
+      "expect_min_total_rate": 0.1,
+      "expect_source_statuses": [
+        "indicative"
+      ]
     },
     {
       "id": "PE-TW-CN-SEMICON-8542",
@@ -235,7 +262,205 @@
       "other_charges": 0,
       "declared_duty": 0,
       "expect_covered": true,
-      "expect_min_total_rate": 0.05
+      "expect_min_total_rate": 0.05,
+      "expect_source_statuses": [
+        "indicative"
+      ]
+    },
+    {
+      "id": "PE-US-CN-ROUTER-851762",
+      "product": "wireless router wifi telecom equipment",
+      "focus": "import",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "851762",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 4200,
+      "freight": 180,
+      "insurance": 30,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_min_total_rate": 0.07,
+      "expect_source_statuses": [
+        "official_source_checked",
+        "indicative"
+      ]
+    },
+    {
+      "id": "PE-US-CN-IPCAM-8525",
+      "product": "ip camera network storage video transmission equipment",
+      "focus": "import",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "8525",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 3600,
+      "freight": 220,
+      "insurance": 35,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_min_total_rate": 0.07,
+      "expect_source_statuses": [
+        "official_source_checked",
+        "indicative"
+      ]
+    },
+    {
+      "id": "PE-EU-CN-TABLET-847130",
+      "product": "tablet computer with wireless module",
+      "focus": "import",
+      "origin_country": "CN",
+      "import_country": "EU",
+      "hs_code": "847130",
+      "incoterm": "FOB",
+      "currency": "EUR",
+      "declared_amount": 9500,
+      "freight": 450,
+      "insurance": 60,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "scope_check_required",
+        "indicative"
+      ]
+    },
+    {
+      "id": "PE-DE-CN-BATTERY-850760",
+      "product": "energy storage lithium-ion battery system",
+      "focus": "import",
+      "origin_country": "CN",
+      "import_country": "DE",
+      "hs_code": "850760",
+      "incoterm": "FOB",
+      "currency": "EUR",
+      "declared_amount": 11000,
+      "freight": 650,
+      "insurance": 90,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "official_source_checked"
+      ]
+    },
+    {
+      "id": "PE-NL-US-SEMICON-8542",
+      "product": "semiconductor chip import classification",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "NL",
+      "hs_code": "8542",
+      "incoterm": "FOB",
+      "currency": "EUR",
+      "declared_amount": 18000,
+      "freight": 700,
+      "insurance": 95,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "official_source_checked"
+      ]
+    },
+    {
+      "id": "PE-MX-US-EVCHARGER-850440",
+      "product": "EV charger power conversion equipment",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "MX",
+      "hs_code": "850440",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 7200,
+      "freight": 300,
+      "insurance": 50,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "benchmark_source_checked"
+      ]
+    },
+    {
+      "id": "PE-JP-US-SMARTPHONE-851713",
+      "product": "smartphone 5G cellular",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "JP",
+      "hs_code": "851713",
+      "incoterm": "FOB",
+      "currency": "JPY",
+      "declared_amount": 1300000,
+      "freight": 60000,
+      "insurance": 7000,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "benchmark_source_checked"
+      ]
+    },
+    {
+      "id": "PE-KR-US-ROUTER-851762",
+      "product": "wireless router wifi telecom equipment",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "KR",
+      "hs_code": "851762",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 5200,
+      "freight": 240,
+      "insurance": 35,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "benchmark_source_checked"
+      ]
+    },
+    {
+      "id": "PE-VN-US-TABLET-847130",
+      "product": "tablet computer with wireless module",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "VN",
+      "hs_code": "847130",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 6800,
+      "freight": 360,
+      "insurance": 45,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "indicative"
+      ]
+    },
+    {
+      "id": "PE-MY-US-POWER-850440",
+      "product": "power adapter charger coa",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "MY",
+      "hs_code": "850440",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 5400,
+      "freight": 260,
+      "insurance": 35,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_source_statuses": [
+        "indicative"
+      ]
     },
     {
       "id": "PE-RU-CN-ELECTRONICS-851762",

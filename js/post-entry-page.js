@@ -1019,6 +1019,43 @@
         });
     }
 
+    function normalizeCountryParam(value) {
+        const registry = getRegistryApi();
+        if (registry?.normalizeCountryCode) {
+            return registry.normalizeCountryCode(value || '');
+        }
+        return String(value || '').trim().toUpperCase();
+    }
+
+    function applyPostEntryQueryParams() {
+        const params = new URLSearchParams(global.location?.search || '');
+        if (!params.toString()) return;
+        const from = normalizeCountryParam(params.get('from') || params.get('origin') || '');
+        const to = normalizeCountryParam(params.get('to') || params.get('import') || params.get('country') || '');
+        const focus = String(params.get('focus') || '').toLowerCase();
+        const hs = String(params.get('hs') || params.get('hscode') || params.get('hs_code') || '').replace(/\D/g, '');
+        const entryDate = params.get('entryDate') || params.get('entry_date') || '';
+
+        if (from) {
+            const origin = $('post-entry-origin-country');
+            if (origin) origin.value = from;
+        }
+        if (to) {
+            const destination = $('post-entry-import-country');
+            if (destination) destination.value = to;
+        }
+        if (hs) {
+            const hsInput = $('post-entry-hs-code');
+            if (hsInput) hsInput.value = hs;
+        }
+        if (focus === 'import' || focus === 'export') {
+            setPostEntryFocus(focus);
+        }
+        if (/^\d{2}\s\/\s\d{2}\s\/\s\d{2}$/.test(entryDate)) {
+            setEntryDateParts(entryDate);
+        }
+    }
+
     function saveReviewSnapshot(snapshot) {
         try {
             sessionStorage.setItem(POST_ENTRY_REVIEW_STORAGE_KEY, JSON.stringify(snapshot));
@@ -1250,6 +1287,7 @@
         bindEntryDateMask();
         bindPostEntryFocusToggle();
         bindPostEntrySamples();
+        applyPostEntryQueryParams();
         bindForm();
     }
 
