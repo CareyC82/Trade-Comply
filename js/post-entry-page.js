@@ -376,50 +376,6 @@
         };
     }
 
-    function formatSignedMoney(value, currency) {
-        const amount = Number(value || 0);
-        if (Math.abs(amount) < 0.01) return formatMoney(0, currency);
-        const formatted = formatMoney(Math.abs(amount), currency);
-        return amount < 0 ? `-${formatted}` : formatted;
-    }
-
-    function buildClientSummary(result, dutyImpact, currency, focus, actionText) {
-        const valueDifference = focus === 'export'
-            ? result.exportRebateBase - result.declaredAmount
-            : result.difference;
-        const valueTone = Math.abs(valueDifference) > 0.01 ? 'review' : 'clear';
-        const summary = {
-            valueGap: {
-                tone: valueTone,
-                label: `${formatSignedMoney(valueDifference, currency)}${result.declaredAmount ? ` (${formatPercent(Math.abs(valueDifference) / result.declaredAmount * 100)})` : ''}`
-            },
-            dutyGap: {
-                tone: 'neutral',
-                label: focus === 'export' ? 'Not applicable' : '—'
-            },
-            action: {
-                tone: valueTone,
-                label: actionText || 'Keep support with the entry file.'
-            }
-        };
-
-        if (focus === 'import') {
-            if (!dutyImpact?.covered) {
-                summary.dutyGap = {
-                    tone: 'not-covered',
-                    label: 'Rate not covered'
-                };
-            } else {
-                const gap = Number(dutyImpact.dutyVariance || 0);
-                summary.dutyGap = {
-                    tone: Math.abs(gap) > 0.01 ? 'review' : 'clear',
-                    label: `${formatSignedMoney(gap, currency)}`
-                };
-            }
-        }
-        return summary;
-    }
-
     function buildCoverageNote(items = []) {
         const level = getSourceCoverageLevel(items);
         if (level === 'official_source_checked') {
@@ -774,7 +730,6 @@
                     compliance: exportReview.complianceMeaning,
                     action: exportAction
                 },
-                clientSummary: buildClientSummary(result, null, currency, focus, exportAction),
                 sourceBreakdown: [{
                     label: exportReview.label || 'Export filing review',
                     status: exportReview.covered ? 'review_basis' : 'not_covered',
@@ -824,7 +779,6 @@
                 compliance: valueApi.buildComplianceMeaning(result, context),
                 action
             },
-            clientSummary: buildClientSummary(result, dutyImpact, currency, focus, action),
             sourceBreakdown: dutyImpact.sourceBreakdown || [],
             coverageNote: [buildCoverageNote(dutyImpact.sourceBreakdown || []), buildJurisdictionScopeNote(context)].filter(Boolean).join(' '),
             rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
@@ -879,22 +833,6 @@
             if (customLabel) customLabel.textContent = snapshot.labels.customsValue || customLabel.textContent;
             if (rebateLabel) rebateLabel.textContent = snapshot.labels.rebateBase || rebateLabel.textContent;
             if (diffLabel) diffLabel.textContent = snapshot.labels.difference || diffLabel.textContent;
-        }
-        const summary = snapshot.clientSummary || {};
-        const valueGap = $('post-entry-summary-value-gap');
-        const dutyGap = $('post-entry-summary-duty-gap');
-        const summaryAction = $('post-entry-summary-action');
-        if (valueGap) {
-            valueGap.textContent = summary.valueGap?.label || snapshot.values?.difference || '—';
-            valueGap.parentElement.className = `post-entry-client-summary-card post-entry-client-summary-card--${summary.valueGap?.tone || 'neutral'}`;
-        }
-        if (dutyGap) {
-            dutyGap.textContent = summary.dutyGap?.label || snapshot.importMetrics?.dutyGap || (snapshot.focus === 'export' ? 'Not applicable' : '—');
-            dutyGap.parentElement.className = `post-entry-client-summary-card post-entry-client-summary-card--${summary.dutyGap?.tone || 'neutral'}`;
-        }
-        if (summaryAction) {
-            summaryAction.textContent = summary.action?.label || snapshot.insights?.action || 'Keep support with the entry file.';
-            summaryAction.parentElement.className = `post-entry-client-summary-card post-entry-client-summary-card--action post-entry-client-summary-card--${summary.action?.tone || 'neutral'}`;
         }
         $('post-entry-customs-value').textContent = snapshot.values?.customsValue || '—';
         $('post-entry-rebate-base').textContent = snapshot.values?.rebateBase || '—';
