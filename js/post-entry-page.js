@@ -1,6 +1,13 @@
 (function (global) {
     let selectedPostEntryFocus = '';
     const POST_ENTRY_REVIEW_STORAGE_KEY = 'tracewize.postEntry.review';
+    const POST_ENTRY_SAMPLE_SCENARIOS = [
+        { id: 'cn-us-import-battery', label: 'CN -> US import battery', focus: 'import', originCountry: 'CN', importCountry: 'US', entryDate: '06 / 12 / 26', hsCode: '850760', incoterm: 'FOB', currency: 'USD', declaredAmount: 2000, freight: 100, insurance: 20, otherCharges: 0, declaredDuty: 0 },
+        { id: 'us-eu-import-battery', label: 'US -> EU import battery', focus: 'import', originCountry: 'US', importCountry: 'EU', entryDate: '06 / 12 / 26', hsCode: '850760', incoterm: 'FOB', currency: 'EUR', declaredAmount: 1200, freight: 200, insurance: 40, otherCharges: 0, declaredDuty: 0 },
+        { id: 'cn-us-export-rebate', label: 'CN -> US export rebate', focus: 'export', originCountry: 'CN', importCountry: 'US', entryDate: '06 / 12 / 26', hsCode: '8542', incoterm: 'CIF', currency: 'USD', declaredAmount: 5000, freight: 300, insurance: 50, otherCharges: 0, declaredDuty: 0 },
+        { id: 'us-jp-export-filing', label: 'US -> JP export filing', focus: 'export', originCountry: 'US', importCountry: 'JP', entryDate: '06 / 12 / 26', hsCode: '851762', incoterm: 'FOB', currency: 'USD', declaredAmount: 3000, freight: 150, insurance: 20, otherCharges: 0, declaredDuty: 0 },
+        { id: 'de-us-export-filing', label: 'DE -> US export filing', focus: 'export', originCountry: 'DE', importCountry: 'US', entryDate: '06 / 12 / 26', hsCode: '850440', incoterm: 'EXW', currency: 'EUR', declaredAmount: 8000, freight: 500, insurance: 80, otherCharges: 120, declaredDuty: 0 }
+    ];
 
     function $(id) {
         return document.getElementById(id);
@@ -184,6 +191,10 @@
             indicative: 'Internal benchmark only',
             scope_check_required: 'Official heading benchmark',
             flag_only: 'Scope check required',
+            exact_hs_required: 'Exact HS required',
+            export_review_only: 'Export filing review only',
+            regional_route_not_exact_rate: 'Regional review only',
+            sanctions_scope_separate: 'Sanctions scope separate',
             not_covered: 'Not covered',
             review_basis: 'Review basis'
         };
@@ -198,6 +209,10 @@
             indicative: 'Maintained by TraceWize as an internal benchmark; useful for screening, not a final tariff lookup.',
             scope_check_required: 'The amount depends on exact tariff line, case scope, exclusion, origin, or product-specific facts.',
             flag_only: 'The amount depends on case scope, exclusion, origin, or product-specific facts.',
+            exact_hs_required: 'A rate source exists, but the final rate requires the exact 10-digit HS/CN code and filing date.',
+            export_review_only: 'This is export-side filing and value review, not an import-duty calculation.',
+            regional_route_not_exact_rate: 'Regional route review is available, but exact country filing and tariff treatment must be selected for rate work.',
+            sanctions_scope_separate: 'Ordinary value math is separate from sanctions, restricted-party, and export-control scope.',
             not_covered: 'No maintained local rate exists for this route and HS prefix yet.',
             review_basis: 'Value logic is available; local filing correction rules still need confirmation.'
         };
@@ -208,7 +223,8 @@
         const status = item.status || 'indicative';
         const detail = `${item.detail || ''} ${item.source || ''}`.toLowerCase();
         if (status === 'not_covered') return 'not_covered';
-        if (status === 'review_basis') return 'review_basis';
+        if (['review_basis', 'export_review_only', 'regional_route_not_exact_rate', 'sanctions_scope_separate'].includes(status)) return status;
+        if (status === 'exact_hs_required') return 'exact_hs_required';
         if (status === 'scope_check_required' || status === 'flag_only') return 'official_heading_benchmark';
         if (status === 'benchmark_source_checked' || status === 'indicative') return 'benchmark_source_checked';
         if (status === 'official_source_checked') {
@@ -227,7 +243,11 @@
             benchmark_source_checked: 'Internal benchmark only',
             indicative: 'Internal benchmark only',
             not_covered: 'Not covered',
-            review_basis: 'Review basis'
+            review_basis: 'Review basis',
+            exact_hs_required: 'Exact HS required',
+            export_review_only: 'Export filing review only',
+            regional_route_not_exact_rate: 'Regional review only',
+            sanctions_scope_separate: 'Sanctions scope separate'
         };
         return labels[tier] || labels.indicative;
     }
@@ -241,6 +261,10 @@
         }
         if (tiers.has('official_source_checked')) return 'mixed';
         if (tiers.has('benchmark_source_checked')) return 'benchmark_source_checked';
+        if (tiers.has('exact_hs_required')) return 'exact_hs_required';
+        if (tiers.has('export_review_only')) return 'export_review_only';
+        if (tiers.has('regional_route_not_exact_rate')) return 'regional_route_not_exact_rate';
+        if (tiers.has('sanctions_scope_separate')) return 'sanctions_scope_separate';
         return tiers.has('review_basis') ? 'review_basis' : 'indicative';
     }
 
@@ -293,6 +317,26 @@
                 label: 'Review basis only',
                 summary: 'This result provides filing-value review logic, not destination import duty math.'
             },
+            exact_hs_required: {
+                tone: 'scope',
+                label: 'Exact HS required',
+                summary: 'The rebate/tax rate cannot be finalized from a 4-6 digit prefix. Use exact 10-digit HS/CN code and filing date.'
+            },
+            export_review_only: {
+                tone: 'review',
+                label: 'Export filing review only',
+                summary: 'This checks export filing value and correction posture. It is not an import duty or final export tax calculation.'
+            },
+            regional_route_not_exact_rate: {
+                tone: 'review',
+                label: 'Regional review only',
+                summary: 'The route is regional. Select a specific country for exact filing and rate work.'
+            },
+            sanctions_scope_separate: {
+                tone: 'scope',
+                label: 'Sanctions scope separate',
+                summary: 'Value math is separate from sanctions, restricted-party, and export-control scope.'
+            },
             indicative: {
                 tone: 'indicative',
                 label: 'Indicative only',
@@ -322,7 +366,8 @@
         const officialRows = rows.filter(item => normalizeRateTier(item) === 'official_source_checked');
         const benchmarkRows = rows.filter(item => normalizeRateTier(item) === 'benchmark_source_checked');
         const scopeRows = rows.filter(item => normalizeRateTier(item) === 'official_heading_benchmark');
-        const reviewRows = rows.filter(item => normalizeRateTier(item) === 'review_basis');
+        const reviewRows = rows.filter(item => ['review_basis', 'export_review_only', 'regional_route_not_exact_rate', 'sanctions_scope_separate'].includes(normalizeRateTier(item)));
+        const exactHsRows = rows.filter(item => normalizeRateTier(item) === 'exact_hs_required');
 
         if (hasScopeCheck) {
             const target = scopeRows[0] || base || {};
@@ -333,11 +378,20 @@
                 detail: target.detail || target.source || 'The exact 8-10 digit tariff line can change the rate.'
             };
         }
+        if (exactHsRows.length) {
+            const target = exactHsRows[0] || {};
+            return {
+                tone: 'scope',
+                label: 'Exact HS required',
+                title: 'Rebate rate is not final until exact 10-digit HS/CN is checked.',
+                detail: target.detail || 'The page calculates export rebate base only; final rebate rate must come from the official rebate library.'
+            };
+        }
         if (reviewRows.length) {
             const target = reviewRows[0] || {};
             return {
                 tone: 'mixed',
-                label: 'Export filing review',
+                label: getRateTierLabel(normalizeRateTier(target)),
                 title: target.detail || 'Export-side value review is available for this route.',
                 detail: 'This result checks declared value logic and correction posture. It does not calculate destination import duty.'
             };
@@ -392,6 +446,18 @@
         }
         if (level === 'not_covered') {
             return 'Rate basis: not covered; value math only.';
+        }
+        if (level === 'exact_hs_required') {
+            return 'Export basis: rebate base calculated; exact 10-digit HS/CN required for final rate.';
+        }
+        if (level === 'export_review_only') {
+            return 'Export basis: filing-value review only; no import duty calculation.';
+        }
+        if (level === 'regional_route_not_exact_rate') {
+            return 'Export basis: regional review only; select a specific country for exact rate work.';
+        }
+        if (level === 'sanctions_scope_separate') {
+            return 'Export basis: filing-value review only; sanctions/export-control scope is separate.';
         }
         if (level === 'review_basis') {
             return 'Rate basis: export filing value logic only.';
@@ -497,9 +563,14 @@
                 rows: rows.filter(item => normalizeRateTier(item) === 'benchmark_source_checked')
             },
             {
+                label: 'Exact HS required',
+                status: 'exact_hs_required',
+                rows: rows.filter(item => normalizeRateTier(item) === 'exact_hs_required')
+            },
+            {
                 label: 'Export filing review',
                 status: 'review_basis',
-                rows: rows.filter(item => normalizeRateTier(item) === 'review_basis')
+                rows: rows.filter(item => ['review_basis', 'export_review_only', 'regional_route_not_exact_rate', 'sanctions_scope_separate'].includes(normalizeRateTier(item)))
             },
             {
                 label: 'Rate not covered',
@@ -532,8 +603,12 @@
                         : (first.detail || 'Internal benchmark used because no exact official route / HS rate is attached yet.');
                 }
                 if (group.status === 'review_basis') {
-                    source = 'Export-side filing logic';
+                    source = first.source || 'Export-side filing logic';
                     detail = first.detail || 'Review declared value, correction posture, and retained evidence for the origin-side filing.';
+                }
+                if (group.status === 'exact_hs_required') {
+                    source = first.source || 'Official rebate library check';
+                    detail = first.detail || 'Exact 10-digit HS/CN code and filing date are required before using a final rebate rate.';
                 }
                 if (group.status === 'not_covered') {
                     source = 'No maintained rate';
@@ -626,6 +701,35 @@
         return 'No obvious export filing value gap from the entered Incoterm and charges.';
     }
 
+    function getExportSourceStatus(exportReview, context = {}) {
+        const origin = String(context.originCountryCode || '').toUpperCase();
+        if (origin === 'CN') return 'exact_hs_required';
+        if (origin === 'ASEAN') return 'regional_route_not_exact_rate';
+        if (origin === 'RU') return 'sanctions_scope_separate';
+        return exportReview.covered ? 'export_review_only' : 'not_covered';
+    }
+
+    function buildExportSourceRow(exportReview, context = {}) {
+        const status = getExportSourceStatus(exportReview, context);
+        const origin = String(context.originCountryCode || '').toUpperCase();
+        if (origin === 'CN') {
+            return {
+                label: 'China export VAT rebate basis',
+                status,
+                source: 'Official rebate library by exact HS/CN',
+                detail: 'Export rebate base is calculated here; final rebate rate requires exact 10-digit HS/CN code and filing date.',
+                url: 'https://www.chinatax.gov.cn/'
+            };
+        }
+        return {
+            label: exportReview.label || 'Export filing review',
+            status,
+            source: 'Origin-side export filing review',
+            detail: exportReview.impact || 'Confirm export declaration requirements for the origin country.',
+            url: ''
+        };
+    }
+
     function buildValuationLogic(result, currency, focus) {
         const charges = buildChargeList(result);
         if (focus === 'export') {
@@ -709,6 +813,7 @@
 
         if (focus === 'export') {
             const exportReview = valueApi.buildExportPostEntryReview(result, context);
+            const exportSourceRow = buildExportSourceRow(exportReview, context);
             const exportDifference = result.exportRebateBase - result.declaredAmount;
             const exportDiffPercent = result.declaredAmount ? Math.abs(exportDifference) / result.declaredAmount * 100 : 100;
             const exportRisk = getValueGapRisk(exportDiffPercent, result.declaredAmount);
@@ -730,24 +835,10 @@
                     compliance: exportReview.complianceMeaning,
                     action: exportAction
                 },
-                sourceBreakdown: [{
-                    label: exportReview.label || 'Export filing review',
-                    status: exportReview.covered ? 'review_basis' : 'not_covered',
-                    source: focus === 'export' ? 'Stored export-side post-entry rule' : 'Stored post-entry rule',
-                    detail: exportReview.impact || 'Confirm export declaration requirements for the origin country.',
-                    url: ''
-                }],
-                coverageNote: buildCoverageNote([{
-                    status: exportReview.covered ? 'review_basis' : 'not_covered'
-                }]),
-                rateConfidence: buildRateConfidence([{
-                    status: exportReview.covered ? 'review_basis' : 'not_covered'
-                }]),
-                rateDecision: buildRateDecisionSummary([{
-                    label: exportReview.label || 'Export filing review',
-                    status: exportReview.covered ? 'review_basis' : 'not_covered',
-                    detail: exportReview.impact || 'Confirm export declaration requirements for the origin country.'
-                }]),
+                sourceBreakdown: [exportSourceRow],
+                coverageNote: buildCoverageNote([exportSourceRow]),
+                rateConfidence: buildRateConfidence([exportSourceRow]),
+                rateDecision: buildRateDecisionSummary([exportSourceRow]),
                 evidence: exportReview.evidence
             };
         }
@@ -811,6 +902,19 @@
     function renderReviewSnapshot(snapshot) {
         if (!snapshot) return false;
         setResultModeLabels(snapshot.focus);
+        const isExport = snapshot.focus === 'export';
+        const title = $('post-entry-result-title');
+        if (title) title.textContent = isExport ? 'Export Filing Review Result' : 'Import Duty Review Result';
+        const confidenceKicker = $('post-entry-confidence-kicker');
+        if (confidenceKicker) confidenceKicker.textContent = isExport ? 'Review basis' : 'Rate confidence';
+        const sourceTitle = $('post-entry-source-title');
+        if (sourceTitle) sourceTitle.textContent = isExport ? 'Export review basis' : 'Rate source status';
+        const sourceNote = $('post-entry-source-note');
+        if (sourceNote) sourceNote.textContent = isExport
+            ? 'Export-side checks show filing-value and correction basis. Final rebate/tax rates are only shown when exact official coverage exists.'
+            : 'Official rate used when available. Exact tariff-line checks stay separate from benchmark estimates.';
+        const dutyImpactLabel = $('post-entry-duty-impact-label');
+        if (dutyImpactLabel) dutyImpactLabel.textContent = isExport ? 'Filing impact' : 'Duty impact';
         const subtitle = $('post-entry-result-subtitle');
         if (subtitle) subtitle.textContent = snapshot.subtitle || 'Post-entry review result.';
         const route = $('post-entry-result-route');
@@ -858,6 +962,61 @@
             requestAnimationFrame(() => resultSection.classList.add('is-visible'));
         }
         return true;
+    }
+
+    function setEntryDateParts(value) {
+        const parts = String(value || '').match(/^(\d{2})\s\/\s(\d{2})\s\/\s(\d{2})$/);
+        const ids = ['post-entry-date-month', 'post-entry-date-day', 'post-entry-date-year'];
+        ids.forEach((id, index) => {
+            const input = $(id);
+            if (input) input.value = parts ? parts[index + 1] : '';
+        });
+        const hidden = $('post-entry-date');
+        if (hidden) hidden.value = parts ? value : '';
+    }
+
+    function setPostEntryFocus(focus) {
+        selectedPostEntryFocus = focus || '';
+        const buttons = Array.from(document.querySelectorAll('[data-post-entry-focus]'));
+        buttons.forEach((button) => {
+            const active = button.dataset.postEntryFocus === selectedPostEntryFocus;
+            button.classList.toggle('is-active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
+    function fillPostEntryScenario(scenario) {
+        if (!scenario) return;
+        const setValue = (id, value) => {
+            const el = $(id);
+            if (el) el.value = value == null ? '' : String(value);
+        };
+        setValue('post-entry-origin-country', scenario.originCountry);
+        setValue('post-entry-import-country', scenario.importCountry);
+        setValue('post-entry-hs-code', scenario.hsCode);
+        setValue('post-entry-incoterm', scenario.incoterm);
+        setValue('post-entry-currency', scenario.currency);
+        setValue('post-entry-declared-amount', scenario.declaredAmount);
+        setValue('post-entry-freight', scenario.freight);
+        setValue('post-entry-insurance', scenario.insurance);
+        setValue('post-entry-other-charges', scenario.otherCharges);
+        setValue('post-entry-declared-duty', scenario.declaredDuty);
+        setEntryDateParts(scenario.entryDate);
+        setPostEntryFocus(scenario.focus);
+    }
+
+    function bindPostEntrySamples() {
+        const list = $('post-entry-sample-list');
+        if (!list) return;
+        list.innerHTML = '';
+        POST_ENTRY_SAMPLE_SCENARIOS.forEach((scenario) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'post-entry-sample-btn';
+            button.textContent = scenario.label;
+            button.addEventListener('click', () => fillPostEntryScenario(scenario));
+            list.appendChild(button);
+        });
     }
 
     function saveReviewSnapshot(snapshot) {
@@ -974,12 +1133,7 @@
         const buttons = Array.from(document.querySelectorAll('[data-post-entry-focus]'));
         buttons.forEach((button) => {
             button.addEventListener('click', () => {
-                selectedPostEntryFocus = button.dataset.postEntryFocus || '';
-                buttons.forEach((candidate) => {
-                    const active = candidate === button;
-                    candidate.classList.toggle('is-active', active);
-                    candidate.setAttribute('aria-pressed', active ? 'true' : 'false');
-                });
+                setPostEntryFocus(button.dataset.postEntryFocus || '');
             });
             button.setAttribute('aria-pressed', 'false');
         });
@@ -1095,6 +1249,7 @@
         clearEntryDate();
         bindEntryDateMask();
         bindPostEntryFocusToggle();
+        bindPostEntrySamples();
         bindForm();
     }
 

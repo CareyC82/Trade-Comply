@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post-Entry Value Check | TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260612-post-entry-dedupe">
+    <link rel="stylesheet" href="css/style.css?v=20260612-post-entry-modes">
 </head>
 <body class="post-entry-page-body">
     <main class="post-entry-page view-container active">
@@ -54,6 +54,10 @@
                         <span>Declared HS code</span>
                         <input id="post-entry-hs-code" class="post-entry-input" type="text" inputmode="numeric" placeholder="e.g. 850760" required>
                     </label>
+                </div>
+                <div class="post-entry-sample-block" aria-label="Post-entry sample scenarios">
+                    <span class="post-entry-focus-label">Sample scenarios</span>
+                    <div id="post-entry-sample-list" class="post-entry-sample-list"></div>
                 </div>
             </section>
 
@@ -125,6 +129,6 @@
         <span id="nav-post-entry" class="nav-btn active" aria-current="page">🧾 Post-Entry</span>
     </nav>
 
-    <script src="js/main.js?v=20260612-post-entry-dedupe" data-app="post-entry"></script>
+    <script src="js/main.js?v=20260612-post-entry-modes" data-app="post-entry"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post-Entry Result | TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260612-post-entry-dedupe">
+    <link rel="stylesheet" href="css/style.css?v=20260612-post-entry-modes">
 </head>
 <body class="post-entry-page-body">
     <main id="post-entry-result-page" class="post-entry-page view-container active">
@@ -22,7 +22,7 @@
         <section id="post-entry-result" class="post-entry-result post-entry-result--standalone" hidden aria-live="polite">
             <div class="post-entry-result-header">
                 <div>
-                    <h2 class="post-entry-result-title">Value Review Result</h2>
+                    <h2 id="post-entry-result-title" class="post-entry-result-title">Value Review Result</h2>
                     <p id="post-entry-result-subtitle" class="post-entry-result-subtitle">Estimated from entered Incoterm and cost components.</p>
                     <p id="post-entry-result-route" class="post-entry-result-route"></p>
                 </div>
@@ -78,7 +78,7 @@
                 <summary>View detailed calculation and source basis</summary>
                 <div id="post-entry-confidence-card" class="post-entry-confidence-card">
                     <div>
-                        <span class="post-entry-confidence-kicker">Rate confidence</span>
+                        <span id="post-entry-confidence-kicker" class="post-entry-confidence-kicker">Rate confidence</span>
                         <strong id="post-entry-confidence-label">—</strong>
                         <p id="post-entry-confidence-summary">—</p>
                     </div>
@@ -87,8 +87,8 @@
 
                 <div class="post-entry-source-card">
                     <div class="post-entry-source-header">
-                        <h3>Rate source status</h3>
-                        <span>Official rate used when available. Exact tariff-line checks stay separate from benchmark estimates.</span>
+                        <h3 id="post-entry-source-title">Rate source status</h3>
+                        <span id="post-entry-source-note">Official rate used when available. Exact tariff-line checks stay separate from benchmark estimates.</span>
                     </div>
                     <div id="post-entry-source-list" class="post-entry-source-list"></div>
                 </div>
@@ -104,7 +104,7 @@
                         <p id="post-entry-valuation-method">—</p>
                     </div>
                     <div class="post-entry-insight-card">
-                        <span class="post-entry-insight-kicker">Duty impact</span>
+                        <span id="post-entry-duty-impact-label" class="post-entry-insight-kicker">Duty impact</span>
                         <p id="post-entry-duty-impact">—</p>
                     </div>
                     <div class="post-entry-insight-card">
@@ -165,6 +165,6 @@
         <span id="nav-post-entry" class="nav-btn active" aria-current="page">🧾 Post-Entry</span>
     </nav>
 
-    <script src="js/main.js?v=20260612-post-entry-dedupe" data-app="post-entry"></script>
+    <script src="js/main.js?v=20260612-post-entry-modes" data-app="post-entry"></script>
 </body>
 </html>
