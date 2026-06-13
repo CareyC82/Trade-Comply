@@ -95,6 +95,7 @@ function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
         source_count: rows.length,
         status_counts: statusCounts,
         auto_updatable: rows.filter(source => source.source_status === 'auto_updatable').map(source => source.country),
+        hybrid_official_candidate: rows.filter(source => source.source_status === 'hybrid_official_candidate').map(source => source.country),
         benchmark_updatable: rows.filter(source => source.source_status === 'benchmark_updatable').map(source => source.country),
         updater_candidates: rows.filter(source => source.source_status === 'updater_candidate').map(source => source.country),
         official_link_only: rows.filter(source => source.source_status === 'official_link').map(source => source.country),
@@ -102,6 +103,47 @@ function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
         missing_coverage: missingCoverage,
         missing_roadmap: missingRoadmap
     };
+}
+
+function summarizeRuleSourceQuality(dutyPayload) {
+    const rows = Array.isArray(dutyPayload?.rules) ? dutyPayload.rules : [];
+    const byCountry = {};
+    rows.forEach((rule) => {
+        const country = String(rule.import_country || '').toUpperCase();
+        if (!country) return;
+        byCountry[country] ||= {
+            country,
+            rule_count: 0,
+            official_source_checked: 0,
+            scope_check_required: 0,
+            benchmark_source_checked: 0,
+            indicative: 0,
+            source_statuses: {}
+        };
+        const bucket = byCountry[country];
+        const status = rule.source_status || 'indicative';
+        bucket.rule_count += 1;
+        bucket.source_statuses[status] = (bucket.source_statuses[status] || 0) + 1;
+        if (status in bucket) {
+            bucket[status] += 1;
+        } else {
+            bucket.indicative += 1;
+        }
+    });
+    return Object.values(byCountry).map((row) => {
+        const officialOrScope = row.official_source_checked + row.scope_check_required;
+        const coverage_level = row.official_source_checked === row.rule_count
+            ? 'official_all'
+            : officialOrScope === row.rule_count
+                ? 'official_or_scope_all'
+                : row.benchmark_source_checked === row.rule_count
+                    ? 'benchmark_all'
+                    : 'mixed';
+        return {
+            ...row,
+            coverage_level
+        };
+    }).sort((a, b) => a.country.localeCompare(b.country));
 }
 
 function ruleMatchesPriority(rule, market, prefix) {
@@ -160,6 +202,7 @@ function runDutyRateHealthCheck() {
         duty_rate_summary: dutySummary,
         duty_rate_gap_matrix: dutyGapMatrix,
         source_roadmap_summary: sourceRoadmap,
+        source_quality_summary: summarizeRuleSourceQuality(dutyPayload),
         sample_count: samples.length,
         failed_sample_count: failures.length,
         failures: failures.concat(sourceFailures.map(error => ({ id: 'source-roadmap', failures: [error] }))),
@@ -183,5 +226,6 @@ module.exports = {
     buildDutyRateGapMatrix,
     runDutyRateHealthCheck,
     runSample,
+    summarizeRuleSourceQuality,
     summarizeSourceRoadmap
 };

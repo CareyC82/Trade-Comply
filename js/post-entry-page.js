@@ -179,12 +179,13 @@
     function getSourceStatusLabel(status) {
         const labels = {
             official_source_checked: 'Official exact rate',
-            official_heading_benchmark: 'Official heading only',
+            official_duty_tax_estimate: 'Official duty + tax estimate',
+            official_heading_benchmark: 'Official source, exact code needed',
             benchmark_source_checked: 'Pre-check estimate',
             indicative: 'Pre-check estimate',
-            scope_check_required: 'Official heading only',
-            flag_only: 'Scope check required',
-            exact_hs_required: 'Exact HS required',
+            scope_check_required: 'Official source, exact code needed',
+            flag_only: 'Official source, exact code needed',
+            exact_hs_required: 'Official source, exact code needed',
             export_review_only: 'Export filing review only',
             regional_route_not_exact_rate: 'Regional review only',
             sanctions_scope_separate: 'Sanctions scope separate',
@@ -221,7 +222,7 @@
         if (status === 'scope_check_required' || status === 'flag_only') return 'official_heading_benchmark';
         if (status === 'benchmark_source_checked' || status === 'indicative') return 'benchmark_source_checked';
         if (status === 'official_source_checked') {
-            if (/scope check|required|multiple|benchmark|prefix|\berga omnes\b|heading|chapter/.test(detail)) {
+            if (/scope check|required|multiple|benchmark|prefix|heading|chapter/.test(detail)) {
                 return 'official_heading_benchmark';
             }
             return 'official_source_checked';
@@ -232,17 +233,21 @@
     function getRateTierLabel(tier) {
         const labels = {
             official_source_checked: 'Official exact rate',
-            official_heading_benchmark: 'Official heading only',
+            official_heading_benchmark: 'Official source, exact code needed',
             benchmark_source_checked: 'Pre-check estimate',
             indicative: 'Pre-check estimate',
             not_covered: 'Not covered',
             review_basis: 'Review basis',
-            exact_hs_required: 'Exact HS required',
+            exact_hs_required: 'Official source, exact code needed',
             export_review_only: 'Export filing review only',
             regional_route_not_exact_rate: 'Regional review only',
             sanctions_scope_separate: 'Sanctions scope separate'
         };
         return labels[tier] || labels.indicative;
+    }
+
+    function isTaxEstimateLayer(item = {}) {
+        return /vat|gst|consumption_tax/i.test(item.component || '');
     }
 
     function getSourceCoverageLevel(items = []) {
@@ -252,7 +257,13 @@
         if (tiers.size && Array.from(tiers).every(status => status === 'official_source_checked')) {
             return 'official_source_checked';
         }
-        if (tiers.has('official_source_checked')) return 'mixed';
+        if (tiers.has('official_source_checked')) {
+            const nonOfficialRows = items.filter(item => normalizeRateTier(item) !== 'official_source_checked');
+            if (nonOfficialRows.length && nonOfficialRows.every(isTaxEstimateLayer)) {
+                return 'official_duty_tax_estimate';
+            }
+            return 'benchmark_source_checked';
+        }
         if (tiers.has('benchmark_source_checked')) return 'benchmark_source_checked';
         if (tiers.has('exact_hs_required')) return 'exact_hs_required';
         if (tiers.has('export_review_only')) return 'export_review_only';
@@ -285,10 +296,15 @@
                 label: 'Official exact rate',
                 summary: 'The displayed duty rate is backed by a maintained official source for this route / HS basis.'
             },
+            official_duty_tax_estimate: {
+                tone: 'official',
+                label: 'Official duty + tax estimate',
+                summary: 'The base duty is official-backed; tax layers such as VAT, GST, or consumption tax remain screening estimates.'
+            },
             official_heading_benchmark: {
                 tone: 'scope',
-                label: 'Official heading only',
-                summary: 'An official tariff source is attached, but the exact line or case scope can change the final rate.'
+                label: 'Official source, exact code needed',
+                summary: 'An official tariff source is attached, but the exact tariff code or case scope can change the final rate.'
             },
             benchmark_source_checked: {
                 tone: 'benchmark',
@@ -296,9 +312,9 @@
                 summary: 'This is a maintained screening estimate. Confirm the final tariff line before filing or correction.'
             },
             mixed: {
-                tone: 'mixed',
-                label: 'Mixed source basis',
-                summary: 'Official and benchmark layers are mixed. Use the result to identify the gap, then verify the non-official layers before correction.'
+                tone: 'benchmark',
+                label: 'Pre-check estimate',
+                summary: 'Some layers are not final official rates. Use the result to identify the gap, then verify the non-official layers before correction.'
             },
             not_covered: {
                 tone: 'not-covered',
@@ -312,7 +328,7 @@
             },
             exact_hs_required: {
                 tone: 'scope',
-                label: 'Exact HS required',
+                label: 'Official source, exact code needed',
                 summary: 'The rebate/tax rate cannot be finalized from a 4-6 digit prefix. Use exact 10-digit HS/CN code and filing date.'
             },
             export_review_only: {
@@ -366,7 +382,7 @@
             const target = scopeRows[0] || base || {};
             return {
                 tone: 'scope',
-                label: 'Official heading only',
+                label: 'Official source, exact code needed',
                 title: 'Use this as a benchmark, not a final payable duty.',
                 detail: target.detail || target.source || 'The exact 8-10 digit tariff line can change the rate.'
             };
@@ -375,7 +391,7 @@
             const target = exactHsRows[0] || {};
             return {
                 tone: 'scope',
-                label: 'Exact HS required',
+                label: 'Official source, exact code needed',
                 title: 'Rebate rate is not final until exact 10-digit HS/CN is checked.',
                 detail: target.detail || 'The page calculates export rebate base only; final rebate rate must come from the official rebate library.'
             };
@@ -390,19 +406,22 @@
             };
         }
         if (normalizeRateTier(base) === 'official_source_checked') {
+            const onlyTaxEstimates = benchmarkRows.length && benchmarkRows.every(isTaxEstimateLayer);
             return {
                 tone: 'official',
-                label: 'Official exact rate',
+                label: onlyTaxEstimates ? 'Official duty + tax estimate' : 'Official exact rate',
                 title: base.detail || 'Official duty rate matched for this route.',
-                detail: benchmarkRows.length
-                    ? 'The base duty is official-backed; benchmark tax or add-on layers are separated below.'
+                detail: onlyTaxEstimates
+                    ? 'The base duty is official-backed; VAT/GST/consumption-tax layers are separated as screening estimates.'
+                    : benchmarkRows.length
+                        ? 'The base duty is official-backed; benchmark tax or add-on layers are separated below.'
                     : 'Displayed duty layers are official-backed in the maintained source table.'
             };
         }
         if (officialRows.length) {
             return {
-                tone: 'mixed',
-                label: 'Mixed source basis',
+                tone: 'benchmark',
+                label: 'Pre-check estimate',
                 title: 'Some duty components are official-checked.',
                 detail: 'Review benchmark add-ons, taxes, or local layers before filing or correction.'
             };
@@ -428,20 +447,23 @@
         if (level === 'official_source_checked') {
             return 'Rate basis: official exact rate.';
         }
+        if (level === 'official_duty_tax_estimate') {
+            return 'Rate basis: official duty + tax estimate.';
+        }
         if (level === 'mixed') {
-            return 'Rate basis: official rate plus benchmark layers.';
+            return 'Rate basis: pre-check estimate.';
         }
         if (level === 'benchmark_source_checked') {
             return 'Rate basis: pre-check estimate.';
         }
         if (level === 'official_heading_benchmark') {
-            return 'Rate basis: official heading only; exact line can change the result.';
+            return 'Rate basis: official source, exact code needed.';
         }
         if (level === 'not_covered') {
             return 'Rate basis: not covered; value math only.';
         }
         if (level === 'exact_hs_required') {
-            return 'Export basis: rebate base calculated; exact 10-digit HS/CN required for final rate.';
+            return 'Export basis: official source, exact code needed.';
         }
         if (level === 'export_review_only') {
             return 'Export basis: filing-value review only; no import duty calculation.';

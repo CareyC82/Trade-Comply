@@ -50,6 +50,21 @@ test('priority Post-Entry samples keep expected source trust tiers', () => {
     });
 });
 
+test('Post-Entry source quality summary separates official, hybrid, and benchmark markets', () => {
+    const result = runDutyRateHealthCheck();
+    const qualityByCountry = new Map(result.source_quality_summary.map(item => [item.country, item]));
+
+    assert.equal(qualityByCountry.get('US').coverage_level, 'official_all');
+    ['EU', 'DE', 'NL'].forEach((country) => {
+        assert.equal(qualityByCountry.get(country).coverage_level, 'official_or_scope_all', country);
+        assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
+        assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-code gates`);
+    });
+    ['SG', 'MX', 'JP', 'KR'].forEach((country) => {
+        assert.equal(qualityByCountry.get(country).coverage_level, 'benchmark_all', country);
+    });
+});
+
 test('priority Post-Entry samples cover common global electronics routes', () => {
     const routeKeys = new Set(samples.samples.map(sample => (
         `${sample.origin_country}->${sample.import_country}:${sample.hs_code}`
@@ -60,8 +75,11 @@ test('priority Post-Entry samples cover common global electronics routes', () =>
         'CN->US:851762',
         'CN->US:8525',
         'CN->EU:847130',
+        'CN->EU:8471300000',
         'CN->DE:850760',
+        'US->DE:8528521000',
         'US->NL:8542',
+        'US->NL:8542310000',
         'US->MX:850440',
         'US->JP:851713',
         'US->KR:851762',

@@ -880,6 +880,10 @@
                     label: 'Official auto',
                     note: '机器可读官方税率源，自动同步可写入税率。'
                 },
+                hybrid_official_candidate: {
+                    label: 'Hybrid official',
+                    note: '部分 HS 可由官方解析器升级，部分仍需精确税号确认。'
+                },
                 benchmark_updatable: {
                     label: 'Benchmark auto',
                     note: '自动刷新 benchmark/官方入口状态；精确税率解析仍待完成。'
@@ -903,7 +907,7 @@
                     note: '未配置 source status。'
                 };
                 const hasProbe = Boolean(source.probe_command);
-                const parserPending = source.machine_readable === 'candidate' && source.source_status !== 'auto_updatable';
+                const parserPending = ['candidate', 'partial'].includes(source.machine_readable) && source.source_status !== 'auto_updatable';
                 return `
                 <div class="duty-source-grade-card">
                     <strong>${escapeHtml(source.country || '—')}</strong>
@@ -927,6 +931,7 @@
             const status = String(source.source_status || 'benchmark');
             const statusLabel = {
                 auto_updatable: 'AUTO',
+                hybrid_official_candidate: 'HYBRID OFFICIAL',
                 benchmark_updatable: 'BENCHMARK AUTO',
                 updater_candidate: 'CANDIDATE',
                 official_link: 'OFFICIAL LINK',

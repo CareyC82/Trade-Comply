@@ -63,7 +63,9 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.equal(roadmap.missing_coverage.length, 0);
     assert.equal(roadmap.missing_roadmap.length, 0);
     assert.ok(roadmap.auto_updatable.includes('US'));
-    assert.ok(roadmap.benchmark_updatable.includes('EU'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('EU'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('DE'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('NL'));
     assert.ok(roadmap.benchmark_updatable.includes('SG'));
     assert.ok(roadmap.benchmark_updatable.includes('MX'));
     assert.ok(roadmap.benchmark_updatable.includes('JP'));
@@ -90,7 +92,7 @@ test('duty-rate health check reports source roadmap status', () => {
     assert.deepEqual(result.source_roadmap_summary.missing_roadmap, []);
 });
 
-test('EU, Singapore, Mexico, Japan, and Korea updater probes are wired as benchmark writers', async () => {
+test('EU hybrid source and benchmark updater probes are wired by market', async () => {
     const eu = await probeEuTaricReadiness();
     const sg = probeSingaporeReadiness();
     const mx = probeMexicoReadiness();
@@ -100,7 +102,7 @@ test('EU, Singapore, Mexico, Japan, and Korea updater probes are wired as benchm
     assert.equal(eu.ok, true);
     assert.equal(eu.writes_rates, true);
     assert.equal(eu.writes_official_machine_rates, false);
-    assert.equal(eu.source_status, 'benchmark_updatable');
+    assert.equal(eu.source_status, 'hybrid_official_candidate');
     assert.ok(eu.maintained_hs_prefixes.includes('850440'));
     assert.equal(eu.official_probe.checked, false);
     assert.equal(eu.official_probe.machine_parser_ready, false);

@@ -141,6 +141,30 @@ test('keeps AD/CVD as a flag-only add-on layer', () => {
     assert.ok(duty.sourceBreakdown.some(source => /AD\/CVD/.test(source.label) && source.status === 'scope_check_required'));
 });
 
+test('uses exact TARIC override when a precise EU code is entered', () => {
+    const valueResult = calculatePostEntryValue({
+        incoterm: 'FOB',
+        declaredAmount: 3000,
+        freight: 120,
+        insurance: 20
+    });
+    const prefixDuty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'DE',
+        originCountryCode: 'CN',
+        hsCode: '8528'
+    });
+    const exactDuty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'DE',
+        originCountryCode: 'CN',
+        hsCode: '8528521000'
+    });
+
+    assert.ok(prefixDuty.sourceBreakdown.some(source => source.status === 'scope_check_required'));
+    assert.ok(exactDuty.sourceBreakdown.some(source => source.component === 'base_duty' && source.status === 'official_source_checked'));
+    assert.equal(exactDuty.baseRate, 0);
+    assert.equal(classifyRateSourceTrust(exactDuty.sourceBreakdown).level, 'official_duty_tax_estimate');
+});
+
 test('splits US duty source rows into general duty, Section 301, and scope flags', () => {
     const valueResult = calculatePostEntryValue({
         incoterm: 'FOB',
@@ -164,6 +188,10 @@ test('splits US duty source rows into general duty, Section 301, and scope flags
 test('classifies Post-Entry rate trust tiers', () => {
     assert.equal(classifyRateSourceTrust([{ status: 'official_source_checked' }]).level, 'official_exact');
     assert.equal(classifyRateSourceTrust([{ status: 'official_source_checked' }, { status: 'indicative' }]).level, 'mixed_official_estimate');
+    assert.equal(classifyRateSourceTrust([
+        { component: 'base_duty', status: 'official_source_checked' },
+        { component: 'import_vat', status: 'indicative' }
+    ]).level, 'official_duty_tax_estimate');
     assert.equal(classifyRateSourceTrust([{ status: 'scope_check_required' }]).level, 'official_heading_only');
     assert.equal(classifyRateSourceTrust([{ status: 'benchmark_source_checked' }]).level, 'precheck_estimate');
     assert.equal(classifyRateSourceTrust([{ status: 'not_covered' }]).level, 'not_covered');
@@ -199,6 +227,17 @@ test('builds direct import decision for official and benchmark rate sources', ()
     const sgDecision = buildImportPostEntryDecision(valueResult, sgDuty, { currency: 'USD' });
     assert.equal(sgDecision.trust.level, 'precheck_estimate');
     assert.match(sgDecision.coreConclusion, /Pre-check estimate/);
+
+    const euDuty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'EU',
+        originCountryCode: 'CN',
+        hsCode: '850760'
+    }, {
+        declaredDuty: 0
+    });
+    const euDecision = buildImportPostEntryDecision(valueResult, euDuty, { currency: 'EUR' });
+    assert.equal(euDecision.trust.level, 'official_duty_tax_estimate');
+    assert.match(euDecision.coreConclusion, /Official duty \+ tax estimate/);
 });
 
 test('loads duty rules from maintainable data file', () => {

@@ -64,6 +64,7 @@ function summarizeDutyHealth(dutyHealth) {
         rule_count: dutyHealth?.duty_rate_summary?.rule_count || 0,
         country_count: dutyHealth?.duty_rate_summary?.country_count || 0,
         source_count: dutyHealth?.source_roadmap_summary?.source_count || 0,
+        source_quality_summary: dutyHealth?.source_quality_summary || [],
         gap_matrix: gapMatrix,
         markets_missing_priority_hs: rows
             .filter((row) => (row.missing || []).length > 0)
