@@ -10,6 +10,8 @@ const {
     buildValuationMethod,
     buildComplianceMeaning,
     buildRecommendedAction,
+    classifyRateSourceTrust,
+    buildImportPostEntryDecision,
     buildExportPostEntryReview,
     buildEvidenceList
 } = require('../lib/post-entry-value');
@@ -157,6 +159,46 @@ test('splits US duty source rows into general duty, Section 301, and scope flags
     assert.ok(components.includes('ad_cvd'));
     assert.ok(duty.sourceBreakdown.some(source => source.label === 'General duty' && source.hts));
     assert.ok(duty.sourceBreakdown.every(source => 'lastCheckedAt' in source));
+});
+
+test('classifies Post-Entry rate trust tiers', () => {
+    assert.equal(classifyRateSourceTrust([{ status: 'official_source_checked' }]).level, 'official_exact');
+    assert.equal(classifyRateSourceTrust([{ status: 'official_source_checked' }, { status: 'indicative' }]).level, 'mixed_official_estimate');
+    assert.equal(classifyRateSourceTrust([{ status: 'scope_check_required' }]).level, 'official_heading_only');
+    assert.equal(classifyRateSourceTrust([{ status: 'benchmark_source_checked' }]).level, 'precheck_estimate');
+    assert.equal(classifyRateSourceTrust([{ status: 'not_covered' }]).level, 'not_covered');
+});
+
+test('builds direct import decision for official and benchmark rate sources', () => {
+    const valueResult = calculatePostEntryValue({
+        incoterm: 'FOB',
+        declaredAmount: 2000,
+        freight: 100,
+        insurance: 20
+    });
+    const usDuty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'US',
+        originCountryCode: 'CN',
+        hsCode: '850760'
+    }, {
+        declaredDuty: 0
+    });
+    const usDecision = buildImportPostEntryDecision(valueResult, usDuty, { currency: 'USD' });
+    assert.match(usDecision.coreConclusion, /Estimated duty shortfall/);
+    assert.match(usDecision.coreConclusion, /value gap/);
+    assert.equal(usDecision.trust.level, 'mixed_official_estimate');
+    assert.match(usDecision.nextAction, /screening alert/);
+
+    const sgDuty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'SG',
+        originCountryCode: 'CN',
+        hsCode: '851762'
+    }, {
+        declaredDuty: 0
+    });
+    const sgDecision = buildImportPostEntryDecision(valueResult, sgDuty, { currency: 'USD' });
+    assert.equal(sgDecision.trust.level, 'precheck_estimate');
+    assert.match(sgDecision.coreConclusion, /Pre-check estimate/);
 });
 
 test('loads duty rules from maintainable data file', () => {

@@ -2,32 +2,295 @@
   "schema_version": "1.0",
   "description": "Representative high-frequency product and trade-route samples used by the TraceWize search quality audit.",
   "samples": [
-    { "id": "cn-us-tablet-import", "from": "CN", "to": "US", "focus": "import", "vertical": "electronics", "query": "tablet computer wifi bluetooth battery" },
-    { "id": "cn-us-router-import", "from": "CN", "to": "US", "focus": "import", "vertical": "electronics", "query": "wireless router wifi telecom equipment", "expected_top_rule": "CL-USFCC-002" },
-    { "id": "cn-us-ip-camera-import", "from": "CN", "to": "US", "focus": "import", "vertical": "electronics", "query": "ip camera network storage wifi encryption" },
-    { "id": "cn-us-drone-import", "from": "CN", "to": "US", "focus": "import", "vertical": "electronics", "query": "drone uav under 2kg", "expected_top_rule": "CL-USDRONE-001" },
-    { "id": "cn-us-solar-import", "from": "CN", "to": "US", "focus": "import", "vertical": "new-energy", "query": "solar panel photovoltaic" },
-    { "id": "cn-us-ess-import", "from": "CN", "to": "US", "focus": "import", "vertical": "new-energy", "query": "energy storage battery system lithium battery", "expected_top_rule": "CL-USESS-001" },
-    { "id": "de-us-battery-export", "from": "DE", "to": "US", "focus": "export", "vertical": "new-energy", "query": "energy storage battery system" },
-    { "id": "us-de-ev-import", "from": "US", "to": "DE", "focus": "import", "vertical": "new-energy", "query": "ev charger wallbox charging station", "expected_top_rule": "CL-DEEV-001" },
-    { "id": "de-us-ev-import", "from": "DE", "to": "US", "focus": "import", "vertical": "new-energy", "query": "ev charger wallbox charging station" },
-    { "id": "nl-us-lithography-export", "from": "NL", "to": "US", "focus": "export", "vertical": "semiconductor", "query": "semiconductor lithography equipment" },
-    { "id": "sg-us-gpu-export", "from": "SG", "to": "US", "focus": "export", "vertical": "semiconductor", "query": "gpu ai accelerator chip" },
-    { "id": "us-sg-router-import", "from": "US", "to": "SG", "focus": "import", "vertical": "electronics", "query": "wireless router wifi telecom equipment" },
-    { "id": "us-sg-battery-import", "from": "US", "to": "SG", "focus": "import", "vertical": "new-energy", "query": "energy storage battery system", "expected_top_rule": "CL-SG-006" },
-    { "id": "sg-us-router-import", "from": "SG", "to": "US", "focus": "import", "vertical": "electronics", "query": "wireless router wifi telecom equipment" },
-    { "id": "us-mx-ev-import", "from": "US", "to": "MX", "focus": "import", "vertical": "new-energy", "query": "ev charger wallbox charging station" },
-    { "id": "mx-us-tablet-import", "from": "MX", "to": "US", "focus": "import", "vertical": "electronics", "query": "tablet computer spanish label warranty" },
-    { "id": "vn-us-router-export", "from": "VN", "to": "US", "focus": "export", "vertical": "electronics", "query": "wireless router wifi telecom equipment" },
-    { "id": "us-vn-router-import", "from": "US", "to": "VN", "focus": "import", "vertical": "electronics", "query": "vietnam wireless router wifi telecom equipment" },
-    { "id": "vn-us-router-import", "from": "VN", "to": "US", "focus": "import", "vertical": "electronics", "query": "vietnam wireless router wifi telecom equipment" },
-    { "id": "us-my-router-import", "from": "US", "to": "MY", "focus": "import", "vertical": "electronics", "query": "malaysia wireless router wifi telecom equipment" },
-    { "id": "my-us-router-import", "from": "MY", "to": "US", "focus": "import", "vertical": "electronics", "query": "malaysia wireless router wifi telecom equipment" },
-    { "id": "us-jp-pse-import", "from": "US", "to": "JP", "focus": "import", "vertical": "electronics", "query": "power adapter charger pse" },
-    { "id": "jp-us-pse-import", "from": "JP", "to": "US", "focus": "import", "vertical": "electronics", "query": "power adapter charger pse" },
-    { "id": "us-kr-kc-import", "from": "US", "to": "KR", "focus": "import", "vertical": "electronics", "query": "power adapter charger kc" },
-    { "id": "kr-us-kc-import", "from": "KR", "to": "US", "focus": "import", "vertical": "electronics", "query": "power adapter charger kc" },
-    { "id": "ru-us-ai-export", "from": "RU", "to": "US", "focus": "export", "vertical": "semiconductor", "query": "ai gpu accelerator export control" },
-    { "id": "us-eu-optical-import", "from": "US", "to": "EU", "focus": "import", "vertical": "semiconductor", "query": "optical transceiver laser telecom module", "expected_top_rule": "CL-EUOPTICAL-001" }
+    {
+      "id": "cn-us-tablet-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "tablet computer wifi bluetooth battery",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 5,
+      "expected_min_cases": 3,
+      "expected_inferred_selections": [
+        "wireless",
+        "battery"
+      ]
+    },
+    {
+      "id": "cn-us-router-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "wireless router wifi telecom equipment",
+      "expected_top_rule": "CL-USFCC-002",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 5,
+      "expected_min_cases": 3,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
+      "id": "cn-us-ip-camera-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "ip camera network storage wifi encryption",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 5,
+      "expected_min_cases": 3,
+      "expected_inferred_selections": [
+        "wireless",
+        "encryption"
+      ]
+    },
+    {
+      "id": "cn-us-drone-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "drone uav under 2kg",
+      "expected_top_rule": "CL-USDRONE-001",
+      "expected_min_rules": 6,
+      "expected_min_exact_rules": 6,
+      "expected_min_cases": 4,
+      "expected_inferred_selections": [
+        "uav",
+        "wireless",
+        "battery"
+      ]
+    },
+    {
+      "id": "cn-us-solar-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "solar panel photovoltaic",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 5,
+      "expected_min_cases": 2
+    },
+    {
+      "id": "cn-us-ess-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "energy storage battery system lithium battery",
+      "expected_top_rule": "CL-USESS-001",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 5,
+      "expected_min_cases": 4,
+      "expected_inferred_selections": [
+        "battery"
+      ]
+    },
+    {
+      "id": "de-us-battery-export",
+      "from": "DE",
+      "to": "US",
+      "focus": "export",
+      "vertical": "new-energy",
+      "query": "energy storage battery system"
+    },
+    {
+      "id": "us-de-ev-import",
+      "from": "US",
+      "to": "DE",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "ev charger wallbox charging station",
+      "expected_top_rule": "CL-DEEV-001",
+      "expected_min_rules": 6,
+      "expected_min_exact_rules": 6,
+      "expected_min_cases": 5
+    },
+    {
+      "id": "de-us-ev-import",
+      "from": "DE",
+      "to": "US",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "ev charger wallbox charging station"
+    },
+    {
+      "id": "nl-us-lithography-export",
+      "from": "NL",
+      "to": "US",
+      "focus": "export",
+      "vertical": "semiconductor",
+      "query": "semiconductor lithography equipment"
+    },
+    {
+      "id": "sg-us-gpu-export",
+      "from": "SG",
+      "to": "US",
+      "focus": "export",
+      "vertical": "semiconductor",
+      "query": "gpu ai accelerator chip"
+    },
+    {
+      "id": "us-sg-router-import",
+      "from": "US",
+      "to": "SG",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "wireless router wifi telecom equipment",
+      "expected_min_rules": 4,
+      "expected_min_exact_rules": 4,
+      "expected_min_cases": 3,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
+      "id": "us-sg-battery-import",
+      "from": "US",
+      "to": "SG",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "energy storage battery system",
+      "expected_top_rule": "CL-SG-006",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "sg-us-router-import",
+      "from": "SG",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "wireless router wifi telecom equipment"
+    },
+    {
+      "id": "us-mx-ev-import",
+      "from": "US",
+      "to": "MX",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "ev charger wallbox charging station"
+    },
+    {
+      "id": "mx-us-tablet-import",
+      "from": "MX",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "tablet computer spanish label warranty"
+    },
+    {
+      "id": "vn-us-router-export",
+      "from": "VN",
+      "to": "US",
+      "focus": "export",
+      "vertical": "electronics",
+      "query": "wireless router wifi telecom equipment"
+    },
+    {
+      "id": "us-vn-router-import",
+      "from": "US",
+      "to": "VN",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "vietnam wireless router wifi telecom equipment",
+      "expected_min_rules": 4,
+      "expected_min_exact_rules": 4,
+      "expected_min_cases": 4,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
+      "id": "vn-us-router-import",
+      "from": "VN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "vietnam wireless router wifi telecom equipment"
+    },
+    {
+      "id": "us-my-router-import",
+      "from": "US",
+      "to": "MY",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "malaysia wireless router wifi telecom equipment",
+      "expected_min_rules": 4,
+      "expected_min_exact_rules": 4,
+      "expected_min_cases": 4,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
+      "id": "my-us-router-import",
+      "from": "MY",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "malaysia wireless router wifi telecom equipment"
+    },
+    {
+      "id": "us-jp-pse-import",
+      "from": "US",
+      "to": "JP",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "power adapter charger pse"
+    },
+    {
+      "id": "jp-us-pse-import",
+      "from": "JP",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "power adapter charger pse"
+    },
+    {
+      "id": "us-kr-kc-import",
+      "from": "US",
+      "to": "KR",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "power adapter charger kc"
+    },
+    {
+      "id": "kr-us-kc-import",
+      "from": "KR",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "power adapter charger kc"
+    },
+    {
+      "id": "ru-us-ai-export",
+      "from": "RU",
+      "to": "US",
+      "focus": "export",
+      "vertical": "semiconductor",
+      "query": "ai gpu accelerator export control"
+    },
+    {
+      "id": "us-eu-optical-import",
+      "from": "US",
+      "to": "EU",
+      "focus": "import",
+      "vertical": "semiconductor",
+      "query": "optical transceiver laser telecom module",
+      "expected_top_rule": "CL-EUOPTICAL-001",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 3,
+      "expected_min_cases": 3,
+      "expected_inferred_selections": [
+        "semiconductor",
+        "wireless"
+      ]
+    }
   ]
 }

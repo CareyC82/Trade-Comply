@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-12",
+  "updated_at": "2026-06-13",
   "notes": "High-frequency Post-Entry Check samples used to verify value math, duty-rate coverage, and source-status behavior. Amounts are synthetic test values, not customer data.",
   "samples": [
     {
@@ -22,7 +22,8 @@
       "expect_source_statuses": [
         "official_source_checked",
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-US-CN-SOLAR-854143",
@@ -44,7 +45,8 @@
         "official_source_checked",
         "indicative",
         "scope_check_required"
-      ]
+      ],
+      "expect_source_trust": "official_heading_only"
     },
     {
       "id": "PE-US-CN-TABLET-847130",
@@ -64,7 +66,8 @@
       "expect_min_total_rate": 0,
       "expect_source_statuses": [
         "official_source_checked"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-EU-CN-EVCHARGER-850440",
@@ -84,7 +87,8 @@
       "expect_min_total_rate": 0.02,
       "expect_source_statuses": [
         "official_source_checked"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-EU-US-BATTERY-850760",
@@ -105,7 +109,8 @@
       "expect_source_statuses": [
         "official_source_checked",
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-SG-CN-ROUTER-851762",
@@ -125,7 +130,8 @@
       "expect_min_total_rate": 0.09,
       "expect_source_statuses": [
         "benchmark_source_checked"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-MX-CN-TABLET-847130",
@@ -145,7 +151,8 @@
       "expect_min_total_rate": 0.16,
       "expect_source_statuses": [
         "benchmark_source_checked"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-JP-CN-POWER-850440",
@@ -165,7 +172,8 @@
       "expect_min_total_rate": 0.1,
       "expect_source_statuses": [
         "benchmark_source_checked"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-KR-CN-SEMICON-8542",
@@ -185,7 +193,8 @@
       "expect_min_total_rate": 0.1,
       "expect_source_statuses": [
         "benchmark_source_checked"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-CN-US-GPU-8542",
@@ -205,7 +214,8 @@
       "expect_min_total_rate": 0.2,
       "expect_source_statuses": [
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-VN-CN-ROUTER-851762",
@@ -225,7 +235,8 @@
       "expect_min_total_rate": 0.1,
       "expect_source_statuses": [
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-MY-CN-BATTERY-850760",
@@ -245,7 +256,8 @@
       "expect_min_total_rate": 0.1,
       "expect_source_statuses": [
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-TW-CN-SEMICON-8542",
@@ -265,7 +277,8 @@
       "expect_min_total_rate": 0.05,
       "expect_source_statuses": [
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-US-CN-ROUTER-851762",
@@ -286,7 +299,8 @@
       "expect_source_statuses": [
         "official_source_checked",
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-US-CN-IPCAM-8525",
@@ -307,7 +321,8 @@
       "expect_source_statuses": [
         "official_source_checked",
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-EU-CN-TABLET-847130",
@@ -327,7 +342,8 @@
       "expect_source_statuses": [
         "scope_check_required",
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "official_heading_only"
     },
     {
       "id": "PE-DE-CN-BATTERY-850760",
@@ -346,7 +362,8 @@
       "expect_covered": true,
       "expect_source_statuses": [
         "official_source_checked"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-NL-US-SEMICON-8542",
@@ -365,7 +382,8 @@
       "expect_covered": true,
       "expect_source_statuses": [
         "official_source_checked"
-      ]
+      ],
+      "expect_source_trust": "mixed_official_estimate"
     },
     {
       "id": "PE-MX-US-EVCHARGER-850440",
@@ -384,7 +402,8 @@
       "expect_covered": true,
       "expect_source_statuses": [
         "benchmark_source_checked"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-JP-US-SMARTPHONE-851713",
@@ -403,7 +422,8 @@
       "expect_covered": true,
       "expect_source_statuses": [
         "benchmark_source_checked"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-KR-US-ROUTER-851762",
@@ -422,7 +442,8 @@
       "expect_covered": true,
       "expect_source_statuses": [
         "benchmark_source_checked"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-VN-US-TABLET-847130",
@@ -441,7 +462,8 @@
       "expect_covered": true,
       "expect_source_statuses": [
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-MY-US-POWER-850440",
@@ -460,7 +482,8 @@
       "expect_covered": true,
       "expect_source_statuses": [
         "indicative"
-      ]
+      ],
+      "expect_source_trust": "precheck_estimate"
     },
     {
       "id": "PE-RU-CN-ELECTRONICS-851762",
@@ -481,7 +504,8 @@
       "expect_source_statuses": [
         "indicative",
         "scope_check_required"
-      ]
+      ],
+      "expect_source_trust": "official_heading_only"
     }
   ]
 }

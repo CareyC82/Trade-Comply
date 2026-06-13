@@ -37,6 +37,16 @@ test('priority Post-Entry samples carry explicit source quality expectations', (
     samples.samples.forEach((sample) => {
         assert.ok(Array.isArray(sample.expect_source_statuses), `${sample.id} should declare expected source statuses`);
         assert.ok(sample.expect_source_statuses.length > 0, `${sample.id} should declare at least one expected source status`);
+        assert.ok(sample.expect_source_trust, `${sample.id} should declare expected source trust tier`);
+    });
+});
+
+test('priority Post-Entry samples keep expected source trust tiers', () => {
+    const result = runDutyRateHealthCheck();
+
+    result.samples.forEach((sampleResult) => {
+        const sample = samples.samples.find(item => item.id === sampleResult.id);
+        assert.equal(sampleResult.source_trust, sample.expect_source_trust, sampleResult.id);
     });
 });
 

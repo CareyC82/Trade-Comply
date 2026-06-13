@@ -11,7 +11,8 @@ const path = require('path');
 
 const {
     calculatePostEntryValue,
-    calculateDutyImpact
+    calculateDutyImpact,
+    classifyRateSourceTrust
 } = require('../lib/post-entry-value');
 const {
     summarizeDutyRateCoverage
@@ -45,6 +46,7 @@ function runSample(sample) {
         declaredDuty: sample.declared_duty
     });
     const sourceStatuses = Array.from(new Set((duty.sourceBreakdown || []).map(item => item.status)));
+    const sourceTrust = classifyRateSourceTrust(duty.sourceBreakdown || []);
     const failures = [];
 
     if (Boolean(duty.covered) !== Boolean(sample.expect_covered)) {
@@ -58,6 +60,9 @@ function runSample(sample) {
             failures.push(`missing source status ${status}`);
         }
     });
+    if (sample.expect_source_trust && sourceTrust.level !== sample.expect_source_trust) {
+        failures.push(`source trust expected ${sample.expect_source_trust} but got ${sourceTrust.level}`);
+    }
 
     return {
         id: sample.id,
@@ -67,6 +72,7 @@ function runSample(sample) {
         covered: duty.covered,
         total_rate: duty.totalRate,
         source_statuses: sourceStatuses,
+        source_trust: sourceTrust.level,
         failures
     };
 }

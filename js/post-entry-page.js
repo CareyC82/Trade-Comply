@@ -179,10 +179,10 @@
     function getSourceStatusLabel(status) {
         const labels = {
             official_source_checked: 'Official exact rate',
-            official_heading_benchmark: 'Official heading benchmark',
+            official_heading_benchmark: 'Official heading only',
             benchmark_source_checked: 'Pre-check estimate',
             indicative: 'Pre-check estimate',
-            scope_check_required: 'Official heading benchmark',
+            scope_check_required: 'Official heading only',
             flag_only: 'Scope check required',
             exact_hs_required: 'Exact HS required',
             export_review_only: 'Export filing review only',
@@ -232,7 +232,7 @@
     function getRateTierLabel(tier) {
         const labels = {
             official_source_checked: 'Official exact rate',
-            official_heading_benchmark: 'Official heading benchmark',
+            official_heading_benchmark: 'Official heading only',
             benchmark_source_checked: 'Pre-check estimate',
             indicative: 'Pre-check estimate',
             not_covered: 'Not covered',
@@ -287,7 +287,7 @@
             },
             official_heading_benchmark: {
                 tone: 'scope',
-                label: 'Official heading benchmark',
+                label: 'Official heading only',
                 summary: 'An official tariff source is attached, but the exact line or case scope can change the final rate.'
             },
             benchmark_source_checked: {
@@ -366,7 +366,7 @@
             const target = scopeRows[0] || base || {};
             return {
                 tone: 'scope',
-                label: 'Official heading benchmark',
+                label: 'Official heading only',
                 title: 'Use this as a benchmark, not a final payable duty.',
                 detail: target.detail || target.source || 'The exact 8-10 digit tariff line can change the rate.'
             };
@@ -435,7 +435,7 @@
             return 'Rate basis: pre-check estimate.';
         }
         if (level === 'official_heading_benchmark') {
-            return 'Rate basis: official heading benchmark; exact line can change the result.';
+            return 'Rate basis: official heading only; exact line can change the result.';
         }
         if (level === 'not_covered') {
             return 'Rate basis: not covered; value math only.';
@@ -516,19 +516,6 @@
         });
     }
 
-    function renderRateDecision(summary) {
-        const card = $('post-entry-rate-decision');
-        if (!card) return;
-        const safe = summary || buildRateDecisionSummary([]);
-        card.className = `post-entry-rate-decision post-entry-rate-decision--${safe.tone || 'benchmark'}`;
-        const label = $('post-entry-rate-decision-label');
-        const title = $('post-entry-rate-decision-title');
-        const detail = $('post-entry-rate-decision-detail');
-        if (label) label.textContent = safe.label || 'Rate decision';
-        if (title) title.textContent = safe.title || 'Review rate basis.';
-        if (detail) detail.textContent = safe.detail || '';
-    }
-
     function compactSourceRows(items = []) {
         const rows = Array.isArray(items) ? items : [];
         if (!rows.length) {
@@ -541,7 +528,7 @@
         }
         const groups = [
             {
-                label: 'Official heading benchmark',
+                label: 'Official heading only',
                 status: 'official_heading_benchmark',
                 rows: rows.filter(item => normalizeRateTier(item) === 'official_heading_benchmark')
             },
@@ -655,6 +642,13 @@
     }
 
     function buildImportTopConclusion(result, dutyImpact, currency) {
+        const valueApi = getValueApi();
+        const decision = valueApi?.buildImportPostEntryDecision
+            ? valueApi.buildImportPostEntryDecision(result, dutyImpact, { currency })
+            : null;
+        if (decision?.coreConclusion) {
+            return decision.coreConclusion;
+        }
         const sourceBreakdown = dutyImpact.sourceBreakdown || [];
         const confidence = buildRateConfidence(sourceBreakdown);
         const basis = buildRateBasisText(sourceBreakdown);
@@ -839,9 +833,13 @@
             const dutyImpact = valueApi.calculateDutyImpact(result, context, {
             declaredDuty: input.declaredDuty
         });
-        const action = dutyImpact.covered && dutyImpact.dutyVariance > 0.01
-            ? dutyImpact.action
-            : valueApi.buildRecommendedAction(result, context);
+        const importDecision = valueApi.buildImportPostEntryDecision
+            ? valueApi.buildImportPostEntryDecision(result, dutyImpact, { currency })
+            : null;
+        const action = importDecision?.nextAction
+            || (dutyImpact.covered && dutyImpact.dutyVariance > 0.01
+                ? dutyImpact.action
+                : valueApi.buildRecommendedAction(result, context));
         return {
             ...base,
             risk: result.risk,
@@ -922,7 +920,6 @@
         const coverageNote = $('post-entry-coverage-note');
         if (coverageNote) coverageNote.textContent = snapshot.coverageNote || buildCoverageNote(snapshot.sourceBreakdown || []);
         renderRateConfidence(snapshot.rateConfidence || buildRateConfidence(snapshot.sourceBreakdown || []));
-        renderRateDecision(snapshot.rateDecision || buildRateDecisionSummary(snapshot.sourceBreakdown || []));
         if (snapshot.labels) {
             const customLabel = $('post-entry-customs-value-label');
             const rebateLabel = $('post-entry-rebate-base-label');

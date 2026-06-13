@@ -133,6 +133,20 @@ function auditSample(sample) {
     if (sample.expected_top_rule && results.tags[0]?.tag_id !== sample.expected_top_rule) {
         failures.push('TOP_RULE_MISMATCH');
     }
+    if (typeof sample.expected_min_rules === 'number' && results.tags.length < sample.expected_min_rules) {
+        failures.push('MIN_RULES_NOT_MET');
+    }
+    if (typeof sample.expected_min_exact_rules === 'number' && coverage.exactCount < sample.expected_min_exact_rules) {
+        failures.push('MIN_EXACT_RULES_NOT_MET');
+    }
+    if (typeof sample.expected_min_cases === 'number' && results.cases.length < sample.expected_min_cases) {
+        failures.push('MIN_CASES_NOT_MET');
+    }
+    (sample.expected_inferred_selections || []).forEach((selection) => {
+        if (!intelligence.inferredSelections.some(item => item.id === selection)) {
+            failures.push(`MISSING_INFERRED_${String(selection).toUpperCase()}`);
+        }
+    });
     if (!hasDroneIntent && droneCategoryTags.length > 0) {
         failures.push('PRODUCT_FAMILY_MISMATCH');
     }
@@ -141,6 +155,12 @@ function auditSample(sample) {
         id: sample.id,
         query: sample.query,
         expectedTopRule: sample.expected_top_rule || '',
+        expectedMinimums: {
+            rules: sample.expected_min_rules || null,
+            exactRules: sample.expected_min_exact_rules || null,
+            cases: sample.expected_min_cases || null,
+            inferredSelections: sample.expected_inferred_selections || []
+        },
         route: routeContext,
         expandedQuery: intelligence.expandedQuery,
         inferredSelections: intelligence.inferredSelections.map((item) => item.id),

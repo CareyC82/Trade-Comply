@@ -41,6 +41,21 @@ describe('search quality audit', () => {
         }
     });
 
+    it('enforces explicit quality floors for priority samples', () => {
+        const report = runQualityAudit();
+        const gated = report.results.filter((result) => (
+            result.expectedMinimums.rules
+            || result.expectedMinimums.exactRules
+            || result.expectedMinimums.cases
+            || result.expectedMinimums.inferredSelections.length
+        ));
+
+        assert.ok(gated.length >= 10);
+        for (const result of gated) {
+            assert.deepEqual(result.issues.failures, [], result.id);
+        }
+    });
+
     it('can write readable markdown and json audit artifacts', () => {
         const report = runQualityAudit(DEFAULT_SAMPLES.slice(0, 2));
         const markdown = formatAuditMarkdown(report);

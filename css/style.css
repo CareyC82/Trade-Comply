@@ -4734,12 +4734,6 @@ button.feedback-link:hover {
     margin-bottom: 14px;
 }
 
-@media (min-width: 760px) {
-    .post-entry-decision-grid {
-        grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-    }
-}
-
 .post-entry-action-card {
     display: grid;
     align-content: start;
@@ -4973,62 +4967,6 @@ button.feedback-link:hover {
     font-size: 0.76rem;
     line-height: 1.35;
     text-align: right;
-}
-
-.post-entry-rate-decision {
-    display: grid;
-    gap: 5px;
-    margin-bottom: 10px;
-    padding: 11px 12px;
-    border: 1px solid rgba(26, 58, 92, 0.14);
-    border-left: 4px solid #0e7490;
-    border-radius: 8px;
-    background: var(--color-bg-secondary);
-}
-
-.post-entry-rate-decision span {
-    color: var(--color-text-secondary);
-    font-size: 0.72rem;
-    font-weight: 900;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.post-entry-rate-decision strong {
-    color: var(--color-primary);
-    font-size: 0.94rem;
-    line-height: 1.35;
-}
-
-.post-entry-rate-decision p {
-    margin: 0;
-    color: var(--color-text-secondary);
-    font-size: 0.82rem;
-    line-height: 1.45;
-}
-
-.post-entry-rate-decision--official {
-    border-left-color: var(--color-success);
-    background: rgba(46, 125, 50, 0.07);
-}
-
-.post-entry-rate-decision--scope {
-    border-left-color: var(--color-danger-text);
-    background: rgba(183, 28, 28, 0.06);
-}
-
-.post-entry-rate-decision--mixed {
-    border-left-color: #0e7490;
-    background: rgba(14, 116, 144, 0.07);
-}
-
-.post-entry-rate-decision--benchmark {
-    border-left-color: #b7791f;
-    background: rgba(232, 168, 23, 0.1);
-}
-
-.post-entry-rate-decision--not-covered {
-    border-left-color: var(--color-text-secondary);
 }
 
 .post-entry-source-list {
