@@ -48,6 +48,7 @@ test('auto sync status treats safe updates as auto-applied without manual review
     assert.equal(payload.policy.manual_review_required, false);
     assert.equal(payload.counts.sources_auto_applied, 1);
     assert.equal(payload.counts.exceptions, 0);
+    assert.equal(payload.health.priority_rate_matrix, null);
 });
 
 test('source failures and material rate changes become admin-visible exceptions', () => {
@@ -126,6 +127,9 @@ test('auto duty-rate sync includes static official-link benchmark countries', as
     assert.equal(staticRun.applied, false);
     assert.equal(staticRun.ok, true, JSON.stringify(staticRun.errors, null, 2));
     assert.equal(staticRun.writes_official_machine_rates, false);
+    assert.ok(payload.health.priority_rate_matrix, 'auto sync health should expose priority rate matrix summary');
+    assert.equal(payload.health.priority_rate_matrix.ok, true, JSON.stringify(payload.health.priority_rate_matrix.failures, null, 2));
+    assert.ok(payload.health.priority_rate_matrix.route_count >= 50);
     ['CN', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
         assert.equal(staticRun.countries.includes(country), true, `${country} should be refreshed by static benchmark sync`);
         assert.equal(staticRun.readiness[country].ok, true, `${country} readiness should be OK`);

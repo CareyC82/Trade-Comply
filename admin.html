@@ -1067,10 +1067,62 @@
             `;
         }
 
+        function renderPriorityRateMatrix(matrix = {}) {
+            const rows = Array.isArray(matrix.rows) ? matrix.rows : [];
+            if (!rows.length) {
+                return '<div class="empty">No high-frequency rate matrix available.</div>';
+            }
+            const failures = Array.isArray(matrix.failures) ? matrix.failures : [];
+            const trustCounts = matrix.trust_counts || {};
+            const automationCounts = matrix.automation_counts || {};
+            const topRows = rows.slice(0, 12);
+            return `
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${matrix.covered_route_count ?? 0}/${matrix.route_count ?? rows.length}</strong><span>High-frequency routes covered</span></div>
+                    <div class="summary-card"><strong>${matrix.official_or_hybrid_count ?? 0}</strong><span>Official / hybrid routes</span></div>
+                    <div class="summary-card"><strong>${matrix.benchmark_count ?? 0}</strong><span>Benchmark routes</span></div>
+                    <div class="summary-card"><strong>${failures.length}</strong><span>Matrix exceptions</span></div>
+                </div>
+                <p class="meta">
+                    Trust: ${Object.entries(trustCounts).map(([key, value]) => `<span class="badge ${key === 'precheck_estimate' ? 'benchmark' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
+                </p>
+                <p class="meta">
+                    Automation: ${Object.entries(automationCounts).map(([key, value]) => `<span class="badge ${key === 'benchmark_auto' ? 'benchmark_updatable' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
+                </p>
+                ${failures.length ? `<div class="empty">Matrix exceptions: ${escapeHtml(failures.map(item => `${item.id}: ${(item.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
+                <div class="coverage-table-wrap">
+                    <table class="quality-gap-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Route</th>
+                                <th>HS</th>
+                                <th>Trust</th>
+                                <th>Automation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${topRows.map((row) => `
+                                <tr>
+                                    <td><strong>${escapeHtml(row.product_id || '')}</strong></td>
+                                    <td>${escapeHtml(row.route || '')}</td>
+                                    <td>${escapeHtml(row.hs_code || '')}</td>
+                                    <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
+                                    <td><span class="badge ${row.automation_level === 'benchmark_auto' ? 'benchmark_updatable' : 'auto_updatable'}">${escapeHtml(row.automation_level || '')}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ${rows.length > topRows.length ? `<p class="meta">Showing ${topRows.length} of ${rows.length} matrix rows.</p>` : ''}
+            `;
+        }
+
         function renderQualityStatus(data) {
             const search = data.search || {};
             const duty = data.duty || {};
             const gap = duty.gap_matrix || {};
+            const priorityMatrix = duty.priority_rate_matrix || {};
             const statusClass = data.ok ? '' : search.failed ? 'fail' : 'warn';
             const statusTitle = data.ok
                 ? 'Quality gate passed'
@@ -1090,6 +1142,7 @@
                         <div class="summary-card"><strong>${search.warned ?? 0}</strong><span>Search warnings</span></div>
                         <div class="summary-card"><strong>${duty.sample_count ?? 0}</strong><span>Post-Entry samples</span></div>
                         <div class="summary-card"><strong>${gap.full_count ?? 0}/${(gap.rows || []).length}</strong><span>Markets with full HS coverage</span></div>
+                        <div class="summary-card"><strong>${priorityMatrix.covered_route_count ?? 0}/${priorityMatrix.route_count ?? 0}</strong><span>Priority exact-rate routes</span></div>
                     </div>
                     <p class="meta">Failure types: ${renderIssueCounts(search.failures_by_type)}</p>
                     <p class="meta">Warning types: ${renderIssueCounts(search.warnings_by_type)}</p>
@@ -1099,6 +1152,8 @@
                 ${(search.failing_samples || []).length ? '' : renderQualitySamples((search.warning_samples || []).slice(0, 5), 'warnings')}
                 <div class="crawl-section-title"><h3>Post-Entry priority HS coverage</h3><span class="meta">${gap.missing_total || 0} missing cells</span></div>
                 ${renderDutyGapMatrix(gap)}
+                <div class="crawl-section-title"><h3>High-frequency exact-rate matrix</h3><span class="meta">${priorityMatrix.route_count || 0} priority routes</span></div>
+                ${renderPriorityRateMatrix(priorityMatrix)}
             `;
         }
 
@@ -1124,6 +1179,7 @@
                 const sources = Array.isArray(data.sources) ? data.sources : [];
                 const failures = Array.isArray(data.failures) ? data.failures : [];
                 const syncStatus = data.duty_rate_sync_status || {};
+                const priorityMatrix = data.priority_rate_matrix || {};
                 dutyRateStatus.innerHTML = `
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">
@@ -1131,6 +1187,7 @@
                         <div class="summary-card"><strong>${summary.country_count ?? 0}</strong><span>Covered import markets</span></div>
                         <div class="summary-card"><strong>${data.sample_count ?? 0}</strong><span>Regression samples</span></div>
                         <div class="summary-card"><strong>${roadmap.source_count ?? sources.length}</strong><span>Tracked sources</span></div>
+                        <div class="summary-card"><strong>${priorityMatrix.covered_route_count ?? 0}/${priorityMatrix.route_count ?? 0}</strong><span>High-frequency rate routes</span></div>
                         <div class="summary-card"><strong>${escapeHtml(data.duty_rates_updated_at || '—')}</strong><span>Duty data updated</span></div>
                     </div>
                     ${renderDutySourceGradeSummary(sources)}
@@ -1143,6 +1200,8 @@
                     </div>
                     <p class="meta">Roadmap 更新: ${escapeHtml(data.source_roadmap_updated_at || '—')} · Health: ${data.ok ? 'OK' : 'Needs review'}</p>
                     ${failures.length ? `<div class="empty">税率源检查有 ${failures.length} 个问题：${escapeHtml(failures.map(f => `${f.id}: ${(f.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
+                    <div class="crawl-section-title"><h3>High-frequency exact-rate matrix</h3><span class="meta">${priorityMatrix.route_count || 0} priority routes</span></div>
+                    ${renderPriorityRateMatrix(priorityMatrix)}
                     <div class="crawl-section-title"><h3>Source roadmap</h3><span class="meta">${sources.length} 个源</span></div>
                     <div class="duty-source-grid">${sources.length ? sources.map(renderDutySource).join('') : '<div class="empty">暂无税率源配置。</div>'}</div>
                 `;

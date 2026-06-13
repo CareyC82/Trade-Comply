@@ -1,0 +1,601 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-06-13",
+  "notes": "High-frequency Post-Entry tariff-rate priority matrix. This is the product/data-coverage target for daily duty-rate sync: every row must be covered by maintained duty rules, and source trust must match the declared expectation.",
+  "trust_tiers": {
+    "official_exact_rate": "All displayed duty layers are official-backed for the maintained route / HS basis.",
+    "official_duty_tax_estimate": "Base customs duty is official-backed; VAT/GST/consumption-tax layers remain maintained estimates.",
+    "mixed_official_estimate": "Official base duty is present, but trade-remedy/add-on scope or local layers still require review.",
+    "official_heading_only": "Official source exists, but exact tariff-line or case scope can change the final payable rate.",
+    "precheck_estimate": "Maintained benchmark for screening only; final official tariff line still needs confirmation."
+  },
+  "automation_levels": {
+    "official_auto": "Daily updater can refresh official machine-readable duty data.",
+    "hybrid_official": "Daily updater can promote unambiguous official candidates while keeping ambiguous prefixes exact-code gated.",
+    "benchmark_auto": "Daily updater refreshes benchmark metadata and timestamps, but does not claim official machine-readable rates."
+  },
+  "priority_products": [
+    {
+      "id": "tablet",
+      "label": "Tablet computer",
+      "hs_basis": "847130 / 8471300000"
+    },
+    {
+      "id": "smartphone",
+      "label": "Smartphone / 5G cellular",
+      "hs_basis": "851713"
+    },
+    {
+      "id": "router",
+      "label": "Wireless router / network equipment",
+      "hs_basis": "851762"
+    },
+    {
+      "id": "ev_charger",
+      "label": "EV charger / power converter",
+      "hs_basis": "850440 / 8504409990"
+    },
+    {
+      "id": "battery",
+      "label": "Lithium battery / ESS",
+      "hs_basis": "850760 / 8507600015"
+    },
+    {
+      "id": "solar",
+      "label": "Solar panel / photovoltaic module",
+      "hs_basis": "854143"
+    },
+    {
+      "id": "semiconductor",
+      "label": "Semiconductor processor / IC",
+      "hs_basis": "854231 / 8542310000"
+    },
+    {
+      "id": "monitor",
+      "label": "Computer monitor / display",
+      "hs_basis": "852852 / 8528521000"
+    }
+  ],
+  "routes": [
+    {
+      "id": "tablet-cn-us",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "847130",
+      "expected_source_trust": "mixed_official_estimate",
+      "automation_level": "official_auto"
+    },
+    {
+      "id": "tablet-cn-eu-exact",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "EU",
+      "hs_code": "8471300000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "tablet-cn-de-exact",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "DE",
+      "hs_code": "8471300000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "tablet-cn-nl-exact",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "NL",
+      "hs_code": "8471300000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "tablet-cn-sg",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "SG",
+      "hs_code": "847130",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "tablet-cn-mx",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "MX",
+      "hs_code": "847130",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "tablet-cn-jp",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "JP",
+      "hs_code": "847130",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "tablet-cn-kr",
+      "product_id": "tablet",
+      "origin_country": "CN",
+      "import_country": "KR",
+      "hs_code": "847130",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "smartphone-cn-us",
+      "product_id": "smartphone",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "851713",
+      "expected_source_trust": "mixed_official_estimate",
+      "automation_level": "official_auto"
+    },
+    {
+      "id": "smartphone-us-eu",
+      "product_id": "smartphone",
+      "origin_country": "US",
+      "import_country": "EU",
+      "hs_code": "851713",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "smartphone-us-de",
+      "product_id": "smartphone",
+      "origin_country": "US",
+      "import_country": "DE",
+      "hs_code": "851713",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "smartphone-us-nl",
+      "product_id": "smartphone",
+      "origin_country": "US",
+      "import_country": "NL",
+      "hs_code": "851713",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "smartphone-us-sg",
+      "product_id": "smartphone",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "851713",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "smartphone-us-mx",
+      "product_id": "smartphone",
+      "origin_country": "US",
+      "import_country": "MX",
+      "hs_code": "851713",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "smartphone-us-jp",
+      "product_id": "smartphone",
+      "origin_country": "US",
+      "import_country": "JP",
+      "hs_code": "851713",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "smartphone-us-kr",
+      "product_id": "smartphone",
+      "origin_country": "US",
+      "import_country": "KR",
+      "hs_code": "851713",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "router-cn-us",
+      "product_id": "router",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "851762",
+      "expected_source_trust": "mixed_official_estimate",
+      "automation_level": "official_auto"
+    },
+    {
+      "id": "router-us-eu",
+      "product_id": "router",
+      "origin_country": "US",
+      "import_country": "EU",
+      "hs_code": "851762",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "router-us-sg",
+      "product_id": "router",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "851762",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "router-us-mx",
+      "product_id": "router",
+      "origin_country": "US",
+      "import_country": "MX",
+      "hs_code": "851762",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "router-us-jp",
+      "product_id": "router",
+      "origin_country": "US",
+      "import_country": "JP",
+      "hs_code": "851762",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "router-us-kr",
+      "product_id": "router",
+      "origin_country": "US",
+      "import_country": "KR",
+      "hs_code": "851762",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "ev-charger-cn-us",
+      "product_id": "ev_charger",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "850440",
+      "expected_source_trust": "mixed_official_estimate",
+      "automation_level": "official_auto"
+    },
+    {
+      "id": "ev-charger-cn-eu-exact",
+      "product_id": "ev_charger",
+      "origin_country": "CN",
+      "import_country": "EU",
+      "hs_code": "8504409990",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "ev-charger-us-de-exact",
+      "product_id": "ev_charger",
+      "origin_country": "US",
+      "import_country": "DE",
+      "hs_code": "8504409990",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "ev-charger-cn-nl-exact",
+      "product_id": "ev_charger",
+      "origin_country": "CN",
+      "import_country": "NL",
+      "hs_code": "8504409990",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "ev-charger-us-sg",
+      "product_id": "ev_charger",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "850440",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "ev-charger-us-mx",
+      "product_id": "ev_charger",
+      "origin_country": "US",
+      "import_country": "MX",
+      "hs_code": "850440",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "ev-charger-us-jp",
+      "product_id": "ev_charger",
+      "origin_country": "US",
+      "import_country": "JP",
+      "hs_code": "850440",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "ev-charger-us-kr",
+      "product_id": "ev_charger",
+      "origin_country": "US",
+      "import_country": "KR",
+      "hs_code": "850440",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "battery-cn-us",
+      "product_id": "battery",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "850760",
+      "expected_source_trust": "mixed_official_estimate",
+      "automation_level": "official_auto"
+    },
+    {
+      "id": "battery-us-eu",
+      "product_id": "battery",
+      "origin_country": "US",
+      "import_country": "EU",
+      "hs_code": "850760",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "battery-cn-de-exact",
+      "product_id": "battery",
+      "origin_country": "CN",
+      "import_country": "DE",
+      "hs_code": "8507600015",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "battery-cn-nl-exact",
+      "product_id": "battery",
+      "origin_country": "CN",
+      "import_country": "NL",
+      "hs_code": "8507600015",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "battery-us-sg",
+      "product_id": "battery",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "850760",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "battery-us-mx",
+      "product_id": "battery",
+      "origin_country": "US",
+      "import_country": "MX",
+      "hs_code": "850760",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "battery-us-jp",
+      "product_id": "battery",
+      "origin_country": "US",
+      "import_country": "JP",
+      "hs_code": "850760",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "battery-us-kr",
+      "product_id": "battery",
+      "origin_country": "US",
+      "import_country": "KR",
+      "hs_code": "850760",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "solar-cn-us",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "854143",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_auto"
+    },
+    {
+      "id": "solar-cn-eu",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "EU",
+      "hs_code": "854143",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "solar-cn-de",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "DE",
+      "hs_code": "854143",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "solar-cn-nl",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "NL",
+      "hs_code": "854143",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "solar-cn-sg",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "SG",
+      "hs_code": "854143",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "solar-cn-mx",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "MX",
+      "hs_code": "854143",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "solar-cn-jp",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "JP",
+      "hs_code": "854143",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "solar-cn-kr",
+      "product_id": "solar",
+      "origin_country": "CN",
+      "import_country": "KR",
+      "hs_code": "854143",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "semiconductor-us-eu-exact",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "EU",
+      "hs_code": "8542310000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "semiconductor-us-de-exact",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "DE",
+      "hs_code": "8542310000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "semiconductor-us-nl-exact",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "NL",
+      "hs_code": "8542310000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "semiconductor-us-sg",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "854231",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "semiconductor-us-mx",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "MX",
+      "hs_code": "854231",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "semiconductor-us-jp",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "JP",
+      "hs_code": "854231",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "semiconductor-us-kr",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "KR",
+      "hs_code": "854231",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "monitor-us-eu-exact",
+      "product_id": "monitor",
+      "origin_country": "US",
+      "import_country": "EU",
+      "hs_code": "8528521000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "monitor-us-de-exact",
+      "product_id": "monitor",
+      "origin_country": "US",
+      "import_country": "DE",
+      "hs_code": "8528521000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "monitor-us-nl-exact",
+      "product_id": "monitor",
+      "origin_country": "US",
+      "import_country": "NL",
+      "hs_code": "8528521000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "monitor-us-sg",
+      "product_id": "monitor",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "852852",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "monitor-us-mx",
+      "product_id": "monitor",
+      "origin_country": "US",
+      "import_country": "MX",
+      "hs_code": "852852",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "monitor-us-jp",
+      "product_id": "monitor",
+      "origin_country": "US",
+      "import_country": "JP",
+      "hs_code": "852852",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    },
+    {
+      "id": "monitor-us-kr",
+      "product_id": "monitor",
+      "origin_country": "US",
+      "import_country": "KR",
+      "hs_code": "852852",
+      "expected_source_trust": "precheck_estimate",
+      "automation_level": "benchmark_auto"
+    }
+  ]
+}

@@ -22,6 +22,7 @@ const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const SAMPLES_PATH = path.join(ROOT, 'data', 'post-entry-samples.json');
+const PRIORITY_MATRIX_PATH = path.join(ROOT, 'data', 'post-entry-rate-priority-matrix.json');
 const PRIORITY_IMPORT_MARKETS = ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'VN', 'MY', 'TW', 'RU'];
 const PRIORITY_HS_PREFIXES = ['847130', '850440', '850760', '8517', '8525', '8528', '8541', '8542', '8543'];
 
@@ -74,6 +75,98 @@ function runSample(sample) {
         source_statuses: sourceStatuses,
         source_trust: sourceTrust.level,
         failures
+    };
+}
+
+function runPriorityMatrixRoute(route) {
+    const value = calculatePostEntryValue({
+        incoterm: route.incoterm || 'FOB',
+        declaredAmount: route.declared_amount || 1000,
+        freight: route.freight || 100,
+        insurance: route.insurance || 20,
+        otherCharges: route.other_charges || 0
+    });
+    const duty = calculateDutyImpact(value, {
+        importCountryCode: route.import_country,
+        originCountryCode: route.origin_country,
+        hsCode: route.hs_code,
+        entryDate: route.entry_date || '06 / 13 / 26'
+    }, {
+        declaredDuty: route.declared_duty || 0
+    });
+    const sourceStatuses = Array.from(new Set((duty.sourceBreakdown || []).map(item => item.status)));
+    const sourceTrust = classifyRateSourceTrust(duty.sourceBreakdown || []);
+    const failures = [];
+
+    if (!duty.covered) {
+        failures.push('priority route is not covered by maintained duty-rate rules');
+    }
+    if (route.expected_source_trust && sourceTrust.level !== route.expected_source_trust) {
+        failures.push(`source trust expected ${route.expected_source_trust} but got ${sourceTrust.level}`);
+    }
+    if (!route.automation_level) {
+        failures.push('automation_level is required');
+    }
+
+    return {
+        id: route.id,
+        product_id: route.product_id,
+        route: `${route.origin_country}->${route.import_country}`,
+        hs_code: route.hs_code,
+        automation_level: route.automation_level || '',
+        expected_source_trust: route.expected_source_trust || '',
+        source_trust: sourceTrust.level,
+        source_statuses: sourceStatuses,
+        covered: duty.covered,
+        total_rate: duty.totalRate,
+        failures
+    };
+}
+
+function summarizePriorityRateMatrix(matrixPayload = {}) {
+    const routes = Array.isArray(matrixPayload.routes) ? matrixPayload.routes : [];
+    const products = new Set((matrixPayload.priority_products || []).map(product => product.id));
+    const results = routes.map(runPriorityMatrixRoute);
+    const failures = results.filter(result => result.failures.length);
+    const productIds = Array.from(new Set(routes.map(route => route.product_id).filter(Boolean))).sort();
+    const importMarkets = Array.from(new Set(routes.map(route => route.import_country).filter(Boolean))).sort();
+    const trustCounts = results.reduce((counts, row) => {
+        counts[row.source_trust] = (counts[row.source_trust] || 0) + 1;
+        return counts;
+    }, {});
+    const automationCounts = results.reduce((counts, row) => {
+        counts[row.automation_level] = (counts[row.automation_level] || 0) + 1;
+        return counts;
+    }, {});
+    const missingProductDefinitions = productIds.filter(productId => !products.has(productId));
+
+    missingProductDefinitions.forEach((productId) => {
+        failures.push({
+            id: `product:${productId}`,
+            failures: [`priority product ${productId} is used by a route but missing from priority_products`]
+        });
+    });
+
+    return {
+        ok: failures.length === 0,
+        updated_at: matrixPayload.updated_at || null,
+        product_count: productIds.length,
+        import_market_count: importMarkets.length,
+        route_count: routes.length,
+        covered_route_count: results.filter(result => result.covered).length,
+        official_or_hybrid_count: results.filter(result => (
+            result.source_trust === 'official_duty_tax_estimate'
+            || result.source_trust === 'mixed_official_estimate'
+            || result.source_trust === 'official_exact_rate'
+            || result.source_trust === 'official_heading_only'
+        )).length,
+        benchmark_count: results.filter(result => result.source_trust === 'precheck_estimate').length,
+        trust_counts: trustCounts,
+        automation_counts: automationCounts,
+        products: productIds,
+        import_markets: importMarkets,
+        failures,
+        rows: results
     };
 }
 
@@ -183,9 +276,11 @@ function runDutyRateHealthCheck() {
     const dutyPayload = readJson(DUTY_RATES_PATH);
     const sourcesPayload = readJson(DUTY_RATE_SOURCES_PATH);
     const samplesPayload = readJson(SAMPLES_PATH);
+    const priorityMatrixPayload = readJson(PRIORITY_MATRIX_PATH);
     const samples = samplesPayload.samples || [];
     const sampleResults = samples.map(runSample);
     const failures = sampleResults.filter(result => result.failures.length);
+    const priorityRateMatrix = summarizePriorityRateMatrix(priorityMatrixPayload);
     const dutySummary = summarizeDutyRateCoverage(dutyPayload);
     const dutyGapMatrix = buildDutyRateGapMatrix(dutyPayload);
     const sourceRoadmap = summarizeSourceRoadmap(sourcesPayload, dutySummary);
@@ -198,14 +293,20 @@ function runDutyRateHealthCheck() {
     }
 
     return {
-        ok: failures.length === 0 && sourceFailures.length === 0,
+        ok: failures.length === 0 && sourceFailures.length === 0 && priorityRateMatrix.ok,
         duty_rate_summary: dutySummary,
         duty_rate_gap_matrix: dutyGapMatrix,
         source_roadmap_summary: sourceRoadmap,
         source_quality_summary: summarizeRuleSourceQuality(dutyPayload),
+        priority_rate_matrix: priorityRateMatrix,
         sample_count: samples.length,
         failed_sample_count: failures.length,
-        failures: failures.concat(sourceFailures.map(error => ({ id: 'source-roadmap', failures: [error] }))),
+        failures: failures
+            .concat(sourceFailures.map(error => ({ id: 'source-roadmap', failures: [error] })))
+            .concat(priorityRateMatrix.failures.map(row => ({
+                id: row.id || 'priority-rate-matrix',
+                failures: row.failures || ['priority rate matrix failure']
+            }))),
         samples: sampleResults
     };
 }
@@ -225,7 +326,9 @@ module.exports = {
     PRIORITY_HS_PREFIXES,
     buildDutyRateGapMatrix,
     runDutyRateHealthCheck,
+    runPriorityMatrixRoute,
     runSample,
+    summarizePriorityRateMatrix,
     summarizeRuleSourceQuality,
     summarizeSourceRoadmap
 };

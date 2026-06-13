@@ -13,6 +13,7 @@ const {
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const samples = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'post-entry-samples.json'), 'utf8'));
+const priorityMatrix = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'post-entry-rate-priority-matrix.json'), 'utf8'));
 
 test('duty-rate table covers priority import markets', () => {
     const summary = summarizeDutyRateCoverage(dutyRates);
@@ -99,6 +100,45 @@ test('priority Post-Entry HS matrix has no uncovered cells', () => {
     matrix.rows.forEach((row) => {
         assert.deepEqual(row.missing, [], `${row.market} should not have missing priority HS prefixes`);
         assert.deepEqual(row.covered, PRIORITY_HS_PREFIXES, `${row.market} should cover every priority HS prefix`);
+    });
+});
+
+test('high-frequency exact-rate matrix covers priority products and routes', () => {
+    const result = runDutyRateHealthCheck();
+    const matrix = result.priority_rate_matrix;
+
+    assert.equal(matrix.ok, true, JSON.stringify(matrix.failures, null, 2));
+    assert.equal(matrix.route_count, priorityMatrix.routes.length);
+    assert.ok(matrix.route_count >= 50, 'priority matrix should cover at least 50 high-frequency routes');
+    assert.deepEqual(matrix.products, [
+        'battery',
+        'ev_charger',
+        'monitor',
+        'router',
+        'semiconductor',
+        'smartphone',
+        'solar',
+        'tablet'
+    ]);
+    ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR'].forEach((country) => {
+        assert.ok(matrix.import_markets.includes(country), `${country} should be in high-frequency rate matrix`);
+    });
+    assert.ok(matrix.official_or_hybrid_count > 20, 'official/hybrid exact-rate coverage should be substantial');
+    assert.ok(matrix.benchmark_count > 20, 'benchmark rows should remain explicit until official feeds are connected');
+    assert.equal(matrix.automation_counts.official_auto > 0, true);
+    assert.equal(matrix.automation_counts.hybrid_official > 0, true);
+    assert.equal(matrix.automation_counts.benchmark_auto > 0, true);
+});
+
+test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {
+    priorityMatrix.routes.forEach((route) => {
+        assert.ok(route.id, 'route id is required');
+        assert.ok(route.product_id, `${route.id} should declare product_id`);
+        assert.ok(route.origin_country, `${route.id} should declare origin_country`);
+        assert.ok(route.import_country, `${route.id} should declare import_country`);
+        assert.ok(route.hs_code, `${route.id} should declare hs_code`);
+        assert.ok(route.expected_source_trust, `${route.id} should declare expected_source_trust`);
+        assert.ok(route.automation_level, `${route.id} should declare automation_level`);
     });
 });
 

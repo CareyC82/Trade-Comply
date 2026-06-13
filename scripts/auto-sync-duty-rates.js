@@ -176,6 +176,14 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             ok: health.ok,
             sample_count: health.sample_count,
             failed_sample_count: health.failed_sample_count,
+            priority_rate_matrix: health.priority_rate_matrix ? {
+                ok: health.priority_rate_matrix.ok,
+                route_count: health.priority_rate_matrix.route_count,
+                covered_route_count: health.priority_rate_matrix.covered_route_count,
+                trust_counts: health.priority_rate_matrix.trust_counts,
+                automation_counts: health.priority_rate_matrix.automation_counts,
+                failures: health.priority_rate_matrix.failures || []
+            } : null,
             failures: health.failures || []
         } : null
     };
