@@ -22,6 +22,12 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         );
     }
 
+    mountOpportunityTeaser(
+        document.getElementById('opportunity-teaser-container'),
+        query,
+        viewModel.renderContext?.routeContext
+    );
+
     const preScreenReport = typeof orchestratePreScreenReport === 'function'
         ? orchestratePreScreenReport(query, tags, cases, precheckSelections)
         : null;
@@ -88,6 +94,41 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     });
 }
 
+function mountOpportunityTeaser(container, query, routeContext) {
+    if (!container) {
+        return;
+    }
+    const opportunity = globalThis.TradeComplyOpportunity;
+    const countryApi = globalThis.TradeComplyCountryRegistry || globalThis.TradeComplyCountry;
+    if (!opportunity || !countryApi || isBrowseAllQuery(query)) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const from = routeContext?.from || AppState.routeFromCountry || 'CN';
+    const to = routeContext?.to || AppState.routeToCountry || AppState.currentCountry || 'US';
+    const focus = routeContext?.focus || AppState.complianceFocus || 'import';
+    const model = opportunity.buildOpportunityInsights({ product: query, from, to, focus });
+    const params = new URLSearchParams({
+        product: query,
+        from: model.from,
+        to: model.to,
+        focus: model.focus
+    });
+    container.innerHTML = `
+        <section class="opportunity-teaser" aria-label="Trade opportunity insight">
+            <div class="opportunity-teaser__icon" aria-hidden="true">🌐</div>
+            <div class="opportunity-teaser__body">
+                <span class="opportunity-teaser__kicker">Trade opportunity insight</span>
+                <strong>${escapeHtml(model.best.label)} may be worth comparing for ${escapeHtml(model.productSignal.label.toLowerCase())}.</strong>
+                <p>${escapeHtml(model.summary)}</p>
+            </div>
+            <a class="opportunity-teaser__link" href="opportunity.html?${params.toString()}">View Opportunity</a>
+        </section>
+    `;
+}
+
 if (typeof globalThis !== 'undefined') {
     globalThis.renderResults = renderResults;
+    globalThis.mountOpportunityTeaser = mountOpportunityTeaser;
 }

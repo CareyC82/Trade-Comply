@@ -14,6 +14,7 @@ const UI_STRINGS = {
     navHome: "Home",
     navIncoterm: "Incoterm",
     navHsCode: "HS Code",
+    navOpportunity: "Opportunity",
     knowledgeBase: "📚 Knowledge Base",
     categories: "📋 Categories",
     back: "< Back",
@@ -285,6 +286,10 @@ function applyUiStrings() {
     const navHsCode = document.getElementById('nav-hscode');
     if (navHsCode) {
         navHsCode.textContent = `🔍 ${t('navHsCode')}`;
+    }
+    const navOpportunity = document.getElementById('nav-opportunity');
+    if (navOpportunity) {
+        navOpportunity.textContent = `🌐 ${t('navOpportunity')}`;
     }
     
     // 更新警告横幅

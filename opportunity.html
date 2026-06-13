@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Opportunity Insights | TraceWize</title>
+    <link rel="stylesheet" href="css/style.css?v=20260613-opportunity">
+</head>
+<body class="opportunity-page-body">
+    <main class="opportunity-page view-container active">
+        <header class="opportunity-header">
+            <div class="home-header opportunity-home-header">
+                <h1 class="home-title opportunity-page-title">🌐 Trade Opportunity Insights</h1>
+                <p class="home-subtitle">Find lower-friction markets, cleaner routes, and compliance-driven business opportunities.</p>
+            </div>
+        </header>
+
+        <div class="disclaimer-bar opportunity-disclaimer">
+            <span>Opportunity screening only. Use this to compare routes before a detailed compliance, tax, and market-entry review.</span>
+        </div>
+
+        <form id="opportunity-form" class="opportunity-form" autocomplete="off" novalidate>
+            <section class="opportunity-form-section">
+                <h2 class="opportunity-form-title">Trade route and product</h2>
+                <div class="opportunity-grid opportunity-grid--two">
+                    <label class="opportunity-field" for="opportunity-from">
+                        <span>From country / region</span>
+                        <select id="opportunity-from" class="opportunity-input" required></select>
+                    </label>
+                    <label class="opportunity-field" for="opportunity-to">
+                        <span>Target market</span>
+                        <select id="opportunity-to" class="opportunity-input" required></select>
+                    </label>
+                </div>
+                <label class="opportunity-field" for="opportunity-product">
+                    <span>Product</span>
+                    <input id="opportunity-product" class="opportunity-input" type="text" placeholder="e.g. lithium battery pack, solar panel, 5G smartphone, AI GPU chip" required>
+                </label>
+                <div class="opportunity-focus-group" role="group" aria-label="Opportunity focus">
+                    <label class="opportunity-focus-option">
+                        <input type="radio" name="opportunity-focus" value="export">
+                        <span>Export opportunity at origin</span>
+                    </label>
+                    <label class="opportunity-focus-option">
+                        <input type="radio" name="opportunity-focus" value="import">
+                        <span>Import opportunity at destination</span>
+                    </label>
+                </div>
+            </section>
+
+            <div id="opportunity-error" class="post-entry-error" hidden role="alert"></div>
+            <button type="submit" class="opportunity-submit-btn">Find Opportunities</button>
+        </form>
+
+        <section class="opportunity-start-panel">
+            <div>
+                <span class="opportunity-kicker">What this checks</span>
+                <h2>Not just risk. Find where the trade may work better.</h2>
+            </div>
+            <div class="opportunity-start-grid">
+                <div><strong>Route fit</strong><span>Compare import friction and route risk.</span></div>
+                <div><strong>Cost signal</strong><span>Use maintained duty signals where available.</span></div>
+                <div><strong>Green trade</strong><span>Surface battery, EPR, RoHS/REACH, and sustainability clues.</span></div>
+                <div><strong>Traceability</strong><span>Spot when origin and supplier evidence can create buyer trust.</span></div>
+            </div>
+        </section>
+
+        <section id="opportunity-result" class="opportunity-result" hidden aria-live="polite"></section>
+    </main>
+
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a id="nav-home" class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a id="nav-incoterm" class="nav-btn nav-btn-link" href="index.html#incoterm">📦 Incoterm</a>
+        <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code</a>
+        <a id="nav-post-entry" class="nav-btn nav-btn-link" href="post-entry.html">🧾 Post-Entry</a>
+        <span id="nav-opportunity" class="nav-btn active" aria-current="page">🌐 Opportunity</span>
+    </nav>
+
+    <script src="js/main.js?v=20260613-opportunity" data-app="opportunity"></script>
+</body>
+</html>

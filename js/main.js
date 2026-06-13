@@ -1,9 +1,9 @@
 /**
  * Single application entry — loads modules in order, then boots the active page.
- * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry"></script>
+ * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity"></script>
  */
 (function () {
-    const BUILD = '20260613-post-entry-exact-rate';
+    const BUILD = '20260613-opportunity';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -17,6 +17,9 @@
         }
         if (/\/post-entry\.html/i.test(path)) {
             return 'post-entry';
+        }
+        if (/\/opportunity\.html/i.test(path)) {
+            return 'opportunity';
         }
         if (/\/electronics\.html/i.test(path) || /\/new-energy\.html/i.test(path) || /\/semiconductor\.html/i.test(path)) {
             return 'category';
@@ -38,6 +41,7 @@
         'lib/enterprise-print-report.js',
         'lib/industry-checklist-baseline.js',
         'lib/product-intelligence.js',
+        'lib/trade-opportunity.js',
         'lib/deep-link.js',
         'js/tag-enrich.js',
         'js/trade-country-ui.js',
@@ -115,6 +119,15 @@
         'js/post-entry-page.js'
     ];
 
+    const OPPORTUNITY_MODULES = [
+        'js/app-state.js',
+        'js/dom-mount.js',
+        'js/core.js',
+        'lib/country-registry.js',
+        'lib/trade-opportunity.js',
+        'js/opportunity-page.js'
+    ];
+
     function withVersion(src) {
         return `${src}?v=${BUILD}`;
     }
@@ -183,6 +196,8 @@
                 modules = HSCODE_MODULES;
             } else if (app === 'post-entry') {
                 modules = POST_ENTRY_MODULES;
+            } else if (app === 'opportunity') {
+                modules = OPPORTUNITY_MODULES;
             } else if (app === 'category') {
                 modules = CATEGORY_MODULES;
             }
@@ -208,6 +223,12 @@
                 if (app === 'post-entry') {
                     if (typeof bootstrapPostEntryPage === 'function') {
                         bootstrapPostEntryPage();
+                    }
+                    return;
+                }
+                if (app === 'opportunity') {
+                    if (typeof bootstrapTradeOpportunityPage === 'function') {
+                        bootstrapTradeOpportunityPage();
                     }
                     return;
                 }
