@@ -19,7 +19,7 @@ const SG_BENCHMARK = {
     gst_rate: 0.09,
     source_hts: 'SG electronics benchmark',
     source_rate_text: 'Benchmark: 0% customs duty + 9% GST',
-    source_note: 'Singapore benchmark refreshed locally. Verify exact HS code, GST value basis, and whether the goods are dutiable before filing.'
+    source_note: 'Singapore official source link monitored; benchmark math refreshed locally. Verify exact HS code, GST value basis, and whether the goods are dutiable before filing.'
 };
 
 function readJson(filePath) {
@@ -77,8 +77,8 @@ function applySingaporeBenchmarkToRule(rule, checkedAt) {
     refreshGstLayer(rule);
 
     const updates = {
-        source_status: 'benchmark_source_checked',
-        confidence: 'Indicative',
+        source_status: 'official_link_checked',
+        confidence: 'Official link monitored',
         source_note: SG_BENCHMARK.source_note,
         source_hts: SG_BENCHMARK.source_hts,
         source_rate_text: SG_BENCHMARK.source_rate_text,

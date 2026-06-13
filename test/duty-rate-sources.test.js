@@ -538,7 +538,7 @@ test('Singapore updater keeps GST benchmark separate from official machine rates
     const changes = applySingaporeBenchmarkToRule(rule, '2026-06-08T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'benchmark_source_checked');
+    assert.equal(rule.source_status, 'official_link_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.09);
     assert.equal(rule.additional_rate, 0.09);
 });
@@ -557,7 +557,7 @@ test('Mexico updater keeps VAT benchmark separate from official machine rates', 
     const changes = applyMexicoBenchmarkToRule(rule, '2026-06-09T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'benchmark_source_checked');
+    assert.equal(rule.source_status, 'official_link_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.16);
     assert.equal(rule.additional_rate, 0.16);
 });
@@ -576,7 +576,7 @@ test('Japan updater keeps consumption tax benchmark separate from official machi
     const changes = applyJapanBenchmarkToRule(rule, '2026-06-10T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'benchmark_source_checked');
+    assert.equal(rule.source_status, 'official_link_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
 });
@@ -595,7 +595,7 @@ test('Korea updater keeps VAT benchmark separate from official machine rates', (
     const changes = applyKoreaBenchmarkToRule(rule, '2026-06-10T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'benchmark_source_checked');
+    assert.equal(rule.source_status, 'official_link_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
 });

@@ -193,6 +193,7 @@ test('classifies Post-Entry rate trust tiers', () => {
         { component: 'import_vat', status: 'indicative' }
     ]).level, 'official_duty_tax_estimate');
     assert.equal(classifyRateSourceTrust([{ status: 'scope_check_required' }]).level, 'official_heading_only');
+    assert.equal(classifyRateSourceTrust([{ status: 'official_link_checked' }]).level, 'official_link_estimate');
     assert.equal(classifyRateSourceTrust([{ status: 'benchmark_source_checked' }]).level, 'precheck_estimate');
     assert.equal(classifyRateSourceTrust([{ status: 'not_covered' }]).level, 'not_covered');
 });
@@ -225,8 +226,8 @@ test('builds direct import decision for official and benchmark rate sources', ()
         declaredDuty: 0
     });
     const sgDecision = buildImportPostEntryDecision(valueResult, sgDuty, { currency: 'USD' });
-    assert.equal(sgDecision.trust.level, 'precheck_estimate');
-    assert.match(sgDecision.coreConclusion, /Pre-check estimate/);
+    assert.equal(sgDecision.trust.level, 'official_link_estimate');
+    assert.match(sgDecision.coreConclusion, /Official link estimate/);
 
     const euDuty = calculateDutyImpact(valueResult, {
         importCountryCode: 'EU',

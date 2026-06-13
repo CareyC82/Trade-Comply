@@ -397,6 +397,7 @@
         }
         .badge.auto_updatable { background: #123d2a; color: #86efac; }
         .badge.benchmark_updatable { background: #164e63; color: #67e8f9; }
+        .badge.official_link_monitor { background: #312e81; color: #c4b5fd; }
         .badge.updater_candidate { background: #1e3a5f; color: #93c5fd; }
         .badge.official_link { background: #3b2f1e; color: #fcd34d; }
         .badge.benchmark { background: #451a1a; color: #fca5a5; }
@@ -888,6 +889,10 @@
                     label: 'Benchmark auto',
                     note: '自动刷新 benchmark/官方入口状态；精确税率解析仍待完成。'
                 },
+                official_link_monitor: {
+                    label: 'Official link monitor',
+                    note: '已挂接官方来源并自动刷新状态；下一步是逐税号机器解析。'
+                },
                 updater_candidate: {
                     label: 'Candidate',
                     note: '已识别候选源，待接入自动更新脚本。'
@@ -1073,25 +1078,56 @@
                 return '<div class="empty">No high-frequency rate matrix available.</div>';
             }
             const failures = Array.isArray(matrix.failures) ? matrix.failures : [];
-            const trustCounts = matrix.trust_counts || {};
-            const automationCounts = matrix.automation_counts || {};
-            const topRows = rows.slice(0, 12);
-            return `
-                <div class="summary-grid">
-                    <div class="summary-card"><strong>${matrix.covered_route_count ?? 0}/${matrix.route_count ?? rows.length}</strong><span>High-frequency routes covered</span></div>
-                    <div class="summary-card"><strong>${matrix.official_or_hybrid_count ?? 0}</strong><span>Official / hybrid routes</span></div>
-                    <div class="summary-card"><strong>${matrix.benchmark_count ?? 0}</strong><span>Benchmark routes</span></div>
-                    <div class="summary-card"><strong>${failures.length}</strong><span>Matrix exceptions</span></div>
-                </div>
-                <p class="meta">
-                    Trust: ${Object.entries(trustCounts).map(([key, value]) => `<span class="badge ${key === 'precheck_estimate' ? 'benchmark' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
-                </p>
-                <p class="meta">
-                    Automation: ${Object.entries(automationCounts).map(([key, value]) => `<span class="badge ${key === 'benchmark_auto' ? 'benchmark_updatable' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
-                </p>
-                ${failures.length ? `<div class="empty">Matrix exceptions: ${escapeHtml(failures.map(item => `${item.id}: ${(item.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
-                <div class="coverage-table-wrap">
-                    <table class="quality-gap-table">
+                const trustCounts = matrix.trust_counts || {};
+                const automationCounts = matrix.automation_counts || {};
+                const upgradeQueue = Array.isArray(matrix.priority_upgrade_queue) ? matrix.priority_upgrade_queue : [];
+                const topRows = rows.slice(0, 12);
+                const topQueue = upgradeQueue.slice(0, 16);
+                return `
+                    <div class="summary-grid">
+                        <div class="summary-card"><strong>${matrix.covered_route_count ?? 0}/${matrix.route_count ?? rows.length}</strong><span>High-frequency routes covered</span></div>
+                        <div class="summary-card"><strong>${matrix.official_or_hybrid_count ?? 0}</strong><span>Official / hybrid routes</span></div>
+                        <div class="summary-card"><strong>${matrix.benchmark_count ?? 0}</strong><span>Benchmark routes</span></div>
+                        <div class="summary-card"><strong>${matrix.parser_priority_count ?? upgradeQueue.length}</strong><span>Parser upgrade queue</span></div>
+                        <div class="summary-card"><strong>${failures.length}</strong><span>Matrix exceptions</span></div>
+                    </div>
+                    <p class="meta">
+                        Trust: ${Object.entries(trustCounts).map(([key, value]) => `<span class="badge ${key === 'precheck_estimate' ? 'benchmark' : key === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
+                    </p>
+                    <p class="meta">
+                        Automation: ${Object.entries(automationCounts).map(([key, value]) => `<span class="badge ${key === 'benchmark_auto' ? 'benchmark_updatable' : key === 'official_link_monitor' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
+                    </p>
+                    ${failures.length ? `<div class="empty">Matrix exceptions: ${escapeHtml(failures.map(item => `${item.id}: ${(item.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
+                    <div class="crawl-section-title"><h3>税率补全优先级列表</h3><span class="meta">${upgradeQueue.length} route(s) need parser / exact-rate upgrade</span></div>
+                    <div class="coverage-table-wrap">
+                        <table class="quality-gap-table">
+                            <thead>
+                                <tr>
+                                    <th>Priority</th>
+                                    <th>Product</th>
+                                    <th>Route</th>
+                                    <th>HS</th>
+                                    <th>Current trust</th>
+                                    <th>Next action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${topQueue.length ? topQueue.map((row) => `
+                                    <tr>
+                                        <td><strong>P${escapeHtml(row.priority || '')}</strong></td>
+                                        <td>${escapeHtml(row.product_id || '')}</td>
+                                        <td>${escapeHtml(row.route || '')}</td>
+                                        <td>${escapeHtml(row.hs_code || '')}</td>
+                                        <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : row.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
+                                        <td>${escapeHtml(row.next_action || '')}</td>
+                                    </tr>
+                                `).join('') : '<tr><td colspan="6"><span class="meta">All priority routes are official exact or official duty + tax estimate.</span></td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                    ${upgradeQueue.length > topQueue.length ? `<p class="meta">Showing ${topQueue.length} of ${upgradeQueue.length} parser upgrade priorities.</p>` : ''}
+                    <div class="coverage-table-wrap">
+                        <table class="quality-gap-table">
                         <thead>
                             <tr>
                                 <th>Product</th>
@@ -1107,8 +1143,8 @@
                                     <td><strong>${escapeHtml(row.product_id || '')}</strong></td>
                                     <td>${escapeHtml(row.route || '')}</td>
                                     <td>${escapeHtml(row.hs_code || '')}</td>
-                                    <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
-                                    <td><span class="badge ${row.automation_level === 'benchmark_auto' ? 'benchmark_updatable' : 'auto_updatable'}">${escapeHtml(row.automation_level || '')}</span></td>
+                                    <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : row.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
+                                    <td><span class="badge ${row.automation_level === 'benchmark_auto' ? 'benchmark_updatable' : row.automation_level === 'official_link_monitor' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(row.automation_level || '')}</span></td>
                                 </tr>
                             `).join('')}
                         </tbody>

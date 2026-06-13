@@ -139,6 +139,33 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         return counts;
     }, {});
     const missingProductDefinitions = productIds.filter(productId => !products.has(productId));
+    const priorityRank = {
+        precheck_estimate: 1,
+        official_link_estimate: 2,
+        official_heading_only: 3,
+        mixed_official_estimate: 4,
+        official_duty_tax_estimate: 5,
+        official_exact: 6
+    };
+    const upgradeQueue = results
+        .filter(result => !['official_exact', 'official_duty_tax_estimate'].includes(result.source_trust))
+        .map(result => ({
+            id: result.id,
+            product_id: result.product_id,
+            route: result.route,
+            hs_code: result.hs_code,
+            source_trust: result.source_trust,
+            automation_level: result.automation_level,
+            priority: priorityRank[result.source_trust] || 9,
+            next_action: result.source_trust === 'official_link_estimate'
+                ? 'Connect exact machine-readable tariff-line parser for this official source.'
+                : result.source_trust === 'official_heading_only'
+                    ? 'Require exact tariff line / scope before promoting to official exact rate.'
+                    : result.source_trust === 'mixed_official_estimate'
+                        ? 'Separate official base duty from trade-remedy or add-on scope and confirm active filing period.'
+                        : 'Find official source or parser before using this route beyond screening.'
+        }))
+        .sort((a, b) => a.priority - b.priority || a.route.localeCompare(b.route) || a.product_id.localeCompare(b.product_id));
 
     missingProductDefinitions.forEach((productId) => {
         failures.push({
@@ -159,8 +186,11 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             || result.source_trust === 'mixed_official_estimate'
             || result.source_trust === 'official_exact_rate'
             || result.source_trust === 'official_heading_only'
+            || result.source_trust === 'official_link_estimate'
         )).length,
         benchmark_count: results.filter(result => result.source_trust === 'precheck_estimate').length,
+        parser_priority_count: upgradeQueue.length,
+        priority_upgrade_queue: upgradeQueue,
         trust_counts: trustCounts,
         automation_counts: automationCounts,
         products: productIds,
@@ -209,6 +239,7 @@ function summarizeRuleSourceQuality(dutyPayload) {
             rule_count: 0,
             official_source_checked: 0,
             scope_check_required: 0,
+            official_link_checked: 0,
             benchmark_source_checked: 0,
             indicative: 0,
             source_statuses: {}
@@ -229,7 +260,9 @@ function summarizeRuleSourceQuality(dutyPayload) {
             ? 'official_all'
             : officialOrScope === row.rule_count
                 ? 'official_or_scope_all'
-                : row.benchmark_source_checked === row.rule_count
+                : row.official_link_checked === row.rule_count
+                    ? 'official_link_all'
+                    : row.benchmark_source_checked === row.rule_count
                     ? 'benchmark_all'
                     : 'mixed';
         return {

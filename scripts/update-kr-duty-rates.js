@@ -21,7 +21,7 @@ const KR_BENCHMARK = {
     vat_rate: 0.1,
     source_hts: 'KR electronics benchmark',
     source_rate_text: 'Benchmark: 0% duty for many electronics + 10% VAT',
-    source_note: 'Korea benchmark refreshed locally. Verify exact tariff line, VAT basis, KC scope, and origin preference before filing.'
+    source_note: 'Korea official source link monitored; benchmark math refreshed locally. Verify exact tariff line, VAT basis, KC scope, and origin preference before filing.'
 };
 
 function readJson(filePath) {
@@ -175,8 +175,8 @@ function applyKoreaBenchmarkToRule(rule, checkedAt) {
     refreshVatLayer(rule);
 
     const updates = {
-        source_status: 'benchmark_source_checked',
-        confidence: 'Benchmark source checked',
+        source_status: 'official_link_checked',
+        confidence: 'Official link monitored',
         source_note: KR_BENCHMARK.source_note,
         source_hts: KR_BENCHMARK.source_hts,
         source_rate_text: KR_BENCHMARK.source_rate_text,

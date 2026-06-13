@@ -62,7 +62,8 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
         assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-code gates`);
     });
     ['SG', 'MX', 'JP', 'KR'].forEach((country) => {
-        assert.equal(qualityByCountry.get(country).coverage_level, 'benchmark_all', country);
+        assert.equal(qualityByCountry.get(country).coverage_level, 'official_link_all', country);
+        assert.ok(qualityByCountry.get(country).official_link_checked > 0, `${country} should have monitored official links`);
     });
 });
 
@@ -123,11 +124,14 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR'].forEach((country) => {
         assert.ok(matrix.import_markets.includes(country), `${country} should be in high-frequency rate matrix`);
     });
-    assert.ok(matrix.official_or_hybrid_count > 20, 'official/hybrid exact-rate coverage should be substantial');
-    assert.ok(matrix.benchmark_count > 20, 'benchmark rows should remain explicit until official feeds are connected');
+    assert.ok(matrix.official_or_hybrid_count > 50, 'official/hybrid/link-monitored coverage should cover the full high-frequency matrix');
+    assert.equal(matrix.benchmark_count, 0, 'high-frequency routes should no longer remain plain benchmark rows');
     assert.equal(matrix.automation_counts.official_auto > 0, true);
     assert.equal(matrix.automation_counts.hybrid_official > 0, true);
-    assert.equal(matrix.automation_counts.benchmark_auto > 0, true);
+    assert.equal(matrix.automation_counts.official_link_monitor > 0, true);
+    assert.equal(matrix.trust_counts.official_link_estimate, 32);
+    assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
+    assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
 });
 
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {
@@ -209,15 +213,15 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
     assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
 });
 
-test('Singapore Mexico Japan and Korea import benchmarks stay source-checked', () => {
+test('Singapore Mexico Japan and Korea import routes are official-link monitored', () => {
     ['SG', 'MX', 'JP', 'KR'].forEach((country) => {
         const rule = (dutyRates.rules || []).find(item => (
             item.import_country === country
             && (item.hs_prefixes || []).includes('8542')
         ));
 
-        assert.ok(rule, `${country} electronics benchmark rule should exist`);
-        assert.equal(rule.source_status, 'benchmark_source_checked', `${country} should use benchmark source checked status`);
+        assert.ok(rule, `${country} electronics rule should exist`);
+        assert.equal(rule.source_status, 'official_link_checked', `${country} should use official-link monitored status`);
         assert.ok(rule.last_checked_at, `${country} should carry checked timestamp when refreshed`);
     });
 });
@@ -243,9 +247,11 @@ test('non-US benchmark samples stay non-official except EU TARIC candidate rows'
     assert.ok(officialTaricSamples.some(sample => sample.source_statuses.includes('official_source_checked')));
     nonUsSamples.forEach((sample) => {
         assert.equal(
-            sample.source_statuses.includes('indicative') || sample.source_statuses.includes('benchmark_source_checked'),
+            sample.source_statuses.includes('indicative')
+                || sample.source_statuses.includes('benchmark_source_checked')
+                || sample.source_statuses.includes('official_link_checked'),
             true,
-            `${sample.id} should remain indicative or benchmark-checked`
+            `${sample.id} should remain indicative, benchmark-checked, or official-link monitored`
         );
         if (
             sample.id.startsWith('PE-EU-')

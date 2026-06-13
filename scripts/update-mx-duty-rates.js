@@ -19,7 +19,7 @@ const MX_BENCHMARK = {
     vat_rate: 0.16,
     source_hts: 'MX electronics benchmark',
     source_rate_text: 'Benchmark: VAT 16%; IGI depends on TIGIE tariff line',
-    source_note: 'Mexico benchmark refreshed locally. Verify exact TIGIE tariff line, VAT base, NOM scope, and preferential origin before filing.'
+    source_note: 'Mexico official source link monitored; benchmark math refreshed locally. Verify exact TIGIE tariff line, VAT base, NOM scope, and preferential origin before filing.'
 };
 
 function readJson(filePath) {
@@ -77,8 +77,8 @@ function applyMexicoBenchmarkToRule(rule, checkedAt) {
     refreshVatLayer(rule);
 
     const updates = {
-        source_status: 'benchmark_source_checked',
-        confidence: 'Indicative',
+        source_status: 'official_link_checked',
+        confidence: 'Official link monitored',
         source_note: MX_BENCHMARK.source_note,
         source_hts: MX_BENCHMARK.source_hts,
         source_rate_text: MX_BENCHMARK.source_rate_text,

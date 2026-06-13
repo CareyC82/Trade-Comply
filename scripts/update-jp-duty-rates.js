@@ -20,7 +20,7 @@ const JP_BENCHMARK = {
     consumption_tax_rate: 0.1,
     source_hts: 'JP electronics benchmark',
     source_rate_text: 'Benchmark: 0% duty for many electronics + 10% consumption tax',
-    source_note: 'Japan benchmark refreshed locally. Verify exact tariff line, consumption tax basis, and product approval scope before filing.'
+    source_note: 'Japan official source link monitored; benchmark math refreshed locally. Verify exact tariff line, consumption tax basis, and product approval scope before filing.'
 };
 
 function readJson(filePath) {
@@ -315,8 +315,8 @@ function applyJapanBenchmarkToRule(rule, checkedAt) {
     refreshConsumptionTaxLayer(rule);
 
     const updates = {
-        source_status: 'benchmark_source_checked',
-        confidence: 'Benchmark source checked',
+        source_status: 'official_link_checked',
+        confidence: 'Official link monitored',
         source_note: JP_BENCHMARK.source_note,
         source_hts: JP_BENCHMARK.source_hts,
         source_rate_text: JP_BENCHMARK.source_rate_text,

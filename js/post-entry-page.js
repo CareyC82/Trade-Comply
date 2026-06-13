@@ -180,6 +180,8 @@
         const labels = {
             official_source_checked: 'Official exact rate',
             official_duty_tax_estimate: 'Official duty + tax estimate',
+            official_link_checked: 'Official link estimate',
+            official_link_estimate: 'Official link estimate',
             official_heading_benchmark: 'Official source, exact code needed',
             benchmark_source_checked: 'Pre-check estimate',
             indicative: 'Pre-check estimate',
@@ -198,6 +200,8 @@
     function getSourceStatusHelp(status) {
         const labels = {
             official_source_checked: 'A maintained official tariff source is attached and the rate is usable for this pre-check.',
+            official_link_checked: 'An official tariff source is attached and monitored, but exact machine-readable tariff-line parsing is still pending.',
+            official_link_estimate: 'An official tariff source is attached and monitored, but exact machine-readable tariff-line parsing is still pending.',
             official_heading_benchmark: 'An official source exists, but the broader HS heading/prefix can contain multiple rates.',
             benchmark_source_checked: 'Use this as a screening estimate; confirm the final tariff line before filing or correction.',
             indicative: 'Use this as a screening estimate; confirm the final tariff line before filing or correction.',
@@ -220,6 +224,7 @@
         if (['review_basis', 'export_review_only', 'regional_route_not_exact_rate', 'sanctions_scope_separate'].includes(status)) return status;
         if (status === 'exact_hs_required') return 'exact_hs_required';
         if (status === 'scope_check_required' || status === 'flag_only') return 'official_heading_benchmark';
+        if (status === 'official_link_checked') return 'official_link_estimate';
         if (status === 'benchmark_source_checked' || status === 'indicative') return 'benchmark_source_checked';
         if (status === 'official_source_checked') {
             if (/scope check|required|multiple|benchmark|prefix|heading|chapter/.test(detail)) {
@@ -234,6 +239,7 @@
         const labels = {
             official_source_checked: 'Official exact rate',
             official_heading_benchmark: 'Official source, exact code needed',
+            official_link_estimate: 'Official link estimate',
             benchmark_source_checked: 'Pre-check estimate',
             indicative: 'Pre-check estimate',
             not_covered: 'Not covered',
@@ -254,6 +260,7 @@
         const tiers = new Set(items.map(normalizeRateTier));
         if (tiers.has('not_covered')) return 'not_covered';
         if (tiers.has('official_heading_benchmark')) return 'official_heading_benchmark';
+        if (tiers.has('official_link_estimate')) return 'official_link_estimate';
         if (tiers.size && Array.from(tiers).every(status => status === 'official_source_checked')) {
             return 'official_source_checked';
         }
@@ -305,6 +312,11 @@
                 tone: 'scope',
                 label: 'Official source, exact code needed',
                 summary: 'An official tariff source is attached, but the exact tariff code or case scope can change the final rate.'
+            },
+            official_link_estimate: {
+                tone: 'scope',
+                label: 'Official link estimate',
+                summary: 'The official tariff source is attached and monitored; exact machine-readable tariff-line parsing is still pending.'
             },
             benchmark_source_checked: {
                 tone: 'benchmark',
@@ -373,6 +385,7 @@
         const base = findBaseDutySource(rows);
         const hasScopeCheck = rows.some(item => normalizeRateTier(item) === 'official_heading_benchmark');
         const officialRows = rows.filter(item => normalizeRateTier(item) === 'official_source_checked');
+        const officialLinkRows = rows.filter(item => normalizeRateTier(item) === 'official_link_estimate');
         const benchmarkRows = rows.filter(item => normalizeRateTier(item) === 'benchmark_source_checked');
         const scopeRows = rows.filter(item => normalizeRateTier(item) === 'official_heading_benchmark');
         const reviewRows = rows.filter(item => ['review_basis', 'export_review_only', 'regional_route_not_exact_rate', 'sanctions_scope_separate'].includes(normalizeRateTier(item)));
@@ -385,6 +398,15 @@
                 label: 'Official source, exact code needed',
                 title: 'Use this as a benchmark, not a final payable duty.',
                 detail: target.detail || target.source || 'The exact 8-10 digit tariff line can change the rate.'
+            };
+        }
+        if (officialLinkRows.length) {
+            const target = officialLinkRows[0] || base || {};
+            return {
+                tone: 'scope',
+                label: 'Official link estimate',
+                title: target.detail || 'Official tariff source is attached, but exact parser is pending.',
+                detail: 'Use this as a stronger pre-check than a local benchmark; final filing still needs the exact official tariff-line result.'
             };
         }
         if (exactHsRows.length) {
@@ -458,6 +480,9 @@
         }
         if (level === 'official_heading_benchmark') {
             return 'Rate basis: official source, exact code needed.';
+        }
+        if (level === 'official_link_estimate') {
+            return 'Rate basis: official link estimate; parser pending.';
         }
         if (level === 'not_covered') {
             return 'Rate basis: not covered; value math only.';
@@ -555,6 +580,11 @@
                 rows: rows.filter(item => normalizeRateTier(item) === 'official_heading_benchmark')
             },
             {
+                label: 'Official link estimate',
+                status: 'official_link_estimate',
+                rows: rows.filter(item => normalizeRateTier(item) === 'official_link_estimate')
+            },
+            {
                 label: 'Official exact rate',
                 status: 'official_source_checked',
                 rows: rows.filter(item => normalizeRateTier(item) === 'official_source_checked')
@@ -597,6 +627,10 @@
                 if (group.status === 'official_heading_benchmark') {
                     source = 'Official source, broader heading';
                     detail = first.detail || 'A broader HS prefix has multiple possible rates; exact tariff line can change the result.';
+                }
+                if (group.status === 'official_link_estimate') {
+                    source = first.source || 'Official tariff source';
+                    detail = first.detail || 'Official source is attached; exact machine-readable tariff-line parsing is still pending.';
                 }
                 if (group.status === 'benchmark_source_checked') {
                     source = 'Pre-check estimate';

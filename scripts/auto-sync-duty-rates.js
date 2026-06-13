@@ -182,6 +182,8 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
                 covered_route_count: health.priority_rate_matrix.covered_route_count,
                 trust_counts: health.priority_rate_matrix.trust_counts,
                 automation_counts: health.priority_rate_matrix.automation_counts,
+                parser_priority_count: health.priority_rate_matrix.parser_priority_count || 0,
+                priority_upgrade_queue: (health.priority_rate_matrix.priority_upgrade_queue || []).slice(0, 20),
                 failures: health.priority_rate_matrix.failures || []
             } : null,
             failures: health.failures || []
