@@ -1,13 +1,6 @@
 (function (global) {
     let selectedPostEntryFocus = '';
     const POST_ENTRY_REVIEW_STORAGE_KEY = 'tracewize.postEntry.review';
-    const POST_ENTRY_SAMPLE_SCENARIOS = [
-        { id: 'cn-us-import-battery', label: 'CN -> US import battery', focus: 'import', originCountry: 'CN', importCountry: 'US', entryDate: '06 / 12 / 26', hsCode: '850760', incoterm: 'FOB', currency: 'USD', declaredAmount: 2000, freight: 100, insurance: 20, otherCharges: 0, declaredDuty: 0 },
-        { id: 'us-eu-import-battery', label: 'US -> EU import battery', focus: 'import', originCountry: 'US', importCountry: 'EU', entryDate: '06 / 12 / 26', hsCode: '850760', incoterm: 'FOB', currency: 'EUR', declaredAmount: 1200, freight: 200, insurance: 40, otherCharges: 0, declaredDuty: 0 },
-        { id: 'cn-us-export-rebate', label: 'CN -> US export rebate', focus: 'export', originCountry: 'CN', importCountry: 'US', entryDate: '06 / 12 / 26', hsCode: '8542', incoterm: 'CIF', currency: 'USD', declaredAmount: 5000, freight: 300, insurance: 50, otherCharges: 0, declaredDuty: 0 },
-        { id: 'us-jp-export-filing', label: 'US -> JP export filing', focus: 'export', originCountry: 'US', importCountry: 'JP', entryDate: '06 / 12 / 26', hsCode: '851762', incoterm: 'FOB', currency: 'USD', declaredAmount: 3000, freight: 150, insurance: 20, otherCharges: 0, declaredDuty: 0 },
-        { id: 'de-us-export-filing', label: 'DE -> US export filing', focus: 'export', originCountry: 'DE', importCountry: 'US', entryDate: '06 / 12 / 26', hsCode: '850440', incoterm: 'EXW', currency: 'EUR', declaredAmount: 8000, freight: 500, insurance: 80, otherCharges: 120, declaredDuty: 0 }
-    ];
 
     function $(id) {
         return document.getElementById(id);
@@ -187,8 +180,8 @@
         const labels = {
             official_source_checked: 'Official exact rate',
             official_heading_benchmark: 'Official heading benchmark',
-            benchmark_source_checked: 'Internal benchmark only',
-            indicative: 'Internal benchmark only',
+            benchmark_source_checked: 'Pre-check estimate',
+            indicative: 'Pre-check estimate',
             scope_check_required: 'Official heading benchmark',
             flag_only: 'Scope check required',
             exact_hs_required: 'Exact HS required',
@@ -198,15 +191,15 @@
             not_covered: 'Not covered',
             review_basis: 'Review basis'
         };
-        return labels[status] || 'Internal benchmark only';
+        return labels[status] || 'Pre-check estimate';
     }
 
     function getSourceStatusHelp(status) {
         const labels = {
             official_source_checked: 'A maintained official tariff source is attached and the rate is usable for this pre-check.',
             official_heading_benchmark: 'An official source exists, but the broader HS heading/prefix can contain multiple rates.',
-            benchmark_source_checked: 'Maintained by TraceWize as an internal benchmark; useful for screening, not a final tariff lookup.',
-            indicative: 'Maintained by TraceWize as an internal benchmark; useful for screening, not a final tariff lookup.',
+            benchmark_source_checked: 'Use this as a screening estimate; confirm the final tariff line before filing or correction.',
+            indicative: 'Use this as a screening estimate; confirm the final tariff line before filing or correction.',
             scope_check_required: 'The amount depends on exact tariff line, case scope, exclusion, origin, or product-specific facts.',
             flag_only: 'The amount depends on case scope, exclusion, origin, or product-specific facts.',
             exact_hs_required: 'A rate source exists, but the final rate requires the exact 10-digit HS/CN code and filing date.',
@@ -240,8 +233,8 @@
         const labels = {
             official_source_checked: 'Official exact rate',
             official_heading_benchmark: 'Official heading benchmark',
-            benchmark_source_checked: 'Internal benchmark only',
-            indicative: 'Internal benchmark only',
+            benchmark_source_checked: 'Pre-check estimate',
+            indicative: 'Pre-check estimate',
             not_covered: 'Not covered',
             review_basis: 'Review basis',
             exact_hs_required: 'Exact HS required',
@@ -299,8 +292,8 @@
             },
             benchmark_source_checked: {
                 tone: 'benchmark',
-                label: 'Internal benchmark only',
-                summary: 'This uses a maintained TraceWize benchmark. Good for screening; do not treat it as a final official tariff rate.'
+                label: 'Pre-check estimate',
+                summary: 'This is a maintained screening estimate. Confirm the final tariff line before filing or correction.'
             },
             mixed: {
                 tone: 'mixed',
@@ -424,9 +417,9 @@
         }
         return {
             tone: 'benchmark',
-            label: 'Internal benchmark only',
-            title: base?.detail || 'Duty math uses a maintained benchmark estimate.',
-            detail: 'Use this for quick screening; the final official tariff line is not attached yet.'
+            label: 'Pre-check estimate',
+            title: base?.detail || 'Duty math uses a maintained screening estimate.',
+            detail: 'Use this for quick screening; confirm the final tariff line before filing or correction.'
         };
     }
 
@@ -439,7 +432,7 @@
             return 'Rate basis: official rate plus benchmark layers.';
         }
         if (level === 'benchmark_source_checked') {
-            return 'Rate basis: internal benchmark only.';
+            return 'Rate basis: pre-check estimate.';
         }
         if (level === 'official_heading_benchmark') {
             return 'Rate basis: official heading benchmark; exact line can change the result.';
@@ -462,7 +455,7 @@
         if (level === 'review_basis') {
             return 'Rate basis: export filing value logic only.';
         }
-        return 'Rate basis: internal benchmark only.';
+        return 'Rate basis: pre-check estimate.';
     }
 
     function buildJurisdictionScopeNote(context = {}) {
@@ -558,7 +551,7 @@
                 rows: rows.filter(item => normalizeRateTier(item) === 'official_source_checked')
             },
             {
-                label: 'Internal benchmark only',
+                label: 'Pre-check estimate',
                 status: 'benchmark_source_checked',
                 rows: rows.filter(item => normalizeRateTier(item) === 'benchmark_source_checked')
             },
@@ -597,10 +590,10 @@
                     detail = first.detail || 'A broader HS prefix has multiple possible rates; exact tariff line can change the result.';
                 }
                 if (group.status === 'benchmark_source_checked') {
-                    source = 'TraceWize benchmark';
+                    source = 'Pre-check estimate';
                     detail = group.rows.length > 1
-                        ? `Benchmark layers included: ${group.rows.map(item => item.label || item.source).filter(Boolean).join(', ')}.`
-                        : (first.detail || 'Internal benchmark used because no exact official route / HS rate is attached yet.');
+                        ? `Estimate layers included: ${group.rows.map(item => item.label || item.source).filter(Boolean).join(', ')}.`
+                        : (first.detail || 'Screening estimate used because no exact official route / HS rate is attached yet.');
                 }
                 if (group.status === 'review_basis') {
                     source = first.source || 'Export-side filing logic';
@@ -985,40 +978,6 @@
         });
     }
 
-    function fillPostEntryScenario(scenario) {
-        if (!scenario) return;
-        const setValue = (id, value) => {
-            const el = $(id);
-            if (el) el.value = value == null ? '' : String(value);
-        };
-        setValue('post-entry-origin-country', scenario.originCountry);
-        setValue('post-entry-import-country', scenario.importCountry);
-        setValue('post-entry-hs-code', scenario.hsCode);
-        setValue('post-entry-incoterm', scenario.incoterm);
-        setValue('post-entry-currency', scenario.currency);
-        setValue('post-entry-declared-amount', scenario.declaredAmount);
-        setValue('post-entry-freight', scenario.freight);
-        setValue('post-entry-insurance', scenario.insurance);
-        setValue('post-entry-other-charges', scenario.otherCharges);
-        setValue('post-entry-declared-duty', scenario.declaredDuty);
-        setEntryDateParts(scenario.entryDate);
-        setPostEntryFocus(scenario.focus);
-    }
-
-    function bindPostEntrySamples() {
-        const list = $('post-entry-sample-list');
-        if (!list) return;
-        list.innerHTML = '';
-        POST_ENTRY_SAMPLE_SCENARIOS.forEach((scenario) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'post-entry-sample-btn';
-            button.textContent = scenario.label;
-            button.addEventListener('click', () => fillPostEntryScenario(scenario));
-            list.appendChild(button);
-        });
-    }
-
     function normalizeCountryParam(value) {
         const registry = getRegistryApi();
         if (registry?.normalizeCountryCode) {
@@ -1286,7 +1245,6 @@
         clearEntryDate();
         bindEntryDateMask();
         bindPostEntryFocusToggle();
-        bindPostEntrySamples();
         applyPostEntryQueryParams();
         bindForm();
     }

@@ -48,6 +48,10 @@ const {
     parseKoreaTariffDbHtml,
     probeKoreaReadiness
 } = require('../scripts/update-kr-duty-rates');
+const {
+    DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
+    probeStaticBenchmarkReadiness
+} = require('../scripts/update-static-duty-rates');
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const dutyRateSources = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rate-sources.json'), 'utf8'));
@@ -64,6 +68,9 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.benchmark_updatable.includes('MX'));
     assert.ok(roadmap.benchmark_updatable.includes('JP'));
     assert.ok(roadmap.benchmark_updatable.includes('KR'));
+    STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
+        assert.ok(roadmap.benchmark_updatable.includes(country), `${country} should be benchmark-updatable`);
+    });
     assert.equal(
         dutyRateSources.sources.some(source => source.country === 'JP' && source.probe_command === 'npm run probe:duty-rates:jp'),
         true
@@ -125,6 +132,17 @@ test('EU, Singapore, Mexico, Japan, and Korea updater probes are wired as benchm
     assert.ok(kr.maintained_hs_prefixes.includes('8542'));
     assert.equal(kr.official_probe.checked, false);
     assert.equal(kr.official_probe.machine_parser_ready, false);
+});
+
+test('static official-link benchmark updater covers China Vietnam Malaysia Taiwan and Russia', () => {
+    STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
+        const readiness = probeStaticBenchmarkReadiness(country);
+        assert.equal(readiness.ok, true, `${country} static benchmark readiness should be OK`);
+        assert.equal(readiness.source_status, 'benchmark_updatable');
+        assert.equal(readiness.writes_rates, true);
+        assert.equal(readiness.writes_official_machine_rates, false);
+        assert.ok(readiness.maintained_hs_prefixes.includes('8542'), `${country} should cover semiconductor HS 8542`);
+    });
 });
 
 test('Japan Customs live probe parses dated tariff schedule and chapter candidates without upgrading rate trust', async () => {

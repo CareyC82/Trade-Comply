@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-12",
+  "updated_at": "2026-06-13",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -1031,12 +1031,12 @@
       ],
       "trade_remedy": "Vietnam import VAT benchmark; verify HS code, preferential tariff, MIC/MOIT product requirements, and entry-date VAT policy.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Vietnam benchmark only. VAT and preferential duty can change by product, origin, and entry date. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+      "source_status": "benchmark_source_checked",
+      "source_note": "Vietnam benchmark refreshed locally. Confirm exact tariff line, VAT basis, preferential origin, and MIC/MOIT product triggers before filing.",
       "source_hts": "VN electronics benchmark",
       "source_rate_text": "Benchmark: duty depends on tariff line + VAT placeholder",
       "source_url": "https://www.customs.gov.vn/",
-      "last_checked_at": "2026-06-11T00:00:00.000Z"
+      "last_checked_at": "2026-06-13T01:51:28.921Z"
     },
     {
       "id": "MY-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -1068,12 +1068,12 @@
       ],
       "trade_remedy": "Malaysia sales tax benchmark; verify customs duty, SST exemption, SIRIM/MCMC approvals, and preferential origin.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Malaysia benchmark only. SST, duty, and exemptions vary by tariff line and product. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+      "source_status": "benchmark_source_checked",
+      "source_note": "Malaysia benchmark refreshed locally. Confirm exact tariff line, SST/duty exemption, and SIRIM/MCMC/ST approval scope before filing.",
       "source_hts": "MY electronics benchmark",
       "source_rate_text": "Benchmark: SST 10%; customs duty depends on tariff line",
       "source_url": "https://mysst.customs.gov.my/",
-      "last_checked_at": "2026-06-11T00:00:00.000Z"
+      "last_checked_at": "2026-06-13T01:51:28.921Z"
     },
     {
       "id": "TW-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -1105,12 +1105,12 @@
       ],
       "trade_remedy": "Taiwan import business tax benchmark; verify tariff code, commodity inspection, telecom approvals, and origin treatment.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Taiwan benchmark only. Confirm exact customs duty and business tax basis before filing. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+      "source_status": "benchmark_source_checked",
+      "source_note": "Taiwan benchmark refreshed locally. Confirm exact customs duty, business tax basis, and tariff-line treatment before filing.",
       "source_hts": "TW electronics benchmark",
       "source_rate_text": "Benchmark: 5% business tax; customs duty depends on tariff line",
       "source_url": "https://web.customs.gov.tw/",
-      "last_checked_at": "2026-06-11T00:00:00.000Z"
+      "last_checked_at": "2026-06-13T01:51:28.921Z"
     },
     {
       "id": "RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -1150,12 +1150,12 @@
       ],
       "trade_remedy": "Russia import VAT and EAEU duty benchmark; restricted-party, sanctions, and export-control scope review may override ordinary entry economics.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Russia benchmark only. Confirm EAEU tariff line, VAT basis, sanctions, restricted party, and licensing status. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+      "source_status": "benchmark_source_checked",
+      "source_note": "Russia/EAEU benchmark refreshed locally. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing.",
       "source_hts": "RU electronics benchmark",
       "source_rate_text": "Benchmark: EAEU duty placeholder + 20% VAT; sanctions scope required",
       "source_url": "https://customs.gov.ru/",
-      "last_checked_at": "2026-06-11T00:00:00.000Z"
+      "last_checked_at": "2026-06-13T01:51:28.921Z"
     },
     {
       "id": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
@@ -1185,7 +1185,10 @@
       ],
       "trade_remedy": "Import VAT and MFN duty estimate; confirm exact tariff line",
       "confidence": "Indicative",
-      "source_note": "Pre-check benchmark only; confirm exact China tariff and VAT treatment."
+      "source_note": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.",
+      "source_status": "benchmark_source_checked",
+      "source_url": "https://www.customs.gov.cn/",
+      "last_checked_at": "2026-06-13T01:51:28.921Z"
     },
     {
       "id": "US-CN-850440-POWER-CONVERSION-INDICATIVE",
@@ -1239,12 +1242,12 @@
       ],
       "trade_remedy": "China tariff/VAT benchmark; verify exact HS code, origin preference, and VAT treatment.",
       "confidence": "Indicative",
-      "source_status": "indicative",
-      "source_note": "Local benchmark for China import post-entry value review. Confirm exact tariff line with China Customs before filing or correction.",
+      "source_status": "benchmark_source_checked",
+      "source_note": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.",
       "source_hts": "847130 / 850440",
       "source_rate_text": "Benchmark duty + 13% VAT",
       "source_url": "https://www.customs.gov.cn/",
-      "last_checked_at": "2026-06-11T00:00:00.000Z"
+      "last_checked_at": "2026-06-13T01:51:28.921Z"
     },
     {
       "id": "EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
@@ -1841,5 +1844,266 @@
       }
     ],
     "errors": []
+  },
+  "last_static_benchmark_sync_at": "2026-06-13T01:51:28.921Z",
+  "last_static_benchmark_sync": {
+    "ok": true,
+    "dry_run": false,
+    "countries": [
+      "CN",
+      "VN",
+      "MY",
+      "TW",
+      "RU"
+    ],
+    "writes_official_machine_rates": false,
+    "changes": [
+      {
+        "rule": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
+        "import_country": "CN",
+        "changes": [
+          {
+            "field": "source_status",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Pre-check benchmark only; confirm exact China tariff and VAT treatment.",
+            "new_value": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing."
+          },
+          {
+            "field": "source_url",
+            "new_value": "https://www.customs.gov.cn/"
+          },
+          {
+            "field": "last_checked_at",
+            "new_value": "2026-06-13T01:51:28.921Z"
+          }
+        ]
+      },
+      {
+        "rule": "CN-GLOBAL-847130-850440-IMPORT-INDICATIVE",
+        "import_country": "CN",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Local benchmark for China import post-entry value review. Confirm exact tariff line with China Customs before filing or correction.",
+            "new_value": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing."
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-11T00:00:00.000Z",
+            "new_value": "2026-06-13T01:51:28.921Z"
+          }
+        ]
+      },
+      {
+        "rule": "VN-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "import_country": "VN",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Vietnam benchmark only. VAT and preferential duty can change by product, origin, and entry date. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+            "new_value": "Vietnam benchmark refreshed locally. Confirm exact tariff line, VAT basis, preferential origin, and MIC/MOIT product triggers before filing."
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-11T00:00:00.000Z",
+            "new_value": "2026-06-13T01:51:28.921Z"
+          }
+        ]
+      },
+      {
+        "rule": "MY-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "import_country": "MY",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Malaysia benchmark only. SST, duty, and exemptions vary by tariff line and product. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+            "new_value": "Malaysia benchmark refreshed locally. Confirm exact tariff line, SST/duty exemption, and SIRIM/MCMC/ST approval scope before filing."
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-11T00:00:00.000Z",
+            "new_value": "2026-06-13T01:51:28.921Z"
+          }
+        ]
+      },
+      {
+        "rule": "TW-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "import_country": "TW",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Taiwan benchmark only. Confirm exact customs duty and business tax basis before filing. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+            "new_value": "Taiwan benchmark refreshed locally. Confirm exact customs duty, business tax basis, and tariff-line treatment before filing."
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-11T00:00:00.000Z",
+            "new_value": "2026-06-13T01:51:28.921Z"
+          }
+        ]
+      },
+      {
+        "rule": "RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+        "import_country": "RU",
+        "changes": [
+          {
+            "field": "source_status",
+            "old_value": "indicative",
+            "new_value": "benchmark_source_checked"
+          },
+          {
+            "field": "source_note",
+            "old_value": "Russia benchmark only. Confirm EAEU tariff line, VAT basis, sanctions, restricted party, and licensing status. Covered benchmark prefixes include camera/transmission equipment (8525) and other electrical machines (8543).",
+            "new_value": "Russia/EAEU benchmark refreshed locally. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing."
+          },
+          {
+            "field": "last_checked_at",
+            "old_value": "2026-06-11T00:00:00.000Z",
+            "new_value": "2026-06-13T01:51:28.921Z"
+          }
+        ]
+      }
+    ],
+    "errors": [],
+    "readiness": {
+      "CN": {
+        "ok": true,
+        "country": "CN",
+        "source_status": "benchmark_updatable",
+        "official_url": "https://www.customs.gov.cn/",
+        "machine_readable": false,
+        "maintained_rule_count": 2,
+        "maintained_hs_prefixes": [
+          "847130",
+          "850440",
+          "850760",
+          "8517",
+          "8525",
+          "8528",
+          "8541",
+          "8542",
+          "8543"
+        ],
+        "writes_rates": true,
+        "writes_official_machine_rates": false,
+        "next_action": "Keep benchmark updater running; map official China tariff lookup or maintained local tariff table before promoting official exact rates.",
+        "status_reason": "Local benchmark exists, but official China tariff lookup is not connected to an updater yet."
+      },
+      "VN": {
+        "ok": true,
+        "country": "VN",
+        "source_status": "benchmark_updatable",
+        "official_url": "https://www.customs.gov.vn/",
+        "machine_readable": false,
+        "maintained_rule_count": 1,
+        "maintained_hs_prefixes": [
+          "847130",
+          "850440",
+          "850760",
+          "8517",
+          "8525",
+          "8528",
+          "8541",
+          "8542",
+          "8543"
+        ],
+        "writes_rates": true,
+        "writes_official_machine_rates": false,
+        "next_action": "Keep benchmark updater running; research downloadable Vietnam tariff/VAT source before promoting official exact rates.",
+        "status_reason": "Official customs source identified, but preferential tariff and VAT data are not wired yet."
+      },
+      "MY": {
+        "ok": true,
+        "country": "MY",
+        "source_status": "benchmark_updatable",
+        "official_url": "https://mysst.customs.gov.my/",
+        "machine_readable": false,
+        "maintained_rule_count": 1,
+        "maintained_hs_prefixes": [
+          "847130",
+          "850440",
+          "850760",
+          "8517",
+          "8525",
+          "8528",
+          "8541",
+          "8542",
+          "8543"
+        ],
+        "writes_rates": true,
+        "writes_official_machine_rates": false,
+        "next_action": "Keep benchmark updater running; research tariff/SST list machine readability and exemptions before promoting official exact rates.",
+        "status_reason": "Official customs/SST source identified, but tariff and exemption data are not wired yet."
+      },
+      "TW": {
+        "ok": true,
+        "country": "TW",
+        "source_status": "benchmark_updatable",
+        "official_url": "https://web.customs.gov.tw/",
+        "machine_readable": false,
+        "maintained_rule_count": 1,
+        "maintained_hs_prefixes": [
+          "847130",
+          "850440",
+          "850760",
+          "8517",
+          "8525",
+          "8528",
+          "8541",
+          "8542",
+          "8543"
+        ],
+        "writes_rates": true,
+        "writes_official_machine_rates": false,
+        "next_action": "Keep benchmark updater running; research customs tariff lookup data export options before promoting official exact rates.",
+        "status_reason": "Official customs source identified; lower current priority than US/EU/SG/MX/JP/KR/VN/MY."
+      },
+      "RU": {
+        "ok": true,
+        "country": "RU",
+        "source_status": "benchmark_updatable",
+        "official_url": "https://customs.gov.ru/",
+        "machine_readable": false,
+        "maintained_rule_count": 1,
+        "maintained_hs_prefixes": [
+          "847130",
+          "850440",
+          "850760",
+          "8517",
+          "8525",
+          "8528",
+          "8541",
+          "8542",
+          "8543"
+        ],
+        "writes_rates": true,
+        "writes_official_machine_rates": false,
+        "next_action": "Keep benchmark updater running and sanctions scope flag separate from ordinary duty math.",
+        "status_reason": "Official source identified, but sanctions scope must stay separate from ordinary duty math."
+      }
+    }
   }
 }

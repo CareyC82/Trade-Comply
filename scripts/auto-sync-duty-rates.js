@@ -14,6 +14,7 @@ const { updateSingaporeRules } = require('./update-sg-duty-rates');
 const { updateMexicoRules } = require('./update-mx-duty-rates');
 const { updateJapanRules } = require('./update-jp-duty-rates');
 const { updateKoreaRules } = require('./update-kr-duty-rates');
+const { DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES, updateStaticBenchmarkRules } = require('./update-static-duty-rates');
 const { runDutyRateHealthCheck } = require('./check-duty-rates');
 
 const ROOT = path.join(__dirname, '..');
@@ -51,6 +52,9 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         change_count: changes.length,
         rate_change_count: countRateChanges(changes),
         error_count: errors.length,
+        countries: Array.isArray(result.countries) ? result.countries : [],
+        writes_official_machine_rates: Boolean(result.writes_official_machine_rates),
+        readiness: result.readiness || null,
         changes,
         errors
     };
@@ -225,6 +229,15 @@ async function runAutoDutyRateSync({ dryRun = false, skipOfficialUs = false } = 
 
     const krResult = updateKoreaRules({ dryRun });
     runs.push(buildRunSummary('Korea Customs benchmark', krResult, {
+        applied: !dryRun,
+        mode: 'benchmark'
+    }));
+
+    const staticResult = updateStaticBenchmarkRules({
+        countries: STATIC_BENCHMARK_COUNTRIES,
+        dryRun
+    });
+    runs.push(buildRunSummary('Static official-link benchmarks', staticResult, {
         applied: !dryRun,
         mode: 'benchmark'
     }));

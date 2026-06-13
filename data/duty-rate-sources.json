@@ -133,14 +133,14 @@
       "authority": "General Administration of Customs / Ministry of Finance",
       "official_url": "https://www.customs.gov.cn/",
       "machine_readable": false,
-      "source_status": "benchmark",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P2",
       "status_reason": "Local benchmark exists, but official China tariff lookup is not connected to an updater yet.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "updater_script": "scripts/update-static-duty-rates.js",
+      "update_command": "npm run update:duty-rates:static -- --countries=CN",
+      "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Local benchmark for electronics import duty and VAT.",
-      "next_action": "Map official China tariff lookup or maintained local tariff table."
+      "next_action": "Keep benchmark updater running; map official China tariff lookup or maintained local tariff table before promoting official exact rates."
     },
     {
       "country": "VN",
@@ -148,14 +148,14 @@
       "authority": "Vietnam Customs",
       "official_url": "https://www.customs.gov.vn/",
       "machine_readable": false,
-      "source_status": "official_link",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P2",
       "status_reason": "Official customs source identified, but preferential tariff and VAT data are not wired yet.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "updater_script": "scripts/update-static-duty-rates.js",
+      "update_command": "npm run update:duty-rates:static -- --countries=VN",
+      "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Benchmark VAT/duty status for electronics; preferential tariffs depend on origin and entry date.",
-      "next_action": "Research downloadable Vietnam tariff/VAT source."
+      "next_action": "Keep benchmark updater running; research downloadable Vietnam tariff/VAT source before promoting official exact rates."
     },
     {
       "country": "MY",
@@ -163,14 +163,14 @@
       "authority": "Royal Malaysian Customs Department",
       "official_url": "https://mysst.customs.gov.my/",
       "machine_readable": false,
-      "source_status": "official_link",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P2",
       "status_reason": "Official customs/SST source identified, but tariff and exemption data are not wired yet.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "updater_script": "scripts/update-static-duty-rates.js",
+      "update_command": "npm run update:duty-rates:static -- --countries=MY",
+      "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Benchmark SST/duty status for electronics.",
-      "next_action": "Research tariff/SST list machine readability and exemptions."
+      "next_action": "Keep benchmark updater running; research tariff/SST list machine readability and exemptions before promoting official exact rates."
     },
     {
       "country": "TW",
@@ -178,14 +178,14 @@
       "authority": "Customs Administration, Ministry of Finance",
       "official_url": "https://web.customs.gov.tw/",
       "machine_readable": false,
-      "source_status": "official_link",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P3",
       "status_reason": "Official customs source identified; lower current priority than US/EU/SG/MX/JP/KR/VN/MY.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "updater_script": "scripts/update-static-duty-rates.js",
+      "update_command": "npm run update:duty-rates:static -- --countries=TW",
+      "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Benchmark business tax and tariff-line reminder.",
-      "next_action": "Research customs tariff lookup data export options."
+      "next_action": "Keep benchmark updater running; research customs tariff lookup data export options before promoting official exact rates."
     },
     {
       "country": "RU",
@@ -193,14 +193,14 @@
       "authority": "Federal Customs Service / EAEU framework",
       "official_url": "https://customs.gov.ru/",
       "machine_readable": false,
-      "source_status": "official_link",
+      "source_status": "benchmark_updatable",
       "maintenance_priority": "P3",
       "status_reason": "Official source identified, but sanctions scope must stay separate from ordinary duty math.",
-      "updater_script": "",
-      "update_command": "",
-      "last_sync_field": "",
+      "updater_script": "scripts/update-static-duty-rates.js",
+      "update_command": "npm run update:duty-rates:static -- --countries=RU",
+      "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Benchmark EAEU duty/VAT plus sanctions and restricted-party scope warning.",
-      "next_action": "Keep sanctions scope flag separate from ordinary duty math."
+      "next_action": "Keep benchmark updater running and sanctions scope flag separate from ordinary duty math."
     }
   ]
 }

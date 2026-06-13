@@ -10,7 +10,8 @@ const {
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
-    buildSyncStatusPayload
+    buildSyncStatusPayload,
+    runAutoDutyRateSync
 } = require('../scripts/auto-sync-duty-rates');
 
 test('material duty-rate changes are detected by percentage-point threshold', () => {
@@ -114,4 +115,19 @@ test('GitHub duty-rate workflow runs tests before committing sync output', () =>
     assert.match(workflow, /npm test/);
     assert.match(workflow, /data\/duty-rate-sources\.json/);
     assert.match(workflow, /git pull --ff-only/);
+});
+
+test('auto duty-rate sync includes static official-link benchmark countries', async () => {
+    const payload = await runAutoDutyRateSync({ dryRun: true, skipOfficialUs: true });
+    const staticRun = payload.runs.find(run => run.source === 'Static official-link benchmarks');
+
+    assert.ok(staticRun, 'static official-link benchmark run should be included');
+    assert.equal(staticRun.mode, 'benchmark');
+    assert.equal(staticRun.applied, false);
+    assert.equal(staticRun.ok, true, JSON.stringify(staticRun.errors, null, 2));
+    assert.equal(staticRun.writes_official_machine_rates, false);
+    ['CN', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
+        assert.equal(staticRun.countries.includes(country), true, `${country} should be refreshed by static benchmark sync`);
+        assert.equal(staticRun.readiness[country].ok, true, `${country} readiness should be OK`);
+    });
 });
