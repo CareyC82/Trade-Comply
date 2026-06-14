@@ -7,6 +7,7 @@ const path = require('node:path');
 const { buildOpportunityInsights, detectProductSignal } = require('../lib/trade-opportunity');
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
+const priorityMatrix = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'post-entry-rate-priority-matrix.json'), 'utf8'));
 
 describe('trade opportunity insights', () => {
     it('detects green and supply-chain heavy product categories', () => {
@@ -25,7 +26,8 @@ describe('trade opportunity insights', () => {
             from: 'CN',
             to: 'US',
             focus: 'import',
-            dutyRates
+            dutyRates,
+            priorityMatrix
         });
 
         assert.equal(model.productSignal.id, 'battery');
@@ -34,6 +36,35 @@ describe('trade opportunity insights', () => {
         assert.ok(model.best.score >= model.markets[model.markets.length - 1].score);
         assert.ok(model.insights.some((item) => item.type === 'Green compliance'));
         assert.ok(model.insights.some((item) => item.type === 'Supply-chain evidence'));
+        assert.ok(model.routeComparison.length >= 6);
+        assert.ok(model.routeComparison.every((row) => row.coverageLabel && row.parserNextAction));
+        assert.ok(model.routeComparison.every((row) => row.businessAction && row.parserPriority));
+        assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
+        assert.ok(model.readyRouteCount >= 1);
+        assert.ok(model.parserBacklogCount >= 1);
+        assert.ok(model.insights.some((item) => item.type === 'Commercial action'));
+        assert.ok(model.insights.some((item) => item.type === 'Coverage backlog'));
+    });
+
+    it('connects route recommendations to source trust and parser priority', () => {
+        const model = buildOpportunityInsights({
+            product: 'solar panel photovoltaic module',
+            from: 'CN',
+            to: 'US',
+            focus: 'import',
+            dutyRates,
+            priorityMatrix
+        });
+        const singapore = model.routeComparison.find((row) => row.market === 'SG');
+        const eu = model.routeComparison.find((row) => row.market === 'EU');
+
+        assert.ok(singapore, 'Singapore should be included in route comparison');
+        assert.equal(singapore.sourceTrust, 'official_link_estimate');
+        assert.equal(singapore.coverageLabel, 'Official link monitored');
+        assert.equal(singapore.parserPriority, 'P2 parser backlog');
+        assert.match(singapore.parserNextAction, /machine-readable tariff-line parser/i);
+        assert.ok(eu, 'EU should be included in route comparison');
+        assert.match(eu.coverageLabel, /Official duty|Hybrid official/i);
     });
 
     it('keeps Russia as a high-friction route even when included in comparisons', () => {
@@ -42,7 +73,8 @@ describe('trade opportunity insights', () => {
             from: 'US',
             to: 'RU',
             focus: 'export',
-            dutyRates
+            dutyRates,
+            priorityMatrix
         });
         const russia = model.markets.find((market) => market.market === 'RU') || model.selectedMarket;
 

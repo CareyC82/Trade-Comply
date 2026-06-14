@@ -15,6 +15,7 @@ function bootstrapTradeOpportunityPage() {
     const result = $('opportunity-result');
     const error = $('opportunity-error');
     let dutyRates = null;
+    let priorityMatrix = null;
 
     function populateSelect(select, defaultValue) {
         if (!select) {
@@ -71,9 +72,25 @@ function bootstrapTradeOpportunityPage() {
         return dutyRates;
     }
 
+    async function loadPriorityMatrix() {
+        if (priorityMatrix) {
+            return priorityMatrix;
+        }
+        try {
+            const response = await fetch(`data/post-entry-rate-priority-matrix.json?v=${globalThis.TradeComplyBuild || Date.now()}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            priorityMatrix = await response.json();
+        } catch (loadError) {
+            priorityMatrix = { routes: [] };
+        }
+        return priorityMatrix;
+    }
+
     function renderMarketCard(card, index) {
         return `
-            <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''}">
+            <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
                 <div class="opportunity-market-score">${escapeHtml(card.score)}</div>
                 <div>
                     <div class="opportunity-market-label">${escapeHtml(card.label)}</div>
@@ -81,8 +98,27 @@ function bootstrapTradeOpportunityPage() {
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
                 <p>${escapeHtml(card.opportunity)}</p>
-                <small>${escapeHtml(card.rateText)} · ${escapeHtml(card.sourceStatus)}</small>
+                <small>${escapeHtml(card.rateText)} · ${escapeHtml(card.coverageLabel)}</small>
+                <div class="opportunity-card-action">${escapeHtml(card.businessAction)}</div>
             </article>
+        `;
+    }
+
+    function renderRouteRow(card) {
+        return `
+            <tr>
+                <td>
+                    <strong>${escapeHtml(card.route)}</strong>
+                    <span>${escapeHtml(card.label)} · score ${escapeHtml(card.score)}</span>
+                </td>
+                <td>${escapeHtml(card.rateText)}</td>
+                <td><span class="opportunity-coverage-pill opportunity-coverage-pill--${escapeHtml(card.coverageTone)}">${escapeHtml(card.coverageLabel)}</span></td>
+                <td>${escapeHtml(card.hsCode || 'Pending')}</td>
+                <td>
+                    <strong>${escapeHtml(card.parserPriority || 'P?')}</strong>
+                    <span>${escapeHtml(card.parserNextAction)}</span>
+                </td>
+            </tr>
         `;
     }
 
@@ -107,6 +143,10 @@ function bootstrapTradeOpportunityPage() {
                     <span class="opportunity-kicker">Opportunity snapshot</span>
                     <h2>${escapeHtml(model.productSignal.label)} · ${escapeHtml(model.routeLabel)}</h2>
                     <p>${escapeHtml(model.summary)}</p>
+                    <div class="opportunity-decision-strip">
+                        <span>${escapeHtml(model.readyRouteCount)} route(s) usable for pricing comparison</span>
+                        <span>${escapeHtml(model.parserBacklogCount)} route(s) need parser/source upgrade</span>
+                    </div>
                 </div>
                 <div class="opportunity-best-badge">
                     <span>Best route to compare</span>
@@ -117,10 +157,33 @@ function bootstrapTradeOpportunityPage() {
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">
                     <h3>Markets to consider</h3>
-                    <p>Ranked by maintained duty signals, market access friction, and category fit.</p>
+                    <p>Ranked by maintained duty signals, source trust, market access friction, and category fit.</p>
                 </div>
                 <div class="opportunity-market-grid">
                     ${model.markets.map(renderMarketCard).join('')}
+                </div>
+            </section>
+
+            <section class="opportunity-section">
+                <div class="opportunity-section-heading">
+                    <h3>Route comparison and rate coverage</h3>
+                    <p>Use this to see whether a route is official-backed, hybrid, official-link monitored, or still missing exact coverage.</p>
+                </div>
+                <div class="opportunity-table-wrap">
+                    <table class="opportunity-route-table">
+                        <thead>
+                            <tr>
+                                <th>Route</th>
+                                <th>Duty signal</th>
+                                <th>Coverage</th>
+                                <th>HS basis</th>
+                                <th>Parser priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${model.routeComparison.map(renderRouteRow).join('')}
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
@@ -177,12 +240,17 @@ function bootstrapTradeOpportunityPage() {
             setError('Select export-side or import-side opportunity focus.');
             return;
         }
+        const [rates, matrix] = await Promise.all([
+            loadDutyRates(),
+            loadPriorityMatrix()
+        ]);
         const model = opportunity.buildOpportunityInsights({
             product,
             from,
             to,
             focus,
-            dutyRates: await loadDutyRates()
+            dutyRates: rates,
+            priorityMatrix: matrix
         });
         renderInsights(model);
         window.history.replaceState(null, '', `opportunity.html?product=${encodeURIComponent(product)}&from=${encodeURIComponent(model.from)}&to=${encodeURIComponent(model.to)}&focus=${encodeURIComponent(model.focus)}`);

@@ -1082,7 +1082,7 @@
                 const automationCounts = matrix.automation_counts || {};
                 const upgradeQueue = Array.isArray(matrix.priority_upgrade_queue) ? matrix.priority_upgrade_queue : [];
                 const topRows = rows.slice(0, 12);
-                const topQueue = upgradeQueue.slice(0, 16);
+                const topQueue = upgradeQueue.slice(0, 32);
                 return `
                     <div class="summary-grid">
                         <div class="summary-card"><strong>${matrix.covered_route_count ?? 0}/${matrix.route_count ?? rows.length}</strong><span>High-frequency routes covered</span></div>
@@ -1098,7 +1098,7 @@
                         Automation: ${Object.entries(automationCounts).map(([key, value]) => `<span class="badge ${key === 'benchmark_auto' ? 'benchmark_updatable' : key === 'official_link_monitor' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
                     </p>
                     ${failures.length ? `<div class="empty">Matrix exceptions: ${escapeHtml(failures.map(item => `${item.id}: ${(item.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
-                    <div class="crawl-section-title"><h3>税率补全优先级列表</h3><span class="meta">${upgradeQueue.length} route(s) need parser / exact-rate upgrade</span></div>
+                    <div class="crawl-section-title"><h3>税率补全优先级列表</h3><span class="meta">${upgradeQueue.length} route(s) need parser / exact-rate upgrade; showing top ${topQueue.length}</span></div>
                     <div class="coverage-table-wrap">
                         <table class="quality-gap-table">
                             <thead>
@@ -1108,6 +1108,7 @@
                                     <th>Route</th>
                                     <th>HS</th>
                                     <th>Current trust</th>
+                                    <th>Parser target</th>
                                     <th>Next action</th>
                                 </tr>
                             </thead>
@@ -1119,9 +1120,10 @@
                                         <td>${escapeHtml(row.route || '')}</td>
                                         <td>${escapeHtml(row.hs_code || '')}</td>
                                         <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : row.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
+                                        <td>${escapeHtml(row.parser_target || '')}</td>
                                         <td>${escapeHtml(row.next_action || '')}</td>
                                     </tr>
-                                `).join('') : '<tr><td colspan="6"><span class="meta">All priority routes are official exact or official duty + tax estimate.</span></td></tr>'}
+                                `).join('') : '<tr><td colspan="7"><span class="meta">All priority routes are official exact or official duty + tax estimate.</span></td></tr>'}
                             </tbody>
                         </table>
                     </div>

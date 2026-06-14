@@ -132,6 +132,8 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.trust_counts.official_link_estimate, 32);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
+    assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
+    assert.ok(matrix.priority_upgrade_queue.some((row) => row.parser_target.includes('SG exact tariff-line parser')));
 });
 
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {

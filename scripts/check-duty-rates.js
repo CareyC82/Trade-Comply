@@ -145,10 +145,10 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         official_heading_only: 3,
         mixed_official_estimate: 4,
         official_duty_tax_estimate: 5,
-        official_exact: 6
+        official_exact_rate: 6
     };
     const upgradeQueue = results
-        .filter(result => !['official_exact', 'official_duty_tax_estimate'].includes(result.source_trust))
+        .filter(result => !['official_exact_rate', 'official_duty_tax_estimate'].includes(result.source_trust))
         .map(result => ({
             id: result.id,
             product_id: result.product_id,
@@ -157,6 +157,13 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             source_trust: result.source_trust,
             automation_level: result.automation_level,
             priority: priorityRank[result.source_trust] || 9,
+            parser_target: result.source_trust === 'official_link_estimate'
+                ? `${result.route.split('->')[1] || 'market'} exact tariff-line parser`
+                : result.source_trust === 'official_heading_only'
+                    ? 'Exact HS / tariff-line scope resolver'
+                    : result.source_trust === 'mixed_official_estimate'
+                        ? 'Add-on duty and trade-remedy scope parser'
+                        : 'Official source mapping',
             next_action: result.source_trust === 'official_link_estimate'
                 ? 'Connect exact machine-readable tariff-line parser for this official source.'
                 : result.source_trust === 'official_heading_only'
