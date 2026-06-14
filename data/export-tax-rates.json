@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-12",
+  "updated_at": "2026-06-14",
   "status": "export_side_tax_rebate_precheck",
   "notes": "Post-Entry export-side coverage is intentionally separate from destination import duty rates. Export review focuses on filing value, export declaration correction, license/control basis, and rebate eligibility where applicable. Exact export tax or rebate rates must not be implied unless a maintained source exists.",
   "priority_hs_prefixes": [
@@ -336,6 +336,29 @@
       "source_url": "https://www.customs.go.kr/english/main.do",
       "source_note": "Korea export-side review focuses on customs declaration, strategic goods/export-control scope, HS classification, value, and correction evidence.",
       "calculation_note": "No maintained Korea export duty/rebate rate table is applied."
+    },
+    {
+      "id": "IN-EXPORT-FILING-REVIEW",
+      "origin_country": "IN",
+      "destination_country": "*",
+      "coverage_type": "export_filing_value_review",
+      "rate_status": "not_rate_based",
+      "source_status": "review_only",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8525",
+        "8528",
+        "8541",
+        "8542",
+        "8543"
+      ],
+      "source_name": "India export declaration / SCOMET review",
+      "source_url": "https://www.dgft.gov.in/",
+      "source_note": "India export-side review focuses on shipping bill data, HS classification, SCOMET/export-control scope, value support, origin evidence, and DGFT/customs filing correction evidence.",
+      "calculation_note": "No maintained India export duty/rebate rate table is applied. Treat this as filing-value and export-control review only."
     }
   ]
 }

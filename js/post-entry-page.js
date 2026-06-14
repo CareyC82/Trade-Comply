@@ -26,6 +26,7 @@
             { value: 'MX', label: 'Mexico' },
             { value: 'VN', label: 'Vietnam' },
             { value: 'MY', label: 'Malaysia' },
+            { value: 'IN', label: 'India' },
             { value: 'JP', label: 'Japan' },
             { value: 'KR', label: 'South Korea' },
             { value: 'GLOBAL', label: 'Other' }

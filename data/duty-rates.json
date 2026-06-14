@@ -1080,6 +1080,59 @@
       "last_checked_at": "2026-06-13T19:50:04.122Z"
     },
     {
+      "id": "IN-GLOBAL-ELECTRONICS-IMPORT-INDIA-EXACT-PENDING",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "850440",
+        "850760",
+        "8517",
+        "8525",
+        "8528",
+        "8541",
+        "8542",
+        "8543"
+      ],
+      "label": "India import electronics BCD/SWS/IGST official-link signal",
+      "base_rate": 0,
+      "additional_rate": 0.18,
+      "add_on_layers": [
+        {
+          "type": "basic_customs_duty",
+          "label": "India BCD exact-HS parser pending",
+          "rate": null,
+          "basis": "tariff_line",
+          "status": "scope_check_required",
+          "source": "ICEGATE/CIP or CBIC tariff line required"
+        },
+        {
+          "type": "social_welfare_surcharge",
+          "label": "India Social Welfare Surcharge scope check",
+          "rate": null,
+          "basis": "basic_customs_duty",
+          "status": "scope_check_required",
+          "source": "SWS depends on applicable BCD and exemption scope"
+        },
+        {
+          "type": "import_igst",
+          "label": "India import IGST benchmark",
+          "rate": 0.18,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "India GST/IGST benchmark; verify HSN rate and exemption scope"
+        }
+      ],
+      "trade_remedy": "India BCD/SWS/IGST exact tariff-line check required; also screen BIS/QCO, WPC wireless approvals, e-waste, battery, and anti-dumping/safeguard scope where applicable.",
+      "confidence": "Official link monitored; exact parser pending",
+      "source_status": "official_link_checked",
+      "source_note": "India official ICEGATE/CIP source path is monitored, but exact tariff-line parser is not connected yet. Treat this as exact-first backlog: verify HS, BCD, SWS, IGST, exemption, and product-control scope before filing.",
+      "source_hts": "IN electronics exact parser pending",
+      "source_rate_text": "Exact BCD pending; IGST benchmark 18%; SWS depends on BCD/exemption scope",
+      "source_url": "https://www.icegate.gov.in/",
+      "last_checked_at": "2026-06-14T00:00:00.000Z"
+    },
+    {
       "id": "VN-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
       "import_country": "VN",
       "origin_country": "*",

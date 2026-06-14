@@ -19,14 +19,15 @@ describe('country-registry', () => {
         assert.equal(normalizeCountryCode('Malaysia'), 'MY');
         assert.equal(normalizeCountryCode('Russia'), 'RU');
         assert.equal(normalizeCountryCode('Taiwan (China)'), 'TW');
+        assert.equal(normalizeCountryCode('India'), 'IN');
         assert.equal(normalizeCountryCode('Other'), 'GLOBAL');
     });
 
     it('export/import option values match registry', () => {
         const exportValues = getExportOptions().map((o) => o.value);
         const importValues = getImportOptions().map((o) => o.value);
-        assert.deepEqual(exportValues, ['US', 'EU', 'VN', 'MY', 'ASEAN', 'RU', 'GLOBAL']);
-        assert.deepEqual(importValues, ['TW', 'JP', 'KR', 'VN', 'MY', 'US', 'GLOBAL']);
+        assert.deepEqual(exportValues, ['US', 'EU', 'IN', 'VN', 'MY', 'ASEAN', 'RU', 'GLOBAL']);
+        assert.deepEqual(importValues, ['TW', 'JP', 'KR', 'VN', 'MY', 'IN', 'US', 'GLOBAL']);
     });
 
     it('provides regional compliance focus for RU and TW', () => {
@@ -35,6 +36,7 @@ describe('country-registry', () => {
         assert.match(getComplianceFocus('ASEAN', 'export'), /origin/i);
         assert.match(getComplianceFocus('VN', 'import'), /Vietnam MIC/i);
         assert.match(getComplianceFocus('MY', 'import'), /SIRIM/i);
+        assert.match(getComplianceFocus('IN', 'import'), /BCD/i);
     });
 
     it('maps route focus to the legacy matching context', () => {

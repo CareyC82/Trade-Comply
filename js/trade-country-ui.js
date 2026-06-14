@@ -5,6 +5,7 @@
 const TRADE_COUNTRY_UI_FALLBACK_EXPORT_OPTIONS = [
     { value: 'US', label: 'United States' },
     { value: 'EU', label: 'European Union' },
+    { value: 'IN', label: 'India' },
     { value: 'VN', label: 'Vietnam' },
     { value: 'MY', label: 'Malaysia' },
     { value: 'ASEAN', label: 'ASEAN' },
@@ -18,6 +19,7 @@ const TRADE_COUNTRY_UI_FALLBACK_IMPORT_OPTIONS = [
     { value: 'KR', label: 'South Korea' },
     { value: 'VN', label: 'Vietnam' },
     { value: 'MY', label: 'Malaysia' },
+    { value: 'IN', label: 'India' },
     { value: 'US', label: 'United States' },
     { value: 'GLOBAL', label: 'Other' }
 ];
@@ -37,6 +39,7 @@ const TRADE_COUNTRY_UI_FALLBACK_ROUTE_OPTIONS = [
     { value: 'TW', label: 'Taiwan (China)' },
     { value: 'JP', label: 'Japan' },
     { value: 'KR', label: 'South Korea' },
+    { value: 'IN', label: 'India' },
     { value: 'GLOBAL', label: 'Other' }
 ];
 
@@ -69,6 +72,7 @@ function getCountryOptionsApi() {
                 'Taiwan (China)': 'TW',
                 Japan: 'JP',
                 'South Korea': 'KR',
+                India: 'IN',
                 Other: 'GLOBAL',
                 OTHER: 'GLOBAL'
             };

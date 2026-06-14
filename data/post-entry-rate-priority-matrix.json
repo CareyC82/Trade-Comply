@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-13",
+  "updated_at": "2026-06-14",
   "notes": "High-frequency Post-Entry tariff-rate priority matrix. This is the product/data-coverage target for daily duty-rate sync: every row must be covered by maintained duty rules, and source trust must match the declared expectation.",
   "trust_tiers": {
     "official_exact_rate": "All displayed duty layers are official-backed for the maintained route / HS basis.",
@@ -597,6 +597,78 @@
       "import_country": "KR",
       "hs_code": "852852",
       "expected_source_trust": "official_link_estimate",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "tablet-global-in",
+      "product_id": "tablet",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "847130",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "smartphone-global-in",
+      "product_id": "smartphone",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "851713",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "router-global-in",
+      "product_id": "router",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "851762",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "ev-charger-global-in",
+      "product_id": "ev_charger",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "850440",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "battery-global-in",
+      "product_id": "battery",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "850760",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "solar-global-in",
+      "product_id": "solar",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "854143",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "semiconductor-global-in",
+      "product_id": "semiconductor",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "854231",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "monitor-global-in",
+      "product_id": "monitor",
+      "origin_country": "*",
+      "import_country": "IN",
+      "hs_code": "852852",
+      "expected_source_trust": "official_heading_only",
       "automation_level": "official_link_monitor"
     }
   ]

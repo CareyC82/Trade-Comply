@@ -16,6 +16,7 @@
     "TW",
     "JP",
     "KR",
+    "IN",
     "GLOBAL"
   ],
   "route_options": [
@@ -76,6 +77,10 @@
       "label": "South Korea"
     },
     {
+      "value": "IN",
+      "label": "India"
+    },
+    {
       "value": "GLOBAL",
       "label": "Other"
     }
@@ -88,6 +93,10 @@
     {
       "value": "EU",
       "label": "European Union"
+    },
+    {
+      "value": "IN",
+      "label": "India"
     },
     {
       "value": "VN",
@@ -132,6 +141,10 @@
       "label": "Malaysia"
     },
     {
+      "value": "IN",
+      "label": "India"
+    },
+    {
       "value": "US",
       "label": "United States"
     },
@@ -155,7 +168,8 @@
     "South Korea": "KR",
     "Other": "GLOBAL",
     "Vietnam": "VN",
-    "Malaysia": "MY"
+    "Malaysia": "MY",
+    "India": "IN"
   },
   "aliases": {
     "USA": "US",
@@ -187,7 +201,10 @@
     "GLOBAL": "GLOBAL",
     "VIET NAM": "VN",
     "VN": "VN",
-    "MY": "MY"
+    "MY": "MY",
+    "INDIA": "IN",
+    "BHARAT": "IN",
+    "IN": "IN"
   },
   "market_themes": {
     "US": "FCC certification (Part 15/18); Section 301 tariff risk; BIS export controls & Entity List",
@@ -203,7 +220,8 @@
     "KR": "KC unified national certification; Korea-origin memory/semiconductor screening",
     "GLOBAL": "General China import/export baseline; CCC/SRRC/CEL where applicable",
     "VN": "Vietnam MIC ICT/radio conformity, MOIT energy labeling, customs classification, and battery/ESS import checks",
-    "MY": "Malaysia MCMC/SIRIM telecom approval, ST electrical safety COA, customs classification, and battery/ESS import checks"
+    "MY": "Malaysia MCMC/SIRIM telecom approval, ST electrical safety COA, customs classification, and battery/ESS import checks",
+    "IN": "India BIS quality-control orders, WPC wireless approvals, customs valuation, BCD/SWS/IGST, e-waste and battery rules"
   },
   "compliance_focus": {
     "RU": {
@@ -275,6 +293,11 @@
       "priority": "medium",
       "export": "Screen Malaysia origin, export documentation, and ASEAN transshipment/origin exposure where relevant.",
       "import": "Check Malaysia MCMC/SIRIM telecom approval, ST electrical safety COA, customs classification, and battery/ESS import requirements."
+    },
+    "IN": {
+      "priority": "high",
+      "export": "Screen India export controls, SCOMET dual-use exposure, DGFT licensing, BIS/QCO documentation, and origin evidence for outbound electronics.",
+      "import": "Check India BCD/SWS/IGST, BIS quality-control orders, WPC wireless approvals, e-waste/battery rules, and customs valuation before import."
     }
   }
 }

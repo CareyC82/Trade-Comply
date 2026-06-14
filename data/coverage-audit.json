@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-12T06:30:34.925Z",
+  "generated_at": "2026-06-14T10:37:21.532Z",
   "dimensions": {
     "destination_import": [
       {
@@ -1616,6 +1616,141 @@
         "case_ids": [
           "CASE-KR-CHINA-IMPORT-BASELINE"
         ]
+      }
+    },
+    {
+      "country": "IN",
+      "label": "India",
+      "destination_import": {
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 5,
+        "case_count": 5,
+        "tag_ids": [
+          "CL-IN-001",
+          "CL-IN-002",
+          "CL-IN-003",
+          "CL-IN-004",
+          "CL-IN-005"
+        ],
+        "case_ids": [
+          "CASE-IN-AI-CHIP-SCOMET",
+          "CASE-IN-BIS-QCO-ELECTRONICS",
+          "CASE-IN-EWASTE-BATTERY-EPR",
+          "CASE-IN-ICEGATE-IMPORT",
+          "CASE-IN-WPC-TEC-WIRELESS"
+        ],
+        "dimensions": [
+          {
+            "id": "wireless_telecom",
+            "label": "Wireless / telecom market access",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-001",
+              "CL-IN-002",
+              "CL-IN-003",
+              "CL-IN-004",
+              "CL-IN-005"
+            ]
+          },
+          {
+            "id": "electrical_safety",
+            "label": "Electrical safety certification",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-001",
+              "CL-IN-002",
+              "CL-IN-003",
+              "CL-IN-004"
+            ]
+          },
+          {
+            "id": "battery_energy",
+            "label": "Battery / ESS / energy-storage safety",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-001",
+              "CL-IN-002",
+              "CL-IN-003",
+              "CL-IN-004",
+              "CL-IN-005"
+            ]
+          },
+          {
+            "id": "customs_import",
+            "label": "Customs import declaration / tariff classification",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-001",
+              "CL-IN-005"
+            ]
+          },
+          {
+            "id": "labeling_consumer",
+            "label": "Labeling / consumer information / product-market records",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-001",
+              "CL-IN-002",
+              "CL-IN-003",
+              "CL-IN-004"
+            ]
+          }
+        ],
+        "gaps": []
+      },
+      "origin_export": {
+        "status": "strong",
+        "priority": "low",
+        "tag_count": 3,
+        "case_count": 3,
+        "tag_ids": [
+          "CL-IN-006",
+          "CL-IN-007",
+          "CL-IN-008"
+        ],
+        "case_ids": [
+          "CASE-IN-ORIGIN-FTA",
+          "CASE-IN-SCOMET-EXPORT",
+          "CASE-IN-SHIPPING-BILL"
+        ],
+        "dimensions": [
+          {
+            "id": "export_control_sanctions",
+            "label": "Export controls / sanctions / dual-use",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-006",
+              "CL-IN-007",
+              "CL-IN-008"
+            ]
+          },
+          {
+            "id": "origin_transshipment",
+            "label": "Origin / re-export / anti-circumvention",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-006",
+              "CL-IN-008"
+            ]
+          },
+          {
+            "id": "export_customs",
+            "label": "Export declaration / outbound customs",
+            "status": "covered",
+            "tag_ids": [
+              "CL-IN-006",
+              "CL-IN-007"
+            ]
+          }
+        ],
+        "gaps": []
+      },
+      "origin_to_china_import": {
+        "tag_count": 0,
+        "case_count": 0,
+        "tag_ids": [],
+        "case_ids": []
       }
     },
     {

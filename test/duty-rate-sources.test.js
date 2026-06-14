@@ -136,7 +136,7 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
     assert.equal(kr.official_probe.machine_parser_ready, false);
 });
 
-test('static official-link benchmark updater covers China Vietnam Malaysia Taiwan and Russia', () => {
+test('static official-link benchmark updater covers China Vietnam Malaysia Taiwan Russia and India', () => {
     STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
         const readiness = probeStaticBenchmarkReadiness(country);
         assert.equal(readiness.ok, true, `${country} static benchmark readiness should be OK`);

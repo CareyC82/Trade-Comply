@@ -19,7 +19,7 @@ test('duty-rate table covers priority import markets', () => {
     const summary = summarizeDutyRateCoverage(dutyRates);
     const markets = new Set(summary.countries.map(country => country.import_country));
 
-    ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
+    ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
         assert.equal(markets.has(country), true, `${country} should have post-entry duty-rate coverage`);
     });
     assert.ok(summary.rule_count >= 16);
@@ -61,7 +61,7 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
         assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-code gates`);
     });
-    ['SG', 'MX', 'JP', 'KR'].forEach((country) => {
+    ['SG', 'MX', 'JP', 'KR', 'IN'].forEach((country) => {
         assert.equal(qualityByCountry.get(country).coverage_level, 'official_link_all', country);
         assert.ok(qualityByCountry.get(country).official_link_checked > 0, `${country} should have monitored official links`);
     });
@@ -85,6 +85,8 @@ test('priority Post-Entry samples cover common global electronics routes', () =>
         'US->MX:850440',
         'US->JP:851713',
         'US->KR:851762',
+        'CN->IN:851713',
+        'US->IN:854231',
         'US->VN:847130',
         'US->MY:850440'
     ].forEach((key) => {
@@ -121,7 +123,7 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
         'solar',
         'tablet'
     ]);
-    ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR'].forEach((country) => {
+    ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN'].forEach((country) => {
         assert.ok(matrix.import_markets.includes(country), `${country} should be in high-frequency rate matrix`);
     });
     assert.ok(matrix.official_or_hybrid_count > 50, 'official/hybrid/link-monitored coverage should cover the full high-frequency matrix');
@@ -130,6 +132,7 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.automation_counts.hybrid_official > 0, true);
     assert.equal(matrix.automation_counts.official_link_monitor > 0, true);
     assert.equal(matrix.trust_counts.official_link_estimate, 32);
+    assert.ok(matrix.trust_counts.official_heading_only >= 8);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
@@ -215,8 +218,8 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
     assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
 });
 
-test('Singapore Mexico Japan and Korea import routes are official-link monitored', () => {
-    ['SG', 'MX', 'JP', 'KR'].forEach((country) => {
+test('Singapore Mexico Japan Korea and India import routes are official-link monitored', () => {
+    ['SG', 'MX', 'JP', 'KR', 'IN'].forEach((country) => {
         const rule = (dutyRates.rules || []).find(item => (
             item.import_country === country
             && (item.hs_prefixes || []).includes('8542')

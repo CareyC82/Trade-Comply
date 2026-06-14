@@ -6,7 +6,7 @@ const tags = JSON.parse(fs.readFileSync(path.join(root, 'data', 'tags.json'), 'u
 const cases = JSON.parse(fs.readFileSync(path.join(root, 'data', 'cases.json'), 'utf8'));
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'data', 'country-registry.json'), 'utf8'));
 
-const COUNTRIES = ['CN', 'US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'ASEAN', 'RU', 'TW'];
+const COUNTRIES = ['CN', 'US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'IN', 'ASEAN', 'RU', 'TW'];
 const IMPORT_DIMENSIONS = [
     {
         id: 'wireless_telecom',

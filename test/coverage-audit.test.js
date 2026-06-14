@@ -9,11 +9,11 @@ function country(code) {
 describe('coverage audit', () => {
     it('tracks all route countries that need coverage decisions', () => {
         const countries = audit.countries.map((entry) => entry.country).sort();
-        assert.deepEqual(countries, ['ASEAN', 'CN', 'DE', 'EU', 'JP', 'KR', 'MX', 'MY', 'NL', 'RU', 'SG', 'TW', 'US', 'VN']);
+        assert.deepEqual(countries, ['ASEAN', 'CN', 'DE', 'EU', 'IN', 'JP', 'KR', 'MX', 'MY', 'NL', 'RU', 'SG', 'TW', 'US', 'VN']);
     });
 
     it('keeps recently added import-side markets out of empty status', () => {
-        for (const code of ['SG', 'MX', 'VN', 'MY', 'JP', 'KR']) {
+        for (const code of ['SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'IN']) {
             const entry = country(code);
             assert.ok(entry, `missing ${code}`);
             assert.notEqual(entry.destination_import.status, 'none', `${code} import coverage should exist`);

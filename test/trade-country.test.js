@@ -18,7 +18,9 @@ describe('trade-country', () => {
         const exportOpts = getCountryOptionsForDirection('export').map((o) => o.value);
         const importOpts = getCountryOptionsForDirection('import').map((o) => o.value);
         assert.ok(exportOpts.includes('EU'));
+        assert.ok(exportOpts.includes('IN'));
         assert.ok(importOpts.includes('TW'));
+        assert.ok(importOpts.includes('IN'));
         assert.ok(!importOpts.includes('RU'));
     });
 
@@ -58,6 +60,8 @@ describe('trade-country', () => {
     it('normalizes aliases', () => {
         assert.equal(normalizeCountryCode('united states'), 'US');
         assert.equal(normalizeCountryCode('Taiwan'), 'TW');
+        assert.equal(normalizeCountryCode('India'), 'IN');
+        assert.equal(normalizeCountryCode('Bharat'), 'IN');
         assert.equal(normalizeCountryCode('Other'), 'GLOBAL');
         assert.equal(normalizeCountryCode('OTHER'), 'GLOBAL');
     });

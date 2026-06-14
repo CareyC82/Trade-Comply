@@ -41,7 +41,15 @@ const NEW_ROUTE_COVERAGE = [
     { focus: 'import', country: 'MY', query: 'malaysia wireless router wifi telecom equipment', expected: 'CL-MY-001' },
     { focus: 'import', country: 'MY', query: 'power adapter charger coa', expected: 'CL-MY-002' },
     { focus: 'import', country: 'MY', query: 'energy storage battery system lithium battery', expected: 'CL-MY-004' },
-    { focus: 'import', country: 'MY', query: 'semiconductor chip import classification', expected: 'CL-MY-003' }
+    { focus: 'import', country: 'MY', query: 'semiconductor chip import classification', expected: 'CL-MY-003' },
+    { focus: 'import', country: 'IN', query: 'gpu ai accelerator chip', expected: 'CL-IN-005' },
+    { focus: 'import', country: 'IN', query: 'semiconductor chip import classification', expected: 'CL-IN-001' },
+    { focus: 'import', country: 'IN', query: 'wireless router wifi telecom equipment', expected: 'CL-IN-003' },
+    { focus: 'import', country: 'IN', query: 'power adapter charger bis qco', expected: 'CL-IN-002' },
+    { focus: 'import', country: 'IN', query: 'energy storage battery system lithium battery', expected: 'CL-IN-004' },
+    { focus: 'export', country: 'IN', query: 'gpu ai accelerator chip', expected: 'CL-IN-006' },
+    { focus: 'export', country: 'IN', query: 'electronics export shipping bill', expected: 'CL-IN-007' },
+    { focus: 'export', country: 'IN', query: 'certificate of origin transshipment electronics', expected: 'CL-IN-008' }
 ];
 
 function scoreTag(tag, query) {

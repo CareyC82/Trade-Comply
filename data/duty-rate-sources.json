@@ -128,6 +128,22 @@
       "next_action": "Use the live probe to monitor KCS Tariff D/B availability; next upgrade is parsing exact 10-digit HS lookup results before official automatic rates."
     },
     {
+      "country": "IN",
+      "name": "India Customs Tariff / ICEGATE CIP",
+      "authority": "Central Board of Indirect Taxes and Customs / ICEGATE",
+      "official_url": "https://www.icegate.gov.in/",
+      "machine_readable": "probe_required",
+      "source_status": "benchmark_updatable",
+      "maintenance_priority": "P1",
+      "status_reason": "India is high-priority for electronics trade opportunity and Post-Entry. Official ICEGATE/CIP sources are identified; local refresh keeps official-link estimates current while exact tariff-line parser remains a P1 upgrade.",
+      "updater_script": "scripts/update-static-duty-rates.js",
+      "update_command": "npm run update:duty-rates:static -- --countries=IN",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=IN",
+      "last_sync_field": "last_static_benchmark_sync_at",
+      "current_scope": "Official-link monitored India import estimate for electronics: BCD must be exact-HS verified; SWS/IGST layers are displayed as filing checks until parser is connected.",
+      "next_action": "Build India exact tariff-line parser for ICEGATE/CIP or CBIC tariff data; promote only after exact HS, BCD, SWS, and IGST basis are machine-verified."
+    },
+    {
       "country": "CN",
       "name": "China import tariff / VAT",
       "authority": "General Administration of Customs / Ministry of Finance",

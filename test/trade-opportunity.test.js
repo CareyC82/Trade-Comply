@@ -62,6 +62,7 @@ describe('trade opportunity insights', () => {
             priorityMatrix
         });
         const singapore = model.routeComparison.find((row) => row.market === 'SG');
+        const india = model.routeComparison.find((row) => row.market === 'IN');
         const eu = model.routeComparison.find((row) => row.market === 'EU');
 
         assert.ok(singapore, 'Singapore should be included in route comparison');
@@ -71,6 +72,10 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.parserPriorityRank, 2);
         assert.match(singapore.parserNextAction, /machine-readable tariff-line parser/i);
         assert.ok(singapore.recommendationReasons.some((reason) => /Parser upgrade/i.test(reason.label)));
+        assert.ok(india, 'India should be included in route comparison');
+        assert.equal(india.sourceTrust, 'official_heading_only');
+        assert.equal(india.coverageLabel, 'Official heading only');
+        assert.match(india.watchpoint, /BCD|IGST|WPC/i);
         assert.ok(eu, 'EU should be included in route comparison');
         assert.match(eu.coverageLabel, /Official duty|Hybrid official/i);
         assert.equal(eu.dutyBreakdown.baseDuty, '0.0%');
