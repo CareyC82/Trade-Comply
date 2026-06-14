@@ -94,6 +94,35 @@ function renderResults(query, tags, cases, precheckSelections = []) {
     });
 }
 
+let opportunityDutyRatesCache = null;
+let opportunityPriorityMatrixCache = null;
+
+async function fetchOpportunityJson(path, fallback) {
+    try {
+        const response = await fetch(`${path}?v=${globalThis.TradeComplyBuild || Date.now()}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        return fallback;
+    }
+}
+
+async function loadOpportunityTeaserData() {
+    if (!opportunityDutyRatesCache) {
+        opportunityDutyRatesCache = fetchOpportunityJson('data/duty-rates.json', { rules: [] });
+    }
+    if (!opportunityPriorityMatrixCache) {
+        opportunityPriorityMatrixCache = fetchOpportunityJson('data/post-entry-rate-priority-matrix.json', { routes: [] });
+    }
+    const [dutyRates, priorityMatrix] = await Promise.all([
+        opportunityDutyRatesCache,
+        opportunityPriorityMatrixCache
+    ]);
+    return { dutyRates, priorityMatrix };
+}
+
 function mountOpportunityTeaser(container, query, routeContext) {
     if (!container) {
         return;
@@ -108,24 +137,34 @@ function mountOpportunityTeaser(container, query, routeContext) {
     const from = routeContext?.from || AppState.routeFromCountry || 'CN';
     const to = routeContext?.to || AppState.routeToCountry || AppState.currentCountry || 'US';
     const focus = routeContext?.focus || AppState.complianceFocus || 'import';
-    const model = opportunity.buildOpportunityInsights({ product: query, from, to, focus });
-    const params = new URLSearchParams({
-        product: query,
-        from: model.from,
-        to: model.to,
-        focus: model.focus
+    const render = (model) => {
+        const params = new URLSearchParams({
+            product: query,
+            from: model.from,
+            to: model.to,
+            focus: model.focus
+        });
+        container.innerHTML = `
+            <section class="opportunity-teaser" aria-label="Trade opportunity insight">
+                <div class="opportunity-teaser__icon" aria-hidden="true">🌐</div>
+                <div class="opportunity-teaser__body">
+                    <span class="opportunity-teaser__kicker">Trade opportunity insight</span>
+                    <strong>${escapeHtml(model.best.label)} may be worth comparing for ${escapeHtml(model.productSignal.label.toLowerCase())}.</strong>
+                    <p>${escapeHtml(model.best.conciseConclusion || model.summary)}</p>
+                    <div class="opportunity-teaser__chips">
+                        <span>${escapeHtml(model.best.dutyBreakdown?.totalRate || 'Rate pending')} total signal</span>
+                        <span>${escapeHtml(model.readyRouteCount || 0)} pricing-comparison route(s)</span>
+                        <span>${escapeHtml(model.parserBacklogCount || 0)} parser backlog</span>
+                    </div>
+                </div>
+                <a class="opportunity-teaser__link" href="opportunity.html?${params.toString()}">View Opportunity</a>
+            </section>
+        `;
+    };
+    render(opportunity.buildOpportunityInsights({ product: query, from, to, focus }));
+    loadOpportunityTeaserData().then(({ dutyRates, priorityMatrix }) => {
+        render(opportunity.buildOpportunityInsights({ product: query, from, to, focus, dutyRates, priorityMatrix }));
     });
-    container.innerHTML = `
-        <section class="opportunity-teaser" aria-label="Trade opportunity insight">
-            <div class="opportunity-teaser__icon" aria-hidden="true">🌐</div>
-            <div class="opportunity-teaser__body">
-                <span class="opportunity-teaser__kicker">Trade opportunity insight</span>
-                <strong>${escapeHtml(model.best.label)} may be worth comparing for ${escapeHtml(model.productSignal.label.toLowerCase())}.</strong>
-                <p>${escapeHtml(model.summary)}</p>
-            </div>
-            <a class="opportunity-teaser__link" href="opportunity.html?${params.toString()}">View Opportunity</a>
-        </section>
-    `;
 }
 
 if (typeof globalThis !== 'undefined') {

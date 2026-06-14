@@ -89,6 +89,12 @@ function bootstrapTradeOpportunityPage() {
     }
 
     function renderMarketCard(card, index) {
+        const reasons = Array.isArray(card.recommendationReasons) ? card.recommendationReasons : [];
+        const metricItems = [
+            { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
+            { label: 'Coverage', value: card.coverageLabel || 'Pending' },
+            { label: 'Next parser', value: card.parserPriority || 'P?' }
+        ];
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
                 <div class="opportunity-market-score">${escapeHtml(card.score)}</div>
@@ -97,8 +103,26 @@ function bootstrapTradeOpportunityPage() {
                     <div class="opportunity-market-route">${escapeHtml(card.route)}</div>
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
-                <p>${escapeHtml(card.opportunity)}</p>
-                <small>${escapeHtml(card.rateText)} · ${escapeHtml(card.coverageLabel)}</small>
+                <p>${escapeHtml(card.conciseConclusion || card.opportunity)}</p>
+                <div class="opportunity-rate-mini-grid">
+                    ${metricItems.map((item) => `
+                        <div>
+                            <span>${escapeHtml(item.label)}</span>
+                            <strong>${escapeHtml(item.value)}</strong>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="opportunity-reason-list">
+                    ${reasons.map((reason, reasonIndex) => `
+                        <div class="opportunity-reason opportunity-reason--${escapeHtml(reason.tone || 'neutral')}">
+                            <span>${escapeHtml(reasonIndex + 1)}</span>
+                            <div>
+                                <strong>${escapeHtml(reason.label)}</strong>
+                                <small>${escapeHtml(reason.detail)}</small>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
                 <div class="opportunity-card-action">${escapeHtml(card.businessAction)}</div>
             </article>
         `;
@@ -111,7 +135,12 @@ function bootstrapTradeOpportunityPage() {
                     <strong>${escapeHtml(card.route)}</strong>
                     <span>${escapeHtml(card.label)} · score ${escapeHtml(card.score)}</span>
                 </td>
-                <td>${escapeHtml(card.rateText)}</td>
+                <td>
+                    <strong>${escapeHtml(card.dutyBreakdown?.totalRate || 'Not covered')}</strong>
+                    <span>Base ${escapeHtml(card.dutyBreakdown?.baseDuty || 'Pending')}</span>
+                    <span>Add-on ${escapeHtml(card.dutyBreakdown?.addOnDuty || 'Pending')}</span>
+                    <span>Tax ${escapeHtml(card.dutyBreakdown?.taxLayer || 'Pending')}</span>
+                </td>
                 <td><span class="opportunity-coverage-pill opportunity-coverage-pill--${escapeHtml(card.coverageTone)}">${escapeHtml(card.coverageLabel)}</span></td>
                 <td>${escapeHtml(card.hsCode || 'Pending')}</td>
                 <td>
@@ -129,6 +158,30 @@ function bootstrapTradeOpportunityPage() {
                 <strong>${escapeHtml(item.label)}</strong>
                 <p>${escapeHtml(item.text)}</p>
             </article>
+        `;
+    }
+
+    function renderParserTargets(model) {
+        const targets = Array.isArray(model.parserTargets) ? model.parserTargets : [];
+        if (!targets.length) {
+            return '';
+        }
+        return `
+            <section class="opportunity-section opportunity-parser-section">
+                <div class="opportunity-section-heading">
+                    <h3>Exact tariff parser priorities</h3>
+                    <p>These are the next routes to upgrade from official-link monitoring to exact tariff-line parsing.</p>
+                </div>
+                <div class="opportunity-parser-grid">
+                    ${targets.map((target) => `
+                        <article class="opportunity-parser-card">
+                            <span>${escapeHtml(target.priority)}</span>
+                            <strong>${escapeHtml(target.label)} · HS ${escapeHtml(target.hsCode)}</strong>
+                            <p>${escapeHtml(target.nextAction)}</p>
+                        </article>
+                    `).join('')}
+                </div>
+            </section>
         `;
     }
 
@@ -157,17 +210,19 @@ function bootstrapTradeOpportunityPage() {
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">
                     <h3>Markets to consider</h3>
-                    <p>Ranked by maintained duty signals, source trust, market access friction, and category fit.</p>
+                    <p>Ranked by duty structure, rate-source confidence, market access friction, and category fit.</p>
                 </div>
                 <div class="opportunity-market-grid">
                     ${model.markets.map(renderMarketCard).join('')}
                 </div>
             </section>
 
+            ${renderParserTargets(model)}
+
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">
                     <h3>Route comparison and rate coverage</h3>
-                    <p>Use this to see whether a route is official-backed, hybrid, official-link monitored, or still missing exact coverage.</p>
+                    <p>Use this to compare duty structure, official coverage, HS basis, and parser priority.</p>
                 </div>
                 <div class="opportunity-table-wrap">
                     <table class="opportunity-route-table">

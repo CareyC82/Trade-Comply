@@ -39,9 +39,15 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.length >= 6);
         assert.ok(model.routeComparison.every((row) => row.coverageLabel && row.parserNextAction));
         assert.ok(model.routeComparison.every((row) => row.businessAction && row.parserPriority));
+        assert.ok(model.routeComparison.every((row) => row.dutyBreakdown && row.dutyBreakdown.items.length === 4));
+        assert.ok(model.routeComparison.every((row) => Array.isArray(row.recommendationReasons) && row.recommendationReasons.length >= 2));
+        assert.ok(model.routeComparison.every((row) => row.recommendationReasons.length <= 3));
+        assert.ok(model.routeComparison.every((row) => row.conciseConclusion));
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
         assert.ok(model.readyRouteCount >= 1);
         assert.ok(model.parserBacklogCount >= 1);
+        assert.ok(model.parserTargets.length >= 1);
+        assert.ok(model.parserTargets.every((target) => target.priority && target.nextAction && target.hsCode));
         assert.ok(model.insights.some((item) => item.type === 'Commercial action'));
         assert.ok(model.insights.some((item) => item.type === 'Coverage backlog'));
     });
@@ -62,9 +68,12 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.sourceTrust, 'official_link_estimate');
         assert.equal(singapore.coverageLabel, 'Official link monitored');
         assert.equal(singapore.parserPriority, 'P2 parser backlog');
+        assert.equal(singapore.parserPriorityRank, 2);
         assert.match(singapore.parserNextAction, /machine-readable tariff-line parser/i);
+        assert.ok(singapore.recommendationReasons.some((reason) => /Parser upgrade/i.test(reason.label)));
         assert.ok(eu, 'EU should be included in route comparison');
         assert.match(eu.coverageLabel, /Official duty|Hybrid official/i);
+        assert.equal(eu.dutyBreakdown.baseDuty, '0.0%');
     });
 
     it('keeps Russia as a high-friction route even when included in comparisons', () => {
@@ -106,5 +115,14 @@ describe('trade opportunity navigation', () => {
         assert.doesNotMatch(html, /data-default-country/);
         assert.doesNotMatch(html, /<option value="CN" selected/);
         assert.doesNotMatch(html, /<option value="US" selected/);
+    });
+
+    it('connects result-page opportunity teaser to rate and parser coverage data', () => {
+        const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'render-results.js'), 'utf8');
+
+        assert.match(source, /data\/duty-rates\.json/);
+        assert.match(source, /data\/post-entry-rate-priority-matrix\.json/);
+        assert.match(source, /opportunity-teaser__chips/);
+        assert.match(source, /parserBacklogCount/);
     });
 });
