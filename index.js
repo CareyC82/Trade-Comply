@@ -294,6 +294,19 @@ function searchTagsForExploratory(query, direction, limitPerBucket = 6) {
     return { sameDirection, otherDirection };
 }
 
+function normalizeAiRoute(rawRoute, direction) {
+    const route = rawRoute && typeof rawRoute === 'object' ? rawRoute : {};
+    const from = truncateText(route.from || '', 20);
+    const to = truncateText(route.to || '', 20);
+    const fromLabel = truncateText(route.from_label || route.fromLabel || getCountryLabel(from) || from || 'selected origin', 80);
+    const toLabel = truncateText(route.to_label || route.toLabel || getCountryLabel(to) || to || 'selected destination', 80);
+    const focus = route.focus === 'export' || route.focus === 'import'
+        ? route.focus
+        : (direction === 'import' ? 'import' : 'export');
+
+    return { from, to, from_label: fromLabel, to_label: toLabel, focus };
+}
+
 function hydrateExploratoryContext(context, userQuery) {
     const direction = context?.direction === 'import' ? 'import' : 'export';
     const productQuery = truncateText(context?.product_query || userQuery || '', 200);
@@ -315,6 +328,7 @@ function hydrateExploratoryContext(context, userQuery) {
         context: {
             product_query: productQuery,
             direction,
+            route: normalizeAiRoute(context?.route, direction),
             risk_level: riskLevel,
             precheck_attributes: precheckAttributes,
             matched_tags: sameDirection,
@@ -341,6 +355,7 @@ function hydrateContext(context) {
     const direction = context.direction === 'import' ? 'import' : 'export';
     const productQuery = truncateText(context.product_query || '', 200);
     const riskLevel = truncateText(context.risk_level || 'low', 40);
+    const route = normalizeAiRoute(context.route, direction);
     const precheckAttributes = Array.isArray(context.precheck_attributes)
         ? context.precheck_attributes.filter(attr => typeof attr === 'string').slice(0, 12)
         : [];
@@ -398,6 +413,7 @@ function hydrateContext(context) {
         context: {
             product_query: productQuery,
             direction,
+            route,
             risk_level: riskLevel,
             precheck_attributes: precheckAttributes,
             matched_tags: matchedTags,
@@ -447,16 +463,18 @@ function buildGroundedUserMessage(context, userQuery) {
         ? context.related_cases.map(formatCaseBlock).join('\n\n')
         : 'None matched.';
 
-    const directionLabel = context.direction === 'import'
-        ? 'import INTO China'
-        : 'export FROM China';
-    const oppositeDirectionLabel = context.direction === 'import'
-        ? 'export FROM China'
-        : 'import INTO China';
+    const route = normalizeAiRoute(context.route, context.direction);
+    const directionLabel = route.focus === 'export'
+        ? `export requirements at origin: ${route.from_label} -> ${route.to_label}`
+        : `import requirements at destination: ${route.from_label} -> ${route.to_label}`;
+    const oppositeDirectionLabel = route.focus === 'export'
+        ? `import requirements at destination: ${route.to_label}`
+        : `export requirements at origin: ${route.from_label}`;
 
     const lines = [
         `PRODUCT QUERY: ${context.product_query || 'Not specified'}`,
-        `DIRECTION: ${directionLabel}`,
+        `TRADE ROUTE: ${route.from_label} -> ${route.to_label}`,
+        `COMPLIANCE FOCUS: ${directionLabel}`,
         `RISK LEVEL: ${context.risk_level}`,
         `PRECHECK ATTRIBUTES: ${context.precheck_attributes.join(', ') || 'none'}`,
         ''
@@ -534,7 +552,7 @@ const AI_MESSAGES = {
     insufficientContext: "The rule library did not find related compliance signals for this product and question.\n\nTry switching import/export direction, broadening the product description, or submit feedback with your product details.",
     invalidTagIds: "The AI assistant could not verify the matched rule IDs against the server rule library. Please refresh the page and try again.",
     libraryUnavailable: "The AI assistant rule library is temporarily unavailable on the server. Please try again later or use the matched cards above.",
-    systemPrompt: `You are a cautious Chinese trade compliance expert. Answer questions ONLY about China's import/export regulations. Never give legal advice. Always reply in English.
+    systemPrompt: `You are a cautious global trade compliance pre-screening expert for electronics, semiconductors, batteries, wireless devices, clean energy products, and related supply chains. Answer questions for the selected trade route and compliance focus only. Never give legal advice. Always reply in English.
 
 CRITICAL - Response Structure:
 Structure your entire response using this exact format:
@@ -562,8 +580,9 @@ Provide actionable guidance:
    - What steps can reduce customs risk?
 
 CRITICAL - Rules:
-- ONLY cover China trade regulations. NEVER mention FCC, CE, FDA, RoHS, WEEE, UL, etc.
-- If asked about non-China regulations, respond: "Sorry, I only cover China's trade compliance regulations."
+- Cover the origin export or destination import jurisdiction shown in the TRADE ROUTE and COMPLIANCE FOCUS fields. This may include China, United States, European Union, Germany, Netherlands, Singapore, Mexico, Vietnam, Malaysia, Russia, Taiwan, Japan, South Korea, India, or other maintained markets when present in the provided context.
+- Do NOT refuse non-China routes merely because they are outside China. If the provided context is thin, say the rule library does not contain enough detail.
+- Do NOT mention unrelated jurisdictions, certifications, or regimes unless they appear in the MATCHED RULES or RELATED CASES for this route.
 - Keep each section concise but specific.
 
 GROUNDING RULES (mandatory):
@@ -1425,3 +1444,5 @@ exports.handler = async (rawEvent) => {
 // Exported for local verification scripts.
 exports.hydrateContext = hydrateContext;
 exports.loadRuleLibrary = loadRuleLibrary;
+exports.AI_MESSAGES = AI_MESSAGES;
+exports.buildGroundedUserMessage = buildGroundedUserMessage;

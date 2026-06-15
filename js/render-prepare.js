@@ -349,6 +349,7 @@ function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
         aiContext: () => buildAiContext({
             productQuery: query,
             direction: AppState.currentDirection,
+            routeContext,
             precheckSelections,
             tags,
             cases,

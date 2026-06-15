@@ -274,13 +274,20 @@ function renderPrecheckSummary(containerId, selections, tags, cardsContainerId =
     bindPrecheckSummaryActions(container, cardsContainerId);
 }
 
-function buildAiContext({ productQuery, direction, precheckSelections, tags, cases, profile }) {
+function buildAiContext({ productQuery, direction, routeContext, precheckSelections, tags, cases, profile }) {
     const MAX_TAGS = 8;
     const MAX_CASES = 3;
 
     return {
         product_query: productQuery || '',
         direction: direction || AppState.currentDirection || 'export',
+        route: routeContext ? {
+            from: routeContext.from || '',
+            to: routeContext.to || '',
+            from_label: routeContext.fromLabel || '',
+            to_label: routeContext.toLabel || '',
+            focus: routeContext.focus || ''
+        } : null,
         precheck_attributes: (precheckSelections || []).map(item => item.id),
         risk_level: profile?.risk || 'low',
         tag_ids: (tags || []).slice(0, MAX_TAGS).map(tag => tag.tag_id).filter(Boolean),
