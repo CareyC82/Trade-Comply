@@ -367,25 +367,87 @@ function updateElementText(id, text) {
 function getTagCategoryLabel(tag) {
     const label = tag.category_label || tag.category || 'General';
     if ((AppState.currentDirection || 'export') === 'import' && tag.category === 'EXPORT_CTRL') {
-        return 'Import Control & Trade Remedies';
+        return 'Import Controls & Trade Remedies';
     }
-    return label;
+    return getDisplayCategoryLabel(label, tag.category);
+}
+
+function getDisplayCategoryLabel(label, categoryCode = '') {
+    const normalized = String(label || '').trim().toLowerCase();
+    const category = String(categoryCode || '').trim();
+
+    if (category === 'IMPORT_REG' || normalized === 'import regulation') {
+        return 'Import Clearance & Tariff';
+    }
+    if (category === 'IMPORT_CONTROL' || normalized === 'import control') {
+        return 'Import Controls & Trade Remedies';
+    }
+    if (category === 'EXPORT_DECLARATION' || normalized === 'export customs' || normalized === 'export declaration') {
+        return 'Export Filing & Documents';
+    }
+    if (category === 'ORIGIN_DOC' || normalized === 'origin / transshipment') {
+        return 'Origin & Anti-Circumvention';
+    }
+    if (normalized === 'compliance standard') {
+        return 'Product Standards';
+    }
+    if (normalized === 'compulsory certification') {
+        return 'Product Certification';
+    }
+    if (normalized === 'wireless & telecom') {
+        return 'Wireless & Telecom Approval';
+    }
+    if (normalized === 'other requirements') {
+        return 'General Compliance Requirements';
+    }
+    if (normalized === 'tax rebate') {
+        return 'Export Rebate';
+    }
+    if (normalized === 'tax & financial incentives') {
+        return 'Duty Drawback & Tax Incentives';
+    }
+    if (/destination barrier/.test(normalized)) {
+        return 'Destination Market Requirements';
+    }
+    if (/origin compliance/.test(normalized)) {
+        return 'Origin-Side Compliance';
+    }
+    if (normalized === 'us tariff exposure') {
+        return 'Tariff Exposure';
+    }
+    if (normalized === 'us ad/cvd') {
+        return 'AD/CVD Trade Remedies';
+    }
+    if (normalized === 'asean solar routing risk') {
+        return 'Solar Origin & Routing Risk';
+    }
+    return label || 'General';
 }
 
 const CATEGORY_THEME = {
     EXPORT_CTRL: { class: 'export-ctrl', icon: '🛡️' },
+    EXPORT_DECLARATION: { class: 'origin-doc', icon: '🧾' },
+    ORIGIN_DOC: { class: 'origin-doc', icon: '🧭' },
+    IMPORT_CONTROL: { class: 'import-regulation', icon: '📦' },
+    IMPORT_REG: { class: 'import-regulation', icon: '📦' },
     COMPULSORY_CERT: { class: 'compulsory-cert', icon: '✅' },
     TAX_INCENTIVE: { class: 'tax-incentive', icon: '💰' },
+    TAX_REBATE: { class: 'tax-incentive', icon: '💰' },
     WIRELESS_TELECOM: { class: 'wireless-telecom', icon: '📡' },
     COMPLIANCE_STD: { class: 'compliance-std', icon: '📋' },
+    ENVIRONMENT_BATTERY: { class: 'battery-ess', icon: '🔋' },
+    SUPPLY_CHAIN: { class: 'destination-barrier', icon: '🧭' },
     OTHER: { class: 'other', icon: '📦' }
 };
 
 const CATEGORY_LABEL_THEME_RULES = [
     { pattern: /battery|ess|energy storage/, theme: { class: 'battery-ess', icon: '🔋' } },
-    { pattern: /destination barrier/, theme: { class: 'destination-barrier', icon: '🚧' } },
-    { pattern: /import regulation|import control|trade remed|tariff|ad\/cvd/, theme: { class: 'import-regulation', icon: '📦' } },
-    { pattern: /compliance standard|standard/, theme: { class: 'compliance-standard', icon: '📘' } },
+    { pattern: /destination market|destination barrier|routing risk|anti-circumvention/, theme: { class: 'destination-barrier', icon: '🚧' } },
+    { pattern: /import clearance|import regulation|import control|trade remed|tariff|ad\/cvd/, theme: { class: 'import-regulation', icon: '📦' } },
+    { pattern: /export filing|export customs|export declaration/, theme: { class: 'origin-doc', icon: '🧾' } },
+    { pattern: /product standards|compliance standard|standard/, theme: { class: 'compliance-standard', icon: '📘' } },
+    { pattern: /product certification|compulsory certification/, theme: { class: 'compulsory-cert', icon: '✅' } },
+    { pattern: /wireless|telecom/, theme: { class: 'wireless-telecom', icon: '📡' } },
     { pattern: /product compliance|product safety/, theme: { class: 'product-compliance', icon: '📄' } },
     { pattern: /ev charger|wallbox|charging/, theme: { class: 'ev-charger', icon: '🔌' } },
     { pattern: /optical|laser/, theme: { class: 'optical-laser', icon: '🔦' } },
@@ -393,10 +455,14 @@ const CATEGORY_LABEL_THEME_RULES = [
 ];
 
 function getCategoryTheme(categoryCode, categoryLabel = '') {
+    const categoryTheme = CATEGORY_THEME[categoryCode];
+    if (categoryTheme && categoryCode !== 'OTHER') {
+        return categoryTheme;
+    }
     const normalizedLabel = String(categoryLabel || '').toLowerCase();
     const labelTheme = CATEGORY_LABEL_THEME_RULES.find((rule) => rule.pattern.test(normalizedLabel));
     if (labelTheme) return labelTheme.theme;
-    return CATEGORY_THEME[categoryCode] || CATEGORY_THEME.OTHER;
+    return categoryTheme || CATEGORY_THEME.OTHER;
 }
 
 // === 更新分类页面摘要 ===
