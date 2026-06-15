@@ -112,6 +112,8 @@ function runPriorityMatrixRoute(route) {
         id: route.id,
         product_id: route.product_id,
         route: `${route.origin_country}->${route.import_country}`,
+        origin_country: route.origin_country,
+        import_country: route.import_country,
         hs_code: route.hs_code,
         automation_level: route.automation_level || '',
         expected_source_trust: route.expected_source_trust || '',
@@ -139,13 +141,38 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         return counts;
     }, {});
     const missingProductDefinitions = productIds.filter(productId => !products.has(productId));
-    const priorityRank = {
-        precheck_estimate: 1,
-        official_link_estimate: 2,
-        official_heading_only: 3,
-        mixed_official_estimate: 4,
-        official_duty_tax_estimate: 5,
-        official_exact_rate: 6
+    const trustRank = {
+        precheck_estimate: 10,
+        official_link_estimate: 20,
+        official_heading_only: 30,
+        mixed_official_estimate: 40,
+        official_duty_tax_estimate: 90,
+        official_exact_rate: 100
+    };
+    const marketRank = {
+        IN: 1,
+        SG: 2,
+        MX: 3,
+        JP: 4,
+        KR: 5,
+        VN: 6,
+        MY: 7,
+        TW: 8,
+        EU: 9,
+        DE: 10,
+        NL: 11,
+        US: 12,
+        CN: 13
+    };
+    const productRank = {
+        semiconductor: 1,
+        router: 2,
+        smartphone: 3,
+        battery: 4,
+        ev_charger: 5,
+        solar: 6,
+        tablet: 7,
+        monitor: 8
     };
     const upgradeQueue = results
         .filter(result => !['official_exact_rate', 'official_duty_tax_estimate'].includes(result.source_trust))
@@ -153,10 +180,21 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             id: result.id,
             product_id: result.product_id,
             route: result.route,
+            origin_country: result.origin_country,
+            import_country: result.import_country,
             hs_code: result.hs_code,
             source_trust: result.source_trust,
             automation_level: result.automation_level,
-            priority: priorityRank[result.source_trust] || 9,
+            priority: trustRank[result.source_trust] || 80,
+            priority_band: result.source_trust === 'precheck_estimate'
+                ? 'P1'
+                : result.source_trust === 'official_link_estimate'
+                    ? 'P1'
+                    : result.source_trust === 'official_heading_only'
+                        ? 'P2'
+                        : 'P3',
+            market_priority: marketRank[result.import_country] || 99,
+            product_priority: productRank[result.product_id] || 99,
             parser_target: result.source_trust === 'official_link_estimate'
                 ? `${result.route.split('->')[1] || 'market'} exact tariff-line parser`
                 : result.source_trust === 'official_heading_only'
@@ -172,7 +210,13 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
                         ? 'Separate official base duty from trade-remedy or add-on scope and confirm active filing period.'
                         : 'Find official source or parser before using this route beyond screening.'
         }))
-        .sort((a, b) => a.priority - b.priority || a.route.localeCompare(b.route) || a.product_id.localeCompare(b.product_id));
+        .sort((a, b) => (
+            a.priority - b.priority
+            || a.market_priority - b.market_priority
+            || a.product_priority - b.product_priority
+            || a.route.localeCompare(b.route)
+            || a.product_id.localeCompare(b.product_id)
+        ));
 
     missingProductDefinitions.forEach((productId) => {
         failures.push({

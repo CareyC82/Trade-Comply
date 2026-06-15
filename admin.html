@@ -1098,16 +1098,16 @@
                         Automation: ${Object.entries(automationCounts).map(([key, value]) => `<span class="badge ${key === 'benchmark_auto' ? 'benchmark_updatable' : key === 'official_link_monitor' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join(' ') || 'none'}
                     </p>
                     ${failures.length ? `<div class="empty">Matrix exceptions: ${escapeHtml(failures.map(item => `${item.id}: ${(item.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
-                    <div class="crawl-section-title"><h3>税率补全优先级列表</h3><span class="meta">${upgradeQueue.length} route(s) need parser / exact-rate upgrade; showing top ${topQueue.length}</span></div>
+                    <div class="crawl-section-title"><h3>税率补全优先级列表</h3><span class="meta">${upgradeQueue.length} route(s) need exact-rate/parser upgrade; showing top ${topQueue.length}</span></div>
                     <div class="coverage-table-wrap">
                         <table class="quality-gap-table">
                             <thead>
                                 <tr>
                                     <th>Priority</th>
+                                    <th>Market</th>
                                     <th>Product</th>
-                                    <th>Route</th>
                                     <th>HS</th>
-                                    <th>Current trust</th>
+                                    <th>Current coverage</th>
                                     <th>Parser target</th>
                                     <th>Next action</th>
                                 </tr>
@@ -1115,9 +1115,9 @@
                             <tbody>
                                 ${topQueue.length ? topQueue.map((row) => `
                                     <tr>
-                                        <td><strong>P${escapeHtml(row.priority || '')}</strong></td>
+                                        <td><strong>${escapeHtml(row.priority_band || `P${row.priority || ''}`)}</strong></td>
+                                        <td>${escapeHtml(row.import_country || (row.route || '').split('->')[1] || '')}<div class="meta">${escapeHtml(row.route || '')}</div></td>
                                         <td>${escapeHtml(row.product_id || '')}</td>
-                                        <td>${escapeHtml(row.route || '')}</td>
                                         <td>${escapeHtml(row.hs_code || '')}</td>
                                         <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : row.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
                                         <td>${escapeHtml(row.parser_target || '')}</td>

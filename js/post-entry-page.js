@@ -270,7 +270,7 @@
             if (nonOfficialRows.length && nonOfficialRows.every(isTaxEstimateLayer)) {
                 return 'official_duty_tax_estimate';
             }
-            return 'benchmark_source_checked';
+            return 'mixed';
         }
         if (tiers.has('benchmark_source_checked')) return 'benchmark_source_checked';
         if (tiers.has('exact_hs_required')) return 'exact_hs_required';
@@ -325,9 +325,9 @@
                 summary: 'This is a maintained screening estimate. Confirm the final tariff line before filing or correction.'
             },
             mixed: {
-                tone: 'benchmark',
-                label: 'Pre-check estimate',
-                summary: 'Some layers are not final official rates. Use the result to identify the gap, then verify the non-official layers before correction.'
+                tone: 'mixed',
+                label: 'Hybrid official + estimate',
+                summary: 'At least one duty layer is official-backed, but add-ons, trade-remedy scope, or local tax layers still need final confirmation.'
             },
             not_covered: {
                 tone: 'not-covered',

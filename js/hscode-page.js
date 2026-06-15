@@ -2,7 +2,7 @@
  * HS Code classifier page logic (hscode.html).
  */
 
-const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run?action=hscode_classify';
+const HSCODE_API_URL = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run/?action=hscode_classify';
 const HSCODE_MIN_INTERVAL_MS = 15000;
 const HSCODE_MAX_DESCRIPTION = 2000;
 

@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const {
     calculatePostEntryValue,
@@ -283,4 +285,14 @@ test('builds US export-side post-entry review without treating it as import duty
     assert.match(review.complianceMeaning, /ECCN\/license/);
     assert.match(review.action, /AES correction/);
     assert.ok(review.evidence.some(item => /ITN/.test(item)));
+});
+
+test('Post-Entry result shows rate confidence without opening details', () => {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'post-entry-result.html'), 'utf8');
+    const confidenceIndex = html.indexOf('id="post-entry-confidence-card"');
+    const detailsIndex = html.indexOf('<details class="post-entry-detail-panel">');
+
+    assert.ok(confidenceIndex > -1, 'rate confidence card should exist');
+    assert.ok(detailsIndex > -1, 'details panel should exist');
+    assert.ok(confidenceIndex < detailsIndex, 'rate confidence card should appear before the collapsible details panel');
 });

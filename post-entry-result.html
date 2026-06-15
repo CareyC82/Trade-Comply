@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post-Entry Result | TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260615-category-labels">
+    <link rel="stylesheet" href="css/style.css?v=20260615-ai-endpoint-fix">
 </head>
 <body class="post-entry-page-body">
     <main id="post-entry-result-page" class="post-entry-page view-container active">
@@ -33,6 +33,15 @@
                 <span class="post-entry-decision-kicker">Core conclusion</span>
                 <strong id="post-entry-decision-text">—</strong>
                 <small id="post-entry-coverage-note" class="post-entry-coverage-note">—</small>
+            </div>
+
+            <div id="post-entry-confidence-card" class="post-entry-confidence-card post-entry-confidence-card--top">
+                <div>
+                    <span id="post-entry-confidence-kicker" class="post-entry-confidence-kicker">Rate confidence</span>
+                    <strong id="post-entry-confidence-label">—</strong>
+                    <p id="post-entry-confidence-summary">—</p>
+                </div>
+                <div id="post-entry-confidence-chips" class="post-entry-confidence-chips" aria-label="Rate source confidence details"></div>
             </div>
 
             <div class="post-entry-decision-grid">
@@ -71,15 +80,6 @@
 
             <details class="post-entry-detail-panel">
                 <summary>View detailed calculation and source basis</summary>
-                <div id="post-entry-confidence-card" class="post-entry-confidence-card">
-                    <div>
-                        <span id="post-entry-confidence-kicker" class="post-entry-confidence-kicker">Rate confidence</span>
-                        <strong id="post-entry-confidence-label">—</strong>
-                        <p id="post-entry-confidence-summary">—</p>
-                    </div>
-                    <div id="post-entry-confidence-chips" class="post-entry-confidence-chips" aria-label="Rate source confidence details"></div>
-                </div>
-
                 <div class="post-entry-source-card">
                     <div class="post-entry-source-header">
                         <h3 id="post-entry-source-title">Rate source status</h3>
@@ -161,6 +161,6 @@
         <a id="nav-opportunity" class="nav-btn nav-btn-link" href="opportunity.html">🌐 Opportunity</a>
     </nav>
 
-    <script src="js/main.js?v=20260615-category-labels" data-app="post-entry"></script>
+    <script src="js/main.js?v=20260615-ai-endpoint-fix" data-app="post-entry"></script>
 </body>
 </html>

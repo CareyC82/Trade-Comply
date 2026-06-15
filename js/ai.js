@@ -1,3 +1,25 @@
+const AI_ASSISTANT_DEFAULT_ENDPOINT = 'https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run/';
+
+function normalizeAiAssistantEndpoint(endpoint) {
+    if (!endpoint || typeof endpoint !== 'string') {
+        return AI_ASSISTANT_DEFAULT_ENDPOINT;
+    }
+    const trimmed = endpoint.trim();
+    if (!trimmed) {
+        return AI_ASSISTANT_DEFAULT_ENDPOINT;
+    }
+    return trimmed.includes('?') || trimmed.endsWith('/')
+        ? trimmed
+        : `${trimmed}/`;
+}
+
+function resolveAiAssistantEndpoint() {
+    const configured = globalThis.TRACEWIZE_AI_ENDPOINT
+        || globalThis.TradeComplyAiEndpoint
+        || document.querySelector('meta[name="tracewize-ai-endpoint"]')?.content;
+    return normalizeAiAssistantEndpoint(configured);
+}
+
 async function callAiAssistant(query) {
     if (!query.trim()) {
         return;
@@ -21,7 +43,7 @@ async function callAiAssistant(query) {
 
         updateAiButtonState(true);
 
-        const response = await fetch('https://tradecoai-agent-ugbhgcutmm.cn-shenzhen.fcapp.run', {
+        const response = await fetch(resolveAiAssistantEndpoint(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: requestBody,
@@ -52,7 +74,7 @@ async function callAiAssistant(query) {
         const isNetworkError = error.name === 'AbortError'
             || /failed to fetch|network|cors/i.test(error.message || '');
         const diagnostic = isNetworkError
-            ? `${fallback} The AI service may be blocked by browser network/CORS settings.`
+            ? `${fallback} The AI service connection failed. Please refresh and try again.`
             : `${fallback} ${error.message || ''}`.trim();
         createAiBox(diagnostic, null);
         updateAiButtonState(false);

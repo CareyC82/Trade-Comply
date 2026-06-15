@@ -123,20 +123,24 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
         'solar',
         'tablet'
     ]);
-    ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN'].forEach((country) => {
+    ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
         assert.ok(matrix.import_markets.includes(country), `${country} should be in high-frequency rate matrix`);
     });
     assert.ok(matrix.official_or_hybrid_count > 50, 'official/hybrid/link-monitored coverage should cover the full high-frequency matrix');
-    assert.equal(matrix.benchmark_count, 0, 'high-frequency routes should no longer remain plain benchmark rows');
+    assert.equal(matrix.benchmark_count, 12, 'new VN/MY/TW priority routes should remain explicit benchmark rows until official parser work is complete');
     assert.equal(matrix.automation_counts.official_auto > 0, true);
     assert.equal(matrix.automation_counts.hybrid_official > 0, true);
     assert.equal(matrix.automation_counts.official_link_monitor > 0, true);
+    assert.equal(matrix.automation_counts.benchmark_auto, 12);
     assert.equal(matrix.trust_counts.official_link_estimate, 32);
+    assert.equal(matrix.trust_counts.precheck_estimate, 12);
     assert.ok(matrix.trust_counts.official_heading_only >= 8);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
+    assert.ok(matrix.priority_upgrade_queue.every((row) => row.priority_band), 'upgrade queue should show business priority band');
     assert.ok(matrix.priority_upgrade_queue.some((row) => row.parser_target.includes('SG exact tariff-line parser')));
+    assert.ok(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN' && row.source_trust === 'precheck_estimate'));
 });
 
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {
