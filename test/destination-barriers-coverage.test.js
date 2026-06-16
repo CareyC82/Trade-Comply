@@ -49,7 +49,17 @@ const NEW_ROUTE_COVERAGE = [
     { focus: 'import', country: 'IN', query: 'energy storage battery system lithium battery', expected: 'CL-IN-004' },
     { focus: 'export', country: 'IN', query: 'gpu ai accelerator chip', expected: 'CL-IN-006' },
     { focus: 'export', country: 'IN', query: 'electronics export shipping bill', expected: 'CL-IN-007' },
-    { focus: 'export', country: 'IN', query: 'certificate of origin transshipment electronics', expected: 'CL-IN-008' }
+    { focus: 'export', country: 'IN', query: 'certificate of origin transshipment electronics', expected: 'CL-IN-008' },
+    { focus: 'import', country: 'US', query: 'ai server gpu server data center', expected: 'CL-USDC-001' },
+    { focus: 'import', country: 'US', query: 'industrial robot arm plc servo machine vision', expected: 'CL-USROBOT-001' },
+    { focus: 'import', country: 'US', query: 'patient monitor medical device lab analyzer', expected: 'CL-USMED-001' },
+    { focus: 'export', country: 'DE', query: 'industrial robot arm plc servo machine vision', expected: 'CL-DEAUTO-001' },
+    { focus: 'import', country: 'JP', query: 'ai server gpu server data center pdu', expected: 'CL-JPDC-001' },
+    { focus: 'import', country: 'JP', query: 'patient monitor medical device lab analyzer', expected: 'CL-JPMED-001' },
+    { focus: 'import', country: 'KR', query: 'ai server gpu server data center pdu', expected: 'CL-KRDC-001' },
+    { focus: 'import', country: 'KR', query: 'patient monitor medical device lab analyzer', expected: 'CL-KRMED-001' },
+    { focus: 'import', country: 'IN', query: 'ai server gpu server data center pdu', expected: 'CL-IN-009' },
+    { focus: 'import', country: 'IN', query: 'patient monitor medical device lab analyzer', expected: 'CL-IN-010' }
 ];
 
 function scoreTag(tag, query) {

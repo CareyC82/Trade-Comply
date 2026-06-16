@@ -1,7 +1,7 @@
 // === English UI strings ===
 const UI_STRINGS = {
     title: "TraceWize",
-    subtitle: "Global trade compliance, tariff checks, and opportunity insights for electronics supply chains",
+    subtitle: "Global trade compliance, tariff checks, and opportunity insights for High-Tech supply chains",
     export: "Export from China",
     import: "Import into China",
     searchPlaceholder: "Enter product, HS Code, or risk feature",

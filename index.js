@@ -530,7 +530,7 @@ function postValidateResponse(text, context) {
         confidence = 'partial';
     }
 
-    if (/rule library does not contain enough detail/i.test(text)) {
+    if (/^\s*The rule library (?:does|did) not (?:contain|find) (?:enough detail|related compliance signals)/i.test(text)) {
         confidence = 'insufficient_context';
     }
 
@@ -581,15 +581,18 @@ Provide actionable guidance:
 
 CRITICAL - Rules:
 - Cover the origin export or destination import jurisdiction shown in the TRADE ROUTE and COMPLIANCE FOCUS fields. This may include China, United States, European Union, Germany, Netherlands, Singapore, Mexico, Vietnam, Malaysia, Russia, Taiwan, Japan, South Korea, India, or other maintained markets when present in the provided context.
-- Do NOT refuse non-China routes merely because they are outside China. If the provided context is thin, say the rule library does not contain enough detail.
+- Do NOT refuse non-China routes merely because they are outside China. If the provided context is thin, still answer from the matched rule titles, descriptions, citations, and cases.
 - Do NOT mention unrelated jurisdictions, certifications, or regimes unless they appear in the MATCHED RULES or RELATED CASES for this route.
 - Keep each section concise but specific.
 
 GROUNDING RULES (mandatory):
 - You MUST answer using ONLY the MATCHED RULES and RELATED CASES provided in the user message.
 - Every regulatory claim MUST cite a tag_id like [CL-CCC-001] or case_id like [CASE-003].
-- If the provided context does not contain enough detail, say exactly:
-  "The rule library does not contain enough detail to answer this. Please verify with the official source or submit feedback."
+- If a specific subsection lacks explicit exemption, threshold, penalty, date, or hidden-risk details, do NOT repeat a generic failure sentence. Instead write:
+  "Not stated in the matched rules. Treat this as an open verification item before filing or shipment."
+- If there are matched rules, each section must contain at least one route-specific, useful sentence derived from those matched rules.
+- If there are zero matched rules and zero related cases, say:
+  "The rule library did not find related compliance signals for this product and route."
 - Do NOT invent HS codes, penalty amounts, effective dates, agency names, or license requirements not present in the context.
 - You MAY add practical next steps, but label them clearly as "General guidance (not from rule library)".`
 };

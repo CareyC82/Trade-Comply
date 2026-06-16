@@ -291,6 +291,89 @@
         "semiconductor",
         "wireless"
       ]
+    },
+    {
+      "id": "cn-us-ai-server-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "data-center",
+      "query": "ai server gpu server data center storage server pdu",
+      "expected_top_rule": "CL-USDC-001",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "cn-us-industrial-robot-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "industrial-automation",
+      "query": "industrial robot arm plc servo drive machine vision",
+      "expected_top_rule": "CL-USROBOT-001",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "cn-us-patient-monitor-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "healthcare-lab",
+      "query": "patient monitor medical device lab analyzer",
+      "expected_top_rule": "CL-USMED-001",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "de-us-industrial-automation-export",
+      "from": "DE",
+      "to": "US",
+      "focus": "export",
+      "vertical": "industrial-automation",
+      "query": "industrial robot arm plc servo drive machine vision",
+      "expected_top_rule": "CL-DEAUTO-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-jp-healthcare-lab-import",
+      "from": "US",
+      "to": "JP",
+      "focus": "import",
+      "vertical": "healthcare-lab",
+      "query": "patient monitor medical device lab analyzer",
+      "expected_top_rule": "CL-JPMED-002",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1
+    },
+    {
+      "id": "us-kr-data-center-import",
+      "from": "US",
+      "to": "KR",
+      "focus": "import",
+      "vertical": "data-center",
+      "query": "ai server gpu server data center pdu",
+      "expected_top_rule": "CL-KRDC-001",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-in-healthcare-lab-import",
+      "from": "US",
+      "to": "IN",
+      "focus": "import",
+      "vertical": "healthcare-lab",
+      "query": "patient monitor medical device lab analyzer",
+      "expected_top_rule": "CL-IN-010",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1
     }
   ]
 }

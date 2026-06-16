@@ -10,6 +10,16 @@ test('AI system prompt supports global trade routes instead of China-only scope'
     assert.doesNotMatch(AI_MESSAGES.systemPrompt, /Sorry, I only cover China's trade compliance regulations/i);
 });
 
+test('AI system prompt avoids repeated generic insufficient-detail sections when rules exist', () => {
+    assert.match(AI_MESSAGES.systemPrompt, /Not stated in the matched rules/i);
+    assert.match(AI_MESSAGES.systemPrompt, /open verification item/i);
+    assert.match(AI_MESSAGES.systemPrompt, /If there are matched rules, each section must contain/i);
+    assert.doesNotMatch(
+        AI_MESSAGES.systemPrompt,
+        /The rule library does not contain enough detail to answer this/i
+    );
+});
+
 test('AI grounded message labels non-China import routes correctly', () => {
     const message = buildGroundedUserMessage({
         product_query: 'gpu ai accelerator chip',
