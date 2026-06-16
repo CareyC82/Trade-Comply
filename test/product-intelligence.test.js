@@ -51,6 +51,30 @@ describe('product intelligence', () => {
         assert.ok(profile.expansionTerms.includes('advanced computing'));
     });
 
+    it('keeps chips in semiconductor but routes system-level AI servers to data center', () => {
+        const chipProfile = inferProductAttributes('AI GPU accelerator chip with HBM package');
+        const serverProfile = inferProductAttributes('AI server GPU server rack with storage and redundant power');
+
+        assert.equal(chipProfile.vertical, 'semiconductor');
+        assert.ok(chipProfile.precheckIds.includes('ai_chip'));
+        assert.equal(serverProfile.vertical, 'data-center');
+        assert.ok(serverProfile.precheckIds.includes('data_center_system'));
+        assert.match(serverProfile.expansionTerms.join(' '), /data center equipment|server|edge computing/i);
+    });
+
+    it('detects industrial automation and healthcare lab product verticals', () => {
+        const industrial = inferProductAttributes('PLC controller industrial automation machine vision gateway');
+        const healthcare = inferProductAttributes('patient monitor medical electronics bluetooth battery');
+
+        assert.equal(industrial.vertical, 'industrial-automation');
+        assert.ok(industrial.precheckIds.includes('industrial_automation'));
+        assert.match(industrial.expansionTerms.join(' '), /robotics|industrial control/i);
+
+        assert.equal(healthcare.vertical, 'healthcare-lab');
+        assert.ok(healthcare.precheckIds.includes('healthcare_lab'));
+        assert.match(healthcare.expansionTerms.join(' '), /medical electronics|diagnostic device/i);
+    });
+
     it('infers wireless, encryption, and surveillance risk for IP camera storage descriptions', () => {
         const profile = inferProductAttributes('IP camera with WiFi, encrypted NVR network storage');
         assert.ok(profile.precheckIds.includes('wireless'));

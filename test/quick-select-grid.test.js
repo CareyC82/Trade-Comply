@@ -24,4 +24,17 @@ describe('quick-select-grid', () => {
         assert.equal(electronicsLabels.includes('EV Charger'), false);
         assert.equal(newEnergyLabels.includes('EV Charger'), true);
     });
+
+    it('adds distinct quick-select cards for the three new product verticals', () => {
+        const context = loadQuickSelectContext();
+
+        assert.ok(context.DATA_CENTER_QUICK_SELECT_CARDS.some((card) => card.label === 'AI Server'));
+        assert.ok(context.INDUSTRIAL_AUTOMATION_QUICK_SELECT_CARDS.some((card) => card.label === 'PLC Controller'));
+        assert.ok(context.HEALTHCARE_LAB_QUICK_SELECT_CARDS.some((card) => card.label === 'Patient Monitor'));
+
+        const semiconductorLabels = context.SEMICONDUCTOR_HUB_QUICK_SELECT_CARDS.map((card) => card.label);
+        assert.equal(semiconductorLabels.includes('AI Server'), false);
+        assert.equal(semiconductorLabels.includes('PLC Controller'), false);
+        assert.equal(semiconductorLabels.includes('Patient Monitor'), false);
+    });
 });

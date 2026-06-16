@@ -202,7 +202,7 @@ function bootstrapTradeOpportunityPage() {
                     </div>
                 </div>
                 <div class="opportunity-best-badge">
-                    <span>Best route to compare</span>
+                    <span>${escapeHtml(model.bestIsSelectedMarket ? 'Primary route to review' : 'Best route to compare')}</span>
                     <strong>${escapeHtml(model.best.label)}</strong>
                 </div>
             </section>

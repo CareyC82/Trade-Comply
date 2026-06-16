@@ -360,7 +360,7 @@ function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
             direction,
             includeBaseline: false,
             productQuery: query,
-            vertical: ['electronics', 'new-energy', 'semiconductor'].includes(AppState.searchOrigin)
+            vertical: ['electronics', 'new-energy', 'semiconductor', 'data-center', 'industrial-automation', 'healthcare-lab'].includes(AppState.searchOrigin)
                 ? AppState.searchOrigin
                 : undefined
         }

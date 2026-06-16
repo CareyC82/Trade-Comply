@@ -144,12 +144,15 @@ function mountOpportunityTeaser(container, query, routeContext) {
             to: model.to,
             focus: model.focus
         });
+        const headline = model.bestIsSelectedMarket
+            ? `${model.best.label} remains the primary market to review for ${model.productSignal.label.toLowerCase()}.`
+            : `${model.best.label} may be worth comparing for ${model.productSignal.label.toLowerCase()}.`;
         container.innerHTML = `
             <section class="opportunity-teaser" aria-label="Trade opportunity insight">
                 <div class="opportunity-teaser__icon" aria-hidden="true">🌐</div>
                 <div class="opportunity-teaser__body">
                     <span class="opportunity-teaser__kicker">Trade opportunity insight</span>
-                    <strong>${escapeHtml(model.best.label)} may be worth comparing for ${escapeHtml(model.productSignal.label.toLowerCase())}.</strong>
+                    <strong>${escapeHtml(headline)}</strong>
                     <p>${escapeHtml(model.best.conciseConclusion || model.summary)}</p>
                     <div class="opportunity-teaser__chips">
                         <span>${escapeHtml(model.best.dutyBreakdown?.totalRate || 'Rate pending')} total signal</span>

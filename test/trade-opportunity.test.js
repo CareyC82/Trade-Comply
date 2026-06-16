@@ -96,11 +96,43 @@ describe('trade opportunity insights', () => {
         assert.ok(russia.score < 50);
         assert.match(russia.watchpoint, /sanctions|Screen/i);
     });
+
+    it('does not over-recommend Singapore for every product opportunity', () => {
+        const samples = [
+            ['industrial robot arm', 'CN', 'US', 'import'],
+            ['AI server GPU server', 'CN', 'US', 'import'],
+            ['patient monitor medical electronics', 'US', 'JP', 'import'],
+            ['solar panel photovoltaic', 'CN', 'IN', 'import']
+        ];
+        const winners = samples.map(([product, from, to, focus]) => buildOpportunityInsights({
+            product,
+            from,
+            to,
+            focus,
+            dutyRates,
+            priorityMatrix
+        }).best.market);
+
+        assert.ok(new Set(winners).size > 1);
+        assert.equal(winners.every((market) => market === 'SG'), false);
+        assert.equal(winners[0], 'US');
+    });
 });
 
 describe('trade opportunity navigation', () => {
     it('exposes Opportunity in primary HTML nav surfaces', () => {
-        ['index.html', 'hscode.html', 'post-entry.html', 'post-entry-result.html', 'electronics.html', 'new-energy.html', 'semiconductor.html'].forEach((file) => {
+        [
+            'index.html',
+            'hscode.html',
+            'post-entry.html',
+            'post-entry-result.html',
+            'electronics.html',
+            'new-energy.html',
+            'semiconductor.html',
+            'data-center.html',
+            'industrial-automation.html',
+            'healthcare-lab.html'
+        ].forEach((file) => {
             const html = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
             assert.match(html, /opportunity\.html/, `${file} should link to Opportunity`);
             assert.match(html, /nav-opportunity/, `${file} should expose nav-opportunity`);

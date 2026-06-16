@@ -1,5 +1,5 @@
 /**
- * Category hub pages — electronics.html, new-energy.html, semiconductor.html
+ * Category hub pages — electronics.html, new-energy.html, semiconductor.html, and adjacent verticals.
  */
 
 const CATEGORY_PAGE_CONFIG = {
@@ -23,6 +23,27 @@ const CATEGORY_PAGE_CONFIG = {
         searchPlaceholder: 'Enter chip, optics module, HS Code, or export control risk',
         vertical: 'semiconductor',
         cards: () => globalThis.SEMICONDUCTOR_HUB_QUICK_SELECT_CARDS
+    },
+    'data-center': {
+        title: 'Data Center & Edge Computing Equipment',
+        subtitle: 'Screen system-level AI servers, storage, network appliances, cooling, and rack power equipment.',
+        searchPlaceholder: 'Enter AI server, storage server, rack power, cooling, or HS Code',
+        vertical: 'data-center',
+        cards: () => globalThis.DATA_CENTER_QUICK_SELECT_CARDS
+    },
+    'industrial-automation': {
+        title: 'Industrial Automation & Robotics',
+        subtitle: 'Pre-check factory automation, robotics, motion control, machine vision, and industrial IoT equipment.',
+        searchPlaceholder: 'Enter PLC, robot, CNC controller, industrial sensor, or HS Code',
+        vertical: 'industrial-automation',
+        cards: () => globalThis.INDUSTRIAL_AUTOMATION_QUICK_SELECT_CARDS
+    },
+    'healthcare-lab': {
+        title: 'Healthcare & Lab Electronics',
+        subtitle: 'Screen medical electronics, diagnostic devices, lab instruments, cold-chain monitors, and safety evidence.',
+        searchPlaceholder: 'Enter medical monitor, lab analyzer, health device, or HS Code',
+        vertical: 'healthcare-lab',
+        cards: () => globalThis.HEALTHCARE_LAB_QUICK_SELECT_CARDS
     }
 };
 
@@ -38,7 +59,20 @@ function getCategoryPageKey() {
     if (path.includes('semiconductor')) {
         return 'semiconductor';
     }
+    if (path.includes('data-center')) {
+        return 'data-center';
+    }
+    if (path.includes('industrial-automation')) {
+        return 'industrial-automation';
+    }
+    if (path.includes('healthcare-lab')) {
+        return 'healthcare-lab';
+    }
     return 'electronics';
+}
+
+function getSupportedCategoryVerticals() {
+    return Object.values(CATEGORY_PAGE_CONFIG).map((config) => config.vertical);
 }
 
 function getCategoryRouteSelection() {
@@ -95,7 +129,7 @@ function redirectCategorySearch(query, verticalOverride) {
         return;
     }
     const route = getCategoryRouteSelection();
-    const vertical = ['electronics', 'new-energy', 'semiconductor'].includes(verticalOverride)
+    const vertical = getSupportedCategoryVerticals().includes(verticalOverride)
         ? verticalOverride
         : config.vertical;
     const url = buildCategorySearchUrl(query, route.direction, route.country, vertical, route);
@@ -195,4 +229,5 @@ function bootstrapCategoryPage() {
 if (typeof globalThis !== 'undefined') {
     globalThis.bootstrapCategoryPage = bootstrapCategoryPage;
     globalThis.buildCategorySearchUrl = buildCategorySearchUrl;
+    globalThis.CATEGORY_PAGE_CONFIG = CATEGORY_PAGE_CONFIG;
 }

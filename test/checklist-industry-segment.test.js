@@ -39,4 +39,30 @@ describe('checklist-industry-segment', () => {
         assert.doesNotMatch(haystack, /part\s*15/i);
         assert.match(haystack, /un38\.3|dangerous goods|battery/i);
     });
+
+    it('resolves and builds checklists for new specialized verticals', () => {
+        const dataCenter = ensureIndustryChecklist([], {
+            description: 'AI server GPU server rack with storage and redundant power',
+            country: 'US',
+            direction: 'export',
+            vertical: 'data-center'
+        });
+        const industrial = ensureIndustryChecklist([], {
+            description: 'PLC controller industrial automation machine vision gateway',
+            country: 'DE',
+            direction: 'export',
+            vertical: 'industrial-automation'
+        });
+        const healthcare = ensureIndustryChecklist([], {
+            description: 'patient monitor medical electronics bluetooth battery',
+            country: 'US',
+            direction: 'import',
+            vertical: 'healthcare-lab'
+        });
+
+        assert.equal(resolveChecklistVertical({ vertical: 'data-center', forceVertical: true }), 'data-center');
+        assert.match(dataCenter.map((row) => row.task).join(' '), /compute|server|end-use/i);
+        assert.match(industrial.map((row) => row.task).join(' '), /machinery|robotics|control/i);
+        assert.match(healthcare.map((row) => row.task).join(' '), /medical|laboratory|wireless/i);
+    });
 });

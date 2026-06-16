@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity"></script>
  */
 (function () {
-    const BUILD = '20260615-global-ai-route';
+    const BUILD = '20260616-expanded-categories';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -21,7 +21,12 @@
         if (/\/opportunity\.html/i.test(path)) {
             return 'opportunity';
         }
-        if (/\/electronics\.html/i.test(path) || /\/new-energy\.html/i.test(path) || /\/semiconductor\.html/i.test(path)) {
+        if (/\/electronics\.html/i.test(path)
+            || /\/new-energy\.html/i.test(path)
+            || /\/semiconductor\.html/i.test(path)
+            || /\/data-center\.html/i.test(path)
+            || /\/industrial-automation\.html/i.test(path)
+            || /\/healthcare-lab\.html/i.test(path)) {
             return 'category';
         }
         return 'index';
