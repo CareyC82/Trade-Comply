@@ -31,7 +31,7 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = '*';
-const FC_BUILD_ID = '20260530test-crawl-v2';
+const FC_BUILD_ID = '20260616-global-ai-route';
 const { runGlobalCrawlTest, ENGINE_BUILD_ID: GLOBAL_ENGINE_BUILD } = require('./lib/global-crawl-engine');
 const {
     authorizeAdminRouteAccess,
