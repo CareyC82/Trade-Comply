@@ -374,6 +374,54 @@
       "expected_min_rules": 3,
       "expected_min_exact_rules": 2,
       "expected_min_cases": 1
+    },
+    {
+      "id": "us-sg-data-center-import",
+      "from": "US",
+      "to": "SG",
+      "focus": "import",
+      "vertical": "data-center",
+      "query": "ai server gpu server data center storage server pdu",
+      "expected_top_rule": "CL-SGDC-001",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-mx-industrial-robot-import",
+      "from": "US",
+      "to": "MX",
+      "focus": "import",
+      "vertical": "industrial-automation",
+      "query": "industrial robot arm plc servo drive machine vision",
+      "expected_top_rule": "CL-MXROBOT-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-vn-healthcare-lab-import",
+      "from": "US",
+      "to": "VN",
+      "focus": "import",
+      "vertical": "healthcare-lab",
+      "query": "patient monitor medical device lab analyzer",
+      "expected_top_rule": "CL-VNMED-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-my-data-center-import",
+      "from": "US",
+      "to": "MY",
+      "focus": "import",
+      "vertical": "data-center",
+      "query": "ai server gpu server data center storage server pdu",
+      "expected_top_rule": "CL-MYDC-001",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
     }
   ]
 }

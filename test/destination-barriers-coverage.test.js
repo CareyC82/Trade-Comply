@@ -59,7 +59,19 @@ const NEW_ROUTE_COVERAGE = [
     { focus: 'import', country: 'KR', query: 'ai server gpu server data center pdu', expected: 'CL-KRDC-001' },
     { focus: 'import', country: 'KR', query: 'patient monitor medical device lab analyzer', expected: 'CL-KRMED-001' },
     { focus: 'import', country: 'IN', query: 'ai server gpu server data center pdu', expected: 'CL-IN-009' },
-    { focus: 'import', country: 'IN', query: 'patient monitor medical device lab analyzer', expected: 'CL-IN-010' }
+    { focus: 'import', country: 'IN', query: 'patient monitor medical device lab analyzer', expected: 'CL-IN-010' },
+    { focus: 'import', country: 'SG', query: 'ai server gpu server data center pdu', expected: 'CL-SGDC-001' },
+    { focus: 'import', country: 'SG', query: 'industrial robot arm plc servo machine vision', expected: 'CL-SGROBOT-001' },
+    { focus: 'import', country: 'SG', query: 'patient monitor medical device lab analyzer', expected: 'CL-SGMED-001' },
+    { focus: 'import', country: 'MX', query: 'ai server gpu server data center pdu', expected: 'CL-MXDC-001' },
+    { focus: 'import', country: 'MX', query: 'industrial robot arm plc servo machine vision', expected: 'CL-MXROBOT-001' },
+    { focus: 'import', country: 'MX', query: 'patient monitor medical device lab analyzer', expected: 'CL-MXMED-001' },
+    { focus: 'import', country: 'VN', query: 'ai server gpu server data center pdu', expected: 'CL-VNDC-001' },
+    { focus: 'import', country: 'VN', query: 'industrial robot arm plc servo machine vision', expected: 'CL-VNROBOT-001' },
+    { focus: 'import', country: 'VN', query: 'patient monitor medical device lab analyzer', expected: 'CL-VNMED-001' },
+    { focus: 'import', country: 'MY', query: 'ai server gpu server data center pdu', expected: 'CL-MYDC-001' },
+    { focus: 'import', country: 'MY', query: 'industrial robot arm plc servo machine vision', expected: 'CL-MYROBOT-001' },
+    { focus: 'import', country: 'MY', query: 'patient monitor medical device lab analyzer', expected: 'CL-MYMED-001' }
 ];
 
 function scoreTag(tag, query) {
