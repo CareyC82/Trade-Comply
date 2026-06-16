@@ -323,6 +323,63 @@ function summarizeRuleSourceQuality(dutyPayload) {
     }).sort((a, b) => a.country.localeCompare(b.country));
 }
 
+function buildDutyRateActionDetails({
+    healthFailures = [],
+    syncStatus = {},
+    priorityMatrix = {}
+} = {}) {
+    const exceptions = Array.isArray(syncStatus.exceptions) ? syncStatus.exceptions : [];
+    const upgradeQueue = Array.isArray(priorityMatrix.priority_upgrade_queue) ? priorityMatrix.priority_upgrade_queue : [];
+    const rows = [];
+
+    exceptions.forEach((item, index) => {
+        rows.push({
+            id: `sync-${index + 1}`,
+            source: item.source || 'sync',
+            country: item.country || '',
+            route: item.route || '',
+            hs_code: item.hs_code || '',
+            severity: item.severity || 'medium',
+            type: item.type || 'sync_exception',
+            reason: item.reason || 'Duty-rate sync exception.',
+            next_action: 'Review this source exception; normal sources do not need manual confirmation.',
+            details: item.details || null
+        });
+    });
+
+    healthFailures.forEach((item, index) => {
+        rows.push({
+            id: `health-${item.id || index + 1}`,
+            source: 'coverage-health',
+            country: item.country || '',
+            route: item.route || '',
+            hs_code: item.hs_code || '',
+            severity: 'medium',
+            type: 'health_check_failed',
+            reason: (item.failures || []).join('; ') || 'Post-Entry health check failure.',
+            next_action: 'Fix the failing route, source trust, or priority matrix row.',
+            details: item
+        });
+    });
+
+    upgradeQueue.slice(0, 50).forEach((item) => {
+        rows.push({
+            id: item.id || `${item.route}-${item.hs_code}`,
+            source: item.parser_target || 'parser-backlog',
+            country: item.import_country || '',
+            route: item.route || '',
+            hs_code: item.hs_code || '',
+            severity: item.priority_band === 'P1' ? 'high' : item.priority_band === 'P2' ? 'medium' : 'low',
+            type: 'exact_rate_backlog',
+            reason: `${item.source_trust || 'unknown'} coverage; ${item.parser_target || 'parser target pending'}.`,
+            next_action: item.next_action || 'Connect exact tariff-line parser or official source mapping.',
+            details: item
+        });
+    });
+
+    return rows;
+}
+
 function ruleMatchesPriority(rule, market, prefix) {
     const importCountry = String(rule.import_country || '').toUpperCase();
     const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes.map(String) : [];
@@ -359,6 +416,8 @@ function buildDutyRateGapMatrix(dutyPayload, {
 function runDutyRateHealthCheck() {
     const dutyPayload = readJson(DUTY_RATES_PATH);
     const sourcesPayload = readJson(DUTY_RATE_SOURCES_PATH);
+    const syncStatusPath = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
+    const syncStatus = fs.existsSync(syncStatusPath) ? readJson(syncStatusPath) : { exceptions: [] };
     const samplesPayload = readJson(SAMPLES_PATH);
     const priorityMatrixPayload = readJson(PRIORITY_MATRIX_PATH);
     const samples = samplesPayload.samples || [];
@@ -383,6 +442,11 @@ function runDutyRateHealthCheck() {
         source_roadmap_summary: sourceRoadmap,
         source_quality_summary: summarizeRuleSourceQuality(dutyPayload),
         priority_rate_matrix: priorityRateMatrix,
+        action_details: buildDutyRateActionDetails({
+            healthFailures: failures,
+            syncStatus,
+            priorityMatrix: priorityRateMatrix
+        }),
         sample_count: samples.length,
         failed_sample_count: failures.length,
         failures: failures
@@ -414,5 +478,6 @@ module.exports = {
     runSample,
     summarizePriorityRateMatrix,
     summarizeRuleSourceQuality,
+    buildDutyRateActionDetails,
     summarizeSourceRoadmap
 };

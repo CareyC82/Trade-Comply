@@ -19,9 +19,14 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(typeof payload.duty_rate_sync_status, 'object');
     assert.equal(payload.duty_rate_sync_status.policy.manual_review_required, false);
     assert.equal(Array.isArray(payload.duty_rate_sync_status.exceptions), true);
+    assert.equal(Array.isArray(payload.action_details), true);
+    assert.ok(payload.action_details.some(item => item.type === 'exact_rate_backlog'));
     assert.equal(payload.sources.some(source => source.country === 'US' && source.source_status === 'auto_updatable'), true);
     assert.equal(payload.source_roadmap_summary.auto_updatable.includes('US'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('EU'), true);
+    assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('JP'), true);
+    assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('KR'), true);
+    assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('IN'), true);
     assert.equal(payload.source_roadmap_summary.missing_coverage.length, 0);
     assert.equal(payload.source_roadmap_summary.missing_roadmap.length, 0);
 });

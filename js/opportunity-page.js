@@ -93,7 +93,7 @@ function bootstrapTradeOpportunityPage() {
         const metricItems = [
             { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
-            { label: 'Next parser', value: card.parserPriority || 'P?' }
+            { label: 'Value lever', value: card.valueLever || 'Pending' }
         ];
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
@@ -113,6 +113,15 @@ function bootstrapTradeOpportunityPage() {
                     `).join('')}
                 </div>
                 <div class="opportunity-reason-list">
+                    ${card.tradeOpportunityThesis ? `
+                        <div class="opportunity-reason opportunity-reason--positive">
+                            <span>✓</span>
+                            <div>
+                                <strong>Business opportunity</strong>
+                                <small>${escapeHtml(card.tradeOpportunityThesis)}</small>
+                            </div>
+                        </div>
+                    ` : ''}
                     ${reasons.map((reason, reasonIndex) => `
                         <div class="opportunity-reason opportunity-reason--${escapeHtml(reason.tone || 'neutral')}">
                             <span>${escapeHtml(reasonIndex + 1)}</span>

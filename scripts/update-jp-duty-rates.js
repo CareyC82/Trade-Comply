@@ -210,6 +210,52 @@ function buildJapanOfficialRateCandidate(chapterRows = [], prefix = '') {
     };
 }
 
+function buildJapanOfficialCandidateForRule(rule = {}, chapterRows = []) {
+    const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes : [];
+    const candidates = prefixes.map(prefix => buildJapanOfficialRateCandidate(chapterRows, prefix));
+    const matched = candidates.filter(candidate => candidate.rate_row_count > 0);
+    if (!matched.length) {
+        return {
+            ok: false,
+            rule: rule.id || '',
+            source_status: 'official_link_checked',
+            reason: 'No Japan official tariff rows matched this maintained rule.',
+            prefix_candidates: candidates
+        };
+    }
+    const blocking = matched.filter(candidate => !candidate.ok);
+    if (blocking.length) {
+        return {
+            ok: false,
+            rule: rule.id || '',
+            source_status: 'scope_check_required',
+            reason: 'Japan official tariff rows require exact statistical code / rate-scope review for at least one maintained prefix.',
+            prefix_candidates: candidates
+        };
+    }
+    const rates = Array.from(new Set(matched.map(candidate => candidate.base_rate).filter(Number.isFinite))).sort((a, b) => a - b);
+    if (rates.length !== 1) {
+        return {
+            ok: false,
+            rule: rule.id || '',
+            source_status: 'scope_check_required',
+            reason: 'Maintained Japan HS prefixes returned different official rates; split the rule or require exact code.',
+            unique_base_rates: rates,
+            prefix_candidates: candidates
+        };
+    }
+    return {
+        ok: true,
+        rule: rule.id || '',
+        source_status: 'official_source_checked',
+        base_rate: rates[0],
+        source_hts: `${prefixes.join(', ')} (Japan Customs general duty)`,
+        source_rate_text: `Japan Customs general duty: ${(rates[0] * 100).toFixed(3)}%`,
+        reason: 'All matched Japan tariff prefixes share one official general duty rate.',
+        prefix_candidates: candidates
+    };
+}
+
 async function probeJapanOfficialSource({ fetcher = fetchText, maintainedPrefixes = [] } = {}) {
     try {
         const response = await fetcher(JP_CUSTOMS_URL);
@@ -332,20 +378,73 @@ function applyJapanBenchmarkToRule(rule, checkedAt) {
     return changes;
 }
 
-function updateJapanRules({ dryRun = false } = {}) {
+function applyJapanOfficialCandidateToRule(rule, candidate, checkedAt) {
+    const changes = [];
+    refreshConsumptionTaxLayer(rule);
+    if (!candidate || !candidate.source_status) {
+        return changes;
+    }
+
+    const updates = candidate.ok ? {
+        base_rate: candidate.base_rate,
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: `Japan Customs official tariff rows parsed for this maintained HS scope. ${candidate.reason}`,
+        source_hts: candidate.source_hts,
+        source_rate_text: candidate.source_rate_text,
+        source_url: JP_CUSTOMS_URL,
+        last_checked_at: checkedAt
+    } : candidate.source_status === 'scope_check_required' ? {
+        source_status: 'scope_check_required',
+        confidence: 'Scope check required',
+        source_note: `Japan Customs official tariff rows were found, but exact statistical-code scope is required. ${candidate.reason}`,
+        source_hts: `${(rule.hs_prefixes || []).join(', ')} (Japan Customs scope check)`,
+        source_rate_text: 'Exact Japan statistical code required before using an official duty rate.',
+        source_url: JP_CUSTOMS_URL,
+        last_checked_at: checkedAt
+    } : {
+        source_status: 'official_link_checked',
+        confidence: 'Official link monitored',
+        source_note: JP_BENCHMARK.source_note,
+        source_hts: JP_BENCHMARK.source_hts,
+        source_rate_text: JP_BENCHMARK.source_rate_text,
+        source_url: JP_CUSTOMS_URL,
+        last_checked_at: checkedAt
+    };
+
+    Object.entries(updates).forEach(([field, value]) => {
+        if (rule[field] !== value) {
+            changes.push({ field, old_value: rule[field], new_value: value });
+            rule[field] = value;
+        }
+    });
+    return changes;
+}
+
+function updateJapanRules({ dryRun = false, officialChapterRows = null } = {}) {
     const payload = readJson(DUTY_RATES_PATH);
     const checkedAt = new Date().toISOString();
     const changes = [];
     const errors = [];
+    const officialCandidateOutcomes = [];
 
     for (const rule of payload.rules || []) {
         if (rule.import_country !== 'JP') continue;
         try {
-            const ruleChanges = applyJapanBenchmarkToRule(rule, checkedAt);
+            const candidate = Array.isArray(officialChapterRows)
+                ? buildJapanOfficialCandidateForRule(rule, officialChapterRows)
+                : null;
+            if (candidate) {
+                officialCandidateOutcomes.push(candidate);
+            }
+            const ruleChanges = candidate
+                ? applyJapanOfficialCandidateToRule(rule, candidate, checkedAt)
+                : applyJapanBenchmarkToRule(rule, checkedAt);
             if (ruleChanges.length) {
                 changes.push({
                     rule: rule.id,
                     import_country: rule.import_country,
+                    mode: candidate ? 'official-candidate' : 'benchmark',
                     changes: ruleChanges
                 });
             }
@@ -359,7 +458,8 @@ function updateJapanRules({ dryRun = false } = {}) {
     payload.last_jp_customs_benchmark_sync = {
         ok: errors.length === 0,
         dry_run: dryRun,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: Array.isArray(officialChapterRows),
+        official_candidate_outcomes: officialCandidateOutcomes,
         changes,
         errors
     };
@@ -397,8 +497,10 @@ module.exports = {
     parseJapanTariffChapterRows,
     parseJapanAdValoremRate,
     buildJapanOfficialRateCandidate,
+    buildJapanOfficialCandidateForRule,
     probeJapanOfficialSource,
     probeJapanReadiness,
     updateJapanRules,
-    applyJapanBenchmarkToRule
+    applyJapanBenchmarkToRule,
+    applyJapanOfficialCandidateToRule
 };

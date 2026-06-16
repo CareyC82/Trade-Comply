@@ -36,6 +36,8 @@ const {
 } = require('../scripts/update-mx-duty-rates');
 const {
     applyJapanBenchmarkToRule,
+    applyJapanOfficialCandidateToRule,
+    buildJapanOfficialCandidateForRule,
     buildJapanOfficialRateCandidate,
     parseJapanAdValoremRate,
     parseJapanScheduleChapterLinks,
@@ -68,10 +70,15 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.hybrid_official_candidate.includes('NL'));
     assert.ok(roadmap.benchmark_updatable.includes('SG'));
     assert.ok(roadmap.benchmark_updatable.includes('MX'));
-    assert.ok(roadmap.benchmark_updatable.includes('JP'));
-    assert.ok(roadmap.benchmark_updatable.includes('KR'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('JP'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('KR'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('IN'));
     STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
-        assert.ok(roadmap.benchmark_updatable.includes(country), `${country} should be benchmark-updatable`);
+        if (country === 'IN') {
+            assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
+        } else {
+            assert.ok(roadmap.benchmark_updatable.includes(country), `${country} should be benchmark-updatable`);
+        }
     });
     assert.equal(
         dutyRateSources.sources.some(source => source.country === 'JP' && source.probe_command === 'npm run probe:duty-rates:jp'),
@@ -122,7 +129,7 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
     assert.equal(jp.ok, true);
     assert.equal(jp.writes_rates, true);
     assert.equal(jp.writes_official_machine_rates, false);
-    assert.equal(jp.source_status, 'benchmark_updatable');
+    assert.equal(jp.source_status, 'hybrid_official_candidate');
     assert.ok(jp.maintained_hs_prefixes.includes('8542'));
     assert.equal(jp.official_probe.checked, false);
     assert.equal(jp.official_probe.machine_parser_ready, false);
@@ -130,7 +137,7 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
     assert.equal(kr.ok, true);
     assert.equal(kr.writes_rates, true);
     assert.equal(kr.writes_official_machine_rates, false);
-    assert.equal(kr.source_status, 'benchmark_updatable');
+    assert.equal(kr.source_status, 'hybrid_official_candidate');
     assert.ok(kr.maintained_hs_prefixes.includes('8542'));
     assert.equal(kr.official_probe.checked, false);
     assert.equal(kr.official_probe.machine_parser_ready, false);
@@ -140,7 +147,11 @@ test('static official-link benchmark updater covers China Vietnam Malaysia Taiwa
     STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
         const readiness = probeStaticBenchmarkReadiness(country);
         assert.equal(readiness.ok, true, `${country} static benchmark readiness should be OK`);
-        assert.equal(readiness.source_status, 'benchmark_updatable');
+        if (country === 'IN') {
+            assert.equal(readiness.source_status, 'hybrid_official_candidate');
+        } else {
+            assert.equal(readiness.source_status, 'benchmark_updatable');
+        }
         assert.equal(readiness.writes_rates, true);
         assert.equal(readiness.writes_official_machine_rates, false);
         assert.ok(readiness.maintained_hs_prefixes.includes('8542'), `${country} should cover semiconductor HS 8542`);
@@ -579,6 +590,71 @@ test('Japan updater keeps consumption tax benchmark separate from official machi
     assert.equal(rule.source_status, 'official_link_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
+});
+
+test('Japan updater can promote unambiguous official candidates while preserving consumption tax layer', () => {
+    const rule = {
+        id: 'TEST-JP-8542',
+        import_country: 'JP',
+        hs_prefixes: ['8542'],
+        base_rate: 0.03,
+        additional_rate: 0.08,
+        add_on_layers: [
+            { type: 'consumption_tax', rate: 0.08, status: 'indicative' }
+        ],
+        source_status: 'official_link_checked'
+    };
+    const rows = [
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            item_name: 'Processors and controllers',
+            general_rate_text: 'Free',
+            parsed_base_rate: 0
+        },
+        {
+            hs_heading: '8542.32',
+            hs_digits: '854232',
+            item_name: 'Memories',
+            general_rate_text: 'Free',
+            parsed_base_rate: 0
+        }
+    ];
+    const candidate = buildJapanOfficialCandidateForRule(rule, rows);
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.source_status, 'official_source_checked');
+
+    const changes = applyJapanOfficialCandidateToRule(rule, candidate, '2026-06-16T00:00:00.000Z');
+    assert.ok(changes.some(change => change.field === 'base_rate'));
+    assert.equal(rule.base_rate, 0);
+    assert.equal(rule.source_status, 'official_source_checked');
+    assert.equal(rule.add_on_layers[0].rate, 0.1);
+    assert.equal(rule.additional_rate, 0.1);
+});
+
+test('Japan official candidate keeps mixed-rate prefixes exact-code gated', () => {
+    const candidate = buildJapanOfficialCandidateForRule({
+        id: 'TEST-JP-MIXED',
+        hs_prefixes: ['8528']
+    }, [
+        {
+            hs_heading: '8528.52',
+            hs_digits: '852852',
+            item_name: 'Monitors',
+            general_rate_text: 'Free',
+            parsed_base_rate: 0
+        },
+        {
+            hs_heading: '8528.59',
+            hs_digits: '852859',
+            item_name: 'Other monitors',
+            general_rate_text: '3.9%',
+            parsed_base_rate: 0.039
+        }
+    ]);
+
+    assert.equal(candidate.ok, false);
+    assert.equal(candidate.source_status, 'scope_check_required');
 });
 
 test('Korea updater keeps VAT benchmark separate from official machine rates', () => {

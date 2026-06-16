@@ -43,12 +43,14 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.recommendationReasons) && row.recommendationReasons.length >= 2));
         assert.ok(model.routeComparison.every((row) => row.recommendationReasons.length <= 3));
         assert.ok(model.routeComparison.every((row) => row.conciseConclusion));
+        assert.ok(model.routeComparison.every((row) => row.tradeOpportunityThesis && row.valueLever && row.executionGate));
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
         assert.ok(model.readyRouteCount >= 1);
         assert.ok(model.parserBacklogCount >= 1);
         assert.ok(model.parserTargets.length >= 1);
         assert.ok(model.parserTargets.every((target) => target.priority && target.nextAction && target.hsCode));
         assert.ok(model.insights.some((item) => item.type === 'Commercial action'));
+        assert.ok(model.insights.some((item) => item.type === 'Trade opportunity'));
         assert.ok(model.insights.some((item) => item.type === 'Coverage backlog'));
     });
 

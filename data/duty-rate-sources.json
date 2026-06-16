@@ -101,15 +101,15 @@
       "authority": "Japan Customs",
       "official_url": "https://www.customs.go.jp/english/tariff/",
       "machine_readable": "candidate",
-      "source_status": "benchmark_updatable",
+      "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Official Japan Customs source is identified; local benchmark updater refreshes consumption-tax and duty-free electronics assumptions until machine tariff parsing is wired.",
+      "status_reason": "Japan Customs dated tariff schedule and chapter pages are parseable into official candidates; unambiguous maintained prefixes can be promoted while ambiguous prefixes stay exact-code gated.",
       "updater_script": "scripts/update-jp-duty-rates.js",
       "update_command": "npm run update:duty-rates:jp",
       "probe_command": "npm run probe:duty-rates:jp",
       "last_sync_field": "last_jp_customs_benchmark_sync_at",
-      "current_scope": "Benchmark duty plus consumption tax reminder. Live probe checks the Japan Customs dated tariff schedule and parses maintained chapter pages into official candidates without auto-applying them yet.",
-      "next_action": "Review Japan official candidates from the live probe; next upgrade is promoting candidate rates only when exact tariff-line coverage and statistical-code scope are stable."
+      "current_scope": "Hybrid official candidate: Japan Customs chapter rows can be parsed into official candidates; consumption tax remains a separate benchmark layer.",
+      "next_action": "Promote only unambiguous Japan official candidates; keep exact statistical-code scope checks for mixed-rate prefixes."
     },
     {
       "country": "KR",
@@ -117,15 +117,15 @@
       "authority": "Korea Customs Service",
       "official_url": "https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?mi=10806&cntntsId=5502",
       "machine_readable": "candidate",
-      "source_status": "benchmark_updatable",
+      "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Official Korea Customs tariff inquiry source is identified; local benchmark updater refreshes VAT and common electronics assumptions until KCS Tariff D/B parsing is wired.",
+      "status_reason": "Korea Customs tariff inquiry source is identified and monitored; the next blocker is exact 10-digit HS result parsing before official automatic rates.",
       "updater_script": "scripts/update-kr-duty-rates.js",
       "update_command": "npm run update:duty-rates:kr",
       "probe_command": "npm run probe:duty-rates:kr",
       "last_sync_field": "last_kr_customs_benchmark_sync_at",
-      "current_scope": "Benchmark duty plus VAT reminder. Live probe checks Korea Customs Tariff D/B lookup availability.",
-      "next_action": "Use the live probe to monitor KCS Tariff D/B availability; next upgrade is parsing exact 10-digit HS lookup results before official automatic rates."
+      "current_scope": "Hybrid official candidate: official tariff lookup availability is monitored; VAT remains a benchmark layer until exact 10-digit HS parsing is connected.",
+      "next_action": "Build the KCS exact 10-digit HS parser; promote only rows with one official base-duty answer."
     },
     {
       "country": "IN",
@@ -133,14 +133,14 @@
       "authority": "Central Board of Indirect Taxes and Customs / ICEGATE",
       "official_url": "https://www.icegate.gov.in/",
       "machine_readable": "probe_required",
-      "source_status": "benchmark_updatable",
+      "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P1",
-      "status_reason": "India is high-priority for electronics trade opportunity and Post-Entry. Official ICEGATE/CIP sources are identified; local refresh keeps official-link estimates current while exact tariff-line parser remains a P1 upgrade.",
+      "status_reason": "India is high-priority for electronics trade opportunity and Post-Entry. Official ICEGATE/CIP sources are identified; exact BCD/SWS/IGST scope parsing remains the P1 blocker.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=IN",
       "probe_command": "npm run probe:duty-rates:static -- --countries=IN",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Official-link monitored India import estimate for electronics: BCD must be exact-HS verified; SWS/IGST layers are displayed as filing checks until parser is connected.",
+      "current_scope": "Hybrid official candidate: official source path is monitored, while exact BCD/SWS/IGST tariff-line parsing is still required before filing-grade rates.",
       "next_action": "Build India exact tariff-line parser for ICEGATE/CIP or CBIC tariff data; promote only after exact HS, BCD, SWS, and IGST basis are machine-verified."
     },
     {
