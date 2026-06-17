@@ -22,6 +22,7 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(Array.isArray(payload.action_details), true);
     assert.equal(Array.isArray(payload.exact_rate_progress.rows), true);
     assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'JP' && row.status === 'hybrid_in_progress'));
+    assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'IN' && Array.isArray(row.backlog_rows) && row.backlog_rows.length > 0));
     assert.ok(payload.exact_rate_progress.totals.backlog_routes > 0);
     assert.ok(payload.action_details.some(item => item.type === 'exact_rate_backlog'));
     assert.equal(payload.sources.some(source => source.country === 'US' && source.source_status === 'auto_updatable'), true);

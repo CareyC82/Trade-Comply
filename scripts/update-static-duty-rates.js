@@ -10,6 +10,7 @@ const ROOT = path.join(__dirname, '..');
 const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DEFAULT_COUNTRIES = ['CN', 'VN', 'MY', 'TW', 'RU', 'IN'];
+const REQUEST_TIMEOUT_MS = 15000;
 
 const COUNTRY_NOTES = {
     CN: 'China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.',
@@ -44,6 +45,49 @@ function normalizeCountries(countries = DEFAULT_COUNTRIES) {
     return countries
         .map(country => String(country || '').trim().toUpperCase())
         .filter(Boolean);
+}
+
+function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
+    if (typeof fetch === 'function') {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        return fetch(url, {
+            signal: controller.signal,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 TraceWize duty-rate updater (+https://tracewize.com)',
+                'Accept': 'text/html,application/xhtml+xml'
+            }
+        })
+            .then(async (response) => ({
+                status_code: response.status,
+                body: await response.text()
+            }))
+            .finally(() => clearTimeout(timer));
+    }
+    return new Promise((resolve, reject) => {
+        const client = url.startsWith('http://') ? require('http') : require('https');
+        const request = client.get(url, {
+            headers: {
+                'User-Agent': 'TraceWize duty-rate updater (+https://tracewize.com)'
+            }
+        }, (response) => {
+            let body = '';
+            response.setEncoding('utf8');
+            response.on('data', chunk => {
+                body += chunk;
+            });
+            response.on('end', () => {
+                resolve({
+                    status_code: response.statusCode,
+                    body
+                });
+            });
+        });
+        request.setTimeout(timeoutMs, () => {
+            request.destroy(new Error(`Request timed out after ${timeoutMs}ms`));
+        });
+        request.on('error', reject);
+    });
 }
 
 function stripHtml(value = '') {
@@ -89,6 +133,22 @@ function parseIndiaTariffRows(html = '') {
             igst_rate: igstRate
         };
     }).filter(Boolean);
+}
+
+async function fetchIndiaOfficialRows({
+    fetcher = fetchText,
+    source = getSource('IN')
+} = {}) {
+    const url = source?.official_url || 'https://www.icegate.gov.in/';
+    const response = await fetcher(url);
+    const rows = parseIndiaTariffRows(response.body || '');
+    return {
+        ok: response.status_code >= 200 && response.status_code < 400 && rows.length > 0,
+        status_code: response.status_code,
+        official_url: url,
+        rows,
+        row_count: rows.length
+    };
 }
 
 function buildIndiaOfficialRateCandidate(rows = [], hsPrefix = '') {
@@ -205,8 +265,36 @@ function probeStaticBenchmarkReadiness(country, {
         maintained_hs_prefixes: prefixes,
         writes_rates: true,
         writes_official_machine_rates: false,
+        live_row_count: 0,
         next_action: source?.next_action || `Add ${code} source roadmap before updating.`,
         status_reason: source?.status_reason || ''
+    };
+}
+
+async function probeIndiaReadiness({ live = false, fetcher = fetchText } = {}) {
+    const readiness = probeStaticBenchmarkReadiness('IN');
+    const officialProbe = live
+        ? await fetchIndiaOfficialRows({ fetcher }).catch(error => ({
+            ok: false,
+            status_code: null,
+            official_url: readiness.official_url,
+            rows: [],
+            row_count: 0,
+            error: error.message
+        }))
+        : { ok: null, row_count: 0, checked: false };
+    return {
+        ...readiness,
+        official_probe: {
+            checked: live,
+            ok: officialProbe.ok,
+            status_code: officialProbe.status_code,
+            official_url: officialProbe.official_url || readiness.official_url,
+            parsed_rate_rows: officialProbe.row_count || 0,
+            machine_parser_ready: Boolean(officialProbe.row_count)
+        },
+        writes_official_machine_rates: false,
+        live_row_count: officialProbe.row_count || 0
     };
 }
 
@@ -381,6 +469,23 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
     return payload.last_static_benchmark_sync;
 }
 
+async function updateIndiaRulesFromOfficialSource({ dryRun = false, fetcher = fetchText } = {}) {
+    const official = await fetchIndiaOfficialRows({ fetcher });
+    const result = updateStaticBenchmarkRules({
+        countries: ['IN'],
+        dryRun,
+        indiaTariffRows: official.rows.length ? official.rows : null
+    });
+    result.official_fetch = {
+        ok: official.ok,
+        status_code: official.status_code,
+        official_url: official.official_url,
+        row_count: official.row_count
+    };
+    result.writes_official_machine_rates = official.ok;
+    return result;
+}
+
 function parseCountriesArg(argv = process.argv.slice(2)) {
     const countryArg = argv.find(arg => arg.startsWith('--countries='));
     if (!countryArg) return DEFAULT_COUNTRIES;
@@ -394,13 +499,25 @@ function parseCountriesArg(argv = process.argv.slice(2)) {
 function main() {
     const dryRun = process.argv.includes('--dry-run');
     const probeOnly = process.argv.includes('--probe');
+    const probeLive = process.argv.includes('--probe-live');
+    const officialLive = process.argv.includes('--official-live');
     const countries = parseCountriesArg();
-    const result = probeOnly
-        ? countries.map(country => probeStaticBenchmarkReadiness(country))
-        : updateStaticBenchmarkRules({ countries, dryRun });
-    console.log(JSON.stringify(result, null, 2));
-    const ok = Array.isArray(result) ? result.every(row => row.ok) : result.ok;
-    process.exit(ok ? 0 : 1);
+    Promise.resolve(
+        probeLive && countries.length === 1 && String(countries[0]).toUpperCase() === 'IN'
+            ? probeIndiaReadiness({ live: true })
+            : officialLive && countries.includes('IN')
+                ? updateIndiaRulesFromOfficialSource({ dryRun })
+                : probeOnly
+                    ? countries.map(country => probeStaticBenchmarkReadiness(country))
+                    : updateStaticBenchmarkRules({ countries, dryRun })
+    ).then((result) => {
+        console.log(JSON.stringify(result, null, 2));
+        const ok = Array.isArray(result) ? result.every(row => row.ok) : result.ok;
+        process.exit(ok ? 0 : 1);
+    }).catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
 }
 
 if (require.main === module) {
@@ -414,9 +531,12 @@ module.exports = {
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,
     buildIndiaOfficialRateCandidate,
+    fetchIndiaOfficialRows,
     getMaintainedPrefixes,
     parseIndiaTariffRows,
     parsePercent,
+    probeIndiaReadiness,
     probeStaticBenchmarkReadiness,
+    updateIndiaRulesFromOfficialSource,
     updateStaticBenchmarkRules
 };

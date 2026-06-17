@@ -121,11 +121,11 @@
       "maintenance_priority": "P2",
       "status_reason": "Korea Customs tariff inquiry source is identified and monitored; the next blocker is exact 10-digit HS result parsing before official automatic rates.",
       "updater_script": "scripts/update-kr-duty-rates.js",
-      "update_command": "npm run update:duty-rates:kr",
+      "update_command": "npm run update:duty-rates:kr:official",
       "probe_command": "npm run probe:duty-rates:kr",
       "last_sync_field": "last_kr_customs_benchmark_sync_at",
       "current_scope": "Hybrid official candidate: official tariff lookup availability is monitored; VAT remains a benchmark layer until exact 10-digit HS parsing is connected.",
-      "next_action": "Build the KCS exact 10-digit HS parser; promote only rows with one official base-duty answer."
+      "next_action": "Run the KCS official updater in dry-run; promote only parsed rows with one official base-duty answer."
     },
     {
       "country": "IN",
@@ -137,11 +137,11 @@
       "maintenance_priority": "P1",
       "status_reason": "India is high-priority for electronics trade opportunity and Post-Entry. Official ICEGATE/CIP sources are identified; exact BCD/SWS/IGST scope parsing remains the P1 blocker.",
       "updater_script": "scripts/update-static-duty-rates.js",
-      "update_command": "npm run update:duty-rates:static -- --countries=IN",
-      "probe_command": "npm run probe:duty-rates:static -- --countries=IN",
+      "update_command": "npm run update:duty-rates:in:official",
+      "probe_command": "npm run probe:duty-rates:in",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Hybrid official candidate: official source path is monitored, while exact BCD/SWS/IGST tariff-line parsing is still required before filing-grade rates.",
-      "next_action": "Build India exact tariff-line parser for ICEGATE/CIP or CBIC tariff data; promote only after exact HS, BCD, SWS, and IGST basis are machine-verified."
+      "next_action": "Run the India official updater in dry-run; promote only after exact HS, BCD, SWS, and IGST basis are machine-verified."
     },
     {
       "country": "CN",

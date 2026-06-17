@@ -121,6 +121,24 @@ describe('trade opportunity insights', () => {
         assert.equal(winners.every((market) => market === 'SG'), false);
         assert.equal(winners[0], 'US');
     });
+
+    it('prioritizes official or hybrid rate coverage over benchmark-only opportunity noise', () => {
+        const model = buildOpportunityInsights({
+            product: 'semiconductor chip',
+            from: 'US',
+            to: 'IN',
+            focus: 'import',
+            dutyRates,
+            priorityMatrix
+        });
+        const firstBenchmarkIndex = model.routeComparison.findIndex((row) => row.sourceTrust === 'precheck_estimate');
+        const firstOfficialIndex = model.routeComparison.findIndex((row) => row.sourceTrust === 'official_duty_tax_estimate' || row.sourceTrust === 'mixed_official_estimate');
+
+        assert.ok(firstOfficialIndex >= 0);
+        if (firstBenchmarkIndex >= 0) {
+            assert.ok(firstOfficialIndex < firstBenchmarkIndex);
+        }
+    });
 });
 
 describe('trade opportunity navigation', () => {

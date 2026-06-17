@@ -95,7 +95,7 @@ function stripHtml(value = '') {
 
 function parseKoreaAdValoremRate(value = '') {
     const text = stripHtml(value);
-    if (!text || /free|免税|무세|0\s*%/i.test(text)) return 0;
+    if (!text || /free|免税|무세/i.test(text) || /^0(?:\.0+)?\s*%$/i.test(text)) return 0;
     const percent = text.match(/(\d+(?:\.\d+)?)\s*%/);
     return percent ? Number(percent[1]) / 100 : null;
 }
@@ -122,14 +122,30 @@ function parseKoreaTariffDbHtml(html = '') {
     const text = stripHtml(html);
     const hasTariffDb = /KCS\s*Tariff\s*D\/B/i.test(text);
     const hasHsLookup = hasTariffDb || /HS\s*Code|10\s*digits|Tariff\s*Item/i.test(text);
+    const tariffRows = parseKoreaTariffRateRows(html);
     return {
         ok: hasTariffDb && hasHsLookup,
         lookup_title: hasTariffDb ? 'KCS Tariff D/B(Inquiry)' : '',
         supports_hs_lookup: hasHsLookup,
-        machine_parser_ready: false,
+        machine_parser_ready: tariffRows.length > 0,
+        parsed_rate_rows: tariffRows.length,
         parser_note: hasTariffDb
-            ? 'Korea Customs tariff inquiry page is reachable; exact 10-digit tariff-line parsing is not auto-applied yet.'
+            ? tariffRows.length
+                ? 'Korea Customs tariff rows were parsed into official candidates; exact promotion remains guarded by one-rate-per-prefix validation.'
+                : 'Korea Customs tariff inquiry page is reachable; exact 10-digit tariff-line parsing is not auto-applied yet.'
             : 'Korea Customs tariff inquiry markers were not found.'
+    };
+}
+
+async function fetchKoreaOfficialRows({ fetcher = fetchText, url = KR_TARIFF_DB_URL } = {}) {
+    const response = await fetcher(url);
+    const rows = parseKoreaTariffRateRows(response.body || '');
+    return {
+        ok: response.status_code >= 200 && response.status_code < 400 && rows.length > 0,
+        status_code: response.status_code,
+        official_url: url,
+        rows,
+        row_count: rows.length
     };
 }
 
@@ -252,6 +268,7 @@ async function probeKoreaReadiness({ live = false, fetcher = fetchText } = {}) {
         writes_rates: true,
         writes_official_machine_rates: false,
         official_probe: officialProbe,
+        live_row_count: officialProbe.parsed_rate_rows || 0,
         next_action: source?.next_action || 'Add Korea source roadmap before updating.',
         status_reason: source?.status_reason || ''
     };
@@ -395,12 +412,31 @@ function updateKoreaRules({ dryRun = false, officialRows = null } = {}) {
     return payload.last_kr_customs_benchmark_sync;
 }
 
+async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fetchText } = {}) {
+    const official = await fetchKoreaOfficialRows({ fetcher });
+    const result = updateKoreaRules({
+        dryRun,
+        officialRows: official.rows.length ? official.rows : null
+    });
+    result.official_fetch = {
+        ok: official.ok,
+        status_code: official.status_code,
+        official_url: official.official_url,
+        row_count: official.row_count
+    };
+    result.writes_official_machine_rates = official.ok;
+    return result;
+}
+
 async function main() {
     const dryRun = process.argv.includes('--dry-run');
     const probeOnly = process.argv.includes('--probe');
     const probeLive = process.argv.includes('--probe-live');
+    const officialLive = process.argv.includes('--official-live');
     const result = probeOnly || probeLive
         ? await probeKoreaReadiness({ live: probeLive })
+        : officialLive
+            ? await updateKoreaRulesFromOfficialSource({ dryRun })
         : updateKoreaRules({ dryRun });
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.ok ? 0 : 1);
@@ -420,11 +456,13 @@ module.exports = {
     parseKoreaTariffDbHtml,
     parseKoreaAdValoremRate,
     parseKoreaTariffRateRows,
+    fetchKoreaOfficialRows,
     buildKoreaOfficialRateCandidate,
     buildKoreaOfficialCandidateForRule,
     applyKoreaOfficialCandidateToRule,
     probeKoreaOfficialSource,
     probeKoreaReadiness,
     updateKoreaRules,
+    updateKoreaRulesFromOfficialSource,
     applyKoreaBenchmarkToRule
 };

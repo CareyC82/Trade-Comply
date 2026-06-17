@@ -1235,7 +1235,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${rows.map((row) => `
+                            ${rows.map((row) => {
+                                const backlogRows = Array.isArray(row.backlog_rows) ? row.backlog_rows : [];
+                                return `
                                 <tr>
                                     <td><strong>${escapeHtml(row.market || '')}</strong></td>
                                     <td><span class="badge ${escapeHtml(statusClass[row.status] || 'benchmark')}">${escapeHtml(statusLabel[row.status] || row.status || '')}</span></td>
@@ -1249,7 +1251,28 @@
                                     </td>
                                     <td>${escapeHtml(row.next_action || '')}</td>
                                 </tr>
-                            `).join('')}
+                                ${backlogRows.length ? `
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="6">
+                                            <details>
+                                                <summary>Show ${escapeHtml(backlogRows.length)} parser / HS backlog item(s)</summary>
+                                                <div class="quality-chip-list" style="margin-top:8px">
+                                                    ${backlogRows.map((item) => `
+                                                        <span class="quality-chip missing">
+                                                            ${escapeHtml(item.product_id || '')} · ${escapeHtml(item.hs_code || '')} · ${escapeHtml(item.source_trust || '')}
+                                                        </span>
+                                                    `).join('')}
+                                                </div>
+                                                <ul class="duty-exception-list">
+                                                    ${backlogRows.map((item) => `<li>${escapeHtml(item.id || item.product_id || '')}: ${escapeHtml(item.next_action || '')}</li>`).join('')}
+                                                </ul>
+                                            </details>
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            `;
+                            }).join('')}
                         </tbody>
                     </table>
                 </div>

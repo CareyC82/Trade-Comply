@@ -407,6 +407,23 @@ function buildExactRateProgress({
                 : exact > 0 || hybrid > 0
                     ? 'hybrid_in_progress'
                     : 'benchmark_only';
+        const backlog_rows = marketRows
+            .filter(row => !exactTrust.has(row.source_trust))
+            .map(row => ({
+                id: row.id,
+                product_id: row.product_id,
+                hs_code: row.hs_code,
+                source_trust: row.source_trust,
+                automation_level: row.automation_level,
+                next_action: row.source_trust === 'precheck_estimate'
+                    ? 'Find official source or parser before using this route beyond screening.'
+                    : row.source_trust === 'official_link_estimate'
+                        ? 'Connect exact machine-readable tariff-line parser for this official source.'
+                        : row.source_trust === 'official_heading_only'
+                            ? 'Require exact tariff line / scope before promoting to official exact rate.'
+                            : 'Separate official base duty from add-on, trade-remedy, or tax scope.'
+            }))
+            .slice(0, 6);
         const nextAction = status === 'exact_ready'
             ? 'Keep daily sync and rate-change threshold monitoring enabled.'
             : status === 'hybrid_in_progress'
@@ -427,6 +444,7 @@ function buildExactRateProgress({
             official_rule_count: sourceQualityRow.official_source_checked || 0,
             scope_check_count: sourceQualityRow.scope_check_required || 0,
             official_link_count: sourceQualityRow.official_link_checked || 0,
+            backlog_rows,
             next_action: nextAction
         };
     });

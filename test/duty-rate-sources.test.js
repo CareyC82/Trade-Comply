@@ -49,6 +49,7 @@ const {
     applyKoreaBenchmarkToRule,
     applyKoreaOfficialCandidateToRule,
     buildKoreaOfficialCandidateForRule,
+    fetchKoreaOfficialRows,
     parseKoreaAdValoremRate,
     parseKoreaTariffRateRows,
     parseKoreaTariffDbHtml,
@@ -58,7 +59,9 @@ const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,
+    fetchIndiaOfficialRows,
     parseIndiaTariffRows,
+    probeIndiaReadiness,
     probeStaticBenchmarkReadiness
 } = require('../scripts/update-static-duty-rates');
 
@@ -248,6 +251,24 @@ test('Korea Customs live probe detects tariff DB lookup without upgrading rate t
     assert.equal(readiness.ok, true);
     assert.equal(readiness.official_probe.ok, true);
     assert.equal(readiness.writes_official_machine_rates, false);
+});
+
+test('Korea official live fetch parses candidate rows without network-dependent tests', async () => {
+    const official = await fetchKoreaOfficialRows({
+        fetcher: async () => ({
+            status_code: 200,
+            body: `
+                <table>
+                    <tr><th>HS Code</th><th>Description</th><th>Rate</th></tr>
+                    <tr><td>8542310000</td><td>Processors</td><td>Free</td></tr>
+                </table>
+            `
+        })
+    });
+
+    assert.equal(official.ok, true);
+    assert.equal(official.row_count, 1);
+    assert.equal(official.rows[0].parsed_base_rate, 0);
 });
 
 test('EU TARIC official probe parses consultation metadata without upgrading rate trust', async () => {
@@ -765,6 +786,33 @@ test('India official candidate can parse BCD SWS and IGST rows', () => {
     assert.equal(rule.source_status, 'official_source_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.add_on_layers[1].rate, 0.18);
+});
+
+test('India official live probe can parse tariff rows from injected official source', async () => {
+    const html = `
+        <table>
+            <tr><th>HS</th><th>Goods</th><th>BCD</th><th>SWS</th><th>IGST</th></tr>
+            <tr><td>85171300</td><td>Smartphones</td><td>BCD 0%</td><td>SWS 10%</td><td>IGST 18%</td></tr>
+        </table>
+    `;
+    const official = await fetchIndiaOfficialRows({
+        fetcher: async () => ({
+            status_code: 200,
+            body: html
+        })
+    });
+    const readiness = await probeIndiaReadiness({
+        live: true,
+        fetcher: async () => ({
+            status_code: 200,
+            body: html
+        })
+    });
+
+    assert.equal(official.ok, true);
+    assert.equal(official.row_count, 1);
+    assert.equal(readiness.official_probe.machine_parser_ready, true);
+    assert.equal(readiness.official_probe.parsed_rate_rows, 1);
 });
 
 test('India official candidate keeps mixed tariff rows exact-line gated', () => {
