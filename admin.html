@@ -1214,6 +1214,7 @@
             if (!rows.length) {
                 return '<div class="empty">No exact-rate progress data available.</div>';
             }
+            const topBacklogRows = Array.isArray(progress.top_backlog_rows) ? progress.top_backlog_rows : [];
             return `
                 <div class="summary-grid">
                     <div class="summary-card"><strong>${totals.exact_routes ?? 0}/${totals.total_routes ?? 0}</strong><span>Exact / official-tax routes</span></div>
@@ -1221,6 +1222,33 @@
                     <div class="summary-card"><strong>${totals.benchmark_routes ?? 0}</strong><span>Benchmark routes</span></div>
                     <div class="summary-card"><strong>${totals.backlog_routes ?? 0}</strong><span>Exact parser backlog</span></div>
                 </div>
+                ${topBacklogRows.length ? `
+                    <div class="crawl-section-title"><h3>Top exact-rate backlog</h3><span class="meta">${topBacklogRows.length} highest priority route(s)</span></div>
+                    <div class="coverage-table-wrap">
+                        <table class="quality-gap-table">
+                            <thead>
+                                <tr>
+                                    <th>Market</th>
+                                    <th>Product</th>
+                                    <th>HS</th>
+                                    <th>Current trust</th>
+                                    <th>Next action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${topBacklogRows.map((item) => `
+                                    <tr>
+                                        <td><strong>${escapeHtml(item.market || '')}</strong></td>
+                                        <td>${escapeHtml(item.product_id || item.id || '')}</td>
+                                        <td>${escapeHtml(item.hs_code || '')}</td>
+                                        <td><span class="badge ${item.source_trust === 'precheck_estimate' ? 'benchmark' : item.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(item.source_trust || '')}</span></td>
+                                        <td>${escapeHtml(item.next_action || '')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : ''}
                 <div class="coverage-table-wrap">
                     <table class="quality-gap-table">
                         <thead>

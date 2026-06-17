@@ -119,14 +119,29 @@ test('GitHub duty-rate workflow runs tests before committing sync output', () =>
 });
 
 test('auto duty-rate sync includes static official-link benchmark countries', async () => {
-    const payload = await runAutoDutyRateSync({ dryRun: true, skipOfficialUs: true });
+    const emptyOfficialFetcher = async () => ({
+        status_code: 200,
+        body: '<html><body>No table in fixture</body></html>'
+    });
+    const payload = await runAutoDutyRateSync({
+        dryRun: true,
+        skipOfficialUs: true,
+        koreaOfficialFetcher: emptyOfficialFetcher,
+        indiaOfficialFetcher: emptyOfficialFetcher
+    });
     const staticRun = payload.runs.find(run => run.source === 'Static official-link benchmarks');
+    const koreaRun = payload.runs.find(run => run.source === 'Korea Customs official-live');
+    const indiaRun = payload.runs.find(run => run.source === 'India Customs official-live');
 
     assert.ok(staticRun, 'static official-link benchmark run should be included');
     assert.equal(staticRun.mode, 'benchmark');
     assert.equal(staticRun.applied, false);
     assert.equal(staticRun.ok, true, JSON.stringify(staticRun.errors, null, 2));
     assert.equal(staticRun.writes_official_machine_rates, false);
+    assert.ok(koreaRun, 'Korea official-live run should be included');
+    assert.equal(koreaRun.mode, 'official-live');
+    assert.ok(indiaRun, 'India official-live run should be included');
+    assert.equal(indiaRun.mode, 'official-live');
     assert.ok(payload.health.priority_rate_matrix, 'auto sync health should expose priority rate matrix summary');
     assert.equal(payload.health.priority_rate_matrix.ok, true, JSON.stringify(payload.health.priority_rate_matrix.failures, null, 2));
     assert.ok(payload.health.priority_rate_matrix.route_count >= 50);
@@ -134,4 +149,5 @@ test('auto duty-rate sync includes static official-link benchmark countries', as
         assert.equal(staticRun.countries.includes(country), true, `${country} should be refreshed by static benchmark sync`);
         assert.equal(staticRun.readiness[country].ok, true, `${country} readiness should be OK`);
     });
+    assert.equal(staticRun.countries.includes('IN'), false, 'India should run through the official-live updater, not static benchmark batch');
 });

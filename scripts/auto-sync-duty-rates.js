@@ -13,8 +13,12 @@ const { updateEuRules } = require('./update-eu-duty-rates');
 const { updateSingaporeRules } = require('./update-sg-duty-rates');
 const { updateMexicoRules } = require('./update-mx-duty-rates');
 const { updateJapanRules } = require('./update-jp-duty-rates');
-const { updateKoreaRules } = require('./update-kr-duty-rates');
-const { DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES, updateStaticBenchmarkRules } = require('./update-static-duty-rates');
+const { updateKoreaRules, updateKoreaRulesFromOfficialSource } = require('./update-kr-duty-rates');
+const {
+    DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
+    updateIndiaRulesFromOfficialSource,
+    updateStaticBenchmarkRules
+} = require('./update-static-duty-rates');
 const { runDutyRateHealthCheck } = require('./check-duty-rates');
 
 const ROOT = path.join(__dirname, '..');
@@ -191,7 +195,12 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
     };
 }
 
-async function runAutoDutyRateSync({ dryRun = false, skipOfficialUs = false } = {}) {
+async function runAutoDutyRateSync({
+    dryRun = false,
+    skipOfficialUs = false,
+    koreaOfficialFetcher = null,
+    indiaOfficialFetcher = null
+} = {}) {
     const startedAt = new Date().toISOString();
     const runs = [];
 
@@ -237,14 +246,46 @@ async function runAutoDutyRateSync({ dryRun = false, skipOfficialUs = false } = 
         mode: 'benchmark'
     }));
 
-    const krResult = updateKoreaRules({ dryRun });
-    runs.push(buildRunSummary('Korea Customs benchmark', krResult, {
+    let krResult;
+    try {
+        krResult = await updateKoreaRulesFromOfficialSource({
+            dryRun,
+            ...(koreaOfficialFetcher ? { fetcher: koreaOfficialFetcher } : {})
+        });
+    } catch (error) {
+        krResult = updateKoreaRules({ dryRun });
+        krResult.errors = [
+            ...(krResult.errors || []),
+            { country: 'KR', error: `Official-live fetch failed: ${error.message}` }
+        ];
+        krResult.ok = false;
+    }
+    runs.push(buildRunSummary('Korea Customs official-live', krResult, {
         applied: !dryRun,
-        mode: 'benchmark'
+        mode: 'official-live'
+    }));
+
+    let indiaResult;
+    try {
+        indiaResult = await updateIndiaRulesFromOfficialSource({
+            dryRun,
+            ...(indiaOfficialFetcher ? { fetcher: indiaOfficialFetcher } : {})
+        });
+    } catch (error) {
+        indiaResult = updateStaticBenchmarkRules({ countries: ['IN'], dryRun });
+        indiaResult.errors = [
+            ...(indiaResult.errors || []),
+            { country: 'IN', error: `Official-live fetch failed: ${error.message}` }
+        ];
+        indiaResult.ok = false;
+    }
+    runs.push(buildRunSummary('India Customs official-live', indiaResult, {
+        applied: !dryRun,
+        mode: 'official-live'
     }));
 
     const staticResult = updateStaticBenchmarkRules({
-        countries: STATIC_BENCHMARK_COUNTRIES,
+        countries: STATIC_BENCHMARK_COUNTRIES.filter(country => country !== 'IN'),
         dryRun
     });
     runs.push(buildRunSummary('Static official-link benchmarks', staticResult, {

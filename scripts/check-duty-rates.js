@@ -481,10 +481,29 @@ function buildExactRateProgress({
         official_link_only: sourceRoadmap.official_link_only || [],
         benchmark_only: sourceRoadmap.benchmark_only || []
     };
+    const trustBacklogRank = {
+        precheck_estimate: 1,
+        official_link_estimate: 2,
+        official_heading_only: 3,
+        mixed_official_estimate: 4
+    };
+    const topBacklogRows = marketRows
+        .flatMap(row => (row.backlog_rows || []).map(item => ({
+            ...item,
+            market: row.market
+        })))
+        .sort((a, b) => (
+            (trustBacklogRank[a.source_trust] || 9) - (trustBacklogRank[b.source_trust] || 9)
+            || String(a.market || '').localeCompare(String(b.market || ''))
+            || String(a.product_id || '').localeCompare(String(b.product_id || ''))
+            || String(a.hs_code || '').localeCompare(String(b.hs_code || ''))
+        ))
+        .slice(0, 12);
 
     return {
         totals,
         roadmap_status: roadmapStatus,
+        top_backlog_rows: topBacklogRows,
         rows: marketRows
     };
 }
