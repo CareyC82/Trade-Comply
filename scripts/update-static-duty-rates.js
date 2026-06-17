@@ -46,6 +46,147 @@ function normalizeCountries(countries = DEFAULT_COUNTRIES) {
         .filter(Boolean);
 }
 
+function stripHtml(value = '') {
+    return String(value)
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function parsePercent(value = '') {
+    const text = stripHtml(value);
+    if (!text || /^(free|nil|exempt|0(?:\.0+)?\s*%)$/i.test(text)) return 0;
+    const match = text.match(/(\d+(?:\.\d+)?)\s*%/);
+    return match ? Number(match[1]) / 100 : null;
+}
+
+function parseIndiaTariffRows(html = '') {
+    const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    return rowMatches.map((rowHtml) => {
+        const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
+        const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
+        if (!hsCode) return null;
+        const bcdCell = cells.find(cell => /BCD|basic customs duty|basic duty/i.test(cell))
+            || cells.find(cell => /\d+(?:\.\d+)?\s*%|nil|free|exempt/i.test(cell))
+            || '';
+        const swsCell = cells.find(cell => /SWS|social welfare/i.test(cell)) || '';
+        const igstCell = cells.find(cell => /IGST|integrated tax/i.test(cell)) || '';
+        const bcdRate = parsePercent(bcdCell);
+        const swsRate = parsePercent(swsCell);
+        const igstRate = parsePercent(igstCell);
+        if (bcdRate === null) return null;
+        return {
+            hs_code: hsCode,
+            hs_prefix: hsCode.slice(0, 6),
+            item_name: cells.find(cell => cell !== hsCode && cell !== bcdCell && cell !== swsCell && cell !== igstCell) || '',
+            bcd_rate_text: bcdCell,
+            sws_rate_text: swsCell,
+            igst_rate_text: igstCell,
+            bcd_rate: bcdRate,
+            sws_rate: swsRate,
+            igst_rate: igstRate
+        };
+    }).filter(Boolean);
+}
+
+function buildIndiaOfficialRateCandidate(rows = [], hsPrefix = '') {
+    const prefix = String(hsPrefix || '').replace(/\D/g, '');
+    const matched = rows.filter(row => String(row.hs_code || row.hs_prefix || '').replace(/\D/g, '').startsWith(prefix));
+    const bcdRates = Array.from(new Set(matched
+        .map(row => row.bcd_rate)
+        .filter(rate => Number.isFinite(rate))
+        .map(rate => Number(rate.toFixed(6)))))
+        .sort((a, b) => a - b);
+    const swsRates = Array.from(new Set(matched
+        .map(row => row.sws_rate)
+        .filter(rate => Number.isFinite(rate))
+        .map(rate => Number(rate.toFixed(6)))))
+        .sort((a, b) => a - b);
+    const igstRates = Array.from(new Set(matched
+        .map(row => row.igst_rate)
+        .filter(rate => Number.isFinite(rate))
+        .map(rate => Number(rate.toFixed(6)))))
+        .sort((a, b) => a - b);
+
+    if (!matched.length) {
+        return {
+            ok: false,
+            source_status: 'official_link_checked',
+            status: 'no_matching_rows',
+            hs_prefix: prefix,
+            matched_rows: 0,
+            reason: `No India official tariff row matched ${prefix}.`
+        };
+    }
+    if (bcdRates.length === 1 && swsRates.length <= 1 && igstRates.length <= 1) {
+        return {
+            ok: true,
+            source_status: 'official_source_checked',
+            status: 'official_source_candidate',
+            hs_prefix: prefix,
+            matched_rows: matched.length,
+            base_rate: bcdRates[0],
+            sws_rate: swsRates[0] ?? null,
+            igst_rate: igstRates[0] ?? null,
+            source_hts: `${prefix} (India Customs tariff candidate)`,
+            source_rate_text: `India official candidate: BCD ${(bcdRates[0] * 100).toFixed(3)}%${swsRates.length ? ` · SWS ${(swsRates[0] * 100).toFixed(3)}%` : ''}${igstRates.length ? ` · IGST ${(igstRates[0] * 100).toFixed(3)}%` : ''}`
+        };
+    }
+    return {
+        ok: false,
+        source_status: 'scope_check_required',
+        status: 'multiple_rates_need_exact_hs',
+        hs_prefix: prefix,
+        matched_rows: matched.length,
+        unique_bcd_rates: bcdRates,
+        unique_sws_rates: swsRates,
+        unique_igst_rates: igstRates,
+        reason: `${prefix} has multiple India tariff/tax rates; exact tariff line is required.`
+    };
+}
+
+function buildIndiaOfficialCandidateForRule(rule, rows = []) {
+    const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes : [];
+    const candidates = prefixes.map(prefix => buildIndiaOfficialRateCandidate(rows, prefix));
+    const okCandidates = candidates.filter(candidate => candidate.ok);
+    const scopeCandidates = candidates.filter(candidate => candidate.source_status === 'scope_check_required');
+    const uniqueBcd = Array.from(new Set(okCandidates.map(candidate => Number(candidate.base_rate.toFixed(6)))));
+    const uniqueSws = Array.from(new Set(okCandidates.map(candidate => candidate.sws_rate).filter(Number.isFinite).map(rate => Number(rate.toFixed(6)))));
+    const uniqueIgst = Array.from(new Set(okCandidates.map(candidate => candidate.igst_rate).filter(Number.isFinite).map(rate => Number(rate.toFixed(6)))));
+
+    if (okCandidates.length === prefixes.length && uniqueBcd.length === 1 && uniqueSws.length <= 1 && uniqueIgst.length <= 1) {
+        return {
+            ok: true,
+            source_status: 'official_source_checked',
+            status: 'official_source_candidate',
+            candidates,
+            base_rate: uniqueBcd[0],
+            sws_rate: uniqueSws[0] ?? null,
+            igst_rate: uniqueIgst[0] ?? null,
+            source_hts: `${prefixes.join(', ')} (India Customs tariff candidate)`,
+            source_rate_text: `India official candidate: BCD ${(uniqueBcd[0] * 100).toFixed(3)}%${uniqueSws.length ? ` · SWS ${(uniqueSws[0] * 100).toFixed(3)}%` : ''}${uniqueIgst.length ? ` · IGST ${(uniqueIgst[0] * 100).toFixed(3)}%` : ''}`
+        };
+    }
+    if (scopeCandidates.length || uniqueBcd.length > 1 || uniqueSws.length > 1 || uniqueIgst.length > 1) {
+        return {
+            ok: false,
+            source_status: 'scope_check_required',
+            status: 'exact_hs_required',
+            candidates,
+            reason: `${rule.id || 'rule'} needs exact India tariff line before BCD/SWS/IGST can be used.`
+        };
+    }
+    return {
+        ok: false,
+        source_status: 'official_link_checked',
+        status: 'no_matching_rows',
+        candidates,
+        reason: `${rule.id || 'rule'} has no matched India tariff rows.`
+    };
+}
+
 function probeStaticBenchmarkReadiness(country, {
     sourcesPayload = readJson(SOURCES_PATH),
     dutyPayload = readJson(DUTY_RATES_PATH)
@@ -104,7 +245,66 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
     return changes;
 }
 
-function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = false } = {}) {
+function applyIndiaOfficialCandidateToRule(rule, candidate, { source, checkedAt }) {
+    const changes = [];
+    refreshLayerStatuses(rule);
+    if (candidate.ok && Number(rule.base_rate) !== Number(candidate.base_rate)) {
+        changes.push({ field: 'base_rate', old_value: rule.base_rate, new_value: candidate.base_rate });
+        rule.base_rate = candidate.base_rate;
+    }
+    if (candidate.ok && Number.isFinite(candidate.sws_rate)) {
+        const sws = (rule.add_on_layers || []).find(layer => /sws|social_welfare/i.test(layer.type || layer.label || ''));
+        if (sws && Number(sws.rate) !== Number(candidate.sws_rate)) {
+            changes.push({ field: 'add_on_layers.sws.rate', old_value: sws.rate, new_value: candidate.sws_rate });
+            sws.rate = candidate.sws_rate;
+            sws.status = 'official_source_checked';
+        }
+    }
+    if (candidate.ok && Number.isFinite(candidate.igst_rate)) {
+        const igst = (rule.add_on_layers || []).find(layer => /igst|import_vat|integrated/i.test(layer.type || layer.label || ''));
+        if (igst && Number(igst.rate) !== Number(candidate.igst_rate)) {
+            changes.push({ field: 'add_on_layers.igst.rate', old_value: igst.rate, new_value: candidate.igst_rate });
+            igst.rate = candidate.igst_rate;
+            igst.status = 'official_source_checked';
+        }
+    }
+    rule.additional_rate = (rule.add_on_layers || []).reduce((sum, layer) => sum + Number(layer.rate || 0), 0);
+
+    const updates = candidate.ok ? {
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: 'India official candidate selected because maintained rows produced one unambiguous BCD basis. Verify exact tariff line, SWS/IGST applicability, exemptions, BIS/QCO, WPC, and origin before filing.',
+        source_hts: candidate.source_hts,
+        source_rate_text: candidate.source_rate_text,
+        source_url: source?.official_url || rule.source_url || '',
+        last_checked_at: checkedAt
+    } : candidate.source_status === 'scope_check_required' ? {
+        source_status: 'scope_check_required',
+        confidence: 'Scope check required',
+        source_note: 'India tariff/tax treatment depends on exact tariff line, exemption notification, SWS, IGST, and product-specific compliance scope.',
+        source_hts: `${(rule.hs_prefixes || []).join(', ')} (India Customs scope check required)`,
+        source_rate_text: 'Exact India tariff line required before using official BCD/SWS/IGST rates.',
+        source_url: source?.official_url || rule.source_url || '',
+        last_checked_at: checkedAt
+    } : {
+        source_status: 'benchmark_source_checked',
+        confidence: 'Indicative',
+        source_note: COUNTRY_NOTES.IN,
+        source_url: source?.official_url || rule.source_url || '',
+        last_checked_at: checkedAt
+    };
+
+    Object.entries(updates).forEach(([field, value]) => {
+        if (rule[field] !== value) {
+            changes.push({ field, old_value: rule[field], new_value: value });
+            rule[field] = value;
+        }
+    });
+
+    return changes;
+}
+
+function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = false, indiaTariffRows = null } = {}) {
     const targetCountries = normalizeCountries(countries);
     const sourcesPayload = readJson(SOURCES_PATH);
     const payload = readJson(DUTY_RATES_PATH);
@@ -112,6 +312,7 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
     const changes = [];
     const errors = [];
     const readiness = {};
+    const officialCandidateOutcomes = [];
 
     targetCountries.forEach((country) => {
         const source = getSource(country, sourcesPayload);
@@ -129,11 +330,26 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
 
         rules.forEach((rule) => {
             try {
-                const ruleChanges = applyStaticBenchmarkToRule(rule, { source, checkedAt });
+                const candidate = country === 'IN' && Array.isArray(indiaTariffRows)
+                    ? buildIndiaOfficialCandidateForRule(rule, indiaTariffRows)
+                    : null;
+                if (candidate) {
+                    officialCandidateOutcomes.push({
+                        rule: rule.id,
+                        ok: candidate.ok,
+                        status: candidate.status,
+                        source_status: candidate.source_status,
+                        reason: candidate.reason || ''
+                    });
+                }
+                const ruleChanges = candidate
+                    ? applyIndiaOfficialCandidateToRule(rule, candidate, { source, checkedAt })
+                    : applyStaticBenchmarkToRule(rule, { source, checkedAt });
                 if (ruleChanges.length) {
                     changes.push({
                         rule: rule.id,
                         import_country: rule.import_country,
+                        mode: candidate ? 'india-official-candidate' : 'benchmark',
                         changes: ruleChanges
                     });
                 }
@@ -149,11 +365,14 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
         ok: errors.length === 0,
         dry_run: dryRun,
         countries: targetCountries,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: Boolean(indiaTariffRows),
         changes,
         errors,
         readiness
     };
+    if (indiaTariffRows) {
+        payload.last_static_benchmark_sync.official_candidate_outcomes = officialCandidateOutcomes;
+    }
 
     if (!dryRun) {
         writeJson(DUTY_RATES_PATH, payload);
@@ -192,7 +411,12 @@ module.exports = {
     DEFAULT_COUNTRIES,
     COUNTRY_NOTES,
     applyStaticBenchmarkToRule,
+    applyIndiaOfficialCandidateToRule,
+    buildIndiaOfficialCandidateForRule,
+    buildIndiaOfficialRateCandidate,
     getMaintainedPrefixes,
+    parseIndiaTariffRows,
+    parsePercent,
     probeStaticBenchmarkReadiness,
     updateStaticBenchmarkRules
 };

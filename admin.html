@@ -1196,6 +1196,66 @@
             `;
         }
 
+        function renderExactRateProgress(progress = {}) {
+            const rows = Array.isArray(progress.rows) ? progress.rows : [];
+            const totals = progress.totals || {};
+            const statusLabel = {
+                exact_ready: 'Exact ready',
+                hybrid_in_progress: 'Hybrid',
+                benchmark_only: 'Benchmark',
+                source_gap: 'Source gap'
+            };
+            const statusClass = {
+                exact_ready: 'auto_updatable',
+                hybrid_in_progress: 'hybrid_official_candidate',
+                benchmark_only: 'benchmark_updatable',
+                source_gap: 'benchmark'
+            };
+            if (!rows.length) {
+                return '<div class="empty">No exact-rate progress data available.</div>';
+            }
+            return `
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${totals.exact_routes ?? 0}/${totals.total_routes ?? 0}</strong><span>Exact / official-tax routes</span></div>
+                    <div class="summary-card"><strong>${totals.hybrid_routes ?? 0}</strong><span>Hybrid official routes</span></div>
+                    <div class="summary-card"><strong>${totals.benchmark_routes ?? 0}</strong><span>Benchmark routes</span></div>
+                    <div class="summary-card"><strong>${totals.backlog_routes ?? 0}</strong><span>Exact parser backlog</span></div>
+                </div>
+                <div class="coverage-table-wrap">
+                    <table class="quality-gap-table">
+                        <thead>
+                            <tr>
+                                <th>Market</th>
+                                <th>Status</th>
+                                <th>Exact / total</th>
+                                <th>Hybrid</th>
+                                <th>Benchmark</th>
+                                <th>Rule source quality</th>
+                                <th>Next action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map((row) => `
+                                <tr>
+                                    <td><strong>${escapeHtml(row.market || '')}</strong></td>
+                                    <td><span class="badge ${escapeHtml(statusClass[row.status] || 'benchmark')}">${escapeHtml(statusLabel[row.status] || row.status || '')}</span></td>
+                                    <td>${escapeHtml(row.exact_routes ?? 0)} / ${escapeHtml(row.total_routes ?? 0)}</td>
+                                    <td>${escapeHtml(row.hybrid_routes ?? 0)}</td>
+                                    <td>${escapeHtml(row.benchmark_routes ?? 0)}</td>
+                                    <td>
+                                        <span class="meta">official ${escapeHtml(row.official_rule_count ?? 0)}</span>
+                                        <span class="meta">scope ${escapeHtml(row.scope_check_count ?? 0)}</span>
+                                        <span class="meta">link ${escapeHtml(row.official_link_count ?? 0)}</span>
+                                    </td>
+                                    <td>${escapeHtml(row.next_action || '')}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         function renderQualityStatus(data) {
             const search = data.search || {};
             const duty = data.duty || {};
@@ -1259,6 +1319,7 @@
                 const actionDetails = Array.isArray(data.action_details) ? data.action_details : [];
                 const syncStatus = data.duty_rate_sync_status || {};
                 const priorityMatrix = data.priority_rate_matrix || {};
+                const exactProgress = data.exact_rate_progress || {};
                 dutyRateStatus.innerHTML = `
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">
@@ -1279,6 +1340,8 @@
                     </div>
                     <p class="meta">Roadmap 更新: ${escapeHtml(data.source_roadmap_updated_at || '—')} · Health: ${data.ok ? 'OK' : 'Needs review'}</p>
                     ${failures.length ? `<div class="empty">税率源检查有 ${failures.length} 个问题：${escapeHtml(failures.map(f => `${f.id}: ${(f.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
+                    <div class="crawl-section-title"><h3>Exact-rate progress board</h3><span class="meta">filing-grade parser status by market</span></div>
+                    ${renderExactRateProgress(exactProgress)}
                     <div class="crawl-section-title"><h3>税率更新失败原因明细</h3><span class="meta">${actionDetails.length} action item(s)</span></div>
                     ${renderDutyRateActionDetails(actionDetails)}
                     <div class="crawl-section-title"><h3>High-frequency exact-rate matrix</h3><span class="meta">${priorityMatrix.route_count || 0} priority routes</span></div>

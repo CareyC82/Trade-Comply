@@ -380,6 +380,97 @@ function buildDutyRateActionDetails({
     return rows;
 }
 
+function buildExactRateProgress({
+    priorityMatrix = {},
+    sourceRoadmap = {},
+    sourceQuality = []
+} = {}) {
+    const rows = Array.isArray(priorityMatrix.rows) ? priorityMatrix.rows : [];
+    const sourceQualityByCountry = new Map((sourceQuality || []).map(row => [row.country, row]));
+    const priorityMarkets = Array.from(new Set(rows.map(row => row.import_country).filter(Boolean))).sort();
+    const exactTrust = new Set(['official_exact_rate', 'official_duty_tax_estimate']);
+    const hybridTrust = new Set(['mixed_official_estimate', 'official_heading_only', 'official_link_estimate']);
+    const benchmarkTrust = new Set(['precheck_estimate']);
+
+    const marketRows = priorityMarkets.map((market) => {
+        const marketRows = rows.filter(row => row.import_country === market);
+        const exact = marketRows.filter(row => exactTrust.has(row.source_trust)).length;
+        const hybrid = marketRows.filter(row => hybridTrust.has(row.source_trust)).length;
+        const benchmark = marketRows.filter(row => benchmarkTrust.has(row.source_trust)).length;
+        const missing = marketRows.filter(row => !row.covered).length;
+        const backlog = marketRows.length - exact;
+        const sourceQualityRow = sourceQualityByCountry.get(market) || {};
+        const status = missing > 0
+            ? 'source_gap'
+            : backlog === 0
+                ? 'exact_ready'
+                : exact > 0 || hybrid > 0
+                    ? 'hybrid_in_progress'
+                    : 'benchmark_only';
+        const nextAction = status === 'exact_ready'
+            ? 'Keep daily sync and rate-change threshold monitoring enabled.'
+            : status === 'hybrid_in_progress'
+                ? 'Finish exact tariff-line parser for the remaining high-frequency HS rows.'
+                : status === 'benchmark_only'
+                    ? 'Connect official tariff source before using this market for filing-grade value review.'
+                    : 'Add maintained duty-rate rule and official source mapping.';
+
+        return {
+            market,
+            status,
+            total_routes: marketRows.length,
+            exact_routes: exact,
+            hybrid_routes: hybrid,
+            benchmark_routes: benchmark,
+            missing_routes: missing,
+            backlog_routes: backlog,
+            official_rule_count: sourceQualityRow.official_source_checked || 0,
+            scope_check_count: sourceQualityRow.scope_check_required || 0,
+            official_link_count: sourceQualityRow.official_link_checked || 0,
+            next_action: nextAction
+        };
+    });
+
+    const totals = marketRows.reduce((acc, row) => {
+        acc.total_routes += row.total_routes;
+        acc.exact_routes += row.exact_routes;
+        acc.hybrid_routes += row.hybrid_routes;
+        acc.benchmark_routes += row.benchmark_routes;
+        acc.missing_routes += row.missing_routes;
+        acc.backlog_routes += row.backlog_routes;
+        acc.exact_ready_markets += row.status === 'exact_ready' ? 1 : 0;
+        acc.hybrid_markets += row.status === 'hybrid_in_progress' ? 1 : 0;
+        acc.benchmark_markets += row.status === 'benchmark_only' ? 1 : 0;
+        acc.source_gap_markets += row.status === 'source_gap' ? 1 : 0;
+        return acc;
+    }, {
+        total_routes: 0,
+        exact_routes: 0,
+        hybrid_routes: 0,
+        benchmark_routes: 0,
+        missing_routes: 0,
+        backlog_routes: 0,
+        exact_ready_markets: 0,
+        hybrid_markets: 0,
+        benchmark_markets: 0,
+        source_gap_markets: 0
+    });
+
+    const roadmapStatus = {
+        auto_updatable: sourceRoadmap.auto_updatable || [],
+        hybrid_official_candidate: sourceRoadmap.hybrid_official_candidate || [],
+        benchmark_updatable: sourceRoadmap.benchmark_updatable || [],
+        official_link_only: sourceRoadmap.official_link_only || [],
+        benchmark_only: sourceRoadmap.benchmark_only || []
+    };
+
+    return {
+        totals,
+        roadmap_status: roadmapStatus,
+        rows: marketRows
+    };
+}
+
 function ruleMatchesPriority(rule, market, prefix) {
     const importCountry = String(rule.import_country || '').toUpperCase();
     const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes.map(String) : [];
@@ -427,6 +518,12 @@ function runDutyRateHealthCheck() {
     const dutySummary = summarizeDutyRateCoverage(dutyPayload);
     const dutyGapMatrix = buildDutyRateGapMatrix(dutyPayload);
     const sourceRoadmap = summarizeSourceRoadmap(sourcesPayload, dutySummary);
+    const sourceQualitySummary = summarizeRuleSourceQuality(dutyPayload);
+    const exactRateProgress = buildExactRateProgress({
+        priorityMatrix: priorityRateMatrix,
+        sourceRoadmap,
+        sourceQuality: sourceQualitySummary
+    });
     const sourceFailures = [];
     if (sourceRoadmap.missing_coverage.length) {
         sourceFailures.push(`source roadmap includes countries without duty rules: ${sourceRoadmap.missing_coverage.join(', ')}`);
@@ -440,8 +537,9 @@ function runDutyRateHealthCheck() {
         duty_rate_summary: dutySummary,
         duty_rate_gap_matrix: dutyGapMatrix,
         source_roadmap_summary: sourceRoadmap,
-        source_quality_summary: summarizeRuleSourceQuality(dutyPayload),
+        source_quality_summary: sourceQualitySummary,
         priority_rate_matrix: priorityRateMatrix,
+        exact_rate_progress: exactRateProgress,
         action_details: buildDutyRateActionDetails({
             healthFailures: failures,
             syncStatus,
@@ -479,5 +577,6 @@ module.exports = {
     summarizePriorityRateMatrix,
     summarizeRuleSourceQuality,
     buildDutyRateActionDetails,
+    buildExactRateProgress,
     summarizeSourceRoadmap
 };

@@ -47,11 +47,18 @@ const {
 } = require('../scripts/update-jp-duty-rates');
 const {
     applyKoreaBenchmarkToRule,
+    applyKoreaOfficialCandidateToRule,
+    buildKoreaOfficialCandidateForRule,
+    parseKoreaAdValoremRate,
+    parseKoreaTariffRateRows,
     parseKoreaTariffDbHtml,
     probeKoreaReadiness
 } = require('../scripts/update-kr-duty-rates');
 const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
+    applyIndiaOfficialCandidateToRule,
+    buildIndiaOfficialCandidateForRule,
+    parseIndiaTariffRows,
     probeStaticBenchmarkReadiness
 } = require('../scripts/update-static-duty-rates');
 
@@ -674,4 +681,101 @@ test('Korea updater keeps VAT benchmark separate from official machine rates', (
     assert.equal(rule.source_status, 'official_link_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
+});
+
+test('Korea official candidate promotes unambiguous tariff rows and keeps VAT separate', () => {
+    const html = `
+        <table>
+            <tr><th>HS Code</th><th>Description</th><th>Basic Rate</th></tr>
+            <tr><td>8542310000</td><td>Processors</td><td>Free</td></tr>
+            <tr><td>8542320000</td><td>Memories</td><td>0%</td></tr>
+        </table>
+    `;
+    const rows = parseKoreaTariffRateRows(html);
+    const rule = {
+        id: 'TEST-KR-8542',
+        import_country: 'KR',
+        hs_prefixes: ['8542'],
+        base_rate: 0.08,
+        additional_rate: 0.1,
+        add_on_layers: [{ type: 'import_vat', rate: 0.1, status: 'indicative' }]
+    };
+
+    assert.equal(parseKoreaAdValoremRate('Free'), 0);
+    assert.equal(rows.length, 2);
+    const candidate = buildKoreaOfficialCandidateForRule(rule, rows);
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.source_status, 'official_source_checked');
+
+    const changes = applyKoreaOfficialCandidateToRule(rule, candidate, '2026-06-17T00:00:00.000Z');
+    assert.ok(changes.some(change => change.field === 'base_rate'));
+    assert.equal(rule.base_rate, 0);
+    assert.equal(rule.source_status, 'official_source_checked');
+    assert.equal(rule.additional_rate, 0.1);
+});
+
+test('Korea official candidate keeps mixed rows exact-HS gated', () => {
+    const candidate = buildKoreaOfficialCandidateForRule({
+        id: 'TEST-KR-MIXED',
+        hs_prefixes: ['8528']
+    }, [
+        { hs_code: '8528521000', parsed_base_rate: 0 },
+        { hs_code: '8528599000', parsed_base_rate: 0.08 }
+    ]);
+
+    assert.equal(candidate.ok, false);
+    assert.equal(candidate.source_status, 'scope_check_required');
+});
+
+test('India official candidate can parse BCD SWS and IGST rows', () => {
+    const html = `
+        <table>
+            <tr><th>HS</th><th>Goods</th><th>BCD</th><th>SWS</th><th>IGST</th></tr>
+            <tr><td>85423100</td><td>Processors</td><td>BCD 0%</td><td>SWS 10%</td><td>IGST 18%</td></tr>
+            <tr><td>85423200</td><td>Memories</td><td>BCD 0%</td><td>SWS 10%</td><td>IGST 18%</td></tr>
+        </table>
+    `;
+    const rows = parseIndiaTariffRows(html);
+    const rule = {
+        id: 'TEST-IN-8542',
+        import_country: 'IN',
+        hs_prefixes: ['8542'],
+        base_rate: 0.1,
+        additional_rate: 0,
+        add_on_layers: [
+            { type: 'social_welfare_surcharge', rate: 0, status: 'indicative' },
+            { type: 'igst', rate: 0, status: 'indicative' }
+        ],
+        source_url: 'https://www.icegate.gov.in/'
+    };
+
+    assert.equal(rows.length, 2);
+    const candidate = buildIndiaOfficialCandidateForRule(rule, rows);
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.source_status, 'official_source_checked');
+    assert.equal(candidate.base_rate, 0);
+    assert.equal(candidate.sws_rate, 0.1);
+    assert.equal(candidate.igst_rate, 0.18);
+
+    const changes = applyIndiaOfficialCandidateToRule(rule, candidate, {
+        source: { official_url: 'https://www.icegate.gov.in/' },
+        checkedAt: '2026-06-17T00:00:00.000Z'
+    });
+    assert.ok(changes.some(change => change.field === 'base_rate'));
+    assert.equal(rule.source_status, 'official_source_checked');
+    assert.equal(rule.add_on_layers[0].rate, 0.1);
+    assert.equal(rule.add_on_layers[1].rate, 0.18);
+});
+
+test('India official candidate keeps mixed tariff rows exact-line gated', () => {
+    const candidate = buildIndiaOfficialCandidateForRule({
+        id: 'TEST-IN-MIXED',
+        hs_prefixes: ['850440']
+    }, [
+        { hs_code: '85044010', bcd_rate: 0, sws_rate: 0.1, igst_rate: 0.18 },
+        { hs_code: '85044090', bcd_rate: 0.075, sws_rate: 0.1, igst_rate: 0.18 }
+    ]);
+
+    assert.equal(candidate.ok, false);
+    assert.equal(candidate.source_status, 'scope_check_required');
 });

@@ -44,6 +44,8 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => row.recommendationReasons.length <= 3));
         assert.ok(model.routeComparison.every((row) => row.conciseConclusion));
         assert.ok(model.routeComparison.every((row) => row.tradeOpportunityThesis && row.valueLever && row.executionGate));
+        assert.ok(model.routeComparison.every((row) => Array.isArray(row.opportunityEvidence) && row.opportunityEvidence.length === 3));
+        assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Demand driver')));
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
         assert.ok(model.readyRouteCount >= 1);
         assert.ok(model.parserBacklogCount >= 1);

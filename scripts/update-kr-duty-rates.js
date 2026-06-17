@@ -93,6 +93,31 @@ function stripHtml(value = '') {
         .trim();
 }
 
+function parseKoreaAdValoremRate(value = '') {
+    const text = stripHtml(value);
+    if (!text || /free|免税|무세|0\s*%/i.test(text)) return 0;
+    const percent = text.match(/(\d+(?:\.\d+)?)\s*%/);
+    return percent ? Number(percent[1]) / 100 : null;
+}
+
+function parseKoreaTariffRateRows(html = '') {
+    const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    return rowMatches.map((rowHtml) => {
+        const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
+        const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
+        const rateCell = cells.find(cell => /free|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
+        const parsedRate = parseKoreaAdValoremRate(rateCell);
+        if (!hsCode || parsedRate === null) return null;
+        return {
+            hs_code: hsCode,
+            hs_prefix: hsCode.slice(0, 6),
+            item_name: cells.find(cell => cell !== hsCode && cell !== rateCell) || '',
+            base_rate_text: rateCell,
+            parsed_base_rate: parsedRate
+        };
+    }).filter(Boolean);
+}
+
 function parseKoreaTariffDbHtml(html = '') {
     const text = stripHtml(html);
     const hasTariffDb = /KCS\s*Tariff\s*D\/B/i.test(text);
@@ -105,6 +130,82 @@ function parseKoreaTariffDbHtml(html = '') {
         parser_note: hasTariffDb
             ? 'Korea Customs tariff inquiry page is reachable; exact 10-digit tariff-line parsing is not auto-applied yet.'
             : 'Korea Customs tariff inquiry markers were not found.'
+    };
+}
+
+function buildKoreaOfficialRateCandidate(rows = [], hsPrefix = '') {
+    const prefix = String(hsPrefix || '').replace(/\D/g, '');
+    const matched = rows.filter(row => String(row.hs_code || row.hs_prefix || '').replace(/\D/g, '').startsWith(prefix));
+    const rates = Array.from(new Set(matched
+        .map(row => row.parsed_base_rate)
+        .filter(rate => Number.isFinite(rate))
+        .map(rate => Number(rate.toFixed(6)))))
+        .sort((a, b) => a - b);
+
+    if (!matched.length) {
+        return {
+            ok: false,
+            source_status: 'official_link_checked',
+            status: 'no_matching_rows',
+            hs_prefix: prefix,
+            matched_rows: 0,
+            reason: `No Korea official tariff row matched ${prefix}.`
+        };
+    }
+    if (rates.length === 1) {
+        return {
+            ok: true,
+            source_status: 'official_source_checked',
+            status: 'official_source_candidate',
+            hs_prefix: prefix,
+            matched_rows: matched.length,
+            base_rate: rates[0],
+            source_hts: `${prefix} (Korea Customs tariff candidate)`,
+            source_rate_text: `Korea official tariff candidate: ${(rates[0] * 100).toFixed(3)}%`,
+            source_url: KR_TARIFF_DB_URL
+        };
+    }
+    return {
+        ok: false,
+        source_status: 'scope_check_required',
+        status: 'multiple_rates_need_hs10',
+        hs_prefix: prefix,
+        matched_rows: matched.length,
+        unique_base_rates: rates,
+        reason: `${prefix} has multiple Korea official rates; exact 10-digit HS is required.`
+    };
+}
+
+function buildKoreaOfficialCandidateForRule(rule, rows = []) {
+    const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes : [];
+    const candidates = prefixes.map(prefix => buildKoreaOfficialRateCandidate(rows, prefix));
+    const okCandidates = candidates.filter(candidate => candidate.ok);
+    const scopeCandidates = candidates.filter(candidate => candidate.source_status === 'scope_check_required');
+    const uniqueRates = Array.from(new Set(okCandidates.map(candidate => Number(candidate.base_rate.toFixed(6)))));
+
+    if (okCandidates.length === prefixes.length && uniqueRates.length === 1) {
+        return {
+            ...okCandidates[0],
+            candidates,
+            source_hts: `${prefixes.join(', ')} (Korea Customs tariff candidate)`,
+            source_rate_text: `Korea official tariff candidate: ${(uniqueRates[0] * 100).toFixed(3)}%`
+        };
+    }
+    if (scopeCandidates.length || uniqueRates.length > 1) {
+        return {
+            ok: false,
+            source_status: 'scope_check_required',
+            status: 'exact_hs_required',
+            candidates,
+            reason: `${rule.id || 'rule'} needs exact Korea 10-digit HS before official duty can be used.`
+        };
+    }
+    return {
+        ok: false,
+        source_status: 'official_link_checked',
+        status: 'no_matching_rows',
+        candidates,
+        reason: `${rule.id || 'rule'} has no matched Korea official tariff rows.`
     };
 }
 
@@ -192,20 +293,80 @@ function applyKoreaBenchmarkToRule(rule, checkedAt) {
     return changes;
 }
 
-function updateKoreaRules({ dryRun = false } = {}) {
+function applyKoreaOfficialCandidateToRule(rule, candidate, checkedAt) {
+    const changes = [];
+    refreshVatLayer(rule);
+
+    if (candidate.ok && Number(rule.base_rate) !== Number(candidate.base_rate)) {
+        changes.push({ field: 'base_rate', old_value: rule.base_rate, new_value: candidate.base_rate });
+        rule.base_rate = candidate.base_rate;
+    }
+
+    const updates = candidate.ok ? {
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: 'Korea Customs tariff candidate selected because maintained official rows produced one unambiguous base-duty rate. Verify exact 10-digit HS, VAT basis, KC scope, and origin preference before filing.',
+        source_hts: candidate.source_hts,
+        source_rate_text: candidate.source_rate_text,
+        source_url: candidate.source_url || KR_TARIFF_DB_URL,
+        last_checked_at: checkedAt
+    } : candidate.source_status === 'scope_check_required' ? {
+        source_status: 'scope_check_required',
+        confidence: 'Scope check required',
+        source_note: 'Korea official rows show that the exact 10-digit HS or product scope can change the duty result.',
+        source_hts: `${(rule.hs_prefixes || []).join(', ')} (Korea Customs scope check required)`,
+        source_rate_text: 'Exact Korea 10-digit HS required before using an official duty rate.',
+        source_url: KR_TARIFF_DB_URL,
+        last_checked_at: checkedAt
+    } : {
+        source_status: 'official_link_checked',
+        confidence: 'Official link monitored',
+        source_note: KR_BENCHMARK.source_note,
+        source_hts: KR_BENCHMARK.source_hts,
+        source_rate_text: KR_BENCHMARK.source_rate_text,
+        source_url: KR_CUSTOMS_URL,
+        last_checked_at: checkedAt
+    };
+
+    Object.entries(updates).forEach(([field, value]) => {
+        if (rule[field] !== value) {
+            changes.push({ field, old_value: rule[field], new_value: value });
+            rule[field] = value;
+        }
+    });
+    return changes;
+}
+
+function updateKoreaRules({ dryRun = false, officialRows = null } = {}) {
     const payload = readJson(DUTY_RATES_PATH);
     const checkedAt = new Date().toISOString();
     const changes = [];
     const errors = [];
+    const officialOutcomes = [];
 
     for (const rule of payload.rules || []) {
         if (rule.import_country !== 'KR') continue;
         try {
-            const ruleChanges = applyKoreaBenchmarkToRule(rule, checkedAt);
+            const candidate = Array.isArray(officialRows)
+                ? buildKoreaOfficialCandidateForRule(rule, officialRows)
+                : null;
+            if (candidate) {
+                officialOutcomes.push({
+                    rule: rule.id,
+                    ok: candidate.ok,
+                    status: candidate.status,
+                    source_status: candidate.source_status,
+                    reason: candidate.reason || ''
+                });
+            }
+            const ruleChanges = candidate
+                ? applyKoreaOfficialCandidateToRule(rule, candidate, checkedAt)
+                : applyKoreaBenchmarkToRule(rule, checkedAt);
             if (ruleChanges.length) {
                 changes.push({
                     rule: rule.id,
                     import_country: rule.import_country,
+                    mode: candidate ? 'official-candidate' : 'benchmark',
                     changes: ruleChanges
                 });
             }
@@ -219,10 +380,13 @@ function updateKoreaRules({ dryRun = false } = {}) {
     payload.last_kr_customs_benchmark_sync = {
         ok: errors.length === 0,
         dry_run: dryRun,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: Boolean(officialRows),
         changes,
         errors
     };
+    if (officialRows) {
+        payload.last_kr_customs_benchmark_sync.official_candidate_outcomes = officialOutcomes;
+    }
 
     if (!dryRun) {
         writeJson(DUTY_RATES_PATH, payload);
@@ -254,6 +418,11 @@ module.exports = {
     KR_CUSTOMS_URL,
     KR_TARIFF_DB_URL,
     parseKoreaTariffDbHtml,
+    parseKoreaAdValoremRate,
+    parseKoreaTariffRateRows,
+    buildKoreaOfficialRateCandidate,
+    buildKoreaOfficialCandidateForRule,
+    applyKoreaOfficialCandidateToRule,
     probeKoreaOfficialSource,
     probeKoreaReadiness,
     updateKoreaRules,

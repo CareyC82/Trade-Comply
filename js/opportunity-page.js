@@ -90,6 +90,7 @@ function bootstrapTradeOpportunityPage() {
 
     function renderMarketCard(card, index) {
         const reasons = Array.isArray(card.recommendationReasons) ? card.recommendationReasons : [];
+        const evidence = Array.isArray(card.opportunityEvidence) ? card.opportunityEvidence : [];
         const metricItems = [
             { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
@@ -122,6 +123,15 @@ function bootstrapTradeOpportunityPage() {
                             </div>
                         </div>
                     ` : ''}
+                    ${evidence.map((item) => `
+                        <div class="opportunity-reason opportunity-reason--neutral">
+                            <span>•</span>
+                            <div>
+                                <strong>${escapeHtml(item.label)}</strong>
+                                <small>${escapeHtml(item.detail)}</small>
+                            </div>
+                        </div>
+                    `).join('')}
                     ${reasons.map((reason, reasonIndex) => `
                         <div class="opportunity-reason opportunity-reason--${escapeHtml(reason.tone || 'neutral')}">
                             <span>${escapeHtml(reasonIndex + 1)}</span>
