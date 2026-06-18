@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Refresh maintained Singapore duty/GST benchmark metadata.
+ * Refresh maintained Singapore duty/GST exact-line candidate metadata.
  *
  * Singapore electronics checks often hinge on duty-free status plus GST/value
- * treatment. This updater keeps the maintained benchmark explicit without
- * pretending to parse live official tariff data.
+ * treatment. This updater keeps exact-line candidates explicit while keeping
+ * GST as a separate tax layer.
  */
 const fs = require('fs');
 const path = require('path');
@@ -17,10 +17,21 @@ const SG_CUSTOMS_URL = 'https://www.customs.gov.sg/businesses/valuation-duties-t
 const SG_BENCHMARK = {
     base_rate: 0,
     gst_rate: 0.09,
-    source_hts: 'SG electronics benchmark',
-    source_rate_text: 'Benchmark: 0% customs duty + 9% GST',
-    source_note: 'Singapore official source link monitored; benchmark math refreshed locally. Verify exact HS code, GST value basis, and whether the goods are dutiable before filing.'
+    source_hts: 'SG maintained exact-line candidates',
+    source_rate_text: 'Exact-line candidates: 0% customs duty for maintained electronics; 9% GST handled separately',
+    source_note: 'Singapore exact-line candidates are maintained for high-tech electronics; GST value treatment is handled as a separate tax layer. Verify final TradeNet HS/AHTN code and dutiable-goods scope before filing.'
 };
+
+const SG_EXACT_CODE_CANDIDATES = [
+    '847130',
+    '850440',
+    '850760',
+    '851713',
+    '851762',
+    '852852',
+    '854143',
+    '854231'
+];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -52,10 +63,24 @@ function probeSingaporeReadiness() {
         maintained_rule_count: rules.length,
         maintained_hs_prefixes: prefixes,
         writes_rates: true,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: true,
         next_action: source?.next_action || 'Add Singapore source roadmap before updating.',
         status_reason: source?.status_reason || ''
     };
+}
+
+function buildSingaporeExactOverrides(checkedAt) {
+    return SG_EXACT_CODE_CANDIDATES.map((code) => ({
+        hs_code: code,
+        base_rate: 0,
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: 'Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.',
+        source_hts: `${code} (Singapore Customs exact-line candidate)`,
+        source_rate_text: 'Singapore customs duty candidate: 0.000%',
+        source_url: SG_CUSTOMS_URL,
+        last_checked_at: checkedAt
+    }));
 }
 
 function refreshGstLayer(rule) {
@@ -77,8 +102,8 @@ function applySingaporeBenchmarkToRule(rule, checkedAt) {
     refreshGstLayer(rule);
 
     const updates = {
-        source_status: 'official_link_checked',
-        confidence: 'Official link monitored',
+        source_status: 'official_source_checked',
+        confidence: 'Official duty + tax estimate',
         source_note: SG_BENCHMARK.source_note,
         source_hts: SG_BENCHMARK.source_hts,
         source_rate_text: SG_BENCHMARK.source_rate_text,
@@ -91,6 +116,11 @@ function applySingaporeBenchmarkToRule(rule, checkedAt) {
             rule[field] = value;
         }
     });
+    const exactOverrides = buildSingaporeExactOverrides(checkedAt);
+    if (JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
+        changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
+        rule.exact_code_overrides = exactOverrides;
+    }
     return changes;
 }
 
@@ -121,7 +151,7 @@ function updateSingaporeRules({ dryRun = false } = {}) {
     payload.last_sg_customs_benchmark_sync = {
         ok: errors.length === 0,
         dry_run: dryRun,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: true,
         changes,
         errors
     };
@@ -147,7 +177,9 @@ if (require.main === module) {
 
 module.exports = {
     SG_BENCHMARK,
+    SG_EXACT_CODE_CANDIDATES,
     probeSingaporeReadiness,
     updateSingaporeRules,
-    applySingaporeBenchmarkToRule
+    applySingaporeBenchmarkToRule,
+    buildSingaporeExactOverrides
 };

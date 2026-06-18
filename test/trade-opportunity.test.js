@@ -72,12 +72,12 @@ describe('trade opportunity insights', () => {
         const eu = model.routeComparison.find((row) => row.market === 'EU');
 
         assert.ok(singapore, 'Singapore should be included in route comparison');
-        assert.equal(singapore.sourceTrust, 'official_link_estimate');
-        assert.equal(singapore.coverageLabel, 'Official link monitored');
-        assert.equal(singapore.parserPriority, 'P2 parser backlog');
-        assert.equal(singapore.parserPriorityRank, 2);
-        assert.match(singapore.parserNextAction, /machine-readable tariff-line parser/i);
-        assert.ok(singapore.recommendationReasons.some((reason) => /Parser upgrade/i.test(reason.label)));
+        assert.equal(singapore.sourceTrust, 'official_duty_tax_estimate');
+        assert.equal(singapore.coverageLabel, 'Official duty + tax estimate');
+        assert.equal(singapore.parserPriority, 'P1 tax-layer refresh');
+        assert.equal(singapore.parserPriorityRank, 1);
+        assert.match(singapore.parserNextAction, /tax layer/i);
+        assert.ok(singapore.recommendationReasons.some((reason) => /Stronger rate confidence/i.test(reason.label)));
         assert.ok(india, 'India should be included in route comparison');
         assert.equal(india.sourceTrust, 'official_heading_only');
         assert.equal(india.coverageLabel, 'Official heading only');
@@ -229,5 +229,14 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /data\/post-entry-rate-priority-matrix\.json/);
         assert.match(source, /opportunity-teaser__chips/);
         assert.match(source, /parserBacklogCount/);
+    });
+
+    it('renders decision cards for opportunity reason, value lever, and execution gate', () => {
+        const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'opportunity-page.js'), 'utf8');
+
+        assert.match(source, /opportunity-decision-card-grid/);
+        assert.match(source, /Opportunity Reason/);
+        assert.match(source, /Value Lever/);
+        assert.match(source, /Execution Gate/);
     });
 });

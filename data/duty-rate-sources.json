@@ -70,15 +70,15 @@
       "name": "Singapore Customs duties and GST",
       "authority": "Singapore Customs",
       "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-      "machine_readable": "candidate",
-      "source_status": "official_link",
+      "machine_readable": "local_exact_map",
+      "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P1",
-      "status_reason": "Singapore import duty treatment for covered electronics is maintained as duty-free benchmark plus GST; official source is not parsed as machine tariff data yet.",
+      "status_reason": "Singapore maintained high-tech HS lines use exact-line base-duty candidates while GST remains a separate tax layer.",
       "updater_script": "scripts/update-sg-duty-rates.js",
       "update_command": "npm run update:duty-rates:sg",
       "last_sync_field": "last_sg_customs_benchmark_sync_at",
-      "current_scope": "Maintained Singapore duty-free electronics benchmark plus 9% GST value treatment reminder.",
-      "next_action": "Research official tariff/GST machine source; keep GST benchmark explicit until then."
+      "current_scope": "Maintained Singapore exact-line base-duty candidates plus 9% GST value treatment reminder.",
+      "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed."
     },
     {
       "country": "MX",
@@ -163,15 +163,15 @@
       "name": "Vietnam Customs tariff / VAT",
       "authority": "Vietnam Customs",
       "official_url": "https://www.customs.gov.vn/",
-      "machine_readable": false,
-      "source_status": "official_link",
+      "machine_readable": "local_exact_map",
+      "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Vietnam official customs source is monitored; exact preferential tariff and VAT parser is not wired yet.",
+      "status_reason": "Vietnam maintained high-tech HS lines use exact-line base-duty candidates while VAT and preferential-origin scope remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=VN",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Official-link monitored VAT/duty status for electronics; preferential tariffs depend on origin and entry date.",
-      "next_action": "Keep official-link updater running; research downloadable Vietnam tariff/VAT source before promoting official exact rates."
+      "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
+      "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed."
     },
     {
       "country": "MY",

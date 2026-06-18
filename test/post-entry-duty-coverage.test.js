@@ -61,7 +61,11 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
         assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-code gates`);
     });
-    ['SG', 'MX', 'JP', 'KR', 'IN'].forEach((country) => {
+    ['SG', 'VN'].forEach((country) => {
+        assert.equal(qualityByCountry.get(country).coverage_level, 'official_all', country);
+        assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have maintained exact-line candidates`);
+    });
+    ['MX', 'JP', 'KR', 'IN'].forEach((country) => {
         assert.equal(qualityByCountry.get(country).coverage_level, 'official_link_all', country);
         assert.ok(qualityByCountry.get(country).official_link_checked > 0, `${country} should have monitored official links`);
     });
@@ -132,15 +136,17 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.automation_counts.hybrid_official > 0, true);
     assert.equal(matrix.automation_counts.official_link_monitor > 0, true);
     assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
-    assert.equal(matrix.trust_counts.official_link_estimate, 44);
+    assert.equal(matrix.trust_counts.official_link_estimate, 32);
+    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 34);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
     assert.ok(matrix.trust_counts.official_heading_only >= 8);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.priority_band), 'upgrade queue should show business priority band');
-    assert.ok(matrix.priority_upgrade_queue.some((row) => row.parser_target.includes('SG exact tariff-line parser')));
-    assert.ok(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN' && row.source_trust === 'official_link_estimate'));
+    assert.ok(matrix.priority_upgrade_queue.some((row) => row.parser_target.includes('MX exact tariff-line parser')));
+    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'SG'), false);
+    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN'), false);
 });
 
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {
@@ -222,7 +228,7 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
     assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
 });
 
-test('Singapore Mexico Japan Korea India and Vietnam import routes are official-link monitored', () => {
+test('Singapore and Vietnam exact candidates coexist with monitored import routes', () => {
     ['SG', 'MX', 'JP', 'KR', 'IN', 'VN'].forEach((country) => {
         const rule = (dutyRates.rules || []).find(item => (
             item.import_country === country
@@ -230,7 +236,12 @@ test('Singapore Mexico Japan Korea India and Vietnam import routes are official-
         ));
 
         assert.ok(rule, `${country} electronics rule should exist`);
-        assert.equal(rule.source_status, 'official_link_checked', `${country} should use official-link monitored status`);
+        if (['SG', 'VN'].includes(country)) {
+            assert.equal(rule.source_status, 'official_source_checked', `${country} should use maintained exact-line candidate status`);
+            assert.ok((rule.exact_code_overrides || []).some(override => override.hs_code === '854231'));
+        } else {
+            assert.equal(rule.source_status, 'official_link_checked', `${country} should use official-link monitored status`);
+        }
         assert.ok(rule.last_checked_at, `${country} should carry checked timestamp when refreshed`);
     });
 });
@@ -243,7 +254,7 @@ test('Russia sample keeps sanctions scope as a review-only flag', () => {
     assert.ok(russia.source_statuses.includes('scope_check_required'));
 });
 
-test('non-US benchmark samples stay non-official except EU TARIC candidate rows', () => {
+test('non-US benchmark samples stay non-official except official candidate rows', () => {
     const result = runDutyRateHealthCheck();
     const nonUsSamples = result.samples.filter(sample => !sample.id.startsWith('PE-US-'));
     const officialTaricSamples = result.samples.filter(sample => (
@@ -266,6 +277,8 @@ test('non-US benchmark samples stay non-official except EU TARIC candidate rows'
             sample.id.startsWith('PE-EU-')
             || sample.id.startsWith('PE-DE-')
             || sample.id.startsWith('PE-NL-')
+            || sample.id.startsWith('PE-SG-')
+            || sample.id.startsWith('PE-VN-')
         ) {
             return;
         }

@@ -228,8 +228,8 @@ test('builds direct import decision for official and benchmark rate sources', ()
         declaredDuty: 0
     });
     const sgDecision = buildImportPostEntryDecision(valueResult, sgDuty, { currency: 'USD' });
-    assert.equal(sgDecision.trust.level, 'official_link_estimate');
-    assert.match(sgDecision.coreConclusion, /Official link estimate/);
+    assert.equal(sgDecision.trust.level, 'official_duty_tax_estimate');
+    assert.match(sgDecision.coreConclusion, /Official duty \+ tax estimate/);
 
     const euDuty = calculateDutyImpact(valueResult, {
         importCountryCode: 'EU',

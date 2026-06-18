@@ -91,6 +91,7 @@ function bootstrapTradeOpportunityPage() {
     function renderMarketCard(card, index) {
         const reasons = Array.isArray(card.recommendationReasons) ? card.recommendationReasons : [];
         const evidence = Array.isArray(card.opportunityEvidence) ? card.opportunityEvidence : [];
+        const signal = card.opportunitySignal || {};
         const metricItems = [
             { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
@@ -105,6 +106,20 @@ function bootstrapTradeOpportunityPage() {
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
                 <p>${escapeHtml(card.conciseConclusion || card.opportunity)}</p>
+                <div class="opportunity-decision-card-grid">
+                    <div>
+                        <span>Opportunity Reason</span>
+                        <strong>${escapeHtml(signal.oneLine || card.tradeOpportunityThesis || card.opportunity)}</strong>
+                    </div>
+                    <div>
+                        <span>Value Lever</span>
+                        <strong>${escapeHtml(card.valueLever || 'Pending')}</strong>
+                    </div>
+                    <div>
+                        <span>Execution Gate</span>
+                        <strong>${escapeHtml(signal.action || card.executionGate || card.businessAction)}</strong>
+                    </div>
+                </div>
                 <div class="opportunity-rate-mini-grid">
                     ${metricItems.map((item) => `
                         <div>

@@ -78,18 +78,20 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.hybrid_official_candidate.includes('EU'));
     assert.ok(roadmap.hybrid_official_candidate.includes('DE'));
     assert.ok(roadmap.hybrid_official_candidate.includes('NL'));
-    assert.ok(roadmap.official_link_only.includes('SG'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('SG'));
     assert.ok(roadmap.benchmark_updatable.includes('MX'));
     assert.ok(roadmap.official_link_only.includes('MY'));
     assert.ok(roadmap.official_link_only.includes('TW'));
-    assert.ok(roadmap.official_link_only.includes('VN'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('VN'));
     assert.ok(roadmap.hybrid_official_candidate.includes('JP'));
     assert.ok(roadmap.hybrid_official_candidate.includes('KR'));
     assert.ok(roadmap.hybrid_official_candidate.includes('IN'));
     STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
         if (country === 'IN') {
             assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
-        } else if (['VN', 'MY', 'TW'].includes(country)) {
+        } else if (country === 'VN') {
+            assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
+        } else if (['MY', 'TW'].includes(country)) {
             assert.ok(roadmap.official_link_only.includes(country), `${country} should be official-link monitored`);
         } else {
             assert.ok(roadmap.benchmark_updatable.includes(country), `${country} should be benchmark-updatable`);
@@ -131,8 +133,8 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
 
     assert.equal(sg.ok, true);
     assert.equal(sg.writes_rates, true);
-    assert.equal(sg.writes_official_machine_rates, false);
-    assert.equal(sg.source_status, 'official_link');
+    assert.equal(sg.writes_official_machine_rates, true);
+    assert.equal(sg.source_status, 'hybrid_official_candidate');
     assert.ok(sg.maintained_hs_prefixes.includes('8517'));
 
     assert.equal(mx.ok, true);
@@ -164,7 +166,9 @@ test('static official-link benchmark updater covers China Vietnam Malaysia Taiwa
         assert.equal(readiness.ok, true, `${country} static benchmark readiness should be OK`);
         if (country === 'IN') {
             assert.equal(readiness.source_status, 'hybrid_official_candidate');
-        } else if (['VN', 'MY', 'TW'].includes(country)) {
+        } else if (country === 'VN') {
+            assert.equal(readiness.source_status, 'hybrid_official_candidate');
+        } else if (['MY', 'TW'].includes(country)) {
             assert.equal(readiness.source_status, 'official_link');
         } else {
             assert.equal(readiness.source_status, 'benchmark_updatable');
@@ -570,7 +574,7 @@ test('EU benchmark updater does not downgrade official or scope-checked rates', 
     assert.equal(scopeRule.source_rate_text, 'Exact TARIC code required before using an official EU duty rate.');
 });
 
-test('Singapore updater keeps GST benchmark separate from official machine rates', () => {
+test('Singapore updater keeps GST exact-line candidates separate from GST tax layer', () => {
     const rule = {
         id: 'TEST-SG',
         import_country: 'SG',
@@ -584,7 +588,9 @@ test('Singapore updater keeps GST benchmark separate from official machine rates
     const changes = applySingaporeBenchmarkToRule(rule, '2026-06-08T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'official_link_checked');
+    assert.equal(rule.source_status, 'official_source_checked');
+    assert.equal(rule.confidence, 'Official duty + tax estimate');
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '851762'));
     assert.equal(rule.add_on_layers[0].rate, 0.09);
     assert.equal(rule.additional_rate, 0.09);
 });

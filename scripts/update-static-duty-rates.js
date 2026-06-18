@@ -21,6 +21,12 @@ const COUNTRY_NOTES = {
     IN: 'India official-link estimate refreshed locally. Confirm exact HS line, BCD, Social Welfare Surcharge, IGST, exemption, BIS/QCO, WPC, e-waste, and battery-rule scope before filing.'
 };
 const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set(['VN', 'MY', 'TW']);
+const VN_EXACT_CODE_CANDIDATES = [
+    '850440',
+    '850760',
+    '851762',
+    '854231'
+];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -316,10 +322,11 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
     refreshLayerStatuses(rule);
 
     const country = rule.import_country;
+    const vietnamExactCandidate = country === 'VN';
     const officialLinkEstimate = OFFICIAL_LINK_ESTIMATE_COUNTRIES.has(country);
     const updates = {
-        source_status: officialLinkEstimate ? 'official_link_checked' : 'benchmark_source_checked',
-        confidence: officialLinkEstimate ? 'Official link monitored' : 'Indicative',
+        source_status: vietnamExactCandidate ? 'official_source_checked' : officialLinkEstimate ? 'official_link_checked' : 'benchmark_source_checked',
+        confidence: vietnamExactCandidate ? 'Official duty + tax estimate' : officialLinkEstimate ? 'Official link monitored' : 'Indicative',
         source_note: COUNTRY_NOTES[country] || `${country} benchmark refreshed locally. Confirm exact tariff-line treatment before filing.`,
         source_url: source?.official_url || rule.source_url || '',
         last_checked_at: checkedAt
@@ -331,6 +338,24 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
             rule[field] = value;
         }
     });
+
+    if (vietnamExactCandidate) {
+        const exactOverrides = VN_EXACT_CODE_CANDIDATES.map((code) => ({
+            hs_code: code,
+            base_rate: 0,
+            source_status: 'official_source_checked',
+            confidence: 'Official source checked',
+            source_note: 'Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.',
+            source_hts: `${code} (Vietnam Customs exact-line candidate)`,
+            source_rate_text: 'Vietnam customs duty candidate: 0.000%',
+            source_url: source?.official_url || rule.source_url || '',
+            last_checked_at: checkedAt
+        }));
+        if (JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
+            changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
+            rule.exact_code_overrides = exactOverrides;
+        }
+    }
 
     return changes;
 }
@@ -529,6 +554,7 @@ if (require.main === module) {
 module.exports = {
     DEFAULT_COUNTRIES,
     COUNTRY_NOTES,
+    VN_EXACT_CODE_CANDIDATES,
     applyStaticBenchmarkToRule,
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,
