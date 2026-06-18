@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-13T19:50:04.253Z",
-  "started_at": "2026-06-13T19:49:58.013Z",
-  "finished_at": "2026-06-13T19:50:04.253Z",
-  "status": "ok",
+  "updated_at": "2026-06-18T20:37:33.804Z",
+  "started_at": "2026-06-18T20:37:23.633Z",
+  "finished_at": "2026-06-18T20:37:33.804Z",
+  "status": "exceptions",
   "policy": {
     "safe_updates_auto_applied": true,
     "manual_review_required": false,
@@ -11,11 +11,11 @@
     "material_rate_change_threshold": 0.03
   },
   "counts": {
-    "sources_checked": 7,
-    "sources_auto_applied": 7,
-    "total_changes": 37,
+    "sources_checked": 8,
+    "sources_auto_applied": 8,
+    "total_changes": 38,
     "total_rate_changes": 0,
-    "exceptions": 0
+    "exceptions": 1
   },
   "auto_applied": [
     {
@@ -49,8 +49,14 @@
       "rate_change_count": 0
     },
     {
-      "source": "Korea Customs benchmark",
-      "mode": "benchmark",
+      "source": "Korea Customs official-live",
+      "mode": "official-live",
+      "change_count": 1,
+      "rate_change_count": 0
+    },
+    {
+      "source": "India Customs official-live",
+      "mode": "official-live",
       "change_count": 1,
       "rate_change_count": 0
     },
@@ -61,7 +67,20 @@
       "rate_change_count": 0
     }
   ],
-  "exceptions": [],
+  "exceptions": [
+    {
+      "source": "India Customs official-live",
+      "severity": "high",
+      "type": "source_or_parse_error",
+      "reason": "India Customs official-live duty-rate updater reported 1 error(s).",
+      "details": [
+        {
+          "country": "IN",
+          "error": "Official-live fetch failed: fetch failed"
+        }
+      ]
+    }
+  ],
   "runs": [
     {
       "source": "USITC",
@@ -96,8 +115,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -108,8 +127,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -120,8 +139,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -132,8 +151,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -144,8 +163,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -156,8 +175,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -168,8 +187,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -180,8 +199,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -192,8 +211,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -204,8 +223,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -216,8 +235,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -228,8 +247,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -240,8 +259,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -252,8 +271,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -264,8 +283,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -276,8 +295,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -288,8 +307,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -300,8 +319,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -312,8 +331,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -324,8 +343,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -336,8 +355,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -348,8 +367,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -360,8 +379,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -372,8 +391,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -384,8 +403,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -396,8 +415,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         },
@@ -408,8 +427,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.424Z",
-              "new_value": "2026-06-13T19:50:04.118Z"
+              "old_value": "2026-06-13T19:50:04.118Z",
+              "new_value": "2026-06-18T20:37:29.390Z"
             }
           ]
         }
@@ -425,7 +444,7 @@
       "rate_change_count": 0,
       "error_count": 0,
       "countries": [],
-      "writes_official_machine_rates": false,
+      "writes_official_machine_rates": true,
       "readiness": null,
       "changes": [
         {
@@ -434,8 +453,191 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.425Z",
-              "new_value": "2026-06-13T19:50:04.119Z"
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:29.392Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "847130 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "851713 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "851762 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "850440 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "850760 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "854143 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "854231 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "852852 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "847130 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "850440 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "850760 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "851713 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "851762 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "852852 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "854143 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Singapore maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; GST remains a separate import tax layer.",
+                  "source_hts": "854231 (Singapore Customs exact-line candidate)",
+                  "source_rate_text": "Singapore customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+                  "last_checked_at": "2026-06-18T20:37:29.392Z"
+                }
+              ]
             }
           ]
         }
@@ -451,7 +653,7 @@
       "rate_change_count": 0,
       "error_count": 0,
       "countries": [],
-      "writes_official_machine_rates": false,
+      "writes_official_machine_rates": true,
       "readiness": null,
       "changes": [
         {
@@ -460,8 +662,191 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.426Z",
-              "new_value": "2026-06-13T19:50:04.120Z"
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:29.393Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "847130 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851713 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851762 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850440 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850760 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854143 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854231 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "852852 (MX maintained TIGIE exact-line candidates)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "847130 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850440 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850760 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851713 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851762 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "852852 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854143 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854231 (MX maintained TIGIE exact-line candidate)",
+                  "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
+                  "source_url": "https://www.snice.gob.mx/",
+                  "last_checked_at": "2026-06-18T20:37:29.393Z"
+                }
+              ]
             }
           ]
         }
@@ -483,11 +868,195 @@
         {
           "rule": "JP-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
           "import_country": "JP",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.427Z",
-              "new_value": "2026-06-13T19:50:04.121Z"
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:29.395Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "847130 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "851713 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "851762 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "850440 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "850760 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "854143 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "854231 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "852852 (JP maintained exact-line candidates)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "847130 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "850440 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "850760 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "851713 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "851762 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "852852 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "854143 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.",
+                  "source_hts": "854231 (JP maintained exact-line candidate)",
+                  "source_rate_text": "Japan customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.jp/english/tariff/",
+                  "last_checked_at": "2026-06-18T20:37:29.395Z"
+                }
+              ]
             }
           ]
         }
@@ -495,10 +1064,10 @@
       "errors": []
     },
     {
-      "source": "Korea Customs benchmark",
+      "source": "Korea Customs official-live",
       "ok": true,
       "applied": true,
-      "mode": "benchmark",
+      "mode": "official-live",
       "change_count": 1,
       "rate_change_count": 0,
       "error_count": 0,
@@ -509,16 +1078,446 @@
         {
           "rule": "KR-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
           "import_country": "KR",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-12T20:22:38.428Z",
-              "new_value": "2026-06-13T19:50:04.122Z"
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:30.837Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "847130 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "851713 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "851762 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "850440 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "850760 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "854143 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "854231 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "852852 (KR maintained exact-line candidates)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "847130 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "850440 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "850760 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "851713 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "851762 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "852852 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "854143 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.",
+                  "source_hts": "854231 (KR maintained exact-line candidate)",
+                  "source_rate_text": "Korea customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.go.kr/english/main.do",
+                  "last_checked_at": "2026-06-18T20:37:30.837Z"
+                }
+              ]
             }
           ]
         }
       ],
       "errors": []
+    },
+    {
+      "source": "India Customs official-live",
+      "ok": false,
+      "applied": true,
+      "mode": "official-live",
+      "change_count": 1,
+      "rate_change_count": 0,
+      "error_count": 1,
+      "countries": [
+        "IN"
+      ],
+      "writes_official_machine_rates": false,
+      "readiness": {
+        "IN": {
+          "ok": true,
+          "country": "IN",
+          "source_status": "hybrid_official_candidate",
+          "official_url": "https://www.icegate.gov.in/",
+          "machine_readable": "local_exact_map",
+          "maintained_rule_count": 1,
+          "maintained_hs_prefixes": [
+            "8471",
+            "847130",
+            "8479",
+            "850440",
+            "850760",
+            "8517",
+            "8525",
+            "8528",
+            "8541",
+            "8542",
+            "8543",
+            "9018",
+            "9027"
+          ],
+          "writes_rates": true,
+          "writes_official_machine_rates": false,
+          "live_row_count": 0,
+          "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
+          "status_reason": "India maintained high-tech HS lines use exact-line BCD candidates while SWS, IGST, exemption notification, BIS/QCO, WPC, and product-control scope remain separate checks."
+        }
+      },
+      "changes": [
+        {
+          "rule": "IN-GLOBAL-ELECTRONICS-IMPORT-INDIA-EXACT-PENDING",
+          "import_country": "IN",
+          "mode": "benchmark",
+          "changes": [
+            {
+              "field": "last_checked_at",
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:33.771Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "847130 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "850440 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "850760 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "851713 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "851762 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "852852 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "854143 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "854231 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "847130 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "850440 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "850760 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "851713 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "851762 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "852852 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "854143 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+                  "source_hts": "854231 (IN maintained exact-line candidate)",
+                  "source_rate_text": "India BCD candidate: 0.000%",
+                  "source_url": "https://www.icegate.gov.in/",
+                  "last_checked_at": "2026-06-18T20:37:33.771Z"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "errors": [
+        {
+          "country": "IN",
+          "error": "Official-live fetch failed: fetch failed"
+        }
+      ]
     },
     {
       "source": "Static official-link benchmarks",
@@ -557,18 +1556,21 @@
           ],
           "writes_rates": true,
           "writes_official_machine_rates": false,
+          "live_row_count": 0,
           "next_action": "Keep benchmark updater running; map official China tariff lookup or maintained local tariff table before promoting official exact rates.",
           "status_reason": "Local benchmark exists, but official China tariff lookup is not connected to an updater yet."
         },
         "VN": {
           "ok": true,
           "country": "VN",
-          "source_status": "benchmark_updatable",
+          "source_status": "hybrid_official_candidate",
           "official_url": "https://www.customs.gov.vn/",
-          "machine_readable": false,
+          "machine_readable": "local_exact_map",
           "maintained_rule_count": 1,
           "maintained_hs_prefixes": [
+            "8471",
             "847130",
+            "8479",
             "850440",
             "850760",
             "8517",
@@ -576,22 +1578,27 @@
             "8528",
             "8541",
             "8542",
-            "8543"
+            "8543",
+            "9018",
+            "9027"
           ],
           "writes_rates": true,
           "writes_official_machine_rates": false,
-          "next_action": "Keep benchmark updater running; research downloadable Vietnam tariff/VAT source before promoting official exact rates.",
-          "status_reason": "Official customs source identified, but preferential tariff and VAT data are not wired yet."
+          "live_row_count": 0,
+          "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed.",
+          "status_reason": "Vietnam maintained high-tech HS lines use exact-line base-duty candidates while VAT and preferential-origin scope remain separate checks."
         },
         "MY": {
           "ok": true,
           "country": "MY",
-          "source_status": "benchmark_updatable",
+          "source_status": "hybrid_official_candidate",
           "official_url": "https://mysst.customs.gov.my/",
-          "machine_readable": false,
+          "machine_readable": "local_exact_map",
           "maintained_rule_count": 1,
           "maintained_hs_prefixes": [
+            "8471",
             "847130",
+            "8479",
             "850440",
             "850760",
             "8517",
@@ -599,19 +1606,22 @@
             "8528",
             "8541",
             "8542",
-            "8543"
+            "8543",
+            "9018",
+            "9027"
           ],
           "writes_rates": true,
           "writes_official_machine_rates": false,
-          "next_action": "Keep benchmark updater running; research tariff/SST list machine readability and exemptions before promoting official exact rates.",
-          "status_reason": "Official customs/SST source identified, but tariff and exemption data are not wired yet."
+          "live_row_count": 0,
+          "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed.",
+          "status_reason": "Malaysia maintained high-tech HS lines use exact-line duty candidates while SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks."
         },
         "TW": {
           "ok": true,
           "country": "TW",
-          "source_status": "benchmark_updatable",
+          "source_status": "hybrid_official_candidate",
           "official_url": "https://web.customs.gov.tw/",
-          "machine_readable": false,
+          "machine_readable": "local_exact_map",
           "maintained_rule_count": 1,
           "maintained_hs_prefixes": [
             "847130",
@@ -626,8 +1636,9 @@
           ],
           "writes_rates": true,
           "writes_official_machine_rates": false,
-          "next_action": "Keep benchmark updater running; research customs tariff lookup data export options before promoting official exact rates.",
-          "status_reason": "Official customs source identified; lower current priority than US/EU/SG/MX/JP/KR/VN/MY."
+          "live_row_count": 0,
+          "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed.",
+          "status_reason": "Taiwan maintained high-tech HS lines use exact-line duty candidates while business tax, inspection, telecom approval, and tariff-line scope remain separate checks."
         },
         "RU": {
           "ok": true,
@@ -649,6 +1660,7 @@
           ],
           "writes_rates": true,
           "writes_official_machine_rates": false,
+          "live_row_count": 0,
           "next_action": "Keep benchmark updater running and sanctions scope flag separate from ordinary duty math.",
           "status_reason": "Official source identified, but sanctions scope must stay separate from ordinary duty math."
         }
@@ -657,66 +1669,577 @@
         {
           "rule": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
           "import_country": "CN",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-13T01:51:28.921Z",
-              "new_value": "2026-06-13T19:50:04.123Z"
+              "old_value": "2026-06-13T19:50:04.123Z",
+              "new_value": "2026-06-18T20:37:33.774Z"
             }
           ]
         },
         {
           "rule": "CN-GLOBAL-847130-850440-IMPORT-INDICATIVE",
           "import_country": "CN",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-13T01:51:28.921Z",
-              "new_value": "2026-06-13T19:50:04.123Z"
+              "old_value": "2026-06-13T19:50:04.123Z",
+              "new_value": "2026-06-18T20:37:33.774Z"
             }
           ]
         },
         {
           "rule": "VN-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
           "import_country": "VN",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-13T01:51:28.921Z",
-              "new_value": "2026-06-13T19:50:04.123Z"
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:33.774Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "851762 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "850760 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "854231 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "850440 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "847130 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "850440 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "850760 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "851713 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "851762 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "852852 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "854143 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
+                  "source_hts": "854231 (Vietnam Customs exact-line candidate)",
+                  "source_rate_text": "Vietnam customs duty candidate: 0.000%",
+                  "source_url": "https://www.customs.gov.vn/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                }
+              ]
             }
           ]
         },
         {
           "rule": "MY-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
           "import_country": "MY",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-13T01:51:28.921Z",
-              "new_value": "2026-06-13T19:50:04.123Z"
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:33.774Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "847130 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851713 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851762 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850440 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850760 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854143 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854231 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "852852 (MY maintained exact-line candidates)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "847130 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850440 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "850760 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851713 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "851762 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "852852 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854143 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+                  "source_hts": "854231 (MY maintained exact-line candidate)",
+                  "source_rate_text": "Malaysia customs duty candidate: 0.000%",
+                  "source_url": "https://mysst.customs.gov.my/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                }
+              ]
             }
           ]
         },
         {
           "rule": "TW-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
           "import_country": "TW",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-13T01:51:28.921Z",
-              "new_value": "2026-06-13T19:50:04.123Z"
+              "old_value": "2026-06-18T00:00:00.000Z",
+              "new_value": "2026-06-18T20:37:33.774Z"
+            },
+            {
+              "field": "exact_code_overrides",
+              "old_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "847130 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "851713 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "851762 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "850440 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "850760 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "854143 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "854231 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "852852 (TW maintained exact-line candidates)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T00:00:00.000Z"
+                }
+              ],
+              "new_value": [
+                {
+                  "hs_code": "847130",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "847130 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "850440",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "850440 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "850760",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "850760 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "851713",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "851713 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "851762",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "851762 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "852852",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "852852 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "854143",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "854143 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                },
+                {
+                  "hs_code": "854231",
+                  "base_rate": 0,
+                  "source_status": "official_source_checked",
+                  "confidence": "Official source checked",
+                  "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
+                  "source_hts": "854231 (TW maintained exact-line candidate)",
+                  "source_rate_text": "Taiwan customs duty candidate: 0.000%",
+                  "source_url": "https://web.customs.gov.tw/",
+                  "last_checked_at": "2026-06-18T20:37:33.774Z"
+                }
+              ]
             }
           ]
         },
         {
           "rule": "RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
           "import_country": "RU",
+          "mode": "benchmark",
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-06-13T01:51:28.921Z",
-              "new_value": "2026-06-13T19:50:04.123Z"
+              "old_value": "2026-06-13T19:50:04.123Z",
+              "new_value": "2026-06-18T20:37:33.774Z"
             }
           ]
         }
@@ -726,224 +2249,170 @@
   ],
   "health": {
     "ok": true,
-    "sample_count": 29,
+    "sample_count": 38,
     "failed_sample_count": 0,
     "priority_rate_matrix": {
       "ok": true,
-      "route_count": 60,
-      "covered_route_count": 60,
+      "route_count": 80,
+      "covered_route_count": 80,
       "trust_counts": {
         "mixed_official_estimate": 5,
-        "official_duty_tax_estimate": 22,
-        "official_link_estimate": 32,
+        "official_duty_tax_estimate": 74,
         "official_heading_only": 1
       },
       "automation_counts": {
         "official_auto": 6,
-        "hybrid_official": 22,
-        "official_link_monitor": 32
+        "hybrid_official": 74
       },
-      "parser_priority_count": 38,
+      "parser_priority_count": 6,
       "priority_upgrade_queue": [
         {
-          "id": "solar-cn-jp",
+          "id": "solar-cn-us",
           "product_id": "solar",
-          "route": "CN->JP",
+          "route": "CN->US",
+          "origin_country": "CN",
+          "import_country": "US",
           "hs_code": "854143",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
+          "source_trust": "official_heading_only",
+          "automation_level": "official_auto",
+          "estimated_total_rate": 0.25,
+          "impact_score": 2500,
+          "priority": 30,
+          "priority_band": "P2",
+          "market_priority": 12,
+          "product_priority": 6,
+          "parser_target": "Exact HS / tariff-line scope resolver",
+          "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+          "why_priority": "CN->US solar remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+          "rate_change_drivers": [
+            "Exact tariff-line scope can change the final payable rate.",
+            "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+            "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
+          ],
+          "us_backlog_focus": "Resolve exact HTS 854143 line, AD/CVD case scope, origin-route evidence, and Section 301 Chapter 99/exclusion before using the rate for filing."
         },
         {
-          "id": "tablet-cn-jp",
-          "product_id": "tablet",
-          "route": "CN->JP",
-          "hs_code": "847130",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "solar-cn-kr",
-          "product_id": "solar",
-          "route": "CN->KR",
-          "hs_code": "854143",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "tablet-cn-kr",
-          "product_id": "tablet",
-          "route": "CN->KR",
-          "hs_code": "847130",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "solar-cn-mx",
-          "product_id": "solar",
-          "route": "CN->MX",
-          "hs_code": "854143",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "tablet-cn-mx",
-          "product_id": "tablet",
-          "route": "CN->MX",
-          "hs_code": "847130",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "solar-cn-sg",
-          "product_id": "solar",
-          "route": "CN->SG",
-          "hs_code": "854143",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "tablet-cn-sg",
-          "product_id": "tablet",
-          "route": "CN->SG",
-          "hs_code": "847130",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "battery-us-jp",
+          "id": "battery-cn-us",
           "product_id": "battery",
-          "route": "US->JP",
+          "route": "CN->US",
+          "origin_country": "CN",
+          "import_country": "US",
           "hs_code": "850760",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
+          "source_trust": "mixed_official_estimate",
+          "automation_level": "official_auto",
+          "estimated_total_rate": 0.109,
+          "impact_score": 1090,
+          "priority": 40,
+          "priority_band": "P3",
+          "market_priority": 12,
+          "product_priority": 4,
+          "parser_target": "Add-on duty and trade-remedy scope parser",
+          "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+          "why_priority": "CN->US battery remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+          "rate_change_drivers": [
+            "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+            "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+            "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
+          ],
+          "us_backlog_focus": "Resolve battery chemistry, capacity, exact 850760 subheading, Section 301 coverage, and any battery-specific trade-remedy scope."
         },
         {
-          "id": "ev-charger-us-jp",
-          "product_id": "ev_charger",
-          "route": "US->JP",
-          "hs_code": "850440",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "monitor-us-jp",
-          "product_id": "monitor",
-          "route": "US->JP",
-          "hs_code": "852852",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "router-us-jp",
+          "id": "router-cn-us",
           "product_id": "router",
-          "route": "US->JP",
+          "route": "CN->US",
+          "origin_country": "CN",
+          "import_country": "US",
           "hs_code": "851762",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
+          "source_trust": "mixed_official_estimate",
+          "automation_level": "official_auto",
+          "estimated_total_rate": 0.075,
+          "impact_score": 750,
+          "priority": 40,
+          "priority_band": "P3",
+          "market_priority": 12,
+          "product_priority": 2,
+          "parser_target": "Add-on duty and trade-remedy scope parser",
+          "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+          "why_priority": "CN->US router remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+          "rate_change_drivers": [
+            "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+            "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+            "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+          ],
+          "us_backlog_focus": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
         },
         {
-          "id": "semiconductor-us-jp",
-          "product_id": "semiconductor",
-          "route": "US->JP",
-          "hs_code": "854231",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "smartphone-us-jp",
+          "id": "smartphone-cn-us",
           "product_id": "smartphone",
-          "route": "US->JP",
+          "route": "CN->US",
+          "origin_country": "CN",
+          "import_country": "US",
           "hs_code": "851713",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
+          "source_trust": "mixed_official_estimate",
+          "automation_level": "official_auto",
+          "estimated_total_rate": 0.075,
+          "impact_score": 750,
+          "priority": 40,
+          "priority_band": "P3",
+          "market_priority": 12,
+          "product_priority": 3,
+          "parser_target": "Add-on duty and trade-remedy scope parser",
+          "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+          "why_priority": "CN->US smartphone remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+          "rate_change_drivers": [
+            "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+            "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+            "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+          ],
+          "us_backlog_focus": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
         },
         {
-          "id": "battery-us-kr",
-          "product_id": "battery",
-          "route": "US->KR",
-          "hs_code": "850760",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "ev-charger-us-kr",
+          "id": "ev-charger-cn-us",
           "product_id": "ev_charger",
-          "route": "US->KR",
+          "route": "CN->US",
+          "origin_country": "CN",
+          "import_country": "US",
           "hs_code": "850440",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
+          "source_trust": "mixed_official_estimate",
+          "automation_level": "official_auto",
+          "estimated_total_rate": 0.075,
+          "impact_score": 750,
+          "priority": 40,
+          "priority_band": "P3",
+          "market_priority": 12,
+          "product_priority": 5,
+          "parser_target": "Add-on duty and trade-remedy scope parser",
+          "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+          "why_priority": "CN->US ev_charger remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+          "rate_change_drivers": [
+            "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+            "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
+          ],
+          "us_backlog_focus": "Resolve exact power-conversion subheading, EV-charger function scope, origin evidence, and Section 301 add-on duty treatment."
         },
         {
-          "id": "monitor-us-kr",
-          "product_id": "monitor",
-          "route": "US->KR",
-          "hs_code": "852852",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "router-us-kr",
-          "product_id": "router",
-          "route": "US->KR",
-          "hs_code": "851762",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "semiconductor-us-kr",
-          "product_id": "semiconductor",
-          "route": "US->KR",
-          "hs_code": "854231",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
-        },
-        {
-          "id": "smartphone-us-kr",
-          "product_id": "smartphone",
-          "route": "US->KR",
-          "hs_code": "851713",
-          "source_trust": "official_link_estimate",
-          "automation_level": "official_link_monitor",
-          "priority": 2,
-          "next_action": "Connect exact machine-readable tariff-line parser for this official source."
+          "id": "tablet-cn-us",
+          "product_id": "tablet",
+          "route": "CN->US",
+          "origin_country": "CN",
+          "import_country": "US",
+          "hs_code": "847130",
+          "source_trust": "mixed_official_estimate",
+          "automation_level": "official_auto",
+          "estimated_total_rate": 0.075,
+          "impact_score": 750,
+          "priority": 40,
+          "priority_band": "P3",
+          "market_priority": 12,
+          "product_priority": 7,
+          "parser_target": "Add-on duty and trade-remedy scope parser",
+          "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+          "why_priority": "CN->US tablet remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+          "rate_change_drivers": [
+            "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+            "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
+          ],
+          "us_backlog_focus": "Resolve exact portable ADP/tablet classification, origin evidence, and Section 301 add-on duty or exclusion status."
         }
       ],
       "failures": []
