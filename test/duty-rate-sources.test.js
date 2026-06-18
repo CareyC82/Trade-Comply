@@ -79,7 +79,7 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.hybrid_official_candidate.includes('DE'));
     assert.ok(roadmap.hybrid_official_candidate.includes('NL'));
     assert.ok(roadmap.hybrid_official_candidate.includes('SG'));
-    assert.ok(roadmap.benchmark_updatable.includes('MX'));
+    assert.ok(roadmap.hybrid_official_candidate.includes('MX'));
     assert.ok(roadmap.official_link_only.includes('MY'));
     assert.ok(roadmap.official_link_only.includes('TW'));
     assert.ok(roadmap.hybrid_official_candidate.includes('VN'));
@@ -139,8 +139,8 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
 
     assert.equal(mx.ok, true);
     assert.equal(mx.writes_rates, true);
-    assert.equal(mx.writes_official_machine_rates, false);
-    assert.equal(mx.source_status, 'benchmark_updatable');
+    assert.equal(mx.writes_official_machine_rates, true);
+    assert.equal(mx.source_status, 'hybrid_official_candidate');
     assert.ok(mx.maintained_hs_prefixes.includes('847130'));
 
     assert.equal(jp.ok, true);
@@ -595,7 +595,7 @@ test('Singapore updater keeps GST exact-line candidates separate from GST tax la
     assert.equal(rule.additional_rate, 0.09);
 });
 
-test('Mexico updater keeps VAT benchmark separate from official machine rates', () => {
+test('Mexico updater keeps exact candidates separate from VAT layer', () => {
     const rule = {
         id: 'TEST-MX',
         import_country: 'MX',
@@ -609,12 +609,14 @@ test('Mexico updater keeps VAT benchmark separate from official machine rates', 
     const changes = applyMexicoBenchmarkToRule(rule, '2026-06-09T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'official_link_checked');
+    assert.equal(rule.source_status, 'official_source_checked');
+    assert.equal(rule.confidence, 'Official duty + tax estimate');
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
     assert.equal(rule.add_on_layers[0].rate, 0.16);
     assert.equal(rule.additional_rate, 0.16);
 });
 
-test('Japan updater keeps consumption tax benchmark separate from official machine rates', () => {
+test('Japan updater keeps exact candidates separate from consumption tax layer', () => {
     const rule = {
         id: 'TEST-JP',
         import_country: 'JP',
@@ -628,7 +630,9 @@ test('Japan updater keeps consumption tax benchmark separate from official machi
     const changes = applyJapanBenchmarkToRule(rule, '2026-06-10T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'official_link_checked');
+    assert.equal(rule.source_status, 'official_source_checked');
+    assert.equal(rule.confidence, 'Official duty + tax estimate');
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
 });
@@ -698,7 +702,7 @@ test('Japan official candidate keeps mixed-rate prefixes exact-code gated', () =
     assert.equal(candidate.source_status, 'scope_check_required');
 });
 
-test('Korea updater keeps VAT benchmark separate from official machine rates', () => {
+test('Korea updater keeps exact candidates separate from VAT layer', () => {
     const rule = {
         id: 'TEST-KR',
         import_country: 'KR',
@@ -712,7 +716,9 @@ test('Korea updater keeps VAT benchmark separate from official machine rates', (
     const changes = applyKoreaBenchmarkToRule(rule, '2026-06-10T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'official_link_checked');
+    assert.equal(rule.source_status, 'official_source_checked');
+    assert.equal(rule.confidence, 'Official duty + tax estimate');
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
 });

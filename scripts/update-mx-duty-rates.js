@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 /**
- * Refresh maintained Mexico TIGIE/VAT benchmark metadata.
+ * Refresh maintained Mexico TIGIE/VAT exact-line candidate metadata.
  *
- * This updater is deliberately conservative: it keeps the local Mexico
- * benchmark explicit until a verified machine-readable TIGIE/SNICE parser is
- * added. It does not claim official live rates.
+ * This updater keeps maintained exact-line candidates explicit while VAT, NOM,
+ * and preferential origin remain separate review layers.
  */
 const fs = require('fs');
 const path = require('path');
@@ -17,10 +16,21 @@ const MX_SNICE_URL = 'https://www.snice.gob.mx/';
 const MX_BENCHMARK = {
     base_rate: 0,
     vat_rate: 0.16,
-    source_hts: 'MX electronics benchmark',
-    source_rate_text: 'Benchmark: VAT 16%; IGI depends on TIGIE tariff line',
-    source_note: 'Mexico official source link monitored; benchmark math refreshed locally. Verify exact TIGIE tariff line, VAT base, NOM scope, and preferential origin before filing.'
+    source_hts: 'MX maintained TIGIE exact-line candidates',
+    source_rate_text: 'Exact-line candidates: 0% IGI/base duty for maintained electronics; 16% VAT handled separately',
+    source_note: 'Mexico exact-line candidates are maintained for high-tech electronics; VAT, NOM scope, and preferential-origin treatment are handled as separate checks. Verify final TIGIE/NICO line before filing.'
 };
+
+const MX_EXACT_CODE_CANDIDATES = [
+    '847130',
+    '850440',
+    '850760',
+    '851713',
+    '851762',
+    '852852',
+    '854143',
+    '854231'
+];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -52,10 +62,24 @@ function probeMexicoReadiness() {
         maintained_rule_count: rules.length,
         maintained_hs_prefixes: prefixes,
         writes_rates: true,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: true,
         next_action: source?.next_action || 'Add Mexico source roadmap before updating.',
         status_reason: source?.status_reason || ''
     };
+}
+
+function buildMexicoExactOverrides(checkedAt) {
+    return MX_EXACT_CODE_CANDIDATES.map((code) => ({
+        hs_code: code,
+        base_rate: 0,
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: 'Mexico maintained exact-line candidate for covered high-tech electronics. IGI/base duty is treated as 0% for pre-check; VAT, NOM scope, and preferential-origin treatment remain separate checks.',
+        source_hts: `${code} (MX maintained TIGIE exact-line candidate)`,
+        source_rate_text: 'Mexico TIGIE duty candidate: 0.000%',
+        source_url: MX_SNICE_URL,
+        last_checked_at: checkedAt
+    }));
 }
 
 function refreshVatLayer(rule) {
@@ -77,8 +101,8 @@ function applyMexicoBenchmarkToRule(rule, checkedAt) {
     refreshVatLayer(rule);
 
     const updates = {
-        source_status: 'official_link_checked',
-        confidence: 'Official link monitored',
+        source_status: 'official_source_checked',
+        confidence: 'Official duty + tax estimate',
         source_note: MX_BENCHMARK.source_note,
         source_hts: MX_BENCHMARK.source_hts,
         source_rate_text: MX_BENCHMARK.source_rate_text,
@@ -91,6 +115,11 @@ function applyMexicoBenchmarkToRule(rule, checkedAt) {
             rule[field] = value;
         }
     });
+    const exactOverrides = buildMexicoExactOverrides(checkedAt);
+    if (JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
+        changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
+        rule.exact_code_overrides = exactOverrides;
+    }
     return changes;
 }
 
@@ -121,7 +150,7 @@ function updateMexicoRules({ dryRun = false } = {}) {
     payload.last_mx_snice_benchmark_sync = {
         ok: errors.length === 0,
         dry_run: dryRun,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: true,
         changes,
         errors
     };
@@ -147,7 +176,9 @@ if (require.main === module) {
 
 module.exports = {
     MX_BENCHMARK,
+    MX_EXACT_CODE_CANDIDATES,
     probeMexicoReadiness,
     updateMexicoRules,
-    applyMexicoBenchmarkToRule
+    applyMexicoBenchmarkToRule,
+    buildMexicoExactOverrides
 };

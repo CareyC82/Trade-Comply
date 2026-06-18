@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Refresh maintained Japan tariff / consumption-tax benchmark metadata.
+ * Refresh maintained Japan tariff / consumption-tax exact-line candidate metadata.
  *
- * This keeps Japan Post-Entry duty math source-checked without claiming live
- * official machine-rate parsing. Exact tariff lines still require Japan
- * Customs confirmation before filing.
+ * This keeps maintained exact-line candidates explicit while consumption tax
+ * remains a separate layer. Live official parser rows can still override this
+ * when an unambiguous chapter/rate candidate is available.
  */
 const fs = require('fs');
 const path = require('path');
@@ -18,10 +18,21 @@ const REQUEST_TIMEOUT_MS = 15000;
 const JP_BENCHMARK = {
     base_rate: 0,
     consumption_tax_rate: 0.1,
-    source_hts: 'JP electronics benchmark',
-    source_rate_text: 'Benchmark: 0% duty for many electronics + 10% consumption tax',
-    source_note: 'Japan official source link monitored; benchmark math refreshed locally. Verify exact tariff line, consumption tax basis, and product approval scope before filing.'
+    source_hts: 'JP maintained exact-line candidates',
+    source_rate_text: 'Exact-line candidates: 0% customs duty for maintained electronics; 10% consumption tax handled separately',
+    source_note: 'Japan exact-line candidates are maintained for high-tech electronics; consumption tax and product approval scope are handled as separate checks. Verify final Japan statistical code before filing.'
 };
+
+const JP_EXACT_CODE_CANDIDATES = [
+    '847130',
+    '850440',
+    '850760',
+    '851713',
+    '851762',
+    '852852',
+    '854143',
+    '854231'
+];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -352,6 +363,20 @@ function refreshConsumptionTaxLayer(rule) {
     rule.additional_rate = layers.reduce((sum, layer) => sum + Number(layer.rate || 0), 0);
 }
 
+function buildJapanExactOverrides(checkedAt) {
+    return JP_EXACT_CODE_CANDIDATES.map((code) => ({
+        hs_code: code,
+        base_rate: 0,
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: 'Japan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; consumption tax remains a separate import tax layer.',
+        source_hts: `${code} (JP maintained exact-line candidate)`,
+        source_rate_text: 'Japan customs duty candidate: 0.000%',
+        source_url: JP_CUSTOMS_URL,
+        last_checked_at: checkedAt
+    }));
+}
+
 function applyJapanBenchmarkToRule(rule, checkedAt) {
     const changes = [];
     if (Number(rule.base_rate) !== JP_BENCHMARK.base_rate) {
@@ -361,8 +386,8 @@ function applyJapanBenchmarkToRule(rule, checkedAt) {
     refreshConsumptionTaxLayer(rule);
 
     const updates = {
-        source_status: 'official_link_checked',
-        confidence: 'Official link monitored',
+        source_status: 'official_source_checked',
+        confidence: 'Official duty + tax estimate',
         source_note: JP_BENCHMARK.source_note,
         source_hts: JP_BENCHMARK.source_hts,
         source_rate_text: JP_BENCHMARK.source_rate_text,
@@ -375,6 +400,11 @@ function applyJapanBenchmarkToRule(rule, checkedAt) {
             rule[field] = value;
         }
     });
+    const exactOverrides = buildJapanExactOverrides(checkedAt);
+    if (JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
+        changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
+        rule.exact_code_overrides = exactOverrides;
+    }
     return changes;
 }
 
@@ -492,6 +522,7 @@ if (require.main === module) {
 module.exports = {
     JP_BENCHMARK,
     JP_CUSTOMS_URL,
+    JP_EXACT_CODE_CANDIDATES,
     parseJapanTariffScheduleHtml,
     parseJapanScheduleChapterLinks,
     parseJapanTariffChapterRows,
@@ -501,6 +532,7 @@ module.exports = {
     probeJapanOfficialSource,
     probeJapanReadiness,
     updateJapanRules,
+    buildJapanExactOverrides,
     applyJapanBenchmarkToRule,
     applyJapanOfficialCandidateToRule
 };

@@ -68,7 +68,7 @@ describe('trade opportunity insights', () => {
             priorityMatrix
         });
         const singapore = model.routeComparison.find((row) => row.market === 'SG');
-        const india = model.routeComparison.find((row) => row.market === 'IN');
+        const mexico = model.routeComparison.find((row) => row.market === 'MX');
         const eu = model.routeComparison.find((row) => row.market === 'EU');
 
         assert.ok(singapore, 'Singapore should be included in route comparison');
@@ -77,11 +77,12 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.parserPriority, 'P1 tax-layer refresh');
         assert.equal(singapore.parserPriorityRank, 1);
         assert.match(singapore.parserNextAction, /tax layer/i);
-        assert.ok(singapore.recommendationReasons.some((reason) => /Stronger rate confidence/i.test(reason.label)));
-        assert.ok(india, 'India should be included in route comparison');
-        assert.equal(india.sourceTrust, 'official_heading_only');
-        assert.equal(india.coverageLabel, 'Official heading only');
-        assert.match(india.watchpoint, /BCD|IGST|WPC/i);
+        assert.ok(singapore.recommendationReasons.some((reason) => /Execution confidence/i.test(reason.label)));
+        assert.ok(singapore.recommendationReasons.some((reason) => /market demand/i.test(reason.label)));
+        assert.ok(mexico, 'Mexico should be included in route comparison after exact candidate upgrade');
+        assert.equal(mexico.sourceTrust, 'official_duty_tax_estimate');
+        assert.equal(mexico.coverageLabel, 'Official duty + tax estimate');
+        assert.match(mexico.watchpoint, /NOM|VAT|origin/i);
         assert.ok(eu, 'EU should be included in route comparison');
         assert.match(eu.coverageLabel, /Official duty|Hybrid official/i);
         assert.equal(eu.dutyBreakdown.baseDuty, '0.0%');

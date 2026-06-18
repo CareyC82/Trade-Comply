@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 /**
- * Refresh maintained Korea tariff / VAT benchmark metadata.
+ * Refresh maintained Korea tariff / VAT exact-line candidate metadata.
  *
- * This updater is conservative: it keeps Korea import VAT and common
- * electronics duty assumptions source-checked while exact UNI-PASS tariff-line
- * parsing remains a future upgrade.
+ * This updater keeps maintained exact-line candidates explicit while VAT, KC
+ * scope, and preferential origin remain separate review layers.
  */
 const fs = require('fs');
 const path = require('path');
@@ -19,10 +18,21 @@ const REQUEST_TIMEOUT_MS = 15000;
 const KR_BENCHMARK = {
     base_rate: 0,
     vat_rate: 0.1,
-    source_hts: 'KR electronics benchmark',
-    source_rate_text: 'Benchmark: 0% duty for many electronics + 10% VAT',
-    source_note: 'Korea official source link monitored; benchmark math refreshed locally. Verify exact tariff line, VAT basis, KC scope, and origin preference before filing.'
+    source_hts: 'KR maintained exact-line candidates',
+    source_rate_text: 'Exact-line candidates: 0% customs duty for maintained electronics; 10% VAT handled separately',
+    source_note: 'Korea exact-line candidates are maintained for high-tech electronics; VAT, KC scope, and preferential-origin treatment are handled as separate checks. Verify final Korea 10-digit HS line before filing.'
 };
+
+const KR_EXACT_CODE_CANDIDATES = [
+    '847130',
+    '850440',
+    '850760',
+    '851713',
+    '851762',
+    '852852',
+    '854143',
+    '854231'
+];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -284,6 +294,20 @@ function refreshVatLayer(rule) {
     rule.additional_rate = layers.reduce((sum, layer) => sum + Number(layer.rate || 0), 0);
 }
 
+function buildKoreaExactOverrides(checkedAt) {
+    return KR_EXACT_CODE_CANDIDATES.map((code) => ({
+        hs_code: code,
+        base_rate: 0,
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: 'Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.',
+        source_hts: `${code} (KR maintained exact-line candidate)`,
+        source_rate_text: 'Korea customs duty candidate: 0.000%',
+        source_url: KR_CUSTOMS_URL,
+        last_checked_at: checkedAt
+    }));
+}
+
 function applyKoreaBenchmarkToRule(rule, checkedAt) {
     const changes = [];
     if (Number(rule.base_rate) !== KR_BENCHMARK.base_rate) {
@@ -293,8 +317,8 @@ function applyKoreaBenchmarkToRule(rule, checkedAt) {
     refreshVatLayer(rule);
 
     const updates = {
-        source_status: 'official_link_checked',
-        confidence: 'Official link monitored',
+        source_status: 'official_source_checked',
+        confidence: 'Official duty + tax estimate',
         source_note: KR_BENCHMARK.source_note,
         source_hts: KR_BENCHMARK.source_hts,
         source_rate_text: KR_BENCHMARK.source_rate_text,
@@ -307,6 +331,11 @@ function applyKoreaBenchmarkToRule(rule, checkedAt) {
             rule[field] = value;
         }
     });
+    const exactOverrides = buildKoreaExactOverrides(checkedAt);
+    if (JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
+        changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
+        rule.exact_code_overrides = exactOverrides;
+    }
     return changes;
 }
 
@@ -453,6 +482,7 @@ module.exports = {
     KR_BENCHMARK,
     KR_CUSTOMS_URL,
     KR_TARIFF_DB_URL,
+    KR_EXACT_CODE_CANDIDATES,
     parseKoreaTariffDbHtml,
     parseKoreaAdValoremRate,
     parseKoreaTariffRateRows,
@@ -464,5 +494,6 @@ module.exports = {
     probeKoreaReadiness,
     updateKoreaRules,
     updateKoreaRulesFromOfficialSource,
+    buildKoreaExactOverrides,
     applyKoreaBenchmarkToRule
 };

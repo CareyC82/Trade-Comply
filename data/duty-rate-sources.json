@@ -85,15 +85,15 @@
       "name": "Mexico tariff / VAT",
       "authority": "SNICE / Mexico customs framework",
       "official_url": "https://www.snice.gob.mx/",
-      "machine_readable": false,
-      "source_status": "benchmark_updatable",
+      "machine_readable": "local_exact_map",
+      "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Official source identified. Local benchmark metadata can refresh automatically while exact TIGIE extraction remains pending.",
+      "status_reason": "Mexico maintained high-tech HS lines use exact-line TIGIE candidates while VAT, NOM scope, and preferential-origin treatment remain separate checks.",
       "updater_script": "scripts/update-mx-duty-rates.js",
       "update_command": "npm run update:duty-rates:mx",
       "last_sync_field": "last_mx_snice_benchmark_sync_at",
-      "current_scope": "Benchmark VAT plus TIGIE tariff-line review reminder.",
-      "next_action": "Keep benchmark updater running; research machine-readable TIGIE source before official automatic rates."
+      "current_scope": "Maintained Mexico exact-line IGI/base-duty candidates plus 16% VAT and NOM/origin review reminders.",
+      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed."
     },
     {
       "country": "JP",
@@ -103,13 +103,13 @@
       "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Japan Customs dated tariff schedule and chapter pages are parseable into official candidates; unambiguous maintained prefixes can be promoted while ambiguous prefixes stay exact-code gated.",
+      "status_reason": "Japan Customs dated tariff schedule and chapter pages are parseable; maintained high-tech HS lines now carry exact-line candidates while consumption tax remains separate.",
       "updater_script": "scripts/update-jp-duty-rates.js",
       "update_command": "npm run update:duty-rates:jp",
       "probe_command": "npm run probe:duty-rates:jp",
       "last_sync_field": "last_jp_customs_benchmark_sync_at",
-      "current_scope": "Hybrid official candidate: Japan Customs chapter rows can be parsed into official candidates; consumption tax remains a separate benchmark layer.",
-      "next_action": "Promote only unambiguous Japan official candidates; keep exact statistical-code scope checks for mixed-rate prefixes."
+      "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
+      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes."
     },
     {
       "country": "KR",
@@ -119,13 +119,13 @@
       "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Korea Customs tariff inquiry source is identified and monitored; the next blocker is exact 10-digit HS result parsing before official automatic rates.",
+      "status_reason": "Korea Customs tariff inquiry source is identified; maintained high-tech HS lines now carry exact-line candidates while VAT and KC/origin scope remain separate.",
       "updater_script": "scripts/update-kr-duty-rates.js",
       "update_command": "npm run update:duty-rates:kr:official",
       "probe_command": "npm run probe:duty-rates:kr",
       "last_sync_field": "last_kr_customs_benchmark_sync_at",
-      "current_scope": "Hybrid official candidate: official tariff lookup availability is monitored; VAT remains a benchmark layer until exact 10-digit HS parsing is connected.",
-      "next_action": "Run the KCS official updater in dry-run; promote only parsed rows with one official base-duty answer."
+      "current_scope": "Maintained Korea exact-line base-duty candidates plus 10% VAT and KC/origin review reminders.",
+      "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows."
     },
     {
       "country": "IN",
