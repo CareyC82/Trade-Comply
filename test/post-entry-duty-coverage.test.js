@@ -127,20 +127,20 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
         assert.ok(matrix.import_markets.includes(country), `${country} should be in high-frequency rate matrix`);
     });
     assert.ok(matrix.official_or_hybrid_count > 50, 'official/hybrid/link-monitored coverage should cover the full high-frequency matrix');
-    assert.equal(matrix.benchmark_count, 4, 'Vietnam priority routes should remain explicit benchmark rows until official parser work is complete');
+    assert.equal(matrix.benchmark_count, 0, 'priority routes should no longer rely on benchmark-only rows');
     assert.equal(matrix.automation_counts.official_auto > 0, true);
     assert.equal(matrix.automation_counts.hybrid_official > 0, true);
     assert.equal(matrix.automation_counts.official_link_monitor > 0, true);
-    assert.equal(matrix.automation_counts.benchmark_auto, 4);
-    assert.equal(matrix.trust_counts.official_link_estimate, 40);
-    assert.equal(matrix.trust_counts.precheck_estimate, 4);
+    assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
+    assert.equal(matrix.trust_counts.official_link_estimate, 44);
+    assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
     assert.ok(matrix.trust_counts.official_heading_only >= 8);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.priority_band), 'upgrade queue should show business priority band');
     assert.ok(matrix.priority_upgrade_queue.some((row) => row.parser_target.includes('SG exact tariff-line parser')));
-    assert.ok(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN' && row.source_trust === 'precheck_estimate'));
+    assert.ok(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN' && row.source_trust === 'official_link_estimate'));
 });
 
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {
@@ -222,8 +222,8 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
     assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
 });
 
-test('Singapore Mexico Japan Korea and India import routes are official-link monitored', () => {
-    ['SG', 'MX', 'JP', 'KR', 'IN'].forEach((country) => {
+test('Singapore Mexico Japan Korea India and Vietnam import routes are official-link monitored', () => {
+    ['SG', 'MX', 'JP', 'KR', 'IN', 'VN'].forEach((country) => {
         const rule = (dutyRates.rules || []).find(item => (
             item.import_country === country
             && (item.hs_prefixes || []).includes('8542')

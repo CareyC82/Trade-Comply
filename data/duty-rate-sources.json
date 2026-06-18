@@ -164,14 +164,14 @@
       "authority": "Vietnam Customs",
       "official_url": "https://www.customs.gov.vn/",
       "machine_readable": false,
-      "source_status": "benchmark_updatable",
+      "source_status": "official_link",
       "maintenance_priority": "P2",
-      "status_reason": "Official customs source identified, but preferential tariff and VAT data are not wired yet.",
+      "status_reason": "Vietnam official customs source is monitored; exact preferential tariff and VAT parser is not wired yet.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=VN",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Benchmark VAT/duty status for electronics; preferential tariffs depend on origin and entry date.",
-      "next_action": "Keep benchmark updater running; research downloadable Vietnam tariff/VAT source before promoting official exact rates."
+      "current_scope": "Official-link monitored VAT/duty status for electronics; preferential tariffs depend on origin and entry date.",
+      "next_action": "Keep official-link updater running; research downloadable Vietnam tariff/VAT source before promoting official exact rates."
     },
     {
       "country": "MY",

@@ -44,6 +44,7 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => row.recommendationReasons.length <= 3));
         assert.ok(model.routeComparison.every((row) => row.conciseConclusion));
         assert.ok(model.routeComparison.every((row) => row.tradeOpportunityThesis && row.valueLever && row.executionGate));
+        assert.ok(model.routeComparison.every((row) => row.opportunitySignal?.oneLine && row.opportunitySignal?.action));
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.opportunityEvidence) && row.opportunityEvidence.length === 3));
         assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Demand driver')));
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
@@ -54,6 +55,7 @@ describe('trade opportunity insights', () => {
         assert.ok(model.insights.some((item) => item.type === 'Commercial action'));
         assert.ok(model.insights.some((item) => item.type === 'Trade opportunity'));
         assert.ok(model.insights.some((item) => item.type === 'Coverage backlog'));
+        assert.ok(model.insights.find((item) => item.type === 'Best route').text.length < 180);
     });
 
     it('connects route recommendations to source trust and parser priority', () => {
@@ -181,6 +183,7 @@ describe('trade opportunity insights', () => {
         assert.ok(pendingRows.every((row) => row.tag === 'Data pending'));
         assert.ok(pendingRows.every((row) => row.recommendationGate === 'compare_later_data_pending'));
         assert.ok(pendingRows.every((row) => row.score <= 55));
+        assert.ok(pendingRows.every((row) => /Compare later/i.test(row.opportunitySignal.action)));
     });
 });
 
