@@ -78,14 +78,18 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.hybrid_official_candidate.includes('EU'));
     assert.ok(roadmap.hybrid_official_candidate.includes('DE'));
     assert.ok(roadmap.hybrid_official_candidate.includes('NL'));
-    assert.ok(roadmap.benchmark_updatable.includes('SG'));
+    assert.ok(roadmap.official_link_only.includes('SG'));
     assert.ok(roadmap.benchmark_updatable.includes('MX'));
+    assert.ok(roadmap.official_link_only.includes('MY'));
+    assert.ok(roadmap.official_link_only.includes('TW'));
     assert.ok(roadmap.hybrid_official_candidate.includes('JP'));
     assert.ok(roadmap.hybrid_official_candidate.includes('KR'));
     assert.ok(roadmap.hybrid_official_candidate.includes('IN'));
     STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
         if (country === 'IN') {
             assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
+        } else if (['MY', 'TW'].includes(country)) {
+            assert.ok(roadmap.official_link_only.includes(country), `${country} should be official-link monitored`);
         } else {
             assert.ok(roadmap.benchmark_updatable.includes(country), `${country} should be benchmark-updatable`);
         }
@@ -127,7 +131,7 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
     assert.equal(sg.ok, true);
     assert.equal(sg.writes_rates, true);
     assert.equal(sg.writes_official_machine_rates, false);
-    assert.equal(sg.source_status, 'benchmark_updatable');
+    assert.equal(sg.source_status, 'official_link');
     assert.ok(sg.maintained_hs_prefixes.includes('8517'));
 
     assert.equal(mx.ok, true);
@@ -159,6 +163,8 @@ test('static official-link benchmark updater covers China Vietnam Malaysia Taiwa
         assert.equal(readiness.ok, true, `${country} static benchmark readiness should be OK`);
         if (country === 'IN') {
             assert.equal(readiness.source_status, 'hybrid_official_candidate');
+        } else if (['MY', 'TW'].includes(country)) {
+            assert.equal(readiness.source_status, 'official_link');
         } else {
             assert.equal(readiness.source_status, 'benchmark_updatable');
         }

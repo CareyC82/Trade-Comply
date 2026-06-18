@@ -15,11 +15,12 @@ const REQUEST_TIMEOUT_MS = 15000;
 const COUNTRY_NOTES = {
     CN: 'China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.',
     VN: 'Vietnam benchmark refreshed locally. Confirm exact tariff line, VAT basis, preferential origin, and MIC/MOIT product triggers before filing.',
-    MY: 'Malaysia benchmark refreshed locally. Confirm exact tariff line, SST/duty exemption, and SIRIM/MCMC/ST approval scope before filing.',
-    TW: 'Taiwan benchmark refreshed locally. Confirm exact customs duty, business tax basis, and tariff-line treatment before filing.',
+    MY: 'Malaysia official customs/SST source link is monitored. Confirm exact tariff line, SST/duty exemption, and SIRIM/MCMC/ST approval scope before filing.',
+    TW: 'Taiwan official customs source link is monitored. Confirm exact customs duty, business tax basis, and tariff-line treatment before filing.',
     RU: 'Russia/EAEU benchmark refreshed locally. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing.',
     IN: 'India official-link estimate refreshed locally. Confirm exact HS line, BCD, Social Welfare Surcharge, IGST, exemption, BIS/QCO, WPC, e-waste, and battery-rule scope before filing.'
 };
+const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set(['MY', 'TW']);
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -315,9 +316,10 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
     refreshLayerStatuses(rule);
 
     const country = rule.import_country;
+    const officialLinkEstimate = OFFICIAL_LINK_ESTIMATE_COUNTRIES.has(country);
     const updates = {
-        source_status: 'benchmark_source_checked',
-        confidence: 'Indicative',
+        source_status: officialLinkEstimate ? 'official_link_checked' : 'benchmark_source_checked',
+        confidence: officialLinkEstimate ? 'Official link monitored' : 'Indicative',
         source_note: COUNTRY_NOTES[country] || `${country} benchmark refreshed locally. Confirm exact tariff-line treatment before filing.`,
         source_url: source?.official_url || rule.source_url || '',
         last_checked_at: checkedAt

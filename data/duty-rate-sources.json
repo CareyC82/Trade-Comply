@@ -71,7 +71,7 @@
       "authority": "Singapore Customs",
       "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
       "machine_readable": "candidate",
-      "source_status": "benchmark_updatable",
+      "source_status": "official_link",
       "maintenance_priority": "P1",
       "status_reason": "Singapore import duty treatment for covered electronics is maintained as duty-free benchmark plus GST; official source is not parsed as machine tariff data yet.",
       "updater_script": "scripts/update-sg-duty-rates.js",
@@ -179,14 +179,14 @@
       "authority": "Royal Malaysian Customs Department",
       "official_url": "https://mysst.customs.gov.my/",
       "machine_readable": false,
-      "source_status": "benchmark_updatable",
+      "source_status": "official_link",
       "maintenance_priority": "P2",
-      "status_reason": "Official customs/SST source identified, but tariff and exemption data are not wired yet.",
+      "status_reason": "Official customs/SST source is monitored; exact tariff and exemption parser is not wired yet.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=MY",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Benchmark SST/duty status for electronics.",
-      "next_action": "Keep benchmark updater running; research tariff/SST list machine readability and exemptions before promoting official exact rates."
+      "current_scope": "Official-link monitored SST/duty status for electronics.",
+      "next_action": "Keep official-link updater running; research tariff/SST list machine readability and exemptions before promoting official exact rates."
     },
     {
       "country": "TW",
@@ -194,14 +194,14 @@
       "authority": "Customs Administration, Ministry of Finance",
       "official_url": "https://web.customs.gov.tw/",
       "machine_readable": false,
-      "source_status": "benchmark_updatable",
+      "source_status": "official_link",
       "maintenance_priority": "P3",
-      "status_reason": "Official customs source identified; lower current priority than US/EU/SG/MX/JP/KR/VN/MY.",
+      "status_reason": "Official customs source is monitored; exact tariff lookup parser is not wired yet.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=TW",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Benchmark business tax and tariff-line reminder.",
-      "next_action": "Keep benchmark updater running; research customs tariff lookup data export options before promoting official exact rates."
+      "current_scope": "Official-link monitored business tax and tariff-line reminder.",
+      "next_action": "Keep official-link updater running; research customs tariff lookup data export options before promoting official exact rates."
     },
     {
       "country": "RU",

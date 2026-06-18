@@ -139,6 +139,49 @@ describe('trade opportunity insights', () => {
             assert.ok(firstOfficialIndex < firstBenchmarkIndex);
         }
     });
+
+    it('gates routes without official or hybrid coverage as data pending', () => {
+        const benchmarkDutyRates = {
+            rules: [{
+                import_country: 'VN',
+                origin_country: '*',
+                hs_prefixes: ['850760'],
+                base_rate: 0,
+                additional_rate: 0.1,
+                source_status: 'benchmark_source_checked',
+                confidence: 'Indicative',
+                source_rate_text: 'Benchmark only'
+            }]
+        };
+        const benchmarkPriorityMatrix = {
+            routes: [{
+                id: 'battery-global-vn',
+                product_id: 'battery',
+                origin_country: '*',
+                import_country: 'VN',
+                hs_code: '850760',
+                expected_source_trust: 'precheck_estimate',
+                automation_level: 'benchmark_auto'
+            }]
+        };
+        const model = buildOpportunityInsights({
+            product: 'energy storage battery system',
+            from: 'CN',
+            to: 'US',
+            focus: 'import',
+            dutyRates: benchmarkDutyRates,
+            priorityMatrix: benchmarkPriorityMatrix
+        });
+        const pendingRows = model.routeComparison.filter((row) => (
+            row.sourceTrust === 'precheck_estimate'
+            || row.sourceTrust === 'not_covered'
+        ));
+
+        assert.ok(pendingRows.length >= 1);
+        assert.ok(pendingRows.every((row) => row.tag === 'Data pending'));
+        assert.ok(pendingRows.every((row) => row.recommendationGate === 'compare_later_data_pending'));
+        assert.ok(pendingRows.every((row) => row.score <= 55));
+    });
 });
 
 describe('trade opportunity navigation', () => {
