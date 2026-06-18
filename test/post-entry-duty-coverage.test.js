@@ -147,6 +147,11 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
         row.import_country === 'US'
         && `${row.why_priority} ${row.rate_change_drivers.join(' ')}`.includes('Section 301')
     )), 'US backlog should explain Section 301 / add-on duty risk');
+    assert.ok(matrix.priority_upgrade_queue.some((row) => (
+        row.import_country === 'US'
+        && row.product_id === 'solar'
+        && /AD\/CVD/.test(row.us_backlog_focus)
+    )), 'US solar backlog should call out AD/CVD scope before filing-grade use');
     assert.ok(matrix.priority_upgrade_queue.every((row) => Number.isFinite(row.impact_score)));
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'IN'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'MY'), false);

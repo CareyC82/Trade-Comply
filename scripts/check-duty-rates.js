@@ -168,6 +168,32 @@ function getRatePriorityReason(result = {}) {
     return drivers[0] || `${route} ${product} needs exact-rate parser coverage before filing-grade use.`;
 }
 
+function getUsBacklogFocus(result = {}) {
+    if (result.import_country !== 'US' || result.origin_country !== 'CN') return '';
+    const product = String(result.product_id || '').toLowerCase();
+    const hsCode = String(result.hs_code || '');
+
+    if (product === 'solar' || hsCode.startsWith('8541')) {
+        return 'Resolve exact HTS 854143 line, AD/CVD case scope, origin-route evidence, and Section 301 Chapter 99/exclusion before using the rate for filing.';
+    }
+    if (product === 'battery' || hsCode.startsWith('850760')) {
+        return 'Resolve battery chemistry, capacity, exact 850760 subheading, Section 301 coverage, and any battery-specific trade-remedy scope.';
+    }
+    if (product === 'router' || product === 'smartphone' || hsCode.startsWith('8517')) {
+        return 'Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status.';
+    }
+    if (product === 'ev_charger' || hsCode.startsWith('850440')) {
+        return 'Resolve exact power-conversion subheading, EV-charger function scope, origin evidence, and Section 301 add-on duty treatment.';
+    }
+    if (product === 'tablet' || hsCode.startsWith('847130')) {
+        return 'Resolve exact portable ADP/tablet classification, origin evidence, and Section 301 add-on duty or exclusion status.';
+    }
+    if (product === 'semiconductor' || hsCode.startsWith('8542')) {
+        return 'Resolve exact semiconductor line, technology/end-use scope, and any Chapter 99/add-on duty treatment.';
+    }
+    return 'Resolve exact HTS line, country of origin evidence, Section 301 coverage, and active exclusion status.';
+}
+
 function runPriorityMatrixRoute(route) {
     const value = calculatePostEntryValue({
         incoterm: route.incoterm || 'FOB',
@@ -219,6 +245,7 @@ function runPriorityMatrixRoute(route) {
     result.parser_target = getRateParserTarget(result);
     result.next_action = getRateNextAction(result);
     result.priority_band = getRatePriorityBand(result.source_trust);
+    result.us_backlog_focus = getUsBacklogFocus(result);
     return result;
 }
 
@@ -291,7 +318,8 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             parser_target: result.parser_target,
             next_action: result.next_action,
             why_priority: result.why_priority,
-            rate_change_drivers: result.rate_change_drivers
+            rate_change_drivers: result.rate_change_drivers,
+            us_backlog_focus: result.us_backlog_focus
         }))
         .sort((a, b) => (
             a.priority - b.priority
@@ -503,6 +531,7 @@ function buildExactRateProgress({
                 impact_score: row.impact_score || 0,
                 why_priority: row.why_priority || getRatePriorityReason(row),
                 rate_change_drivers: row.rate_change_drivers || getRateChangeDrivers(row),
+                us_backlog_focus: row.us_backlog_focus || getUsBacklogFocus(row),
                 next_action: row.next_action || getRateNextAction(row)
             }))
             .slice(0, 6);
@@ -591,6 +620,86 @@ function buildExactRateProgress({
     };
 }
 
+function buildDutyRateBusinessSummary({
+    syncStatus = {},
+    priorityMatrix = {},
+    exactRateProgress = {}
+} = {}) {
+    const counts = syncStatus.counts || {};
+    const exceptions = Array.isArray(syncStatus.exceptions) ? syncStatus.exceptions : [];
+    const rateChanges = Number(counts.total_rate_changes || 0);
+    const totalChanges = Number(counts.total_changes || 0);
+    const topPriorities = Array.isArray(exactRateProgress.top_backlog_rows)
+        ? exactRateProgress.top_backlog_rows.slice(0, 5)
+        : [];
+    const upgradeQueue = Array.isArray(priorityMatrix.priority_upgrade_queue)
+        ? priorityMatrix.priority_upgrade_queue
+        : [];
+    const usBacklog = upgradeQueue
+        .filter(row => row.import_country === 'US')
+        .slice(0, 6);
+
+    const syncConclusion = exceptions.length
+        ? `${exceptions.length} duty-rate sync exception(s) need attention; normal sources do not need manual review.`
+        : rateChanges > 0
+            ? `${rateChanges} material rate change(s) were detected; review affected routes before quoting or filing.`
+            : totalChanges > 0
+                ? `${totalChanges} source update(s) were applied, with no material duty-rate change detected.`
+                : 'No material duty-rate change detected in the latest sync.';
+
+    const firstPriority = topPriorities[0];
+    const priorityConclusion = firstPriority
+        ? `Highest priority: ${firstPriority.market || firstPriority.import_country || ''} ${firstPriority.product_id || ''} HS ${firstPriority.hs_code || ''}. ${firstPriority.why_priority || firstPriority.next_action || ''}`
+        : 'No exact-rate backlog is currently blocking high-frequency routes.';
+
+    const nextActions = [];
+    if (exceptions.length) {
+        nextActions.push('Review sync exceptions first; safe sources are already auto-applied.');
+    }
+    if (usBacklog.length) {
+        nextActions.push('Finish US exact duty work by product: solar AD/CVD scope first, then Section 301/exclusion checks for battery and 8517 electronics.');
+    }
+    if (topPriorities.length) {
+        nextActions.push('Use the top rate-priority rows below as the daily parser/backlog queue.');
+    }
+    if (!nextActions.length) {
+        nextActions.push('Keep daily sync running and monitor material-rate-change alerts.');
+    }
+
+    return {
+        status: exceptions.length ? 'review_required' : rateChanges > 0 ? 'rate_changed' : 'stable',
+        sync_conclusion: syncConclusion,
+        priority_conclusion: priorityConclusion,
+        business_impact: rateChanges > 0
+            ? 'Potential quote, landed-cost, or post-entry correction impact.'
+            : exceptions.length
+                ? 'Operational exception only; check listed source before relying on affected route.'
+                : 'No immediate quote or filing impact detected from the latest sync.',
+        next_actions: nextActions,
+        top_priorities: topPriorities.map(row => ({
+            market: row.market || row.import_country || '',
+            product_id: row.product_id || '',
+            hs_code: row.hs_code || '',
+            impact_score: row.impact_score || 0,
+            estimated_total_rate: row.estimated_total_rate,
+            why_priority: row.why_priority || '',
+            rate_change_drivers: row.rate_change_drivers || [],
+            next_action: row.next_action || '',
+            us_backlog_focus: row.us_backlog_focus || ''
+        })),
+        us_backlog: usBacklog.map(row => ({
+            id: row.id,
+            product_id: row.product_id,
+            hs_code: row.hs_code,
+            estimated_total_rate: row.estimated_total_rate,
+            priority_band: row.priority_band,
+            why_priority: row.why_priority,
+            rate_change_drivers: row.rate_change_drivers,
+            us_backlog_focus: row.us_backlog_focus
+        }))
+    };
+}
+
 function ruleMatchesPriority(rule, market, prefix) {
     const importCountry = String(rule.import_country || '').toUpperCase();
     const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes.map(String) : [];
@@ -644,6 +753,11 @@ function runDutyRateHealthCheck() {
         sourceRoadmap,
         sourceQuality: sourceQualitySummary
     });
+    const businessSummary = buildDutyRateBusinessSummary({
+        syncStatus,
+        priorityMatrix: priorityRateMatrix,
+        exactRateProgress
+    });
     const sourceFailures = [];
     if (sourceRoadmap.missing_coverage.length) {
         sourceFailures.push(`source roadmap includes countries without duty rules: ${sourceRoadmap.missing_coverage.join(', ')}`);
@@ -660,6 +774,7 @@ function runDutyRateHealthCheck() {
         source_quality_summary: sourceQualitySummary,
         priority_rate_matrix: priorityRateMatrix,
         exact_rate_progress: exactRateProgress,
+        business_summary: businessSummary,
         action_details: buildDutyRateActionDetails({
             healthFailures: failures,
             syncStatus,
@@ -698,5 +813,6 @@ module.exports = {
     summarizeRuleSourceQuality,
     buildDutyRateActionDetails,
     buildExactRateProgress,
+    buildDutyRateBusinessSummary,
     summarizeSourceRoadmap
 };

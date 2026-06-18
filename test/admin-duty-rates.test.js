@@ -19,6 +19,15 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(typeof payload.duty_rate_sync_status, 'object');
     assert.equal(payload.duty_rate_sync_status.policy.manual_review_required, false);
     assert.equal(Array.isArray(payload.duty_rate_sync_status.exceptions), true);
+    assert.equal(typeof payload.business_summary, 'object');
+    assert.ok(payload.business_summary.sync_conclusion);
+    assert.ok(payload.business_summary.priority_conclusion);
+    assert.ok(Array.isArray(payload.business_summary.next_actions));
+    assert.ok(payload.business_summary.next_actions.length > 0);
+    assert.ok(Array.isArray(payload.business_summary.top_priorities));
+    assert.ok(payload.business_summary.top_priorities.length > 0);
+    assert.ok(Array.isArray(payload.business_summary.us_backlog));
+    assert.ok(payload.business_summary.us_backlog.some(row => row.product_id === 'solar' && /AD\/CVD|Section 301/.test(row.us_backlog_focus)));
     assert.equal(Array.isArray(payload.action_details), true);
     assert.equal(Array.isArray(payload.exact_rate_progress.rows), true);
     assert.equal(Array.isArray(payload.exact_rate_progress.top_backlog_rows), true);

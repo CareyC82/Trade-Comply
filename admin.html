@@ -1004,6 +1004,47 @@
             `;
         }
 
+        function renderDutyBusinessSummary(summary = {}) {
+            if (!summary || !summary.sync_conclusion) {
+                return '';
+            }
+            const statusClass = summary.status === 'rate_changed'
+                ? 'medium'
+                : summary.status === 'review_required'
+                    ? 'high'
+                    : 'auto_updatable';
+            const nextActions = Array.isArray(summary.next_actions) ? summary.next_actions : [];
+            const topPriorities = Array.isArray(summary.top_priorities) ? summary.top_priorities : [];
+            const usBacklog = Array.isArray(summary.us_backlog) ? summary.us_backlog : [];
+
+            return `
+                <div class="quality-banner">
+                    <h3>Duty Rate Business Summary <span class="badge ${escapeHtml(statusClass)}">${escapeHtml(summary.status || 'stable')}</span></h3>
+                    <p class="desc">${escapeHtml(summary.sync_conclusion || '')}</p>
+                    <p class="meta">${escapeHtml(summary.priority_conclusion || '')}</p>
+                    <p class="meta">${escapeHtml(summary.business_impact || '')}</p>
+                    ${nextActions.length ? `<ul class="duty-exception-list">${nextActions.map(action => `<li>${escapeHtml(action)}</li>`).join('')}</ul>` : ''}
+                    ${topPriorities.length ? `
+                        <div class="quality-chip-list" style="margin-top:10px">
+                            ${topPriorities.slice(0, 5).map(item => `
+                                <span class="quality-chip missing">
+                                    ${escapeHtml(item.market || '')} · ${escapeHtml(item.product_id || '')} · HS ${escapeHtml(item.hs_code || '')} · impact ${escapeHtml(item.impact_score ?? 0)}
+                                </span>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    ${usBacklog.length ? `
+                        <details style="margin-top:12px">
+                            <summary>US backlog focus (${escapeHtml(usBacklog.length)} product route(s))</summary>
+                            <ul class="duty-exception-list">
+                                ${usBacklog.map(item => `<li><strong>${escapeHtml(item.product_id || '')}</strong> HS ${escapeHtml(item.hs_code || '')}: ${escapeHtml(item.us_backlog_focus || item.why_priority || '')}</li>`).join('')}
+                            </ul>
+                        </details>
+                    ` : ''}
+                </div>
+            `;
+        }
+
         function renderIssueCounts(counts = {}) {
             const entries = Object.entries(counts);
             if (!entries.length) {
@@ -1378,7 +1419,9 @@
                 const syncStatus = data.duty_rate_sync_status || {};
                 const priorityMatrix = data.priority_rate_matrix || {};
                 const exactProgress = data.exact_rate_progress || {};
+                const businessSummary = data.business_summary || {};
                 dutyRateStatus.innerHTML = `
+                    ${renderDutyBusinessSummary(businessSummary)}
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">
                         <div class="summary-card"><strong>${summary.rule_count ?? 0}</strong><span>Maintained duty rules</span></div>
