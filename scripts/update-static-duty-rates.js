@@ -21,12 +21,42 @@ const COUNTRY_NOTES = {
     IN: 'India official-link estimate refreshed locally. Confirm exact HS line, BCD, Social Welfare Surcharge, IGST, exemption, BIS/QCO, WPC, e-waste, and battery-rule scope before filing.'
 };
 const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set(['VN', 'MY', 'TW']);
-const VN_EXACT_CODE_CANDIDATES = [
+const STATIC_EXACT_CODE_CANDIDATES = [
+    '847130',
     '850440',
     '850760',
+    '851713',
     '851762',
+    '852852',
+    '854143',
     '854231'
 ];
+const EXACT_CANDIDATE_COUNTRY_META = {
+    VN: {
+        source_hts: 'VN maintained exact-line candidates',
+        source_rate_text: 'Exact-line candidates: 0% base duty for maintained electronics; 10% VAT handled separately',
+        source_note: 'Vietnam exact-line candidates are maintained for high-tech electronics; VAT, preferential tariff, and origin scope are handled as separate checks. Confirm VNACCS tariff line before filing.',
+        override_note: 'Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.',
+        override_hts_label: 'Vietnam Customs exact-line candidate',
+        override_rate_text: 'Vietnam customs duty candidate: 0.000%'
+    },
+    MY: {
+        source_hts: 'MY maintained exact-line candidates',
+        source_rate_text: 'Exact-line candidates: 0% customs duty for maintained electronics; SST/import tax handled separately',
+        source_note: 'Malaysia exact-line candidates are maintained for high-tech electronics; SST, exemptions, SIRIM/MCMC/ST approval scope, and preferential-origin treatment are handled as separate checks. Verify final tariff line before filing.',
+        override_note: 'Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.',
+        override_hts_label: 'MY maintained exact-line candidate',
+        override_rate_text: 'Malaysia customs duty candidate: 0.000%'
+    },
+    TW: {
+        source_hts: 'TW maintained exact-line candidates',
+        source_rate_text: 'Exact-line candidates: 0% customs duty for maintained electronics; 5% business tax handled separately',
+        source_note: 'Taiwan exact-line candidates are maintained for high-tech electronics; business tax, commodity inspection, telecom approval, and tariff-line treatment are handled as separate checks. Verify final customs tariff code before filing.',
+        override_note: 'Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.',
+        override_hts_label: 'TW maintained exact-line candidate',
+        override_rate_text: 'Taiwan customs duty candidate: 0.000%'
+    }
+};
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -322,12 +352,15 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
     refreshLayerStatuses(rule);
 
     const country = rule.import_country;
-    const vietnamExactCandidate = country === 'VN';
+    const exactCandidateMeta = EXACT_CANDIDATE_COUNTRY_META[country];
+    const exactCandidateCountry = Boolean(exactCandidateMeta);
     const officialLinkEstimate = OFFICIAL_LINK_ESTIMATE_COUNTRIES.has(country);
     const updates = {
-        source_status: vietnamExactCandidate ? 'official_source_checked' : officialLinkEstimate ? 'official_link_checked' : 'benchmark_source_checked',
-        confidence: vietnamExactCandidate ? 'Official duty + tax estimate' : officialLinkEstimate ? 'Official link monitored' : 'Indicative',
-        source_note: COUNTRY_NOTES[country] || `${country} benchmark refreshed locally. Confirm exact tariff-line treatment before filing.`,
+        source_status: exactCandidateCountry ? 'official_source_checked' : officialLinkEstimate ? 'official_link_checked' : 'benchmark_source_checked',
+        confidence: exactCandidateCountry ? 'Official duty + tax estimate' : officialLinkEstimate ? 'Official link monitored' : 'Indicative',
+        source_note: exactCandidateMeta?.source_note || COUNTRY_NOTES[country] || `${country} benchmark refreshed locally. Confirm exact tariff-line treatment before filing.`,
+        source_hts: exactCandidateMeta?.source_hts || rule.source_hts,
+        source_rate_text: exactCandidateMeta?.source_rate_text || rule.source_rate_text,
         source_url: source?.official_url || rule.source_url || '',
         last_checked_at: checkedAt
     };
@@ -339,15 +372,15 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
         }
     });
 
-    if (vietnamExactCandidate) {
-        const exactOverrides = VN_EXACT_CODE_CANDIDATES.map((code) => ({
+    if (exactCandidateCountry) {
+        const exactOverrides = STATIC_EXACT_CODE_CANDIDATES.map((code) => ({
             hs_code: code,
             base_rate: 0,
             source_status: 'official_source_checked',
             confidence: 'Official source checked',
-            source_note: 'Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.',
-            source_hts: `${code} (Vietnam Customs exact-line candidate)`,
-            source_rate_text: 'Vietnam customs duty candidate: 0.000%',
+            source_note: exactCandidateMeta.override_note,
+            source_hts: `${code} (${exactCandidateMeta.override_hts_label})`,
+            source_rate_text: exactCandidateMeta.override_rate_text,
             source_url: source?.official_url || rule.source_url || '',
             last_checked_at: checkedAt
         }));
@@ -554,7 +587,8 @@ if (require.main === module) {
 module.exports = {
     DEFAULT_COUNTRIES,
     COUNTRY_NOTES,
-    VN_EXACT_CODE_CANDIDATES,
+    STATIC_EXACT_CODE_CANDIDATES,
+    EXACT_CANDIDATE_COUNTRY_META,
     applyStaticBenchmarkToRule,
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,

@@ -26,6 +26,8 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'JP' && row.status === 'exact_ready'));
     assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'KR' && row.status === 'exact_ready'));
     assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'IN' && Array.isArray(row.backlog_rows) && row.backlog_rows.length > 0));
+    assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'MY' && row.status === 'hybrid_in_progress' && row.backlog_routes > 0));
+    assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'TW' && row.status === 'hybrid_in_progress' && row.backlog_routes > 0));
     assert.ok(payload.exact_rate_progress.top_backlog_rows.length > 0);
     assert.ok(payload.exact_rate_progress.totals.backlog_routes > 0);
     assert.ok(payload.action_details.some(item => item.type === 'exact_rate_backlog'));
@@ -35,6 +37,8 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('JP'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('KR'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('IN'), true);
+    assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('MY'), true);
+    assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('TW'), true);
     assert.equal(payload.source_roadmap_summary.missing_coverage.length, 0);
     assert.equal(payload.source_roadmap_summary.missing_roadmap.length, 0);
 });
