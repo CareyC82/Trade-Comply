@@ -141,6 +141,12 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.priority_band), 'upgrade queue should show business priority band');
+    assert.ok(matrix.priority_upgrade_queue.every((row) => row.why_priority), 'upgrade queue should explain why the route is a priority');
+    assert.ok(matrix.priority_upgrade_queue.every((row) => Array.isArray(row.rate_change_drivers) && row.rate_change_drivers.length > 0), 'upgrade queue should expose rate-change drivers');
+    assert.ok(matrix.priority_upgrade_queue.some((row) => (
+        row.import_country === 'US'
+        && `${row.why_priority} ${row.rate_change_drivers.join(' ')}`.includes('Section 301')
+    )), 'US backlog should explain Section 301 / add-on duty risk');
     assert.ok(matrix.priority_upgrade_queue.every((row) => Number.isFinite(row.impact_score)));
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'IN'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'MY'), false);

@@ -1107,8 +1107,9 @@
                                     <th>Market</th>
                                     <th>Product</th>
                                     <th>HS</th>
+                                    <th>Impact</th>
                                     <th>Current coverage</th>
-                                    <th>Parser target</th>
+                                    <th>Why priority</th>
                                     <th>Next action</th>
                                 </tr>
                             </thead>
@@ -1119,11 +1120,12 @@
                                         <td>${escapeHtml(row.import_country || (row.route || '').split('->')[1] || '')}<div class="meta">${escapeHtml(row.route || '')}</div></td>
                                         <td>${escapeHtml(row.product_id || '')}</td>
                                         <td>${escapeHtml(row.hs_code || '')}</td>
+                                        <td>${escapeHtml(row.impact_score ?? 0)}<div class="meta">${Number.isFinite(Number(row.estimated_total_rate)) ? `${(Number(row.estimated_total_rate) * 100).toFixed(1)}% est.` : ''}</div></td>
                                         <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : row.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
-                                        <td>${escapeHtml(row.parser_target || '')}</td>
-                                        <td>${escapeHtml(row.next_action || '')}</td>
+                                        <td>${escapeHtml(row.why_priority || row.parser_target || '')}</td>
+                                        <td>${escapeHtml(row.next_action || '')}<div class="meta">${(row.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div></td>
                                     </tr>
-                                `).join('') : '<tr><td colspan="7"><span class="meta">All priority routes are official exact or official duty + tax estimate.</span></td></tr>'}
+                                `).join('') : '<tr><td colspan="8"><span class="meta">All priority routes are official exact or official duty + tax estimate.</span></td></tr>'}
                             </tbody>
                         </table>
                     </div>
@@ -1223,7 +1225,7 @@
                     <div class="summary-card"><strong>${totals.backlog_routes ?? 0}</strong><span>Exact parser backlog</span></div>
                 </div>
                 ${topBacklogRows.length ? `
-                    <div class="crawl-section-title"><h3>Top exact-rate backlog</h3><span class="meta">${topBacklogRows.length} highest priority route(s)</span></div>
+                    <div class="crawl-section-title"><h3>Today's Top Rate Priorities</h3><span class="meta">${topBacklogRows.length} highest priority route(s)</span></div>
                     <div class="coverage-table-wrap">
                         <table class="quality-gap-table">
                             <thead>
@@ -1231,7 +1233,9 @@
                                     <th>Market</th>
                                     <th>Product</th>
                                     <th>HS</th>
+                                    <th>Impact</th>
                                     <th>Current trust</th>
+                                    <th>Why it matters</th>
                                     <th>Next action</th>
                                 </tr>
                             </thead>
@@ -1241,7 +1245,9 @@
                                         <td><strong>${escapeHtml(item.market || '')}</strong></td>
                                         <td>${escapeHtml(item.product_id || item.id || '')}</td>
                                         <td>${escapeHtml(item.hs_code || '')}</td>
+                                        <td>${escapeHtml(item.impact_score ?? 0)}<div class="meta">${Number.isFinite(Number(item.estimated_total_rate)) ? `${(Number(item.estimated_total_rate) * 100).toFixed(1)}% est.` : ''}</div></td>
                                         <td><span class="badge ${item.source_trust === 'precheck_estimate' ? 'benchmark' : item.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(item.source_trust || '')}</span></td>
+                                        <td>${escapeHtml(item.why_priority || '')}<div class="meta">${(item.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div></td>
                                         <td>${escapeHtml(item.next_action || '')}</td>
                                     </tr>
                                 `).join('')}
@@ -1294,6 +1300,7 @@
                                                 </div>
                                                 <ul class="duty-exception-list">
                                                     ${backlogRows.map((item) => `<li>${escapeHtml(item.id || item.product_id || '')}: ${escapeHtml(item.next_action || '')}</li>`).join('')}
+                                                    ${backlogRows.map((item) => item.why_priority ? `<li>${escapeHtml(item.id || item.product_id || '')} priority reason: ${escapeHtml(item.why_priority)}</li>` : '').join('')}
                                                 </ul>
                                             </details>
                                         </td>

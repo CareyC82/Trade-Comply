@@ -78,6 +78,96 @@ function runSample(sample) {
     };
 }
 
+function getRatePriorityBand(sourceTrust) {
+    if (sourceTrust === 'precheck_estimate' || sourceTrust === 'official_link_estimate') return 'P1';
+    if (sourceTrust === 'official_heading_only') return 'P2';
+    return 'P3';
+}
+
+function getRateParserTarget(result = {}) {
+    if (result.source_trust === 'official_link_estimate') {
+        return `${result.import_country || 'market'} exact tariff-line parser`;
+    }
+    if (result.source_trust === 'official_heading_only') {
+        return 'Exact HS / tariff-line scope resolver';
+    }
+    if (result.source_trust === 'mixed_official_estimate') {
+        return 'Add-on duty and trade-remedy scope parser';
+    }
+    return 'Official source mapping';
+}
+
+function getRateNextAction(result = {}) {
+    if (result.source_trust === 'official_link_estimate') {
+        return 'Connect exact machine-readable tariff-line parser for this official source.';
+    }
+    if (result.source_trust === 'official_heading_only') {
+        return 'Require exact tariff line / scope before promoting to official exact rate.';
+    }
+    if (result.source_trust === 'mixed_official_estimate') {
+        return 'Separate official base duty from trade-remedy or add-on scope and confirm active filing period.';
+    }
+    return 'Find official source or parser before using this route beyond screening.';
+}
+
+function getRateChangeDrivers(result = {}) {
+    const drivers = [];
+    const text = [
+        result.id,
+        result.product_id,
+        result.route,
+        result.hs_code,
+        result.source_trust,
+        ...(result.source_statuses || [])
+    ].join(' ').toLowerCase();
+
+    if (result.source_trust === 'official_heading_only') {
+        drivers.push('Exact tariff-line scope can change the final payable rate.');
+    }
+    if (result.source_trust === 'mixed_official_estimate') {
+        drivers.push('Trade-remedy scope, add-on duty, or exclusion period can change payable duty.');
+    }
+    if (result.source_trust === 'official_link_estimate') {
+        drivers.push('Official page is monitored, but the exact machine-readable tariff line is not wired yet.');
+    }
+    if (result.source_trust === 'precheck_estimate') {
+        drivers.push('Official source mapping is not wired yet, so this route remains screening-only.');
+    }
+    if (result.import_country === 'US' && result.origin_country === 'CN') {
+        drivers.push('US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.');
+    }
+    if (/solar|8541|photovoltaic/.test(text)) {
+        drivers.push('Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure.');
+    }
+    if (/battery|850760/.test(text)) {
+        drivers.push('Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment.');
+    }
+    if (/semiconductor|8542|gpu|ai/.test(text)) {
+        drivers.push('Semiconductor scope can depend on exact HS line, end-use, and technology classification.');
+    }
+    if (/8517|router|smartphone|telecom/.test(text)) {
+        drivers.push('Telecom electronics may need exact subheading, wireless module scope, and local tax treatment.');
+    }
+
+    return Array.from(new Set(drivers));
+}
+
+function getRatePriorityReason(result = {}) {
+    const drivers = getRateChangeDrivers(result);
+    const route = result.route || `${result.origin_country || '?'}->${result.import_country || '?'}`;
+    const product = result.product_id || 'route';
+    if (result.import_country === 'US') {
+        return `${route} ${product} remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.`;
+    }
+    if (result.source_trust === 'official_heading_only') {
+        return `${route} ${product} has official heading support, but exact tariff-line scope is still the blocker.`;
+    }
+    if (result.source_trust === 'mixed_official_estimate') {
+        return `${route} ${product} has official base-rate support, but add-on duty or scope must be split before filing-grade use.`;
+    }
+    return drivers[0] || `${route} ${product} needs exact-rate parser coverage before filing-grade use.`;
+}
+
 function runPriorityMatrixRoute(route) {
     const value = calculatePostEntryValue({
         incoterm: route.incoterm || 'FOB',
@@ -108,7 +198,7 @@ function runPriorityMatrixRoute(route) {
         failures.push('automation_level is required');
     }
 
-    return {
+    const result = {
         id: route.id,
         product_id: route.product_id,
         route: `${route.origin_country}->${route.import_country}`,
@@ -124,6 +214,12 @@ function runPriorityMatrixRoute(route) {
         impact_score: Math.round(Number(duty.totalRate || 0) * 10000),
         failures
     };
+    result.rate_change_drivers = getRateChangeDrivers(result);
+    result.why_priority = getRatePriorityReason(result);
+    result.parser_target = getRateParserTarget(result);
+    result.next_action = getRateNextAction(result);
+    result.priority_band = getRatePriorityBand(result.source_trust);
+    return result;
 }
 
 function summarizePriorityRateMatrix(matrixPayload = {}) {
@@ -189,29 +285,13 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             estimated_total_rate: result.total_rate,
             impact_score: result.impact_score || 0,
             priority: trustRank[result.source_trust] || 80,
-            priority_band: result.source_trust === 'precheck_estimate'
-                ? 'P1'
-                : result.source_trust === 'official_link_estimate'
-                    ? 'P1'
-                    : result.source_trust === 'official_heading_only'
-                        ? 'P2'
-                        : 'P3',
+            priority_band: result.priority_band,
             market_priority: marketRank[result.import_country] || 99,
             product_priority: productRank[result.product_id] || 99,
-            parser_target: result.source_trust === 'official_link_estimate'
-                ? `${result.route.split('->')[1] || 'market'} exact tariff-line parser`
-                : result.source_trust === 'official_heading_only'
-                    ? 'Exact HS / tariff-line scope resolver'
-                    : result.source_trust === 'mixed_official_estimate'
-                        ? 'Add-on duty and trade-remedy scope parser'
-                        : 'Official source mapping',
-            next_action: result.source_trust === 'official_link_estimate'
-                ? 'Connect exact machine-readable tariff-line parser for this official source.'
-                : result.source_trust === 'official_heading_only'
-                    ? 'Require exact tariff line / scope before promoting to official exact rate.'
-                    : result.source_trust === 'mixed_official_estimate'
-                        ? 'Separate official base duty from trade-remedy or add-on scope and confirm active filing period.'
-                        : 'Find official source or parser before using this route beyond screening.'
+            parser_target: result.parser_target,
+            next_action: result.next_action,
+            why_priority: result.why_priority,
+            rate_change_drivers: result.rate_change_drivers
         }))
         .sort((a, b) => (
             a.priority - b.priority
@@ -375,7 +455,7 @@ function buildDutyRateActionDetails({
             hs_code: item.hs_code || '',
             severity: item.priority_band === 'P1' ? 'high' : item.priority_band === 'P2' ? 'medium' : 'low',
             type: 'exact_rate_backlog',
-            reason: `${item.source_trust || 'unknown'} coverage; ${item.parser_target || 'parser target pending'}.`,
+            reason: item.why_priority || `${item.source_trust || 'unknown'} coverage; ${item.parser_target || 'parser target pending'}.`,
             next_action: item.next_action || 'Connect exact tariff-line parser or official source mapping.',
             details: item
         });
@@ -421,13 +501,9 @@ function buildExactRateProgress({
                 automation_level: row.automation_level,
                 estimated_total_rate: row.total_rate,
                 impact_score: row.impact_score || 0,
-                next_action: row.source_trust === 'precheck_estimate'
-                    ? 'Find official source or parser before using this route beyond screening.'
-                    : row.source_trust === 'official_link_estimate'
-                        ? 'Connect exact machine-readable tariff-line parser for this official source.'
-                        : row.source_trust === 'official_heading_only'
-                            ? 'Require exact tariff line / scope before promoting to official exact rate.'
-                            : 'Separate official base duty from add-on, trade-remedy, or tax scope.'
+                why_priority: row.why_priority || getRatePriorityReason(row),
+                rate_change_drivers: row.rate_change_drivers || getRateChangeDrivers(row),
+                next_action: row.next_action || getRateNextAction(row)
             }))
             .slice(0, 6);
         const nextAction = status === 'exact_ready'

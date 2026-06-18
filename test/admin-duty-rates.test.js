@@ -30,8 +30,14 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'TW' && row.status === 'exact_ready'));
     assert.ok(payload.exact_rate_progress.top_backlog_rows.length > 0);
     assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => Number.isFinite(row.impact_score)));
+    assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => row.why_priority));
+    assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => Array.isArray(row.rate_change_drivers) && row.rate_change_drivers.length > 0));
+    assert.ok(payload.exact_rate_progress.top_backlog_rows.some(row => (
+        `${row.why_priority} ${(row.rate_change_drivers || []).join(' ')}`.includes('Section 301')
+    )));
     assert.ok(payload.exact_rate_progress.totals.backlog_routes > 0);
     assert.ok(payload.action_details.some(item => item.type === 'exact_rate_backlog'));
+    assert.ok(payload.action_details.some(item => item.type === 'exact_rate_backlog' && item.details?.why_priority));
     assert.equal(payload.sources.some(source => source.country === 'US' && source.source_status === 'auto_updatable'), true);
     assert.equal(payload.source_roadmap_summary.auto_updatable.includes('US'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('EU'), true);
