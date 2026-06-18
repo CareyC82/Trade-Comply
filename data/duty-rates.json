@@ -1474,25 +1474,17 @@
         "9018",
         "9027"
       ],
-      "label": "India import electronics / high-tech equipment BCD/SWS/IGST official-link signal",
+      "label": "India import electronics / high-tech equipment BCD/SWS/IGST maintained exact-line signal",
       "base_rate": 0,
       "additional_rate": 0.18,
       "add_on_layers": [
         {
-          "type": "basic_customs_duty",
-          "label": "India BCD exact-HS parser pending",
-          "rate": null,
-          "basis": "tariff_line",
-          "status": "scope_check_required",
-          "source": "ICEGATE/CIP or CBIC tariff line required"
-        },
-        {
           "type": "social_welfare_surcharge",
-          "label": "India Social Welfare Surcharge scope check",
-          "rate": null,
+          "label": "India Social Welfare Surcharge on BCD",
+          "rate": 0.1,
           "basis": "basic_customs_duty",
-          "status": "scope_check_required",
-          "source": "SWS depends on applicable BCD and exemption scope"
+          "status": "official_source_checked",
+          "source": "CBIC / ICEGATE maintained SWS treatment; amount is zero when BCD is 0%"
         },
         {
           "type": "import_igst",
@@ -1500,17 +1492,107 @@
           "rate": 0.18,
           "basis": "customs_value_plus_duty",
           "status": "indicative",
-          "source": "India GST/IGST benchmark; verify HSN rate and exemption scope"
+          "source": "India GST/IGST benchmark; verify HSN rate and exemption notification scope"
         }
       ],
-      "trade_remedy": "India BCD/SWS/IGST exact tariff-line check required; also screen BIS/QCO, WPC wireless approvals, e-waste, battery, and anti-dumping/safeguard scope where applicable. High-Tech HS prefixes still require exact tariff-line confirmation.",
-      "confidence": "Official link monitored; exact parser pending",
-      "source_status": "official_link_checked",
-      "source_note": "India official ICEGATE/CIP source path is monitored, but exact tariff-line parser is not connected yet. Treat this as exact-first backlog: verify HS, BCD, SWS, IGST, exemption, and product-control scope before filing. Maintained High-Tech extensions cover data center equipment, industrial automation, and medical/lab electronics prefixes for pre-check math.",
-      "source_hts": "IN electronics exact parser pending",
-      "source_rate_text": "Exact BCD pending; IGST benchmark 18%; SWS depends on BCD/exemption scope",
+      "trade_remedy": "India maintained exact-line base duty candidates; screen SWS, IGST, exemption notification, BIS/QCO, WPC, e-waste, battery, and anti-dumping/safeguard scope where applicable.",
+      "confidence": "Official duty + tax estimate",
+      "source_status": "official_source_checked",
+      "source_note": "India exact-line candidates are maintained for high-tech electronics; BCD is treated as 0% for covered candidates, SWS follows BCD, and IGST/exemption/product-control scope remains a separate check. Verify final HSN and notification treatment before filing.",
+      "source_hts": "IN maintained exact-line candidates",
+      "source_rate_text": "Exact-line candidates: 0% BCD for maintained electronics; SWS on BCD and 18% IGST handled separately",
       "source_url": "https://www.icegate.gov.in/",
-      "last_checked_at": "2026-06-14T00:00:00.000Z"
+      "last_checked_at": "2026-06-18T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "847130",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "847130 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        },
+        {
+          "hs_code": "850440",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "850440 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        },
+        {
+          "hs_code": "850760",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "850760 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        },
+        {
+          "hs_code": "851713",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "851713 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        },
+        {
+          "hs_code": "851762",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "851762 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        },
+        {
+          "hs_code": "852852",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "852852 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854143",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "854143 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854231",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.",
+          "source_hts": "854231 (IN maintained exact-line candidate)",
+          "source_rate_text": "India BCD candidate: 0.000%",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-06-18T00:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "VN-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",

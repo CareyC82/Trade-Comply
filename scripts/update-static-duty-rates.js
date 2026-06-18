@@ -20,7 +20,7 @@ const COUNTRY_NOTES = {
     RU: 'Russia/EAEU benchmark refreshed locally. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing.',
     IN: 'India official-link estimate refreshed locally. Confirm exact HS line, BCD, Social Welfare Surcharge, IGST, exemption, BIS/QCO, WPC, e-waste, and battery-rule scope before filing.'
 };
-const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set(['VN', 'MY', 'TW']);
+const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set([]);
 const STATIC_EXACT_CODE_CANDIDATES = [
     '847130',
     '850440',
@@ -55,6 +55,14 @@ const EXACT_CANDIDATE_COUNTRY_META = {
         override_note: 'Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.',
         override_hts_label: 'TW maintained exact-line candidate',
         override_rate_text: 'Taiwan customs duty candidate: 0.000%'
+    },
+    IN: {
+        source_hts: 'IN maintained exact-line candidates',
+        source_rate_text: 'Exact-line candidates: 0% BCD for maintained electronics; SWS on BCD and 18% IGST handled separately',
+        source_note: 'India exact-line candidates are maintained for high-tech electronics; BCD is treated as 0% for covered candidates, SWS follows BCD, and IGST/exemption/product-control scope remains a separate check. Verify final HSN and notification treatment before filing.',
+        override_note: 'India maintained exact-line candidate for covered high-tech electronics. BCD is treated as 0% for pre-check; SWS, IGST, exemption notification, BIS/QCO, WPC, and other product-control scope remain separate checks.',
+        override_hts_label: 'IN maintained exact-line candidate',
+        override_rate_text: 'India BCD candidate: 0.000%'
     }
 };
 
@@ -347,6 +355,29 @@ function refreshLayerStatuses(rule) {
     rule.additional_rate = layers.reduce((sum, layer) => sum + Number(layer.rate || 0), 0);
 }
 
+function refreshExactCandidateLayers(rule, country) {
+    if (country !== 'IN') return;
+    const layers = Array.isArray(rule.add_on_layers) ? rule.add_on_layers : [];
+    layers.forEach((layer) => {
+        if (/sws|social_welfare/i.test(layer.type || layer.label || '')) {
+            layer.rate = 0.1;
+            layer.status = 'official_source_checked';
+            layer.source = layer.source || 'CBIC / ICEGATE maintained SWS treatment; amount is zero when BCD is 0%';
+        }
+        if (/igst|integrated/i.test(layer.type || layer.label || '')) {
+            layer.rate = 0.18;
+            layer.status = 'indicative';
+            layer.source = layer.source || 'India GST/IGST benchmark; verify HSN rate and exemption notification scope';
+        }
+        if (/basic_customs_duty/i.test(layer.type || layer.label || '')) {
+            layer.rate = 0;
+            layer.status = 'official_source_checked';
+            layer.source = layer.source || 'ICEGATE/CIP maintained BCD candidate';
+        }
+    });
+    rule.additional_rate = layers.reduce((sum, layer) => sum + Number(layer.rate || 0), 0);
+}
+
 function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
     const changes = [];
     refreshLayerStatuses(rule);
@@ -373,6 +404,7 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
     });
 
     if (exactCandidateCountry) {
+        refreshExactCandidateLayers(rule, country);
         const exactOverrides = STATIC_EXACT_CODE_CANDIDATES.map((code) => ({
             hs_code: code,
             base_rate: 0,

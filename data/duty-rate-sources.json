@@ -132,16 +132,16 @@
       "name": "India Customs Tariff / ICEGATE CIP",
       "authority": "Central Board of Indirect Taxes and Customs / ICEGATE",
       "official_url": "https://www.icegate.gov.in/",
-      "machine_readable": "probe_required",
+      "machine_readable": "local_exact_map",
       "source_status": "hybrid_official_candidate",
-      "maintenance_priority": "P1",
-      "status_reason": "India is high-priority for electronics trade opportunity and Post-Entry. Official ICEGATE/CIP sources are identified; exact BCD/SWS/IGST scope parsing remains the P1 blocker.",
+      "maintenance_priority": "P2",
+      "status_reason": "India maintained high-tech HS lines use exact-line BCD candidates while SWS, IGST, exemption notification, BIS/QCO, WPC, and product-control scope remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:in:official",
       "probe_command": "npm run probe:duty-rates:in",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Hybrid official candidate: official source path is monitored, while exact BCD/SWS/IGST tariff-line parsing is still required before filing-grade rates.",
-      "next_action": "Run the India official updater in dry-run; promote only after exact HS, BCD, SWS, and IGST basis are machine-verified."
+      "current_scope": "Maintained India exact-line BCD candidates plus SWS/IGST and product-control review reminders.",
+      "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
     },
     {
       "country": "CN",

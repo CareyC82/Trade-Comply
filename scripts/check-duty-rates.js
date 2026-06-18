@@ -121,6 +121,7 @@ function runPriorityMatrixRoute(route) {
         source_statuses: sourceStatuses,
         covered: duty.covered,
         total_rate: duty.totalRate,
+        impact_score: Math.round(Number(duty.totalRate || 0) * 10000),
         failures
     };
 }
@@ -185,6 +186,8 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             hs_code: result.hs_code,
             source_trust: result.source_trust,
             automation_level: result.automation_level,
+            estimated_total_rate: result.total_rate,
+            impact_score: result.impact_score || 0,
             priority: trustRank[result.source_trust] || 80,
             priority_band: result.source_trust === 'precheck_estimate'
                 ? 'P1'
@@ -212,6 +215,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         }))
         .sort((a, b) => (
             a.priority - b.priority
+            || b.impact_score - a.impact_score
             || a.market_priority - b.market_priority
             || a.product_priority - b.product_priority
             || a.route.localeCompare(b.route)
@@ -415,6 +419,8 @@ function buildExactRateProgress({
                 hs_code: row.hs_code,
                 source_trust: row.source_trust,
                 automation_level: row.automation_level,
+                estimated_total_rate: row.total_rate,
+                impact_score: row.impact_score || 0,
                 next_action: row.source_trust === 'precheck_estimate'
                     ? 'Find official source or parser before using this route beyond screening.'
                     : row.source_trust === 'official_link_estimate'
@@ -494,6 +500,7 @@ function buildExactRateProgress({
         })))
         .sort((a, b) => (
             (trustBacklogRank[a.source_trust] || 9) - (trustBacklogRank[b.source_trust] || 9)
+            || (b.impact_score || 0) - (a.impact_score || 0)
             || String(a.market || '').localeCompare(String(b.market || ''))
             || String(a.product_id || '').localeCompare(String(b.product_id || ''))
             || String(a.hs_code || '').localeCompare(String(b.hs_code || ''))

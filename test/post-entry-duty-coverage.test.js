@@ -61,13 +61,9 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
         assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-code gates`);
     });
-    ['SG', 'MX', 'JP', 'KR', 'VN', 'MY', 'TW'].forEach((country) => {
+    ['SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
         assert.equal(qualityByCountry.get(country).coverage_level, 'official_all', country);
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have maintained exact-line candidates`);
-    });
-    ['IN'].forEach((country) => {
-        assert.equal(qualityByCountry.get(country).coverage_level, 'official_link_all', country);
-        assert.ok(qualityByCountry.get(country).official_link_checked > 0, `${country} should have monitored official links`);
     });
 });
 
@@ -134,19 +130,21 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.benchmark_count, 0, 'priority routes should no longer rely on benchmark-only rows');
     assert.equal(matrix.automation_counts.official_auto > 0, true);
     assert.equal(matrix.automation_counts.hybrid_official > 0, true);
-    assert.equal(matrix.automation_counts.official_link_monitor > 0, true);
+    assert.equal(matrix.automation_counts.official_link_monitor || 0, 0);
     assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
     assert.equal(matrix.trust_counts.official_link_estimate || 0, 0);
-    assert.equal(matrix.trust_counts.mixed_official_estimate, 13);
-    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 58);
+    assert.equal(matrix.trust_counts.mixed_official_estimate, 5);
+    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 74);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
-    assert.ok(matrix.trust_counts.official_heading_only >= 8);
+    assert.equal(matrix.trust_counts.official_heading_only, 1);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.priority_band), 'upgrade queue should show business priority band');
-    assert.ok(matrix.priority_upgrade_queue.some((row) => row.import_country === 'MY' && row.parser_target.includes('Add-on duty')));
-    assert.ok(matrix.priority_upgrade_queue.some((row) => row.import_country === 'TW' && row.parser_target.includes('Add-on duty')));
+    assert.ok(matrix.priority_upgrade_queue.every((row) => Number.isFinite(row.impact_score)));
+    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'IN'), false);
+    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'MY'), false);
+    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'TW'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'SG'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'MX'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'JP'), false);
@@ -241,7 +239,7 @@ test('maintained exact candidates coexist with monitored import routes', () => {
         ));
 
         assert.ok(rule, `${country} electronics rule should exist`);
-        if (['SG', 'MX', 'JP', 'KR', 'VN', 'MY', 'TW'].includes(country)) {
+        if (['SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].includes(country)) {
             assert.equal(rule.source_status, 'official_source_checked', `${country} should use maintained exact-line candidate status`);
             assert.ok((rule.exact_code_overrides || []).some(override => override.hs_code === '854231'));
         } else {
@@ -286,6 +284,7 @@ test('non-US benchmark samples stay non-official except official candidate rows'
             || sample.id.startsWith('PE-MX-')
             || sample.id.startsWith('PE-JP-')
             || sample.id.startsWith('PE-KR-')
+            || sample.id.startsWith('PE-IN-')
             || sample.id.startsWith('PE-VN-')
             || sample.id.startsWith('PE-MY-')
             || sample.id.startsWith('PE-TW-')
