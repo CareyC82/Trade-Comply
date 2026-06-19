@@ -44,7 +44,11 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => row.recommendationReasons.length <= 3));
         assert.ok(model.routeComparison.every((row) => row.conciseConclusion));
         assert.ok(model.routeComparison.every((row) => row.tradeOpportunityThesis && row.valueLever && row.executionGate));
+        assert.ok(model.routeComparison.every((row) => row.commercialDecision && row.marginSignal && row.quoteGate));
+        assert.ok(model.routeComparison.every((row) => row.quoteReadiness && row.landedCostRisk));
+        assert.ok(model.routeComparison.every((row) => row.commercialDecision.length < 180));
         assert.ok(model.routeComparison.every((row) => row.opportunitySignal?.oneLine && row.opportunitySignal?.action));
+        assert.ok(model.routeComparison.every((row) => row.opportunitySignal?.shortAction));
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.opportunityEvidence) && row.opportunityEvidence.length === 3));
         assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Demand driver')));
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
@@ -125,6 +129,24 @@ describe('trade opportunity insights', () => {
         assert.equal(winners[0], 'US');
     });
 
+    it('keeps the selected target market visible in route comparisons', () => {
+        const model = buildOpportunityInsights({
+            product: 'AI GPU accelerator chip',
+            from: 'US',
+            to: 'CN',
+            focus: 'import',
+            dutyRates,
+            priorityMatrix
+        });
+        const china = model.routeComparison.find((row) => row.market === 'CN');
+
+        assert.ok(china, 'selected China target should remain visible even when alternatives rank higher');
+        assert.equal(china.sourceTrust, 'official_duty_tax_estimate');
+        assert.equal(china.quoteReadiness, 'Selective quote');
+        assert.equal(china.landedCostRisk, 'High');
+        assert.equal(china.dutyBreakdown.totalRate, '13.0%');
+    });
+
     it('prioritizes official or hybrid rate coverage over benchmark-only opportunity noise', () => {
         const model = buildOpportunityInsights({
             product: 'semiconductor chip',
@@ -185,6 +207,8 @@ describe('trade opportunity insights', () => {
         assert.ok(pendingRows.every((row) => row.recommendationGate === 'compare_later_data_pending'));
         assert.ok(pendingRows.every((row) => row.score <= 55));
         assert.ok(pendingRows.every((row) => /Compare later/i.test(row.opportunitySignal.action)));
+        assert.ok(pendingRows.every((row) => /Research only|coverage/i.test(row.commercialDecision)));
+        assert.ok(pendingRows.every((row) => row.quoteReadiness === 'Research only'));
     });
 });
 
@@ -232,12 +256,14 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /parserBacklogCount/);
     });
 
-    it('renders decision cards for opportunity reason, value lever, and execution gate', () => {
+    it('renders decision cards for commercial decision, margin signal, and quote gate', () => {
         const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'opportunity-page.js'), 'utf8');
 
         assert.match(source, /opportunity-decision-card-grid/);
-        assert.match(source, /Opportunity Reason/);
-        assert.match(source, /Value Lever/);
-        assert.match(source, /Execution Gate/);
+        assert.match(source, /Commercial Decision/);
+        assert.match(source, /Margin Signal/);
+        assert.match(source, /Quote Gate/);
+        assert.match(source, /Quote readiness/);
+        assert.match(source, /Landed-cost risk/);
     });
 });

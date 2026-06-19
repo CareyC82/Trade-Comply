@@ -95,7 +95,8 @@ function bootstrapTradeOpportunityPage() {
         const metricItems = [
             { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
-            { label: 'Value lever', value: card.valueLever || 'Pending' }
+            { label: 'Quote readiness', value: card.quoteReadiness || 'Pending' },
+            { label: 'Landed-cost risk', value: card.landedCostRisk || 'Unknown' }
         ];
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
@@ -108,16 +109,16 @@ function bootstrapTradeOpportunityPage() {
                 <p>${escapeHtml(card.conciseConclusion || card.opportunity)}</p>
                 <div class="opportunity-decision-card-grid">
                     <div>
-                        <span>Opportunity Reason</span>
-                        <strong>${escapeHtml(signal.oneLine || card.tradeOpportunityThesis || card.opportunity)}</strong>
+                        <span>Commercial Decision</span>
+                        <strong>${escapeHtml(card.commercialDecision || signal.oneLine || card.tradeOpportunityThesis || card.opportunity)}</strong>
                     </div>
                     <div>
-                        <span>Value Lever</span>
-                        <strong>${escapeHtml(card.valueLever || 'Pending')}</strong>
+                        <span>Margin Signal</span>
+                        <strong>${escapeHtml(card.marginSignal || card.valueLever || 'Pending')}</strong>
                     </div>
                     <div>
-                        <span>Execution Gate</span>
-                        <strong>${escapeHtml(signal.action || card.executionGate || card.businessAction)}</strong>
+                        <span>Quote Gate</span>
+                        <strong>${escapeHtml(card.quoteGate || signal.action || card.executionGate || card.businessAction)}</strong>
                     </div>
                 </div>
                 <div class="opportunity-rate-mini-grid">

@@ -309,14 +309,17 @@ function search(query) {
     }
 
     const currentDirection = AppState.currentDirection || 'export';
+    const currentFocus = AppState.complianceFocus === 'export' ? 'export'
+        : AppState.complianceFocus === 'import' ? 'import'
+            : '';
+    const caseDirectionsForRoute = currentFocus
+        ? Array.from(new Set([currentFocus, currentDirection]))
+        : [currentDirection];
     matchedTags = matchedTags.filter(tag => {
         const tagDirection = tag.direction || 'both';
         return tagDirection === 'both' || tagDirection === currentDirection;
     });
 
-    const currentFocus = AppState.complianceFocus === 'export' ? 'export'
-        : AppState.complianceFocus === 'import' ? 'import'
-            : '';
     if (currentFocus) {
         matchedTags = matchedTags.filter((tag) => {
             const tagFocus = tag.route_focus || tag.compliance_focus || '';
@@ -367,7 +370,7 @@ function search(query) {
     // Search cases by query relevance, HS codes, and related tags
     let matchedCases = cases.map((caseItem) => {
         const caseDirection = caseItem.direction || 'both';
-        if (caseDirection !== 'both' && caseDirection !== currentDirection) {
+        if (caseDirection !== 'both' && !caseDirectionsForRoute.includes(caseDirection)) {
             return { case: caseItem, score: 0 };
         }
 
@@ -410,7 +413,7 @@ function search(query) {
         const linkedCases = enrichApi.collectCasesForMatchedTags(
             matchedTags,
             cases,
-            currentDirection,
+            caseDirectionsForRoute,
             query
         );
         matchedCases = enrichApi.mergeCasesById(matchedCases, linkedCases);

@@ -13,7 +13,7 @@ const DEFAULT_COUNTRIES = ['CN', 'VN', 'MY', 'TW', 'RU', 'IN'];
 const REQUEST_TIMEOUT_MS = 15000;
 
 const COUNTRY_NOTES = {
-    CN: 'China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.',
+    CN: 'China maintained exact-line candidates refreshed locally. Confirm final customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.',
     VN: 'Vietnam official customs source link is monitored. Confirm exact tariff line, VAT basis, preferential origin, and MIC/MOIT product triggers before filing.',
     MY: 'Malaysia official customs/SST source link is monitored. Confirm exact tariff line, SST/duty exemption, and SIRIM/MCMC/ST approval scope before filing.',
     TW: 'Taiwan official customs source link is monitored. Confirm exact customs duty, business tax basis, and tariff-line treatment before filing.',
@@ -32,6 +32,14 @@ const STATIC_EXACT_CODE_CANDIDATES = [
     '854231'
 ];
 const EXACT_CANDIDATE_COUNTRY_META = {
+    CN: {
+        source_hts: 'CN maintained exact-line candidates',
+        source_rate_text: 'Exact-line candidates: 0% MFN duty for maintained high-tech electronics; 13% import VAT handled separately',
+        source_note: 'China exact-line candidates are maintained for high-tech electronics; MFN duty is treated as 0% for covered candidates, while import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.',
+        override_note: 'China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.',
+        override_hts_label: 'CN maintained exact-line candidate',
+        override_rate_text: 'China MFN duty candidate: 0.000%'
+    },
     VN: {
         source_hts: 'VN maintained exact-line candidates',
         source_rate_text: 'Exact-line candidates: 0% base duty for maintained electronics; 10% VAT handled separately',

@@ -89,7 +89,7 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
         if (country === 'IN') {
             assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
-        } else if (['VN', 'MY', 'TW'].includes(country)) {
+        } else if (['CN', 'VN', 'MY', 'TW'].includes(country)) {
             assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
         } else {
             assert.ok(roadmap.benchmark_updatable.includes(country), `${country} should be benchmark-updatable`);
@@ -164,7 +164,7 @@ test('static official-link benchmark updater covers China Vietnam Malaysia Taiwa
         assert.equal(readiness.ok, true, `${country} static benchmark readiness should be OK`);
         if (country === 'IN') {
             assert.equal(readiness.source_status, 'hybrid_official_candidate');
-        } else if (['VN', 'MY', 'TW'].includes(country)) {
+        } else if (['CN', 'VN', 'MY', 'TW'].includes(country)) {
             assert.equal(readiness.source_status, 'hybrid_official_candidate');
         } else {
             assert.equal(readiness.source_status, 'benchmark_updatable');

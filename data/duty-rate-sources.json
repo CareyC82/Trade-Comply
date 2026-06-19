@@ -148,15 +148,15 @@
       "name": "China import tariff / VAT",
       "authority": "General Administration of Customs / Ministry of Finance",
       "official_url": "https://www.customs.gov.cn/",
-      "machine_readable": false,
-      "source_status": "benchmark_updatable",
+      "machine_readable": "local_exact_map",
+      "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Local benchmark exists, but official China tariff lookup is not connected to an updater yet.",
+      "status_reason": "China maintained high-tech HS lines use exact-line MFN duty candidates while import VAT, origin preference, licensing, CCC/SRRC, and other product controls remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=CN",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Local benchmark for electronics import duty and VAT.",
-      "next_action": "Keep benchmark updater running; map official China tariff lookup or maintained local tariff table before promoting official exact rates."
+      "current_scope": "Maintained China exact-line MFN duty candidates plus 13% import VAT and product-control review reminders.",
+      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
     },
     {
       "country": "VN",

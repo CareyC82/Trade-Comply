@@ -118,7 +118,7 @@ test('GitHub duty-rate workflow runs tests before committing sync output', () =>
     assert.match(workflow, /git pull --ff-only/);
 });
 
-test('auto duty-rate sync includes static official-link benchmark countries', async () => {
+test('auto duty-rate sync includes static maintained countries', async () => {
     const emptyOfficialFetcher = async () => ({
         status_code: 200,
         body: '<html><body>No table in fixture</body></html>'
@@ -133,7 +133,7 @@ test('auto duty-rate sync includes static official-link benchmark countries', as
     const koreaRun = payload.runs.find(run => run.source === 'Korea Customs official-live');
     const indiaRun = payload.runs.find(run => run.source === 'India Customs official-live');
 
-    assert.ok(staticRun, 'static official-link benchmark run should be included');
+    assert.ok(staticRun, 'static maintained-country run should be included');
     assert.equal(staticRun.mode, 'benchmark');
     assert.equal(staticRun.applied, false);
     assert.equal(staticRun.ok, true, JSON.stringify(staticRun.errors, null, 2));

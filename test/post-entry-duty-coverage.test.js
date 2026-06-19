@@ -61,7 +61,7 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
         assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-code gates`);
     });
-    ['SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
+    ['CN', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
         assert.equal(qualityByCountry.get(country).coverage_level, 'official_all', country);
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have maintained exact-line candidates`);
     });
@@ -123,7 +123,7 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
         'solar',
         'tablet'
     ]);
-    ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
+    ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
         assert.ok(matrix.import_markets.includes(country), `${country} should be in high-frequency rate matrix`);
     });
     assert.ok(matrix.official_or_hybrid_count > 50, 'official/hybrid/link-monitored coverage should cover the full high-frequency matrix');
@@ -134,7 +134,7 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
     assert.equal(matrix.trust_counts.official_link_estimate || 0, 0);
     assert.equal(matrix.trust_counts.mixed_official_estimate, 5);
-    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 74);
+    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 75);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
     assert.equal(matrix.trust_counts.official_heading_only, 1);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
@@ -243,14 +243,14 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
 });
 
 test('maintained exact candidates coexist with monitored import routes', () => {
-    ['SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
+    ['CN', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
         const rule = (dutyRates.rules || []).find(item => (
             item.import_country === country
             && (item.hs_prefixes || []).includes('8542')
         ));
 
         assert.ok(rule, `${country} electronics rule should exist`);
-        if (['SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].includes(country)) {
+        if (['CN', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].includes(country)) {
             assert.equal(rule.source_status, 'official_source_checked', `${country} should use maintained exact-line candidate status`);
             assert.ok((rule.exact_code_overrides || []).some(override => override.hs_code === '854231'));
         } else {
@@ -268,7 +268,7 @@ test('Russia sample keeps sanctions scope as a review-only flag', () => {
     assert.ok(russia.source_statuses.includes('scope_check_required'));
 });
 
-test('non-US benchmark samples stay non-official except official candidate rows', () => {
+test('non-US samples stay non-official except maintained official candidate rows', () => {
     const result = runDutyRateHealthCheck();
     const nonUsSamples = result.samples.filter(sample => !sample.id.startsWith('PE-US-'));
     const officialTaricSamples = result.samples.filter(sample => (
@@ -295,6 +295,7 @@ test('non-US benchmark samples stay non-official except official candidate rows'
             || sample.id.startsWith('PE-MX-')
             || sample.id.startsWith('PE-JP-')
             || sample.id.startsWith('PE-KR-')
+            || sample.id.startsWith('PE-CN-')
             || sample.id.startsWith('PE-IN-')
             || sample.id.startsWith('PE-VN-')
             || sample.id.startsWith('PE-MY-')

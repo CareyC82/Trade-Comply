@@ -30,6 +30,28 @@ describe('matched-results', () => {
         assert.equal(linked[0].case_id, 'CASE-050');
     });
 
+    it('accepts both legacy direction and route focus when collecting linked cases', () => {
+        const tags = [{ tag_id: 'CL-JPMED-001' }];
+        const allCases = [
+            {
+                case_id: 'CASE-JP-PMD',
+                direction: 'import',
+                related_tags: ['CL-JPMED-001'],
+                title: 'Japan patient monitor PMD Act review',
+                related_keywords: ['patient monitor', 'medical device']
+            },
+            {
+                case_id: 'CASE-US-LEGACY',
+                direction: 'export',
+                related_tags: ['CL-JPMED-001'],
+                title: 'Legacy linked medical export review',
+                related_keywords: ['patient monitor', 'medical device']
+            }
+        ];
+        const linked = collectCasesForMatchedTags(tags, allCases, ['import', 'export'], 'patient monitor');
+        assert.deepEqual(linked.map((caseItem) => caseItem.case_id), ['CASE-JP-PMD', 'CASE-US-LEGACY']);
+    });
+
     it('filters tag-linked cases that do not match the product query', () => {
         const tags = [{ tag_id: 'CL-CHIP-001' }];
         const allCases = [

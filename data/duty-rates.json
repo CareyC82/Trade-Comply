@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-18",
+  "updated_at": "2026-06-19",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -2055,11 +2055,103 @@
         }
       ],
       "trade_remedy": "Import VAT and MFN duty estimate; confirm exact tariff line",
-      "confidence": "Indicative",
-      "source_note": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.",
-      "source_status": "benchmark_source_checked",
+      "confidence": "Official duty + tax estimate",
+      "source_note": "China exact-line candidates are maintained for high-tech electronics; MFN duty is treated as 0% for covered candidates, while import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+      "source_status": "official_source_checked",
       "source_url": "https://www.customs.gov.cn/",
-      "last_checked_at": "2026-06-18T20:37:33.774Z"
+      "last_checked_at": "2026-06-19T07:33:43.681Z",
+      "source_hts": "CN maintained exact-line candidates",
+      "source_rate_text": "Exact-line candidates: 0% MFN duty for maintained high-tech electronics; 13% import VAT handled separately",
+      "exact_code_overrides": [
+        {
+          "hs_code": "847130",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "847130 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "850440",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "850440 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "850760",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "850760 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "851713",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "851713 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "851762",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "851762 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "852852",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "852852 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "854143",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "854143 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "854231",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "854231 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        }
+      ]
     },
     {
       "id": "US-CN-850440-POWER-CONVERSION-INDICATIVE",
@@ -2112,13 +2204,103 @@
         }
       ],
       "trade_remedy": "China tariff/VAT benchmark; verify exact HS code, origin preference, and VAT treatment.",
-      "confidence": "Indicative",
-      "source_status": "benchmark_source_checked",
-      "source_note": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.",
-      "source_hts": "847130 / 850440",
-      "source_rate_text": "Benchmark duty + 13% VAT",
+      "confidence": "Official duty + tax estimate",
+      "source_status": "official_source_checked",
+      "source_note": "China exact-line candidates are maintained for high-tech electronics; MFN duty is treated as 0% for covered candidates, while import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+      "source_hts": "CN maintained exact-line candidates",
+      "source_rate_text": "Exact-line candidates: 0% MFN duty for maintained high-tech electronics; 13% import VAT handled separately",
       "source_url": "https://www.customs.gov.cn/",
-      "last_checked_at": "2026-06-18T20:37:33.774Z"
+      "last_checked_at": "2026-06-19T07:33:43.681Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "847130",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "847130 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "850440",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "850440 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "850760",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "850760 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "851713",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "851713 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "851762",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "851762 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "852852",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "852852 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "854143",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "854143 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        },
+        {
+          "hs_code": "854231",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "854231 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-06-19T07:33:43.681Z"
+        }
+      ]
     },
     {
       "id": "EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
@@ -3451,16 +3633,12 @@
     ],
     "errors": []
   },
-  "last_static_benchmark_sync_at": "2026-06-18T20:37:33.774Z",
+  "last_static_benchmark_sync_at": "2026-06-19T07:33:43.681Z",
   "last_static_benchmark_sync": {
     "ok": true,
     "dry_run": false,
     "countries": [
-      "CN",
-      "VN",
-      "MY",
-      "TW",
-      "RU"
+      "CN"
     ],
     "writes_official_machine_rates": false,
     "changes": [
@@ -3470,9 +3648,126 @@
         "mode": "benchmark",
         "changes": [
           {
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official duty + tax estimate"
+          },
+          {
+            "field": "source_note",
+            "old_value": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.",
+            "new_value": "China exact-line candidates are maintained for high-tech electronics; MFN duty is treated as 0% for covered candidates, while import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks."
+          },
+          {
+            "field": "source_hts",
+            "new_value": "CN maintained exact-line candidates"
+          },
+          {
+            "field": "source_rate_text",
+            "new_value": "Exact-line candidates: 0% MFN duty for maintained high-tech electronics; 13% import VAT handled separately"
+          },
+          {
             "field": "last_checked_at",
-            "old_value": "2026-06-13T19:50:04.123Z",
-            "new_value": "2026-06-18T20:37:33.774Z"
+            "old_value": "2026-06-18T20:37:33.774Z",
+            "new_value": "2026-06-19T07:33:43.681Z"
+          },
+          {
+            "field": "exact_code_overrides",
+            "old_value": [],
+            "new_value": [
+              {
+                "hs_code": "847130",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "847130 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              },
+              {
+                "hs_code": "850440",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "850440 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              },
+              {
+                "hs_code": "850760",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "850760 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              },
+              {
+                "hs_code": "851713",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "851713 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              },
+              {
+                "hs_code": "851762",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "851762 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              },
+              {
+                "hs_code": "852852",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "852852 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              },
+              {
+                "hs_code": "854143",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "854143 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              },
+              {
+                "hs_code": "854231",
+                "base_rate": 0,
+                "source_status": "official_source_checked",
+                "confidence": "Official source checked",
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "854231 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
+              }
+            ]
           }
         ]
       },
@@ -3482,562 +3777,128 @@
         "mode": "benchmark",
         "changes": [
           {
-            "field": "last_checked_at",
-            "old_value": "2026-06-13T19:50:04.123Z",
-            "new_value": "2026-06-18T20:37:33.774Z"
-          }
-        ]
-      },
-      {
-        "rule": "VN-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
-        "import_country": "VN",
-        "mode": "benchmark",
-        "changes": [
+            "field": "source_status",
+            "old_value": "benchmark_source_checked",
+            "new_value": "official_source_checked"
+          },
+          {
+            "field": "confidence",
+            "old_value": "Indicative",
+            "new_value": "Official duty + tax estimate"
+          },
+          {
+            "field": "source_note",
+            "old_value": "China benchmark refreshed locally. Confirm exact customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.",
+            "new_value": "China exact-line candidates are maintained for high-tech electronics; MFN duty is treated as 0% for covered candidates, while import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks."
+          },
+          {
+            "field": "source_hts",
+            "old_value": "847130 / 850440",
+            "new_value": "CN maintained exact-line candidates"
+          },
+          {
+            "field": "source_rate_text",
+            "old_value": "Benchmark duty + 13% VAT",
+            "new_value": "Exact-line candidates: 0% MFN duty for maintained high-tech electronics; 13% import VAT handled separately"
+          },
           {
             "field": "last_checked_at",
-            "old_value": "2026-06-18T00:00:00.000Z",
-            "new_value": "2026-06-18T20:37:33.774Z"
+            "old_value": "2026-06-18T20:37:33.774Z",
+            "new_value": "2026-06-19T07:33:43.681Z"
           },
           {
             "field": "exact_code_overrides",
-            "old_value": [
-              {
-                "hs_code": "851762",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "851762 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "850760",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "850760 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "854231",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "854231 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "850440",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "850440 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              }
-            ],
+            "old_value": [],
             "new_value": [
               {
                 "hs_code": "847130",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "847130 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "847130 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               },
               {
                 "hs_code": "850440",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "850440 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "850440 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               },
               {
                 "hs_code": "850760",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "850760 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "850760 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               },
               {
                 "hs_code": "851713",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "851713 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "851713 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               },
               {
                 "hs_code": "851762",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "851762 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "851762 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               },
               {
                 "hs_code": "852852",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "852852 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "852852 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               },
               {
                 "hs_code": "854143",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "854143 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "854143 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               },
               {
                 "hs_code": "854231",
                 "base_rate": 0,
                 "source_status": "official_source_checked",
                 "confidence": "Official source checked",
-                "source_note": "Vietnam maintained exact-line candidate for covered high-tech electronics. Base duty is treated as 0% for pre-check; VAT and preferential-origin scope remain separate checks.",
-                "source_hts": "854231 (Vietnam Customs exact-line candidate)",
-                "source_rate_text": "Vietnam customs duty candidate: 0.000%",
-                "source_url": "https://www.customs.gov.vn/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
+                "source_note": "China maintained exact-line candidate for covered high-tech electronics. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+                "source_hts": "854231 (CN maintained exact-line candidate)",
+                "source_rate_text": "China MFN duty candidate: 0.000%",
+                "source_url": "https://www.customs.gov.cn/",
+                "last_checked_at": "2026-06-19T07:33:43.681Z"
               }
             ]
-          }
-        ]
-      },
-      {
-        "rule": "MY-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
-        "import_country": "MY",
-        "mode": "benchmark",
-        "changes": [
-          {
-            "field": "last_checked_at",
-            "old_value": "2026-06-18T00:00:00.000Z",
-            "new_value": "2026-06-18T20:37:33.774Z"
-          },
-          {
-            "field": "exact_code_overrides",
-            "old_value": [
-              {
-                "hs_code": "847130",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "847130 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "851713",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "851713 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "851762",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "851762 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "850440",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "850440 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "850760",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "850760 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "854143",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "854143 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "854231",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "854231 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "852852",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "852852 (MY maintained exact-line candidates)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              }
-            ],
-            "new_value": [
-              {
-                "hs_code": "847130",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "847130 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "850440",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "850440 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "850760",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "850760 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "851713",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "851713 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "851762",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "851762 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "852852",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "852852 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "854143",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "854143 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "854231",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Malaysia maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-                "source_hts": "854231 (MY maintained exact-line candidate)",
-                "source_rate_text": "Malaysia customs duty candidate: 0.000%",
-                "source_url": "https://mysst.customs.gov.my/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "rule": "TW-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
-        "import_country": "TW",
-        "mode": "benchmark",
-        "changes": [
-          {
-            "field": "last_checked_at",
-            "old_value": "2026-06-18T00:00:00.000Z",
-            "new_value": "2026-06-18T20:37:33.774Z"
-          },
-          {
-            "field": "exact_code_overrides",
-            "old_value": [
-              {
-                "hs_code": "847130",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "847130 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "851713",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "851713 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "851762",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "851762 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "850440",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "850440 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "850760",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "850760 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "854143",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "854143 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "854231",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "854231 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              },
-              {
-                "hs_code": "852852",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "852852 (TW maintained exact-line candidates)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T00:00:00.000Z"
-              }
-            ],
-            "new_value": [
-              {
-                "hs_code": "847130",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "847130 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "850440",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "850440 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "850760",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "850760 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "851713",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "851713 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "851762",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "851762 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "852852",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "852852 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "854143",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "854143 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              },
-              {
-                "hs_code": "854231",
-                "base_rate": 0,
-                "source_status": "official_source_checked",
-                "confidence": "Official source checked",
-                "source_note": "Taiwan maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0% for pre-check; business tax, inspection, telecom approval, and tariff-line treatment remain separate checks.",
-                "source_hts": "854231 (TW maintained exact-line candidate)",
-                "source_rate_text": "Taiwan customs duty candidate: 0.000%",
-                "source_url": "https://web.customs.gov.tw/",
-                "last_checked_at": "2026-06-18T20:37:33.774Z"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "rule": "RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
-        "import_country": "RU",
-        "mode": "benchmark",
-        "changes": [
-          {
-            "field": "last_checked_at",
-            "old_value": "2026-06-13T19:50:04.123Z",
-            "new_value": "2026-06-18T20:37:33.774Z"
           }
         ]
       }
@@ -4047,9 +3908,9 @@
       "CN": {
         "ok": true,
         "country": "CN",
-        "source_status": "benchmark_updatable",
+        "source_status": "hybrid_official_candidate",
         "official_url": "https://www.customs.gov.cn/",
-        "machine_readable": false,
+        "machine_readable": "local_exact_map",
         "maintained_rule_count": 2,
         "maintained_hs_prefixes": [
           "847130",
@@ -4065,112 +3926,8 @@
         "writes_rates": true,
         "writes_official_machine_rates": false,
         "live_row_count": 0,
-        "next_action": "Keep benchmark updater running; map official China tariff lookup or maintained local tariff table before promoting official exact rates.",
-        "status_reason": "Local benchmark exists, but official China tariff lookup is not connected to an updater yet."
-      },
-      "VN": {
-        "ok": true,
-        "country": "VN",
-        "source_status": "hybrid_official_candidate",
-        "official_url": "https://www.customs.gov.vn/",
-        "machine_readable": "local_exact_map",
-        "maintained_rule_count": 1,
-        "maintained_hs_prefixes": [
-          "8471",
-          "847130",
-          "8479",
-          "850440",
-          "850760",
-          "8517",
-          "8525",
-          "8528",
-          "8541",
-          "8542",
-          "8543",
-          "9018",
-          "9027"
-        ],
-        "writes_rates": true,
-        "writes_official_machine_rates": false,
-        "live_row_count": 0,
-        "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed.",
-        "status_reason": "Vietnam maintained high-tech HS lines use exact-line base-duty candidates while VAT and preferential-origin scope remain separate checks."
-      },
-      "MY": {
-        "ok": true,
-        "country": "MY",
-        "source_status": "hybrid_official_candidate",
-        "official_url": "https://mysst.customs.gov.my/",
-        "machine_readable": "local_exact_map",
-        "maintained_rule_count": 1,
-        "maintained_hs_prefixes": [
-          "8471",
-          "847130",
-          "8479",
-          "850440",
-          "850760",
-          "8517",
-          "8525",
-          "8528",
-          "8541",
-          "8542",
-          "8543",
-          "9018",
-          "9027"
-        ],
-        "writes_rates": true,
-        "writes_official_machine_rates": false,
-        "live_row_count": 0,
-        "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed.",
-        "status_reason": "Malaysia maintained high-tech HS lines use exact-line duty candidates while SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks."
-      },
-      "TW": {
-        "ok": true,
-        "country": "TW",
-        "source_status": "hybrid_official_candidate",
-        "official_url": "https://web.customs.gov.tw/",
-        "machine_readable": "local_exact_map",
-        "maintained_rule_count": 1,
-        "maintained_hs_prefixes": [
-          "847130",
-          "850440",
-          "850760",
-          "8517",
-          "8525",
-          "8528",
-          "8541",
-          "8542",
-          "8543"
-        ],
-        "writes_rates": true,
-        "writes_official_machine_rates": false,
-        "live_row_count": 0,
-        "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed.",
-        "status_reason": "Taiwan maintained high-tech HS lines use exact-line duty candidates while business tax, inspection, telecom approval, and tariff-line scope remain separate checks."
-      },
-      "RU": {
-        "ok": true,
-        "country": "RU",
-        "source_status": "benchmark_updatable",
-        "official_url": "https://customs.gov.ru/",
-        "machine_readable": false,
-        "maintained_rule_count": 1,
-        "maintained_hs_prefixes": [
-          "847130",
-          "850440",
-          "850760",
-          "8517",
-          "8525",
-          "8528",
-          "8541",
-          "8542",
-          "8543"
-        ],
-        "writes_rates": true,
-        "writes_official_machine_rates": false,
-        "live_row_count": 0,
-        "next_action": "Keep benchmark updater running and sanctions scope flag separate from ordinary duty math.",
-        "status_reason": "Official source identified, but sanctions scope must stay separate from ordinary duty math."
+        "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed.",
+        "status_reason": "China maintained high-tech HS lines use exact-line MFN duty candidates while import VAT, origin preference, licensing, CCC/SRRC, and other product controls remain separate checks."
       }
     }
   }
