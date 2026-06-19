@@ -422,6 +422,111 @@
       "expected_min_rules": 2,
       "expected_min_exact_rules": 1,
       "expected_min_cases": 1
+    },
+    {
+      "id": "cn-us-lfp-battery-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "lfp lithium battery pack energy storage 850760",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 4,
+      "expected_min_cases": 3,
+      "expected_inferred_selections": [
+        "battery"
+      ]
+    },
+    {
+      "id": "cn-us-solar-adcvd-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "crystalline silicon solar module photovoltaic AD CVD UFLPA",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 4,
+      "expected_min_cases": 2
+    },
+    {
+      "id": "cn-us-5g-smartphone-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "smartphone 5g cellular wireless battery 8517",
+      "expected_min_rules": 5,
+      "expected_min_exact_rules": 4,
+      "expected_min_cases": 2,
+      "expected_inferred_selections": [
+        "wireless",
+        "battery"
+      ]
+    },
+    {
+      "id": "cn-sg-optical-module-import",
+      "from": "CN",
+      "to": "SG",
+      "focus": "import",
+      "vertical": "data-center",
+      "query": "optical transceiver module data center 8517",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1
+    },
+    {
+      "id": "us-in-ai-gpu-import",
+      "from": "US",
+      "to": "IN",
+      "focus": "import",
+      "vertical": "semiconductor",
+      "query": "ai gpu accelerator chip advanced computing",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "cn-mx-5g-smartphone-import",
+      "from": "CN",
+      "to": "MX",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "smartphone 5g cellular wireless battery",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-jp-ai-server-import",
+      "from": "US",
+      "to": "JP",
+      "focus": "import",
+      "vertical": "data-center",
+      "query": "ai server gpu server data center storage server",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "cn-vn-ess-import",
+      "from": "CN",
+      "to": "VN",
+      "focus": "import",
+      "vertical": "new-energy",
+      "query": "energy storage battery system lithium pack inverter",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "cn-my-industrial-robot-import",
+      "from": "CN",
+      "to": "MY",
+      "focus": "import",
+      "vertical": "industrial-automation",
+      "query": "industrial robot arm servo drive machine vision plc",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
     }
   ]
 }

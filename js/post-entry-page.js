@@ -947,6 +947,82 @@
         }
     }
 
+    function formatSyncDate(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toLocaleString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function buildDutySyncSummary(payload = {}) {
+        const counts = payload.counts || {};
+        const exceptions = Number(counts.exceptions || 0);
+        const rateChanges = Number(counts.total_rate_changes || 0);
+        const changes = Number(counts.total_changes || 0);
+        const sources = Number(counts.sources_checked || 0);
+        const updatedAt = formatSyncDate(payload.finished_at || payload.updated_at);
+        const timeText = updatedAt ? ` Latest sync: ${updatedAt}.` : '';
+
+        if (exceptions > 0) {
+            return {
+                tone: 'exception',
+                title: 'Duty source sync needs review',
+                summary: `${exceptions} exception(s) were reported. Use the value math, but do not rely on affected route rates until the admin exception list is cleared.${timeText}`
+            };
+        }
+
+        if (rateChanges > 0) {
+            return {
+                tone: 'changed',
+                title: 'Material duty-rate change detected',
+                summary: `${rateChanges} rate change(s) were detected across ${sources || 'the monitored'} source(s). Re-check quote, landed cost, and correction amount before filing.${timeText}`
+            };
+        }
+
+        if (changes > 0 || sources > 0) {
+            return {
+                tone: 'stable',
+                title: 'No material duty-rate change detected',
+                summary: `${sources || 'Monitored'} source(s) synced with ${changes} metadata/source update(s), but no material duty-rate change was reported.${timeText}`
+            };
+        }
+
+        return {
+            tone: 'review',
+            title: 'Duty source status unavailable',
+            summary: 'Use the rate confidence card below and confirm the official tariff line before filing.'
+        };
+    }
+
+    function renderDutySyncCard(summary) {
+        const card = $('post-entry-duty-sync-card');
+        if (!card || !summary) return;
+        card.hidden = false;
+        card.className = `post-entry-duty-sync-card post-entry-duty-sync-card--${summary.tone || 'review'}`;
+        const title = $('post-entry-duty-sync-title');
+        const text = $('post-entry-duty-sync-summary');
+        if (title) title.textContent = summary.title || 'Duty source status';
+        if (text) text.textContent = summary.summary || '';
+    }
+
+    async function hydrateDutySyncStatus() {
+        const card = $('post-entry-duty-sync-card');
+        if (!card) return;
+        try {
+            const response = await fetch('data/duty-rate-sync-status.json', { cache: 'no-store' });
+            if (!response.ok) return;
+            const payload = await response.json();
+            renderDutySyncCard(buildDutySyncSummary(payload));
+        } catch (error) {
+            card.hidden = true;
+        }
+    }
+
     function renderReviewSnapshot(snapshot) {
         if (!snapshot) return false;
         setResultModeLabels(snapshot.focus);
@@ -1008,6 +1084,7 @@
             resultSection.hidden = false;
             requestAnimationFrame(() => resultSection.classList.add('is-visible'));
         }
+        hydrateDutySyncStatus();
         return true;
     }
 

@@ -5522,6 +5522,50 @@ button.feedback-link:hover {
     margin-top: -2px;
 }
 
+.post-entry-duty-sync-card {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 14px;
+    padding: 13px 15px;
+    border: 1px solid rgba(26, 58, 92, 0.14);
+    border-left: 4px solid var(--color-primary);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.post-entry-duty-sync-card[hidden] {
+    display: none !important;
+}
+
+.post-entry-duty-sync-card strong {
+    color: var(--color-primary);
+    font-size: 0.96rem;
+    line-height: 1.35;
+}
+
+.post-entry-duty-sync-card p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.post-entry-duty-sync-card--stable {
+    border-left-color: #2e7d32;
+    background: rgba(46, 125, 50, 0.04);
+}
+
+.post-entry-duty-sync-card--changed,
+.post-entry-duty-sync-card--review {
+    border-left-color: #b7791f;
+    background: rgba(232, 168, 23, 0.07);
+}
+
+.post-entry-duty-sync-card--exception {
+    border-left-color: #b71c1c;
+    background: rgba(183, 28, 28, 0.05);
+}
+
 .post-entry-decision-grid {
     display: grid;
     grid-template-columns: 1fr;

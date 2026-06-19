@@ -18,7 +18,7 @@ describe('search quality audit', () => {
         const report = runQualityAudit();
         assert.equal(report.ok, true);
         assert.equal(report.summary.failed, 0);
-        assert.ok(report.summary.samples >= 20);
+        assert.ok(report.summary.samples >= 45);
         assert.equal(report.results.length, DEFAULT_SAMPLES.length);
     });
 

@@ -121,6 +121,8 @@ test('calculates indicative duty impact for US imports from China', () => {
     assert.equal(Number(duty.estimatedDuty.toFixed(2)), 231.08);
     assert.equal(duty.addOnLayers[0].type, 'section_301');
     assert.match(duty.tradeRemedy, /Section 301/);
+    assert.match(duty.filingGradeFocus, /battery chemistry/);
+    assert.match(duty.filingGradeFocus, /Section 301/);
     assert.ok(duty.sourceBreakdown.some(source => source.label === 'General duty' && source.status === 'official_source_checked'));
     assert.ok(duty.sourceBreakdown.some(source => /Section 301/.test(source.label) && source.status === 'indicative'));
 });
@@ -140,6 +142,8 @@ test('keeps AD/CVD as a flag-only add-on layer', () => {
     assert.equal(duty.addOnLayers.some(layer => layer.type === 'section_301' && layer.amount === 2500), true);
     assert.equal(duty.flagOnlyLayers.some(layer => layer.type === 'ad_cvd'), true);
     assert.equal(duty.estimatedDuty, 2500);
+    assert.match(duty.filingGradeFocus, /AD\/CVD/);
+    assert.match(duty.filingGradeFocus, /UFLPA/);
     assert.ok(duty.sourceBreakdown.some(source => /AD\/CVD/.test(source.label) && source.status === 'scope_check_required'));
 });
 
@@ -218,7 +222,8 @@ test('builds direct import decision for official and benchmark rate sources', ()
     assert.match(usDecision.coreConclusion, /Estimated duty shortfall/);
     assert.match(usDecision.coreConclusion, /value gap/);
     assert.equal(usDecision.trust.level, 'mixed_official_estimate');
-    assert.match(usDecision.nextAction, /screening alert/);
+    assert.match(usDecision.nextAction, /battery chemistry/);
+    assert.match(usDecision.nextAction, /Section 301/);
 
     const sgDuty = calculateDutyImpact(valueResult, {
         importCountryCode: 'SG',
@@ -290,9 +295,12 @@ test('builds US export-side post-entry review without treating it as import duty
 test('Post-Entry result shows rate confidence without opening details', () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'post-entry-result.html'), 'utf8');
     const confidenceIndex = html.indexOf('id="post-entry-confidence-card"');
+    const syncIndex = html.indexOf('id="post-entry-duty-sync-card"');
     const detailsIndex = html.indexOf('<details class="post-entry-detail-panel">');
 
     assert.ok(confidenceIndex > -1, 'rate confidence card should exist');
+    assert.ok(syncIndex > -1, 'duty sync status card should exist');
     assert.ok(detailsIndex > -1, 'details panel should exist');
     assert.ok(confidenceIndex < detailsIndex, 'rate confidence card should appear before the collapsible details panel');
+    assert.ok(syncIndex < detailsIndex, 'duty sync status should appear before the collapsible details panel');
 });
