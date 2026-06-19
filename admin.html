@@ -1199,6 +1199,59 @@
             `;
         }
 
+        function renderOpportunityPriority(opportunity = {}) {
+            const rows = Array.isArray(opportunity.rows) ? opportunity.rows : [];
+            if (!rows.length) {
+                return '<div class="empty">No trade opportunity priority rows available.</div>';
+            }
+            return `
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${escapeHtml(opportunity.row_count ?? rows.length)}</strong><span>Opportunity routes ranked</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(opportunity.quote_ready_count ?? 0)}</strong><span>Quote-ready routes</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(opportunity.selective_quote_count ?? 0)}</strong><span>Selective quote routes</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(opportunity.compare_first_count ?? 0)}</strong><span>Compare-first routes</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(opportunity.high_landed_cost_risk_count ?? 0)}</strong><span>High landed-cost risk</span></div>
+                </div>
+                <div class="coverage-table-wrap">
+                    <table class="quality-gap-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Route</th>
+                                <th>Product / HS</th>
+                                <th>Target market</th>
+                                <th>Best comparison</th>
+                                <th>Commercial signal</th>
+                                <th>Next action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.slice(0, 24).map((row) => `
+                                <tr>
+                                    <td><strong>${escapeHtml(row.priority_score ?? 0)}</strong></td>
+                                    <td>${escapeHtml(row.route || '')}</td>
+                                    <td>${escapeHtml(row.product_id || '')}<div class="meta">HS ${escapeHtml(row.hs_code || '')}</div></td>
+                                    <td>
+                                        ${escapeHtml(row.selected_market || '')}
+                                        <div class="meta">${escapeHtml(row.selected_total_rate || '')} · ${escapeHtml(row.selected_source_trust || '')}</div>
+                                    </td>
+                                    <td>
+                                        ${escapeHtml(row.best_market || '')}
+                                        <div class="meta">${escapeHtml(row.best_total_rate || '')} · score ${escapeHtml(row.best_market_score ?? 0)}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge ${row.quote_readiness === 'Quote-ready' ? 'auto_updatable' : row.quote_readiness === 'Selective quote' ? 'medium' : 'benchmark'}">${escapeHtml(row.quote_readiness || '')}</span>
+                                        <div class="meta">${escapeHtml(row.opportunity_type || '')} · ${escapeHtml(row.landed_cost_risk || '')} landed-cost risk</div>
+                                    </td>
+                                    <td>${escapeHtml(row.commercial_action || row.route_strategy || '')}<div class="meta">${escapeHtml(row.route_strategy || row.next_action || '')}</div></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         function renderDutyRateActionDetails(details = []) {
             if (!Array.isArray(details) || !details.length) {
                 return '<div class="empty">No duty-rate action details. All monitored exceptions and parser priorities are clear.</div>';
@@ -1358,6 +1411,7 @@
         function renderQualityStatus(data) {
             const search = data.search || {};
             const duty = data.duty || {};
+            const opportunity = data.opportunity || {};
             const gap = duty.gap_matrix || {};
             const priorityMatrix = duty.priority_rate_matrix || {};
             const statusClass = data.ok ? '' : search.failed ? 'fail' : 'warn';
@@ -1387,6 +1441,8 @@
                 <div class="crawl-section-title"><h3>Search quality exceptions</h3><span class="meta">${(search.failing_samples || []).length} failed · ${(search.warning_samples || []).length} warned</span></div>
                 ${renderQualitySamples(search.failing_samples || [], 'failures')}
                 ${(search.failing_samples || []).length ? '' : renderQualitySamples((search.warning_samples || []).slice(0, 5), 'warnings')}
+                <div class="crawl-section-title"><h3>Trade Opportunity priority list</h3><span class="meta">${opportunity.row_count || 0} ranked route(s)</span></div>
+                ${renderOpportunityPriority(opportunity)}
                 <div class="crawl-section-title"><h3>Post-Entry priority HS coverage</h3><span class="meta">${gap.missing_total || 0} missing cells</span></div>
                 ${renderDutyGapMatrix(gap)}
                 <div class="crawl-section-title"><h3>High-frequency exact-rate matrix</h3><span class="meta">${priorityMatrix.route_count || 0} priority routes</span></div>

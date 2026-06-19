@@ -11,6 +11,21 @@ const {
 const {
     runPostEntryTaxCoverageCheck
 } = require('./check-post-entry-tax-coverage');
+const {
+    buildOpportunityPriorityList
+} = require('../lib/trade-opportunity');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const ROOT = path.join(__dirname, '..');
+
+function readJson(relativePath, fallback = {}) {
+    try {
+        return JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), 'utf8'));
+    } catch (error) {
+        return fallback;
+    }
+}
 
 function summarizeSearchAudit(searchAudit) {
     const results = Array.isArray(searchAudit?.results) ? searchAudit.results : [];
@@ -96,6 +111,26 @@ function summarizePostEntryTaxCoverage(taxHealth) {
     };
 }
 
+function summarizeOpportunityPriority() {
+    const dutyRates = readJson('data/duty-rates.json', { rules: [] });
+    const priorityMatrix = readJson('data/post-entry-rate-priority-matrix.json', { routes: [] });
+    const rows = buildOpportunityPriorityList({ dutyRates, priorityMatrix, limit: 24 });
+    const quoteReady = rows.filter((row) => row.quote_readiness === 'Quote-ready').length;
+    const selective = rows.filter((row) => row.quote_readiness === 'Selective quote').length;
+    const highRisk = rows.filter((row) => row.landed_cost_risk === 'High').length;
+    const compareFirst = rows.filter((row) => !row.best_is_selected).length;
+
+    return {
+        ok: rows.length > 0,
+        row_count: rows.length,
+        quote_ready_count: quoteReady,
+        selective_quote_count: selective,
+        high_landed_cost_risk_count: highRisk,
+        compare_first_count: compareFirst,
+        rows
+    };
+}
+
 function buildQualityStatus() {
     const searchAudit = runQualityAudit();
     const dutyHealth = runDutyRateHealthCheck();
@@ -103,12 +138,14 @@ function buildQualityStatus() {
     const search = summarizeSearchAudit(searchAudit);
     const duty = summarizeDutyHealth(dutyHealth);
     const postEntryTax = summarizePostEntryTaxCoverage(taxHealth);
+    const opportunity = summarizeOpportunityPriority();
     return {
-        ok: search.ok && duty.ok && postEntryTax.ok,
+        ok: search.ok && duty.ok && postEntryTax.ok && opportunity.ok,
         generated_at: new Date().toISOString(),
         search,
         duty,
         post_entry_tax: postEntryTax,
+        opportunity,
         compact_report: formatAuditReport(searchAudit)
     };
 }
@@ -127,5 +164,6 @@ module.exports = {
     buildQualityStatus,
     summarizeSearchAudit,
     summarizeDutyHealth,
-    summarizePostEntryTaxCoverage
+    summarizePostEntryTaxCoverage,
+    summarizeOpportunityPriority
 };

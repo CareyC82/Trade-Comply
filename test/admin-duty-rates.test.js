@@ -69,6 +69,11 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.equal(payload.duty.gap_matrix.full_count, payload.duty.gap_matrix.rows.length);
     assert.equal(payload.post_entry_tax.export_missing_countries.length, 0);
     assert.equal(payload.post_entry_tax.false_official_rate_claims.length, 0);
+    assert.equal(payload.opportunity.ok, true);
+    assert.ok(payload.opportunity.row_count > 0);
+    assert.ok(payload.opportunity.quote_ready_count > 0);
+    assert.ok(payload.opportunity.rows.some(row => row.to === 'IN' || row.to === 'MY' || row.to === 'VN'));
+    assert.ok(payload.opportunity.rows.every(row => Number.isFinite(row.priority_score)));
     assert.equal(Array.isArray(payload.search.failing_samples), true);
     assert.equal(Array.isArray(payload.duty.markets_missing_priority_hs), true);
 });

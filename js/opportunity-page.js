@@ -96,7 +96,9 @@ function bootstrapTradeOpportunityPage() {
             { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
             { label: 'Quote readiness', value: card.quoteReadiness || 'Pending' },
-            { label: 'Landed-cost risk', value: card.landedCostRisk || 'Unknown' }
+            { label: 'Landed-cost risk', value: card.landedCostRisk || 'Unknown' },
+            { label: 'Market role', value: card.marketRole || 'Route option' },
+            { label: 'Opportunity type', value: card.opportunityType || 'Review' }
         ];
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
@@ -136,6 +138,15 @@ function bootstrapTradeOpportunityPage() {
                             <div>
                                 <strong>Business opportunity</strong>
                                 <small>${escapeHtml(card.tradeOpportunityThesis)}</small>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${card.routeStrategy ? `
+                        <div class="opportunity-reason opportunity-reason--neutral">
+                            <span>→</span>
+                            <div>
+                                <strong>Route strategy</strong>
+                                <small>${escapeHtml(card.routeStrategy)}</small>
                             </div>
                         </div>
                     ` : ''}

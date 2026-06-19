@@ -4,7 +4,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { buildOpportunityInsights, detectProductSignal } = require('../lib/trade-opportunity');
+const { buildOpportunityInsights, buildOpportunityPriorityList, detectProductSignal } = require('../lib/trade-opportunity');
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const priorityMatrix = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'post-entry-rate-priority-matrix.json'), 'utf8'));
@@ -46,6 +46,7 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => row.tradeOpportunityThesis && row.valueLever && row.executionGate));
         assert.ok(model.routeComparison.every((row) => row.commercialDecision && row.marginSignal && row.quoteGate));
         assert.ok(model.routeComparison.every((row) => row.quoteReadiness && row.landedCostRisk));
+        assert.ok(model.routeComparison.every((row) => row.marketRole && row.opportunityType && row.routeStrategy));
         assert.ok(model.routeComparison.every((row) => row.commercialDecision.length < 180));
         assert.ok(model.routeComparison.every((row) => row.opportunitySignal?.oneLine && row.opportunitySignal?.action));
         assert.ok(model.routeComparison.every((row) => row.opportunitySignal?.shortAction));
@@ -210,6 +211,19 @@ describe('trade opportunity insights', () => {
         assert.ok(pendingRows.every((row) => /Research only|coverage/i.test(row.commercialDecision)));
         assert.ok(pendingRows.every((row) => row.quoteReadiness === 'Research only'));
     });
+
+    it('builds an admin-ready opportunity priority list from maintained rate routes', () => {
+        const rows = buildOpportunityPriorityList({ dutyRates, priorityMatrix, limit: 80 });
+
+        assert.ok(rows.length >= 8);
+        assert.ok(rows.every((row) => Number.isFinite(row.priority_score)));
+        assert.ok(rows.every((row) => row.route && row.product_id && row.hs_code));
+        assert.ok(rows.every((row) => row.quote_readiness && row.landed_cost_risk && row.market_role));
+        assert.ok(rows.every((row) => row.commercial_action && row.route_strategy));
+        assert.ok(rows.some((row) => row.to === 'IN' && row.from === 'CN'));
+        assert.ok(rows.some((row) => row.to === 'CN' && row.from === 'US'));
+        assert.ok(rows[0].priority_score >= rows[rows.length - 1].priority_score);
+    });
 });
 
 describe('trade opportunity navigation', () => {
@@ -265,5 +279,8 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Quote Gate/);
         assert.match(source, /Quote readiness/);
         assert.match(source, /Landed-cost risk/);
+        assert.match(source, /Market role/);
+        assert.match(source, /Opportunity type/);
+        assert.match(source, /Route strategy/);
     });
 });
