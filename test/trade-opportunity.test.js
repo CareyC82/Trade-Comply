@@ -361,4 +361,13 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Strategic note/);
         assert.match(source, /Risk note/);
     });
+
+    it('hides the Opportunity input form when rendering a result URL', () => {
+        const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'opportunity-page.js'), 'utf8');
+
+        assert.match(source, /setResultMode/);
+        assert.match(source, /form\.hidden = enabled/);
+        assert.match(source, /startPanel\.hidden = enabled/);
+        assert.match(source, /opportunity-result-mode/);
+    });
 });

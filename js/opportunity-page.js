@@ -14,6 +14,7 @@ function bootstrapTradeOpportunityPage() {
     const form = $('opportunity-form');
     const result = $('opportunity-result');
     const error = $('opportunity-error');
+    const startPanel = document.querySelector('.opportunity-start-panel');
     let dutyRates = null;
     let priorityMatrix = null;
 
@@ -318,12 +319,50 @@ function bootstrapTradeOpportunityPage() {
         `;
     }
 
+    function buildOpportunityUrl({ product, from, to, focus }) {
+        const params = new URLSearchParams();
+        params.set('product', product);
+        params.set('from', from);
+        params.set('to', to);
+        params.set('focus', focus);
+        params.set('result', '1');
+        return `opportunity.html?${params.toString()}`;
+    }
+
+    async function renderOpportunityResult({ product, from, to, focus }) {
+        const [rates, matrix] = await Promise.all([
+            loadDutyRates(),
+            loadPriorityMatrix()
+        ]);
+        const model = opportunity.buildOpportunityInsights({
+            product,
+            from,
+            to,
+            focus,
+            dutyRates: rates,
+            priorityMatrix: matrix
+        });
+        renderInsights(model);
+    }
+
+    function setResultMode(enabled) {
+        document.body.classList.toggle('opportunity-result-mode', enabled);
+        if (form) {
+            form.hidden = enabled;
+        }
+        if (startPanel) {
+            startPanel.hidden = enabled;
+        }
+    }
+
     function applyParams() {
         const params = new URLSearchParams(window.location.search);
         const product = params.get('product') || params.get('search') || '';
         const from = params.has('from') ? registry.normalizeCountryCode(params.get('from')) : '';
         const to = params.has('to') ? registry.normalizeCountryCode(params.get('to')) : '';
         const focus = params.has('focus') ? params.get('focus') : '';
+        const hasResultParams = Boolean(product && from && to && focus);
+        setResultMode(hasResultParams);
         if ($('opportunity-product')) {
             $('opportunity-product').value = product;
         }
@@ -335,12 +374,13 @@ function bootstrapTradeOpportunityPage() {
         if (focusEl && (product || from || to)) {
             focusEl.checked = true;
         }
-        if (product || params.get('auto') === '1') {
-            form?.requestSubmit();
+        if (hasResultParams) {
+            renderOpportunityResult({ product, from, to, focus })
+                .catch(() => setError('Unable to load opportunity results. Please try again.'));
         }
     }
 
-    form?.addEventListener('submit', async (event) => {
+    form?.addEventListener('submit', (event) => {
         event.preventDefault();
         setError('');
         const product = $('opportunity-product')?.value.trim();
@@ -359,20 +399,7 @@ function bootstrapTradeOpportunityPage() {
             setError('Select export-side or import-side opportunity focus.');
             return;
         }
-        const [rates, matrix] = await Promise.all([
-            loadDutyRates(),
-            loadPriorityMatrix()
-        ]);
-        const model = opportunity.buildOpportunityInsights({
-            product,
-            from,
-            to,
-            focus,
-            dutyRates: rates,
-            priorityMatrix: matrix
-        });
-        renderInsights(model);
-        window.history.replaceState(null, '', `opportunity.html?product=${encodeURIComponent(product)}&from=${encodeURIComponent(model.from)}&to=${encodeURIComponent(model.to)}&focus=${encodeURIComponent(model.focus)}`);
+        window.location.assign(buildOpportunityUrl({ product, from, to, focus }));
     });
 
     applyParams();
