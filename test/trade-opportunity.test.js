@@ -346,13 +346,14 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /parserBacklogCount/);
     });
 
-    it('renders decision cards for commercial decision, margin signal, and quote gate', () => {
+    it('renders compact market metrics without repeated decision cards', () => {
         const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'opportunity-page.js'), 'utf8');
 
-        assert.match(source, /opportunity-decision-card-grid/);
-        assert.match(source, /Commercial Decision/);
-        assert.match(source, /Margin Signal/);
-        assert.match(source, /Quote Gate/);
+        assert.doesNotMatch(source, /opportunity-decision-card-grid/);
+        assert.doesNotMatch(source, /Commercial Decision/);
+        assert.doesNotMatch(source, /Margin Signal/);
+        assert.doesNotMatch(source, /Quote Gate/);
+        assert.match(source, /opportunity-rate-mini-grid/);
         assert.match(source, /Quote readiness/);
         assert.match(source, /Landed-cost risk/);
         assert.match(source, /Demand strength/);

@@ -5013,43 +5013,6 @@ button.feedback-link:hover {
     display: block;
 }
 
-.opportunity-decision-card-grid {
-    grid-column: 2 / 4;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-}
-
-@media (max-width: 760px) {
-    .opportunity-decision-card-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.opportunity-decision-card-grid div {
-    border: 1px solid rgba(15, 118, 110, 0.16);
-    border-radius: 10px;
-    padding: 9px 10px;
-    background: rgba(240, 253, 250, 0.72);
-}
-
-.opportunity-decision-card-grid span {
-    display: block;
-    color: #0f766e;
-    font-size: 0.66rem;
-    font-weight: 900;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
-.opportunity-decision-card-grid strong {
-    display: block;
-    margin-top: 4px;
-    color: var(--color-primary);
-    font-size: 0.8rem;
-    line-height: 1.35;
-}
-
 .opportunity-rate-mini-grid {
     grid-column: 2 / 4;
     display: grid;
