@@ -97,8 +97,8 @@ function bootstrapTradeOpportunityPage() {
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
             { label: 'Quote readiness', value: card.quoteReadiness || 'Pending' },
             { label: 'Landed-cost risk', value: card.landedCostRisk || 'Unknown' },
-            { label: 'Market role', value: card.marketRole || 'Route option' },
-            { label: 'Opportunity type', value: card.opportunityType || 'Review' }
+            { label: 'Demand strength', value: card.demandStrength || 'Selective' },
+            { label: 'Compliance friction', value: card.complianceFriction || 'Medium' }
         ];
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
@@ -147,6 +147,24 @@ function bootstrapTradeOpportunityPage() {
                             <div>
                                 <strong>Route strategy</strong>
                                 <small>${escapeHtml(card.routeStrategy)}</small>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${card.strategicNote ? `
+                        <div class="opportunity-reason opportunity-reason--positive">
+                            <span>+</span>
+                            <div>
+                                <strong>Strategic note</strong>
+                                <small>${escapeHtml(card.strategicNote)}</small>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${card.riskNote ? `
+                        <div class="opportunity-reason opportunity-reason--caution">
+                            <span>!</span>
+                            <div>
+                                <strong>Risk note</strong>
+                                <small>${escapeHtml(card.riskNote)}</small>
                             </div>
                         </div>
                     ` : ''}

@@ -72,8 +72,18 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.equal(payload.opportunity.ok, true);
     assert.ok(payload.opportunity.row_count > 0);
     assert.ok(payload.opportunity.quote_ready_count > 0);
+    assert.ok(payload.opportunity.bucket_counts.top_opportunity >= 0);
+    assert.ok(payload.opportunity.bucket_counts.data_gap >= 0);
+    assert.ok(payload.opportunity.bucket_counts.need_tariff_upgrade >= 0);
+    assert.ok(payload.opportunity.bucket_counts.need_rule_upgrade >= 0);
+    assert.ok(payload.opportunity.bucket_counts.top_opportunity > 0);
+    assert.equal(Array.isArray(payload.opportunity.top_opportunities), true);
+    assert.equal(Array.isArray(payload.opportunity.data_gaps), true);
+    assert.equal(Array.isArray(payload.opportunity.tariff_upgrades), true);
+    assert.equal(Array.isArray(payload.opportunity.rule_upgrades), true);
     assert.ok(payload.opportunity.rows.some(row => row.to === 'IN' || row.to === 'MY' || row.to === 'VN'));
     assert.ok(payload.opportunity.rows.every(row => Number.isFinite(row.priority_score)));
+    assert.ok(payload.opportunity.rows.every(row => row.workbench_bucket && row.workbench_bucket_label));
     assert.equal(Array.isArray(payload.search.failing_samples), true);
     assert.equal(Array.isArray(payload.duty.markets_missing_priority_hs), true);
 });

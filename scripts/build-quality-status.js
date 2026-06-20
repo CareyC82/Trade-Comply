@@ -119,6 +119,19 @@ function summarizeOpportunityPriority() {
     const selective = rows.filter((row) => row.quote_readiness === 'Selective quote').length;
     const highRisk = rows.filter((row) => row.landed_cost_risk === 'High').length;
     const compareFirst = rows.filter((row) => !row.best_is_selected).length;
+    const bucketCounts = rows.reduce((acc, row) => {
+        const bucket = row.workbench_bucket || 'data_gap';
+        acc[bucket] = (acc[bucket] || 0) + 1;
+        return acc;
+    }, {
+        top_opportunity: 0,
+        data_gap: 0,
+        need_tariff_upgrade: 0,
+        need_rule_upgrade: 0
+    });
+    const bucketRows = (bucket) => rows
+        .filter((row) => row.workbench_bucket === bucket)
+        .slice(0, 8);
 
     return {
         ok: rows.length > 0,
@@ -127,6 +140,11 @@ function summarizeOpportunityPriority() {
         selective_quote_count: selective,
         high_landed_cost_risk_count: highRisk,
         compare_first_count: compareFirst,
+        bucket_counts: bucketCounts,
+        top_opportunities: bucketRows('top_opportunity'),
+        data_gaps: bucketRows('data_gap'),
+        tariff_upgrades: bucketRows('need_tariff_upgrade'),
+        rule_upgrades: bucketRows('need_rule_upgrade'),
         rows
     };
 }

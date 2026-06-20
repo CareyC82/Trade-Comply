@@ -36,4 +36,15 @@ describe('coverage audit', () => {
         assert.deepEqual(highPriority, []);
         assert.equal(audit.next_actions.length, 0);
     });
+
+    it('keeps every maintained route focus at strong compliance-rule coverage', () => {
+        audit.countries.forEach((entry) => {
+            assert.equal(entry.destination_import.status, 'strong', `${entry.country} destination import should be strong`);
+            assert.equal(entry.origin_export.status, 'strong', `${entry.country} origin export should be strong`);
+            assert.deepEqual(entry.destination_import.gaps, [], `${entry.country} import gaps should be empty`);
+            assert.deepEqual(entry.origin_export.gaps, [], `${entry.country} export gaps should be empty`);
+            assert.ok(entry.destination_import.case_count > 0, `${entry.country} import cases should exist`);
+            assert.ok(entry.origin_export.case_count > 0, `${entry.country} export cases should exist`);
+        });
+    });
 });

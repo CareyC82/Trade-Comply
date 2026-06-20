@@ -1204,13 +1204,27 @@
             if (!rows.length) {
                 return '<div class="empty">No trade opportunity priority rows available.</div>';
             }
+            const buckets = opportunity.bucket_counts || {};
+            const renderBucketRows = (title, bucketRows = []) => `
+                <div class="summary-card">
+                    <strong>${escapeHtml(bucketRows.length)}</strong>
+                    <span>${escapeHtml(title)}</span>
+                    <div class="meta">${bucketRows.slice(0, 3).map((row) => `${row.product_id || ''}: ${row.from || ''}->${row.to || ''}`).join(' · ') || 'No rows'}</div>
+                </div>
+            `;
             return `
                 <div class="summary-grid">
                     <div class="summary-card"><strong>${escapeHtml(opportunity.row_count ?? rows.length)}</strong><span>Opportunity routes ranked</span></div>
-                    <div class="summary-card"><strong>${escapeHtml(opportunity.quote_ready_count ?? 0)}</strong><span>Quote-ready routes</span></div>
-                    <div class="summary-card"><strong>${escapeHtml(opportunity.selective_quote_count ?? 0)}</strong><span>Selective quote routes</span></div>
-                    <div class="summary-card"><strong>${escapeHtml(opportunity.compare_first_count ?? 0)}</strong><span>Compare-first routes</span></div>
-                    <div class="summary-card"><strong>${escapeHtml(opportunity.high_landed_cost_risk_count ?? 0)}</strong><span>High landed-cost risk</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(buckets.top_opportunity ?? 0)}</strong><span>Top opportunity</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(buckets.data_gap ?? 0)}</strong><span>Data gap</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(buckets.need_tariff_upgrade ?? 0)}</strong><span>Need tariff upgrade</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(buckets.need_rule_upgrade ?? 0)}</strong><span>Need rule upgrade</span></div>
+                </div>
+                <div class="summary-grid">
+                    ${renderBucketRows('Top opportunities', opportunity.top_opportunities || [])}
+                    ${renderBucketRows('Data gaps', opportunity.data_gaps || [])}
+                    ${renderBucketRows('Tariff upgrades', opportunity.tariff_upgrades || [])}
+                    ${renderBucketRows('Rule upgrades', opportunity.rule_upgrades || [])}
                 </div>
                 <div class="coverage-table-wrap">
                     <table class="quality-gap-table">
@@ -1221,6 +1235,7 @@
                                 <th>Product / HS</th>
                                 <th>Target market</th>
                                 <th>Best comparison</th>
+                                <th>Workbench</th>
                                 <th>Commercial signal</th>
                                 <th>Next action</th>
                             </tr>
@@ -1240,8 +1255,12 @@
                                         <div class="meta">${escapeHtml(row.best_total_rate || '')} · score ${escapeHtml(row.best_market_score ?? 0)}</div>
                                     </td>
                                     <td>
+                                        <span class="badge ${row.workbench_bucket === 'top_opportunity' ? 'auto_updatable' : row.workbench_bucket === 'data_gap' ? 'benchmark' : 'medium'}">${escapeHtml(row.workbench_bucket_label || '')}</span>
+                                        <div class="meta">${escapeHtml(row.workbench_action || '')}</div>
+                                    </td>
+                                    <td>
                                         <span class="badge ${row.quote_readiness === 'Quote-ready' ? 'auto_updatable' : row.quote_readiness === 'Selective quote' ? 'medium' : 'benchmark'}">${escapeHtml(row.quote_readiness || '')}</span>
-                                        <div class="meta">${escapeHtml(row.opportunity_type || '')} · ${escapeHtml(row.landed_cost_risk || '')} landed-cost risk</div>
+                                        <div class="meta">${escapeHtml(row.opportunity_type || '')} · ${escapeHtml(row.demand_strength || '')} demand · ${escapeHtml(row.compliance_friction || '')} friction</div>
                                     </td>
                                     <td>${escapeHtml(row.commercial_action || row.route_strategy || '')}<div class="meta">${escapeHtml(row.route_strategy || row.next_action || '')}</div></td>
                                 </tr>

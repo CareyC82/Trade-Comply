@@ -47,11 +47,15 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => row.commercialDecision && row.marginSignal && row.quoteGate));
         assert.ok(model.routeComparison.every((row) => row.quoteReadiness && row.landedCostRisk));
         assert.ok(model.routeComparison.every((row) => row.marketRole && row.opportunityType && row.routeStrategy));
+        assert.ok(model.routeComparison.every((row) => row.demandStrength && row.complianceFriction && row.routeFeasibility));
+        assert.ok(model.routeComparison.every((row) => row.greenSupplyChainAdvantage && Array.isArray(row.opportunityTags)));
+        assert.ok(model.routeComparison.every((row) => row.strategicNote && row.riskNote));
         assert.ok(model.routeComparison.every((row) => row.commercialDecision.length < 180));
         assert.ok(model.routeComparison.every((row) => row.opportunitySignal?.oneLine && row.opportunitySignal?.action));
         assert.ok(model.routeComparison.every((row) => row.opportunitySignal?.shortAction));
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.opportunityEvidence) && row.opportunityEvidence.length === 3));
         assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Demand driver')));
+        assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Compliance friction')));
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
         assert.ok(model.readyRouteCount >= 1);
         assert.ok(model.parserBacklogCount >= 0);
@@ -128,6 +132,74 @@ describe('trade opportunity insights', () => {
         assert.ok(new Set(winners).size > 1);
         assert.equal(winners.every((market) => market === 'SG'), false);
         assert.equal(winners[0], 'US');
+    });
+
+    it('keeps high-frequency opportunity ranking aligned with business intuition', () => {
+        const samples = [
+            {
+                product: 'AI GPU accelerator chip',
+                from: 'US',
+                to: 'IN',
+                expectedSelected: {
+                    market: 'IN',
+                    demand: /Very high|High/,
+                    friction: /High|Very high/,
+                    note: /BIS|QCO|approval|controlled/i
+                }
+            },
+            {
+                product: 'solar panel photovoltaic module',
+                from: 'CN',
+                to: 'EU',
+                expectedSelected: {
+                    market: 'EU',
+                    green: /High/,
+                    tags: /energy transition|origin traceability|green/i
+                }
+            },
+            {
+                product: 'energy storage battery system',
+                from: 'CN',
+                to: 'MY',
+                expectedSelected: {
+                    market: 'MY',
+                    role: /Manufacturing|supply-chain/i,
+                    tags: /electronics cluster|battery|ASEAN/i
+                }
+            }
+        ];
+
+        samples.forEach((sample) => {
+            const model = buildOpportunityInsights({
+                product: sample.product,
+                from: sample.from,
+                to: sample.to,
+                focus: 'import',
+                dutyRates,
+                priorityMatrix
+            });
+            const selected = model.selectedMarket;
+
+            assert.equal(selected.market, sample.expectedSelected.market);
+            if (sample.expectedSelected.demand) {
+                assert.match(selected.demandStrength, sample.expectedSelected.demand);
+            }
+            if (sample.expectedSelected.friction) {
+                assert.match(selected.complianceFriction, sample.expectedSelected.friction);
+            }
+            if (sample.expectedSelected.green) {
+                assert.match(selected.greenSupplyChainAdvantage, sample.expectedSelected.green);
+            }
+            if (sample.expectedSelected.role) {
+                assert.match(selected.marketRole, sample.expectedSelected.role);
+            }
+            if (sample.expectedSelected.note) {
+                assert.match(`${selected.strategicNote} ${selected.riskNote}`, sample.expectedSelected.note);
+            }
+            if (sample.expectedSelected.tags) {
+                assert.match(selected.opportunityTags.join(' '), sample.expectedSelected.tags);
+            }
+        });
     });
 
     it('keeps the selected target market visible in route comparisons', () => {
@@ -219,9 +291,13 @@ describe('trade opportunity insights', () => {
         assert.ok(rows.every((row) => Number.isFinite(row.priority_score)));
         assert.ok(rows.every((row) => row.route && row.product_id && row.hs_code));
         assert.ok(rows.every((row) => row.quote_readiness && row.landed_cost_risk && row.market_role));
+        assert.ok(rows.every((row) => row.demand_strength && row.compliance_friction && row.route_feasibility));
+        assert.ok(rows.every((row) => row.workbench_bucket && row.workbench_bucket_label && row.workbench_action));
         assert.ok(rows.every((row) => row.commercial_action && row.route_strategy));
         assert.ok(rows.some((row) => row.to === 'IN' && row.from === 'CN'));
         assert.ok(rows.some((row) => row.to === 'CN' && row.from === 'US'));
+        assert.ok(rows.some((row) => row.workbench_bucket === 'top_opportunity'));
+        assert.ok(rows.some((row) => row.workbench_bucket === 'need_rule_upgrade'));
         assert.ok(rows[0].priority_score >= rows[rows.length - 1].priority_score);
     });
 });
@@ -279,8 +355,10 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Quote Gate/);
         assert.match(source, /Quote readiness/);
         assert.match(source, /Landed-cost risk/);
-        assert.match(source, /Market role/);
-        assert.match(source, /Opportunity type/);
+        assert.match(source, /Demand strength/);
+        assert.match(source, /Compliance friction/);
         assert.match(source, /Route strategy/);
+        assert.match(source, /Strategic note/);
+        assert.match(source, /Risk note/);
     });
 });

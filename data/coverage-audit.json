@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-14T12:32:14.349Z",
+  "generated_at": "2026-06-20T05:54:53.224Z",
   "dimensions": {
     "destination_import": [
       {
@@ -231,7 +231,7 @@
       "origin_export": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 48,
+        "tag_count": 49,
         "case_count": 40,
         "tag_ids": [
           "CL-BATT-001",
@@ -265,6 +265,7 @@
           "CL-DU-004",
           "CL-ENCR-001",
           "CL-ENERGY-001",
+          "CL-GLPOL-112",
           "CL-GLPOL-132",
           "CL-GLPOL-133",
           "CL-OPTICAL-002",
@@ -366,6 +367,7 @@
               "CL-CHIP-002",
               "CL-CHIP-006",
               "CL-DRAWBACK-001",
+              "CL-GLPOL-112",
               "CL-GLPOL-132"
             ]
           }
@@ -388,21 +390,27 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 5,
-        "case_count": 5,
+        "tag_count": 8,
+        "case_count": 8,
         "tag_ids": [
           "CL-USCPSC-001",
+          "CL-USDC-001",
           "CL-USDRONE-001",
           "CL-USESS-001",
           "CL-USFCC-002",
-          "CL-USIMPCUST-001"
+          "CL-USIMPCUST-001",
+          "CL-USMED-001",
+          "CL-USROBOT-001"
         ],
         "case_ids": [
           "CASE-US-CPSC-LITHIUM",
+          "CASE-US-DATACENTER-IMPORT",
           "CASE-US-DRONE-REMOTE-ID",
           "CASE-US-ESS-UL-FIRECODE",
           "CASE-US-FCC-EQUIPAUTH",
-          "CASE-US-IMPORT-CUSTOMS"
+          "CASE-US-FDA-MEDDEVICE",
+          "CASE-US-IMPORT-CUSTOMS",
+          "CASE-US-MACHINERY-IMPORT"
         ],
         "dimensions": [
           {
@@ -411,9 +419,11 @@
             "status": "covered",
             "tag_ids": [
               "CL-USCPSC-001",
+              "CL-USDC-001",
               "CL-USDRONE-001",
               "CL-USFCC-002",
-              "CL-USIMPCUST-001"
+              "CL-USIMPCUST-001",
+              "CL-USROBOT-001"
             ]
           },
           {
@@ -422,10 +432,12 @@
             "status": "covered",
             "tag_ids": [
               "CL-USCPSC-001",
+              "CL-USDC-001",
               "CL-USDRONE-001",
               "CL-USESS-001",
               "CL-USFCC-002",
-              "CL-USIMPCUST-001"
+              "CL-USIMPCUST-001",
+              "CL-USROBOT-001"
             ]
           },
           {
@@ -437,7 +449,8 @@
               "CL-USDRONE-001",
               "CL-USESS-001",
               "CL-USFCC-002",
-              "CL-USIMPCUST-001"
+              "CL-USIMPCUST-001",
+              "CL-USROBOT-001"
             ]
           },
           {
@@ -445,7 +458,10 @@
             "label": "Customs import declaration / tariff classification",
             "status": "covered",
             "tag_ids": [
-              "CL-USIMPCUST-001"
+              "CL-USDC-001",
+              "CL-USIMPCUST-001",
+              "CL-USMED-001",
+              "CL-USROBOT-001"
             ]
           },
           {
@@ -457,7 +473,8 @@
               "CL-USDRONE-001",
               "CL-USESS-001",
               "CL-USFCC-002",
-              "CL-USIMPCUST-001"
+              "CL-USIMPCUST-001",
+              "CL-USMED-001"
             ]
           }
         ],
@@ -720,12 +737,14 @@
       "origin_export": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 1,
-        "case_count": 1,
+        "tag_count": 2,
+        "case_count": 2,
         "tag_ids": [
-          "CL-DE-001"
+          "CL-DE-001",
+          "CL-DEAUTO-001"
         ],
         "case_ids": [
+          "CASE-DE-DUALUSE-AUTOMATION",
           "CASE-DE-EXPORT-BAFA-DUALUSE"
         ],
         "dimensions": [
@@ -734,7 +753,8 @@
             "label": "Export controls / sanctions / dual-use",
             "status": "covered",
             "tag_ids": [
-              "CL-DE-001"
+              "CL-DE-001",
+              "CL-DEAUTO-001"
             ]
           },
           {
@@ -742,7 +762,8 @@
             "label": "Origin / re-export / anti-circumvention",
             "status": "covered",
             "tag_ids": [
-              "CL-DE-001"
+              "CL-DE-001",
+              "CL-DEAUTO-001"
             ]
           },
           {
@@ -750,7 +771,8 @@
             "label": "Export declaration / outbound customs",
             "status": "covered",
             "tag_ids": [
-              "CL-DE-001"
+              "CL-DE-001",
+              "CL-DEAUTO-001"
             ]
           }
         ],
@@ -890,19 +912,23 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 6,
-        "case_count": 5,
+        "tag_count": 9,
+        "case_count": 6,
         "tag_ids": [
           "CL-SG-002",
           "CL-SG-003",
           "CL-SG-004",
           "CL-SG-005",
           "CL-SG-006",
-          "CL-SGIMPCUST-001"
+          "CL-SGDC-001",
+          "CL-SGIMPCUST-001",
+          "CL-SGMED-001",
+          "CL-SGROBOT-001"
         ],
         "case_ids": [
           "CASE-SG-CPSO-UNREGISTERED-APPLIANCES",
           "CASE-SG-CSA-ROUTER-CLS",
+          "CASE-SG-HIGHTECH-IMPORT",
           "CASE-SG-IMDA-IMPORT-REGISTRATION",
           "CASE-SG-IMPORT-CUSTOMS",
           "CASE-SG-SCDF-ESS-FIRECODE"
@@ -916,7 +942,9 @@
               "CL-SG-002",
               "CL-SG-003",
               "CL-SG-005",
-              "CL-SGIMPCUST-001"
+              "CL-SGDC-001",
+              "CL-SGIMPCUST-001",
+              "CL-SGROBOT-001"
             ]
           },
           {
@@ -927,7 +955,9 @@
               "CL-SG-003",
               "CL-SG-004",
               "CL-SG-006",
-              "CL-SGIMPCUST-001"
+              "CL-SGDC-001",
+              "CL-SGIMPCUST-001",
+              "CL-SGROBOT-001"
             ]
           },
           {
@@ -940,7 +970,9 @@
               "CL-SG-004",
               "CL-SG-005",
               "CL-SG-006",
-              "CL-SGIMPCUST-001"
+              "CL-SGDC-001",
+              "CL-SGIMPCUST-001",
+              "CL-SGROBOT-001"
             ]
           },
           {
@@ -948,7 +980,10 @@
             "label": "Customs import declaration / tariff classification",
             "status": "covered",
             "tag_ids": [
-              "CL-SGIMPCUST-001"
+              "CL-SGDC-001",
+              "CL-SGIMPCUST-001",
+              "CL-SGMED-001",
+              "CL-SGROBOT-001"
             ]
           },
           {
@@ -959,7 +994,9 @@
               "CL-SG-003",
               "CL-SG-004",
               "CL-SG-005",
-              "CL-SGIMPCUST-001"
+              "CL-SGDC-001",
+              "CL-SGIMPCUST-001",
+              "CL-SGMED-001"
             ]
           }
         ],
@@ -1017,17 +1054,21 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 6,
-        "case_count": 4,
+        "tag_count": 9,
+        "case_count": 5,
         "tag_ids": [
           "CL-MX-001",
           "CL-MX-002",
           "CL-MX-003",
           "CL-MX-004",
           "CL-MX-005",
-          "CL-MX-006"
+          "CL-MX-006",
+          "CL-MXDC-001",
+          "CL-MXMED-001",
+          "CL-MXROBOT-001"
         ],
         "case_ids": [
+          "CASE-MX-HIGHTECH-IMPORT",
           "CASE-MX-IFT-HOMOLOGATION",
           "CASE-MX-NOM024-COMMERCIAL-INFO",
           "CASE-MX-PROFECO-NOM",
@@ -1044,7 +1085,9 @@
               "CL-MX-003",
               "CL-MX-004",
               "CL-MX-005",
-              "CL-MX-006"
+              "CL-MX-006",
+              "CL-MXDC-001",
+              "CL-MXROBOT-001"
             ]
           },
           {
@@ -1057,7 +1100,10 @@
               "CL-MX-003",
               "CL-MX-004",
               "CL-MX-005",
-              "CL-MX-006"
+              "CL-MX-006",
+              "CL-MXDC-001",
+              "CL-MXMED-001",
+              "CL-MXROBOT-001"
             ]
           },
           {
@@ -1070,7 +1116,8 @@
               "CL-MX-003",
               "CL-MX-004",
               "CL-MX-005",
-              "CL-MX-006"
+              "CL-MX-006",
+              "CL-MXROBOT-001"
             ]
           },
           {
@@ -1080,7 +1127,10 @@
             "tag_ids": [
               "CL-MX-002",
               "CL-MX-003",
-              "CL-MX-006"
+              "CL-MX-006",
+              "CL-MXDC-001",
+              "CL-MXMED-001",
+              "CL-MXROBOT-001"
             ]
           },
           {
@@ -1091,7 +1141,10 @@
               "CL-MX-001",
               "CL-MX-003",
               "CL-MX-005",
-              "CL-MX-006"
+              "CL-MX-006",
+              "CL-MXDC-001",
+              "CL-MXMED-001",
+              "CL-MXROBOT-001"
             ]
           }
         ],
@@ -1149,18 +1202,22 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 4,
-        "case_count": 4,
+        "tag_count": 7,
+        "case_count": 5,
         "tag_ids": [
           "CL-VN-001",
           "CL-VN-002",
           "CL-VN-003",
-          "CL-VN-004"
+          "CL-VN-004",
+          "CL-VNDC-001",
+          "CL-VNMED-001",
+          "CL-VNROBOT-001"
         ],
         "case_ids": [
           "CASE-VN-BATTERY-ESS",
           "CASE-VN-CUSTOMS-IMPORT",
           "CASE-VN-ELECTRICAL-SAFETY",
+          "CASE-VN-HIGHTECH-IMPORT",
           "CASE-VN-MIC-ICT"
         ],
         "dimensions": [
@@ -1170,7 +1227,9 @@
             "status": "covered",
             "tag_ids": [
               "CL-VN-001",
-              "CL-VN-003"
+              "CL-VN-003",
+              "CL-VNDC-001",
+              "CL-VNROBOT-001"
             ]
           },
           {
@@ -1180,7 +1239,9 @@
             "tag_ids": [
               "CL-VN-002",
               "CL-VN-003",
-              "CL-VN-004"
+              "CL-VN-004",
+              "CL-VNDC-001",
+              "CL-VNROBOT-001"
             ]
           },
           {
@@ -1191,7 +1252,8 @@
               "CL-VN-001",
               "CL-VN-002",
               "CL-VN-003",
-              "CL-VN-004"
+              "CL-VN-004",
+              "CL-VNROBOT-001"
             ]
           },
           {
@@ -1201,7 +1263,10 @@
             "tag_ids": [
               "CL-VN-001",
               "CL-VN-003",
-              "CL-VN-004"
+              "CL-VN-004",
+              "CL-VNDC-001",
+              "CL-VNMED-001",
+              "CL-VNROBOT-001"
             ]
           },
           {
@@ -1210,7 +1275,10 @@
             "status": "covered",
             "tag_ids": [
               "CL-VN-001",
-              "CL-VN-002"
+              "CL-VN-002",
+              "CL-VNDC-001",
+              "CL-VNMED-001",
+              "CL-VNROBOT-001"
             ]
           }
         ],
@@ -1268,18 +1336,22 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 4,
-        "case_count": 4,
+        "tag_count": 7,
+        "case_count": 5,
         "tag_ids": [
           "CL-MY-001",
           "CL-MY-002",
           "CL-MY-003",
-          "CL-MY-004"
+          "CL-MY-004",
+          "CL-MYDC-001",
+          "CL-MYMED-001",
+          "CL-MYROBOT-001"
         ],
         "case_ids": [
           "CASE-MY-BATTERY-ESS",
           "CASE-MY-CUSTOMS-IMPORT",
           "CASE-MY-ELECTRICAL-SAFETY",
+          "CASE-MY-HIGHTECH-IMPORT",
           "CASE-MY-SIRIM-MCMC"
         ],
         "dimensions": [
@@ -1289,7 +1361,9 @@
             "status": "covered",
             "tag_ids": [
               "CL-MY-001",
-              "CL-MY-003"
+              "CL-MY-003",
+              "CL-MYDC-001",
+              "CL-MYROBOT-001"
             ]
           },
           {
@@ -1299,7 +1373,9 @@
             "tag_ids": [
               "CL-MY-002",
               "CL-MY-003",
-              "CL-MY-004"
+              "CL-MY-004",
+              "CL-MYDC-001",
+              "CL-MYROBOT-001"
             ]
           },
           {
@@ -1310,7 +1386,9 @@
               "CL-MY-001",
               "CL-MY-002",
               "CL-MY-003",
-              "CL-MY-004"
+              "CL-MY-004",
+              "CL-MYDC-001",
+              "CL-MYROBOT-001"
             ]
           },
           {
@@ -1320,7 +1398,10 @@
             "tag_ids": [
               "CL-MY-001",
               "CL-MY-003",
-              "CL-MY-004"
+              "CL-MY-004",
+              "CL-MYDC-001",
+              "CL-MYMED-001",
+              "CL-MYROBOT-001"
             ]
           },
           {
@@ -1329,7 +1410,10 @@
             "status": "covered",
             "tag_ids": [
               "CL-MY-001",
-              "CL-MY-002"
+              "CL-MY-002",
+              "CL-MYDC-001",
+              "CL-MYMED-001",
+              "CL-MYROBOT-001"
             ]
           }
         ],
@@ -1387,16 +1471,21 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 3,
-        "case_count": 3,
+        "tag_count": 6,
+        "case_count": 5,
         "tag_ids": [
           "CL-JP-003",
           "CL-JP-004",
-          "CL-JP-005"
+          "CL-JP-005",
+          "CL-JPDC-001",
+          "CL-JPMED-001",
+          "CL-JPMED-002"
         ],
         "case_ids": [
           "CASE-JP-CUSTOMS-TARIFF",
           "CASE-JP-MIC-RADIO-LAW",
+          "CASE-JP-PMD-MEDDEVICE",
+          "CASE-JP-PSE-DATACENTER",
           "CASE-JP-PSE-ELECTRICAL"
         ],
         "dimensions": [
@@ -1406,7 +1495,8 @@
             "status": "covered",
             "tag_ids": [
               "CL-JP-003",
-              "CL-JP-005"
+              "CL-JP-005",
+              "CL-JPDC-001"
             ]
           },
           {
@@ -1415,7 +1505,8 @@
             "status": "covered",
             "tag_ids": [
               "CL-JP-004",
-              "CL-JP-005"
+              "CL-JP-005",
+              "CL-JPDC-001"
             ]
           },
           {
@@ -1425,7 +1516,8 @@
             "tag_ids": [
               "CL-JP-003",
               "CL-JP-004",
-              "CL-JP-005"
+              "CL-JP-005",
+              "CL-JPDC-001"
             ]
           },
           {
@@ -1433,7 +1525,10 @@
             "label": "Customs import declaration / tariff classification",
             "status": "covered",
             "tag_ids": [
-              "CL-JP-005"
+              "CL-JP-005",
+              "CL-JPDC-001",
+              "CL-JPMED-001",
+              "CL-JPMED-002"
             ]
           },
           {
@@ -1441,7 +1536,10 @@
             "label": "Labeling / consumer information / product-market records",
             "status": "covered",
             "tag_ids": [
-              "CL-JP-004"
+              "CL-JP-004",
+              "CL-JPDC-001",
+              "CL-JPMED-001",
+              "CL-JPMED-002"
             ]
           }
         ],
@@ -1505,16 +1603,20 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 3,
-        "case_count": 3,
+        "tag_count": 5,
+        "case_count": 5,
         "tag_ids": [
           "CL-KR-003",
           "CL-KR-004",
-          "CL-KR-005"
+          "CL-KR-005",
+          "CL-KRDC-001",
+          "CL-KRMED-001"
         ],
         "case_ids": [
           "CASE-KR-CUSTOMS-UNIPASS",
+          "CASE-KR-KC-DATACENTER",
           "CASE-KR-KC-ELECTRICAL-SAFETY",
+          "CASE-KR-MFDS-MEDDEVICE",
           "CASE-KR-RRA-WIRELESS-KC"
         ],
         "dimensions": [
@@ -1524,7 +1626,8 @@
             "status": "covered",
             "tag_ids": [
               "CL-KR-003",
-              "CL-KR-005"
+              "CL-KR-005",
+              "CL-KRDC-001"
             ]
           },
           {
@@ -1533,7 +1636,9 @@
             "status": "covered",
             "tag_ids": [
               "CL-KR-004",
-              "CL-KR-005"
+              "CL-KR-005",
+              "CL-KRDC-001",
+              "CL-KRMED-001"
             ]
           },
           {
@@ -1551,7 +1656,9 @@
             "label": "Customs import declaration / tariff classification",
             "status": "covered",
             "tag_ids": [
-              "CL-KR-005"
+              "CL-KR-005",
+              "CL-KRDC-001",
+              "CL-KRMED-001"
             ]
           },
           {
@@ -1560,7 +1667,9 @@
             "status": "covered",
             "tag_ids": [
               "CL-KR-003",
-              "CL-KR-004"
+              "CL-KR-004",
+              "CL-KRDC-001",
+              "CL-KRMED-001"
             ]
           }
         ],
@@ -1624,20 +1733,25 @@
       "destination_import": {
         "status": "strong",
         "priority": "low",
-        "tag_count": 5,
-        "case_count": 5,
+        "tag_count": 8,
+        "case_count": 7,
         "tag_ids": [
           "CL-IN-001",
           "CL-IN-002",
           "CL-IN-003",
           "CL-IN-004",
-          "CL-IN-005"
+          "CL-IN-005",
+          "CL-IN-009",
+          "CL-IN-010",
+          "CL-IN-011"
         ],
         "case_ids": [
           "CASE-IN-AI-CHIP-SCOMET",
           "CASE-IN-BIS-QCO-ELECTRONICS",
+          "CASE-IN-DATACENTER-IMPORT",
           "CASE-IN-EWASTE-BATTERY-EPR",
           "CASE-IN-ICEGATE-IMPORT",
+          "CASE-IN-MEDICAL-IMPORT",
           "CASE-IN-WPC-TEC-WIRELESS"
         ],
         "dimensions": [
@@ -1650,7 +1764,8 @@
               "CL-IN-002",
               "CL-IN-003",
               "CL-IN-004",
-              "CL-IN-005"
+              "CL-IN-005",
+              "CL-IN-009"
             ]
           },
           {
@@ -1661,7 +1776,8 @@
               "CL-IN-001",
               "CL-IN-002",
               "CL-IN-003",
-              "CL-IN-004"
+              "CL-IN-004",
+              "CL-IN-009"
             ]
           },
           {
@@ -1673,7 +1789,8 @@
               "CL-IN-002",
               "CL-IN-003",
               "CL-IN-004",
-              "CL-IN-005"
+              "CL-IN-005",
+              "CL-IN-009"
             ]
           },
           {
@@ -1682,7 +1799,10 @@
             "status": "covered",
             "tag_ids": [
               "CL-IN-001",
-              "CL-IN-005"
+              "CL-IN-005",
+              "CL-IN-009",
+              "CL-IN-010",
+              "CL-IN-011"
             ]
           },
           {
@@ -1693,7 +1813,9 @@
               "CL-IN-001",
               "CL-IN-002",
               "CL-IN-003",
-              "CL-IN-004"
+              "CL-IN-004",
+              "CL-IN-010",
+              "CL-IN-011"
             ]
           }
         ],
