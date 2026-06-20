@@ -26,7 +26,6 @@ function bootstrapTradeOpportunityPage() {
         const placeholder = document.createElement('option');
         placeholder.value = '';
         placeholder.textContent = 'Select country / region';
-        placeholder.disabled = true;
         placeholder.selected = !defaultValue;
         select.appendChild(placeholder);
         registry.getRouteOptions()
@@ -90,8 +89,6 @@ function bootstrapTradeOpportunityPage() {
     }
 
     function renderMarketCard(card, index) {
-        const reasons = Array.isArray(card.recommendationReasons) ? card.recommendationReasons : [];
-        const evidence = Array.isArray(card.opportunityEvidence) ? card.opportunityEvidence : [];
         const metricItems = [
             { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
@@ -114,62 +111,6 @@ function bootstrapTradeOpportunityPage() {
                         <div>
                             <span>${escapeHtml(item.label)}</span>
                             <strong>${escapeHtml(item.value)}</strong>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="opportunity-reason-list">
-                    ${card.tradeOpportunityThesis ? `
-                        <div class="opportunity-reason opportunity-reason--positive">
-                            <span>✓</span>
-                            <div>
-                                <strong>Business opportunity</strong>
-                                <small>${escapeHtml(card.tradeOpportunityThesis)}</small>
-                            </div>
-                        </div>
-                    ` : ''}
-                    ${card.routeStrategy ? `
-                        <div class="opportunity-reason opportunity-reason--neutral">
-                            <span>→</span>
-                            <div>
-                                <strong>Route strategy</strong>
-                                <small>${escapeHtml(card.routeStrategy)}</small>
-                            </div>
-                        </div>
-                    ` : ''}
-                    ${card.strategicNote ? `
-                        <div class="opportunity-reason opportunity-reason--positive">
-                            <span>+</span>
-                            <div>
-                                <strong>Strategic note</strong>
-                                <small>${escapeHtml(card.strategicNote)}</small>
-                            </div>
-                        </div>
-                    ` : ''}
-                    ${card.riskNote ? `
-                        <div class="opportunity-reason opportunity-reason--caution">
-                            <span>!</span>
-                            <div>
-                                <strong>Risk note</strong>
-                                <small>${escapeHtml(card.riskNote)}</small>
-                            </div>
-                        </div>
-                    ` : ''}
-                    ${evidence.map((item) => `
-                        <div class="opportunity-reason opportunity-reason--neutral">
-                            <span>•</span>
-                            <div>
-                                <strong>${escapeHtml(item.label)}</strong>
-                                <small>${escapeHtml(item.detail)}</small>
-                            </div>
-                        </div>
-                    `).join('')}
-                    ${reasons.map((reason, reasonIndex) => `
-                        <div class="opportunity-reason opportunity-reason--${escapeHtml(reason.tone || 'neutral')}">
-                            <span>${escapeHtml(reasonIndex + 1)}</span>
-                            <div>
-                                <strong>${escapeHtml(reason.label)}</strong>
-                                <small>${escapeHtml(reason.detail)}</small>
-                            </div>
                         </div>
                     `).join('')}
                 </div>

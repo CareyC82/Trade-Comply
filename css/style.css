@@ -4726,6 +4726,14 @@ button.feedback-link:hover {
     font-size: 0.94rem;
 }
 
+.opportunity-input:invalid {
+    color: var(--color-text-secondary);
+}
+
+.opportunity-input option {
+    color: var(--color-text);
+}
+
 .opportunity-input:focus {
     outline: none;
     border-color: var(--color-primary);
@@ -5054,61 +5062,6 @@ button.feedback-link:hover {
     color: var(--color-primary);
     font-size: 0.82rem;
     line-height: 1.25;
-}
-
-.opportunity-reason-list {
-    grid-column: 2 / 4;
-    display: grid;
-    gap: 7px;
-}
-
-.opportunity-reason {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 8px;
-    align-items: start;
-    border: 1px solid rgba(23, 61, 101, 0.1);
-    border-radius: 10px;
-    padding: 8px;
-    background: #fff;
-}
-
-.opportunity-reason > span {
-    width: 22px;
-    height: 22px;
-    display: grid;
-    place-items: center;
-    border-radius: 999px;
-    background: #eef2ff;
-    color: var(--color-primary);
-    font-size: 0.68rem;
-    font-weight: 900;
-}
-
-.opportunity-reason strong {
-    display: block;
-    color: var(--color-primary);
-    font-size: 0.78rem;
-    line-height: 1.25;
-}
-
-.opportunity-reason small {
-    display: block;
-    grid-column: auto;
-    margin-top: 2px;
-    color: var(--color-text-secondary);
-    font-size: 0.74rem;
-    line-height: 1.35;
-}
-
-.opportunity-reason--positive > span {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.opportunity-reason--caution > span {
-    background: #fef3c7;
-    color: #92400e;
 }
 
 .opportunity-card-action {

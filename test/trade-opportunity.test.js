@@ -335,6 +335,15 @@ describe('trade opportunity navigation', () => {
         assert.doesNotMatch(html, /data-default-country/);
         assert.doesNotMatch(html, /<option value="CN" selected/);
         assert.doesNotMatch(html, /<option value="US" selected/);
+        assert.match(html, /<option value="" selected>Select country \/ region<\/option>/);
+    });
+
+    it('keeps Opportunity country placeholders visible before selection', () => {
+        const html = fs.readFileSync(path.join(__dirname, '..', 'opportunity.html'), 'utf8');
+        const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'opportunity-page.js'), 'utf8');
+
+        assert.equal((html.match(/Select country \/ region/g) || []).length, 2);
+        assert.doesNotMatch(source, /placeholder\.disabled = true/);
     });
 
     it('connects result-page opportunity teaser to rate and parser coverage data', () => {
@@ -350,6 +359,10 @@ describe('trade opportunity navigation', () => {
         const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'opportunity-page.js'), 'utf8');
 
         assert.doesNotMatch(source, /opportunity-decision-card-grid/);
+        assert.doesNotMatch(source, /opportunity-reason-list/);
+        assert.doesNotMatch(source, /recommendationReasons\.map/);
+        assert.doesNotMatch(source, /Cost data gap/);
+        assert.doesNotMatch(source, /Execution gate/);
         assert.doesNotMatch(source, /Commercial Decision/);
         assert.doesNotMatch(source, /Margin Signal/);
         assert.doesNotMatch(source, /Quote Gate/);
@@ -358,9 +371,6 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Landed-cost risk/);
         assert.match(source, /Demand strength/);
         assert.match(source, /Compliance friction/);
-        assert.match(source, /Route strategy/);
-        assert.match(source, /Strategic note/);
-        assert.match(source, /Risk note/);
     });
 
     it('hides the Opportunity input form when rendering a result URL', () => {
