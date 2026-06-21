@@ -16,6 +16,9 @@ describe('trade opportunity insights', () => {
 
         assert.equal(battery.id, 'battery');
         assert.equal(solar.id, 'solar');
+        assert.equal(detectProductSignal('800G optical transceiver module').id, 'optical_module');
+        assert.equal(detectProductSignal('optical module').id, 'optical_module');
+        assert.equal(detectProductSignal('ic chip').id, 'semiconductor');
         assert.match(battery.green, /Battery/i);
         assert.match(solar.supplyChain, /origin/i);
     });
@@ -218,6 +221,23 @@ describe('trade opportunity insights', () => {
         assert.equal(china.quoteReadiness, 'Selective quote');
         assert.equal(china.landedCostRisk, 'High');
         assert.equal(china.dutyBreakdown.totalRate, '13.0%');
+        assert.match(china.salesAngle, /manufacturing ecosystem/i);
+        assert.doesNotMatch(china.salesAngle, /agency reference systems/i);
+    });
+
+    it('treats optical transceivers as telecom interconnect opportunities, not generic IC matches', () => {
+        const model = buildOpportunityInsights({
+            product: '800G optical transceiver module',
+            from: 'CN',
+            to: 'IN',
+            focus: 'import',
+            dutyRates,
+            priorityMatrix
+        });
+
+        assert.equal(model.productSignal.id, 'optical_module');
+        assert.match(model.selectedMarket.salesAngle, /high-speed interconnect/i);
+        assert.doesNotMatch(model.selectedMarket.salesAngle, /advanced hardware procurement/i);
     });
 
     it('prioritizes official or hybrid rate coverage over benchmark-only opportunity noise', () => {
