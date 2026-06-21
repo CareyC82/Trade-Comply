@@ -6,6 +6,8 @@ const { AI_MESSAGES, buildGroundedUserMessage } = require('../index.js');
 test('AI system prompt supports global trade routes instead of China-only scope', () => {
     assert.match(AI_MESSAGES.systemPrompt, /global trade compliance pre-screening expert/i);
     assert.match(AI_MESSAGES.systemPrompt, /selected trade route and compliance focus/i);
+    assert.match(AI_MESSAGES.systemPrompt, /Do NOT describe TraceWize as China-only/i);
+    assert.match(AI_MESSAGES.systemPrompt, /state which route, jurisdiction, or product detail is missing/i);
     assert.doesNotMatch(AI_MESSAGES.systemPrompt, /ONLY about China's import\/export/i);
     assert.doesNotMatch(AI_MESSAGES.systemPrompt, /Sorry, I only cover China's trade compliance regulations/i);
 });

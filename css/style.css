@@ -4862,6 +4862,39 @@ button.feedback-link:hover {
     line-height: 1.45;
 }
 
+.opportunity-hero-facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+@media (min-width: 720px) {
+    .opportunity-hero-facts {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.opportunity-hero-facts span {
+    display: grid;
+    gap: 3px;
+    min-height: 62px;
+    padding: 10px 12px;
+    border: 1px solid rgba(15, 118, 110, 0.18);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+.opportunity-hero-facts strong {
+    color: #0f766e;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
 .opportunity-decision-strip {
     display: flex;
     flex-wrap: wrap;

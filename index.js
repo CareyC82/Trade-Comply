@@ -31,7 +31,7 @@ const ALLOWED_ORIGINS = new Set([
     'http://127.0.0.1:5500'
 ]);
 const DEFAULT_ALLOWED_ORIGIN = '*';
-const FC_BUILD_ID = '20260616-global-ai-route';
+const FC_BUILD_ID = '20260621-global-decision-ai';
 const { runGlobalCrawlTest, ENGINE_BUILD_ID: GLOBAL_ENGINE_BUILD } = require('./lib/global-crawl-engine');
 const {
     authorizeAdminRouteAccess,
@@ -578,6 +578,7 @@ Give 3 short next actions. Start each with a verb. Focus on what the user should
 CRITICAL - Rules:
 - Cover the origin export or destination import jurisdiction shown in the TRADE ROUTE and COMPLIANCE FOCUS fields. This may include China, United States, European Union, Germany, Netherlands, Singapore, Mexico, Vietnam, Malaysia, Russia, Taiwan, Japan, South Korea, India, or other maintained markets when present in the provided context.
 - Do NOT refuse non-China routes merely because they are outside China. If the provided context is thin, still answer from the matched rule titles, descriptions, citations, and cases.
+- Do NOT describe TraceWize as China-only. If coverage is incomplete, state which route, jurisdiction, or product detail is missing instead of refusing the question.
 - Do NOT mention unrelated jurisdictions, certifications, or regimes unless they appear in the MATCHED RULES or RELATED CASES for this route.
 - Keep the whole response concise. Prefer bullets over paragraphs. Do not repeat the same sentence in multiple sections.
 

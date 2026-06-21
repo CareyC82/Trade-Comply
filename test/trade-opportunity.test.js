@@ -371,6 +371,9 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Landed-cost risk/);
         assert.match(source, /Demand strength/);
         assert.match(source, /Compliance friction/);
+        assert.match(source, /opportunity-hero-facts/);
+        assert.match(source, /Data confidence/);
+        assert.match(source, /Next move/);
     });
 
     it('hides the Opportunity input form when rendering a result URL', () => {
@@ -380,5 +383,32 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /form\.hidden = enabled/);
         assert.match(source, /startPanel\.hidden = enabled/);
         assert.match(source, /opportunity-result-mode/);
+    });
+});
+
+describe('trade opportunity demo scenarios', () => {
+    it('keeps five high-tech demo scenarios ready for customer demos', () => {
+        const demo = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'demo-scenarios.json'), 'utf8'));
+        const scenarios = demo.scenarios || [];
+
+        assert.equal(scenarios.length, 5);
+        assert.deepEqual(
+            scenarios.map((item) => item.id),
+            [
+                'demo-us-cn-ai-gpu-import',
+                'demo-cn-us-solar-import',
+                'demo-cn-eu-battery-import',
+                'demo-de-us-robot-import',
+                'demo-cn-in-optical-module-import'
+            ]
+        );
+        scenarios.forEach((item) => {
+            assert.match(item.product, /\S/);
+            assert.match(item.from, /^[A-Z]{2,6}$/);
+            assert.match(item.to, /^[A-Z]{2,6}$/);
+            assert.match(item.focus, /^(import|export)$/);
+            assert.match(item.decision_question, /\?$/);
+            assert.match(item.demo_url, /(index|opportunity)\.html/);
+        });
     });
 });

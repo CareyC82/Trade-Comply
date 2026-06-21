@@ -180,6 +180,8 @@ function bootstrapTradeOpportunityPage() {
         if (!result) {
             return;
         }
+        const best = model.best || {};
+        const bestAction = best.opportunitySignal?.shortAction || best.businessAction || best.parserNextAction || 'Compare this route before quoting.';
         result.hidden = false;
         result.innerHTML = `
             <section class="opportunity-hero-result">
@@ -187,6 +189,11 @@ function bootstrapTradeOpportunityPage() {
                     <span class="opportunity-kicker">Opportunity snapshot</span>
                     <h2>${escapeHtml(model.productSignal.label)} · ${escapeHtml(model.routeLabel)}</h2>
                     <p>${escapeHtml(model.summary)}</p>
+                    <div class="opportunity-hero-facts" aria-label="Opportunity decision facts">
+                        <span><strong>Best route</strong>${escapeHtml(best.label || 'Selected route')}</span>
+                        <span><strong>Data confidence</strong>${escapeHtml(best.coverageLabel || 'Pending')}</span>
+                        <span><strong>Next move</strong>${escapeHtml(bestAction)}</span>
+                    </div>
                     <div class="opportunity-decision-strip">
                         <span>${escapeHtml(model.readyRouteCount)} route(s) usable for pricing comparison</span>
                         <span>${escapeHtml(model.parserBacklogCount)} route(s) need parser/source upgrade</span>
@@ -194,7 +201,7 @@ function bootstrapTradeOpportunityPage() {
                 </div>
                 <div class="opportunity-best-badge">
                     <span>${escapeHtml(model.bestIsSelectedMarket ? 'Primary route to review' : 'Best route to compare')}</span>
-                    <strong>${escapeHtml(model.best.label)}</strong>
+                    <strong>${escapeHtml(best.label || 'Selected route')}</strong>
                 </div>
             </section>
 
