@@ -182,6 +182,8 @@ function bootstrapTradeOpportunityPage() {
         }
         const best = model.best || {};
         const bestAction = best.opportunitySignal?.shortAction || best.businessAction || best.parserNextAction || 'Compare this route before quoting.';
+        const salesAngle = best.salesAngle || best.strategicNote || 'Use this as a route comparison input before quoting.';
+        const quoteGate = best.quoteGate || best.riskNote || 'Confirm tariff source and compliance evidence before final quote.';
         result.hidden = false;
         result.innerHTML = `
             <section class="opportunity-hero-result">
@@ -194,9 +196,15 @@ function bootstrapTradeOpportunityPage() {
                         <span><strong>Data confidence</strong>${escapeHtml(best.coverageLabel || 'Pending')}</span>
                         <span><strong>Next move</strong>${escapeHtml(bestAction)}</span>
                     </div>
+                    <div class="opportunity-commercial-brief" aria-label="Commercial decision brief">
+                        <strong>${escapeHtml(best.commercialDecision || best.opportunitySignal?.oneLine || 'Review this route before quoting.')}</strong>
+                        <span>${escapeHtml(salesAngle)}</span>
+                        <span>${escapeHtml(quoteGate)}</span>
+                    </div>
                     <div class="opportunity-decision-strip">
-                        <span>${escapeHtml(model.readyRouteCount)} route(s) usable for pricing comparison</span>
-                        <span>${escapeHtml(model.parserBacklogCount)} route(s) need parser/source upgrade</span>
+                        <span>Quote status: ${escapeHtml(best.quoteReadiness || 'Research only')}</span>
+                        <span>Landed-cost risk: ${escapeHtml(best.landedCostRisk || 'Unknown')}</span>
+                        <span>Compliance friction: ${escapeHtml(best.complianceFriction || 'Medium')}</span>
                     </div>
                 </div>
                 <div class="opportunity-best-badge">

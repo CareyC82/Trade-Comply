@@ -372,8 +372,13 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Demand strength/);
         assert.match(source, /Compliance friction/);
         assert.match(source, /opportunity-hero-facts/);
+        assert.match(source, /opportunity-commercial-brief/);
         assert.match(source, /Data confidence/);
         assert.match(source, /Next move/);
+        assert.match(source, /Quote status:/);
+        assert.match(source, /Landed-cost risk:/);
+        assert.match(source, /Compliance friction:/);
+        assert.doesNotMatch(source, /route\(s\) usable for pricing comparison/);
     });
 
     it('hides the Opportunity input form when rendering a result URL', () => {

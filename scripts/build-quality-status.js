@@ -132,6 +132,30 @@ function summarizeOpportunityPriority() {
     const bucketRows = (bucket) => rows
         .filter((row) => row.workbench_bucket === bucket)
         .slice(0, 8);
+    const sourceTrustCounts = rows.reduce((acc, row) => {
+        const key = row.selected_source_trust || 'not_covered';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+    const quoteReadinessCounts = rows.reduce((acc, row) => {
+        const key = row.quote_readiness || 'Research only';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+    const officialEnough = new Set(['official_exact_rate', 'official_duty_tax_estimate', 'mixed_official_estimate']);
+    const tariffCoveragePriorities = rows
+        .filter((row) => !officialEnough.has(row.selected_source_trust) || row.workbench_bucket === 'need_tariff_upgrade')
+        .slice(0, 12)
+        .map((row) => ({
+            route: row.route,
+            product_id: row.product_id,
+            hs_code: row.hs_code,
+            source_trust: row.selected_source_trust,
+            coverage_label: row.coverage_label,
+            parser_priority: row.parser_priority,
+            next_action: row.next_action,
+            priority_score: row.priority_score
+        }));
 
     return {
         ok: rows.length > 0,
@@ -141,6 +165,10 @@ function summarizeOpportunityPriority() {
         high_landed_cost_risk_count: highRisk,
         compare_first_count: compareFirst,
         bucket_counts: bucketCounts,
+        source_trust_counts: sourceTrustCounts,
+        quote_readiness_counts: quoteReadinessCounts,
+        official_or_hybrid_count: rows.filter((row) => officialEnough.has(row.selected_source_trust)).length,
+        tariff_coverage_priorities: tariffCoveragePriorities,
         top_opportunities: bucketRows('top_opportunity'),
         data_gaps: bucketRows('data_gap'),
         tariff_upgrades: bucketRows('need_tariff_upgrade'),

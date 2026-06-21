@@ -77,6 +77,11 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.ok(payload.opportunity.bucket_counts.need_tariff_upgrade >= 0);
     assert.ok(payload.opportunity.bucket_counts.need_rule_upgrade >= 0);
     assert.ok(payload.opportunity.bucket_counts.top_opportunity > 0);
+    assert.ok(payload.opportunity.official_or_hybrid_count > 0);
+    assert.equal(typeof payload.opportunity.source_trust_counts, 'object');
+    assert.equal(typeof payload.opportunity.quote_readiness_counts, 'object');
+    assert.equal(Array.isArray(payload.opportunity.tariff_coverage_priorities), true);
+    assert.ok(payload.opportunity.tariff_coverage_priorities.every(row => row.route && row.product_id && row.next_action));
     assert.equal(Array.isArray(payload.opportunity.top_opportunities), true);
     assert.equal(Array.isArray(payload.opportunity.data_gaps), true);
     assert.equal(Array.isArray(payload.opportunity.tariff_upgrades), true);
