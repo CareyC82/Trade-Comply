@@ -4740,38 +4740,6 @@ button.feedback-link:hover {
     box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.12);
 }
 
-.opportunity-focus-group {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-top: 4px;
-}
-
-@media (min-width: 720px) {
-    .opportunity-focus-group {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-.opportunity-focus-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 46px;
-    padding: 10px 12px;
-    border: 2px solid var(--color-border);
-    border-radius: 10px;
-    color: var(--color-text-secondary);
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.opportunity-focus-option:has(input:checked) {
-    border-color: var(--color-primary);
-    background: rgba(26, 58, 92, 0.06);
-    color: var(--color-primary);
-}
-
 .opportunity-submit-btn {
     width: 100%;
     min-height: 50px;
@@ -4919,6 +4887,56 @@ button.feedback-link:hover {
     color: var(--color-text-secondary);
     font-size: 0.8rem;
     line-height: 1.4;
+}
+
+.opportunity-control-gate {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(153, 27, 27, 0.28);
+    border-left: 5px solid #991b1b;
+    border-radius: 12px;
+    background: rgba(254, 242, 242, 0.88);
+    color: #7f1d1d;
+}
+
+.opportunity-control-gate div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.opportunity-control-gate span {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 9px;
+    background: #991b1b;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.opportunity-control-gate strong {
+    color: #7f1d1d;
+    font-size: 0.9rem;
+}
+
+.opportunity-control-gate p,
+.opportunity-control-gate li {
+    color: #7f1d1d;
+    font-size: 0.76rem;
+    font-weight: 750;
+    line-height: 1.38;
+}
+
+.opportunity-control-gate ul {
+    margin: 0;
+    padding-left: 18px;
 }
 
 .opportunity-decision-strip {
@@ -5131,6 +5149,18 @@ button.feedback-link:hover {
     font-size: 0.78rem;
     font-weight: 700;
     line-height: 1.4;
+}
+
+.opportunity-transit-note {
+    grid-column: 2 / 4;
+    padding: 10px 12px;
+    border: 1px solid rgba(180, 83, 9, 0.2);
+    border-radius: 10px;
+    background: rgba(255, 251, 235, 0.72);
+    color: #92400e;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.35;
 }
 
 .opportunity-parser-section {

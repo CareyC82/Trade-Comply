@@ -29,10 +29,18 @@ function matchByHSCode(hsCode, tags) {
 function matchByProductName(query, tags) {
     const queryLower = query.toLowerCase();
     const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
+    const aiAcceleratorModelRe = /\b(h100|h200|h800|a100|a800|b100|b200|l40s?|mi300x?|gb200|rtx\s*pro)\b/i;
+    if (aiAcceleratorModelRe.test(queryLower)) {
+        ['gpu', 'ai', 'accelerator', 'chip', 'advanced', 'computing', 'semiconductor'].forEach((word) => {
+            if (!queryWords.includes(word)) {
+                queryWords.push(word);
+            }
+        });
+    }
     
     // Check if this is a semiconductor-related query
-    const semiKeywords = ["chip", "semiconductor", "gpu", "cpu", "processor", "memory", "dram", "hbm", "nand", "flash", "wafer", "foundry", "fabless", "eda", "chiplet", "3d ic", "advanced packaging", "silicon photonics"];
-    const isSemiQuery = queryWords.some(word => semiKeywords.includes(word));
+    const semiKeywords = ["chip", "semiconductor", "gpu", "cpu", "processor", "memory", "dram", "hbm", "nand", "flash", "wafer", "foundry", "fabless", "eda", "chiplet", "3d ic", "advanced", "computing", "accelerator", "h100", "h200", "h800", "a100", "a800", "b100", "b200", "l40", "l40s", "mi300", "mi300x", "gb200", "rtx", "advanced packaging", "silicon photonics"];
+    const isSemiQuery = queryWords.some(word => semiKeywords.includes(word)) || aiAcceleratorModelRe.test(queryLower);
     
     let scoredTags = tags.map(tag => {
         const keywords = tag.related_keywords || [];

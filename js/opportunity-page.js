@@ -89,23 +89,32 @@ function bootstrapTradeOpportunityPage() {
     }
 
     function renderMarketCard(card, index) {
-        const metricItems = [
-            { label: 'Total signal', value: card.dutyBreakdown?.totalRate || 'Not covered' },
+        const transit = card.transitComparison || null;
+        const metricItems = transit ? [
+            { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
+            { label: 'First leg', value: transit.firstLegRate || 'Pending' },
+            { label: 'Second leg', value: transit.secondLegRate || 'Pending' },
+            { label: 'Direct route', value: transit.directRate || 'Pending' },
+            { label: 'Coverage', value: card.coverageLabel || 'Pending' },
+            { label: 'Compliance friction', value: card.complianceFriction || 'Medium' }
+        ] : [
+            { label: 'Direct total', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
             { label: 'Quote readiness', value: card.quoteReadiness || 'Pending' },
             { label: 'Landed-cost risk', value: card.landedCostRisk || 'Unknown' },
             { label: 'Demand strength', value: card.demandStrength || 'Selective' },
             { label: 'Compliance friction', value: card.complianceFriction || 'Medium' }
         ];
+        const displaySummary = transit?.costConclusion || card.conciseConclusion || card.opportunity;
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
                 <div class="opportunity-market-score">${escapeHtml(card.score)}</div>
                 <div>
                     <div class="opportunity-market-label">${escapeHtml(card.label)}</div>
-                    <div class="opportunity-market-route">${escapeHtml(card.route)}</div>
+                    <div class="opportunity-market-route">${escapeHtml(card.routeScopeLabel || card.route)}</div>
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
-                <p>${escapeHtml(card.conciseConclusion || card.opportunity)}</p>
+                <p>${escapeHtml(displaySummary)}</p>
                 <div class="opportunity-rate-mini-grid">
                     ${metricItems.map((item) => `
                         <div>
@@ -114,6 +123,7 @@ function bootstrapTradeOpportunityPage() {
                         </div>
                     `).join('')}
                 </div>
+                ${card.transitWarning ? `<div class="opportunity-transit-note">${escapeHtml(card.transitWarning)}</div>` : ''}
                 <div class="opportunity-card-action">${escapeHtml(card.businessAction)}</div>
             </article>
         `;
@@ -124,7 +134,8 @@ function bootstrapTradeOpportunityPage() {
             <tr>
                 <td>
                     <strong>${escapeHtml(card.route)}</strong>
-                    <span>${escapeHtml(card.label)} · score ${escapeHtml(card.score)}</span>
+                    <span>${escapeHtml(card.routeScopeLabel || card.label)} · score ${escapeHtml(card.score)}</span>
+                    ${card.transitWarning ? `<span>${escapeHtml(card.transitWarning)}</span>` : ''}
                 </td>
                 <td>
                     <strong>${escapeHtml(card.dutyBreakdown?.totalRate || 'Not covered')}</strong>
@@ -184,6 +195,7 @@ function bootstrapTradeOpportunityPage() {
         const bestAction = best.opportunitySignal?.shortAction || best.businessAction || best.parserNextAction || 'Compare this route before quoting.';
         const salesAngle = best.salesAngle || best.strategicNote || 'Use this as a route comparison input before quoting.';
         const quoteGate = best.quoteGate || best.riskNote || 'Confirm tariff source and compliance evidence before final quote.';
+        const controlGate = best.exportControlGate || null;
         result.hidden = false;
         result.innerHTML = `
             <section class="opportunity-hero-result">
@@ -203,6 +215,18 @@ function bootstrapTradeOpportunityPage() {
                         <span><b>Why this route:</b> ${escapeHtml(model.whyThisRoute || 'Compare maintained duty, tax, and compliance evidence before quoting.')}</span>
                         <span><b>Selected route check:</b> ${escapeHtml(model.whyNotSelectedRoute || 'Keep the selected route visible until evidence shows a better option.')}</span>
                     </div>
+                    ${controlGate ? `
+                        <div class="opportunity-control-gate" aria-label="Export control gate">
+                            <div>
+                                <span>${escapeHtml(controlGate.severity || 'Review required')}</span>
+                                <strong>${escapeHtml(controlGate.label)}</strong>
+                            </div>
+                            <p>${escapeHtml(controlGate.summary)}</p>
+                            <ul>
+                                ${(controlGate.checks || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
                     <div class="opportunity-decision-strip">
                         <span>Quote status: ${escapeHtml(best.quoteReadiness || 'Research only')}</span>
                         <span>Landed-cost risk: ${escapeHtml(best.landedCostRisk || 'Unknown')}</span>
@@ -217,8 +241,8 @@ function bootstrapTradeOpportunityPage() {
 
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">
-                    <h3>Markets to consider</h3>
-                    <p>Ranked by duty structure, rate-source confidence, market access friction, and category fit.</p>
+                    <h3>Direct route and top transit options</h3>
+                    <p>Showing the selected direct route plus the two strongest transit comparisons. Transit totals combine both maintained duty/tax signals and still require origin-transformation and logistics review.</p>
                 </div>
                 <div class="opportunity-market-grid">
                     ${model.markets.map(renderMarketCard).join('')}
@@ -262,17 +286,16 @@ function bootstrapTradeOpportunityPage() {
         `;
     }
 
-    function buildOpportunityUrl({ product, from, to, focus }) {
+    function buildOpportunityUrl({ product, from, to }) {
         const params = new URLSearchParams();
         params.set('product', product);
         params.set('from', from);
         params.set('to', to);
-        params.set('focus', focus);
         params.set('result', '1');
         return `opportunity.html?${params.toString()}`;
     }
 
-    async function renderOpportunityResult({ product, from, to, focus }) {
+    async function renderOpportunityResult({ product, from, to }) {
         const [rates, matrix] = await Promise.all([
             loadDutyRates(),
             loadPriorityMatrix()
@@ -281,7 +304,6 @@ function bootstrapTradeOpportunityPage() {
             product,
             from,
             to,
-            focus,
             dutyRates: rates,
             priorityMatrix: matrix
         });
@@ -303,22 +325,15 @@ function bootstrapTradeOpportunityPage() {
         const product = params.get('product') || params.get('search') || '';
         const from = params.has('from') ? registry.normalizeCountryCode(params.get('from')) : '';
         const to = params.has('to') ? registry.normalizeCountryCode(params.get('to')) : '';
-        const focus = params.has('focus') ? params.get('focus') : '';
-        const hasResultParams = Boolean(product && from && to && focus);
+        const hasResultParams = Boolean(product && from && to);
         setResultMode(hasResultParams);
         if ($('opportunity-product')) {
             $('opportunity-product').value = product;
         }
         populateSelect($('opportunity-from'), from);
         populateSelect($('opportunity-to'), to);
-        const focusEl = focus
-            ? document.querySelector(`input[name="opportunity-focus"][value="${focus === 'export' ? 'export' : 'import'}"]`)
-            : null;
-        if (focusEl && (product || from || to)) {
-            focusEl.checked = true;
-        }
         if (hasResultParams) {
-            renderOpportunityResult({ product, from, to, focus })
+            renderOpportunityResult({ product, from, to })
                 .catch(() => setError('Unable to load opportunity results. Please try again.'));
         }
     }
@@ -329,7 +344,6 @@ function bootstrapTradeOpportunityPage() {
         const product = $('opportunity-product')?.value.trim();
         const from = $('opportunity-from')?.value || '';
         const to = $('opportunity-to')?.value || '';
-        const focus = document.querySelector('input[name="opportunity-focus"]:checked')?.value || '';
         if (!product) {
             setError('Enter a product description to find opportunity signals.');
             return;
@@ -338,11 +352,7 @@ function bootstrapTradeOpportunityPage() {
             setError('Select both From country / region and Target market.');
             return;
         }
-        if (!focus) {
-            setError('Select export-side or import-side opportunity focus.');
-            return;
-        }
-        window.location.assign(buildOpportunityUrl({ product, from, to, focus }));
+        window.location.assign(buildOpportunityUrl({ product, from, to }));
     });
 
     applyParams();

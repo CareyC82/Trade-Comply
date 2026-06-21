@@ -152,6 +152,19 @@ describe('compliance matching matrix', () => {
         assert.match(text, /Russia|RU/i);
     });
 
+    it('treats H200 model-only queries as AI GPU / advanced computing exports to China', () => {
+        const result = runSearch('H200', 'export', 'US', 'export', { from: 'US', to: 'CN' });
+        const text = haystack(result);
+
+        assert.ok(result.tags.length > 0, 'expected H200 to trigger export-control matches');
+        assert.match(text, /BIS|advanced computing|semiconductor|Entity List|license/i);
+        assert.ok(
+            result.tags.some((tag) => effectiveCountry(tag) === 'US' || tag.country === 'US'),
+            'expected US-origin export-control rules for H200'
+        );
+        assertNoOppositeRouteFocus(result, 'export', 'US to China H200 export');
+    });
+
     it('surfaces China import origin checks for US, Taiwan, Japan, and Korea semiconductor products', () => {
         const expectedByOrigin = {
             US: 'CL-USORIGIN-001',
