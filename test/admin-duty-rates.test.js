@@ -67,6 +67,12 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.equal(payload.search.warned, 0);
     assert.equal(payload.duty.gap_matrix.missing_total, 0);
     assert.equal(payload.duty.gap_matrix.full_count, payload.duty.gap_matrix.rows.length);
+    assert.equal(Array.isArray(payload.duty.exact_tariff_parser_queue.priorities), true);
+    assert.equal(payload.duty.exact_tariff_parser_queue.priorities[0].id, 'solar-cn-us');
+    assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => row.parser_target && row.next_action && row.why_priority));
+    assert.ok(payload.duty.exact_tariff_parser_queue.priorities.some(row => (
+        row.rate_change_drivers.join(' ').includes('Section 301')
+    )));
     assert.equal(payload.post_entry_tax.export_missing_countries.length, 0);
     assert.equal(payload.post_entry_tax.false_official_rate_claims.length, 0);
     assert.equal(payload.opportunity.ok, true);

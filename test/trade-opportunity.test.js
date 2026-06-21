@@ -19,6 +19,15 @@ describe('trade opportunity insights', () => {
         assert.equal(detectProductSignal('800G optical transceiver module').id, 'optical_module');
         assert.equal(detectProductSignal('optical module').id, 'optical_module');
         assert.equal(detectProductSignal('ic chip').id, 'semiconductor');
+        assert.equal(detectProductSignal('GPU').id, 'semiconductor');
+        assert.equal(detectProductSignal('GPU').label, 'GPU / AI accelerator');
+        assert.equal(detectProductSignal('processor').id, 'semiconductor');
+        assert.equal(detectProductSignal('router wifi network').id, 'network_equipment');
+        assert.equal(detectProductSignal('network storage NAS').id, 'data_center');
+        assert.equal(detectProductSignal('smartphone 5G cellular').label, 'Smartphone / cellular device');
+        assert.equal(detectProductSignal('laptop computer').label, 'Laptop / computer');
+        assert.equal(detectProductSignal('PCR analyzer').id, 'healthcare_lab');
+        assert.equal(detectProductSignal('lab equipment').id, 'healthcare_lab');
         assert.match(battery.green, /Battery/i);
         assert.match(solar.supplyChain, /origin/i);
     });
@@ -59,6 +68,8 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.opportunityEvidence) && row.opportunityEvidence.length === 3));
         assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Demand driver')));
         assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Compliance friction')));
+        assert.match(model.whyThisRoute, /because/i);
+        assert.match(model.whyNotSelectedRoute, /United States|alternate market|selected route/i);
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
         assert.ok(model.readyRouteCount >= 1);
         assert.ok(model.parserBacklogCount >= 0);
@@ -98,6 +109,8 @@ describe('trade opportunity insights', () => {
         assert.ok(eu, 'EU should be included in route comparison');
         assert.match(eu.coverageLabel, /Official duty|Hybrid official/i);
         assert.equal(eu.dutyBreakdown.baseDuty, '0.0%');
+        assert.match(model.whyThisRoute, new RegExp(model.best.label));
+        assert.match(model.whyNotSelectedRoute, /United States/);
     });
 
     it('keeps Russia as a high-friction route even when included in comparisons', () => {
@@ -112,6 +125,7 @@ describe('trade opportunity insights', () => {
         const russia = model.markets.find((market) => market.market === 'RU') || model.selectedMarket;
 
         assert.equal(model.productSignal.id, 'semiconductor');
+        assert.equal(model.productSignal.label, 'GPU / AI accelerator');
         assert.ok(russia.score < 50);
         assert.match(russia.watchpoint, /sanctions|Screen/i);
     });
@@ -223,6 +237,8 @@ describe('trade opportunity insights', () => {
         assert.equal(china.dutyBreakdown.totalRate, '13.0%');
         assert.match(china.salesAngle, /manufacturing ecosystem/i);
         assert.doesNotMatch(china.salesAngle, /agency reference systems/i);
+        assert.match(model.whyThisRoute, /China/i);
+        assert.match(model.whyNotSelectedRoute, /No alternate market|China/i);
     });
 
     it('treats optical transceivers as telecom interconnect opportunities, not generic IC matches', () => {
@@ -393,6 +409,8 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Compliance friction/);
         assert.match(source, /opportunity-hero-facts/);
         assert.match(source, /opportunity-commercial-brief/);
+        assert.match(source, /Why this route:/);
+        assert.match(source, /Selected route check:/);
         assert.match(source, /Data confidence/);
         assert.match(source, /Next move/);
         assert.match(source, /Quote status:/);

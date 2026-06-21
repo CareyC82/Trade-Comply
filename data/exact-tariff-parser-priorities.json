@@ -1,0 +1,125 @@
+{
+  "version": "2026-06-21",
+  "scope": "Exact tariff parser backlog for routes where benchmark or mixed official estimates still need tariff-line, add-on duty, or trade-remedy scope resolution.",
+  "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue",
+  "priorities": [
+    {
+      "id": "solar-cn-us",
+      "route": "CN->US",
+      "product_id": "solar",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_code": "854143",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 2500,
+      "why_priority": "CN->US solar remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+        "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
+      ],
+      "parser_scope": "Resolve exact HTS 854143 line, AD/CVD case scope, origin-route evidence, and Section 301 Chapter 99/exclusion before using the rate for filing."
+    },
+    {
+      "id": "battery-cn-us",
+      "route": "CN->US",
+      "product_id": "battery",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_code": "850760",
+      "source_trust": "mixed_official_estimate",
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+      "priority_band": "P3",
+      "impact_score": 1090,
+      "why_priority": "CN->US battery remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+      "rate_change_drivers": [
+        "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+        "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+        "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
+      ],
+      "parser_scope": "Resolve battery chemistry, capacity, exact 850760 subheading, Section 301 coverage, and any battery-specific trade-remedy scope."
+    },
+    {
+      "id": "router-cn-us",
+      "route": "CN->US",
+      "product_id": "router",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_code": "851762",
+      "source_trust": "mixed_official_estimate",
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+      "priority_band": "P3",
+      "impact_score": 750,
+      "why_priority": "CN->US router remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+      "rate_change_drivers": [
+        "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+        "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+      ],
+      "parser_scope": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
+    },
+    {
+      "id": "smartphone-cn-us",
+      "route": "CN->US",
+      "product_id": "smartphone",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_code": "851713",
+      "source_trust": "mixed_official_estimate",
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+      "priority_band": "P3",
+      "impact_score": 750,
+      "why_priority": "CN->US smartphone remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+      "rate_change_drivers": [
+        "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+        "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
+        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+      ],
+      "parser_scope": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
+    },
+    {
+      "id": "ev-charger-cn-us",
+      "route": "CN->US",
+      "product_id": "ev_charger",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_code": "850440",
+      "source_trust": "mixed_official_estimate",
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+      "priority_band": "P3",
+      "impact_score": 750,
+      "why_priority": "CN->US ev_charger remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+      "rate_change_drivers": [
+        "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+        "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
+      ],
+      "parser_scope": "Resolve exact power-conversion subheading, EV-charger function scope, origin evidence, and Section 301 add-on duty treatment."
+    },
+    {
+      "id": "tablet-cn-us",
+      "route": "CN->US",
+      "product_id": "tablet",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_code": "847130",
+      "source_trust": "mixed_official_estimate",
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period.",
+      "priority_band": "P3",
+      "impact_score": 750,
+      "why_priority": "CN->US tablet remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
+      "rate_change_drivers": [
+        "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
+        "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
+      ],
+      "parser_scope": "Resolve exact portable ADP/tablet classification, origin evidence, and Section 301 add-on duty or exclusion status."
+    }
+  ]
+}

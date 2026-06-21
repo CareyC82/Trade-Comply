@@ -200,6 +200,8 @@ function bootstrapTradeOpportunityPage() {
                         <strong>${escapeHtml(best.commercialDecision || best.opportunitySignal?.oneLine || 'Review this route before quoting.')}</strong>
                         <span>${escapeHtml(salesAngle)}</span>
                         <span>${escapeHtml(quoteGate)}</span>
+                        <span><b>Why this route:</b> ${escapeHtml(model.whyThisRoute || 'Compare maintained duty, tax, and compliance evidence before quoting.')}</span>
+                        <span><b>Selected route check:</b> ${escapeHtml(model.whyNotSelectedRoute || 'Keep the selected route visible until evidence shows a better option.')}</span>
                     </div>
                     <div class="opportunity-decision-strip">
                         <span>Quote status: ${escapeHtml(best.quoteReadiness || 'Research only')}</span>

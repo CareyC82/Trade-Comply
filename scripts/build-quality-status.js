@@ -72,6 +72,7 @@ function summarizeSearchAudit(searchAudit) {
 function summarizeDutyHealth(dutyHealth) {
     const gapMatrix = dutyHealth?.duty_rate_gap_matrix || {};
     const rows = Array.isArray(gapMatrix.rows) ? gapMatrix.rows : [];
+    const exactTariffParserQueue = readJson('data/exact-tariff-parser-priorities.json', { priorities: [] });
     return {
         ok: Boolean(dutyHealth?.ok) && Number(gapMatrix.missing_total || 0) === 0,
         sample_count: dutyHealth?.sample_count || 0,
@@ -81,6 +82,7 @@ function summarizeDutyHealth(dutyHealth) {
         source_count: dutyHealth?.source_roadmap_summary?.source_count || 0,
         source_quality_summary: dutyHealth?.source_quality_summary || [],
         priority_rate_matrix: dutyHealth?.priority_rate_matrix || null,
+        exact_tariff_parser_queue: exactTariffParserQueue,
         gap_matrix: gapMatrix,
         markets_missing_priority_hs: rows
             .filter((row) => (row.missing || []).length > 0)
