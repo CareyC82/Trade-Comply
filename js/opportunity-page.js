@@ -90,6 +90,9 @@ function bootstrapTradeOpportunityPage() {
 
     function renderMarketCard(card, index) {
         const transit = card.transitComparison || null;
+        const sourceEvidence = Array.isArray(card.sourceEvidence)
+            ? card.sourceEvidence.slice(0, 5)
+            : [];
         const metricItems = transit ? [
             { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
             { label: 'Cost delta', value: transit.deltaRate || 'Pending' },
@@ -132,6 +135,17 @@ function bootstrapTradeOpportunityPage() {
                     `).join('')}
                 </div>
                 ${card.transitWarning ? `<div class="opportunity-transit-note">${escapeHtml(card.transitWarning)}</div>` : ''}
+                ${sourceEvidence.length ? `
+                    <div class="opportunity-source-evidence" aria-label="Decision evidence">
+                        <span>Decision evidence</span>
+                        ${sourceEvidence.map((item) => `
+                            <div>
+                                <strong>${escapeHtml(item.label)}</strong>
+                                <p>${escapeHtml(item.detail)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
                 <div class="opportunity-card-action">${escapeHtml(card.businessAction)}</div>
             </article>
         `;

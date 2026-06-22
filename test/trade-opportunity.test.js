@@ -75,6 +75,9 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.opportunityEvidence) && row.opportunityEvidence.length === 3));
         assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Demand driver')));
         assert.ok(model.routeComparison.every((row) => row.opportunityEvidence.some((item) => item.label === 'Compliance friction')));
+        assert.ok(model.routeComparison.every((row) => Array.isArray(row.sourceEvidence) && row.sourceEvidence.length >= 4));
+        assert.ok(model.routeComparison.every((row) => row.sourceEvidence.some((item) => /Data source|Source coverage|Transit decision/.test(item.label))));
+        assert.ok(model.routeComparison.every((row) => row.sourceEvidence.some((item) => /Control gate|Origin \/ re-export gate/.test(item.label))));
         assert.match(model.whyThisRoute, /because/i);
         assert.match(model.whyNotSelectedRoute, /United States|alternate market|selected route/i);
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
@@ -254,6 +257,8 @@ describe('trade opportunity insights', () => {
         assert.match(singapore.transitComparison.decision.reason, /not simple tariff savings/i);
         assert.match(singapore.transitWarning, /No duty-cost advantage versus direct route/i);
         assert.match(singapore.transitWarning, /origin transformation/i);
+        assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Combined cost' && /United States -> Singapore/.test(item.detail)));
+        assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Origin / re-export gate' && /origin transformation/i.test(item.detail)));
     });
 
     it('surfaces a BIS export-control gate for US-origin H200 opportunities to China', () => {
@@ -488,6 +493,8 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /opportunity-transit-note/);
         assert.match(source, /opportunity-transit-verdict/);
         assert.match(source, /opportunity-control-gate/);
+        assert.match(source, /opportunity-source-evidence/);
+        assert.match(source, /Decision evidence/);
         assert.match(source, /Export control gate/);
         assert.match(source, /Data confidence/);
         assert.match(source, /Next move/);

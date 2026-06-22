@@ -5212,6 +5212,58 @@ button.feedback-link:hover {
     line-height: 1.35;
 }
 
+.opportunity-source-evidence {
+    grid-column: 2 / 4;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid rgba(15, 118, 110, 0.16);
+    border-radius: 10px;
+    background: rgba(240, 253, 250, 0.58);
+}
+
+.opportunity-source-evidence > span {
+    color: #0f766e;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.opportunity-source-evidence div {
+    display: grid;
+    grid-template-columns: minmax(92px, 0.28fr) 1fr;
+    gap: 8px;
+    align-items: start;
+}
+
+.opportunity-source-evidence strong {
+    color: var(--color-primary);
+    font-size: 0.74rem;
+    line-height: 1.25;
+}
+
+.opportunity-source-evidence p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+@media (max-width: 720px) {
+    .opportunity-source-evidence,
+    .opportunity-transit-note {
+        grid-column: 1 / -1;
+    }
+
+    .opportunity-source-evidence div {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+}
+
 .opportunity-parser-section {
     background: #fffaf0;
     border-color: rgba(180, 83, 9, 0.22);
