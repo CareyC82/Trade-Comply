@@ -152,6 +152,13 @@ function chooseMostSpecificRate(rows, hsPrefix) {
     return candidates[0] || null;
 }
 
+function chooseBestRulePrefix(prefixes = []) {
+    return (Array.isArray(prefixes) ? prefixes : [])
+        .map(prefix => normalizeHs(prefix))
+        .filter(Boolean)
+        .sort((a, b) => b.length - a.length || a.localeCompare(b))[0] || '';
+}
+
 async function fetchRateForPrefix(prefix) {
     const normalized = normalizeHs(prefix);
     const rangeStart = formatHtsQuery(normalized);
@@ -176,8 +183,12 @@ async function updateUsRules({ dryRun = false } = {}) {
 
     for (const rule of rules) {
         if (rule.import_country !== 'US') continue;
-        const prefixes = rule.hs_prefixes || [];
-        for (const prefix of prefixes) {
+        const prefix = chooseBestRulePrefix(rule.hs_prefixes || []);
+        if (!prefix) {
+            errors.push({ rule: rule.id, prefix: '', error: 'No HS prefix configured' });
+            continue;
+        }
+        {
             try {
                 const rate = await fetchRateForPrefix(prefix);
                 await sleep(150);
@@ -277,6 +288,7 @@ module.exports = {
     extractHtsNumber,
     extractGeneralRate,
     chooseMostSpecificRate,
+    chooseBestRulePrefix,
     updateUsRules,
     summarizeDutyRateCoverage
 };

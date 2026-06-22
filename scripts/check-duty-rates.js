@@ -271,7 +271,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         official_heading_only: 30,
         mixed_official_estimate: 40,
         official_duty_tax_estimate: 90,
-        official_exact_rate: 100
+        official_exact: 100
     };
     const marketRank = {
         IN: 1,
@@ -299,7 +299,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         monitor: 8
     };
     const upgradeQueue = results
-        .filter(result => !['official_exact_rate', 'official_duty_tax_estimate'].includes(result.source_trust))
+        .filter(result => !['official_exact', 'official_duty_tax_estimate'].includes(result.source_trust))
         .map(result => ({
             id: result.id,
             product_id: result.product_id,
@@ -347,7 +347,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         official_or_hybrid_count: results.filter(result => (
             result.source_trust === 'official_duty_tax_estimate'
             || result.source_trust === 'mixed_official_estimate'
-            || result.source_trust === 'official_exact_rate'
+            || result.source_trust === 'official_exact'
             || result.source_trust === 'official_heading_only'
             || result.source_trust === 'official_link_estimate'
         )).length,
@@ -500,7 +500,7 @@ function buildExactRateProgress({
     const rows = Array.isArray(priorityMatrix.rows) ? priorityMatrix.rows : [];
     const sourceQualityByCountry = new Map((sourceQuality || []).map(row => [row.country, row]));
     const priorityMarkets = Array.from(new Set(rows.map(row => row.import_country).filter(Boolean))).sort();
-    const exactTrust = new Set(['official_exact_rate', 'official_duty_tax_estimate']);
+    const exactTrust = new Set(['official_exact', 'official_duty_tax_estimate']);
     const hybridTrust = new Set(['mixed_official_estimate', 'official_heading_only', 'official_link_estimate']);
     const benchmarkTrust = new Set(['precheck_estimate']);
 

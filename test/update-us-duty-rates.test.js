@@ -6,7 +6,8 @@ const {
     formatHtsQuery,
     extractHtsNumber,
     extractGeneralRate,
-    chooseMostSpecificRate
+    chooseMostSpecificRate,
+    chooseBestRulePrefix
 } = require('../scripts/update-us-duty-rates');
 
 test('formats HS prefixes for USITC query ranges', () => {
@@ -44,4 +45,9 @@ test('chooses most specific matching HTS rate', () => {
 
     assert.equal(match.rate, 0.025);
     assert.equal(match.hts, '85076000');
+});
+
+test('chooses the longest rule prefix before querying USITC', () => {
+    assert.equal(chooseBestRulePrefix(['847950', '8479']), '847950');
+    assert.equal(chooseBestRulePrefix(['8806', '880622']), '880622');
 });

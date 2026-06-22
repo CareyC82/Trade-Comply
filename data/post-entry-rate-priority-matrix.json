@@ -3,7 +3,7 @@
   "updated_at": "2026-06-22",
   "notes": "High-frequency Post-Entry tariff-rate priority matrix. This is the product/data-coverage target for daily duty-rate sync: every row must be covered by maintained duty rules, and source trust must match the declared expectation.",
   "trust_tiers": {
-    "official_exact_rate": "All displayed duty layers are official-backed for the maintained route / HS basis.",
+    "official_exact": "All displayed duty layers are official-backed for the maintained route / HS basis.",
     "official_duty_tax_estimate": "Base customs duty is official-backed; VAT/GST/consumption-tax layers remain maintained estimates.",
     "mixed_official_estimate": "Official base duty is present, but trade-remedy/add-on scope or local layers still require review.",
     "official_heading_only": "Official source exists, but exact tariff-line or case scope can change the final payable rate.",
@@ -1089,7 +1089,7 @@
       "origin_country": "DE",
       "import_country": "US",
       "hs_code": "847950",
-      "expected_source_trust": "official_heading_only",
+      "expected_source_trust": "official_exact",
       "automation_level": "official_link_monitor"
     }
   ]

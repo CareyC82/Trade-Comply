@@ -55,8 +55,8 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
     const result = runDutyRateHealthCheck();
     const qualityByCountry = new Map(result.source_quality_summary.map(item => [item.country, item]));
 
-    assert.equal(qualityByCountry.get('US').coverage_level, 'official_or_scope_all');
-    assert.ok(qualityByCountry.get('US').scope_check_required > 0, 'US should retain exact-code gates for high-risk monitored headings');
+    assert.equal(qualityByCountry.get('US').coverage_level, 'official_all');
+    assert.equal(qualityByCountry.get('US').official_source_checked, qualityByCountry.get('US').rule_count);
     ['EU', 'DE', 'NL'].forEach((country) => {
         assert.equal(qualityByCountry.get(country).coverage_level, 'official_or_scope_all', country);
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
@@ -142,7 +142,8 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.trust_counts.mixed_official_estimate, 5);
     assert.equal(matrix.trust_counts.official_duty_tax_estimate, 104);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
-    assert.equal(matrix.trust_counts.official_heading_only, 3);
+    assert.equal(matrix.trust_counts.official_heading_only, 2);
+    assert.equal(matrix.trust_counts.official_exact, 1);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');

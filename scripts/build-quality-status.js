@@ -144,7 +144,7 @@ function summarizeOpportunityPriority() {
         acc[key] = (acc[key] || 0) + 1;
         return acc;
     }, {});
-    const officialEnough = new Set(['official_exact_rate', 'official_duty_tax_estimate', 'mixed_official_estimate']);
+    const officialEnough = new Set(['official_exact', 'official_duty_tax_estimate', 'mixed_official_estimate']);
     const tariffCoveragePriorities = rows
         .filter((row) => !officialEnough.has(row.selected_source_trust) || row.workbench_bucket === 'need_tariff_upgrade')
         .slice(0, 12)
