@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity"></script>
  */
 (function () {
-    const BUILD = '20260622-opportunity-evidence';
+    const BUILD = '20260622-opportunity-route-decision';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();

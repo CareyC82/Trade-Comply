@@ -78,6 +78,8 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.sourceEvidence) && row.sourceEvidence.length >= 4));
         assert.ok(model.routeComparison.every((row) => row.sourceEvidence.some((item) => /Data source|Source coverage|Transit decision/.test(item.label))));
         assert.ok(model.routeComparison.every((row) => row.sourceEvidence.some((item) => /Control gate|Origin \/ re-export gate/.test(item.label))));
+        assert.ok(model.routeComparison.every((row) => row.routeDecisionSummary));
+        assert.ok(model.routeComparison.every((row) => Array.isArray(row.rejectionReasons) && row.rejectionReasons.length >= 1));
         assert.match(model.whyThisRoute, /because/i);
         assert.match(model.whyNotSelectedRoute, /United States|alternate market|selected route/i);
         assert.ok(model.routeComparison.some((row) => row.sourceTrust !== 'not_covered'));
@@ -259,6 +261,8 @@ describe('trade opportunity insights', () => {
         assert.match(singapore.transitWarning, /origin transformation/i);
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Combined cost' && /United States -> Singapore/.test(item.detail)));
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Origin / re-export gate' && /origin transformation/i.test(item.detail)));
+        assert.match(singapore.routeDecisionSummary, /Not cheaper|cost reduction|direct/i);
+        assert.ok(singapore.rejectionReasons.some((item) => /higher than direct|workaround|origin/i.test(item)));
     });
 
     it('surfaces a BIS export-control gate for US-origin H200 opportunities to China', () => {
@@ -495,6 +499,9 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /opportunity-control-gate/);
         assert.match(source, /opportunity-source-evidence/);
         assert.match(source, /Decision evidence/);
+        assert.match(source, /opportunity-route-decision/);
+        assert.match(source, /Route decision/);
+        assert.match(source, /rejectionReasons/);
         assert.match(source, /Export control gate/);
         assert.match(source, /Data confidence/);
         assert.match(source, /Next move/);

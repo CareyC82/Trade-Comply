@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-21",
+  "updated_at": "2026-06-22",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -2475,6 +2475,86 @@
       "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
       "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
       "last_checked_at": "2026-06-21T19:58:39.651Z"
+    },
+    {
+      "id": "CN-US-847150-AI-SERVER-HYBRID",
+      "import_country": "CN",
+      "origin_country": "US",
+      "hs_prefixes": [
+        "847150"
+      ],
+      "label": "China import AI server / data-processing machine maintained signal",
+      "base_rate": 0,
+      "additional_rate": 0.13,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "China import VAT estimate",
+          "rate": 0.13,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "China import VAT maintained estimate"
+        }
+      ],
+      "trade_remedy": "China import VAT and equipment classification signal; export-control review remains separate.",
+      "confidence": "Hybrid official candidate",
+      "source_status": "official_source_checked",
+      "source_note": "Maintained high-risk AI compute route. Base duty is treated as exact-line candidate; VAT and CCC/inspection/import licensing scope require refresh before filing.",
+      "source_hts": "847150 (CN maintained exact-line candidate)",
+      "source_rate_text": "0% duty + 13% VAT estimate",
+      "source_url": "https://www.customs.gov.cn/",
+      "last_checked_at": "2026-06-22T00:00:00.000Z"
+    },
+    {
+      "id": "US-CN-880622-UAV-LINK-MONITORED",
+      "import_country": "US",
+      "origin_country": "CN",
+      "hs_prefixes": [
+        "880622",
+        "8806"
+      ],
+      "label": "US import UAV / drone official heading monitored signal",
+      "base_rate": 0,
+      "additional_rate": 0,
+      "add_on_layers": [
+        {
+          "type": "section_301_scope",
+          "label": "Section 301 / Chapter 99 scope check",
+          "rate": null,
+          "basis": "case_scope",
+          "status": "scope_check_required",
+          "source": "US HTS / USTR scope requires exact 10-digit and Chapter 99 review"
+        }
+      ],
+      "trade_remedy": "US UAV import heading is source-monitored; exact HTS, FAA/FCC/battery, and China-origin add-on scope must be checked.",
+      "confidence": "Official heading only",
+      "source_status": "scope_check_required",
+      "source_note": "Official heading monitored for UAV/drone imports. Do not treat as final payable rate until exact 10-digit HTS and Chapter 99 scope are confirmed.",
+      "source_hts": "880622 (US HTS heading monitor)",
+      "source_rate_text": "Exact HTS required",
+      "source_url": "https://hts.usitc.gov/",
+      "last_checked_at": "2026-06-22T00:00:00.000Z"
+    },
+    {
+      "id": "US-DE-847950-ROBOT-LINK-MONITORED",
+      "import_country": "US",
+      "origin_country": "DE",
+      "hs_prefixes": [
+        "847950",
+        "8479"
+      ],
+      "label": "US import industrial robot official heading monitored signal",
+      "base_rate": 0,
+      "additional_rate": 0,
+      "add_on_layers": [],
+      "trade_remedy": "US industrial robot import heading is source-monitored; exact HTS, assists/software, and valuation scope must be confirmed.",
+      "confidence": "Official heading only",
+      "source_status": "scope_check_required",
+      "source_note": "Official heading monitored for industrial robots. Exact 10-digit HTS and valuation/software treatment remain gated before filing.",
+      "source_hts": "847950 (US HTS heading monitor)",
+      "source_rate_text": "Exact HTS required",
+      "source_url": "https://hts.usitc.gov/",
+      "last_checked_at": "2026-06-22T00:00:00.000Z"
     }
   ],
   "last_usitc_sync_at": "2026-06-21T19:58:39.648Z",

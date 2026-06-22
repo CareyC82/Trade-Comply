@@ -93,6 +93,9 @@ function bootstrapTradeOpportunityPage() {
         const sourceEvidence = Array.isArray(card.sourceEvidence)
             ? card.sourceEvidence.slice(0, 5)
             : [];
+        const rejectionReasons = Array.isArray(card.rejectionReasons)
+            ? card.rejectionReasons.slice(0, 3)
+            : [];
         const metricItems = transit ? [
             { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
             { label: 'Cost delta', value: transit.deltaRate || 'Pending' },
@@ -135,6 +138,17 @@ function bootstrapTradeOpportunityPage() {
                     `).join('')}
                 </div>
                 ${card.transitWarning ? `<div class="opportunity-transit-note">${escapeHtml(card.transitWarning)}</div>` : ''}
+                ${card.routeDecisionSummary || rejectionReasons.length ? `
+                    <div class="opportunity-route-decision" aria-label="Route decision">
+                        <span>Route decision</span>
+                        ${card.routeDecisionSummary ? `<strong>${escapeHtml(card.routeDecisionSummary)}</strong>` : ''}
+                        ${rejectionReasons.length ? `
+                            <ul>
+                                ${rejectionReasons.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                ` : ''}
                 ${sourceEvidence.length ? `
                     <div class="opportunity-source-evidence" aria-label="Decision evidence">
                         <span>Decision evidence</span>

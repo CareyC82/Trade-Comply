@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-19",
+  "updated_at": "2026-06-22",
   "notes": "High-frequency Post-Entry tariff-rate priority matrix. This is the product/data-coverage target for daily duty-rate sync: every row must be covered by maintained duty rules, and source trust must match the declared expectation.",
   "trust_tiers": {
     "official_exact_rate": "All displayed duty layers are official-backed for the maintained route / HS basis.",
@@ -56,6 +56,31 @@
       "id": "monitor",
       "label": "Computer monitor / display",
       "hs_basis": "852852 / 8528521000"
+    },
+    {
+      "id": "ai_compute",
+      "label": "AI server / accelerator system",
+      "hs_basis": "847150 / 8471500000"
+    },
+    {
+      "id": "optical_module",
+      "label": "Optical module / high-speed interconnect",
+      "hs_basis": "851770 / 851762"
+    },
+    {
+      "id": "drone",
+      "label": "Drone / UAV",
+      "hs_basis": "880622 / 852589"
+    },
+    {
+      "id": "surveillance_imaging",
+      "label": "Surveillance / sensitive imaging",
+      "hs_basis": "852589 / 8525"
+    },
+    {
+      "id": "industrial_automation",
+      "label": "Industrial robot / automation equipment",
+      "hs_basis": "847950 / 8479"
     }
   ],
   "routes": [
@@ -1012,6 +1037,60 @@
       "hs_code": "850440",
       "expected_source_trust": "official_duty_tax_estimate",
       "automation_level": "hybrid_official"
+    },
+    {
+      "id": "h200-us-cn",
+      "product_id": "semiconductor",
+      "origin_country": "US",
+      "import_country": "CN",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "ai-server-us-cn",
+      "product_id": "ai_compute",
+      "origin_country": "US",
+      "import_country": "CN",
+      "hs_code": "847150",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "optical-module-cn-in",
+      "product_id": "optical_module",
+      "origin_country": "CN",
+      "import_country": "IN",
+      "hs_code": "851770",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "drone-cn-us",
+      "product_id": "drone",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "880622",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
+    },
+    {
+      "id": "thermal-camera-us-in",
+      "product_id": "surveillance_imaging",
+      "origin_country": "US",
+      "import_country": "IN",
+      "hs_code": "852589",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "industrial-robot-de-us",
+      "product_id": "industrial_automation",
+      "origin_country": "DE",
+      "import_country": "US",
+      "hs_code": "847950",
+      "expected_source_trust": "official_heading_only",
+      "automation_level": "official_link_monitor"
     }
   ]
 }

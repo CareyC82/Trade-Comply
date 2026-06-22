@@ -5212,6 +5212,44 @@ button.feedback-link:hover {
     line-height: 1.35;
 }
 
+.opportunity-route-decision {
+    grid-column: 2 / 4;
+    padding: 10px 12px;
+    border: 1px solid rgba(30, 64, 175, 0.16);
+    border-radius: 10px;
+    background: rgba(239, 246, 255, 0.72);
+}
+
+.opportunity-route-decision > span {
+    display: block;
+    margin-bottom: 5px;
+    color: #1d4ed8;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.opportunity-route-decision strong {
+    display: block;
+    color: var(--color-primary);
+    font-size: 0.82rem;
+    line-height: 1.3;
+}
+
+.opportunity-route-decision ul {
+    margin: 7px 0 0;
+    padding-left: 18px;
+    color: var(--color-text-secondary);
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.opportunity-route-decision li + li {
+    margin-top: 3px;
+}
+
 .opportunity-source-evidence {
     grid-column: 2 / 4;
     display: grid;
@@ -5253,6 +5291,7 @@ button.feedback-link:hover {
 }
 
 @media (max-width: 720px) {
+    .opportunity-route-decision,
     .opportunity-source-evidence,
     .opportunity-transit-note {
         grid-column: 1 / -1;

@@ -38,13 +38,24 @@ describe('high-risk product journeys', () => {
                 priorityMatrix
             });
             const selected = model.selectedMarket;
+            const maintainedRoute = (priorityMatrix.routes || []).find((route) => (
+                route.id === sample.id
+                || (
+                    route.origin_country === sample.from
+                    && route.import_country === sample.to
+                    && String(sample.hs_code).startsWith(String(route.hs_code).slice(0, 6))
+                )
+            ));
 
             assert.equal(model.productSignal.id, sample.expected_signal);
             assert.equal(selected.market, sample.to);
+            assert.ok(maintainedRoute, `${sample.id} should be present in the rate-priority matrix`);
             assert.ok(Array.isArray(selected.sourceEvidence));
             assert.ok(selected.sourceEvidence.some((item) => item.label === 'Data source'));
             assert.ok(selected.sourceEvidence.some((item) => item.label === 'Tariff basis'));
             assert.ok(selected.sourceEvidence.some((item) => item.label === 'Control gate'));
+            assert.ok(selected.routeDecisionSummary);
+            assert.ok(Array.isArray(selected.rejectionReasons) && selected.rejectionReasons.length >= 1);
             assert.ok(model.routeComparison.every((row) => Array.isArray(row.sourceEvidence) && row.sourceEvidence.length >= 4));
 
             if (sample.expected_export_control_severity) {
@@ -101,6 +112,7 @@ describe('high-risk product journeys', () => {
 
             assert.ok(Array.isArray(duty.sourceBreakdown));
             assert.ok(duty.sourceBreakdown.length >= 1);
+            assert.equal(duty.sourceBreakdown.some((item) => item.status !== 'not_covered'), true, `${sample.id} should have maintained duty source coverage`);
             assert.ok(trust.level);
             assert.notEqual(trust.label, '');
         });

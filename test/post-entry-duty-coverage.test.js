@@ -55,7 +55,8 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
     const result = runDutyRateHealthCheck();
     const qualityByCountry = new Map(result.source_quality_summary.map(item => [item.country, item]));
 
-    assert.equal(qualityByCountry.get('US').coverage_level, 'official_all');
+    assert.equal(qualityByCountry.get('US').coverage_level, 'official_or_scope_all');
+    assert.ok(qualityByCountry.get('US').scope_check_required > 0, 'US should retain exact-code gates for high-risk monitored headings');
     ['EU', 'DE', 'NL'].forEach((country) => {
         assert.equal(qualityByCountry.get(country).coverage_level, 'official_or_scope_all', country);
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
@@ -114,13 +115,18 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.route_count, priorityMatrix.routes.length);
     assert.ok(matrix.route_count >= 50, 'priority matrix should cover at least 50 high-frequency routes');
     assert.deepEqual(matrix.products, [
+        'ai_compute',
         'battery',
+        'drone',
         'ev_charger',
+        'industrial_automation',
         'monitor',
+        'optical_module',
         'router',
         'semiconductor',
         'smartphone',
         'solar',
+        'surveillance_imaging',
         'tablet'
     ]);
     ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
@@ -130,13 +136,13 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.benchmark_count, 0, 'priority routes should no longer rely on benchmark-only rows');
     assert.equal(matrix.automation_counts.official_auto > 0, true);
     assert.equal(matrix.automation_counts.hybrid_official > 0, true);
-    assert.equal(matrix.automation_counts.official_link_monitor || 0, 0);
+    assert.equal(matrix.automation_counts.official_link_monitor, 2);
     assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
     assert.equal(matrix.trust_counts.official_link_estimate || 0, 0);
     assert.equal(matrix.trust_counts.mixed_official_estimate, 5);
-    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 100);
+    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 104);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
-    assert.equal(matrix.trust_counts.official_heading_only, 1);
+    assert.equal(matrix.trust_counts.official_heading_only, 3);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
