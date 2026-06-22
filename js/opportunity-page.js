@@ -285,7 +285,7 @@ function bootstrapTradeOpportunityPage() {
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">
                     <h3>Direct route and top transit options</h3>
-                    <p>Showing the selected direct route plus the two strongest transit comparisons. Transit totals combine both maintained duty/tax signals and still require origin-transformation and logistics review.</p>
+                    <p>Showing the selected direct route plus the two strongest transit comparisons. Transit totals combine both maintained duty/tax legs and still require origin-transformation, re-export, and logistics evidence.</p>
                 </div>
                 <div class="opportunity-market-grid">
                     ${model.markets.map(renderMarketCard).join('')}

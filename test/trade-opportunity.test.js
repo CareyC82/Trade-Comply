@@ -487,7 +487,8 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Why this route:/);
         assert.match(source, /Selected route check:/);
         assert.match(source, /Direct route and top transit options/);
-        assert.match(source, /Transit totals combine both maintained duty\/tax signals/);
+        assert.match(source, /Transit totals combine both maintained duty\/tax legs/);
+        assert.match(source, /re-export, and logistics evidence/);
         assert.match(source, /Transit decision/);
         assert.match(source, /Transit total/);
         assert.match(source, /Cost delta/);

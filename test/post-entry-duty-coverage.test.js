@@ -10,6 +10,9 @@ const {
 const {
     summarizeDutyRateCoverage
 } = require('../scripts/update-us-duty-rates');
+const {
+    buildExactTariffParserPriorities
+} = require('../scripts/update-exact-tariff-parser-priorities');
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const samples = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'post-entry-samples.json'), 'utf8'));
@@ -168,6 +171,19 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'JP'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'KR'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN'), false);
+});
+
+test('exact tariff parser priorities mirror the live upgrade queue', () => {
+    const result = runDutyRateHealthCheck();
+    const payload = buildExactTariffParserPriorities({ generatedAt: '2026-06-22T00:00:00.000Z' });
+    const liveIds = result.priority_rate_matrix.priority_upgrade_queue.map((row) => row.id);
+    const payloadIds = payload.priorities.map((row) => row.id);
+
+    assert.deepEqual(payloadIds, liveIds);
+    assert.equal(payload.priorities.length, 7);
+    assert.ok(payload.priorities.some((row) => row.id === 'drone-cn-us'));
+    assert.equal(payload.priorities.some((row) => row.id === 'industrial-robot-de-us'), false);
+    assert.ok(payload.priorities.every((row) => row.parser_scope && row.rate_change_drivers.length > 0));
 });
 
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {
