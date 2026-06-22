@@ -5093,6 +5093,55 @@ button.feedback-link:hover {
     line-height: 1.45;
 }
 
+.opportunity-transit-verdict {
+    grid-column: 2 / 4;
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(23, 61, 101, 0.14);
+    background: #f8fafc;
+}
+
+.opportunity-transit-verdict span {
+    color: var(--color-text-secondary);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.opportunity-transit-verdict strong {
+    color: var(--color-primary);
+    font-size: 0.84rem;
+    line-height: 1.35;
+}
+
+.opportunity-transit-verdict p {
+    grid-column: auto;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 750;
+}
+
+.opportunity-transit-verdict--favorable {
+    border-color: rgba(22, 163, 74, 0.24);
+    background: #f0fdf4;
+}
+
+.opportunity-transit-verdict--caution,
+.opportunity-transit-verdict--neutral {
+    border-color: rgba(202, 138, 4, 0.24);
+    background: #fffbeb;
+}
+
+.opportunity-transit-verdict--unfavorable,
+.opportunity-transit-verdict--blocked {
+    border-color: rgba(220, 38, 38, 0.22);
+    background: #fff7f7;
+}
+
 .opportunity-market-card small {
     grid-column: 2 / 4;
     display: block;

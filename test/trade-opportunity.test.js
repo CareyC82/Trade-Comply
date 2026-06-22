@@ -106,6 +106,10 @@ describe('trade opportunity insights', () => {
         assert.equal(transitRows.length, 2);
         assert.ok(transitRows.every((row) => row.transitComparison));
         assert.ok(transitRows.every((row) => row.transitComparison.directRate === '25.0%'));
+        assert.ok(transitRows.every((row) => row.transitComparison.secondLegRate));
+        assert.ok(transitRows.every((row) => row.transitComparison.deltaRate));
+        assert.ok(transitRows.every((row) => row.transitComparison.decision?.headline));
+        assert.ok(transitRows.every((row) => /transit|direct|cost|duty|tax/i.test(row.transitComparison.decision.headline)));
         assert.ok(transitRows.every((row) => /Combined cost|duty-cost advantage/i.test(row.transitComparison.costConclusion)));
         assert.match(model.whyThisRoute, new RegExp(model.best.label));
         assert.match(model.whyNotSelectedRoute, /United States/);
@@ -245,6 +249,9 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.transitComparison.firstLegRate, '9.0%');
         assert.equal(singapore.transitComparison.secondLegRate, '13.0%');
         assert.equal(singapore.transitComparison.combinedRate, '22.0%');
+        assert.equal(singapore.transitComparison.deltaRate, '+9.0%');
+        assert.match(singapore.transitComparison.decision.headline, /Do not use Singapore for cost reduction/i);
+        assert.match(singapore.transitComparison.decision.reason, /not simple tariff savings/i);
         assert.match(singapore.transitWarning, /No duty-cost advantage versus direct route/i);
         assert.match(singapore.transitWarning, /origin transformation/i);
     });
@@ -371,11 +378,11 @@ describe('trade opportunity insights', () => {
         ));
 
         assert.ok(pendingRows.length >= 1);
-        assert.ok(pendingRows.every((row) => row.tag === 'Data pending'));
+        assert.ok(pendingRows.every((row) => row.tag === 'Data pending' || row.tag === 'Do not recommend yet'));
         assert.ok(pendingRows.every((row) => row.recommendationGate === 'compare_later_data_pending'));
         assert.ok(pendingRows.every((row) => row.score <= 55));
         assert.ok(pendingRows.every((row) => /Compare later/i.test(row.opportunitySignal.action)));
-        assert.ok(pendingRows.every((row) => /Research only|coverage/i.test(row.commercialDecision)));
+        assert.ok(pendingRows.every((row) => /Research only|coverage|recommend/i.test(row.commercialDecision)));
         assert.ok(pendingRows.every((row) => row.quoteReadiness === 'Research only'));
     });
 
@@ -472,9 +479,14 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Selected route check:/);
         assert.match(source, /Direct route and top transit options/);
         assert.match(source, /Transit totals combine both maintained duty\/tax signals/);
+        assert.match(source, /Transit decision/);
         assert.match(source, /Transit total/);
+        assert.match(source, /Cost delta/);
         assert.match(source, /Second leg/);
+        assert.match(source, /Second-leg coverage/);
+        assert.match(source, /deltaRate/);
         assert.match(source, /opportunity-transit-note/);
+        assert.match(source, /opportunity-transit-verdict/);
         assert.match(source, /opportunity-control-gate/);
         assert.match(source, /Export control gate/);
         assert.match(source, /Data confidence/);

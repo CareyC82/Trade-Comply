@@ -92,11 +92,11 @@ function bootstrapTradeOpportunityPage() {
         const transit = card.transitComparison || null;
         const metricItems = transit ? [
             { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
+            { label: 'Cost delta', value: transit.deltaRate || 'Pending' },
             { label: 'First leg', value: transit.firstLegRate || 'Pending' },
             { label: 'Second leg', value: transit.secondLegRate || 'Pending' },
             { label: 'Direct route', value: transit.directRate || 'Pending' },
-            { label: 'Coverage', value: card.coverageLabel || 'Pending' },
-            { label: 'Compliance friction', value: card.complianceFriction || 'Medium' }
+            { label: 'Second-leg coverage', value: transit.secondCoverageLabel || 'Pending' }
         ] : [
             { label: 'Direct total', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
@@ -106,6 +106,7 @@ function bootstrapTradeOpportunityPage() {
             { label: 'Compliance friction', value: card.complianceFriction || 'Medium' }
         ];
         const displaySummary = transit?.costConclusion || card.conciseConclusion || card.opportunity;
+        const transitDecision = transit?.decision || null;
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
                 <div class="opportunity-market-score">${escapeHtml(card.score)}</div>
@@ -114,6 +115,13 @@ function bootstrapTradeOpportunityPage() {
                     <div class="opportunity-market-route">${escapeHtml(card.routeScopeLabel || card.route)}</div>
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
+                ${transitDecision ? `
+                    <div class="opportunity-transit-verdict opportunity-transit-verdict--${escapeHtml(transitDecision.tone || 'neutral')}">
+                        <span>Transit decision</span>
+                        <strong>${escapeHtml(transitDecision.headline)}</strong>
+                        <p>${escapeHtml(transitDecision.reason)}</p>
+                    </div>
+                ` : ''}
                 <p>${escapeHtml(displaySummary)}</p>
                 <div class="opportunity-rate-mini-grid">
                     ${metricItems.map((item) => `
@@ -130,6 +138,7 @@ function bootstrapTradeOpportunityPage() {
     }
 
     function renderRouteRow(card) {
+        const transit = card.transitComparison || null;
         return `
             <tr>
                 <td>
@@ -138,10 +147,16 @@ function bootstrapTradeOpportunityPage() {
                     ${card.transitWarning ? `<span>${escapeHtml(card.transitWarning)}</span>` : ''}
                 </td>
                 <td>
-                    <strong>${escapeHtml(card.dutyBreakdown?.totalRate || 'Not covered')}</strong>
-                    <span>Base ${escapeHtml(card.dutyBreakdown?.baseDuty || 'Pending')}</span>
-                    <span>Add-on ${escapeHtml(card.dutyBreakdown?.addOnDuty || 'Pending')}</span>
-                    <span>Tax ${escapeHtml(card.dutyBreakdown?.taxLayer || 'Pending')}</span>
+                    <strong>${escapeHtml(transit?.combinedRate || card.dutyBreakdown?.totalRate || 'Not covered')}</strong>
+                    ${transit ? `
+                        <span>First leg ${escapeHtml(transit.firstLegRate || 'Pending')}</span>
+                        <span>Second leg ${escapeHtml(transit.secondLegRate || 'Pending')}</span>
+                        <span>Delta ${escapeHtml(transit.deltaRate || 'Pending')} vs direct</span>
+                    ` : `
+                        <span>Base ${escapeHtml(card.dutyBreakdown?.baseDuty || 'Pending')}</span>
+                        <span>Add-on ${escapeHtml(card.dutyBreakdown?.addOnDuty || 'Pending')}</span>
+                        <span>Tax ${escapeHtml(card.dutyBreakdown?.taxLayer || 'Pending')}</span>
+                    `}
                 </td>
                 <td><span class="opportunity-coverage-pill opportunity-coverage-pill--${escapeHtml(card.coverageTone)}">${escapeHtml(card.coverageLabel)}</span></td>
                 <td>${escapeHtml(card.hsCode || 'Pending')}</td>
