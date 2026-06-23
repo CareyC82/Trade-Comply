@@ -9,6 +9,7 @@
     "audit:search-quality": "node scripts/audit-search-quality.js",
     "audit:search-quality:report": "node scripts/audit-search-quality.js --write-report",
     "check:quality": "node scripts/build-quality-status.js",
+    "build:automation-launch-status": "node scripts/build-automation-launch-status.js",
     "check:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js && bash scripts/with-node.sh node scripts/build-catalog.js --check",
     "summarize:feedback": "bash scripts/with-node.sh node scripts/summarize-feedback.js",
     "parse:announcement": "bash scripts/with-node.sh node scripts/auto-parse-announcement.js",

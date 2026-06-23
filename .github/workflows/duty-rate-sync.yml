@@ -30,6 +30,9 @@ jobs:
       - name: Run duty-rate auto sync
         run: npm run sync:duty-rates:auto
 
+      - name: Refresh automation launch status
+        run: npm run build:automation-launch-status
+
       - name: Verify duty-rate sync output
         run: npm test
 
@@ -40,7 +43,8 @@ jobs:
           git add \
             data/duty-rate-sources.json \
             data/duty-rates.json \
-            data/duty-rate-sync-status.json
+            data/duty-rate-sync-status.json \
+            data/automation-launch-status.json
 
           if git diff --staged --quiet; then
             echo "No duty-rate sync changes."

@@ -1004,6 +1004,63 @@
             `;
         }
 
+        function renderAutomationLaunchStatus(status = {}) {
+            const summary = status.summary || {};
+            const regulatory = Array.isArray(status.regulatory) ? status.regulatory : [];
+            const dutyRates = Array.isArray(status.duty_rates) ? status.duty_rates : [];
+            const modeLabel = {
+                live_auto: 'Live auto',
+                live_hybrid: 'Live hybrid',
+                live_monitor: 'Live monitor',
+                not_live: 'Not live'
+            };
+            const badgeClass = {
+                live_auto: 'auto_updatable',
+                live_hybrid: 'hybrid_official_candidate',
+                live_monitor: 'official_link_monitor',
+                not_live: 'benchmark'
+            };
+            const dutyRows = dutyRates.map(row => `
+                <article class="duty-source-grade-card">
+                    <strong>${escapeHtml(row.country || '—')}</strong>
+                    <div class="grade-line">
+                        <span class="badge ${escapeHtml(badgeClass[row.launch_mode] || 'benchmark')}">${escapeHtml(modeLabel[row.launch_mode] || row.launch_mode || 'Unknown')}</span>
+                        ${row.filing_grade_auto ? '<span class="badge official_reachable">Filing-grade auto</span>' : '<span class="badge parser_pending">Gated exact scope</span>'}
+                    </div>
+                    <div class="grade-note">${escapeHtml(row.note || '')}</div>
+                    ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
+                </article>
+            `).join('');
+            const regRows = regulatory.map(row => `
+                <article class="duty-source-grade-card">
+                    <strong>${escapeHtml(row.country || '—')}</strong>
+                    <div class="grade-line">
+                        <span class="badge auto_updatable">Live official crawl</span>
+                        <span class="badge official_reachable">${escapeHtml(row.source_count || 0)} source(s)</span>
+                    </div>
+                    <div class="grade-note">${escapeHtml(row.note || '')}</div>
+                    <div class="grade-note">${(row.sources || []).map(source => escapeHtml(source.id)).join(', ')}</div>
+                </article>
+            `).join('');
+            return `
+                <div class="quality-banner">
+                    <h3>Automation Launch Board</h3>
+                    <p class="desc">已上线可公开展示的自动化能力；Hybrid / Monitor 不会被包装成完整 filing-grade 自动税率。</p>
+                    <div class="summary-grid">
+                        <div class="summary-card"><strong>${escapeHtml((summary.filing_grade_auto_countries || []).length)}</strong><span>Filing-grade auto markets</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((summary.public_launch_countries || []).length)}</strong><span>Public launch duty markets</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(regulatory.length)}</strong><span>Official crawl jurisdictions</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_hybrid || 0)}</strong><span>Hybrid live markets</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_monitor || 0)}</strong><span>Monitor-only markets</span></div>
+                    </div>
+                    <div class="crawl-section-title"><h3>Regulatory automation live</h3><span class="meta">${regulatory.length} jurisdiction(s)</span></div>
+                    <div class="duty-sync-mini-grid">${regRows || '<div class="empty">No live regulatory automation.</div>'}</div>
+                    <div class="crawl-section-title"><h3>Duty-rate automation live</h3><span class="meta">${dutyRates.length} market(s)</span></div>
+                    <div class="duty-sync-mini-grid">${dutyRows || '<div class="empty">No live duty-rate automation.</div>'}</div>
+                </div>
+            `;
+        }
+
         function renderDutyBusinessSummary(summary = {}) {
             if (!summary || !summary.sync_conclusion) {
                 return '';
@@ -1495,7 +1552,9 @@
                 const priorityMatrix = data.priority_rate_matrix || {};
                 const exactProgress = data.exact_rate_progress || {};
                 const businessSummary = data.business_summary || {};
+                const automationLaunchStatus = data.automation_launch_status || {};
                 dutyRateStatus.innerHTML = `
+                    ${renderAutomationLaunchStatus(automationLaunchStatus)}
                     ${renderDutyBusinessSummary(businessSummary)}
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">

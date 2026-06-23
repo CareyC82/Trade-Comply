@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-06-23T09:13:13.260Z",
+  "launch_policy": {
+    "public_launch_means": "Feature can be exposed with its launch-mode label.",
+    "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
+    "guardrail": "Hybrid and monitor modes must not be marketed as fully automatic filing-grade rates."
+  },
+  "summary": {
+    "regulatory_sources": 3,
+    "duty_rate_markets": 14,
+    "regulatory_modes": {
+      "live_auto": 3
+    },
+    "duty_rate_modes": {
+      "live_auto": 1,
+      "live_hybrid": 12,
+      "live_monitor": 1
+    },
+    "public_launch_countries": [
+      "US",
+      "CN",
+      "DE",
+      "EU",
+      "IN",
+      "JP",
+      "KR",
+      "MX",
+      "MY",
+      "NL",
+      "SG",
+      "TW",
+      "VN",
+      "RU"
+    ],
+    "filing_grade_auto_countries": [
+      "US"
+    ]
+  },
+  "regulatory": [
+    {
+      "country": "CN",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 2,
+      "sources": [
+        {
+          "id": "zh-mofcom",
+          "label": "China MOFCOM export control announcements",
+          "type": "export",
+          "method": "fetch",
+          "url": "https://www.mofcom.gov.cn/zwgk/zcfb/"
+        },
+        {
+          "id": "zh-gac",
+          "label": "China GAC customs notices",
+          "type": "both",
+          "method": "got-scraping",
+          "url": "http://www.customs.gov.cn/customs/302249/302266/index.html"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    },
+    {
+      "country": "EU",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 2,
+      "sources": [
+        {
+          "id": "eu-lex",
+          "label": "EU EUR-Lex Official Journal index",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://eur-lex.europa.eu/homepage.html?ihcl=en"
+        },
+        {
+          "id": "eu-trade",
+          "label": "European Commission trade policy news",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://policy.trade.ec.europa.eu/news_en"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    },
+    {
+      "country": "US",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 5,
+      "sources": [
+        {
+          "id": "us-bis",
+          "label": "US BIS newsroom",
+          "type": "export",
+          "method": "fetch",
+          "url": "https://www.bis.doc.gov/index.php/about-bis/newsroom"
+        },
+        {
+          "id": "us-cbp",
+          "label": "US CBP trade newsflash",
+          "type": "import",
+          "method": "fetch",
+          "url": "https://www.cbp.gov/trade/automated/newsflash"
+        },
+        {
+          "id": "us-ustr",
+          "label": "US USTR Section 301 tariff actions",
+          "type": "import",
+          "method": "fetch",
+          "url": "https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions"
+        },
+        {
+          "id": "us-ofac",
+          "label": "US OFAC recent sanctions actions",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://ofac.treasury.gov/recent-actions"
+        },
+        {
+          "id": "us-fcc",
+          "label": "US FCC equipment authorization and enforcement headlines",
+          "type": "import",
+          "method": "fetch",
+          "url": "https://www.fcc.gov/news-events/headlines"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    }
+  ],
+  "duty_rates": [
+    {
+      "country": "US",
+      "name": "United States HTS / USITC",
+      "source_status": "auto_updatable",
+      "machine_readable": true,
+      "maintenance_priority": "P0",
+      "update_command": "npm run update:duty-rates:us",
+      "probe_command": "",
+      "official_url": "https://hts.usitc.gov/",
+      "current_scope": "General HTS base duty for maintained HS prefixes. Additional duties such as Section 301 and AD/CVD remain separate benchmark/scope checks.",
+      "next_action": "Keep USITC sync running before releases and monitor changes in data/duty-rates.json.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
+      "country": "CN",
+      "name": "China import tariff / VAT",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "local_exact_map",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:static -- --countries=CN",
+      "probe_command": "",
+      "official_url": "https://www.customs.gov.cn/",
+      "current_scope": "Maintained China exact-line MFN duty candidates plus 13% import VAT and product-control review reminders.",
+      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "DE",
+      "name": "Germany import VAT with EU TARIC duty",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "partial",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "",
+      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "current_scope": "Hybrid Germany coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Germany VAT benchmark separately.",
+      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "EU",
+      "name": "EU TARIC",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "partial",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "npm run probe:duty-rates:eu",
+      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "current_scope": "Hybrid EU coverage: official TARIC candidate duty for unambiguous HS prefixes, scope-check status for ambiguous prefixes, and benchmark member-state VAT shown separately.",
+      "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "IN",
+      "name": "India Customs Tariff / ICEGATE CIP",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "local_exact_map",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:in:official",
+      "probe_command": "npm run probe:duty-rates:in",
+      "official_url": "https://www.icegate.gov.in/",
+      "current_scope": "Maintained India exact-line BCD candidates plus SWS/IGST and product-control review reminders.",
+      "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "JP",
+      "name": "Japan Customs tariff",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "candidate",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:jp",
+      "probe_command": "npm run probe:duty-rates:jp",
+      "official_url": "https://www.customs.go.jp/english/tariff/",
+      "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
+      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "KR",
+      "name": "Korea Customs tariff / VAT",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "candidate",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:kr:official",
+      "probe_command": "npm run probe:duty-rates:kr",
+      "official_url": "https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?mi=10806&cntntsId=5502",
+      "current_scope": "Maintained Korea exact-line base-duty candidates plus 10% VAT and KC/origin review reminders.",
+      "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "MX",
+      "name": "Mexico tariff / VAT",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "local_exact_map",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:mx",
+      "probe_command": "",
+      "official_url": "https://www.snice.gob.mx/",
+      "current_scope": "Maintained Mexico exact-line IGI/base-duty candidates plus 16% VAT and NOM/origin review reminders.",
+      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "MY",
+      "name": "Malaysia Customs SST / duty",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "local_exact_map",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:static -- --countries=MY",
+      "probe_command": "",
+      "official_url": "https://mysst.customs.gov.my/",
+      "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
+      "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "NL",
+      "name": "Netherlands import VAT with EU TARIC duty",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "partial",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "",
+      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "current_scope": "Hybrid Netherlands coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Netherlands VAT benchmark separately.",
+      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "SG",
+      "name": "Singapore Customs duties and GST",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "local_exact_map",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:sg",
+      "probe_command": "",
+      "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+      "current_scope": "Maintained Singapore exact-line base-duty candidates plus 9% GST value treatment reminder.",
+      "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "TW",
+      "name": "Taiwan Customs tariff / business tax",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "local_exact_map",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:static -- --countries=TW",
+      "probe_command": "",
+      "official_url": "https://web.customs.gov.tw/",
+      "current_scope": "Maintained Taiwan exact-line base-duty candidates plus 5% business-tax and product-scope review reminders.",
+      "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "VN",
+      "name": "Vietnam Customs tariff / VAT",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "local_exact_map",
+      "maintenance_priority": "P2",
+      "update_command": "npm run update:duty-rates:static -- --countries=VN",
+      "probe_command": "",
+      "official_url": "https://www.customs.gov.vn/",
+      "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
+      "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "RU",
+      "name": "Russia / EAEU tariff and VAT",
+      "source_status": "official_link",
+      "machine_readable": false,
+      "maintenance_priority": "P3",
+      "update_command": "npm run update:duty-rates:static -- --countries=RU",
+      "probe_command": "",
+      "official_url": "https://customs.gov.ru/",
+      "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
+      "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math.",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live monitor",
+      "note": "Official source is monitored, but exact machine-readable parsing is not live yet."
+    }
+  ]
+}
