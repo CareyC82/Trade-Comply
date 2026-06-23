@@ -209,14 +209,14 @@
       "authority": "Federal Customs Service / EAEU framework",
       "official_url": "https://customs.gov.ru/",
       "machine_readable": false,
-      "source_status": "benchmark_updatable",
+      "source_status": "official_link",
       "maintenance_priority": "P3",
-      "status_reason": "Official source identified, but sanctions scope must stay separate from ordinary duty math.",
+      "status_reason": "Official customs source link is monitored, but exact EAEU tariff-line parsing is not wired yet and sanctions scope must stay separate from ordinary duty math.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=RU",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Benchmark EAEU duty/VAT plus sanctions and restricted-party scope warning.",
-      "next_action": "Keep benchmark updater running and sanctions scope flag separate from ordinary duty math."
+      "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
+      "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math."
     }
   ]
 }

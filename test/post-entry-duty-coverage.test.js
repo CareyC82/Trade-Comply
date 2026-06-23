@@ -184,6 +184,14 @@ test('exact tariff parser priorities mirror the live upgrade queue', () => {
     assert.ok(payload.priorities.some((row) => row.id === 'drone-cn-us'));
     assert.equal(payload.priorities.some((row) => row.id === 'industrial-robot-de-us'), false);
     assert.ok(payload.priorities.every((row) => row.parser_scope && row.rate_change_drivers.length > 0));
+    assert.equal(
+        payload.rule_scope_priorities.length,
+        result.exact_rate_progress.rule_scope_backlog_rows.length
+    );
+    assert.ok(payload.rule_scope_priorities.some((row) => row.rule_id === 'EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE'));
+    assert.ok(payload.rule_scope_priorities.some((row) => row.rule_id === 'DE-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE'));
+    assert.ok(payload.rule_scope_priorities.some((row) => row.rule_id === 'RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE'));
+    assert.ok(payload.rule_scope_priorities.every((row) => row.parser_scope && row.parser_target && row.next_action));
 });
 
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {

@@ -41,13 +41,32 @@ function buildExactTariffParserPriorities({ generatedAt = new Date().toISOString
         rate_change_drivers: row.rate_change_drivers || [],
         parser_scope: buildParserScope(row)
     }));
+    const ruleScopePriorities = (health.exact_rate_progress?.rule_scope_backlog_rows || []).map((row) => ({
+        id: row.id,
+        rule_id: row.rule_id,
+        route: row.route,
+        product_id: row.product_id,
+        import_country: row.import_country,
+        origin_country: row.origin_country,
+        hs_code: row.hs_code,
+        source_status: row.source_status,
+        source_trust: row.source_trust,
+        parser_target: row.parser_target,
+        next_action: row.next_action,
+        priority_band: row.priority_band,
+        impact_score: row.impact_score,
+        why_priority: row.why_priority,
+        rate_change_drivers: row.rate_change_drivers || [],
+        parser_scope: buildParserScope(row)
+    }));
 
     return {
         version: generatedAt.slice(0, 10),
         generated_at: generatedAt,
         scope: 'Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.',
-        generated_from: 'scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue',
-        priorities
+        generated_from: 'scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows',
+        priorities,
+        rule_scope_priorities: ruleScopePriorities
     };
 }
 
@@ -58,6 +77,7 @@ function main() {
         ok: true,
         output: path.relative(ROOT, OUTPUT_PATH),
         count: payload.priorities.length,
+        rule_scope_count: payload.rule_scope_priorities.length,
         ids: payload.priorities.map((row) => row.id)
     }, null, 2));
 }

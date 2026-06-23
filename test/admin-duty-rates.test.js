@@ -73,6 +73,10 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.some(row => (
         row.rate_change_drivers.join(' ').includes('Section 301')
     )));
+    assert.equal(Array.isArray(payload.duty.exact_tariff_parser_queue.rule_scope_priorities), true);
+    assert.ok(payload.duty.exact_tariff_parser_queue.rule_scope_priorities.length > 0);
+    assert.ok(payload.duty.exact_tariff_parser_queue.rule_scope_priorities.every(row => row.rule_id && row.parser_target && row.next_action && row.why_priority));
+    assert.ok(payload.duty.exact_tariff_parser_queue.rule_scope_priorities.some(row => row.rule_id === 'EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE'));
     assert.equal(payload.post_entry_tax.export_missing_countries.length, 0);
     assert.equal(payload.post_entry_tax.false_official_rate_claims.length, 0);
     assert.equal(payload.opportunity.ok, true);

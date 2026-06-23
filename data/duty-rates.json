@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-22",
+  "updated_at": "2026-06-23",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -2004,11 +2004,11 @@
       "add_on_layers": [
         {
           "type": "import_vat",
-          "label": "Russia import VAT benchmark",
+          "label": "Russia import VAT official-link benchmark",
           "rate": 0.2,
           "basis": "customs_value_plus_duty",
           "status": "indicative",
-          "source": "Russia / EAEU tariff and VAT benchmark"
+          "source": "Russia / EAEU official-link monitored VAT benchmark"
         },
         {
           "type": "sanctions_scope",
@@ -2020,13 +2020,13 @@
         }
       ],
       "trade_remedy": "Russia import VAT and EAEU duty benchmark; restricted-party, sanctions, and export-control scope review may override ordinary entry economics.",
-      "confidence": "Indicative",
-      "source_status": "benchmark_source_checked",
-      "source_note": "Russia/EAEU benchmark refreshed locally. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing.",
-      "source_hts": "RU electronics benchmark",
-      "source_rate_text": "Benchmark: EAEU duty placeholder + 20% VAT; sanctions scope required",
+      "confidence": "Official link monitored",
+      "source_status": "official_link_checked",
+      "source_note": "Russia/EAEU official source link is monitored. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing.",
+      "source_hts": "RU / EAEU electronics official-link scope",
+      "source_rate_text": "Official link monitored; exact EAEU tariff line required before using a filing-grade duty rate. 20% VAT benchmark retained for screening.",
       "source_url": "https://customs.gov.ru/",
-      "last_checked_at": "2026-06-22T21:12:07.525Z"
+      "last_checked_at": "2026-06-23T07:39:47.054Z"
     },
     {
       "id": "CN-GLOBAL-ELECTRONICS-INDICATIVE",

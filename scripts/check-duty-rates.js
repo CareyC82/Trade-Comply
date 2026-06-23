@@ -438,10 +438,14 @@ function summarizeRuleSourceQuality(dutyPayload) {
 function buildDutyRateActionDetails({
     healthFailures = [],
     syncStatus = {},
-    priorityMatrix = {}
+    priorityMatrix = {},
+    exactRateProgress = {}
 } = {}) {
     const exceptions = Array.isArray(syncStatus.exceptions) ? syncStatus.exceptions : [];
     const upgradeQueue = Array.isArray(priorityMatrix.priority_upgrade_queue) ? priorityMatrix.priority_upgrade_queue : [];
+    const ruleScopeBacklog = Array.isArray(exactRateProgress.rule_scope_backlog_rows)
+        ? exactRateProgress.rule_scope_backlog_rows
+        : [];
     const rows = [];
 
     exceptions.forEach((item, index) => {
@@ -489,13 +493,121 @@ function buildDutyRateActionDetails({
         });
     });
 
+    ruleScopeBacklog.slice(0, 50).forEach((item) => {
+        rows.push({
+            id: item.id,
+            source: item.parser_target || 'rule-scope-backlog',
+            country: item.import_country || item.market || '',
+            route: item.route || '',
+            hs_code: item.hs_code || '',
+            severity: item.priority_band === 'P1' ? 'high' : item.priority_band === 'P2' ? 'medium' : 'low',
+            type: 'rule_scope_backlog',
+            reason: item.why_priority || 'Maintained duty rule still requires exact tariff-line scope.',
+            next_action: item.next_action || 'Add exact-code override or official parser support for this maintained rule.',
+            details: item
+        });
+    });
+
     return rows;
+}
+
+function buildRuleScopeBacklog(dutyPayload = {}) {
+    const rules = Array.isArray(dutyPayload?.rules) ? dutyPayload.rules : [];
+    const trustRank = {
+        benchmark_source_checked: 1,
+        official_link_checked: 2,
+        scope_check_required: 3,
+        indicative: 4
+    };
+    const countryRank = {
+        US: 1,
+        EU: 2,
+        DE: 3,
+        NL: 4,
+        CN: 5,
+        SG: 6,
+        MX: 7,
+        JP: 8,
+        KR: 9,
+        IN: 10,
+        VN: 11,
+        MY: 12,
+        TW: 13,
+        RU: 14
+    };
+
+    return rules
+        .filter((rule) => rule.source_status && rule.source_status !== 'official_source_checked')
+        .map((rule) => {
+            const importCountry = String(rule.import_country || '').toUpperCase();
+            const originCountry = String(rule.origin_country || '*').toUpperCase();
+            const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes.map(String) : [];
+            const hsCode = prefixes.join(' / ') || rule.source_hts || '';
+            const exactOverrides = Array.isArray(rule.exact_code_overrides) ? rule.exact_code_overrides : [];
+            const hasOverrides = exactOverrides.length > 0;
+            const sourceStatus = rule.source_status || 'indicative';
+            const route = `${originCountry || '*'}->${importCountry}`;
+            const drivers = [];
+
+            if (sourceStatus === 'scope_check_required') {
+                drivers.push('Broad HS prefix has multiple possible official tariff lines.');
+            }
+            if (sourceStatus === 'benchmark_source_checked') {
+                drivers.push('Only benchmark coverage exists; exact official parser/source mapping is not attached.');
+            }
+            if (hasOverrides) {
+                drivers.push('Some exact-code overrides already exist; remaining product scopes still need parser coverage.');
+            }
+            if (['EU', 'DE', 'NL'].includes(importCountry)) {
+                drivers.push('TARIC exact 10-digit goods-code scope can change the final duty rate.');
+            }
+            if (importCountry === 'RU') {
+                drivers.push('Russia/EAEU duty and sanctions scope should stay review-only until official machine-readable coverage is available.');
+            }
+
+            return {
+                id: `rule-${rule.id}`,
+                rule_id: rule.id,
+                product_id: rule.label || '',
+                market: importCountry,
+                import_country: importCountry,
+                origin_country: originCountry,
+                route,
+                hs_code: hsCode,
+                source_trust: sourceStatus === 'benchmark_source_checked' ? 'precheck_estimate' : 'official_heading_only',
+                source_status: sourceStatus,
+                automation_level: sourceStatus === 'benchmark_source_checked' ? 'benchmark_auto' : 'hybrid_official',
+                estimated_total_rate: Number(rule.base_rate || 0) + Number(rule.additional_rate || 0),
+                impact_score: Math.round((Number(rule.base_rate || 0) + Number(rule.additional_rate || 0)) * 10000),
+                priority: trustRank[sourceStatus] || 9,
+                priority_band: sourceStatus === 'benchmark_source_checked' ? 'P1' : 'P2',
+                market_priority: countryRank[importCountry] || 99,
+                product_priority: prefixes.includes('8542') ? 1 : prefixes.includes('8517') ? 2 : prefixes.includes('8525') ? 3 : 9,
+                parser_target: sourceStatus === 'benchmark_source_checked'
+                    ? `${importCountry} official tariff source mapping`
+                    : `${importCountry} exact tariff-line scope resolver`,
+                next_action: sourceStatus === 'benchmark_source_checked'
+                    ? 'Replace benchmark coverage with official machine-readable tariff-line mapping before filing-grade use.'
+                    : 'Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.',
+                why_priority: `${route} ${hsCode} remains a rule-level exact-rate gap: ${rule.label || 'duty rule'} is ${sourceStatus}.`,
+                rate_change_drivers: Array.from(new Set(drivers)),
+                parser_scope: rule.source_note || rule.trade_remedy || 'Exact tariff-line scope is required before using a final rate.'
+            };
+        })
+        .sort((a, b) => (
+            a.priority - b.priority
+            || a.market_priority - b.market_priority
+            || a.product_priority - b.product_priority
+            || b.impact_score - a.impact_score
+            || a.id.localeCompare(b.id)
+        ));
 }
 
 function buildExactRateProgress({
     priorityMatrix = {},
     sourceRoadmap = {},
-    sourceQuality = []
+    sourceQuality = [],
+    dutyPayload = {}
 } = {}) {
     const rows = Array.isArray(priorityMatrix.rows) ? priorityMatrix.rows : [];
     const sourceQualityByCountry = new Map((sourceQuality || []).map(row => [row.country, row]));
@@ -598,11 +710,14 @@ function buildExactRateProgress({
         official_heading_only: 3,
         mixed_official_estimate: 4
     };
-    const topBacklogRows = marketRows
+    const ruleScopeBacklogRows = buildRuleScopeBacklog(dutyPayload);
+    const matrixBacklogRows = marketRows
         .flatMap(row => (row.backlog_rows || []).map(item => ({
             ...item,
             market: row.market
-        })))
+        })));
+    const topBacklogRows = matrixBacklogRows
+        .concat(ruleScopeBacklogRows)
         .sort((a, b) => (
             (trustBacklogRank[a.source_trust] || 9) - (trustBacklogRank[b.source_trust] || 9)
             || (b.impact_score || 0) - (a.impact_score || 0)
@@ -616,6 +731,7 @@ function buildExactRateProgress({
         totals,
         roadmap_status: roadmapStatus,
         top_backlog_rows: topBacklogRows,
+        rule_scope_backlog_rows: ruleScopeBacklogRows,
         rows: marketRows
     };
 }
@@ -751,7 +867,8 @@ function runDutyRateHealthCheck() {
     const exactRateProgress = buildExactRateProgress({
         priorityMatrix: priorityRateMatrix,
         sourceRoadmap,
-        sourceQuality: sourceQualitySummary
+        sourceQuality: sourceQualitySummary,
+        dutyPayload
     });
     const businessSummary = buildDutyRateBusinessSummary({
         syncStatus,
@@ -778,7 +895,8 @@ function runDutyRateHealthCheck() {
         action_details: buildDutyRateActionDetails({
             healthFailures: failures,
             syncStatus,
-            priorityMatrix: priorityRateMatrix
+            priorityMatrix: priorityRateMatrix,
+            exactRateProgress
         }),
         sample_count: samples.length,
         failed_sample_count: failures.length,
@@ -812,6 +930,7 @@ module.exports = {
     summarizePriorityRateMatrix,
     summarizeRuleSourceQuality,
     buildDutyRateActionDetails,
+    buildRuleScopeBacklog,
     buildExactRateProgress,
     buildDutyRateBusinessSummary,
     summarizeSourceRoadmap

@@ -17,10 +17,10 @@ const COUNTRY_NOTES = {
     VN: 'Vietnam official customs source link is monitored. Confirm exact tariff line, VAT basis, preferential origin, and MIC/MOIT product triggers before filing.',
     MY: 'Malaysia official customs/SST source link is monitored. Confirm exact tariff line, SST/duty exemption, and SIRIM/MCMC/ST approval scope before filing.',
     TW: 'Taiwan official customs source link is monitored. Confirm exact customs duty, business tax basis, and tariff-line treatment before filing.',
-    RU: 'Russia/EAEU benchmark refreshed locally. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing.',
+    RU: 'Russia/EAEU official source link is monitored. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, and licensing scope before filing.',
     IN: 'India official-link estimate refreshed locally. Confirm exact HS line, BCD, Social Welfare Surcharge, IGST, exemption, BIS/QCO, WPC, e-waste, and battery-rule scope before filing.'
 };
-const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set([]);
+const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set(['RU']);
 const STATIC_EXACT_CODE_CANDIDATES = [
     '847130',
     '850440',

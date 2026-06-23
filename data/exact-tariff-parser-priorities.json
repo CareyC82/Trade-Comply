@@ -1,8 +1,8 @@
 {
-  "version": "2026-06-22",
-  "generated_at": "2026-06-22T08:18:27.011Z",
+  "version": "2026-06-23",
+  "generated_at": "2026-06-23T07:39:47.603Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
-  "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue",
+  "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows",
   "priorities": [
     {
       "id": "solar-cn-us",
@@ -140,6 +140,286 @@
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
       ],
       "parser_scope": "Resolve exact portable ADP/tablet classification, origin evidence, and Section 301 add-on duty or exclusion status."
+    }
+  ],
+  "rule_scope_priorities": [
+    {
+      "id": "rule-RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "rule_id": "RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
+      "route": "*->RU",
+      "product_id": "Russia import electronics VAT / EAEU duty signal",
+      "import_country": "RU",
+      "origin_country": "*",
+      "hs_code": "847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543",
+      "source_status": "official_link_checked",
+      "source_trust": "official_heading_only",
+      "parser_target": "RU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2500,
+      "why_priority": "*->RU 847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 remains a rule-level exact-rate gap: Russia import electronics VAT / EAEU duty signal is official_link_checked.",
+      "rate_change_drivers": [
+        "Russia/EAEU duty and sanctions scope should stay review-only until official machine-readable coverage is available."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "rule_id": "EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "route": "*->EU",
+      "product_id": "EU import camera / transmission equipment signal",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_code": "8525",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "EU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->EU 8525 remains a rule-level exact-rate gap: EU import camera / transmission equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-EU-GLOBAL-847130-TABLET-IMPORT-SCOPE",
+      "rule_id": "EU-GLOBAL-847130-TABLET-IMPORT-SCOPE",
+      "route": "*->EU",
+      "product_id": "EU import tablet / portable ADP equipment signal",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_code": "847130",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "EU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->EU 847130 remains a rule-level exact-rate gap: EU import tablet / portable ADP equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-EU-GLOBAL-8528-DISPLAY-IMPORT-SCOPE",
+      "rule_id": "EU-GLOBAL-8528-DISPLAY-IMPORT-SCOPE",
+      "route": "*->EU",
+      "product_id": "EU import display / monitor equipment signal",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_code": "8528",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "EU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->EU 8528 remains a rule-level exact-rate gap: EU import display / monitor equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-EU-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "rule_id": "EU-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "route": "*->EU",
+      "product_id": "EU import other electrical machines signal",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_code": "8543",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "EU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->EU 8543 remains a rule-level exact-rate gap: EU import other electrical machines signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-DE-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "rule_id": "DE-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "route": "*->DE",
+      "product_id": "Germany import camera / transmission equipment signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "8525",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->DE 8525 remains a rule-level exact-rate gap: Germany import camera / transmission equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
+      "rule_id": "DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
+      "route": "*->DE",
+      "product_id": "Germany import tablet / portable ADP equipment signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "847130",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->DE 847130 remains a rule-level exact-rate gap: Germany import tablet / portable ADP equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+      "rule_id": "DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+      "route": "*->DE",
+      "product_id": "Germany import display / monitor equipment signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "8528",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->DE 8528 remains a rule-level exact-rate gap: Germany import display / monitor equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-DE-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "rule_id": "DE-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "route": "*->DE",
+      "product_id": "Germany import other electrical machines signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "8543",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->DE 8543 remains a rule-level exact-rate gap: Germany import other electrical machines signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "rule_id": "NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
+      "route": "*->NL",
+      "product_id": "Netherlands import camera / transmission equipment signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "8525",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2370,
+      "why_priority": "*->NL 8525 remains a rule-level exact-rate gap: Netherlands import camera / transmission equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
+      "rule_id": "NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
+      "route": "*->NL",
+      "product_id": "Netherlands import tablet / portable ADP equipment signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "847130",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2370,
+      "why_priority": "*->NL 847130 remains a rule-level exact-rate gap: Netherlands import tablet / portable ADP equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NL-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+      "rule_id": "NL-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
+      "route": "*->NL",
+      "product_id": "Netherlands import display / monitor equipment signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "8528",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2370,
+      "why_priority": "*->NL 8528 remains a rule-level exact-rate gap: Netherlands import display / monitor equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NL-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "rule_id": "NL-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE",
+      "route": "*->NL",
+      "product_id": "Netherlands import other electrical machines signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "8543",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2370,
+      "why_priority": "*->NL 8543 remains a rule-level exact-rate gap: Netherlands import other electrical machines signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     }
   ]
 }
