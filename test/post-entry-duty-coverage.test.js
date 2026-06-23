@@ -194,6 +194,18 @@ test('exact tariff parser priorities mirror the live upgrade queue', () => {
     assert.ok(payload.rule_scope_priorities.every((row) => row.parser_scope && row.parser_target && row.next_action));
 });
 
+test('daily duty-rate sync refreshes exact tariff parser priorities', () => {
+    const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+    const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'duty-rate-sync.yml'), 'utf8');
+
+    assert.equal(
+        packageJson.scripts['update:exact-tariff-parser-priorities'],
+        'node scripts/update-exact-tariff-parser-priorities.js'
+    );
+    assert.match(workflow, /npm run update:exact-tariff-parser-priorities/);
+    assert.match(workflow, /data\/exact-tariff-parser-priorities\.json/);
+});
+
 test('high-frequency exact-rate matrix has source-trust expectations on every row', () => {
     priorityMatrix.routes.forEach((route) => {
         assert.ok(route.id, 'route id is required');

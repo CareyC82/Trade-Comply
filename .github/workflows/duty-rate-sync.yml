@@ -33,6 +33,9 @@ jobs:
       - name: Refresh automation launch status
         run: npm run build:automation-launch-status
 
+      - name: Refresh exact tariff parser priorities
+        run: npm run update:exact-tariff-parser-priorities
+
       - name: Verify duty-rate sync output
         run: npm test
 
@@ -44,7 +47,8 @@ jobs:
             data/duty-rate-sources.json \
             data/duty-rates.json \
             data/duty-rate-sync-status.json \
-            data/automation-launch-status.json
+            data/automation-launch-status.json \
+            data/exact-tariff-parser-priorities.json
 
           if git diff --staged --quiet; then
             echo "No duty-rate sync changes."
