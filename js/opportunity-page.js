@@ -165,50 +165,6 @@ function bootstrapTradeOpportunityPage() {
         `;
     }
 
-    function renderRouteRow(card) {
-        const transit = card.transitComparison || null;
-        const baseDuty = card.dutyBreakdown?.baseDuty || 'Pending';
-        const addOnDuty = card.dutyBreakdown?.addOnDuty || 'Pending';
-        const taxLayer = compactRateValue(card.dutyBreakdown?.taxLayer || 'Pending');
-        return `
-            <tr>
-                <td class="opportunity-route-cell">
-                    <strong>${escapeHtml(card.route)}</strong>
-                    <span>${escapeHtml(card.routeScopeLabel || card.label)} · score ${escapeHtml(card.score)}</span>
-                    ${card.transitWarning ? `<span class="opportunity-route-note">${escapeHtml(card.transitWarning)}</span>` : ''}
-                </td>
-                <td class="opportunity-duty-cell">
-                    <strong class="opportunity-duty-total">${escapeHtml(transit?.combinedRate || card.dutyBreakdown?.totalRate || 'Not covered')}</strong>
-                    ${transit ? `
-                        <div class="opportunity-duty-breakdown">
-                            <span>First ${escapeHtml(transit.firstLegRate || 'Pending')}</span>
-                            <span>Second ${escapeHtml(transit.secondLegRate || 'Pending')}</span>
-                            <span>Delta ${escapeHtml(transit.deltaRate || 'Pending')}</span>
-                        </div>
-                    ` : `
-                        <div class="opportunity-duty-breakdown">
-                            <span>Base ${escapeHtml(baseDuty)}</span>
-                            <span>Add-on ${escapeHtml(addOnDuty)}</span>
-                            <span>Tax ${escapeHtml(taxLayer)}</span>
-                        </div>
-                    `}
-                </td>
-                <td><span class="opportunity-coverage-pill opportunity-coverage-pill--${escapeHtml(card.coverageTone)}">${escapeHtml(card.coverageLabel)}</span></td>
-                <td>${escapeHtml(card.hsCode || 'Pending')}</td>
-                <td class="opportunity-parser-cell">
-                    <strong>${escapeHtml(card.parserPriority || 'P?')}</strong>
-                    <span>${escapeHtml(card.parserNextAction)}</span>
-                </td>
-            </tr>
-        `;
-    }
-
-    function compactRateValue(value) {
-        const text = String(value || '').trim();
-        const percentMatch = text.match(/-?\d+(?:\.\d+)?%/);
-        return percentMatch ? percentMatch[0] : text;
-    }
-
     function renderInsightCard(item) {
         return `
             <article class="opportunity-insight-card">
@@ -306,36 +262,6 @@ function bootstrapTradeOpportunityPage() {
             </section>
 
             ${renderParserTargets(model)}
-
-            <section class="opportunity-section">
-                <div class="opportunity-section-heading">
-                    <h3>Route comparison and rate coverage</h3>
-                    <p>Use this to compare duty structure, official coverage, HS basis, and parser priority.</p>
-                </div>
-                <div class="opportunity-table-wrap">
-                    <table class="opportunity-route-table">
-                        <colgroup>
-                            <col class="opportunity-route-col">
-                            <col class="opportunity-duty-col">
-                            <col class="opportunity-coverage-col">
-                            <col class="opportunity-hs-col">
-                            <col class="opportunity-parser-col">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Route</th>
-                                <th>Duty signal</th>
-                                <th>Coverage</th>
-                                <th>HS basis</th>
-                                <th>Parser priority</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${model.routeComparison.map(renderRouteRow).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
 
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">

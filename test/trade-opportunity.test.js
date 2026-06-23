@@ -501,11 +501,7 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Delta \/ \$1k/);
         assert.match(source, /combinedCostPer1000/);
         assert.match(source, /deltaCostPer1000/);
-        assert.match(source, /compactRateValue/);
-        assert.match(source, /opportunity-duty-breakdown/);
-        assert.match(source, /opportunity-parser-cell/);
         assert.match(source, /Second leg/);
-        assert.match(source, /deltaRate/);
         assert.match(source, /opportunity-transit-note/);
         assert.match(source, /opportunity-transit-verdict/);
         assert.match(source, /opportunity-control-gate/);
@@ -520,14 +516,15 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Quote status:/);
         assert.match(source, /Landed-cost risk:/);
         assert.match(source, /Compliance friction:/);
+        assert.doesNotMatch(source, /Route comparison and rate coverage/);
+        assert.doesNotMatch(source, /opportunity-route-table/);
+        assert.doesNotMatch(source, /renderRouteRow/);
         assert.doesNotMatch(source, /route\(s\) usable for pricing comparison/);
 
         const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
-        assert.match(css, /table-layout: fixed/);
-        assert.match(css, /\.opportunity-duty-col/);
-        assert.match(css, /\.opportunity-parser-col/);
-        assert.match(css, /\.opportunity-duty-breakdown span/);
-        assert.match(css, /white-space: nowrap/);
+        assert.doesNotMatch(css, /opportunity-route-table/);
+        assert.doesNotMatch(css, /opportunity-duty-breakdown/);
+        assert.doesNotMatch(css, /opportunity-parser-cell/);
     });
 
     it('hides the Opportunity input form when rendering a result URL', () => {
