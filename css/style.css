@@ -5391,8 +5391,29 @@ button.feedback-link:hover {
 
 .opportunity-route-table {
     width: 100%;
-    min-width: 760px;
+    min-width: 1120px;
     border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.opportunity-route-col {
+    width: 38%;
+}
+
+.opportunity-duty-col {
+    width: 17%;
+}
+
+.opportunity-coverage-col {
+    width: 22%;
+}
+
+.opportunity-hs-col {
+    width: 8%;
+}
+
+.opportunity-parser-col {
+    width: 15%;
 }
 
 .opportunity-route-table th,
@@ -5429,6 +5450,59 @@ button.feedback-link:hover {
     display: block;
     color: var(--color-text-secondary);
     font-size: 0.76rem;
+}
+
+.opportunity-route-cell strong {
+    font-size: 0.92rem !important;
+}
+
+.opportunity-route-note {
+    margin-top: 8px;
+    max-width: 680px;
+    line-height: 1.45;
+}
+
+.opportunity-duty-cell {
+    min-width: 160px;
+}
+
+.opportunity-duty-total {
+    font-size: 0.96rem !important;
+    margin-bottom: 8px !important;
+}
+
+.opportunity-duty-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.opportunity-duty-breakdown span {
+    display: inline-flex !important;
+    width: max-content;
+    max-width: 100%;
+    align-items: center;
+    padding: 4px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: #f8fafc;
+    color: var(--color-text-secondary);
+    font-size: 0.72rem !important;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.opportunity-parser-cell strong {
+    display: inline-block !important;
+    margin-bottom: 6px !important;
+    font-size: 0.86rem !important;
+    line-height: 1.25;
+}
+
+.opportunity-parser-cell span {
+    max-width: 210px;
+    line-height: 1.45;
 }
 
 .opportunity-coverage-pill {

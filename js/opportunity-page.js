@@ -98,11 +98,11 @@ function bootstrapTradeOpportunityPage() {
             : [];
         const metricItems = transit ? [
             { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
-            { label: 'Cost delta', value: transit.deltaRate || 'Pending' },
-            { label: 'First leg', value: transit.firstLegRate || 'Pending' },
-            { label: 'Second leg', value: transit.secondLegRate || 'Pending' },
-            { label: 'Direct route', value: transit.directRate || 'Pending' },
-            { label: 'Second-leg coverage', value: transit.secondCoverageLabel || 'Pending' }
+            { label: 'Transit cost / $1k', value: transit.combinedCostPer1000 || 'Pending' },
+            { label: 'Delta / $1k', value: transit.deltaCostPer1000 || 'Pending' },
+            { label: 'First leg', value: `${transit.firstLegRate || 'Pending'} · ${transit.firstLegCostPer1000 || 'Pending'}` },
+            { label: 'Second leg', value: `${transit.secondLegRate || 'Pending'} · ${transit.secondLegCostPer1000 || 'Pending'}` },
+            { label: 'Direct route', value: `${transit.directRate || 'Pending'} · ${transit.directCostPer1000 || 'Pending'}` }
         ] : [
             { label: 'Direct total', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
@@ -167,33 +167,46 @@ function bootstrapTradeOpportunityPage() {
 
     function renderRouteRow(card) {
         const transit = card.transitComparison || null;
+        const baseDuty = card.dutyBreakdown?.baseDuty || 'Pending';
+        const addOnDuty = card.dutyBreakdown?.addOnDuty || 'Pending';
+        const taxLayer = compactRateValue(card.dutyBreakdown?.taxLayer || 'Pending');
         return `
             <tr>
-                <td>
+                <td class="opportunity-route-cell">
                     <strong>${escapeHtml(card.route)}</strong>
                     <span>${escapeHtml(card.routeScopeLabel || card.label)} · score ${escapeHtml(card.score)}</span>
-                    ${card.transitWarning ? `<span>${escapeHtml(card.transitWarning)}</span>` : ''}
+                    ${card.transitWarning ? `<span class="opportunity-route-note">${escapeHtml(card.transitWarning)}</span>` : ''}
                 </td>
-                <td>
-                    <strong>${escapeHtml(transit?.combinedRate || card.dutyBreakdown?.totalRate || 'Not covered')}</strong>
+                <td class="opportunity-duty-cell">
+                    <strong class="opportunity-duty-total">${escapeHtml(transit?.combinedRate || card.dutyBreakdown?.totalRate || 'Not covered')}</strong>
                     ${transit ? `
-                        <span>First leg ${escapeHtml(transit.firstLegRate || 'Pending')}</span>
-                        <span>Second leg ${escapeHtml(transit.secondLegRate || 'Pending')}</span>
-                        <span>Delta ${escapeHtml(transit.deltaRate || 'Pending')} vs direct</span>
+                        <div class="opportunity-duty-breakdown">
+                            <span>First ${escapeHtml(transit.firstLegRate || 'Pending')}</span>
+                            <span>Second ${escapeHtml(transit.secondLegRate || 'Pending')}</span>
+                            <span>Delta ${escapeHtml(transit.deltaRate || 'Pending')}</span>
+                        </div>
                     ` : `
-                        <span>Base ${escapeHtml(card.dutyBreakdown?.baseDuty || 'Pending')}</span>
-                        <span>Add-on ${escapeHtml(card.dutyBreakdown?.addOnDuty || 'Pending')}</span>
-                        <span>Tax ${escapeHtml(card.dutyBreakdown?.taxLayer || 'Pending')}</span>
+                        <div class="opportunity-duty-breakdown">
+                            <span>Base ${escapeHtml(baseDuty)}</span>
+                            <span>Add-on ${escapeHtml(addOnDuty)}</span>
+                            <span>Tax ${escapeHtml(taxLayer)}</span>
+                        </div>
                     `}
                 </td>
                 <td><span class="opportunity-coverage-pill opportunity-coverage-pill--${escapeHtml(card.coverageTone)}">${escapeHtml(card.coverageLabel)}</span></td>
                 <td>${escapeHtml(card.hsCode || 'Pending')}</td>
-                <td>
+                <td class="opportunity-parser-cell">
                     <strong>${escapeHtml(card.parserPriority || 'P?')}</strong>
                     <span>${escapeHtml(card.parserNextAction)}</span>
                 </td>
             </tr>
         `;
+    }
+
+    function compactRateValue(value) {
+        const text = String(value || '').trim();
+        const percentMatch = text.match(/-?\d+(?:\.\d+)?%/);
+        return percentMatch ? percentMatch[0] : text;
     }
 
     function renderInsightCard(item) {
@@ -301,6 +314,13 @@ function bootstrapTradeOpportunityPage() {
                 </div>
                 <div class="opportunity-table-wrap">
                     <table class="opportunity-route-table">
+                        <colgroup>
+                            <col class="opportunity-route-col">
+                            <col class="opportunity-duty-col">
+                            <col class="opportunity-coverage-col">
+                            <col class="opportunity-hs-col">
+                            <col class="opportunity-parser-col">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Route</th>

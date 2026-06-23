@@ -255,11 +255,17 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.transitComparison.secondLegRate, '13.0%');
         assert.equal(singapore.transitComparison.combinedRate, '22.0%');
         assert.equal(singapore.transitComparison.deltaRate, '+9.0%');
+        assert.equal(singapore.transitComparison.firstLegCostPer1000, '$90.00 / $1k');
+        assert.equal(singapore.transitComparison.secondLegCostPer1000, '$130.00 / $1k');
+        assert.equal(singapore.transitComparison.combinedCostPer1000, '$220.00 / $1k');
+        assert.equal(singapore.transitComparison.directCostPer1000, '$130.00 / $1k');
+        assert.equal(singapore.transitComparison.deltaCostPer1000, '+$90.00 / $1k');
         assert.match(singapore.transitComparison.decision.headline, /Do not use Singapore for cost reduction/i);
         assert.match(singapore.transitComparison.decision.reason, /not simple tariff savings/i);
         assert.match(singapore.transitWarning, /No duty-cost advantage versus direct route/i);
+        assert.match(singapore.transitWarning, /delta: \+9\.0% \(\+\$90\.00 \/ \$1k\) per \$1k/i);
         assert.match(singapore.transitWarning, /origin transformation/i);
-        assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Combined cost' && /United States -> Singapore/.test(item.detail)));
+        assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Combined cost' && /United States -> Singapore/.test(item.detail) && /\+\$90\.00 \/ \$1k/.test(item.detail)));
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Origin / re-export gate' && /origin transformation/i.test(item.detail)));
         assert.match(singapore.routeDecisionSummary, /Not cheaper|cost reduction|direct/i);
         assert.ok(singapore.rejectionReasons.some((item) => /higher than direct|workaround|origin/i.test(item)));
@@ -491,9 +497,14 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /re-export, and logistics evidence/);
         assert.match(source, /Transit decision/);
         assert.match(source, /Transit total/);
-        assert.match(source, /Cost delta/);
+        assert.match(source, /Transit cost \/ \$1k/);
+        assert.match(source, /Delta \/ \$1k/);
+        assert.match(source, /combinedCostPer1000/);
+        assert.match(source, /deltaCostPer1000/);
+        assert.match(source, /compactRateValue/);
+        assert.match(source, /opportunity-duty-breakdown/);
+        assert.match(source, /opportunity-parser-cell/);
         assert.match(source, /Second leg/);
-        assert.match(source, /Second-leg coverage/);
         assert.match(source, /deltaRate/);
         assert.match(source, /opportunity-transit-note/);
         assert.match(source, /opportunity-transit-verdict/);
@@ -510,6 +521,13 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Landed-cost risk:/);
         assert.match(source, /Compliance friction:/);
         assert.doesNotMatch(source, /route\(s\) usable for pricing comparison/);
+
+        const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
+        assert.match(css, /table-layout: fixed/);
+        assert.match(css, /\.opportunity-duty-col/);
+        assert.match(css, /\.opportunity-parser-col/);
+        assert.match(css, /\.opportunity-duty-breakdown span/);
+        assert.match(css, /white-space: nowrap/);
     });
 
     it('hides the Opportunity input form when rendering a result URL', () => {
