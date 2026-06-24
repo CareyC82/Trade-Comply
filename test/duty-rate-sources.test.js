@@ -834,6 +834,17 @@ test('India official live probe can parse tariff rows from injected official sou
     assert.equal(readiness.official_probe.parsed_rate_rows, 1);
 });
 
+test('India official updater keeps TLS verification while falling back to system curl', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'update-static-duty-rates.js'), 'utf8');
+    const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+
+    assert.match(script, /UNABLE_TO_VERIFY_LEAF_SIGNATURE/);
+    assert.match(script, /fetchTextWithCurl/);
+    assert.doesNotMatch(script, /NODE_TLS_REJECT_UNAUTHORIZED/);
+    assert.match(packageJson.scripts['sync:duty-rates:auto'], /--use-system-ca/);
+    assert.match(packageJson.scripts['update:duty-rates:in:official'], /--use-system-ca/);
+});
+
 test('India official candidate keeps mixed tariff rows exact-line gated', () => {
     const candidate = buildIndiaOfficialCandidateForRule({
         id: 'TEST-IN-MIXED',

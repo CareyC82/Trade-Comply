@@ -5,6 +5,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
@@ -115,6 +116,12 @@ function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
                 status_code: response.status,
                 body: await response.text()
             }))
+            .catch((error) => {
+                if (error?.cause?.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
+                    return fetchTextWithCurl(url, { timeoutMs });
+                }
+                throw error;
+            })
             .finally(() => clearTimeout(timer));
     }
     return new Promise((resolve, reject) => {
@@ -140,6 +147,43 @@ function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
             request.destroy(new Error(`Request timed out after ${timeoutMs}ms`));
         });
         request.on('error', reject);
+    });
+}
+
+function fetchTextWithCurl(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
+    const timeoutSeconds = Math.max(1, Math.ceil(timeoutMs / 1000));
+    return new Promise((resolve, reject) => {
+        execFile('curl', [
+            '--location',
+            '--silent',
+            '--show-error',
+            '--max-time',
+            String(timeoutSeconds),
+            '--user-agent',
+            'Mozilla/5.0 TraceWize duty-rate updater (+https://tracewize.com)',
+            '--write-out',
+            '\n__TRACEWIZE_HTTP_STATUS__:%{http_code}',
+            url
+        ], {
+            maxBuffer: 10 * 1024 * 1024
+        }, (error, stdout, stderr) => {
+            if (error) {
+                reject(new Error(stderr || error.message));
+                return;
+            }
+            const marker = '\n__TRACEWIZE_HTTP_STATUS__:';
+            const markerIndex = stdout.lastIndexOf(marker);
+            if (markerIndex === -1) {
+                reject(new Error('curl response did not include HTTP status marker.'));
+                return;
+            }
+            const body = stdout.slice(0, markerIndex);
+            const status_code = Number(stdout.slice(markerIndex + marker.length).trim());
+            resolve({
+                status_code: Number.isFinite(status_code) ? status_code : 0,
+                body
+            });
+        });
     });
 }
 
@@ -634,6 +678,8 @@ module.exports = {
     buildIndiaOfficialCandidateForRule,
     buildIndiaOfficialRateCandidate,
     fetchIndiaOfficialRows,
+    fetchText,
+    fetchTextWithCurl,
     getMaintainedPrefixes,
     parseIndiaTariffRows,
     parsePercent,
