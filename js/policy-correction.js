@@ -178,13 +178,17 @@ function bindPolicyCorrectionTriggers(root = document) {
 }
 
 function renderPolicyCorrectionSection(variant) {
-    const label = variant === 'no_match'
-        ? t('policyCorrectionBtnNoMatch')
-        : t('policyCorrectionBtnHasResults');
+    if (variant !== 'no_match') {
+        return `
+            <a href="#" class="feedback-link feedback-formspree-trigger">
+                ${escapeHtml(t('feedback'))}
+            </a>
+        `;
+    }
 
     return `
-        <a href="#" class="feedback-link report-action-link policy-correction-trigger" data-correction-variant="${escapeHtml(variant)}">
-            ${escapeHtml(label)}
+        <a href="#" class="feedback-link policy-correction-trigger" data-correction-variant="${escapeHtml(variant)}">
+            ${escapeHtml(t('policyCorrectionBtnNoMatch'))}
         </a>
     `;
 }

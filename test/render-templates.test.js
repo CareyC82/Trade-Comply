@@ -2,6 +2,8 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const {
     templateComplianceCard,
     templateResultSummary,
@@ -53,6 +55,16 @@ describe('render-templates', () => {
         const none = templateEmptyResultsMessage({ variant: 'no_results', messageHtml: 'No results' });
         assert.match(out, /line-height: 1.6/);
         assert.doesNotMatch(none, /line-height: 1.6/);
+    });
+
+    it('uses the Formspree feedback CTA for result correction prompts', () => {
+        const policyCorrectionSource = fs.readFileSync(path.join(__dirname, '..', 'js', 'policy-correction.js'), 'utf8');
+        const renderMountSource = fs.readFileSync(path.join(__dirname, '..', 'js', 'render-mount.js'), 'utf8');
+
+        assert.match(policyCorrectionSource, /feedback-formspree-trigger/);
+        assert.match(policyCorrectionSource, /t\('feedback'\)/);
+        assert.doesNotMatch(policyCorrectionSource, /report-action-link policy-correction-trigger/);
+        assert.match(renderMountSource, /bindFeedbackTriggers\(section\)/);
     });
 });
 

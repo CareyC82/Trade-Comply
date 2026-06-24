@@ -84,7 +84,11 @@ function mountPolicyCorrectionSection(section, viewModel) {
     }
     section.style.display = 'block';
     mountHtml(section, renderPolicyCorrectionSection(viewModel.policyCorrectionVariant));
-    bindPolicyCorrectionTriggers(section);
+    if (viewModel.policyCorrectionVariant === 'no_match') {
+        bindPolicyCorrectionTriggers(section);
+    } else if (typeof bindFeedbackTriggers === 'function') {
+        bindFeedbackTriggers(section);
+    }
 }
 
 function mountResultComplianceChecklist(tags, selectedCountry, direction, query, options) {

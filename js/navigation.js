@@ -257,16 +257,9 @@ function bindEvents() {
     const feedbackThanks = document.getElementById('feedback-thanks');
     const feedbackFormDiv = document.getElementById('feedback-form');
 
-    ['feedback-trigger', 'result-feedback-trigger', 'home-feedback-trigger', 'semi-feedback-trigger', 'energy-feedback-trigger', 'incoterm-feedback-trigger']
-        .forEach(id => {
-            const trigger = document.getElementById(id);
-            if (trigger && feedbackModal) {
-                trigger.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    openFeedbackModal();
-                });
-            }
-        });
+    if (feedbackModal && typeof bindFeedbackTriggers === 'function') {
+        bindFeedbackTriggers(document);
+    }
 
     if (modalCancel && feedbackModal) {
         feedbackModal.classList.remove('open');

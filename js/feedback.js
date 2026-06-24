@@ -77,6 +77,32 @@ function openFeedbackModal() {
     feedbackModal.classList.add('open');
 }
 
+function bindFeedbackTriggers(root = document) {
+    const ids = [
+        'feedback-trigger',
+        'result-feedback-trigger',
+        'home-feedback-trigger',
+        'semi-feedback-trigger',
+        'energy-feedback-trigger',
+        'incoterm-feedback-trigger'
+    ];
+    const staticTriggers = ids
+        .map(id => root.getElementById ? root.getElementById(id) : document.getElementById(id))
+        .filter(Boolean);
+    const dynamicTriggers = Array.from(root.querySelectorAll ? root.querySelectorAll('.feedback-formspree-trigger') : []);
+
+    [...staticTriggers, ...dynamicTriggers].forEach((trigger) => {
+        if (trigger.dataset.feedbackBound === 'true') {
+            return;
+        }
+        trigger.dataset.feedbackBound = 'true';
+        trigger.addEventListener('click', (event) => {
+            event.preventDefault();
+            openFeedbackModal();
+        });
+    });
+}
+
 async function submitFeedbackForm(form) {
     const payload = buildFeedbackPayload(form);
     const response = await fetch(FEEDBACK_API_URL, {
