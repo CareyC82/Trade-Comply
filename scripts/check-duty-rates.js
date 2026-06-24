@@ -160,6 +160,44 @@ function getRateChangeDrivers(result = {}) {
     return Array.from(new Set(drivers));
 }
 
+function getRateScopeComponents(result = {}) {
+    const components = [];
+    const text = [
+        result.id,
+        result.product_id,
+        result.route,
+        result.hs_code,
+        result.source_trust,
+        ...(result.source_statuses || [])
+    ].join(' ').toLowerCase();
+
+    if (result.exact_base_rate_covered) {
+        components.push('official_base_duty');
+    }
+    if (result.import_country === 'US' && result.origin_country === 'CN') {
+        components.push('chapter_99_section_301');
+    }
+    if (/solar|8541|photovoltaic/.test(text)) {
+        components.push('ad_cvd_scope');
+        components.push('origin_route_evidence');
+    }
+    if (/battery|850760/.test(text)) {
+        components.push('battery_chemistry_scope');
+    }
+    if (/8517|router|smartphone|telecom/.test(text)) {
+        components.push('telecom_subheading_scope');
+        components.push('wireless_module_scope');
+    }
+    if (/semiconductor|8542|gpu|ai/.test(text)) {
+        components.push('technology_end_use_scope');
+    }
+    if (result.source_trust === 'official_heading_only' || result.source_trust === 'mixed_official_estimate') {
+        components.push('active_exclusion_or_case_period');
+    }
+
+    return Array.from(new Set(components));
+}
+
 function getRatePriorityReason(result = {}) {
     const drivers = getRateChangeDrivers(result);
     const route = result.route || `${result.origin_country || '?'}->${result.import_country || '?'}`;
@@ -255,6 +293,7 @@ function runPriorityMatrixRoute(route) {
         failures
     };
     result.rate_change_drivers = getRateChangeDrivers(result);
+    result.scope_components = getRateScopeComponents(result);
     result.why_priority = getRatePriorityReason(result);
     result.parser_target = getRateParserTarget(result);
     result.next_action = getRateNextAction(result);
@@ -334,6 +373,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             next_action: result.next_action,
             why_priority: result.why_priority,
             rate_change_drivers: result.rate_change_drivers,
+            scope_components: result.scope_components,
             us_backlog_focus: result.us_backlog_focus
         }))
         .sort((a, b) => (

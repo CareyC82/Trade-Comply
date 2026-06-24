@@ -1,6 +1,6 @@
 {
   "version": "2026-06-24",
-  "generated_at": "2026-06-24T08:53:05.714Z",
+  "generated_at": "2026-06-24T10:00:32.474Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows",
   "priorities": [
@@ -22,6 +22,13 @@
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
         "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
       ],
+      "scope_components": [
+        "official_base_duty",
+        "chapter_99_section_301",
+        "ad_cvd_scope",
+        "origin_route_evidence",
+        "active_exclusion_or_case_period"
+      ],
       "parser_scope": "Resolve exact HTS 854143 line, AD/CVD case scope, origin-route evidence, and Section 301 Chapter 99/exclusion before using the rate for filing."
     },
     {
@@ -40,6 +47,11 @@
       "rate_change_drivers": [
         "Official base duty is covered, but add-on or case-scope layers can still change the final payable rate.",
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
+      ],
+      "scope_components": [
+        "official_base_duty",
+        "chapter_99_section_301",
+        "active_exclusion_or_case_period"
       ],
       "parser_scope": "Resolve exact HTS line, country of origin evidence, Section 301 coverage, and active exclusion status."
     },
@@ -61,6 +73,12 @@
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
         "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
       ],
+      "scope_components": [
+        "official_base_duty",
+        "chapter_99_section_301",
+        "battery_chemistry_scope",
+        "active_exclusion_or_case_period"
+      ],
       "parser_scope": "Resolve battery chemistry, capacity, exact 850760 subheading, Section 301 coverage, and any battery-specific trade-remedy scope."
     },
     {
@@ -80,6 +98,13 @@
         "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
         "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+      ],
+      "scope_components": [
+        "official_base_duty",
+        "chapter_99_section_301",
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period"
       ],
       "parser_scope": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
     },
@@ -101,6 +126,13 @@
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
         "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
       ],
+      "scope_components": [
+        "official_base_duty",
+        "chapter_99_section_301",
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period"
+      ],
       "parser_scope": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
     },
     {
@@ -120,6 +152,11 @@
         "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
       ],
+      "scope_components": [
+        "official_base_duty",
+        "chapter_99_section_301",
+        "active_exclusion_or_case_period"
+      ],
       "parser_scope": "Resolve exact power-conversion subheading, EV-charger function scope, origin evidence, and Section 301 add-on duty treatment."
     },
     {
@@ -138,6 +175,11 @@
       "rate_change_drivers": [
         "Trade-remedy scope, add-on duty, or exclusion period can change payable duty.",
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
+      ],
+      "scope_components": [
+        "official_base_duty",
+        "chapter_99_section_301",
+        "active_exclusion_or_case_period"
       ],
       "parser_scope": "Resolve exact portable ADP/tablet classification, origin evidence, and Section 301 add-on duty or exclusion status."
     }
@@ -161,6 +203,7 @@
       "rate_change_drivers": [
         "Russia/EAEU duty and sanctions scope should stay review-only until official machine-readable coverage is available."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -182,6 +225,7 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -204,6 +248,7 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -226,6 +271,7 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -247,6 +293,7 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -268,6 +315,7 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -290,6 +338,7 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -312,6 +361,7 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -333,6 +383,7 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -354,6 +405,7 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -376,6 +428,7 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -398,6 +451,7 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -419,6 +473,7 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
+      "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     }
   ]

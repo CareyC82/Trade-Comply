@@ -160,6 +160,18 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
             .every(row => row.exact_base_rate_covered && row.parser_target === 'Add-on duty / case-scope resolver'),
         'US solar and drone should show official base duty covered while scope layers remain pending'
     );
+    assert.ok(
+        matrix.priority_upgrade_queue
+            .filter(row => row.import_country === 'US' && row.origin_country === 'CN')
+            .every(row => Array.isArray(row.scope_components) && row.scope_components.includes('chapter_99_section_301')),
+        'US origin China routes should expose Section 301 as a parser scope component'
+    );
+    assert.ok(
+        matrix.priority_upgrade_queue
+            .find(row => row.id === 'solar-cn-us')
+            .scope_components.includes('ad_cvd_scope'),
+        'US solar backlog should expose AD/CVD scope as a parser component'
+    );
     assert.ok(matrix.priority_upgrade_queue.some((row) => (
         row.import_country === 'US'
         && `${row.why_priority} ${row.rate_change_drivers.join(' ')}`.includes('Section 301')

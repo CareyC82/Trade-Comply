@@ -55,7 +55,10 @@ describe('trade opportunity insights', () => {
         assert.ok(model.insights.some((item) => item.type === 'Green compliance'));
         assert.ok(model.insights.some((item) => item.type === 'Supply-chain evidence'));
         assert.equal(model.routeComparison.length, 3);
+        assert.equal(model.routeComparison.filter((row) => row.routeKind === 'direct').length, 1);
+        assert.equal(model.routeComparison.filter((row) => row.routeKind === 'transit').length, 2);
         assert.ok(model.transitRoutes.every((row) => row.transitComparison && row.routeScopeLabel.includes('Transit comparison')));
+        assert.ok(model.transitRoutes.every((row) => row.transitCostStatus && row.transitReason));
         assert.ok(model.routeComparison.every((row) => row.coverageLabel && row.parserNextAction));
         assert.ok(model.routeComparison.every((row) => row.businessAction && row.parserPriority));
         assert.ok(model.routeComparison.every((row) => row.dutyBreakdown && row.dutyBreakdown.items.length === 4));
@@ -260,6 +263,12 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.transitComparison.combinedCostPer1000, '$220.00 / $1k');
         assert.equal(singapore.transitComparison.directCostPer1000, '$130.00 / $1k');
         assert.equal(singapore.transitComparison.deltaCostPer1000, '+$90.00 / $1k');
+        assert.equal(singapore.routeKind, 'transit');
+        assert.equal(singapore.transitCostStatus, 'cost_disadvantage');
+        assert.match(singapore.transitReason, /not cheaper than direct routing/i);
+        assert.match(singapore.transitComparison.secondCoverageLabel, /Official duty/);
+        assert.ok(singapore.transitComparison.secondParserPriority);
+        assert.ok(singapore.transitComparison.secondParserNextAction);
         assert.match(singapore.transitComparison.decision.headline, /Do not use Singapore for cost reduction/i);
         assert.match(singapore.transitComparison.decision.reason, /not simple tariff savings/i);
         assert.match(singapore.transitWarning, /No duty-cost advantage versus direct route/i);

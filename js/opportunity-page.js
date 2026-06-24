@@ -97,13 +97,14 @@ function bootstrapTradeOpportunityPage() {
             ? card.rejectionReasons.slice(0, 3)
             : [];
         const metricItems = transit ? [
+            { label: 'Status', value: card.transitCostStatus ? card.transitCostStatus.replace(/_/g, ' ') : 'Transit review' },
             { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
             { label: 'Transit cost / $1k', value: transit.combinedCostPer1000 || 'Pending' },
             { label: 'Delta / $1k', value: transit.deltaCostPer1000 || 'Pending' },
             { label: 'First leg', value: `${transit.firstLegRate || 'Pending'} · ${transit.firstLegCostPer1000 || 'Pending'}` },
-            { label: 'Second leg', value: `${transit.secondLegRate || 'Pending'} · ${transit.secondLegCostPer1000 || 'Pending'}` },
-            { label: 'Direct route', value: `${transit.directRate || 'Pending'} · ${transit.directCostPer1000 || 'Pending'}` }
+            { label: 'Second leg', value: `${transit.secondLegRate || 'Pending'} · ${transit.secondLegCostPer1000 || 'Pending'}` }
         ] : [
+            { label: 'Route type', value: 'Direct route' },
             { label: 'Direct total', value: card.dutyBreakdown?.totalRate || 'Not covered' },
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
             { label: 'Quote readiness', value: card.quoteReadiness || 'Pending' },
@@ -129,6 +130,7 @@ function bootstrapTradeOpportunityPage() {
                     </div>
                 ` : ''}
                 <p>${escapeHtml(displaySummary)}</p>
+                ${card.transitReason ? `<p class="opportunity-transit-reason">${escapeHtml(card.transitReason)}</p>` : ''}
                 <div class="opportunity-rate-mini-grid">
                     ${metricItems.map((item) => `
                         <div>
