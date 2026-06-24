@@ -264,20 +264,51 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.transitComparison.directCostPer1000, '$130.00 / $1k');
         assert.equal(singapore.transitComparison.deltaCostPer1000, '+$90.00 / $1k');
         assert.equal(singapore.routeKind, 'transit');
-        assert.equal(singapore.transitCostStatus, 'cost_disadvantage');
-        assert.match(singapore.transitReason, /not cheaper than direct routing/i);
-        assert.match(singapore.transitComparison.secondCoverageLabel, /Official duty/);
+        assert.equal(singapore.transitCostStatus, 'second_leg_baseline');
+        assert.match(singapore.transitReason, /baseline comparison route/i);
+        assert.match(singapore.transitComparison.secondCoverageLabel, /baseline route check/);
+        assert.equal(singapore.transitComparison.secondLegRouteSpecific, false);
+        assert.match(singapore.transitComparison.secondLegScopeNote, /destination baseline/i);
         assert.ok(singapore.transitComparison.secondParserPriority);
         assert.ok(singapore.transitComparison.secondParserNextAction);
-        assert.match(singapore.transitComparison.decision.headline, /Do not use Singapore for cost reduction/i);
-        assert.match(singapore.transitComparison.decision.reason, /not simple tariff savings/i);
+        assert.match(singapore.transitComparison.decision.headline, /route-specific second-leg evidence/i);
+        assert.match(singapore.transitComparison.decision.reason, /benchmark/i);
         assert.match(singapore.transitWarning, /No duty-cost advantage versus direct route/i);
         assert.match(singapore.transitWarning, /delta: \+9\.0% \(\+\$90\.00 \/ \$1k\) per \$1k/i);
+        assert.match(singapore.transitWarning, /destination baseline/i);
         assert.match(singapore.transitWarning, /origin transformation/i);
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Combined cost' && /United States -> Singapore/.test(item.detail) && /\+\$90\.00 \/ \$1k/.test(item.detail)));
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Origin / re-export gate' && /origin transformation/i.test(item.detail)));
-        assert.match(singapore.routeDecisionSummary, /Not cheaper|cost reduction|direct/i);
-        assert.ok(singapore.rejectionReasons.some((item) => /higher than direct|workaround|origin/i.test(item)));
+        assert.match(singapore.routeDecisionSummary, /Baseline check only|route-specific/i);
+        assert.ok(singapore.rejectionReasons.some((item) => /destination baseline|route-specific origin/i.test(item)));
+    });
+
+    it('keeps transit options to two routes and explains full two-leg cost limits for high-risk samples', () => {
+        [
+            ['H200', 'US', 'CN', 'GPU / AI accelerator'],
+            ['GPU', 'US', 'CN', 'GPU / AI accelerator'],
+            ['solar panel photovoltaic', 'US', 'CN', 'Solar / PV'],
+            ['energy storage battery system', 'US', 'CN', 'Battery / ESS'],
+            ['AI server GPU server', 'US', 'CN', 'AI server / accelerator system']
+        ].forEach(([product, from, to, expectedLabel]) => {
+            const model = buildOpportunityInsights({
+                product,
+                from,
+                to,
+                dutyRates,
+                priorityMatrix
+            });
+
+            assert.equal(model.productSignal.label, expectedLabel);
+            assert.equal(model.routeComparison[0].routeKind, 'direct');
+            assert.equal(model.routeComparison[0].market, to);
+            assert.equal(model.transitRoutes.length, 2);
+            assert.equal(model.routeComparison.filter((row) => row.routeKind === 'transit').length, 2);
+            assert.ok(model.transitRoutes.every((row) => row.transitComparison.combinedCostPer1000));
+            assert.ok(model.transitRoutes.every((row) => row.transitComparison.deltaCostPer1000));
+            assert.ok(model.transitRoutes.every((row) => /destination baseline|route-specific|origin transformation/i.test(`${row.transitReason} ${row.transitWarning}`)));
+            assert.ok(model.transitRoutes.every((row) => !/Strong opportunity route with 9\.0% total/i.test(row.commercialDecision)));
+        });
     });
 
     it('surfaces a BIS export-control gate for US-origin H200 opportunities to China', () => {
@@ -508,6 +539,7 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Transit total/);
         assert.match(source, /Transit cost \/ \$1k/);
         assert.match(source, /Delta \/ \$1k/);
+        assert.match(source, /Baseline second-leg check/);
         assert.match(source, /combinedCostPer1000/);
         assert.match(source, /deltaCostPer1000/);
         assert.match(source, /Second leg/);

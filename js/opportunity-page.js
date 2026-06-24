@@ -56,6 +56,17 @@ function bootstrapTradeOpportunityPage() {
             .replace(/'/g, '&#39;');
     }
 
+    function transitStatusLabel(status = '') {
+        const labels = {
+            second_leg_not_covered: 'Second leg not covered',
+            second_leg_baseline: 'Baseline second-leg check',
+            cost_advantage: 'Potential cost advantage',
+            cost_disadvantage: 'Not cheaper than direct',
+            cost_similar: 'Cost-similar to direct'
+        };
+        return labels[status] || String(status || 'Transit review').replace(/_/g, ' ');
+    }
+
     async function loadDutyRates() {
         if (dutyRates) {
             return dutyRates;
@@ -97,7 +108,7 @@ function bootstrapTradeOpportunityPage() {
             ? card.rejectionReasons.slice(0, 3)
             : [];
         const metricItems = transit ? [
-            { label: 'Status', value: card.transitCostStatus ? card.transitCostStatus.replace(/_/g, ' ') : 'Transit review' },
+            { label: 'Status', value: transitStatusLabel(card.transitCostStatus) },
             { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
             { label: 'Transit cost / $1k', value: transit.combinedCostPer1000 || 'Pending' },
             { label: 'Delta / $1k', value: transit.deltaCostPer1000 || 'Pending' },
