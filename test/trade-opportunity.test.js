@@ -245,6 +245,7 @@ describe('trade opportunity insights', () => {
         assert.equal(china.quoteReadiness, 'Selective quote');
         assert.equal(china.landedCostRisk, 'High');
         assert.equal(china.dutyBreakdown.totalRate, '13.0%');
+        assert.equal(china.opportunityVerdict.label, 'Control first');
         assert.match(china.salesAngle, /manufacturing ecosystem/i);
         assert.doesNotMatch(china.salesAngle, /agency reference systems/i);
         assert.match(model.whyThisRoute, /China/i);
@@ -264,23 +265,25 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.transitComparison.directCostPer1000, '$130.00 / $1k');
         assert.equal(singapore.transitComparison.deltaCostPer1000, '+$90.00 / $1k');
         assert.equal(singapore.routeKind, 'transit');
-        assert.equal(singapore.transitCostStatus, 'second_leg_baseline');
-        assert.match(singapore.transitReason, /baseline comparison route/i);
-        assert.match(singapore.transitComparison.secondCoverageLabel, /baseline route check/);
-        assert.equal(singapore.transitComparison.secondLegRouteSpecific, false);
-        assert.match(singapore.transitComparison.secondLegScopeNote, /destination baseline/i);
+        assert.equal(singapore.transitCostStatus, 'cost_disadvantage');
+        assert.equal(singapore.opportunityVerdict.label, 'Control first');
+        assert.match(singapore.transitReason, /not cheaper than direct routing/i);
+        assert.match(singapore.transitComparison.secondCoverageLabel, /transit evidence/);
+        assert.equal(singapore.transitComparison.secondLegRouteSpecific, true);
+        assert.equal(singapore.transitComparison.secondLegTransitEvidence, true);
+        assert.match(singapore.transitComparison.secondLegScopeNote, /Singapore -> China has maintained transit-route review evidence/i);
         assert.ok(singapore.transitComparison.secondParserPriority);
         assert.ok(singapore.transitComparison.secondParserNextAction);
-        assert.match(singapore.transitComparison.decision.headline, /route-specific second-leg evidence/i);
-        assert.match(singapore.transitComparison.decision.reason, /benchmark/i);
+        assert.match(singapore.transitComparison.decision.headline, /Do not use Singapore for cost reduction/i);
+        assert.match(singapore.transitComparison.decision.reason, /not simple tariff savings/i);
         assert.match(singapore.transitWarning, /No duty-cost advantage versus direct route/i);
         assert.match(singapore.transitWarning, /delta: \+9\.0% \(\+\$90\.00 \/ \$1k\) per \$1k/i);
-        assert.match(singapore.transitWarning, /destination baseline/i);
+        assert.match(singapore.transitWarning, /maintained transit-route review evidence/i);
         assert.match(singapore.transitWarning, /origin transformation/i);
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Combined cost' && /United States -> Singapore/.test(item.detail) && /\+\$90\.00 \/ \$1k/.test(item.detail)));
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Origin / re-export gate' && /origin transformation/i.test(item.detail)));
-        assert.match(singapore.routeDecisionSummary, /Baseline check only|route-specific/i);
-        assert.ok(singapore.rejectionReasons.some((item) => /destination baseline|route-specific origin/i.test(item)));
+        assert.match(singapore.routeDecisionSummary, /Not cheaper|cost reduction|direct/i);
+        assert.ok(singapore.rejectionReasons.some((item) => /higher than direct|workaround|origin/i.test(item)));
     });
 
     it('keeps transit options to two routes and explains full two-leg cost limits for high-risk samples', () => {
@@ -306,7 +309,7 @@ describe('trade opportunity insights', () => {
             assert.equal(model.routeComparison.filter((row) => row.routeKind === 'transit').length, 2);
             assert.ok(model.transitRoutes.every((row) => row.transitComparison.combinedCostPer1000));
             assert.ok(model.transitRoutes.every((row) => row.transitComparison.deltaCostPer1000));
-            assert.ok(model.transitRoutes.every((row) => /destination baseline|route-specific|origin transformation/i.test(`${row.transitReason} ${row.transitWarning}`)));
+            assert.ok(model.transitRoutes.every((row) => /transit-route review evidence|route-specific|origin transformation/i.test(`${row.transitReason} ${row.transitWarning}`)));
             assert.ok(model.transitRoutes.every((row) => !/Strong opportunity route with 9\.0% total/i.test(row.commercialDecision)));
         });
     });
@@ -321,6 +324,8 @@ describe('trade opportunity insights', () => {
         });
 
         assert.equal(model.productSignal.label, 'GPU / AI accelerator');
+        assert.equal(model.selectedMarket.opportunityVerdict.label, 'Control first');
+        assert.match(model.selectedMarket.commercialDecision, /Control first/i);
         assert.match(model.selectedMarket.exportControlGate.label, /US BIS|advanced-computing|semiconductor/i);
         assert.equal(model.selectedMarket.exportControlGate.severity, 'Critical');
         assert.match(model.selectedMarket.exportControlGate.summary, /AI GPUs|advanced ICs|semiconductor/i);
@@ -540,6 +545,8 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /Transit cost \/ \$1k/);
         assert.match(source, /Delta \/ \$1k/);
         assert.match(source, /Baseline second-leg check/);
+        assert.match(source, /opportunity-route-verdict/);
+        assert.match(source, /verdict\.label/);
         assert.match(source, /combinedCostPer1000/);
         assert.match(source, /deltaCostPer1000/);
         assert.match(source, /Second leg/);
@@ -563,6 +570,7 @@ describe('trade opportunity navigation', () => {
         assert.doesNotMatch(source, /route\(s\) usable for pricing comparison/);
 
         const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
+        assert.match(css, /opportunity-route-verdict/);
         assert.doesNotMatch(css, /opportunity-route-table/);
         assert.doesNotMatch(css, /opportunity-duty-breakdown/);
         assert.doesNotMatch(css, /opportunity-parser-cell/);

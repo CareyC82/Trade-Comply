@@ -125,6 +125,7 @@ function bootstrapTradeOpportunityPage() {
         ];
         const displaySummary = transit?.costConclusion || card.conciseConclusion || card.opportunity;
         const transitDecision = transit?.decision || null;
+        const verdict = card.opportunityVerdict || null;
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
                 <div class="opportunity-market-score">${escapeHtml(card.score)}</div>
@@ -133,6 +134,13 @@ function bootstrapTradeOpportunityPage() {
                     <div class="opportunity-market-route">${escapeHtml(card.routeScopeLabel || card.route)}</div>
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
+                ${verdict ? `
+                    <div class="opportunity-route-verdict opportunity-route-verdict--${escapeHtml(verdict.tone || 'neutral')}">
+                        <span>Decision</span>
+                        <strong>${escapeHtml(verdict.label)}</strong>
+                        <p>${escapeHtml(verdict.action)}</p>
+                    </div>
+                ` : ''}
                 ${transitDecision ? `
                     <div class="opportunity-transit-verdict opportunity-transit-verdict--${escapeHtml(transitDecision.tone || 'neutral')}">
                         <span>Transit decision</span>

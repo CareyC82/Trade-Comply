@@ -5093,6 +5093,7 @@ button.feedback-link:hover {
     line-height: 1.45;
 }
 
+.opportunity-route-verdict,
 .opportunity-transit-verdict {
     grid-column: 2 / 4;
     display: grid;
@@ -5103,6 +5104,7 @@ button.feedback-link:hover {
     background: #f8fafc;
 }
 
+.opportunity-route-verdict span,
 .opportunity-transit-verdict span {
     color: var(--color-text-secondary);
     font-size: 0.68rem;
@@ -5111,12 +5113,14 @@ button.feedback-link:hover {
     text-transform: uppercase;
 }
 
+.opportunity-route-verdict strong,
 .opportunity-transit-verdict strong {
     color: var(--color-primary);
     font-size: 0.84rem;
     line-height: 1.35;
 }
 
+.opportunity-route-verdict p,
 .opportunity-transit-verdict p {
     grid-column: auto;
     margin: 0;
@@ -5128,6 +5132,23 @@ button.feedback-link:hover {
 .opportunity-transit-verdict--favorable {
     border-color: rgba(22, 163, 74, 0.24);
     background: #f0fdf4;
+}
+
+.opportunity-route-verdict--favorable {
+    border-color: rgba(22, 163, 74, 0.24);
+    background: #f0fdf4;
+}
+
+.opportunity-route-verdict--critical,
+.opportunity-route-verdict--blocked {
+    border-color: rgba(220, 38, 38, 0.22);
+    background: #fff7f7;
+}
+
+.opportunity-route-verdict--caution,
+.opportunity-route-verdict--neutral {
+    border-color: rgba(202, 138, 4, 0.24);
+    background: #fffbeb;
 }
 
 .opportunity-transit-verdict--caution,
@@ -5298,6 +5319,8 @@ button.feedback-link:hover {
 }
 
 @media (max-width: 720px) {
+    .opportunity-route-verdict,
+    .opportunity-transit-verdict,
     .opportunity-route-decision,
     .opportunity-source-evidence,
     .opportunity-transit-note {
