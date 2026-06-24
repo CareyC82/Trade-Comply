@@ -1,6 +1,6 @@
 {
-  "version": "2026-06-23",
-  "generated_at": "2026-06-23T20:20:17.341Z",
+  "version": "2026-06-24",
+  "generated_at": "2026-06-24T08:53:05.714Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows",
   "priorities": [
@@ -12,13 +12,13 @@
       "origin_country": "CN",
       "hs_code": "854143",
       "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "parser_target": "Add-on duty / case-scope resolver",
+      "next_action": "Keep the official base duty; resolve Chapter 99, trade-remedy, exclusion, or case-scope layers before filing-grade use.",
       "priority_band": "P2",
       "impact_score": 2500,
       "why_priority": "CN->US solar remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
       "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
+        "Official base duty is covered, but add-on or case-scope layers can still change the final payable rate.",
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.",
         "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
       ],
@@ -32,13 +32,13 @@
       "origin_country": "CN",
       "hs_code": "880622",
       "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "parser_target": "Add-on duty / case-scope resolver",
+      "next_action": "Keep the official base duty; resolve Chapter 99, trade-remedy, exclusion, or case-scope layers before filing-grade use.",
       "priority_band": "P2",
       "impact_score": 0,
       "why_priority": "CN->US drone remains a high-impact backlog because US exact duty may change with Section 301, trade-remedy scope, or exclusion status.",
       "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
+        "Official base duty is covered, but add-on or case-scope layers can still change the final payable rate.",
         "US Section 301 Chapter 99 coverage and exclusion status can change add-on duty."
       ],
       "parser_scope": "Resolve exact HTS line, country of origin evidence, Section 301 coverage, and active exclusion status."

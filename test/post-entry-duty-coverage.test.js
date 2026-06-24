@@ -147,12 +147,19 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
     assert.equal(matrix.trust_counts.official_heading_only, 2);
     assert.equal(matrix.trust_counts.official_exact, 1);
+    assert.equal(matrix.exact_base_rate_covered_count, matrix.route_count);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.priority_band), 'upgrade queue should show business priority band');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.why_priority), 'upgrade queue should explain why the route is a priority');
     assert.ok(matrix.priority_upgrade_queue.every((row) => Array.isArray(row.rate_change_drivers) && row.rate_change_drivers.length > 0), 'upgrade queue should expose rate-change drivers');
+    assert.ok(
+        matrix.priority_upgrade_queue
+            .filter(row => row.id === 'solar-cn-us' || row.id === 'drone-cn-us')
+            .every(row => row.exact_base_rate_covered && row.parser_target === 'Add-on duty / case-scope resolver'),
+        'US solar and drone should show official base duty covered while scope layers remain pending'
+    );
     assert.ok(matrix.priority_upgrade_queue.some((row) => (
         row.import_country === 'US'
         && `${row.why_priority} ${row.rate_change_drivers.join(' ')}`.includes('Section 301')

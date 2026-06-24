@@ -89,6 +89,9 @@ function getRateParserTarget(result = {}) {
         return `${result.import_country || 'market'} exact tariff-line parser`;
     }
     if (result.source_trust === 'official_heading_only') {
+        if (result.exact_base_rate_covered) {
+            return 'Add-on duty / case-scope resolver';
+        }
         return 'Exact HS / tariff-line scope resolver';
     }
     if (result.source_trust === 'mixed_official_estimate') {
@@ -102,6 +105,9 @@ function getRateNextAction(result = {}) {
         return 'Connect exact machine-readable tariff-line parser for this official source.';
     }
     if (result.source_trust === 'official_heading_only') {
+        if (result.exact_base_rate_covered) {
+            return 'Keep the official base duty; resolve Chapter 99, trade-remedy, exclusion, or case-scope layers before filing-grade use.';
+        }
         return 'Require exact tariff line / scope before promoting to official exact rate.';
     }
     if (result.source_trust === 'mixed_official_estimate') {
@@ -122,7 +128,9 @@ function getRateChangeDrivers(result = {}) {
     ].join(' ').toLowerCase();
 
     if (result.source_trust === 'official_heading_only') {
-        drivers.push('Exact tariff-line scope can change the final payable rate.');
+        drivers.push(result.exact_base_rate_covered
+            ? 'Official base duty is covered, but add-on or case-scope layers can still change the final payable rate.'
+            : 'Exact tariff-line scope can change the final payable rate.');
     }
     if (result.source_trust === 'mixed_official_estimate') {
         drivers.push('Trade-remedy scope, add-on duty, or exclusion period can change payable duty.');
@@ -211,6 +219,11 @@ function runPriorityMatrixRoute(route) {
         declaredDuty: route.declared_duty || 0
     });
     const sourceStatuses = Array.from(new Set((duty.sourceBreakdown || []).map(item => item.status)));
+    const exactBaseRateCovered = (duty.sourceBreakdown || []).some(item => (
+        item.component === 'base_duty'
+        && item.status === 'official_source_checked'
+        && item.hts
+    ));
     const sourceTrust = classifyRateSourceTrust(duty.sourceBreakdown || []);
     const failures = [];
 
@@ -235,6 +248,7 @@ function runPriorityMatrixRoute(route) {
         expected_source_trust: route.expected_source_trust || '',
         source_trust: sourceTrust.level,
         source_statuses: sourceStatuses,
+        exact_base_rate_covered: exactBaseRateCovered,
         covered: duty.covered,
         total_rate: duty.totalRate,
         impact_score: Math.round(Number(duty.totalRate || 0) * 10000),
@@ -309,6 +323,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             hs_code: result.hs_code,
             source_trust: result.source_trust,
             automation_level: result.automation_level,
+            exact_base_rate_covered: result.exact_base_rate_covered,
             estimated_total_rate: result.total_rate,
             impact_score: result.impact_score || 0,
             priority: trustRank[result.source_trust] || 80,
@@ -351,6 +366,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             || result.source_trust === 'official_heading_only'
             || result.source_trust === 'official_link_estimate'
         )).length,
+        exact_base_rate_covered_count: results.filter(result => result.exact_base_rate_covered).length,
         benchmark_count: results.filter(result => result.source_trust === 'precheck_estimate').length,
         parser_priority_count: upgradeQueue.length,
         priority_upgrade_queue: upgradeQueue,
