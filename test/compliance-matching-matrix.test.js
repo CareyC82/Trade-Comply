@@ -136,6 +136,18 @@ describe('compliance matching matrix', () => {
         assert.ok(tagIds.includes('CL-USSOLARADCV-001'), 'expected AD/CVD solar rule');
     });
 
+    it('surfaces green compliance signals for electronics and battery market access', () => {
+        const usResult = runSearch('ai server gpu data center battery', 'export', 'US', 'import', { from: 'CN', to: 'US' });
+        assert.ok(ids(usResult).includes('CL-USGREEN-001'), 'expected US e-waste / battery stewardship rule');
+        assert.match(haystack(usResult), /Green Compliance & ESG|e-waste|battery stewardship/i);
+        assertNoOppositeRouteFocus(usResult, 'import', 'US green compliance import focus');
+
+        const sgResult = runSearch('network switch data center electronics battery', 'export', 'SG', 'import', { from: 'US', to: 'SG' });
+        assert.ok(ids(sgResult).includes('CL-SGGREEN-001'), 'expected Singapore e-waste EPR rule');
+        assert.match(haystack(sgResult), /Green Compliance & ESG|e-waste|producer responsibility/i);
+        assertNoOppositeRouteFocus(sgResult, 'import', 'Singapore green compliance import focus');
+    });
+
     it('surfaces Vietnam / Malaysia solar routing risk for ASEAN photovoltaic products', () => {
         const result = runSearch('solar panel photovoltaic', 'export', 'ASEAN');
         const text = haystack(result);

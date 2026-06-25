@@ -46,6 +46,14 @@ describe('category display labels', () => {
             'Product Standards'
         );
         assert.equal(
+            getTagCategoryLabel({ category: 'ENVIRONMENT_BATTERY', category_label: 'Battery / E-Waste' }),
+            'Green Compliance & ESG'
+        );
+        assert.equal(
+            getTagCategoryLabel({ category: 'OTHER', category_label: 'EU Battery Regulation' }),
+            'Green Compliance & ESG'
+        );
+        assert.equal(
             getTagCategoryLabel({ category: 'OTHER', category_label: 'Other Requirements' }),
             'General Compliance Requirements'
         );
@@ -71,5 +79,9 @@ describe('category display labels', () => {
         assert.equal(exportTheme.icon, '🧾');
         assert.equal(originTheme.class, 'origin-doc');
         assert.equal(originTheme.icon, '🧭');
+
+        const greenTheme = getCategoryTheme('ENVIRONMENT_BATTERY', 'Green Compliance & ESG');
+        assert.equal(greenTheme.class, 'green-compliance');
+        assert.equal(greenTheme.icon, '🌱');
     });
 });

@@ -388,6 +388,12 @@ function getDisplayCategoryLabel(label, categoryCode = '') {
     if (category === 'ORIGIN_DOC' || normalized === 'origin / transshipment') {
         return 'Origin & Anti-Circumvention';
     }
+    if (category === 'ENVIRONMENT_BATTERY'
+        || normalized === 'battery / e-waste'
+        || normalized === 'green compliance & esg'
+        || /e-waste|weee|battery regulation|battery law|producer responsibility|sustainability|cbam|carbon|packaging/.test(normalized)) {
+        return 'Green Compliance & ESG';
+    }
     if (normalized === 'compliance standard') {
         return 'Product Standards';
     }
@@ -435,12 +441,13 @@ const CATEGORY_THEME = {
     TAX_REBATE: { class: 'tax-incentive', icon: '💰' },
     WIRELESS_TELECOM: { class: 'wireless-telecom', icon: '📡' },
     COMPLIANCE_STD: { class: 'compliance-std', icon: '📋' },
-    ENVIRONMENT_BATTERY: { class: 'battery-ess', icon: '🔋' },
+    ENVIRONMENT_BATTERY: { class: 'green-compliance', icon: '🌱' },
     SUPPLY_CHAIN: { class: 'destination-barrier', icon: '🧭' },
     OTHER: { class: 'other', icon: '📦' }
 };
 
 const CATEGORY_LABEL_THEME_RULES = [
+    { pattern: /green compliance|esg|e-waste|weee|battery regulation|battery law|producer responsibility|sustainability|cbam|carbon|packaging/, theme: { class: 'green-compliance', icon: '🌱' } },
     { pattern: /battery|ess|energy storage/, theme: { class: 'battery-ess', icon: '🔋' } },
     { pattern: /destination market|destination barrier|routing risk|anti-circumvention/, theme: { class: 'destination-barrier', icon: '🚧' } },
     { pattern: /import clearance|import regulation|import control|trade remed|tariff|ad\/cvd/, theme: { class: 'import-regulation', icon: '📦' } },
