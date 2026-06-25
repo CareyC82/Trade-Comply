@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { buildOpportunityInsights, buildOpportunityPriorityList, detectProductSignal } = require('../lib/trade-opportunity');
 
+const tags = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'tags.json'), 'utf8'));
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const priorityMatrix = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'post-entry-rate-priority-matrix.json'), 'utf8'));
 
@@ -236,6 +237,25 @@ describe('trade opportunity insights', () => {
                 assert.match(selected.opportunityTags.join(' '), sample.expectedSelected.tags);
             }
         });
+    });
+
+    it('uses country ESG rule coverage in opportunity market cards', () => {
+        const model = buildOpportunityInsights({
+            product: 'smartphone 5G battery electronics',
+            from: 'US',
+            to: 'JP',
+            focus: 'import',
+            dutyRates,
+            priorityMatrix,
+            ruleTags: tags
+        });
+        const japan = model.routeComparison.find((row) => row.market === 'JP');
+
+        assert.ok(japan, 'selected Japan market should be present');
+        assert.equal(japan.greenCompliance.status, 'covered');
+        assert.equal(japan.esgReadiness, 'ESG covered');
+        assert.ok(japan.esgRuleCount >= 1);
+        assert.ok(japan.sourceEvidence.some((item) => item.label === 'Green / ESG' && /CL-JPGREEN-001|Green Compliance/i.test(item.detail)));
     });
 
     it('keeps the selected target market visible in route comparisons', () => {
@@ -598,7 +618,7 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /opportunity-rate-mini-grid/);
         assert.match(source, /Quote readiness/);
         assert.match(source, /Landed-cost risk/);
-        assert.match(source, /Demand strength/);
+        assert.match(source, /ESG readiness/);
         assert.match(source, /Compliance friction/);
         assert.match(source, /opportunity-hero-facts/);
         assert.match(source, /opportunity-commercial-brief/);

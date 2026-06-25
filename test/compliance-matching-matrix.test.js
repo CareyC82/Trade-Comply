@@ -148,6 +148,23 @@ describe('compliance matching matrix', () => {
         assertNoOppositeRouteFocus(sgResult, 'import', 'Singapore green compliance import focus');
     });
 
+    it('surfaces ESG coverage for Japan, Korea, Vietnam, Malaysia, and Mexico electronics imports', () => {
+        [
+            ['JP', 'CL-JPGREEN-001', /Japan|J-MOSS|recycling/i],
+            ['KR', 'CL-KRGREEN-001', /Korea|K-RoHS|EPR/i],
+            ['VN', 'CL-VNGREEN-001', /Vietnam|EPR|recycling/i],
+            ['MY', 'CL-MYGREEN-001', /Malaysia|e-waste|DOE/i],
+            ['MX', 'CL-MXGREEN-001', /Mexico|SEMARNAT|NOM/i]
+        ].forEach(([market, expectedId, expectedText]) => {
+            const result = runSearch('smartphone 5G battery electronics', 'export', market, 'import', { from: 'US', to: market });
+
+            assert.ok(ids(result).includes(expectedId), `expected ${expectedId}`);
+            assert.match(haystack(result), /Green Compliance & ESG/i);
+            assert.match(haystack(result), expectedText);
+            assertNoOppositeRouteFocus(result, 'import', `${market} green compliance import focus`);
+        });
+    });
+
     it('surfaces Vietnam / Malaysia solar routing risk for ASEAN photovoltaic products', () => {
         const result = runSearch('solar panel photovoltaic', 'export', 'ASEAN');
         const text = haystack(result);

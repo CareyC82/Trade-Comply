@@ -17,6 +17,7 @@ function bootstrapTradeOpportunityPage() {
     const startPanel = document.querySelector('.opportunity-start-panel');
     let dutyRates = null;
     let priorityMatrix = null;
+    let ruleTags = null;
 
     function populateSelect(select, defaultValue) {
         if (!select) {
@@ -99,6 +100,22 @@ function bootstrapTradeOpportunityPage() {
         return priorityMatrix;
     }
 
+    async function loadRuleTags() {
+        if (ruleTags) {
+            return ruleTags;
+        }
+        try {
+            const response = await fetch(`data/tags.json?v=${globalThis.TradeComplyBuild || Date.now()}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            ruleTags = await response.json();
+        } catch (loadError) {
+            ruleTags = [];
+        }
+        return ruleTags;
+    }
+
     function renderMarketCard(card, index) {
         const transit = card.transitComparison || null;
         const sourceEvidence = Array.isArray(card.sourceEvidence)
@@ -120,7 +137,7 @@ function bootstrapTradeOpportunityPage() {
             { label: 'Coverage', value: card.coverageLabel || 'Pending' },
             { label: 'Quote readiness', value: card.quoteReadiness || 'Pending' },
             { label: 'Landed-cost risk', value: card.landedCostRisk || 'Unknown' },
-            { label: 'Demand strength', value: card.demandStrength || 'Selective' },
+            { label: 'ESG readiness', value: card.esgReadiness || 'Not mapped' },
             { label: 'Compliance friction', value: card.complianceFriction || 'Medium' }
         ];
         const displaySummary = transit?.costConclusion || card.conciseConclusion || card.opportunity;
@@ -321,16 +338,18 @@ function bootstrapTradeOpportunityPage() {
     }
 
     async function renderOpportunityResult({ product, from, to }) {
-        const [rates, matrix] = await Promise.all([
+        const [rates, matrix, tags] = await Promise.all([
             loadDutyRates(),
-            loadPriorityMatrix()
+            loadPriorityMatrix(),
+            loadRuleTags()
         ]);
         const model = opportunity.buildOpportunityInsights({
             product,
             from,
             to,
             dutyRates: rates,
-            priorityMatrix: matrix
+            priorityMatrix: matrix,
+            ruleTags: tags
         });
         renderInsights(model);
     }
