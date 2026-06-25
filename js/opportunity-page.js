@@ -124,9 +124,6 @@ function bootstrapTradeOpportunityPage() {
             { label: 'Compliance friction', value: card.complianceFriction || 'Medium' }
         ];
         const displaySummary = transit?.costConclusion || card.conciseConclusion || card.opportunity;
-        const transitDecision = transit?.decision || null;
-        const verdict = card.opportunityVerdict || null;
-        const trustSummary = card.trustSummary || null;
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
                 <div class="opportunity-market-score">${escapeHtml(card.score)}</div>
@@ -135,34 +132,8 @@ function bootstrapTradeOpportunityPage() {
                     <div class="opportunity-market-route">${escapeHtml(card.routeScopeLabel || card.route)}</div>
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
-                ${verdict ? `
-                    <div class="opportunity-route-verdict opportunity-route-verdict--${escapeHtml(verdict.tone || 'neutral')}">
-                        <span>Decision</span>
-                        <strong>${escapeHtml(verdict.label)}</strong>
-                        <p>${escapeHtml(verdict.action)}</p>
-                    </div>
-                ` : ''}
-                ${transitDecision ? `
-                    <div class="opportunity-transit-verdict opportunity-transit-verdict--${escapeHtml(transitDecision.tone || 'neutral')}">
-                        <span>Transit decision</span>
-                        <strong>${escapeHtml(transitDecision.headline)}</strong>
-                        <p>${escapeHtml(transitDecision.reason)}</p>
-                    </div>
-                ` : ''}
-                ${card.complianceBlocker ? `
-                    <div class="opportunity-compliance-blocker">
-                        ${escapeHtml(card.complianceBlocker)}
-                    </div>
-                ` : ''}
                 <p>${escapeHtml(displaySummary)}</p>
                 ${card.transitReason ? `<p class="opportunity-transit-reason">${escapeHtml(card.transitReason)}</p>` : ''}
-                ${trustSummary?.summaryLine ? `
-                    <div class="opportunity-trust-summary" aria-label="Evidence summary">
-                        <span>Evidence summary</span>
-                        <strong>${escapeHtml(trustSummary.summaryLine)}</strong>
-                        <small>${escapeHtml(trustSummary.routeCost || '')}</small>
-                    </div>
-                ` : ''}
                 <div class="opportunity-rate-mini-grid">
                     ${metricItems.map((item) => `
                         <div>

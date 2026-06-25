@@ -5183,76 +5183,6 @@ button.feedback-link:hover {
     line-height: 1.45;
 }
 
-.opportunity-route-verdict,
-.opportunity-transit-verdict {
-    grid-column: 2 / 4;
-    display: grid;
-    gap: 4px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(23, 61, 101, 0.14);
-    background: #f8fafc;
-}
-
-.opportunity-route-verdict span,
-.opportunity-transit-verdict span {
-    color: var(--color-text-secondary);
-    font-size: 0.68rem;
-    font-weight: 900;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.opportunity-route-verdict strong,
-.opportunity-transit-verdict strong {
-    color: var(--color-primary);
-    font-size: 0.84rem;
-    line-height: 1.35;
-}
-
-.opportunity-route-verdict p,
-.opportunity-transit-verdict p {
-    grid-column: auto;
-    margin: 0;
-    color: var(--color-text-secondary);
-    font-size: 0.75rem;
-    font-weight: 750;
-}
-
-.opportunity-transit-verdict--favorable {
-    border-color: rgba(22, 163, 74, 0.24);
-    background: #f0fdf4;
-}
-
-.opportunity-route-verdict--favorable {
-    border-color: rgba(22, 163, 74, 0.24);
-    background: #f0fdf4;
-}
-
-.opportunity-route-verdict--critical,
-.opportunity-route-verdict--blocked {
-    border-color: rgba(220, 38, 38, 0.22);
-    background: #fff7f7;
-}
-
-.opportunity-route-verdict--caution,
-.opportunity-route-verdict--neutral {
-    border-color: rgba(202, 138, 4, 0.24);
-    background: #fffbeb;
-}
-
-.opportunity-transit-verdict--caution,
-.opportunity-transit-verdict--neutral {
-    border-color: rgba(202, 138, 4, 0.24);
-    background: #fffbeb;
-}
-
-.opportunity-transit-verdict--unfavorable,
-.opportunity-transit-verdict--blocked {
-    border-color: rgba(220, 38, 38, 0.22);
-    background: #fff7f7;
-}
-
 .opportunity-market-card small {
     grid-column: 2 / 4;
     display: block;
@@ -5262,49 +5192,6 @@ button.feedback-link:hover {
     border-left: 3px solid rgba(13, 148, 136, 0.28);
     padding-left: 10px;
     color: #0f766e !important;
-    font-weight: 800;
-}
-
-.opportunity-compliance-blocker,
-.opportunity-trust-summary {
-    grid-column: 2 / 4;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 0.76rem;
-    line-height: 1.35;
-}
-
-.opportunity-compliance-blocker {
-    border: 1px solid rgba(220, 38, 38, 0.22);
-    background: #fff7f7;
-    color: #991b1b;
-    font-weight: 900;
-}
-
-.opportunity-trust-summary {
-    display: grid;
-    gap: 4px;
-    border: 1px solid rgba(15, 118, 110, 0.16);
-    background: rgba(240, 253, 250, 0.58);
-}
-
-.opportunity-trust-summary span {
-    color: #0f766e;
-    font-size: 0.68rem;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.opportunity-trust-summary strong {
-    color: var(--color-primary);
-    font-size: 0.78rem;
-    line-height: 1.35;
-}
-
-.opportunity-trust-summary small {
-    color: var(--color-text-secondary);
-    font-size: 0.72rem;
     font-weight: 800;
 }
 
@@ -5452,12 +5339,8 @@ button.feedback-link:hover {
 }
 
 @media (max-width: 720px) {
-    .opportunity-route-verdict,
-    .opportunity-transit-verdict,
     .opportunity-route-decision,
     .opportunity-source-evidence,
-    .opportunity-compliance-blocker,
-    .opportunity-trust-summary,
     .opportunity-transit-note {
         grid-column: 1 / -1;
     }
