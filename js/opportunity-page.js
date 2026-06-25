@@ -196,6 +196,34 @@ function bootstrapTradeOpportunityPage() {
         `;
     }
 
+    function renderBusinessDecisionSummary(model) {
+        const summary = model.businessDecisionSummary || {};
+        const rows = Array.isArray(summary.rows) ? summary.rows : [];
+        if (!rows.length) {
+            return '';
+        }
+        return `
+            <section class="opportunity-section opportunity-decision-summary">
+                <div class="opportunity-section-heading">
+                    <h3>Decision summary</h3>
+                    <p>${escapeHtml(summary.headline || 'Use this summary to decide whether the route is worth quoting.')}</p>
+                </div>
+                <div class="opportunity-summary-action">${escapeHtml(summary.primaryAction || 'Compare tariff, control, and evidence readiness before quoting.')}</div>
+                <div class="opportunity-decision-summary-grid">
+                    ${rows.map((row) => `
+                        <article class="opportunity-summary-row opportunity-summary-row--${escapeHtml(row.tone || 'neutral')}">
+                            <span>${escapeHtml(row.type)}</span>
+                            <strong>${escapeHtml(row.label)}</strong>
+                            <p>${escapeHtml(row.route)}</p>
+                            <b>${escapeHtml(row.cost)}</b>
+                            <small>${escapeHtml(row.gate || row.action)}</small>
+                        </article>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
     function renderParserTargets(model) {
         const targets = Array.isArray(model.parserTargets) ? model.parserTargets : [];
         if (!targets.length) {
@@ -271,6 +299,8 @@ function bootstrapTradeOpportunityPage() {
                     <strong>${escapeHtml(best.label || 'Selected route')}</strong>
                 </div>
             </section>
+
+            ${renderBusinessDecisionSummary(model)}
 
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">
