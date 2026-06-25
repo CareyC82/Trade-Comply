@@ -5046,11 +5046,20 @@ button.feedback-link:hover {
 }
 
 .opportunity-summary-row p,
-.opportunity-summary-row small {
+.opportunity-summary-row small,
+.opportunity-summary-row em {
     margin: 0;
     color: var(--color-text-secondary);
     font-size: 0.76rem;
     line-height: 1.35;
+}
+
+.opportunity-summary-row em {
+    display: block;
+    padding-top: 4px;
+    border-top: 1px solid rgba(23, 61, 101, 0.1);
+    font-style: normal;
+    font-weight: 800;
 }
 
 .opportunity-summary-row b {
@@ -5256,6 +5265,49 @@ button.feedback-link:hover {
     font-weight: 800;
 }
 
+.opportunity-compliance-blocker,
+.opportunity-trust-summary {
+    grid-column: 2 / 4;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.76rem;
+    line-height: 1.35;
+}
+
+.opportunity-compliance-blocker {
+    border: 1px solid rgba(220, 38, 38, 0.22);
+    background: #fff7f7;
+    color: #991b1b;
+    font-weight: 900;
+}
+
+.opportunity-trust-summary {
+    display: grid;
+    gap: 4px;
+    border: 1px solid rgba(15, 118, 110, 0.16);
+    background: rgba(240, 253, 250, 0.58);
+}
+
+.opportunity-trust-summary span {
+    color: #0f766e;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.opportunity-trust-summary strong {
+    color: var(--color-primary);
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+.opportunity-trust-summary small {
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
 .opportunity-rate-mini-grid {
     grid-column: 2 / 4;
     display: grid;
@@ -5404,6 +5456,8 @@ button.feedback-link:hover {
     .opportunity-transit-verdict,
     .opportunity-route-decision,
     .opportunity-source-evidence,
+    .opportunity-compliance-blocker,
+    .opportunity-trust-summary,
     .opportunity-transit-note {
         grid-column: 1 / -1;
     }

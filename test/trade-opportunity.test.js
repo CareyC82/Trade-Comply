@@ -81,11 +81,15 @@ describe('trade opportunity insights', () => {
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.sourceEvidence) && row.sourceEvidence.length >= 4));
         assert.ok(model.routeComparison.every((row) => row.sourceEvidence.some((item) => /Data source|Source coverage|Transit decision/.test(item.label))));
         assert.ok(model.routeComparison.every((row) => row.sourceEvidence.some((item) => /Control gate|Origin \/ re-export gate/.test(item.label))));
+        assert.ok(model.routeComparison.every((row) => row.trustSummary?.summaryLine));
+        assert.ok(model.routeComparison.every((row) => /rates refreshed/i.test(row.trustSummary.summaryLine)));
+        assert.ok(model.routeComparison.every((row) => row.trustSummary.routeCost));
         assert.ok(model.routeComparison.every((row) => row.routeDecisionSummary));
         assert.ok(model.routeComparison.every((row) => Array.isArray(row.rejectionReasons) && row.rejectionReasons.length >= 1));
         assert.ok(model.businessDecisionSummary?.headline);
         assert.equal(model.businessDecisionSummary.rows.length, 3);
         assert.ok(model.businessDecisionSummary.rows.some((row) => row.type === 'Direct route'));
+        assert.ok(model.businessDecisionSummary.rows.every((row) => row.evidence));
         assert.equal(model.rateCoverageSummary.transitOptions, 2);
         assert.match(model.rateCoverageSummary.summary, /transit options have combined duty\/tax signals/i);
         assert.match(model.whyThisRoute, /because/i);
@@ -251,8 +255,11 @@ describe('trade opportunity insights', () => {
         assert.equal(china.landedCostRisk, 'High');
         assert.equal(china.dutyBreakdown.totalRate, '13.0%');
         assert.equal(china.opportunityVerdict.label, 'Control first');
+        assert.match(china.complianceBlocker, /Not a commercial opportunity/i);
+        assert.match(china.trustSummary.summaryLine, /US BIS|control|must clear/i);
         assert.match(model.businessDecisionSummary.headline, /Control check comes before route optimization/i);
         assert.match(model.businessDecisionSummary.primaryAction, /export-control/i);
+        assert.match(model.businessDecisionSummary.primaryAction, /Do not use any route as a commercial recommendation/i);
         assert.ok(model.businessDecisionSummary.rows.every((row) => row.label === 'Control first' || row.type === 'Direct route' || row.type === 'Transit option'));
         assert.match(china.salesAngle, /manufacturing ecosystem/i);
         assert.doesNotMatch(china.salesAngle, /agency reference systems/i);
@@ -275,6 +282,8 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.routeKind, 'transit');
         assert.equal(singapore.transitCostStatus, 'cost_disadvantage');
         assert.equal(singapore.opportunityVerdict.label, 'Control first');
+        assert.match(singapore.complianceBlocker, /Not a commercial opportunity/i);
+        assert.match(singapore.trustSummary.routeCost, /22\.0% combined; 9\.0% first leg \+ 13\.0% second leg/i);
         assert.match(singapore.transitReason, /not cheaper than direct routing/i);
         assert.match(singapore.transitComparison.secondCoverageLabel, /transit evidence/);
         assert.equal(singapore.transitComparison.secondLegRouteSpecific, true);
@@ -325,6 +334,50 @@ describe('trade opportunity insights', () => {
         });
     });
 
+    it('keeps high-frequency opportunity routes evidence-backed and compliance-gated', () => {
+        const samples = [
+            { product: 'H200', from: 'US', to: 'CN', criticalControl: true },
+            { product: 'GPU', from: 'US', to: 'CN', criticalControl: true },
+            { product: 'AI server GPU server', from: 'US', to: 'CN', criticalControl: true },
+            { product: 'optical transceiver module', from: 'US', to: 'CN', controlled: true },
+            { product: 'industrial robot arm', from: 'US', to: 'CN', controlled: true },
+            { product: 'solar panel photovoltaic', from: 'CN', to: 'US', control: false },
+            { product: 'energy storage battery system', from: 'CN', to: 'US', control: false },
+            { product: 'smartphone 5G cellular', from: 'US', to: 'JP', control: false },
+            { product: 'tablet computer', from: 'MY', to: 'US', control: false },
+            { product: 'wireless router wifi telecom equipment', from: 'VN', to: 'US', control: false }
+        ];
+
+        for (const sample of samples) {
+            const model = buildOpportunityInsights({
+                ...sample,
+                dutyRates,
+                priorityMatrix
+            });
+            const selected = model.routeComparison[0];
+
+            assert.equal(model.routeComparison.length, 3, `${sample.product} should show direct route plus two transit routes`);
+            assert.equal(selected.routeKind, 'direct', `${sample.product} selected market should stay first`);
+            assert.equal(selected.market, sample.to, `${sample.product} should keep selected destination as direct route`);
+            assert.equal(model.transitRoutes.length, 2, `${sample.product} should show exactly two transit options`);
+            assert.ok(model.routeComparison.every((row) => row.trustSummary?.summaryLine), `${sample.product} should carry trust summaries`);
+            assert.ok(model.routeComparison.every((row) => /rates refreshed/i.test(row.trustSummary.summaryLine)), `${sample.product} should show rate refresh evidence`);
+            assert.ok(model.businessDecisionSummary.rows.every((row) => row.evidence), `${sample.product} decision rows should show evidence`);
+            assert.ok(model.transitRoutes.every((row) => row.transitComparison?.combinedRate), `${sample.product} transit routes should show combined rate status`);
+
+            if (sample.criticalControl) {
+                assert.equal(selected.opportunityVerdict.label, 'Control first', `${sample.product} should be control-first`);
+                assert.match(selected.complianceBlocker, /Not a commercial opportunity/i);
+                assert.match(model.businessDecisionSummary.primaryAction, /Do not use any route as a commercial recommendation/i);
+            } else if (sample.controlled) {
+                assert.ok(selected.exportControlGate, `${sample.product} should keep an export-control gate`);
+                assert.match(selected.routeDecisionSummary, /review|clear|control/i);
+            } else {
+                assert.doesNotMatch(model.businessDecisionSummary.primaryAction, /Do not use any route as a commercial recommendation/i);
+            }
+        }
+    });
+
     it('surfaces a BIS export-control gate for US-origin H200 opportunities to China', () => {
         const model = buildOpportunityInsights({
             product: 'H200',
@@ -337,6 +390,7 @@ describe('trade opportunity insights', () => {
         assert.equal(model.productSignal.label, 'GPU / AI accelerator');
         assert.equal(model.selectedMarket.opportunityVerdict.label, 'Control first');
         assert.match(model.selectedMarket.commercialDecision, /Control first/i);
+        assert.match(model.selectedMarket.complianceBlocker, /Not a commercial opportunity/i);
         assert.match(model.businessDecisionSummary.headline, /Control check comes before route optimization/i);
         assert.ok(model.businessDecisionSummary.rows.every((row) => /Control first|Transit option|Direct route/.test(`${row.label} ${row.type}`)));
         assert.match(model.selectedMarket.exportControlGate.label, /US BIS|advanced-computing|semiconductor/i);
@@ -551,6 +605,10 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /renderBusinessDecisionSummary/);
         assert.match(source, /Decision summary/);
         assert.match(source, /opportunity-decision-summary-grid/);
+        assert.match(source, /Evidence summary/);
+        assert.match(source, /opportunity-trust-summary/);
+        assert.match(source, /opportunity-compliance-blocker/);
+        assert.match(source, /row\.evidence/);
         assert.match(source, /Why this route:/);
         assert.match(source, /Selected route check:/);
         assert.match(source, /Direct route and top transit options/);
@@ -589,6 +647,8 @@ describe('trade opportunity navigation', () => {
         assert.match(css, /opportunity-decision-summary/);
         assert.match(css, /opportunity-summary-row--critical/);
         assert.match(css, /opportunity-route-verdict/);
+        assert.match(css, /opportunity-trust-summary/);
+        assert.match(css, /opportunity-compliance-blocker/);
         assert.doesNotMatch(css, /opportunity-route-table/);
         assert.doesNotMatch(css, /opportunity-duty-breakdown/);
         assert.doesNotMatch(css, /opportunity-parser-cell/);

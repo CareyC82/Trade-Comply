@@ -126,6 +126,7 @@ function bootstrapTradeOpportunityPage() {
         const displaySummary = transit?.costConclusion || card.conciseConclusion || card.opportunity;
         const transitDecision = transit?.decision || null;
         const verdict = card.opportunityVerdict || null;
+        const trustSummary = card.trustSummary || null;
         return `
             <article class="opportunity-market-card ${index === 0 ? 'opportunity-market-card--best' : ''} opportunity-market-card--${escapeHtml(card.coverageTone)}">
                 <div class="opportunity-market-score">${escapeHtml(card.score)}</div>
@@ -148,8 +149,20 @@ function bootstrapTradeOpportunityPage() {
                         <p>${escapeHtml(transitDecision.reason)}</p>
                     </div>
                 ` : ''}
+                ${card.complianceBlocker ? `
+                    <div class="opportunity-compliance-blocker">
+                        ${escapeHtml(card.complianceBlocker)}
+                    </div>
+                ` : ''}
                 <p>${escapeHtml(displaySummary)}</p>
                 ${card.transitReason ? `<p class="opportunity-transit-reason">${escapeHtml(card.transitReason)}</p>` : ''}
+                ${trustSummary?.summaryLine ? `
+                    <div class="opportunity-trust-summary" aria-label="Evidence summary">
+                        <span>Evidence summary</span>
+                        <strong>${escapeHtml(trustSummary.summaryLine)}</strong>
+                        <small>${escapeHtml(trustSummary.routeCost || '')}</small>
+                    </div>
+                ` : ''}
                 <div class="opportunity-rate-mini-grid">
                     ${metricItems.map((item) => `
                         <div>
@@ -217,6 +230,7 @@ function bootstrapTradeOpportunityPage() {
                             <p>${escapeHtml(row.route)}</p>
                             <b>${escapeHtml(row.cost)}</b>
                             <small>${escapeHtml(row.gate || row.action)}</small>
+                            ${row.evidence ? `<em>${escapeHtml(row.evidence)}</em>` : ''}
                         </article>
                     `).join('')}
                 </div>
