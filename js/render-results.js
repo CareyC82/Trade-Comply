@@ -96,6 +96,7 @@ function renderResults(query, tags, cases, precheckSelections = []) {
 
 let opportunityDutyRatesCache = null;
 let opportunityPriorityMatrixCache = null;
+let opportunityRuleTagsCache = null;
 
 async function fetchOpportunityJson(path, fallback) {
     try {
@@ -116,11 +117,15 @@ async function loadOpportunityTeaserData() {
     if (!opportunityPriorityMatrixCache) {
         opportunityPriorityMatrixCache = fetchOpportunityJson('data/post-entry-rate-priority-matrix.json', { routes: [] });
     }
-    const [dutyRates, priorityMatrix] = await Promise.all([
+    if (!opportunityRuleTagsCache) {
+        opportunityRuleTagsCache = fetchOpportunityJson('data/tags.json', []);
+    }
+    const [dutyRates, priorityMatrix, ruleTags] = await Promise.all([
         opportunityDutyRatesCache,
-        opportunityPriorityMatrixCache
+        opportunityPriorityMatrixCache,
+        opportunityRuleTagsCache
     ]);
-    return { dutyRates, priorityMatrix };
+    return { dutyRates, priorityMatrix, ruleTags };
 }
 
 function mountOpportunityTeaser(container, query, routeContext) {
@@ -165,8 +170,8 @@ function mountOpportunityTeaser(container, query, routeContext) {
         `;
     };
     render(opportunity.buildOpportunityInsights({ product: query, from, to, focus }));
-    loadOpportunityTeaserData().then(({ dutyRates, priorityMatrix }) => {
-        render(opportunity.buildOpportunityInsights({ product: query, from, to, focus, dutyRates, priorityMatrix }));
+    loadOpportunityTeaserData().then(({ dutyRates, priorityMatrix, ruleTags }) => {
+        render(opportunity.buildOpportunityInsights({ product: query, from, to, focus, dutyRates, priorityMatrix, ruleTags }));
     });
 }
 

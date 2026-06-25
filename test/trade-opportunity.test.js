@@ -600,6 +600,8 @@ describe('trade opportunity navigation', () => {
 
         assert.match(source, /data\/duty-rates\.json/);
         assert.match(source, /data\/post-entry-rate-priority-matrix\.json/);
+        assert.match(source, /data\/tags\.json/);
+        assert.match(source, /ruleTags/);
         assert.match(source, /opportunity-teaser__chips/);
         assert.match(source, /parserBacklogCount/);
     });

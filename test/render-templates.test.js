@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {
     templateComplianceCard,
+    templateComplianceEsgEvidence,
     templateResultSummary,
     templateEmptyResultsMessage
 } = require('../js/render-templates');
@@ -34,6 +35,37 @@ describe('render-templates', () => {
         assert.match(html, /\[US-BIS\]/);
         assert.match(html, /policy-audit-trail/);
         assert.doesNotMatch(html, /tag\.description/);
+    });
+
+    it('renders compact ESG evidence when provided by the card view model', () => {
+        const html = templateComplianceCard({
+            matchRibbonHtml: '',
+            tagTypeClass: 'matched',
+            tagTypeLabelHtml: 'MATCHED',
+            riskBadgeHtml: '',
+            regulatoryBadgeHtml: '',
+            countryCodeBadgeHtml: '',
+            cardLabelHtml: 'Green Compliance & ESG',
+            scopePillHtml: '',
+            cardHintHtml: '',
+            auditTrailHtml: '',
+            bodyTitleHtml: 'Battery recycling evidence',
+            bodyDescHtml: 'Summary',
+            exemptionsHtml: '',
+            riskScenariosHtml: '',
+            esgEvidenceHtml: templateComplianceEsgEvidence({
+                labelHtml: 'ESG evidence',
+                valueHtml: 'Keep recycling, take-back, battery, labeling, importer, and customer evidence with the file.'
+            }),
+            hsCodeLabelHtml: 'HS Code',
+            hsCodesHtml: '8507',
+            legacySourceHtml: ''
+        });
+
+        assert.match(html, /Green Compliance & ESG/);
+        assert.match(html, /ESG evidence/);
+        assert.match(html, /recycling, take-back, battery/);
+        assert.doesNotMatch(html, />undefined</);
     });
 
     it('renders result summary without raw query injection', () => {

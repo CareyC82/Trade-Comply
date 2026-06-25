@@ -422,6 +422,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
 function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
     const coveredCountries = new Set((dutySummary.countries || []).map(item => item.import_country));
     const rows = sourcesPayload.sources || [];
+    const priorityRank = { P0: 0, P1: 1, P2: 2, P3: 3 };
     const missingCoverage = rows
         .filter(source => !coveredCountries.has(source.country))
         .map(source => source.country);
@@ -432,10 +433,43 @@ function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
         counts[source.source_status] = (counts[source.source_status] || 0) + 1;
         return counts;
     }, {});
+    const maintenancePriorityGroups = rows.reduce((groups, source) => {
+        const band = source.maintenance_priority || 'Unassigned';
+        groups[band] ||= [];
+        groups[band].push({
+            country: source.country,
+            source_status: source.source_status,
+            machine_readable: source.machine_readable,
+            updater_script: source.updater_script || '',
+            update_command: source.update_command || '',
+            next_action: source.next_action || ''
+        });
+        return groups;
+    }, {});
+    Object.values(maintenancePriorityGroups).forEach((group) => {
+        group.sort((a, b) => String(a.country || '').localeCompare(String(b.country || '')));
+    });
+    const nextSourcePriorities = rows
+        .filter(source => source.maintenance_priority && source.maintenance_priority !== 'P3')
+        .sort((a, b) => (
+            (priorityRank[a.maintenance_priority] ?? 9) - (priorityRank[b.maintenance_priority] ?? 9)
+            || String(a.country || '').localeCompare(String(b.country || ''))
+        ))
+        .slice(0, 12)
+        .map(source => ({
+            country: source.country,
+            maintenance_priority: source.maintenance_priority,
+            source_status: source.source_status,
+            updater_script: source.updater_script || '',
+            update_command: source.update_command || '',
+            next_action: source.next_action || ''
+        }));
 
     return {
         source_count: rows.length,
         status_counts: statusCounts,
+        maintenance_priority_groups: maintenancePriorityGroups,
+        next_source_priorities: nextSourcePriorities,
         auto_updatable: rows.filter(source => source.source_status === 'auto_updatable').map(source => source.country),
         hybrid_official_candidate: rows.filter(source => source.source_status === 'hybrid_official_candidate').map(source => source.country),
         benchmark_updatable: rows.filter(source => source.source_status === 'benchmark_updatable').map(source => source.country),

@@ -55,6 +55,19 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('IN'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('MY'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('TW'), true);
+    assert.ok(Array.isArray(payload.source_roadmap_summary.next_source_priorities));
+    assert.ok(payload.source_roadmap_summary.next_source_priorities.some(row => (
+        row.country === 'US'
+        && row.maintenance_priority === 'P0'
+        && /USITC/.test(row.next_action)
+    )));
+    assert.ok(payload.source_roadmap_summary.next_source_priorities.some(row => (
+        row.country === 'JP'
+        && row.maintenance_priority === 'P2'
+        && /Japan Customs/.test(row.next_action)
+    )));
+    assert.ok(payload.source_roadmap_summary.maintenance_priority_groups.P1.some(row => row.country === 'SG'));
+    assert.ok(payload.source_roadmap_summary.maintenance_priority_groups.P2.some(row => row.country === 'MX'));
     assert.equal(payload.source_roadmap_summary.missing_coverage.length, 0);
     assert.equal(payload.source_roadmap_summary.missing_roadmap.length, 0);
 });

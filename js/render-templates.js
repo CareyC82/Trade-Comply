@@ -62,6 +62,10 @@ function templateComplianceRiskScenarios(vm) {
     return `<div class="compliance-extra risk-row">⚠️ <strong>${vm.labelHtml}:</strong> ${vm.valueHtml}</div>`;
 }
 
+function templateComplianceEsgEvidence(vm) {
+    return `<div class="compliance-extra esg-row">🌱 <strong>${vm.labelHtml}:</strong> ${vm.valueHtml}</div>`;
+}
+
 function templateComplianceLegacySource(vm) {
     return `<div class="compliance-source"><strong>${vm.sourceLabelHtml}:</strong> <a href="${vm.sourceUrl}" target="_blank" rel="noopener noreferrer">${vm.sourceCitationHtml}</a></div>`;
 }
@@ -87,6 +91,7 @@ function templateComplianceCard(vm) {
             ${vm.auditTrailHtml}
             <div class="compliance-title">${vm.bodyTitleHtml}</div>
             <div class="compliance-desc">${vm.bodyDescHtml}</div>
+            ${vm.esgEvidenceHtml || ''}
             ${vm.exemptionsHtml}
             ${vm.riskScenariosHtml}
             <div class="compliance-hs"><strong>${vm.hsCodeLabelHtml}:</strong> ${vm.hsCodesHtml}</div>
@@ -136,6 +141,7 @@ if (typeof globalThis !== 'undefined') {
     globalThis.templateComplianceCardHeaderHint = templateComplianceCardHeaderHint;
     globalThis.templateComplianceExemptions = templateComplianceExemptions;
     globalThis.templateComplianceRiskScenarios = templateComplianceRiskScenarios;
+    globalThis.templateComplianceEsgEvidence = templateComplianceEsgEvidence;
     globalThis.templateComplianceLegacySource = templateComplianceLegacySource;
     globalThis.templateComplianceCard = templateComplianceCard;
     globalThis.templateCaseCard = templateCaseCard;
@@ -149,6 +155,7 @@ if (typeof module !== 'undefined' && module.exports) {
         templateEmptyResultsMessage,
         templateCategoryGroupShell,
         templateComplianceCard,
+        templateComplianceEsgEvidence,
         templateCaseCard,
         templateCasesGroup
     };

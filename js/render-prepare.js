@@ -215,6 +215,22 @@ function prepareComplianceCardViewModel(tag, context) {
         });
     }
 
+    let esgEvidenceHtml = '';
+    const isGreenCompliance = tag.category === 'ENVIRONMENT_BATTERY'
+        || getDisplayCategoryLabel(tag.category_label || tag.category, tag.category) === 'Green Compliance & ESG';
+    if (isGreenCompliance && typeof templateComplianceEsgEvidence === 'function') {
+        const checklistTasks = Array.isArray(tag.checklist)
+            ? tag.checklist.map((item) => item.task).filter(Boolean).slice(0, 2)
+            : [];
+        const evidenceText = checklistTasks.length
+            ? checklistTasks.join('; ')
+            : 'Keep recycling, take-back, battery, labeling, importer, and customer evidence with the file.';
+        esgEvidenceHtml = templateComplianceEsgEvidence({
+            labelHtml: escapeHtml('ESG evidence'),
+            valueHtml: escapeHtml(evidenceText)
+        });
+    }
+
     let legacySourceHtml = '';
     if (!isGlobalPolicy && tag.source_citation) {
         legacySourceHtml = templateComplianceLegacySource({
@@ -253,6 +269,7 @@ function prepareComplianceCardViewModel(tag, context) {
             : '',
         bodyTitleHtml: `${escapeHtml(shortTagId)}: ${escapeHtml(tag.description || '')}`,
         bodyDescHtml: escapeHtml(tag.short_description || tag.description || t('cardNoDetails')),
+        esgEvidenceHtml,
         exemptionsHtml,
         riskScenariosHtml,
         hsCodeLabelHtml: escapeHtml(t('hsCode')),
