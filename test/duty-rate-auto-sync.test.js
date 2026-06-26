@@ -10,6 +10,7 @@ const {
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
+    buildSourceRunPlan,
     buildSyncStatusPayload,
     runAutoDutyRateSync
 } = require('../scripts/auto-sync-duty-rates');
@@ -118,6 +119,49 @@ test('GitHub duty-rate workflow runs tests before committing sync output', () =>
     assert.match(workflow, /git pull --ff-only/);
 });
 
+test('source run plan maps roadmap sources to daily updater runs', () => {
+    const plan = buildSourceRunPlan({
+        sourcesPayload: {
+            sources: [
+                {
+                    country: 'US',
+                    source_status: 'auto_updatable',
+                    maintenance_priority: 'P0',
+                    update_command: 'npm run update:duty-rates:us',
+                    next_action: 'Keep USITC sync running.'
+                },
+                {
+                    country: 'IN',
+                    source_status: 'hybrid_official_candidate',
+                    maintenance_priority: 'P2',
+                    update_command: 'npm run update:duty-rates:in:official',
+                    next_action: 'Use official-live parser.'
+                },
+                {
+                    country: 'VN',
+                    source_status: 'hybrid_official_candidate',
+                    maintenance_priority: 'P2',
+                    update_command: 'npm run update:duty-rates:static -- --countries=VN',
+                    next_action: 'Refresh official-link benchmark.'
+                }
+            ]
+        },
+        runs: [
+            buildRunSummary('USITC', { ok: true, changes: [], errors: [] }, { applied: true, mode: 'official' }),
+            buildRunSummary('India Customs official-live', { ok: false, changes: [], errors: [{ error: 'fixture' }] }, { applied: false, mode: 'official-live' }),
+            buildRunSummary('Static official-link benchmarks', { ok: true, changes: [], errors: [], countries: ['VN'] }, { applied: true, mode: 'benchmark' })
+        ]
+    });
+
+    assert.deepEqual(plan.map(row => row.country), ['US', 'IN', 'VN']);
+    assert.equal(plan.find(row => row.country === 'US').run_source, 'USITC');
+    assert.equal(plan.find(row => row.country === 'US').run_status, 'ok');
+    assert.equal(plan.find(row => row.country === 'IN').run_source, 'India Customs official-live');
+    assert.equal(plan.find(row => row.country === 'IN').run_status, 'exception');
+    assert.equal(plan.find(row => row.country === 'VN').run_source, 'Static official-link benchmarks');
+    assert.equal(plan.find(row => row.country === 'VN').applied, true);
+});
+
 test('auto duty-rate sync includes static maintained countries', async () => {
     const emptyOfficialFetcher = async () => ({
         status_code: 200,
@@ -145,6 +189,11 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     assert.ok(payload.health.priority_rate_matrix, 'auto sync health should expose priority rate matrix summary');
     assert.equal(payload.health.priority_rate_matrix.ok, true, JSON.stringify(payload.health.priority_rate_matrix.failures, null, 2));
     assert.ok(payload.health.priority_rate_matrix.route_count >= 50);
+    assert.ok(Array.isArray(payload.source_run_plan));
+    assert.ok(payload.source_run_plan.some(row => row.country === 'US' && row.run_status === 'not_run'));
+    assert.ok(payload.source_run_plan.some(row => row.country === 'IN' && row.run_source === 'India Customs official-live'));
+    assert.ok(payload.source_run_plan.some(row => row.country === 'KR' && row.run_source === 'Korea Customs official-live'));
+    assert.ok(payload.source_run_plan.some(row => row.country === 'VN' && row.run_source === 'Static official-link benchmarks'));
     ['CN', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
         assert.equal(staticRun.countries.includes(country), true, `${country} should be refreshed by static benchmark sync`);
         assert.equal(staticRun.readiness[country].ok, true, `${country} readiness should be OK`);

@@ -253,6 +253,13 @@ function buildDutyRateStatusPayload() {
         exceptions: [],
         auto_applied: []
     });
+    if (!Array.isArray(syncStatus.source_run_plan)) {
+        const { buildSourceRunPlan } = require('./auto-sync-duty-rates');
+        syncStatus.source_run_plan = buildSourceRunPlan({
+            sourcesPayload,
+            runs: Array.isArray(syncStatus.runs) ? syncStatus.runs : []
+        });
+    }
     return {
         ...health,
         generated_at: new Date().toISOString(),

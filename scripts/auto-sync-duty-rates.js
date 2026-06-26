@@ -23,10 +23,19 @@ const { runDutyRateHealthCheck } = require('./check-duty-rates');
 
 const ROOT = path.join(__dirname, '..');
 const SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
+const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const MATERIAL_RATE_CHANGE_THRESHOLD = 0.03;
 
 function writeJson(filePath, payload) {
     fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`);
+}
+
+function readJson(filePath, fallback) {
+    try {
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch {
+        return fallback;
+    }
 }
 
 function isMaterialRateChange(change, threshold = MATERIAL_RATE_CHANGE_THRESHOLD) {
@@ -136,7 +145,52 @@ function appendMultiPrefixConflicts(run) {
     };
 }
 
-function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt } = {}) {
+function getSourceRunName(source = {}) {
+    const country = String(source.country || '').toUpperCase();
+    if (country === 'US') return 'USITC';
+    if (['EU', 'DE', 'NL'].includes(country)) return 'EU TARIC benchmark';
+    if (country === 'SG') return 'Singapore Customs benchmark';
+    if (country === 'MX') return 'Mexico SNICE benchmark';
+    if (country === 'JP') return 'Japan Customs benchmark';
+    if (country === 'KR') return 'Korea Customs official-live';
+    if (country === 'IN') return 'India Customs official-live';
+    if (['CN', 'VN', 'MY', 'TW', 'RU'].includes(country)) return 'Static official-link benchmarks';
+    return source.name || country || 'Unknown source';
+}
+
+function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
+    const priorityRank = { P0: 0, P1: 1, P2: 2, P3: 3 };
+    const runsBySource = new Map(runs.map(run => [run.source, run]));
+    const sources = Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : [];
+    return sources
+        .map((source) => {
+            const runSource = getSourceRunName(source);
+            const run = runsBySource.get(runSource);
+            return {
+                country: source.country || '',
+                maintenance_priority: source.maintenance_priority || 'Unassigned',
+                source_status: source.source_status || '',
+                machine_readable: source.machine_readable,
+                update_command: source.update_command || '',
+                probe_command: source.probe_command || '',
+                run_source: runSource,
+                run_status: run
+                    ? run.ok ? 'ok' : 'exception'
+                    : 'not_run',
+                applied: run ? Boolean(run.applied) : false,
+                mode: run?.mode || '',
+                change_count: run?.change_count || 0,
+                rate_change_count: run?.rate_change_count || 0,
+                next_action: source.next_action || ''
+            };
+        })
+        .sort((a, b) => (
+            (priorityRank[a.maintenance_priority] ?? 9) - (priorityRank[b.maintenance_priority] ?? 9)
+            || String(a.country || '').localeCompare(String(b.country || ''))
+        ));
+}
+
+function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt, sourceRunPlan = [] } = {}) {
     const autoApplied = runs.filter(run => run.applied);
     const exceptions = runs.flatMap(run => buildExceptionsForRun(run));
     if (health && health.ok === false) {
@@ -176,6 +230,7 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
         })),
         exceptions,
         runs,
+        source_run_plan: sourceRunPlan,
         health: health ? {
             ok: health.ok,
             sample_count: health.sample_count,
@@ -306,7 +361,11 @@ async function runAutoDutyRateSync({
     }
 
     const finishedAt = new Date().toISOString();
-    const payload = buildSyncStatusPayload({ runs, health, startedAt, finishedAt });
+    const sourceRunPlan = buildSourceRunPlan({
+        sourcesPayload: readJson(DUTY_RATE_SOURCES_PATH, { sources: [] }),
+        runs
+    });
+    const payload = buildSyncStatusPayload({ runs, health, startedAt, finishedAt, sourceRunPlan });
 
     if (!dryRun) {
         writeJson(SYNC_STATUS_PATH, payload);
@@ -336,6 +395,7 @@ module.exports = {
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
+    buildSourceRunPlan,
     buildSyncStatusPayload,
     runAutoDutyRateSync
 };
