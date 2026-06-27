@@ -1053,10 +1053,12 @@
             const regulatoryHealthLabel = {
                 healthy: 'Healthy',
                 partial: 'Partial',
+                monitor: 'Official link monitor',
                 pending: 'Pending first run',
                 blocked: 'Fetch issue',
                 fetch_ok: 'Fetch OK',
                 cached_ok: 'Cached OK',
+                official_link_monitor: 'Official link monitor',
                 fetch_issue: 'Fetch issue',
                 optional_issue: 'Optional issue',
                 pending_first_run: 'Pending first run'
@@ -1064,10 +1066,12 @@
             const regulatoryHealthClass = {
                 healthy: 'auto_updatable',
                 partial: 'official_link_monitor',
+                monitor: 'official_link_monitor',
                 pending: 'hybrid_official_candidate',
                 blocked: 'benchmark',
                 fetch_ok: 'auto_updatable',
                 cached_ok: 'official_reachable',
+                official_link_monitor: 'official_link_monitor',
                 fetch_issue: 'benchmark',
                 optional_issue: 'official_link_monitor',
                 pending_first_run: 'hybrid_official_candidate'
@@ -1096,6 +1100,9 @@
                         <span class="badge auto_updatable">Live official crawl</span>
                         <span class="badge official_reachable">${escapeHtml(row.source_count || 0)} source(s)</span>
                         <span class="badge ${escapeHtml(regulatoryHealthClass[row.source_health_grade] || 'hybrid_official_candidate')}">${escapeHtml(regulatoryHealthLabel[row.source_health_grade] || row.source_health_grade || 'Pending')}</span>
+                    </div>
+                    <div class="grade-line">
+                        <span class="badge ${escapeHtml(row.marketing_recommendation === 'Ready to market' ? 'auto_updatable' : row.marketing_recommendation === 'Do not market as automated yet' ? 'benchmark' : 'official_link_monitor')}">${escapeHtml(row.marketing_recommendation || 'Use with source caveat')}</span>
                     </div>
                     <div class="grade-note">${escapeHtml(row.note || '')}</div>
                     <div class="grade-note">
@@ -1130,6 +1137,8 @@
                         <div class="summary-card"><strong>${escapeHtml((summary.public_launch_countries || []).length)}</strong><span>Public launch duty markets</span></div>
                         <div class="summary-card"><strong>${escapeHtml(regulatory.length)}</strong><span>Official crawl jurisdictions</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.regulatory_health || {}).healthy || 0)}</strong><span>Healthy crawl jurisdictions</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((summary.regulatory_marketing || {}).ready_to_market || 0)}</strong><span>Ready to market regulatory</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((summary.regulatory_marketing || {}).source_caveat || 0)}</strong><span>Use with source caveat</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_hybrid || 0)}</strong><span>Hybrid live markets</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_monitor || 0)}</strong><span>Monitor-only markets</span></div>
                     </div>

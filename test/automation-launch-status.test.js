@@ -15,21 +15,28 @@ test('automation launch status exposes only safe public launch modes', () => {
 
     assert.equal(payload.summary.regulatory_sources, 8);
     assert.deepEqual(payload.regulatory.map(row => row.country), ['CN', 'EU', 'IN', 'JP', 'KR', 'MX', 'SG', 'US']);
-    assert.equal(payload.summary.regulatory_modes.live_auto, 6);
+    assert.equal(payload.summary.regulatory_modes.live_auto, 7);
     assert.equal(payload.summary.regulatory_modes.live_monitor, 1);
-    assert.equal(payload.summary.regulatory_modes.not_live, 1);
-    assert.equal(payload.summary.regulatory_health.healthy, 6);
-    assert.equal(payload.summary.regulatory_health.partial, 1);
-    assert.equal(payload.summary.regulatory_health.blocked, 1);
+    assert.equal(payload.summary.regulatory_modes.not_live || 0, 0);
+    assert.equal(payload.summary.regulatory_health.healthy, 7);
+    assert.equal(payload.summary.regulatory_health.monitor, 1);
+    assert.equal(payload.summary.regulatory_health.partial || 0, 0);
+    assert.equal(payload.summary.regulatory_health.blocked || 0, 0);
+    assert.equal(payload.summary.regulatory_marketing.ready_to_market, 7);
+    assert.equal(payload.summary.regulatory_marketing.source_caveat, 1);
+    assert.equal(payload.summary.regulatory_marketing.do_not_market, 0);
     assert.equal(typeof payload.summary.regulatory_health, 'object');
     assert.equal(payload.regulatory.every(row => row.source_health_grade), true);
     assert.equal(payload.regulatory.every(row => typeof row.source_health_counts === 'object'), true);
     assert.equal(payload.regulatory.every(row => row.sources.every(source => source.health_status)), true);
     const regulatoryByCountry = Object.fromEntries(payload.regulatory.map(row => [row.country, row]));
-    assert.equal(regulatoryByCountry.US.launch_mode, 'live_monitor');
-    assert.equal(regulatoryByCountry.US.source_health_grade, 'partial');
-    assert.equal(regulatoryByCountry.MX.launch_mode, 'not_live');
-    assert.equal(regulatoryByCountry.MX.public_launch, false);
+    assert.equal(regulatoryByCountry.US.launch_mode, 'live_auto');
+    assert.equal(regulatoryByCountry.US.source_health_grade, 'healthy');
+    assert.equal(regulatoryByCountry.US.marketing_recommendation, 'Ready to market');
+    assert.equal(regulatoryByCountry.MX.launch_mode, 'live_monitor');
+    assert.equal(regulatoryByCountry.MX.source_health_grade, 'monitor');
+    assert.equal(regulatoryByCountry.MX.marketing_recommendation, 'Use with source caveat');
+    assert.equal(regulatoryByCountry.MX.public_launch, true);
 
     assert.equal(payload.summary.duty_rate_markets, 14);
     assert.equal(payload.summary.duty_rate_modes.live_auto, 1);
@@ -55,7 +62,10 @@ test('checked-in automation launch status is fresh enough for admin display', ()
     assert.equal(payload.summary.duty_rate_markets, 14);
     assert.equal(payload.summary.regulatory_sources, 8);
     assert.equal(typeof payload.summary.regulatory_health, 'object');
-    assert.equal(payload.summary.regulatory_health.healthy, 6);
+    assert.equal(payload.summary.regulatory_health.healthy, 7);
+    assert.equal(payload.summary.regulatory_health.monitor, 1);
+    assert.equal(payload.summary.regulatory_marketing.ready_to_market, 7);
+    assert.equal(payload.summary.regulatory_marketing.source_caveat, 1);
     assert.equal(payload.summary.duty_rate_modes.live_monitor, 1);
 });
 

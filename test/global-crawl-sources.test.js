@@ -77,17 +77,21 @@ describe('global-crawl-sources', () => {
             sources: [
                 { id: 'us-bis', country: 'US', type: 'export', label: 'US BIS', method: 'fetch', url: 'https://example.com/us', ok: true, byte_length: 100, transport: 'fetch' },
                 { id: 'jp-meti', country: 'JP', type: 'both', label: 'JP METI', method: 'fetch', url: 'https://example.com/jp', ok: false, error: 'timeout' },
+                { id: 'mx-snice', country: 'MX', type: 'both', label: 'Mexico SNICE', method: 'fetch', url: 'https://example.com/mx', ok: true, monitor_only: true, transport: 'official-link-monitor' },
+                { id: 'zh-mofcom', country: 'CN', type: 'export', label: 'MOFCOM', method: 'fetch', url: 'https://example.com/mofcom', ok: true, byte_length: 120, transport: 'fetch' },
                 { id: 'zh-gac', country: 'CN', type: 'both', label: 'GAC', method: 'got-scraping', url: 'https://example.com/cn', ok: false, optional: true, error: 'blocked' }
             ]
         });
 
-        assert.equal(health.source_count, 3);
-        assert.equal(health.ok_count, 1);
+        assert.equal(health.source_count, 5);
+        assert.equal(health.ok_count, 3);
         assert.deepEqual(health.countries.map(row => [row.country, row.status]), [
             ['CN', 'ok'],
             ['JP', 'failed'],
+            ['MX', 'monitor'],
             ['US', 'ok']
         ]);
         assert.equal(health.sources.find(row => row.id === 'jp-meti').error, 'timeout');
+        assert.equal(health.sources.find(row => row.id === 'mx-snice').monitor_only, true);
     });
 });

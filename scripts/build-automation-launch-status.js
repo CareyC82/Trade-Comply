@@ -80,6 +80,17 @@ function buildHealthLookup() {
 }
 
 function sourceHealthStatus(source, lookup) {
+    if (source?.monitor_only) {
+        return {
+            health_status: 'official_link_monitor',
+            last_fetch_at: null,
+            byte_length: 0,
+            error: '',
+            transport: 'official-link-monitor',
+            fetched_url: source.url || '',
+            monitor_only: true
+        };
+    }
     const live = lookup.byId.get(source.id);
     const inbox = lookup.inboxSources[sourceManifestKey(source)];
     if (live) {
@@ -89,7 +100,8 @@ function sourceHealthStatus(source, lookup) {
             byte_length: live.byte_length || 0,
             error: live.error || '',
             transport: live.transport || live.method || '',
-            fetched_url: live.fetched_url || ''
+            fetched_url: live.fetched_url || '',
+            monitor_only: Boolean(live.monitor_only)
         };
     }
     if (inbox?.fetched_at) {
@@ -118,12 +130,16 @@ function summarizeRegulatoryHealth(sources) {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
     }, {});
-    const issueCount = (counts.fetch_issue || 0) + (counts.optional_issue || 0);
+    const blockingIssueCount = counts.fetch_issue || 0;
     const okCount = (counts.fetch_ok || 0) + (counts.cached_ok || 0);
+    const monitorCount = counts.official_link_monitor || 0;
+    const optionalIssueCount = counts.optional_issue || 0;
     let grade = 'pending';
-    if (issueCount > 0) {
+    if (blockingIssueCount > 0) {
         grade = okCount > 0 ? 'partial' : 'blocked';
-    } else if (okCount === sources.length && sources.length > 0) {
+    } else if (monitorCount === sources.length && sources.length > 0) {
+        grade = 'monitor';
+    } else if ((okCount + monitorCount + optionalIssueCount) === sources.length && okCount > 0) {
         grade = 'healthy';
     }
     return {
@@ -137,6 +153,7 @@ function regulatoryModeFromHealth(grade) {
         return {
             launch_mode: 'live_auto',
             public_launch: true,
+            marketing_recommendation: 'Ready to market',
             note_suffix: ' Source fetch health is currently healthy.'
         };
     }
@@ -144,6 +161,7 @@ function regulatoryModeFromHealth(grade) {
         return {
             launch_mode: 'live_monitor',
             public_launch: true,
+            marketing_recommendation: 'Use with source caveat',
             note_suffix: ' Some sources are reachable; review source exceptions before relying on this market.'
         };
     }
@@ -151,12 +169,22 @@ function regulatoryModeFromHealth(grade) {
         return {
             launch_mode: 'not_live',
             public_launch: false,
+            marketing_recommendation: 'Do not market as automated yet',
             note_suffix: ' Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.'
+        };
+    }
+    if (grade === 'monitor') {
+        return {
+            launch_mode: 'live_monitor',
+            public_launch: true,
+            marketing_recommendation: 'Use with source caveat',
+            note_suffix: ' Official link monitoring is configured, but no stable automated text source is connected yet.'
         };
     }
     return {
         launch_mode: 'live_monitor',
         public_launch: true,
+        marketing_recommendation: 'Use with source caveat',
         note_suffix: ' Source fetch health is pending the first live check.'
     };
 }
@@ -202,6 +230,7 @@ function buildRegulatoryAutomation() {
             ...row,
             launch_mode: mode.launch_mode,
             public_launch: mode.public_launch,
+            marketing_recommendation: mode.marketing_recommendation,
             source_health_grade: summary.grade,
             source_health_counts: summary.counts,
             health_updated_at: healthLookup.health_updated_at,
@@ -242,6 +271,23 @@ function summarize(rows) {
     }, {});
 }
 
+function summarizeRegulatoryMarketing(rows) {
+    return rows.reduce((acc, row) => {
+        if (row.marketing_recommendation === 'Ready to market') {
+            acc.ready_to_market += 1;
+        } else if (row.marketing_recommendation === 'Do not market as automated yet') {
+            acc.do_not_market += 1;
+        } else {
+            acc.source_caveat += 1;
+        }
+        return acc;
+    }, {
+        ready_to_market: 0,
+        source_caveat: 0,
+        do_not_market: 0
+    });
+}
+
 function buildAutomationLaunchStatus() {
     const regulatory = buildRegulatoryAutomation();
     const duty_rates = buildDutyAutomation();
@@ -262,6 +308,7 @@ function buildAutomationLaunchStatus() {
                 acc[key] = (acc[key] || 0) + 1;
                 return acc;
             }, {}),
+            regulatory_marketing: summarizeRegulatoryMarketing(regulatory),
             duty_rate_modes: summarize(duty_rates),
             public_launch_countries: duty_rates.filter(row => row.public_launch).map(row => row.country),
             filing_grade_auto_countries: duty_rates.filter(row => row.filing_grade_auto).map(row => row.country)
