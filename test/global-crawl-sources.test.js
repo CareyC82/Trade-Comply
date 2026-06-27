@@ -11,7 +11,7 @@ const REQUIRED_KEYS = ['id', 'country', 'type', 'url', 'method'];
 
 describe('global-crawl-sources', () => {
     it('defines official configuration-driven sources across core jurisdictions', () => {
-        assert.equal(GLOBAL_CRAWL_SOURCES.length, 9);
+        assert.equal(GLOBAL_CRAWL_SOURCES.length, 14);
         const ids = GLOBAL_CRAWL_SOURCES.map((row) => row.id);
         assert.deepEqual(ids, [
             'zh-mofcom',
@@ -22,7 +22,12 @@ describe('global-crawl-sources', () => {
             'us-ofac',
             'us-fcc',
             'eu-lex',
-            'eu-trade'
+            'eu-trade',
+            'jp-meti',
+            'kr-kcs',
+            'sg-customs',
+            'in-dgft',
+            'mx-snice'
         ]);
     });
 
@@ -31,7 +36,7 @@ describe('global-crawl-sources', () => {
             for (const key of REQUIRED_KEYS) {
                 assert.ok(entry[key], `${entry.id} missing ${key}`);
             }
-            assert.match(entry.country, /^(CN|US|EU)$/);
+            assert.match(entry.country, /^(CN|US|EU|JP|KR|SG|IN|MX)$/);
             assert.match(entry.type, /^(import|export|both)$/);
             assert.match(entry.method, /^(fetch|got-scraping)$/);
         }
@@ -47,6 +52,11 @@ describe('global-crawl-sources', () => {
         assert.equal(byId['us-fcc'].url, 'https://www.fcc.gov/news-events/headlines');
         assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/homepage.html?ihcl=en');
         assert.equal(byId['eu-trade'].url, 'https://policy.trade.ec.europa.eu/news_en');
+        assert.equal(byId['jp-meti'].url, 'https://www.meti.go.jp/english/press/');
+        assert.equal(byId['kr-kcs'].url, 'https://www.customs.go.kr/english/main.do');
+        assert.equal(byId['sg-customs'].url, 'https://www.customs.gov.sg/news-and-media/circulars/');
+        assert.equal(byId['in-dgft'].url, 'https://www.dgft.gov.in/CP/?opt=notification');
+        assert.equal(byId['mx-snice'].url, 'https://www.snice.gob.mx/');
     });
 
     it('getEnabledGlobalSources filters disabled rows', () => {

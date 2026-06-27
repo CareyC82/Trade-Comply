@@ -13,8 +13,8 @@ const {
 test('automation launch status exposes only safe public launch modes', () => {
     const payload = buildAutomationLaunchStatus();
 
-    assert.equal(payload.summary.regulatory_sources, 3);
-    assert.deepEqual(payload.regulatory.map(row => row.country), ['CN', 'EU', 'US']);
+    assert.equal(payload.summary.regulatory_sources, 8);
+    assert.deepEqual(payload.regulatory.map(row => row.country), ['CN', 'EU', 'IN', 'JP', 'KR', 'MX', 'SG', 'US']);
     assert.equal(payload.regulatory.every(row => row.launch_mode === 'live_auto'), true);
 
     assert.equal(payload.summary.duty_rate_markets, 14);
@@ -39,7 +39,7 @@ test('checked-in automation launch status is fresh enough for admin display', ()
 
     assert.equal(payload.schema_version, 1);
     assert.equal(payload.summary.duty_rate_markets, 14);
-    assert.equal(payload.summary.regulatory_sources, 3);
+    assert.equal(payload.summary.regulatory_sources, 8);
     assert.equal(payload.summary.duty_rate_modes.live_monitor, 1);
 });
 
@@ -48,7 +48,7 @@ test('admin duty-rate status includes automation launch board payload', () => {
 
     assert.equal(payload.ok, true, JSON.stringify(payload.failures, null, 2));
     assert.equal(payload.automation_launch_status.summary.duty_rate_markets, 14);
-    assert.equal(payload.automation_launch_status.summary.regulatory_sources, 3);
+    assert.equal(payload.automation_launch_status.summary.regulatory_sources, 8);
     assert.equal(
         payload.automation_launch_status.duty_rates.some(row => row.country === 'US' && row.launch_mode === 'live_auto'),
         true

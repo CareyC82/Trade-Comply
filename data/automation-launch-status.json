@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-26T20:05:20.390Z",
+  "updated_at": "2026-06-27T07:41:15.732Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
     "guardrail": "Hybrid and monitor modes must not be marketed as fully automatic filing-grade rates."
   },
   "summary": {
-    "regulatory_sources": 3,
+    "regulatory_sources": 8,
     "duty_rate_markets": 14,
     "regulatory_modes": {
-      "live_auto": 3
+      "live_auto": 8
     },
     "duty_rate_modes": {
       "live_auto": 1,
@@ -82,6 +82,91 @@
           "type": "both",
           "method": "fetch",
           "url": "https://policy.trade.ec.europa.eu/news_en"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    },
+    {
+      "country": "IN",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "sources": [
+        {
+          "id": "in-dgft",
+          "label": "India DGFT notifications",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.dgft.gov.in/CP/?opt=notification"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    },
+    {
+      "country": "JP",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "sources": [
+        {
+          "id": "jp-meti",
+          "label": "Japan METI policy and trade control press releases",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.meti.go.jp/english/press/"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    },
+    {
+      "country": "KR",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "sources": [
+        {
+          "id": "kr-kcs",
+          "label": "Korea Customs Service official notices",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.customs.go.kr/english/main.do"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    },
+    {
+      "country": "MX",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "sources": [
+        {
+          "id": "mx-snice",
+          "label": "Mexico SNICE trade notices",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.snice.gob.mx/"
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
+    },
+    {
+      "country": "SG",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "sources": [
+        {
+          "id": "sg-customs",
+          "label": "Singapore Customs circulars and notices",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.customs.gov.sg/news-and-media/circulars/"
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published."
