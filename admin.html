@@ -1050,6 +1050,28 @@
                 live_monitor: 'Live monitor',
                 not_live: 'Not live'
             };
+            const regulatoryHealthLabel = {
+                healthy: 'Healthy',
+                partial: 'Partial',
+                pending: 'Pending first run',
+                blocked: 'Fetch issue',
+                fetch_ok: 'Fetch OK',
+                cached_ok: 'Cached OK',
+                fetch_issue: 'Fetch issue',
+                optional_issue: 'Optional issue',
+                pending_first_run: 'Pending first run'
+            };
+            const regulatoryHealthClass = {
+                healthy: 'auto_updatable',
+                partial: 'official_link_monitor',
+                pending: 'hybrid_official_candidate',
+                blocked: 'benchmark',
+                fetch_ok: 'auto_updatable',
+                cached_ok: 'official_reachable',
+                fetch_issue: 'benchmark',
+                optional_issue: 'official_link_monitor',
+                pending_first_run: 'hybrid_official_candidate'
+            };
             const badgeClass = {
                 live_auto: 'auto_updatable',
                 live_hybrid: 'hybrid_official_candidate',
@@ -1073,9 +1095,30 @@
                     <div class="grade-line">
                         <span class="badge auto_updatable">Live official crawl</span>
                         <span class="badge official_reachable">${escapeHtml(row.source_count || 0)} source(s)</span>
+                        <span class="badge ${escapeHtml(regulatoryHealthClass[row.source_health_grade] || 'hybrid_official_candidate')}">${escapeHtml(regulatoryHealthLabel[row.source_health_grade] || row.source_health_grade || 'Pending')}</span>
                     </div>
                     <div class="grade-note">${escapeHtml(row.note || '')}</div>
-                    <div class="grade-note">${(row.sources || []).map(source => escapeHtml(source.id)).join(', ')}</div>
+                    <div class="grade-note">
+                        Health:
+                        ${Object.entries(row.source_health_counts || {}).map(([key, value]) => `<span class="badge ${escapeHtml(regulatoryHealthClass[key] || 'hybrid_official_candidate')}">${escapeHtml(regulatoryHealthLabel[key] || key)}: ${escapeHtml(value)}</span>`).join(' ') || '<span class="meta">no run data</span>'}
+                    </div>
+                    <details style="margin-top:8px">
+                        <summary>Source status</summary>
+                        <div class="crawl-list" style="margin-top:8px">
+                            ${(row.sources || []).map(source => `
+                                <article class="crawl-entry">
+                                    <div>
+                                        <span class="badge ${escapeHtml(regulatoryHealthClass[source.health_status] || 'hybrid_official_candidate')}">${escapeHtml(regulatoryHealthLabel[source.health_status] || source.health_status || 'Pending')}</span>
+                                        <span class="meta">${escapeHtml(source.id || '')} · ${escapeHtml(source.type || '')} · ${escapeHtml(source.method || '')}</span>
+                                    </div>
+                                    <h4>${escapeHtml(source.label || source.id || '')}</h4>
+                                    <p class="meta">Last fetch: ${escapeHtml(formatDateTime(source.last_fetch_at) || '—')} · ${escapeHtml(source.byte_length || 0)} bytes · ${escapeHtml(source.transport || '—')}</p>
+                                    ${source.error ? `<p class="meta">Error: ${escapeHtml(source.error)}</p>` : ''}
+                                    <p class="meta"><a href="${escapeHtml(source.url || '')}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.url || '')}</a></p>
+                                </article>
+                            `).join('')}
+                        </div>
+                    </details>
                 </article>
             `).join('');
             return `
@@ -1086,6 +1129,7 @@
                         <div class="summary-card"><strong>${escapeHtml((summary.filing_grade_auto_countries || []).length)}</strong><span>Filing-grade auto markets</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.public_launch_countries || []).length)}</strong><span>Public launch duty markets</span></div>
                         <div class="summary-card"><strong>${escapeHtml(regulatory.length)}</strong><span>Official crawl jurisdictions</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((summary.regulatory_health || {}).healthy || 0)}</strong><span>Healthy crawl jurisdictions</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_hybrid || 0)}</strong><span>Hybrid live markets</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_monitor || 0)}</strong><span>Monitor-only markets</span></div>
                     </div>

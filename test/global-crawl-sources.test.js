@@ -6,6 +6,9 @@ const {
     GLOBAL_CRAWL_SOURCES,
     getEnabledGlobalSources
 } = require('../lib/global-crawl-sources');
+const {
+    summarizeFetchHealth
+} = require('../lib/global-crawl-health');
 
 const REQUIRED_KEYS = ['id', 'country', 'type', 'url', 'method'];
 
@@ -54,7 +57,7 @@ describe('global-crawl-sources', () => {
         assert.equal(byId['eu-trade'].url, 'https://policy.trade.ec.europa.eu/news_en');
         assert.equal(byId['jp-meti'].url, 'https://www.meti.go.jp/english/press/');
         assert.equal(byId['kr-kcs'].url, 'https://www.customs.go.kr/english/main.do');
-        assert.equal(byId['sg-customs'].url, 'https://www.customs.gov.sg/news-and-media/circulars/');
+        assert.equal(byId['sg-customs'].url, 'https://www.customs.gov.sg/news/');
         assert.equal(byId['in-dgft'].url, 'https://www.dgft.gov.in/CP/?opt=notification');
         assert.equal(byId['mx-snice'].url, 'https://www.snice.gob.mx/');
     });
@@ -64,5 +67,27 @@ describe('global-crawl-sources', () => {
             { id: 'x', country: 'US', type: 'both', url: 'https://example.com', method: 'fetch', enabled: false }
         ]);
         assert.equal(disabled.length, 0);
+    });
+
+    it('summarizes fetch health by country for admin launch checks', () => {
+        const health = summarizeFetchHealth({
+            ok: true,
+            errors: 1,
+            fetched_at: '2026-06-27T00:00:00.000Z',
+            sources: [
+                { id: 'us-bis', country: 'US', type: 'export', label: 'US BIS', method: 'fetch', url: 'https://example.com/us', ok: true, byte_length: 100, transport: 'fetch' },
+                { id: 'jp-meti', country: 'JP', type: 'both', label: 'JP METI', method: 'fetch', url: 'https://example.com/jp', ok: false, error: 'timeout' },
+                { id: 'zh-gac', country: 'CN', type: 'both', label: 'GAC', method: 'got-scraping', url: 'https://example.com/cn', ok: false, optional: true, error: 'blocked' }
+            ]
+        });
+
+        assert.equal(health.source_count, 3);
+        assert.equal(health.ok_count, 1);
+        assert.deepEqual(health.countries.map(row => [row.country, row.status]), [
+            ['CN', 'ok'],
+            ['JP', 'failed'],
+            ['US', 'ok']
+        ]);
+        assert.equal(health.sources.find(row => row.id === 'jp-meti').error, 'timeout');
     });
 });
