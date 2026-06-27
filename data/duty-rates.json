@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-26",
+  "updated_at": "2026-06-27",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -2039,7 +2039,8 @@
         "8528",
         "8541",
         "8542",
-        "8543"
+        "8543",
+        "847150"
       ],
       "label": "China import electronics VAT/duty review signal",
       "base_rate": 0.08,
@@ -2150,6 +2151,16 @@
           "source_rate_text": "China MFN duty candidate: 0.000%",
           "source_url": "https://www.customs.gov.cn/",
           "last_checked_at": "2026-06-26T20:05:20.084Z"
+        },
+        {
+          "hs_code": "847150",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China maintained exact-line candidate for AI server / processing unit imports. MFN duty is treated as 0% for pre-check; import VAT, licensing, CCC/SRRC, and origin treatment remain separate checks.",
+          "source_hts": "847150 (CN maintained exact-line candidate)",
+          "source_rate_text": "China MFN duty candidate: 0.000%",
+          "source_url": "https://www.customs.gov.cn/"
         }
       ]
     },
@@ -2645,6 +2656,169 @@
       "source_rate_text": "2.5%",
       "source_url": "https://hts.usitc.gov/reststop/exportList?from=847950&to=84795099&format=JSON&styles=false",
       "last_checked_at": "2026-06-26T20:05:04.408Z"
+    },
+    {
+      "id": "US-NONCN-HIGHTECH-GENERAL-DUTY",
+      "import_country": "US",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847130",
+        "847950",
+        "850440",
+        "850760",
+        "8517",
+        "8525",
+        "8528",
+        "8541",
+        "8542",
+        "8543"
+      ],
+      "label": "US import non-China high-tech general duty signal",
+      "base_rate": 0,
+      "additional_rate": 0,
+      "add_on_layers": [],
+      "trade_remedy": "US general duty signal for non-China origin high-tech goods; confirm exact HTS line and any trade-remedy scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "USITC HTS general duty candidates for maintained high-tech prefixes. China-origin Section 301 rules are separate and take priority when origin is China.",
+      "last_checked_at": "2026-06-26T20:05:04.408Z",
+      "source_hts": "USITC maintained high-tech prefixes",
+      "source_rate_text": "General duty candidate; exact HTS line required before filing",
+      "source_url": "https://hts.usitc.gov/",
+      "exact_code_overrides": [
+        {
+          "hs_code": "847130",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "847130 (USITC general duty candidate)",
+          "source_rate_text": "Portable ADP/tablet candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "847950",
+          "base_rate": 0.025,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "847950 (USITC general duty candidate)",
+          "source_rate_text": "Industrial robot candidate: 2.5%",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "850440",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "850440 (USITC general duty candidate)",
+          "source_rate_text": "Static converters / power conversion candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "850760",
+          "base_rate": 0.034,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "850760 (USITC general duty candidate)",
+          "source_rate_text": "Lithium-ion batteries candidate: 3.4%",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "851713",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "851713 (USITC general duty candidate)",
+          "source_rate_text": "Smartphones candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "851762",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "851762 (USITC general duty candidate)",
+          "source_rate_text": "Network equipment candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "8525",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "8525 (USITC general duty candidate)",
+          "source_rate_text": "Camera / transmission equipment candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "852852",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "852852 (USITC general duty candidate)",
+          "source_rate_text": "Computer monitors candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "854143",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "854143 (USITC general duty candidate)",
+          "source_rate_text": "Photovoltaic module candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "854231",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "854231 (USITC general duty candidate)",
+          "source_rate_text": "Processors/controllers IC candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "854239 (USITC general duty candidate)",
+          "source_rate_text": "Other electronic IC candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "8543",
+          "base_rate": 0.019,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
+          "source_hts": "8543 (USITC general duty candidate)",
+          "source_rate_text": "Electrical machines/apparatus candidate: 1.9%",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-06-26T20:05:04.408Z"
+        }
+      ]
     }
   ],
   "last_usitc_sync_at": "2026-06-26T20:05:04.408Z",
