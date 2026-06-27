@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-10",
+  "updated_at": "2026-06-27",
   "notes": "Operational roadmap for Post-Entry duty-rate sources. Source status controls product trust wording: auto_updatable means a maintained script can refresh official machine-readable rates; hybrid_official_candidate means some maintained rules can be promoted from an official parser while ambiguous prefixes stay scope-check gated; benchmark_updatable means a maintained script can refresh local benchmark metadata but the rate remains indicative; official_link means an official source is identified but not machine-refreshed yet; benchmark means local pre-check math only.",
   "sources": [
     {
@@ -132,16 +132,16 @@
       "name": "India Customs Tariff / ICEGATE CIP",
       "authority": "Central Board of Indirect Taxes and Customs / ICEGATE",
       "official_url": "https://www.icegate.gov.in/",
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "India maintained high-tech HS lines use exact-line BCD candidates while SWS, IGST, exemption notification, BIS/QCO, WPC, and product-control scope remain separate checks.",
+      "status_reason": "India ICEGATE/CIP official-live probe is wired; maintained exact-line BCD candidates remain fallback while parser promotion stays gated by exact HSN and exemption scope.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:in:official",
       "probe_command": "npm run probe:duty-rates:in",
       "last_sync_field": "last_static_benchmark_sync_at",
-      "current_scope": "Maintained India exact-line BCD candidates plus SWS/IGST and product-control review reminders.",
-      "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
+      "current_scope": "Official-live probe candidate plus maintained exact-line BCD fallback; SWS/IGST and product-control review reminders stay separate.",
+      "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
     },
     {
       "country": "CN",

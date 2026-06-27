@@ -126,6 +126,7 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
                 {
                     country: 'US',
                     source_status: 'auto_updatable',
+                    machine_readable: true,
                     maintenance_priority: 'P0',
                     update_command: 'npm run update:duty-rates:us',
                     next_action: 'Keep USITC sync running.'
@@ -133,6 +134,7 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
                 {
                     country: 'IN',
                     source_status: 'hybrid_official_candidate',
+                    machine_readable: 'candidate',
                     maintenance_priority: 'P2',
                     update_command: 'npm run update:duty-rates:in:official',
                     next_action: 'Use official-live parser.'
@@ -140,6 +142,7 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
                 {
                     country: 'VN',
                     source_status: 'hybrid_official_candidate',
+                    machine_readable: 'local_exact_map',
                     maintenance_priority: 'P2',
                     update_command: 'npm run update:duty-rates:static -- --countries=VN',
                     next_action: 'Refresh official-link benchmark.'
@@ -156,10 +159,16 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
     assert.deepEqual(plan.map(row => row.country), ['US', 'IN', 'VN']);
     assert.equal(plan.find(row => row.country === 'US').run_source, 'USITC');
     assert.equal(plan.find(row => row.country === 'US').run_status, 'ok');
+    assert.equal(plan.find(row => row.country === 'US').rate_automation_stage, 'official_machine_sync');
+    assert.equal(plan.find(row => row.country === 'US').parser_gap, false);
     assert.equal(plan.find(row => row.country === 'IN').run_source, 'India Customs official-live');
     assert.equal(plan.find(row => row.country === 'IN').run_status, 'exception');
+    assert.equal(plan.find(row => row.country === 'IN').rate_automation_stage, 'official_probe_candidate');
+    assert.match(plan.find(row => row.country === 'IN').run_plan_action, /Fix updater exception/);
     assert.equal(plan.find(row => row.country === 'VN').run_source, 'Static official-link benchmarks');
     assert.equal(plan.find(row => row.country === 'VN').applied, true);
+    assert.equal(plan.find(row => row.country === 'VN').rate_automation_stage, 'maintained_exact_map');
+    assert.equal(plan.find(row => row.country === 'VN').parser_gap, true);
 });
 
 test('auto duty-rate sync includes static maintained countries', async () => {
@@ -190,6 +199,10 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     assert.equal(payload.health.priority_rate_matrix.ok, true, JSON.stringify(payload.health.priority_rate_matrix.failures, null, 2));
     assert.ok(payload.health.priority_rate_matrix.route_count >= 50);
     assert.ok(Array.isArray(payload.source_run_plan));
+    assert.ok(payload.source_run_plan_summary);
+    assert.ok(Array.isArray(payload.automation_upgrade_queue));
+    assert.ok(payload.source_run_plan_summary.parser_gap_count >= 1);
+    assert.ok(payload.automation_upgrade_queue.some(row => row.country === 'KR' && row.rate_automation_stage === 'official_probe_candidate'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'US' && row.run_status === 'not_run'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'IN' && row.run_source === 'India Customs official-live'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'KR' && row.run_source === 'Korea Customs official-live'));

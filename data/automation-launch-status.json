@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-27T13:36:31.280Z",
+  "updated_at": "2026-06-27T14:19:57.264Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -683,13 +683,13 @@
       "country": "IN",
       "name": "India Customs Tariff / ICEGATE CIP",
       "source_status": "hybrid_official_candidate",
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "maintenance_priority": "P2",
       "update_command": "npm run update:duty-rates:in:official",
       "probe_command": "npm run probe:duty-rates:in",
       "official_url": "https://www.icegate.gov.in/",
-      "current_scope": "Maintained India exact-line BCD candidates plus SWS/IGST and product-control review reminders.",
-      "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
+      "current_scope": "Official-live probe candidate plus maintained exact-line BCD fallback; SWS/IGST and product-control review reminders stay separate.",
+      "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
@@ -943,7 +943,7 @@
       "update_command": "npm run update:duty-rates:in:official",
       "probe_command": "npm run probe:duty-rates:in",
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
-      "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
+      "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
     },
     {
       "country": "JP",

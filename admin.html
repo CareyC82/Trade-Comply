@@ -977,6 +977,14 @@
                 exception: 'benchmark',
                 not_run: 'official_link'
             };
+            const stageLabel = {
+                official_machine_sync: 'Official machine sync',
+                official_hybrid_parser: 'Hybrid parser',
+                official_probe_candidate: 'Official probe',
+                maintained_exact_map: 'Exact map',
+                official_link_monitor: 'Link monitor',
+                not_automated: 'Not automated'
+            };
             return `
                 <div class="crawl-section-title" style="margin-top:14px"><h3>Duty-rate source run plan</h3><span class="meta">${rows.length} source(s)</span></div>
                 <div class="duty-sync-mini-grid">
@@ -987,10 +995,12 @@
                                 <span class="badge ${escapeHtml(statusClass[row.run_status] || 'official_link')}">${escapeHtml(statusLabel[row.run_status] || row.run_status || 'Unknown')}</span>
                                 <span class="badge hybrid_official_candidate">${escapeHtml(row.maintenance_priority || '—')}</span>
                             </div>
+                            <div class="grade-note"><strong>${escapeHtml(stageLabel[row.rate_automation_stage] || row.rate_automation_stage || 'Unknown stage')}</strong>${row.parser_gap ? ' · parser gap' : ' · filing-grade auto'}</div>
+                            <div class="grade-note">${escapeHtml(row.public_claim || row.automation_claim || '—')}</div>
                             <div class="grade-note">${escapeHtml(row.source_status || '')} · ${escapeHtml(row.run_source || '')}</div>
                             ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
                             ${row.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
-                            <div class="grade-note">Next: ${escapeHtml(row.next_action || '—')}</div>
+                            <div class="grade-note">Next: ${escapeHtml(row.run_plan_action || row.next_action || '—')}</div>
                         </article>
                     `).join('')}
                 </div>
@@ -1000,6 +1010,7 @@
         function renderDutySyncStatus(syncStatus = {}, roadmap = {}) {
             const status = String(syncStatus.status || 'not_run');
             const counts = syncStatus.counts || {};
+            const runPlanSummary = syncStatus.source_run_plan_summary || {};
             const exceptions = Array.isArray(syncStatus.exceptions) ? syncStatus.exceptions : [];
             const autoApplied = Array.isArray(syncStatus.auto_applied) ? syncStatus.auto_applied : [];
             const sourceRunPlan = Array.isArray(syncStatus.source_run_plan) ? syncStatus.source_run_plan : [];
@@ -1030,8 +1041,8 @@
                     <div class="duty-sync-mini-grid">
                         <div class="duty-sync-mini-card"><strong>${counts.sources_auto_applied ?? autoApplied.length}</strong><span>自动同步源</span></div>
                         <div class="duty-sync-mini-card"><strong>${counts.exceptions ?? exceptions.length}</strong><span>异常提醒</span></div>
-                        <div class="duty-sync-mini-card"><strong>${officialLinkOnly.length}</strong><span>仅官方链接源</span></div>
-                        <div class="duty-sync-mini-card"><strong>${benchmarkOnly.length}</strong><span>本地 benchmark 源</span></div>
+                        <div class="duty-sync-mini-card"><strong>${counts.filing_grade_auto_sources ?? runPlanSummary.filing_grade_auto_count ?? 0}</strong><span>可自动机读源</span></div>
+                        <div class="duty-sync-mini-card"><strong>${counts.parser_gap_sources ?? runPlanSummary.parser_gap_count ?? 0}</strong><span>待升级 parser 源</span></div>
                     </div>
                     <p class="meta" style="margin:10px 0 0">${escapeHtml(nextAction)}</p>
                     ${exceptionList}

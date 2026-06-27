@@ -20,6 +20,7 @@ const {
     updateStaticBenchmarkRules
 } = require('./update-static-duty-rates');
 const { runDutyRateHealthCheck } = require('./check-duty-rates');
+const { dutyAutomationStage } = require('./build-automation-launch-status');
 
 const ROOT = path.join(__dirname, '..');
 const SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
@@ -166,22 +167,34 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
         .map((source) => {
             const runSource = getSourceRunName(source);
             const run = runsBySource.get(runSource);
+            const stage = dutyAutomationStage(source);
+            const runStatus = run
+                ? run.ok ? 'ok' : 'exception'
+                : 'not_run';
+            const runPlanAction = runStatus === 'exception'
+                ? 'Fix updater exception before relying on this source.'
+                : stage.parser_gap
+                    ? stage.next_upgrade
+                    : 'Keep official machine-readable sync running.';
             return {
                 country: source.country || '',
                 maintenance_priority: source.maintenance_priority || 'Unassigned',
                 source_status: source.source_status || '',
                 machine_readable: source.machine_readable,
+                rate_automation_stage: stage.rate_automation_stage,
+                automation_claim: stage.automation_claim,
+                public_claim: stage.public_claim,
+                parser_gap: stage.parser_gap,
                 update_command: source.update_command || '',
                 probe_command: source.probe_command || '',
                 run_source: runSource,
-                run_status: run
-                    ? run.ok ? 'ok' : 'exception'
-                    : 'not_run',
+                run_status: runStatus,
                 applied: run ? Boolean(run.applied) : false,
                 mode: run?.mode || '',
                 change_count: run?.change_count || 0,
                 rate_change_count: run?.rate_change_count || 0,
-                next_action: source.next_action || ''
+                next_action: source.next_action || '',
+                run_plan_action: runPlanAction
             };
         })
         .sort((a, b) => (
@@ -193,6 +206,21 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
 function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt, sourceRunPlan = [] } = {}) {
     const autoApplied = runs.filter(run => run.applied);
     const exceptions = runs.flatMap(run => buildExceptionsForRun(run));
+    const stageCounts = sourceRunPlan.reduce((acc, row) => {
+        const key = row.rate_automation_stage || 'unknown';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+    const upgradeQueue = sourceRunPlan
+        .filter(row => row.parser_gap || row.run_status === 'exception')
+        .map(row => ({
+            country: row.country,
+            maintenance_priority: row.maintenance_priority,
+            rate_automation_stage: row.rate_automation_stage,
+            run_status: row.run_status,
+            parser_gap: Boolean(row.parser_gap),
+            next_upgrade: row.run_plan_action || row.next_action || ''
+        }));
     if (health && health.ok === false) {
         exceptions.push({
             source: 'coverage-health',
@@ -220,8 +248,17 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             sources_auto_applied: autoApplied.length,
             total_changes: runs.reduce((sum, run) => sum + Number(run.change_count || 0), 0),
             total_rate_changes: runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0),
-            exceptions: exceptions.length
+            exceptions: exceptions.length,
+            filing_grade_auto_sources: sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync').length,
+            parser_gap_sources: sourceRunPlan.filter(row => row.parser_gap).length
         },
+        source_run_plan_summary: {
+            stages: stageCounts,
+            parser_gap_count: sourceRunPlan.filter(row => row.parser_gap).length,
+            filing_grade_auto_count: sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync').length,
+            exception_count: sourceRunPlan.filter(row => row.run_status === 'exception').length
+        },
+        automation_upgrade_queue: upgradeQueue,
         auto_applied: autoApplied.map(run => ({
             source: run.source,
             mode: run.mode,
