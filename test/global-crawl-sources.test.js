@@ -14,7 +14,7 @@ const REQUIRED_KEYS = ['id', 'country', 'type', 'url', 'method'];
 
 describe('global-crawl-sources', () => {
     it('defines official configuration-driven sources across core jurisdictions', () => {
-        assert.equal(GLOBAL_CRAWL_SOURCES.length, 14);
+        assert.equal(GLOBAL_CRAWL_SOURCES.length, 20);
         const ids = GLOBAL_CRAWL_SOURCES.map((row) => row.id);
         assert.deepEqual(ids, [
             'zh-mofcom',
@@ -26,11 +26,17 @@ describe('global-crawl-sources', () => {
             'us-fcc',
             'eu-lex',
             'eu-trade',
+            'de-zoll',
+            'nl-customs',
             'jp-meti',
             'kr-kcs',
             'sg-customs',
             'in-dgft',
-            'mx-snice'
+            'mx-snice',
+            'vn-customs',
+            'my-customs',
+            'tw-customs',
+            'ru-customs'
         ]);
     });
 
@@ -39,7 +45,7 @@ describe('global-crawl-sources', () => {
             for (const key of REQUIRED_KEYS) {
                 assert.ok(entry[key], `${entry.id} missing ${key}`);
             }
-            assert.match(entry.country, /^(CN|US|EU|JP|KR|SG|IN|MX)$/);
+            assert.match(entry.country, /^(CN|US|EU|DE|NL|JP|KR|SG|IN|MX|VN|MY|TW|RU)$/);
             assert.match(entry.type, /^(import|export|both)$/);
             assert.match(entry.method, /^(fetch|got-scraping)$/);
         }
@@ -55,11 +61,17 @@ describe('global-crawl-sources', () => {
         assert.equal(byId['us-fcc'].url, 'https://www.fcc.gov/news-events/headlines');
         assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/homepage.html?ihcl=en');
         assert.equal(byId['eu-trade'].url, 'https://policy.trade.ec.europa.eu/news_en');
+        assert.equal(byId['de-zoll'].url, 'https://www.zoll.de/EN/Home/home_node.html');
+        assert.equal(byId['nl-customs'].url, 'https://www.belastingdienst.nl/wps/wcm/connect/en/customs/customs');
         assert.equal(byId['jp-meti'].url, 'https://www.meti.go.jp/english/press/');
         assert.equal(byId['kr-kcs'].url, 'https://www.customs.go.kr/english/main.do');
         assert.equal(byId['sg-customs'].url, 'https://www.customs.gov.sg/news/');
         assert.equal(byId['in-dgft'].url, 'https://www.dgft.gov.in/CP/?opt=notification');
         assert.equal(byId['mx-snice'].url, 'https://www.snice.gob.mx/');
+        assert.equal(byId['vn-customs'].url, 'https://www.customs.gov.vn/');
+        assert.equal(byId['my-customs'].url, 'https://mysst.customs.gov.my/');
+        assert.equal(byId['tw-customs'].url, 'https://web.customs.gov.tw/');
+        assert.equal(byId['ru-customs'].url, 'https://customs.gov.ru/');
     });
 
     it('getEnabledGlobalSources filters disabled rows', () => {

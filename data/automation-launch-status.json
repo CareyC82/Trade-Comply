@@ -1,31 +1,38 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-27T09:34:50.535Z",
+  "updated_at": "2026-06-27T13:36:31.280Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
     "guardrail": "Hybrid and monitor modes must not be marketed as fully automatic filing-grade rates."
   },
   "summary": {
-    "regulatory_sources": 8,
+    "regulatory_sources": 14,
     "duty_rate_markets": 14,
     "regulatory_modes": {
       "live_auto": 7,
-      "live_monitor": 1
+      "live_monitor": 7
     },
     "regulatory_health": {
       "healthy": 7,
-      "monitor": 1
+      "monitor": 7
     },
     "regulatory_marketing": {
       "ready_to_market": 7,
-      "source_caveat": 1,
+      "source_caveat": 7,
       "do_not_market": 0
     },
     "duty_rate_modes": {
       "live_auto": 1,
       "live_hybrid": 12,
       "live_monitor": 1
+    },
+    "duty_rate_automation_stages": {
+      "official_machine_sync": 1,
+      "maintained_exact_map": 6,
+      "official_hybrid_parser": 3,
+      "official_probe_candidate": 3,
+      "official_link_monitor": 1
     },
     "public_launch_countries": [
       "US",
@@ -45,6 +52,21 @@
     ],
     "filing_grade_auto_countries": [
       "US"
+    ],
+    "parser_gap_countries": [
+      "CN",
+      "DE",
+      "EU",
+      "IN",
+      "JP",
+      "KR",
+      "MX",
+      "MY",
+      "NL",
+      "SG",
+      "TW",
+      "VN",
+      "RU"
     ]
   },
   "regulatory": [
@@ -90,6 +112,37 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
       "marketing_recommendation": "Ready to market",
+      "health_updated_at": "2026-06-27T09:30:43.627Z",
+      "inbox_updated_at": "2026-05-30T02:46:51.592Z"
+    },
+    {
+      "country": "DE",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "source_health_grade": "monitor",
+      "source_health_counts": {
+        "official_link_monitor": 1
+      },
+      "sources": [
+        {
+          "id": "de-zoll",
+          "label": "Germany Customs trade and customs portal monitor",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.zoll.de/EN/Home/home_node.html",
+          "health_status": "official_link_monitor",
+          "last_fetch_at": null,
+          "byte_length": 0,
+          "error": "",
+          "transport": "official-link-monitor",
+          "fetched_url": "https://www.zoll.de/EN/Home/home_node.html",
+          "monitor_only": true
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
+      "marketing_recommendation": "Use with source caveat",
       "health_updated_at": "2026-06-27T09:30:43.627Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
@@ -263,6 +316,99 @@
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
+      "country": "MY",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "source_health_grade": "monitor",
+      "source_health_counts": {
+        "official_link_monitor": 1
+      },
+      "sources": [
+        {
+          "id": "my-customs",
+          "label": "Malaysia Customs SST and duty portal monitor",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://mysst.customs.gov.my/",
+          "health_status": "official_link_monitor",
+          "last_fetch_at": null,
+          "byte_length": 0,
+          "error": "",
+          "transport": "official-link-monitor",
+          "fetched_url": "https://mysst.customs.gov.my/",
+          "monitor_only": true
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
+      "marketing_recommendation": "Use with source caveat",
+      "health_updated_at": "2026-06-27T09:30:43.627Z",
+      "inbox_updated_at": "2026-05-30T02:46:51.592Z"
+    },
+    {
+      "country": "NL",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "source_health_grade": "monitor",
+      "source_health_counts": {
+        "official_link_monitor": 1
+      },
+      "sources": [
+        {
+          "id": "nl-customs",
+          "label": "Netherlands Customs business portal monitor",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/customs/customs",
+          "health_status": "official_link_monitor",
+          "last_fetch_at": null,
+          "byte_length": 0,
+          "error": "",
+          "transport": "official-link-monitor",
+          "fetched_url": "https://www.belastingdienst.nl/wps/wcm/connect/en/customs/customs",
+          "monitor_only": true
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
+      "marketing_recommendation": "Use with source caveat",
+      "health_updated_at": "2026-06-27T09:30:43.627Z",
+      "inbox_updated_at": "2026-05-30T02:46:51.592Z"
+    },
+    {
+      "country": "RU",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "source_health_grade": "monitor",
+      "source_health_counts": {
+        "official_link_monitor": 1
+      },
+      "sources": [
+        {
+          "id": "ru-customs",
+          "label": "Russia Federal Customs Service portal monitor",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://customs.gov.ru/",
+          "health_status": "official_link_monitor",
+          "last_fetch_at": null,
+          "byte_length": 0,
+          "error": "",
+          "transport": "official-link-monitor",
+          "fetched_url": "https://customs.gov.ru/",
+          "monitor_only": true
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
+      "marketing_recommendation": "Use with source caveat",
+      "health_updated_at": "2026-06-27T09:30:43.627Z",
+      "inbox_updated_at": "2026-05-30T02:46:51.592Z"
+    },
+    {
       "country": "SG",
       "launch_mode": "live_auto",
       "public_launch": true,
@@ -290,6 +436,37 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
       "marketing_recommendation": "Ready to market",
+      "health_updated_at": "2026-06-27T09:30:43.627Z",
+      "inbox_updated_at": "2026-05-30T02:46:51.592Z"
+    },
+    {
+      "country": "TW",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "source_health_grade": "monitor",
+      "source_health_counts": {
+        "official_link_monitor": 1
+      },
+      "sources": [
+        {
+          "id": "tw-customs",
+          "label": "Taiwan Customs tariff and notices portal monitor",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://web.customs.gov.tw/",
+          "health_status": "official_link_monitor",
+          "last_fetch_at": null,
+          "byte_length": 0,
+          "error": "",
+          "transport": "official-link-monitor",
+          "fetched_url": "https://web.customs.gov.tw/",
+          "monitor_only": true
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
+      "marketing_recommendation": "Use with source caveat",
       "health_updated_at": "2026-06-27T09:30:43.627Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
@@ -380,6 +557,37 @@
       "marketing_recommendation": "Ready to market",
       "health_updated_at": "2026-06-27T09:30:43.627Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
+    },
+    {
+      "country": "VN",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "source_count": 1,
+      "source_health_grade": "monitor",
+      "source_health_counts": {
+        "official_link_monitor": 1
+      },
+      "sources": [
+        {
+          "id": "vn-customs",
+          "label": "Vietnam Customs official portal monitor",
+          "type": "both",
+          "method": "fetch",
+          "url": "https://www.customs.gov.vn/",
+          "health_status": "official_link_monitor",
+          "last_fetch_at": null,
+          "byte_length": 0,
+          "error": "",
+          "transport": "official-link-monitor",
+          "fetched_url": "https://www.customs.gov.vn/",
+          "monitor_only": true
+        }
+      ],
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
+      "marketing_recommendation": "Use with source caveat",
+      "health_updated_at": "2026-06-27T09:30:43.627Z",
+      "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     }
   ],
   "duty_rates": [
@@ -394,6 +602,11 @@
       "official_url": "https://hts.usitc.gov/",
       "current_scope": "General HTS base duty for maintained HS prefixes. Additional duties such as Section 301 and AD/CVD remain separate benchmark/scope checks.",
       "next_action": "Keep USITC sync running before releases and monitor changes in data/duty-rates.json.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
       "launch_mode": "live_auto",
       "public_launch": true,
       "filing_grade_auto": true,
@@ -411,6 +624,11 @@
       "official_url": "https://www.customs.gov.cn/",
       "current_scope": "Maintained China exact-line MFN duty candidates plus 13% import VAT and product-control review reminders.",
       "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed.",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "parser_gap": true,
+      "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -428,6 +646,11 @@
       "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
       "current_scope": "Hybrid Germany coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Germany VAT benchmark separately.",
       "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
+      "rate_automation_stage": "official_hybrid_parser",
+      "automation_claim": "Official parser candidate with exact-code gates",
+      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
+      "parser_gap": true,
+      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -445,6 +668,11 @@
       "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
       "current_scope": "Hybrid EU coverage: official TARIC candidate duty for unambiguous HS prefixes, scope-check status for ambiguous prefixes, and benchmark member-state VAT shown separately.",
       "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated.",
+      "rate_automation_stage": "official_hybrid_parser",
+      "automation_claim": "Official parser candidate with exact-code gates",
+      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
+      "parser_gap": true,
+      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -462,6 +690,11 @@
       "official_url": "https://www.icegate.gov.in/",
       "current_scope": "Maintained India exact-line BCD candidates plus SWS/IGST and product-control review reminders.",
       "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "parser_gap": true,
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -479,6 +712,11 @@
       "official_url": "https://www.customs.go.jp/english/tariff/",
       "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
       "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes.",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "parser_gap": true,
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -496,6 +734,11 @@
       "official_url": "https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?mi=10806&cntntsId=5502",
       "current_scope": "Maintained Korea exact-line base-duty candidates plus 10% VAT and KC/origin review reminders.",
       "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows.",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "parser_gap": true,
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -513,6 +756,11 @@
       "official_url": "https://www.snice.gob.mx/",
       "current_scope": "Maintained Mexico exact-line IGI/base-duty candidates plus 16% VAT and NOM/origin review reminders.",
       "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed.",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "parser_gap": true,
+      "next_upgrade": "Connect a machine-readable MX tariff parser or official API.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -530,6 +778,11 @@
       "official_url": "https://mysst.customs.gov.my/",
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
       "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed.",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "parser_gap": true,
+      "next_upgrade": "Connect a machine-readable MY tariff parser or official API.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -547,6 +800,11 @@
       "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
       "current_scope": "Hybrid Netherlands coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Netherlands VAT benchmark separately.",
       "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
+      "rate_automation_stage": "official_hybrid_parser",
+      "automation_claim": "Official parser candidate with exact-code gates",
+      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
+      "parser_gap": true,
+      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -564,6 +822,11 @@
       "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
       "current_scope": "Maintained Singapore exact-line base-duty candidates plus 9% GST value treatment reminder.",
       "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed.",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "parser_gap": true,
+      "next_upgrade": "Connect a machine-readable SG tariff parser or official API.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -581,6 +844,11 @@
       "official_url": "https://web.customs.gov.tw/",
       "current_scope": "Maintained Taiwan exact-line base-duty candidates plus 5% business-tax and product-scope review reminders.",
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed.",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "parser_gap": true,
+      "next_upgrade": "Connect a machine-readable TW tariff parser or official API.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -598,6 +866,11 @@
       "official_url": "https://www.customs.gov.vn/",
       "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
       "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed.",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "parser_gap": true,
+      "next_upgrade": "Connect a machine-readable VN tariff parser or official API.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -615,11 +888,161 @@
       "official_url": "https://customs.gov.ru/",
       "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
       "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math.",
+      "rate_automation_stage": "official_link_monitor",
+      "automation_claim": "Official source link monitored",
+      "public_claim": "Source monitored; do not show as automated rate extraction",
+      "parser_gap": true,
+      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
       "launch_mode": "live_monitor",
       "public_launch": true,
       "filing_grade_auto": false,
       "label": "Live monitor",
       "note": "Official source is monitored, but exact machine-readable parsing is not live yet."
+    }
+  ],
+  "duty_rate_priority_queue": [
+    {
+      "country": "DE",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "automation_claim": "Official parser candidate with exact-code gates",
+      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "",
+      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
+      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
+    },
+    {
+      "country": "EU",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "automation_claim": "Official parser candidate with exact-code gates",
+      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "npm run probe:duty-rates:eu",
+      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
+      "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated."
+    },
+    {
+      "country": "NL",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "automation_claim": "Official parser candidate with exact-code gates",
+      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "",
+      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
+      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
+    },
+    {
+      "country": "IN",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "npm run update:duty-rates:in:official",
+      "probe_command": "npm run probe:duty-rates:in",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
+      "next_action": "Replace local exact map with machine-readable ICEGATE/CIP parser output when available; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
+    },
+    {
+      "country": "JP",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "npm run update:duty-rates:jp",
+      "probe_command": "npm run probe:duty-rates:jp",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
+      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes."
+    },
+    {
+      "country": "KR",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "npm run update:duty-rates:kr:official",
+      "probe_command": "npm run probe:duty-rates:kr",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
+      "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows."
+    },
+    {
+      "country": "SG",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:sg",
+      "probe_command": "",
+      "next_upgrade": "Connect a machine-readable SG tariff parser or official API.",
+      "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed."
+    },
+    {
+      "country": "CN",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:static -- --countries=CN",
+      "probe_command": "",
+      "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
+      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
+    },
+    {
+      "country": "MX",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:mx",
+      "probe_command": "",
+      "next_upgrade": "Connect a machine-readable MX tariff parser or official API.",
+      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed."
+    },
+    {
+      "country": "MY",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:static -- --countries=MY",
+      "probe_command": "",
+      "next_upgrade": "Connect a machine-readable MY tariff parser or official API.",
+      "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed."
+    },
+    {
+      "country": "TW",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:static -- --countries=TW",
+      "probe_command": "",
+      "next_upgrade": "Connect a machine-readable TW tariff parser or official API.",
+      "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed."
+    },
+    {
+      "country": "VN",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:static -- --countries=VN",
+      "probe_command": "",
+      "next_upgrade": "Connect a machine-readable VN tariff parser or official API.",
+      "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed."
+    },
+    {
+      "country": "RU",
+      "maintenance_priority": "P3",
+      "rate_automation_stage": "official_link_monitor",
+      "automation_claim": "Official source link monitored",
+      "public_claim": "Source monitored; do not show as automated rate extraction",
+      "update_command": "npm run update:duty-rates:static -- --countries=RU",
+      "probe_command": "",
+      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
+      "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math."
     }
   ]
 }

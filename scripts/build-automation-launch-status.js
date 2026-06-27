@@ -55,6 +55,66 @@ function sourceMode(sourceStatus) {
     };
 }
 
+function dutyAutomationStage(source = {}) {
+    const sourceStatus = source.source_status || '';
+    const machineReadable = source.machine_readable;
+    const updateCommand = source.update_command || '';
+    const country = source.country || '';
+
+    if (sourceStatus === 'auto_updatable' && machineReadable === true) {
+        return {
+            rate_automation_stage: 'official_machine_sync',
+            automation_claim: 'Official machine-readable tariff sync',
+            public_claim: 'Filing-grade auto for maintained HS prefixes',
+            parser_gap: false,
+            next_upgrade: 'Monitor upstream schema and add scope layers such as trade remedies separately.'
+        };
+    }
+    if (machineReadable === 'partial') {
+        return {
+            rate_automation_stage: 'official_hybrid_parser',
+            automation_claim: 'Official parser candidate with exact-code gates',
+            public_claim: 'Hybrid official coverage; exact tariff-line scope stays gated',
+            parser_gap: true,
+            next_upgrade: 'Add exact tariff-code input and promote only unambiguous official rows.'
+        };
+    }
+    if (/official-live|:official/i.test(updateCommand) || machineReadable === 'candidate') {
+        return {
+            rate_automation_stage: 'official_probe_candidate',
+            automation_claim: 'Official source probe wired; parser promotion still gated',
+            public_claim: 'Official-linked candidate coverage with parser caveat',
+            parser_gap: true,
+            next_upgrade: 'Replace maintained candidates with verified official parser output where unambiguous.'
+        };
+    }
+    if (machineReadable === 'local_exact_map') {
+        return {
+            rate_automation_stage: 'maintained_exact_map',
+            automation_claim: 'Maintained exact-line map refreshed by source roadmap',
+            public_claim: 'Maintained exact candidates; not fully machine-parsed',
+            parser_gap: true,
+            next_upgrade: `Connect a machine-readable ${country || 'market'} tariff parser or official API.`
+        };
+    }
+    if (sourceStatus === 'official_link') {
+        return {
+            rate_automation_stage: 'official_link_monitor',
+            automation_claim: 'Official source link monitored',
+            public_claim: 'Source monitored; do not show as automated rate extraction',
+            parser_gap: true,
+            next_upgrade: 'Connect exact tariff-line parser before using rate math beyond screening.'
+        };
+    }
+    return {
+        rate_automation_stage: 'not_automated',
+        automation_claim: 'Not automated',
+        public_claim: 'Do not market as automated',
+        parser_gap: true,
+        next_upgrade: 'Add a source roadmap and updater before public automation claims.'
+    };
+}
+
 function sourceManifestKey(source) {
     if (source?.legacy_profile === 'cn-gac') {
         return 'gac-customs-notices';
@@ -244,6 +304,7 @@ function buildDutyAutomation() {
     const payload = readJson(DUTY_RATE_SOURCES_PATH, { sources: [] });
     return (payload.sources || []).map(source => {
         const mode = sourceMode(source.source_status);
+        const stage = dutyAutomationStage(source);
         return {
             country: source.country,
             name: source.name || source.country,
@@ -255,6 +316,7 @@ function buildDutyAutomation() {
             official_url: source.official_url || '',
             current_scope: source.current_scope || '',
             next_action: source.next_action || '',
+            ...stage,
             ...mode
         };
     }).sort((a, b) => {
@@ -269,6 +331,43 @@ function summarize(rows) {
         acc[key] = (acc[key] || 0) + 1;
         return acc;
     }, {});
+}
+
+function summarizeStages(rows) {
+    return rows.reduce((acc, row) => {
+        const key = row.rate_automation_stage || 'unknown';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+}
+
+function buildDutyAutomationPriority(rows) {
+    const rank = {
+        official_hybrid_parser: 0,
+        official_probe_candidate: 1,
+        maintained_exact_map: 2,
+        official_link_monitor: 3,
+        not_automated: 4,
+        official_machine_sync: 9
+    };
+    return rows
+        .filter(row => row.parser_gap || !row.filing_grade_auto)
+        .map(row => ({
+            country: row.country,
+            maintenance_priority: row.maintenance_priority,
+            rate_automation_stage: row.rate_automation_stage,
+            automation_claim: row.automation_claim,
+            public_claim: row.public_claim,
+            update_command: row.update_command,
+            probe_command: row.probe_command,
+            next_upgrade: row.next_upgrade,
+            next_action: row.next_action
+        }))
+        .sort((a, b) => (
+            (rank[a.rate_automation_stage] ?? 8) - (rank[b.rate_automation_stage] ?? 8)
+            || String(a.maintenance_priority || '').localeCompare(String(b.maintenance_priority || ''))
+            || String(a.country || '').localeCompare(String(b.country || ''))
+        ));
 }
 
 function summarizeRegulatoryMarketing(rows) {
@@ -291,6 +390,7 @@ function summarizeRegulatoryMarketing(rows) {
 function buildAutomationLaunchStatus() {
     const regulatory = buildRegulatoryAutomation();
     const duty_rates = buildDutyAutomation();
+    const duty_rate_priority_queue = buildDutyAutomationPriority(duty_rates);
     const payload = {
         schema_version: 1,
         updated_at: new Date().toISOString(),
@@ -310,11 +410,14 @@ function buildAutomationLaunchStatus() {
             }, {}),
             regulatory_marketing: summarizeRegulatoryMarketing(regulatory),
             duty_rate_modes: summarize(duty_rates),
+            duty_rate_automation_stages: summarizeStages(duty_rates),
             public_launch_countries: duty_rates.filter(row => row.public_launch).map(row => row.country),
-            filing_grade_auto_countries: duty_rates.filter(row => row.filing_grade_auto).map(row => row.country)
+            filing_grade_auto_countries: duty_rates.filter(row => row.filing_grade_auto).map(row => row.country),
+            parser_gap_countries: duty_rates.filter(row => row.parser_gap).map(row => row.country)
         },
         regulatory,
-        duty_rates
+        duty_rates,
+        duty_rate_priority_queue
     };
     return payload;
 }
@@ -336,5 +439,7 @@ if (require.main === module) {
 
 module.exports = {
     buildAutomationLaunchStatus,
-    writeAutomationLaunchStatus
+    writeAutomationLaunchStatus,
+    dutyAutomationStage,
+    buildDutyAutomationPriority
 };
