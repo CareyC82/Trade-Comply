@@ -17,6 +17,7 @@ const {
 const {
     summarizeDutyRateCoverage
 } = require('./update-us-duty-rates');
+const { dutyAutomationStage } = require('./build-automation-launch-status');
 
 const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
@@ -464,12 +465,60 @@ function summarizeSourceRoadmap(sourcesPayload, dutySummary) {
             update_command: source.update_command || '',
             next_action: source.next_action || ''
         }));
+    const automationBacklog = rows
+        .map((source) => {
+            const stage = dutyAutomationStage(source);
+            const covered = coveredCountries.has(source.country);
+            let workstream = 'parser';
+            if (stage.rate_automation_stage === 'official_hybrid_parser') {
+                workstream = 'exact-code parser';
+            } else if (stage.rate_automation_stage === 'official_probe_candidate') {
+                workstream = 'official probe promotion';
+            } else if (stage.rate_automation_stage === 'maintained_exact_map') {
+                workstream = 'machine-readable source connector';
+            } else if (stage.rate_automation_stage === 'official_link_monitor') {
+                workstream = 'official-link parser discovery';
+            } else if (stage.rate_automation_stage === 'official_machine_sync') {
+                workstream = 'monitor';
+            }
+            return {
+                country: source.country,
+                maintenance_priority: source.maintenance_priority || 'Unassigned',
+                rate_automation_stage: stage.rate_automation_stage,
+                workstream,
+                parser_gap: Boolean(stage.parser_gap),
+                covered_by_rules: covered,
+                public_claim: stage.public_claim,
+                update_command: source.update_command || '',
+                probe_command: source.probe_command || '',
+                next_action: stage.parser_gap
+                    ? stage.next_upgrade
+                    : 'Keep official machine-readable sync running and monitor upstream schema changes.'
+            };
+        })
+        .filter(row => row.parser_gap)
+        .sort((a, b) => (
+            (priorityRank[a.maintenance_priority] ?? 9) - (priorityRank[b.maintenance_priority] ?? 9)
+            || (a.parser_gap === b.parser_gap ? 0 : a.parser_gap ? -1 : 1)
+            || String(a.country || '').localeCompare(String(b.country || ''))
+        ));
 
     return {
         source_count: rows.length,
         status_counts: statusCounts,
         maintenance_priority_groups: maintenancePriorityGroups,
         next_source_priorities: nextSourcePriorities,
+        automation_backlog: automationBacklog,
+        automation_backlog_summary: {
+            parser_gap_count: automationBacklog.filter(row => row.parser_gap).length,
+            filing_grade_auto_count: rows
+                .filter(source => dutyAutomationStage(source).rate_automation_stage === 'official_machine_sync')
+                .length,
+            workstreams: automationBacklog.reduce((acc, row) => {
+                acc[row.workstream] = (acc[row.workstream] || 0) + 1;
+                return acc;
+            }, {})
+        },
         auto_updatable: rows.filter(source => source.source_status === 'auto_updatable').map(source => source.country),
         hybrid_official_candidate: rows.filter(source => source.source_status === 'hybrid_official_candidate').map(source => source.country),
         benchmark_updatable: rows.filter(source => source.source_status === 'benchmark_updatable').map(source => source.country),

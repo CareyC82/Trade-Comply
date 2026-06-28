@@ -59,6 +59,24 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('MY'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('TW'), true);
     assert.ok(Array.isArray(payload.source_roadmap_summary.next_source_priorities));
+    assert.ok(Array.isArray(payload.source_roadmap_summary.automation_backlog));
+    assert.ok(payload.source_roadmap_summary.automation_backlog_summary.parser_gap_count > 0);
+    assert.deepEqual(payload.source_roadmap_summary.automation_backlog.slice(0, 3).map(row => row.country), ['DE', 'EU', 'NL']);
+    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
+        row.country === 'EU'
+        && row.rate_automation_stage === 'official_hybrid_parser'
+        && row.workstream === 'exact-code parser'
+    )));
+    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
+        row.country === 'IN'
+        && row.rate_automation_stage === 'official_probe_candidate'
+        && row.workstream === 'official probe promotion'
+    )));
+    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
+        row.country === 'SG'
+        && row.rate_automation_stage === 'maintained_exact_map'
+        && row.workstream === 'machine-readable source connector'
+    )));
     assert.ok(payload.source_roadmap_summary.next_source_priorities.some(row => (
         row.country === 'US'
         && row.maintenance_priority === 'P0'
