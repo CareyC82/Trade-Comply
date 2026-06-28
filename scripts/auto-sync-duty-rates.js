@@ -171,10 +171,14 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
             const run = runsBySource.get(runSource);
             const stage = dutyAutomationStage(source);
             const runStatus = run
-                ? run.ok ? 'ok' : 'exception'
+                ? run.official_fetch_degraded
+                    ? 'degraded'
+                    : run.ok ? 'ok' : 'exception'
                 : 'not_run';
             const runPlanAction = runStatus === 'exception'
                 ? 'Fix updater exception before relying on this source.'
+                : runStatus === 'degraded'
+                    ? 'Official source probe degraded; keep maintained exact candidates and promote parser when rows are machine-readable.'
                 : stage.parser_gap
                     ? stage.next_upgrade
                     : 'Keep official machine-readable sync running.';
@@ -211,6 +215,7 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
     const exactCodeGates = sourceRunPlan.filter(row => row.rate_automation_stage === 'official_hybrid_parser');
     const filingGrade = sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync');
     const exceptions = sourceRunPlan.filter(row => row.run_status === 'exception');
+    const degraded = sourceRunPlan.filter(row => row.run_status === 'degraded');
     const officialProbeDegradedSources = runs
         .filter(run => run.official_fetch_degraded)
         .map(run => run.source);
@@ -244,6 +249,7 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
         exact_code_gate_countries: exactCodeGates.map(row => row.country),
         official_probe_countries: probeCandidates.map(row => row.country),
         official_probe_degraded_sources: officialProbeDegradedSources,
+        degraded_countries: degraded.map(row => row.country),
         parser_gap_countries: parserGaps.map(row => row.country),
         exception_countries: exceptions.map(row => row.country),
         rate_change_count: rateChanges,
@@ -300,12 +306,14 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             total_rate_changes: runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0),
             exceptions: exceptions.length,
             filing_grade_auto_sources: sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync').length,
-            parser_gap_sources: sourceRunPlan.filter(row => row.parser_gap).length
+            parser_gap_sources: sourceRunPlan.filter(row => row.parser_gap).length,
+            degraded_sources: sourceRunPlan.filter(row => row.run_status === 'degraded').length
         },
         source_run_plan_summary: {
             stages: stageCounts,
             parser_gap_count: sourceRunPlan.filter(row => row.parser_gap).length,
             filing_grade_auto_count: sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync').length,
+            degraded_count: sourceRunPlan.filter(row => row.run_status === 'degraded').length,
             exception_count: sourceRunPlan.filter(row => row.run_status === 'exception').length
         },
         automation_digest: buildAutomationDigest({ runs, health, sourceRunPlan }),

@@ -23,6 +23,7 @@ const COUNTRY_NOTES = {
 };
 const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set(['RU']);
 const STATIC_EXACT_CODE_CANDIDATES = [
+    '847150',
     '847130',
     '850440',
     '850760',

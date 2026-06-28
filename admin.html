@@ -969,11 +969,13 @@
             }
             const statusLabel = {
                 ok: 'OK',
+                degraded: 'Parser pending',
                 exception: 'Exception',
                 not_run: 'Not run'
             };
             const statusClass = {
                 ok: 'auto_updatable',
+                degraded: 'parser_pending',
                 exception: 'benchmark',
                 not_run: 'official_link'
             };
@@ -1016,6 +1018,8 @@
             const autoApplied = Array.isArray(syncStatus.auto_applied) ? syncStatus.auto_applied : [];
             const sourceRunPlan = Array.isArray(syncStatus.source_run_plan) ? syncStatus.source_run_plan : [];
             const digestQueue = Array.isArray(digest.priority_queue) ? digest.priority_queue : [];
+            const degradedCountries = Array.isArray(digest.degraded_countries) ? digest.degraded_countries : [];
+            const degradedSources = Array.isArray(digest.official_probe_degraded_sources) ? digest.official_probe_degraded_sources : [];
             const officialLinkOnly = Array.isArray(roadmap.official_link_only) ? roadmap.official_link_only : [];
             const benchmarkOnly = Array.isArray(roadmap.benchmark_only) ? roadmap.benchmark_only : [];
             const statusLabel = status === 'ok'
@@ -1024,7 +1028,7 @@
                     ? '税率同步有异常提醒'
                     : '税率自动同步尚未运行';
             const summary = status === 'ok'
-                ? `已自动同步 ${counts.sources_auto_applied ?? autoApplied.length} 个源，${counts.total_changes ?? 0} 项更新，0 个异常。`
+                ? `已自动同步 ${counts.sources_auto_applied ?? autoApplied.length} 个源，${counts.total_changes ?? 0} 项更新，${counts.degraded_sources ?? degradedCountries.length} 个官方源待 parser 升级，0 个异常。`
                 : status === 'exceptions'
                     ? `已自动处理可安全更新；发现 ${counts.exceptions ?? exceptions.length} 个异常提醒。`
                     : '等待下一次 daily duty-rate sync 生成状态。';
@@ -1045,6 +1049,7 @@
                             <span class="quality-chip ok">${escapeHtml(digest.headline)}</span>
                             <span class="quality-chip missing">Exact-code gates: ${escapeHtml((digest.exact_code_gate_countries || []).join(', ') || '—')}</span>
                             <span class="quality-chip missing">Probe promotion: ${escapeHtml((digest.official_probe_countries || []).join(', ') || '—')}</span>
+                            <span class="quality-chip missing">Parser pending: ${escapeHtml(degradedCountries.join(', ') || degradedSources.join(', ') || '—')}</span>
                         </div>
                         <p class="meta" style="margin:10px 0 0">Next automation move: ${escapeHtml(digest.next_best_action || '')}</p>
                         ${digestQueue.length ? `<ul class="duty-exception-list">${digestQueue.slice(0, 4).map(row => `<li>${escapeHtml(row.country || '')}: ${escapeHtml(row.workstream || '')} · ${escapeHtml(row.next_action || '')}</li>`).join('')}</ul>` : ''}
@@ -1054,6 +1059,7 @@
                         <div class="duty-sync-mini-card"><strong>${counts.exceptions ?? exceptions.length}</strong><span>异常提醒</span></div>
                         <div class="duty-sync-mini-card"><strong>${counts.filing_grade_auto_sources ?? runPlanSummary.filing_grade_auto_count ?? 0}</strong><span>可自动机读源</span></div>
                         <div class="duty-sync-mini-card"><strong>${counts.parser_gap_sources ?? runPlanSummary.parser_gap_count ?? 0}</strong><span>待升级 parser 源</span></div>
+                        <div class="duty-sync-mini-card"><strong>${counts.degraded_sources ?? runPlanSummary.degraded_count ?? degradedCountries.length}</strong><span>官方源待解析</span></div>
                     </div>
                     <p class="meta" style="margin:10px 0 0">${escapeHtml(nextAction)}</p>
                     ${exceptionList}

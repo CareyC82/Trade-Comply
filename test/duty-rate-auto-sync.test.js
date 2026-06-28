@@ -285,10 +285,14 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.equal(indiaRun.errors.length, 0);
     assert.equal(payload.status, 'ok');
     assert.equal(payload.exceptions.length, 0);
-    assert.equal(payload.source_run_plan.find(row => row.country === 'KR').run_status, 'ok');
-    assert.equal(payload.source_run_plan.find(row => row.country === 'IN').run_status, 'ok');
+    assert.equal(payload.source_run_plan.find(row => row.country === 'KR').run_status, 'degraded');
+    assert.equal(payload.source_run_plan.find(row => row.country === 'IN').run_status, 'degraded');
     assert.ok(payload.automation_digest.official_probe_countries.includes('KR'));
     assert.ok(payload.automation_digest.official_probe_countries.includes('IN'));
     assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('Korea Customs official-live'));
     assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('India Customs official-live'));
+    assert.ok(payload.automation_digest.degraded_countries.includes('KR'));
+    assert.ok(payload.automation_digest.degraded_countries.includes('IN'));
+    assert.equal(payload.counts.degraded_sources, 2);
+    assert.equal(payload.source_run_plan_summary.degraded_count, 2);
 });
