@@ -1011,9 +1011,11 @@
             const status = String(syncStatus.status || 'not_run');
             const counts = syncStatus.counts || {};
             const runPlanSummary = syncStatus.source_run_plan_summary || {};
+            const digest = syncStatus.automation_digest || {};
             const exceptions = Array.isArray(syncStatus.exceptions) ? syncStatus.exceptions : [];
             const autoApplied = Array.isArray(syncStatus.auto_applied) ? syncStatus.auto_applied : [];
             const sourceRunPlan = Array.isArray(syncStatus.source_run_plan) ? syncStatus.source_run_plan : [];
+            const digestQueue = Array.isArray(digest.priority_queue) ? digest.priority_queue : [];
             const officialLinkOnly = Array.isArray(roadmap.official_link_only) ? roadmap.official_link_only : [];
             const benchmarkOnly = Array.isArray(roadmap.benchmark_only) ? roadmap.benchmark_only : [];
             const statusLabel = status === 'ok'
@@ -1038,6 +1040,15 @@
                 <div class="duty-sync-banner ${escapeHtml(status)}">
                     <h3>${escapeHtml(statusLabel)}</h3>
                     <p class="meta" style="margin:0">${escapeHtml(summary)} · Last run: ${escapeHtml(formatDateTime(syncStatus.updated_at))}</p>
+                    ${digest.headline ? `
+                        <div class="quality-chip-list" style="margin-top:10px">
+                            <span class="quality-chip ok">${escapeHtml(digest.headline)}</span>
+                            <span class="quality-chip missing">Exact-code gates: ${escapeHtml((digest.exact_code_gate_countries || []).join(', ') || '—')}</span>
+                            <span class="quality-chip missing">Probe promotion: ${escapeHtml((digest.official_probe_countries || []).join(', ') || '—')}</span>
+                        </div>
+                        <p class="meta" style="margin:10px 0 0">Next automation move: ${escapeHtml(digest.next_best_action || '')}</p>
+                        ${digestQueue.length ? `<ul class="duty-exception-list">${digestQueue.slice(0, 4).map(row => `<li>${escapeHtml(row.country || '')}: ${escapeHtml(row.workstream || '')} · ${escapeHtml(row.next_action || '')}</li>`).join('')}</ul>` : ''}
+                    ` : ''}
                     <div class="duty-sync-mini-grid">
                         <div class="duty-sync-mini-card"><strong>${counts.sources_auto_applied ?? autoApplied.length}</strong><span>自动同步源</span></div>
                         <div class="duty-sync-mini-card"><strong>${counts.exceptions ?? exceptions.length}</strong><span>异常提醒</span></div>

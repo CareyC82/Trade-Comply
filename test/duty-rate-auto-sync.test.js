@@ -11,6 +11,7 @@ const {
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
     buildSourceRunPlan,
+    buildAutomationDigest,
     buildSyncStatusPayload,
     runAutoDutyRateSync
 } = require('../scripts/auto-sync-duty-rates');
@@ -171,6 +172,51 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
     assert.equal(plan.find(row => row.country === 'VN').parser_gap, true);
 });
 
+test('auto sync builds an automation digest for parser and probe gaps', () => {
+    const runs = [
+        buildRunSummary('EU TARIC benchmark', { ok: true, changes: [], errors: [] }, { applied: true, mode: 'benchmark' }),
+        buildRunSummary('India Customs official-live', { ok: false, changes: [], errors: [{ error: 'fixture' }] }, { applied: false, mode: 'official-live' })
+    ];
+    const sourceRunPlan = buildSourceRunPlan({
+        sourcesPayload: {
+            sources: [
+                {
+                    country: 'US',
+                    source_status: 'auto_updatable',
+                    machine_readable: true,
+                    maintenance_priority: 'P0'
+                },
+                {
+                    country: 'EU',
+                    source_status: 'hybrid_official_candidate',
+                    machine_readable: 'partial',
+                    maintenance_priority: 'P1',
+                    update_command: 'npm run update:duty-rates:eu'
+                },
+                {
+                    country: 'IN',
+                    source_status: 'hybrid_official_candidate',
+                    machine_readable: 'candidate',
+                    maintenance_priority: 'P2',
+                    update_command: 'npm run update:duty-rates:in:official'
+                }
+            ]
+        },
+        runs
+    });
+    const digest = buildAutomationDigest({ runs, sourceRunPlan, health: { ok: true } });
+
+    assert.match(digest.headline, /source exception|parser gap|filing-grade/);
+    assert.deepEqual(digest.filing_grade_countries, ['US']);
+    assert.deepEqual(digest.exact_code_gate_countries, ['EU']);
+    assert.deepEqual(digest.official_probe_countries, ['IN']);
+    assert.ok(digest.priority_queue.some(row => row.country === 'EU' && row.workstream === 'exact-code parser'));
+
+    const payload = buildSyncStatusPayload({ runs, sourceRunPlan, health: { ok: true } });
+    assert.ok(payload.automation_digest);
+    assert.equal(payload.automation_digest.health_ok, true);
+});
+
 test('auto duty-rate sync includes static maintained countries', async () => {
     const emptyOfficialFetcher = async () => ({
         status_code: 200,
@@ -201,6 +247,8 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     assert.ok(Array.isArray(payload.source_run_plan));
     assert.ok(payload.source_run_plan_summary);
     assert.ok(Array.isArray(payload.automation_upgrade_queue));
+    assert.ok(payload.automation_digest);
+    assert.ok(Array.isArray(payload.automation_digest.parser_gap_countries));
     assert.ok(payload.source_run_plan_summary.parser_gap_count >= 1);
     assert.ok(payload.automation_upgrade_queue.some(row => row.country === 'KR' && row.rate_automation_stage === 'official_probe_candidate'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'US' && row.run_status === 'not_run'));

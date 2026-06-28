@@ -343,9 +343,16 @@ function parseTaricPercentDuty(value) {
     return match ? Number((Number(match[1]) / 100).toFixed(8)) : null;
 }
 
-function summarizeThirdCountryDutyRates(rows, hsPrefix) {
+function normalizeTaricGoodsCode(value) {
+    return String(value || '').replace(/\D/g, '');
+}
+
+function summarizeThirdCountryDutyRates(rows, hsPrefix, { exactTaricCode = '' } = {}) {
+    const normalizedExact = normalizeTaricGoodsCode(exactTaricCode);
+    const normalizedPrefix = String(hsPrefix || '');
     const matching = (rows || []).filter(row => (
-        String(row.goods_code || '').startsWith(String(hsPrefix || ''))
+        String(row.goods_code || '').startsWith(normalizedPrefix)
+        && (!normalizedExact || normalizeTaricGoodsCode(row.goods_code) === normalizedExact)
         && row.origin_code === '1011'
         && row.measure_type_code === '103'
         && /third country duty/i.test(row.measure_type || '')
@@ -356,7 +363,8 @@ function summarizeThirdCountryDutyRates(rows, hsPrefix) {
     })).filter(row => row.base_rate !== null);
     const uniqueRates = Array.from(new Set(matching.map(row => row.base_rate))).sort((a, b) => a - b);
     return {
-        hs_prefix: String(hsPrefix || ''),
+        hs_prefix: normalizedPrefix,
+        exact_taric_code: normalizedExact,
         ok: matching.length > 0,
         exact_single_rate: uniqueRates.length === 1,
         unique_base_rates: uniqueRates,
@@ -364,8 +372,8 @@ function summarizeThirdCountryDutyRates(rows, hsPrefix) {
     };
 }
 
-function selectEuThirdCountryDutyRate(rows, hsPrefix) {
-    const summary = summarizeThirdCountryDutyRates(rows, hsPrefix);
+function selectEuThirdCountryDutyRate(rows, hsPrefix, { exactTaricCode = '' } = {}) {
+    const summary = summarizeThirdCountryDutyRates(rows, hsPrefix, { exactTaricCode });
     const sampleCodes = Array.from(new Set(summary.rows.map(row => row.goods_code).filter(Boolean))).slice(0, 8);
     if (!summary.rows.length) {
         return {
@@ -383,11 +391,13 @@ function selectEuThirdCountryDutyRate(rows, hsPrefix) {
             ...summary,
             selected: true,
             scope_check_required: false,
-            status: 'exact_single_rate',
+            status: summary.exact_taric_code ? 'exact_taric_code_match' : 'exact_single_rate',
             base_rate: baseRate,
             source_rate_text: `TARIC third-country duty: ${(baseRate * 100).toFixed(3)}%`,
-            source_hts: `${String(hsPrefix || '')} (TARIC ERGA OMNES third-country duty)`,
-            reason: 'All parsed ERGA OMNES third-country-duty rows under this prefix share one duty rate.',
+            source_hts: `${summary.exact_taric_code || String(hsPrefix || '')} (TARIC ERGA OMNES third-country duty)`,
+            reason: summary.exact_taric_code
+                ? 'Exact TARIC goods code matched one ERGA OMNES third-country-duty row.'
+                : 'All parsed ERGA OMNES third-country-duty rows under this prefix share one duty rate.',
             sample_goods_codes: sampleCodes
         };
     }
@@ -401,12 +411,13 @@ function selectEuThirdCountryDutyRate(rows, hsPrefix) {
     };
 }
 
-function buildEuOfficialRateCandidate(rows, hsPrefix) {
-    const selection = selectEuThirdCountryDutyRate(rows, hsPrefix);
+function buildEuOfficialRateCandidate(rows, hsPrefix, { exactTaricCode = '' } = {}) {
+    const selection = selectEuThirdCountryDutyRate(rows, hsPrefix, { exactTaricCode });
     if (!selection.selected) {
         return {
             ok: false,
             hs_prefix: selection.hs_prefix,
+            exact_taric_code: selection.exact_taric_code || '',
             source_status: 'scope_check_required',
             status: selection.status,
             reason: selection.reason,
@@ -417,6 +428,7 @@ function buildEuOfficialRateCandidate(rows, hsPrefix) {
     return {
         ok: true,
         hs_prefix: selection.hs_prefix,
+        exact_taric_code: selection.exact_taric_code || '',
         source_status: 'official_source_candidate',
         base_rate: selection.base_rate,
         source_rate_text: selection.source_rate_text,
@@ -704,6 +716,7 @@ module.exports = {
     buildCircabcDirectDownloadUrl,
     parseEuTaricConsultationHtml,
     parseTaricSheetRows,
+    normalizeTaricGoodsCode,
     parseTaricPercentDuty,
     summarizeThirdCountryDutyRates,
     selectEuThirdCountryDutyRate,

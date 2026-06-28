@@ -17,6 +17,7 @@ const {
     pickTaricImportDutiesFile,
     parseEuTaricConsultationHtml,
     parseTaricSheetRows,
+    normalizeTaricGoodsCode,
     summarizeThirdCountryDutyRates,
     selectEuThirdCountryDutyRate,
     buildEuOfficialRateCandidate,
@@ -429,6 +430,40 @@ test('EU TARIC selector requires exact TARIC scope when one HS prefix has multip
     const candidate = buildEuOfficialRateCandidate(rows, '850440');
     assert.equal(candidate.ok, false);
     assert.equal(candidate.source_status, 'scope_check_required');
+});
+
+test('EU TARIC selector promotes an exact 10-digit TARIC goods-code match', () => {
+    const rows = [
+        {
+            goods_code: '8504406090',
+            origin: 'ERGA OMNES',
+            measure_type: 'Third country duty',
+            duty: '0.000 %',
+            origin_code: '1011',
+            measure_type_code: '103'
+        },
+        {
+            goods_code: '8504409590',
+            origin: 'ERGA OMNES',
+            measure_type: 'Third country duty',
+            duty: '2.700 %',
+            origin_code: '1011',
+            measure_type_code: '103'
+        }
+    ];
+    assert.equal(normalizeTaricGoodsCode('8504.40.6090'), '8504406090');
+
+    const selection = selectEuThirdCountryDutyRate(rows, '850440', { exactTaricCode: '8504.40.6090' });
+    assert.equal(selection.selected, true);
+    assert.equal(selection.scope_check_required, false);
+    assert.equal(selection.status, 'exact_taric_code_match');
+    assert.equal(selection.base_rate, 0);
+    assert.equal(selection.source_hts, '8504406090 (TARIC ERGA OMNES third-country duty)');
+
+    const candidate = buildEuOfficialRateCandidate(rows, '850440', { exactTaricCode: '8504.40.9590' });
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.exact_taric_code, '8504409590');
+    assert.equal(candidate.base_rate, 0.027);
 });
 
 test('EU official candidate can update a single-prefix rule without changing VAT layers', () => {

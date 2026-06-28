@@ -203,6 +203,50 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
         ));
 }
 
+function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } = {}) {
+    const parserGaps = sourceRunPlan.filter(row => row.parser_gap);
+    const probeCandidates = sourceRunPlan.filter(row => row.rate_automation_stage === 'official_probe_candidate');
+    const exactCodeGates = sourceRunPlan.filter(row => row.rate_automation_stage === 'official_hybrid_parser');
+    const filingGrade = sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync');
+    const exceptions = sourceRunPlan.filter(row => row.run_status === 'exception');
+    const rateChanges = runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0);
+    const priorityQueue = parserGaps
+        .map(row => ({
+            country: row.country,
+            workstream: row.rate_automation_stage === 'official_hybrid_parser'
+                ? 'exact-code parser'
+                : row.rate_automation_stage === 'official_probe_candidate'
+                    ? 'official probe promotion'
+                    : row.rate_automation_stage === 'maintained_exact_map'
+                        ? 'machine-readable source connector'
+                        : 'official-link parser discovery',
+            rate_automation_stage: row.rate_automation_stage,
+            run_status: row.run_status,
+            update_command: row.update_command,
+            next_action: row.run_plan_action || row.next_action || ''
+        }))
+        .slice(0, 8);
+
+    const headline = exceptions.length
+        ? `${exceptions.length} source exception(s) need parser/source attention; safe updates remain exception-only.`
+        : rateChanges > 0
+            ? `${rateChanges} rate change(s) were detected by daily duty-rate sync.`
+            : `${filingGrade.length} filing-grade source(s) and ${parserGaps.length} parser gap(s) tracked by daily duty-rate sync.`;
+
+    return {
+        headline,
+        filing_grade_countries: filingGrade.map(row => row.country),
+        exact_code_gate_countries: exactCodeGates.map(row => row.country),
+        official_probe_countries: probeCandidates.map(row => row.country),
+        parser_gap_countries: parserGaps.map(row => row.country),
+        exception_countries: exceptions.map(row => row.country),
+        rate_change_count: rateChanges,
+        health_ok: health ? Boolean(health.ok) : null,
+        priority_queue: priorityQueue,
+        next_best_action: priorityQueue[0]?.next_action || 'Keep daily duty-rate sync running and monitor material rate changes.'
+    };
+}
+
 function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt, sourceRunPlan = [] } = {}) {
     const autoApplied = runs.filter(run => run.applied);
     const exceptions = runs.flatMap(run => buildExceptionsForRun(run));
@@ -258,6 +302,7 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             filing_grade_auto_count: sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync').length,
             exception_count: sourceRunPlan.filter(row => row.run_status === 'exception').length
         },
+        automation_digest: buildAutomationDigest({ runs, health, sourceRunPlan }),
         automation_upgrade_queue: upgradeQueue,
         auto_applied: autoApplied.map(run => ({
             source: run.source,
@@ -433,6 +478,7 @@ module.exports = {
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
     buildSourceRunPlan,
+    buildAutomationDigest,
     buildSyncStatusPayload,
     runAutoDutyRateSync
 };

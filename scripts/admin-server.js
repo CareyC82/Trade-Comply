@@ -260,6 +260,14 @@ function buildDutyRateStatusPayload() {
             runs: Array.isArray(syncStatus.runs) ? syncStatus.runs : []
         });
     }
+    if (!syncStatus.automation_digest) {
+        const { buildAutomationDigest } = require('./auto-sync-duty-rates');
+        syncStatus.automation_digest = buildAutomationDigest({
+            runs: Array.isArray(syncStatus.runs) ? syncStatus.runs : [],
+            sourceRunPlan: Array.isArray(syncStatus.source_run_plan) ? syncStatus.source_run_plan : [],
+            health: null
+        });
+    }
     return {
         ...health,
         generated_at: new Date().toISOString(),
