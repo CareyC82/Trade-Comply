@@ -261,3 +261,34 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     });
     assert.equal(staticRun.countries.includes('IN'), false, 'India should run through the official-live updater, not static benchmark batch');
 });
+
+test('auto duty-rate sync downgrades official-live transport failures without blocking daily sync', async () => {
+    const failingOfficialFetcher = async () => {
+        throw new Error('fetch failed');
+    };
+    const payload = await runAutoDutyRateSync({
+        dryRun: true,
+        skipOfficialUs: true,
+        koreaOfficialFetcher: failingOfficialFetcher,
+        indiaOfficialFetcher: failingOfficialFetcher
+    });
+    const koreaRun = payload.runs.find(run => run.source === 'Korea Customs official-live');
+    const indiaRun = payload.runs.find(run => run.source === 'India Customs official-live');
+
+    assert.equal(koreaRun.ok, true);
+    assert.equal(indiaRun.ok, true);
+    assert.equal(koreaRun.writes_official_machine_rates, false);
+    assert.equal(indiaRun.writes_official_machine_rates, false);
+    assert.equal(koreaRun.official_fetch_degraded, true);
+    assert.equal(indiaRun.official_fetch_degraded, true);
+    assert.equal(koreaRun.errors.length, 0);
+    assert.equal(indiaRun.errors.length, 0);
+    assert.equal(payload.status, 'ok');
+    assert.equal(payload.exceptions.length, 0);
+    assert.equal(payload.source_run_plan.find(row => row.country === 'KR').run_status, 'ok');
+    assert.equal(payload.source_run_plan.find(row => row.country === 'IN').run_status, 'ok');
+    assert.ok(payload.automation_digest.official_probe_countries.includes('KR'));
+    assert.ok(payload.automation_digest.official_probe_countries.includes('IN'));
+    assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('Korea Customs official-live'));
+    assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('India Customs official-live'));
+});

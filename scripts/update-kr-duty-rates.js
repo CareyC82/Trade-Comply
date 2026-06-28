@@ -442,7 +442,19 @@ function updateKoreaRules({ dryRun = false, officialRows = null } = {}) {
 }
 
 async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fetchText } = {}) {
-    const official = await fetchKoreaOfficialRows({ fetcher });
+    let official;
+    try {
+        official = await fetchKoreaOfficialRows({ fetcher });
+    } catch (error) {
+        official = {
+            ok: false,
+            status_code: null,
+            official_url: KR_TARIFF_DB_URL,
+            rows: [],
+            row_count: 0,
+            error: error.message
+        };
+    }
     const result = updateKoreaRules({
         dryRun,
         officialRows: official.rows.length ? official.rows : null
@@ -451,8 +463,10 @@ async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fe
         ok: official.ok,
         status_code: official.status_code,
         official_url: official.official_url,
-        row_count: official.row_count
+        row_count: official.row_count,
+        error: official.error || ''
     };
+    result.official_fetch_degraded = !official.ok;
     result.writes_official_machine_rates = official.ok;
     return result;
 }

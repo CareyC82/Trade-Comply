@@ -68,6 +68,8 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         error_count: errors.length,
         countries: Array.isArray(result.countries) ? result.countries : [],
         writes_official_machine_rates: Boolean(result.writes_official_machine_rates),
+        official_fetch: result.official_fetch || null,
+        official_fetch_degraded: Boolean(result.official_fetch_degraded),
         readiness: result.readiness || null,
         changes,
         errors
@@ -209,6 +211,9 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
     const exactCodeGates = sourceRunPlan.filter(row => row.rate_automation_stage === 'official_hybrid_parser');
     const filingGrade = sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync');
     const exceptions = sourceRunPlan.filter(row => row.run_status === 'exception');
+    const officialProbeDegradedSources = runs
+        .filter(run => run.official_fetch_degraded)
+        .map(run => run.source);
     const rateChanges = runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0);
     const priorityQueue = parserGaps
         .map(row => ({
@@ -238,6 +243,7 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
         filing_grade_countries: filingGrade.map(row => row.country),
         exact_code_gate_countries: exactCodeGates.map(row => row.country),
         official_probe_countries: probeCandidates.map(row => row.country),
+        official_probe_degraded_sources: officialProbeDegradedSources,
         parser_gap_countries: parserGaps.map(row => row.country),
         exception_countries: exceptions.map(row => row.country),
         rate_change_count: rateChanges,
