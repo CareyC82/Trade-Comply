@@ -1499,6 +1499,9 @@
                     ...row,
                     original_order: index,
                     latest_run_status: sync.run_status || '',
+                    latest_run_at: syncStatus.updated_at || '',
+                    change_count: sync.change_count ?? '',
+                    rate_change_count: sync.rate_change_count ?? '',
                     degraded_reason: sync.degraded_reason || '',
                     degraded_detail: sync.degraded_detail || '',
                     run_plan_action: sync.run_plan_action || ''
@@ -1544,6 +1547,8 @@
                                     <td><span class="badge ${row.rate_automation_stage === 'official_hybrid_parser' ? 'hybrid_official_candidate' : row.rate_automation_stage === 'official_probe_candidate' ? 'updater_candidate' : row.rate_automation_stage === 'official_link_monitor' ? 'official_link' : 'benchmark_updatable'}">${escapeHtml(row.rate_automation_stage || '')}</span></td>
                                     <td>
                                         <span class="badge ${row.latest_run_status === 'degraded' ? 'benchmark' : row.latest_run_status === 'ok' ? 'auto_updatable' : 'official_link'}">${escapeHtml(row.latest_run_status || 'not run')}</span>
+                                        ${row.latest_run_at ? `<div class="meta">Last run: ${escapeHtml(formatDateTime(row.latest_run_at))}</div>` : ''}
+                                        ${row.latest_run_status ? `<div class="meta">Changes: ${escapeHtml(row.change_count ?? 0)} · Rate changes: ${escapeHtml(row.rate_change_count ?? 0)}</div>` : ''}
                                         ${row.degraded_reason ? `<div class="meta">${escapeHtml(row.degraded_reason)}</div>` : ''}
                                         ${row.degraded_detail ? `<div class="meta">${escapeHtml(row.degraded_detail)}</div>` : ''}
                                     </td>

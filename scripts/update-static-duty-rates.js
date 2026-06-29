@@ -272,22 +272,88 @@ function parseIndiaTariffRows(html = '') {
         .filter(Boolean);
 }
 
+function getOfficialProbeUrls(source = {}, fallbackUrl = '') {
+    const urls = [
+        ...(Array.isArray(source?.official_probe_urls) ? source.official_probe_urls : []),
+        source?.official_url,
+        fallbackUrl
+    ]
+        .filter(Boolean)
+        .map(url => String(url).trim())
+        .filter(Boolean);
+    return Array.from(new Set(urls));
+}
+
 async function fetchIndiaOfficialRows({
     fetcher = fetchText,
     source = getSource('IN')
 } = {}) {
-    const url = source?.official_url || 'https://www.icegate.gov.in/';
-    const response = await fetcher(url, { timeoutMs: INDIA_REQUEST_TIMEOUT_MS });
-    const rows = parseIndiaTariffRows(response.body || '');
-    const acceptableStatus = response.status_code >= 200 && response.status_code < 400;
+    const urls = getOfficialProbeUrls(source, 'https://www.icegate.gov.in/');
+    const attempts = [];
+    let best = null;
+    for (const url of urls) {
+        try {
+            const response = await fetcher(url, { timeoutMs: INDIA_REQUEST_TIMEOUT_MS });
+            const rows = parseIndiaTariffRows(response.body || '');
+            const acceptableStatus = response.status_code >= 200 && response.status_code < 400;
+            const attempt = {
+                ok: acceptableStatus && rows.length > 0,
+                status_code: response.status_code,
+                official_url: url,
+                rows,
+                row_count: rows.length,
+                partial: Boolean(response.partial),
+                error: response.error || ''
+            };
+            attempts.push({
+                official_url: url,
+                status_code: response.status_code,
+                row_count: rows.length,
+                partial: Boolean(response.partial),
+                error: response.error || ''
+            });
+            if (attempt.ok) {
+                return {
+                    ...attempt,
+                    attempts
+                };
+            }
+            if (!best || attempt.row_count > best.row_count || (!best.status_code && attempt.status_code)) {
+                best = attempt;
+            }
+        } catch (error) {
+            attempts.push({
+                official_url: url,
+                status_code: null,
+                row_count: 0,
+                partial: false,
+                error: error.message
+            });
+            if (!best) {
+                best = {
+                    ok: false,
+                    status_code: null,
+                    official_url: url,
+                    rows: [],
+                    row_count: 0,
+                    partial: false,
+                    error: error.message
+                };
+            }
+        }
+    }
+    const selected = best || {
+        ok: false,
+        status_code: null,
+        official_url: source?.official_url || 'https://www.icegate.gov.in/',
+        rows: [],
+        row_count: 0,
+        partial: false,
+        error: ''
+    };
     return {
-        ok: acceptableStatus && rows.length > 0,
-        status_code: response.status_code,
-        official_url: url,
-        rows,
-        row_count: rows.length,
-        partial: Boolean(response.partial),
-        error: response.error || ''
+        ...selected,
+        attempts
     };
 }
 
@@ -689,7 +755,8 @@ async function updateIndiaRulesFromOfficialSource({ dryRun = false, fetcher = fe
         official_url: official.official_url,
         row_count: official.row_count,
         partial: Boolean(official.partial),
-        error: official.error || ''
+        error: official.error || '',
+        attempts: official.attempts || []
     };
     result.official_fetch_degraded = !official.ok;
     result.official_fetch_degraded_reason = degradedReason;
@@ -752,6 +819,7 @@ module.exports = {
     fetchIndiaOfficialRows,
     fetchText,
     fetchTextWithCurl,
+    getOfficialProbeUrls,
     getMaintainedPrefixes,
     parseIndiaTariffRows,
     parsePercent,

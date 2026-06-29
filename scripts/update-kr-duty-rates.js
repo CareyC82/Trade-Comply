@@ -12,7 +12,8 @@ const ROOT = path.join(__dirname, '..');
 const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const KR_CUSTOMS_URL = 'https://www.customs.go.kr/english/main.do';
-const KR_TARIFF_DB_URL = 'https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?mi=10806&cntntsId=5502';
+const KR_TARIFF_DB_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037';
+const KR_TARIFF_LOOKUP_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffView.do';
 const REQUEST_TIMEOUT_MS = 15000;
 
 const KR_BENCHMARK = {
@@ -51,16 +52,19 @@ function getKoreaDutyRules(payload = readJson(DUTY_RATES_PATH)) {
     return (payload.rules || []).filter(rule => rule.import_country === 'KR');
 }
 
-function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
+function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS, method = 'GET', headers = {}, body = null } = {}) {
     if (typeof fetch === 'function') {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);
         return fetch(url, {
             signal: controller.signal,
+            method,
             headers: {
                 'User-Agent': 'Mozilla/5.0 TraceWize duty-rate updater (+https://tracewize.com)',
-                'Accept': 'text/html,application/xhtml+xml'
-            }
+                'Accept': 'text/html,application/xhtml+xml,application/json',
+                ...headers
+            },
+            body
         })
             .then(async (response) => ({
                 status_code: response.status,
@@ -149,6 +153,29 @@ function parseKoreaTariffRateRows(html = '') {
         .filter(Boolean);
 }
 
+function parseKoreaOfficialJsonRows(value = '') {
+    let payload;
+    try {
+        payload = typeof value === 'string' ? JSON.parse(value) : value;
+    } catch (_error) {
+        return [];
+    }
+    const rows = Array.isArray(payload) ? payload : Array.isArray(payload?.list) ? payload.list : [];
+    return rows.map((row) => {
+        const hsCode = String(row.hsCode || row.hs_code || '').replace(/\D/g, '');
+        const rateText = row.taxRate || row.tax_rate || row.base_rate || '';
+        const parsedRate = parseKoreaAdValoremRate(rateText);
+        if (!hsCode || parsedRate === null) return null;
+        return {
+            hs_code: hsCode,
+            hs_prefix: hsCode.slice(0, 6),
+            item_name: row.goodsName || row.goods_name || '',
+            base_rate_text: String(rateText),
+            parsed_base_rate: parsedRate
+        };
+    }).filter(Boolean);
+}
+
 function parseKoreaTariffDbHtml(html = '') {
     const text = stripHtml(html);
     const hasTariffDb = /KCS\s*Tariff\s*D\/B/i.test(text);
@@ -168,13 +195,52 @@ function parseKoreaTariffDbHtml(html = '') {
     };
 }
 
-async function fetchKoreaOfficialRows({ fetcher = fetchText, url = KR_TARIFF_DB_URL } = {}) {
+function normalizeKoreaHs10(value = '') {
+    const digits = String(value || '').replace(/\D/g, '');
+    if (!digits) return '';
+    return digits.length >= 10 ? digits.slice(0, 10) : digits.padEnd(10, '0');
+}
+
+async function fetchKoreaOfficialRows({
+    fetcher = fetchText,
+    url = KR_TARIFF_DB_URL,
+    lookupUrl = KR_TARIFF_LOOKUP_URL,
+    queryHsCodes = KR_EXACT_CODE_CANDIDATES.map(normalizeKoreaHs10)
+} = {}) {
     const response = await fetcher(url);
-    const rows = parseKoreaTariffRateRows(response.body || '');
+    let rows = parseKoreaTariffRateRows(response.body || '');
+    const queryAttempts = [];
+    if (!rows.length && Array.isArray(queryHsCodes) && queryHsCodes.length) {
+        for (const hsCode of queryHsCodes.map(normalizeKoreaHs10).filter(Boolean)) {
+            try {
+                const lookup = await fetcher(lookupUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `customsSeachType=Y&hsCode=${encodeURIComponent(hsCode)}`
+                });
+                const lookupRows = parseKoreaOfficialJsonRows(lookup.body || '');
+                queryAttempts.push({
+                    hs_code: hsCode,
+                    status_code: lookup.status_code,
+                    row_count: lookupRows.length
+                });
+                rows = rows.concat(lookupRows);
+            } catch (error) {
+                queryAttempts.push({
+                    hs_code: hsCode,
+                    status_code: null,
+                    row_count: 0,
+                    error: error.message
+                });
+            }
+        }
+    }
     return {
         ok: response.status_code >= 200 && response.status_code < 400 && rows.length > 0,
         status_code: response.status_code,
         official_url: url,
+        lookup_url: lookupUrl,
+        query_attempts: queryAttempts,
         rows,
         row_count: rows.length
     };
@@ -530,10 +596,12 @@ module.exports = {
     KR_BENCHMARK,
     KR_CUSTOMS_URL,
     KR_TARIFF_DB_URL,
+    KR_TARIFF_LOOKUP_URL,
     KR_EXACT_CODE_CANDIDATES,
     parseKoreaTariffDbHtml,
     parseKoreaAdValoremRate,
     parseKoreaTariffRateRows,
+    parseKoreaOfficialJsonRows,
     fetchKoreaOfficialRows,
     buildKoreaOfficialRateCandidate,
     buildKoreaOfficialCandidateForRule,

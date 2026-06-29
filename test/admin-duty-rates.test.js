@@ -24,6 +24,9 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(Array.isArray(payload.duty_rate_sync_status.source_run_plan), true);
     assert.ok(payload.duty_rate_sync_status.source_run_plan.some(row => row.country === 'US' && row.run_source === 'USITC'));
     assert.ok(payload.duty_rate_sync_status.source_run_plan.some(row => row.country === 'IN' && row.run_source === 'India Customs official-live'));
+    assert.equal(typeof payload.duty_rate_sync_status.updated_at, 'string');
+    assert.ok(payload.duty_rate_sync_status.source_run_plan.every(row => typeof row.change_count === 'number'));
+    assert.ok(payload.sources.some(source => source.country === 'KR' && /CustomsTariffList\.do/.test(source.official_url || '')));
     assert.equal(typeof payload.business_summary, 'object');
     assert.ok(payload.business_summary.sync_conclusion);
     assert.ok(payload.business_summary.priority_conclusion);

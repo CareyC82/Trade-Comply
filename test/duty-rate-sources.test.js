@@ -51,7 +51,10 @@ const {
     applyKoreaOfficialCandidateToRule,
     buildKoreaOfficialCandidateForRule,
     fetchKoreaOfficialRows,
+    KR_TARIFF_DB_URL,
+    KR_TARIFF_LOOKUP_URL,
     parseKoreaAdValoremRate,
+    parseKoreaOfficialJsonRows,
     parseKoreaTariffRateRows,
     parseKoreaTariffDbHtml,
     probeKoreaReadiness
@@ -61,6 +64,7 @@ const {
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,
     fetchIndiaOfficialRows,
+    getOfficialProbeUrls,
     parseIndiaTariffRows,
     probeIndiaReadiness,
     probeStaticBenchmarkReadiness
@@ -243,6 +247,9 @@ test('Japan Customs live probe parses dated tariff schedule and chapter candidat
 });
 
 test('Korea Customs live probe detects tariff DB lookup without upgrading rate trust', async () => {
+    assert.equal(KR_TARIFF_DB_URL.includes('/english/ad/ct/CustomsTariffList.do?mi=8037'), true);
+    assert.equal(KR_TARIFF_LOOKUP_URL.includes('/english/ad/ct/CustomsTariffView.do'), true);
+
     const html = `
         <title>KCS Tariff D/B(Inquiry)</title>
         <h1>KCS Tariff D/B(Inquiry)</h1>
@@ -281,6 +288,31 @@ test('Korea official live fetch parses candidate rows without network-dependent 
     assert.equal(official.ok, true);
     assert.equal(official.row_count, 1);
     assert.equal(official.rows[0].parsed_base_rate, 0);
+});
+
+test('Korea official lookup JSON rows are parsed into guarded candidates', async () => {
+    const rows = parseKoreaOfficialJsonRows(JSON.stringify([
+        {
+            hsCode: '8471500000',
+            goodsName: 'Processing units',
+            taxRate: '0%'
+        }
+    ]));
+    const official = await fetchKoreaOfficialRows({
+        fetcher: async (url) => ({
+            status_code: 200,
+            body: url.includes('CustomsTariffView.do')
+                ? JSON.stringify([{ hsCode: '8471500000', goodsName: 'Processing units', taxRate: '0%' }])
+                : '<h1>KCS Tariff D/B(Inquiry)</h1>'
+        }),
+        queryHsCodes: ['8471500000']
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].parsed_base_rate, 0);
+    assert.equal(official.ok, true);
+    assert.equal(official.query_attempts.length, 1);
+    assert.equal(official.query_attempts[0].row_count, 1);
 });
 
 test('EU TARIC official probe parses consultation metadata without upgrading rate trust', async () => {
@@ -882,6 +914,34 @@ test('India official live probe can parse tariff rows from injected official sou
     assert.equal(official.row_count, 1);
     assert.equal(readiness.official_probe.machine_parser_ready, true);
     assert.equal(readiness.official_probe.parsed_rate_rows, 1);
+});
+
+test('India official probe tries candidate sources before falling back to maintained exact map', async () => {
+    const source = {
+        official_url: 'https://example.invalid/primary',
+        official_probe_urls: [
+            'https://example.invalid/primary',
+            'https://example.invalid/secondary'
+        ]
+    };
+    const urls = getOfficialProbeUrls(source, 'https://www.icegate.gov.in/');
+    const official = await fetchIndiaOfficialRows({
+        source,
+        fetcher: async (url) => ({
+            status_code: 200,
+            body: url.includes('secondary')
+                ? '<table><tr><td>85423100</td><td>Processors</td><td>BCD 0%</td><td>SWS 10%</td><td>IGST 18%</td></tr></table>'
+                : '<html>No rows yet</html>'
+        })
+    });
+
+    assert.deepEqual(urls.slice(0, 2), ['https://example.invalid/primary', 'https://example.invalid/secondary']);
+    assert.equal(official.ok, true);
+    assert.equal(official.official_url, 'https://example.invalid/secondary');
+    assert.equal(official.row_count, 1);
+    assert.equal(official.attempts.length, 2);
+    assert.equal(official.attempts[0].row_count, 0);
+    assert.equal(official.attempts[1].row_count, 1);
 });
 
 test('India official parser accepts text rows and salvaged partial official responses', async () => {

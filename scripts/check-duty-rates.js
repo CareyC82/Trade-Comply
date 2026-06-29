@@ -343,14 +343,19 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         CN: 13
     };
     const productRank = {
-        semiconductor: 1,
-        router: 2,
-        smartphone: 3,
-        battery: 4,
-        ev_charger: 5,
-        solar: 6,
-        tablet: 7,
-        monitor: 8
+        ai_compute: 1,
+        semiconductor: 2,
+        optical_module: 3,
+        router: 4,
+        smartphone: 5,
+        battery: 6,
+        ev_charger: 7,
+        solar: 8,
+        industrial_automation: 9,
+        drone: 10,
+        surveillance_imaging: 11,
+        tablet: 12,
+        monitor: 13
     };
     const upgradeQueue = results
         .filter(result => !['official_exact', 'official_duty_tax_estimate'].includes(result.source_trust))
