@@ -112,7 +112,7 @@ function parseKoreaAdValoremRate(value = '') {
 
 function parseKoreaTariffRateRows(html = '') {
     const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
-    return rowMatches.map((rowHtml) => {
+    const tableRows = rowMatches.map((rowHtml) => {
         const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
         const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
         const rateCell = cells.find(cell => /free|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
@@ -126,6 +126,27 @@ function parseKoreaTariffRateRows(html = '') {
             parsed_base_rate: parsedRate
         };
     }).filter(Boolean);
+    if (tableRows.length) return tableRows;
+
+    return stripHtml(html)
+        .split(/(?=\b\d{6,10}\b)/)
+        .map((line) => {
+            const hsCode = line.match(/\b\d{6,10}\b/)?.[0] || '';
+            if (!hsCode) return null;
+            const rateText = line.match(/(?:basic rate|customs duty|WTO|general|base rate)[:\s-]*(free|무세|免税|\d+(?:\.\d+)?\s*%)/i)?.[0]
+                || line.match(/\b(free|무세|免税|\d+(?:\.\d+)?\s*%)\b/i)?.[0]
+                || '';
+            const parsedRate = parseKoreaAdValoremRate(rateText);
+            if (parsedRate === null) return null;
+            return {
+                hs_code: hsCode,
+                hs_prefix: hsCode.slice(0, 6),
+                item_name: line.replace(hsCode, '').slice(0, 140).trim(),
+                base_rate_text: rateText,
+                parsed_base_rate: parsedRate
+            };
+        })
+        .filter(Boolean);
 }
 
 function parseKoreaTariffDbHtml(html = '') {

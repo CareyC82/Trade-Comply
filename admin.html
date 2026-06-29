@@ -1486,17 +1486,36 @@
             `;
         }
 
-        function renderAutomationBacklog(roadmap = {}) {
+        function renderAutomationBacklog(roadmap = {}, syncStatus = {}) {
             const rows = Array.isArray(roadmap.automation_backlog) ? roadmap.automation_backlog : [];
             const summary = roadmap.automation_backlog_summary || {};
             if (!rows.length) {
                 return '<div class="empty">No parser automation backlog. Filing-grade machine-readable coverage is current.</div>';
             }
+            const syncByCountry = new Map((syncStatus.source_run_plan || []).map(row => [row.country, row]));
+            const mergedRows = rows.map((row, index) => {
+                const sync = syncByCountry.get(row.country) || {};
+                return {
+                    ...row,
+                    original_order: index,
+                    latest_run_status: sync.run_status || '',
+                    degraded_reason: sync.degraded_reason || '',
+                    degraded_detail: sync.degraded_detail || '',
+                    run_plan_action: sync.run_plan_action || ''
+                };
+            }).sort((a, b) => {
+                const rank = { degraded: 0, exception: 1, not_run: 2, ok: 3 };
+                const statusRank = (rank[a.latest_run_status] ?? 4) - (rank[b.latest_run_status] ?? 4);
+                if (statusRank) return statusRank;
+                return (a.original_order || 0) - (b.original_order || 0);
+            });
+            const parserPendingCount = mergedRows.filter(row => row.latest_run_status === 'degraded').length;
             const workstreams = summary.workstreams || {};
             return `
                 <div class="summary-grid">
                     <div class="summary-card"><strong>${escapeHtml(summary.filing_grade_auto_count ?? 0)}</strong><span>Filing-grade machine sync</span></div>
                     <div class="summary-card"><strong>${escapeHtml(summary.parser_gap_count ?? rows.length)}</strong><span>Parser/source gaps</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(parserPendingCount)}</strong><span>Parser pending now</span></div>
                     <div class="summary-card"><strong>${escapeHtml(workstreams['exact-code parser'] || 0)}</strong><span>Exact-code parser</span></div>
                     <div class="summary-card"><strong>${escapeHtml(workstreams['official probe promotion'] || 0)}</strong><span>Probe promotion</span></div>
                     <div class="summary-card"><strong>${escapeHtml(workstreams['machine-readable source connector'] || 0)}</strong><span>Source connectors</span></div>
@@ -1510,30 +1529,36 @@
                                 <th>Country</th>
                                 <th>Workstream</th>
                                 <th>Automation stage</th>
+                                <th>Latest sync</th>
                                 <th>Coverage</th>
                                 <th>Command</th>
                                 <th>Next action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${rows.slice(0, 24).map(row => `
+                            ${mergedRows.slice(0, 24).map(row => `
                                 <tr>
                                     <td><strong>${escapeHtml(row.maintenance_priority || '—')}</strong></td>
                                     <td><strong>${escapeHtml(row.country || '')}</strong></td>
                                     <td>${escapeHtml(row.workstream || '')}</td>
                                     <td><span class="badge ${row.rate_automation_stage === 'official_hybrid_parser' ? 'hybrid_official_candidate' : row.rate_automation_stage === 'official_probe_candidate' ? 'updater_candidate' : row.rate_automation_stage === 'official_link_monitor' ? 'official_link' : 'benchmark_updatable'}">${escapeHtml(row.rate_automation_stage || '')}</span></td>
+                                    <td>
+                                        <span class="badge ${row.latest_run_status === 'degraded' ? 'benchmark' : row.latest_run_status === 'ok' ? 'auto_updatable' : 'official_link'}">${escapeHtml(row.latest_run_status || 'not run')}</span>
+                                        ${row.degraded_reason ? `<div class="meta">${escapeHtml(row.degraded_reason)}</div>` : ''}
+                                        ${row.degraded_detail ? `<div class="meta">${escapeHtml(row.degraded_detail)}</div>` : ''}
+                                    </td>
                                     <td>${row.covered_by_rules ? '<span class="badge auto_updatable">rules covered</span>' : '<span class="badge benchmark">missing rules</span>'}<div class="meta">${escapeHtml(row.public_claim || '')}</div></td>
                                     <td>
                                         ${row.update_command ? `<code>${escapeHtml(row.update_command)}</code>` : '<span class="meta">—</span>'}
                                         ${row.probe_command ? `<div class="meta">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
                                     </td>
-                                    <td>${escapeHtml(row.next_action || '')}</td>
+                                    <td>${escapeHtml(row.run_plan_action || row.next_action || '')}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 </div>
-                ${rows.length > 24 ? `<p class="meta">Showing 24 of ${rows.length} automation backlog rows.</p>` : ''}
+                ${mergedRows.length > 24 ? `<p class="meta">Showing 24 of ${mergedRows.length} automation backlog rows.</p>` : ''}
             `;
         }
 
@@ -1745,7 +1770,7 @@
                     <p class="meta">Roadmap 更新: ${escapeHtml(data.source_roadmap_updated_at || '—')} · Health: ${data.ok ? 'OK' : 'Needs review'}</p>
                     ${failures.length ? `<div class="empty">税率源检查有 ${failures.length} 个问题：${escapeHtml(failures.map(f => `${f.id}: ${(f.failures || []).join('; ')}`).join(' | '))}</div>` : ''}
                     <div class="crawl-section-title"><h3>Automation parser backlog</h3><span class="meta">next source upgrades by country</span></div>
-                    ${renderAutomationBacklog(roadmap)}
+                    ${renderAutomationBacklog(roadmap, syncStatus)}
                     <div class="crawl-section-title"><h3>Exact-rate progress board</h3><span class="meta">filing-grade parser status by market</span></div>
                     ${renderExactRateProgress(exactProgress)}
                     <div class="crawl-section-title"><h3>税率更新失败原因明细</h3><span class="meta">${actionDetails.length} action item(s)</span></div>

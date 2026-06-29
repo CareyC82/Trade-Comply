@@ -12,6 +12,7 @@ const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DEFAULT_COUNTRIES = ['CN', 'VN', 'MY', 'TW', 'RU', 'IN'];
 const REQUEST_TIMEOUT_MS = 15000;
+const INDIA_REQUEST_TIMEOUT_MS = 30000;
 
 const COUNTRY_NOTES = {
     CN: 'China maintained exact-line candidates refreshed locally. Confirm final customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.',
@@ -169,6 +170,17 @@ function fetchTextWithCurl(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
             maxBuffer: 10 * 1024 * 1024
         }, (error, stdout, stderr) => {
             if (error) {
+                const message = stderr || error.message || '';
+                const partialBody = String(stdout || '');
+                if (partialBody.trim() && /timed out|Operation timed out|timeout/i.test(message)) {
+                    resolve({
+                        status_code: 206,
+                        body: partialBody,
+                        partial: true,
+                        error: message
+                    });
+                    return;
+                }
                 reject(new Error(stderr || error.message));
                 return;
             }
@@ -206,7 +218,7 @@ function parsePercent(value = '') {
 
 function parseIndiaTariffRows(html = '') {
     const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
-    return rowMatches.map((rowHtml) => {
+    const tableRows = rowMatches.map((rowHtml) => {
         const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
         const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
         if (!hsCode) return null;
@@ -231,6 +243,33 @@ function parseIndiaTariffRows(html = '') {
             igst_rate: igstRate
         };
     }).filter(Boolean);
+    if (tableRows.length) return tableRows;
+
+    return stripHtml(html)
+        .split(/(?=\b\d{6,10}\b)/)
+        .map((line) => {
+            const hsCode = line.match(/\b\d{6,10}\b/)?.[0] || '';
+            if (!hsCode) return null;
+            const bcdText = line.match(/(?:BCD|basic customs duty|basic duty)[:\s-]*(free|nil|exempt|\d+(?:\.\d+)?\s*%)/i)?.[0]
+                || line.match(/\b(free|nil|exempt|\d+(?:\.\d+)?\s*%)\b/i)?.[0]
+                || '';
+            const swsText = line.match(/(?:SWS|social welfare(?: surcharge)?)[:\s-]*(free|nil|exempt|\d+(?:\.\d+)?\s*%)/i)?.[0] || '';
+            const igstText = line.match(/(?:IGST|integrated(?: goods and services)? tax)[:\s-]*(free|nil|exempt|\d+(?:\.\d+)?\s*%)/i)?.[0] || '';
+            const bcdRate = parsePercent(bcdText);
+            if (bcdRate === null) return null;
+            return {
+                hs_code: hsCode,
+                hs_prefix: hsCode.slice(0, 6),
+                item_name: line.replace(hsCode, '').slice(0, 140).trim(),
+                bcd_rate_text: bcdText,
+                sws_rate_text: swsText,
+                igst_rate_text: igstText,
+                bcd_rate: bcdRate,
+                sws_rate: parsePercent(swsText),
+                igst_rate: parsePercent(igstText)
+            };
+        })
+        .filter(Boolean);
 }
 
 async function fetchIndiaOfficialRows({
@@ -238,14 +277,17 @@ async function fetchIndiaOfficialRows({
     source = getSource('IN')
 } = {}) {
     const url = source?.official_url || 'https://www.icegate.gov.in/';
-    const response = await fetcher(url);
+    const response = await fetcher(url, { timeoutMs: INDIA_REQUEST_TIMEOUT_MS });
     const rows = parseIndiaTariffRows(response.body || '');
+    const acceptableStatus = response.status_code >= 200 && response.status_code < 400;
     return {
-        ok: response.status_code >= 200 && response.status_code < 400 && rows.length > 0,
+        ok: acceptableStatus && rows.length > 0,
         status_code: response.status_code,
         official_url: url,
         rows,
-        row_count: rows.length
+        row_count: rows.length,
+        partial: Boolean(response.partial),
+        error: response.error || ''
     };
 }
 
@@ -646,6 +688,7 @@ async function updateIndiaRulesFromOfficialSource({ dryRun = false, fetcher = fe
         status_code: official.status_code,
         official_url: official.official_url,
         row_count: official.row_count,
+        partial: Boolean(official.partial),
         error: official.error || ''
     };
     result.official_fetch_degraded = !official.ok;

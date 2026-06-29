@@ -789,6 +789,21 @@ test('Korea official candidate promotes unambiguous tariff rows and keeps VAT se
     assert.equal(rule.additional_rate, 0.1);
 });
 
+test('Korea official parser accepts text rows when the tariff page is not a simple table', () => {
+    const html = `
+        <section>
+            8542310000 Processors Basic rate Free
+            8528521000 Monitors WTO 8%
+        </section>
+    `;
+    const rows = parseKoreaTariffRateRows(html);
+
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].hs_code, '8542310000');
+    assert.equal(rows[0].parsed_base_rate, 0);
+    assert.equal(rows[1].parsed_base_rate, 0.08);
+});
+
 test('Korea official candidate keeps mixed rows exact-HS gated', () => {
     const candidate = buildKoreaOfficialCandidateForRule({
         id: 'TEST-KR-MIXED',
@@ -867,6 +882,30 @@ test('India official live probe can parse tariff rows from injected official sou
     assert.equal(official.row_count, 1);
     assert.equal(readiness.official_probe.machine_parser_ready, true);
     assert.equal(readiness.official_probe.parsed_rate_rows, 1);
+});
+
+test('India official parser accepts text rows and salvaged partial official responses', async () => {
+    const body = `
+        85423100 Processors BCD 0% SWS 10% IGST 18%
+        85044090 Power supplies BCD 7.5% SWS 10% IGST 18%
+    `;
+    const rows = parseIndiaTariffRows(body);
+    const official = await fetchIndiaOfficialRows({
+        fetcher: async (_url, options = {}) => ({
+            status_code: 206,
+            partial: true,
+            error: `Request timed out after ${options.timeoutMs}ms after partial body`,
+            body
+        })
+    });
+
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].bcd_rate, 0);
+    assert.equal(rows[0].sws_rate, 0.1);
+    assert.equal(rows[0].igst_rate, 0.18);
+    assert.equal(official.ok, true);
+    assert.equal(official.partial, true);
+    assert.equal(official.row_count, 2);
 });
 
 test('India official updater keeps TLS verification while falling back to system curl', () => {
