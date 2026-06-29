@@ -150,6 +150,7 @@ function bootstrapTradeOpportunityPage() {
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
                 <p>${escapeHtml(displaySummary)}</p>
+                ${card.originSavingsCaveat ? `<p class="opportunity-origin-caveat">${escapeHtml(card.originSavingsCaveat)}</p>` : ''}
                 ${card.transitReason ? `<p class="opportunity-transit-reason">${escapeHtml(card.transitReason)}</p>` : ''}
                 <div class="opportunity-rate-mini-grid">
                     ${metricItems.map((item) => `

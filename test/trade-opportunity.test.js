@@ -129,6 +129,8 @@ describe('trade opportunity insights', () => {
         assert.ok(transitRows.every((row) => row.transitComparison.decision?.headline));
         assert.ok(transitRows.every((row) => /transit|direct|cost|duty|tax/i.test(row.transitComparison.decision.headline)));
         assert.ok(transitRows.every((row) => /Combined cost|duty-cost advantage/i.test(row.transitComparison.costConclusion)));
+        assert.ok(transitRows.some((row) => /Potential savings only if origin transformation is legally supported/i.test(row.transitComparison.costConclusion)));
+        assert.ok(transitRows.some((row) => /Potential savings only if origin transformation is legally supported/i.test(row.originSavingsCaveat || '')));
         assert.match(model.whyThisRoute, new RegExp(model.best.label));
         assert.match(model.whyNotSelectedRoute, /United States/);
     });
@@ -641,6 +643,8 @@ describe('trade opportunity navigation', () => {
         assert.match(source, /deltaCostPer1000/);
         assert.match(source, /Second leg/);
         assert.match(source, /opportunity-transit-note/);
+        assert.match(source, /originSavingsCaveat/);
+        assert.match(source, /opportunity-origin-caveat/);
         assert.match(source, /opportunity-control-gate/);
         assert.match(source, /opportunity-source-evidence/);
         assert.match(source, /Decision evidence/);
@@ -667,6 +671,7 @@ describe('trade opportunity navigation', () => {
         const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
         assert.match(css, /opportunity-decision-summary/);
         assert.match(css, /opportunity-summary-row--critical/);
+        assert.match(css, /opportunity-origin-caveat/);
         assert.doesNotMatch(css, /opportunity-route-table/);
         assert.doesNotMatch(css, /opportunity-route-verdict/);
         assert.doesNotMatch(css, /opportunity-transit-verdict/);
