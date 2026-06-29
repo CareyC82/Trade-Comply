@@ -70,6 +70,8 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         writes_official_machine_rates: Boolean(result.writes_official_machine_rates),
         official_fetch: result.official_fetch || null,
         official_fetch_degraded: Boolean(result.official_fetch_degraded),
+        official_fetch_degraded_reason: result.official_fetch_degraded_reason || '',
+        official_fetch_degraded_detail: result.official_fetch_degraded_detail || '',
         readiness: result.readiness || null,
         changes,
         errors
@@ -199,6 +201,8 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 mode: run?.mode || '',
                 change_count: run?.change_count || 0,
                 rate_change_count: run?.rate_change_count || 0,
+                degraded_reason: run?.official_fetch_degraded_reason || '',
+                degraded_detail: run?.official_fetch_degraded_detail || run?.official_fetch?.error || '',
                 next_action: source.next_action || '',
                 run_plan_action: runPlanAction
             };
@@ -219,6 +223,13 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
     const officialProbeDegradedSources = runs
         .filter(run => run.official_fetch_degraded)
         .map(run => run.source);
+    const officialProbeDegradedReasons = runs
+        .filter(run => run.official_fetch_degraded)
+        .map(run => ({
+            source: run.source,
+            reason: run.official_fetch_degraded_reason || 'official_probe_degraded',
+            detail: run.official_fetch_degraded_detail || run.official_fetch?.error || ''
+        }));
     const rateChanges = runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0);
     const priorityQueue = parserGaps
         .map(row => ({
@@ -249,6 +260,7 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
         exact_code_gate_countries: exactCodeGates.map(row => row.country),
         official_probe_countries: probeCandidates.map(row => row.country),
         official_probe_degraded_sources: officialProbeDegradedSources,
+        official_probe_degraded_reasons: officialProbeDegradedReasons,
         degraded_countries: degraded.map(row => row.country),
         parser_gap_countries: parserGaps.map(row => row.country),
         exception_countries: exceptions.map(row => row.country),

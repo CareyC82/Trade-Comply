@@ -455,6 +455,13 @@ async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fe
             error: error.message
         };
     }
+    const degradedReason = official.ok
+        ? ''
+        : official.error
+            ? 'official_fetch_failed'
+            : official.status_code && official.status_code >= 400
+                ? 'official_http_error'
+                : 'official_source_returned_no_rate_rows';
     const result = updateKoreaRules({
         dryRun,
         officialRows: official.rows.length ? official.rows : null
@@ -467,6 +474,12 @@ async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fe
         error: official.error || ''
     };
     result.official_fetch_degraded = !official.ok;
+    result.official_fetch_degraded_reason = degradedReason;
+    result.official_fetch_degraded_detail = official.error || (
+        degradedReason === 'official_http_error'
+            ? `HTTP ${official.status_code}`
+            : 'Official source was reachable but no machine-readable tariff rows were parsed.'
+    );
     result.writes_official_machine_rates = official.ok;
     return result;
 }

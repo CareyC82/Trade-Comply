@@ -1000,6 +1000,7 @@
                             <div class="grade-note"><strong>${escapeHtml(stageLabel[row.rate_automation_stage] || row.rate_automation_stage || 'Unknown stage')}</strong>${row.parser_gap ? ' · parser gap' : ' · filing-grade auto'}</div>
                             <div class="grade-note">${escapeHtml(row.public_claim || row.automation_claim || '—')}</div>
                             <div class="grade-note">${escapeHtml(row.source_status || '')} · ${escapeHtml(row.run_source || '')}</div>
+                            ${row.degraded_reason ? `<div class="grade-note">Reason: ${escapeHtml(row.degraded_reason)}${row.degraded_detail ? ` · ${escapeHtml(row.degraded_detail)}` : ''}</div>` : ''}
                             ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
                             ${row.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
                             <div class="grade-note">Next: ${escapeHtml(row.run_plan_action || row.next_action || '—')}</div>
