@@ -606,6 +606,57 @@
       "expected_inferred_selections": [
         "encryption"
       ]
+    },
+    {
+      "id": "us-cn-hbm-export",
+      "from": "US",
+      "to": "CN",
+      "focus": "export",
+      "vertical": "semiconductor",
+      "query": "H200 HBM3E high bandwidth memory AI accelerator memory",
+      "expected_top_rule": "CL-USMEM-EXP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1,
+      "expected_inferred_selections": [
+        "semiconductor"
+      ]
+    },
+    {
+      "id": "kr-cn-dram-import",
+      "from": "KR",
+      "to": "CN",
+      "focus": "import",
+      "vertical": "semiconductor",
+      "query": "DRAM DDR5 memory chip import China",
+      "expected_top_rule": "CL-CNMEM-IMP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "tw-us-nand-export",
+      "from": "TW",
+      "to": "US",
+      "focus": "export",
+      "vertical": "semiconductor",
+      "query": "NAND flash memory IC 3D NAND storage controller",
+      "expected_top_rule": "CL-TWMEM-EXP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "jp-in-memory-module-import",
+      "from": "JP",
+      "to": "IN",
+      "focus": "import",
+      "vertical": "semiconductor",
+      "query": "DDR5 memory module LPDDR memory component",
+      "expected_top_rule": "CL-INMEM-IMP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
     }
   ]
 }
