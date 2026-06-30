@@ -344,6 +344,16 @@ function summarizeStages(rows) {
     }, {});
 }
 
+function summarizeDutyLaunchLevels(rows) {
+    return {
+        official_exact: rows.filter(row => row.filing_grade_auto).map(row => row.country),
+        hybrid_official: rows.filter(row => row.launch_mode === 'live_hybrid' && row.rate_automation_stage !== 'maintained_exact_map').map(row => row.country),
+        maintained_benchmark: rows.filter(row => row.rate_automation_stage === 'maintained_exact_map').map(row => row.country),
+        monitor_only: rows.filter(row => row.launch_mode === 'live_monitor').map(row => row.country),
+        parser_gap: rows.filter(row => row.parser_gap).map(row => row.country)
+    };
+}
+
 function buildDutyParserGapTask(row = {}) {
     if (!row.parser_gap && row.filing_grade_auto) return null;
     const taskByStage = {
@@ -420,6 +430,7 @@ function buildAutomationLaunchStatus() {
     const regulatory = buildRegulatoryAutomation();
     const duty_rates = buildDutyAutomation();
     const duty_rate_priority_queue = buildDutyAutomationPriority(duty_rates);
+    const duty_rate_launch_levels = summarizeDutyLaunchLevels(duty_rates);
     const payload = {
         schema_version: 1,
         updated_at: new Date().toISOString(),
@@ -440,6 +451,7 @@ function buildAutomationLaunchStatus() {
             regulatory_marketing: summarizeRegulatoryMarketing(regulatory),
             duty_rate_modes: summarize(duty_rates),
             duty_rate_automation_stages: summarizeStages(duty_rates),
+            duty_rate_launch_levels,
             public_launch_countries: duty_rates.filter(row => row.public_launch).map(row => row.country),
             filing_grade_auto_countries: duty_rates.filter(row => row.filing_grade_auto).map(row => row.country),
             parser_gap_countries: duty_rates.filter(row => row.parser_gap).map(row => row.country)

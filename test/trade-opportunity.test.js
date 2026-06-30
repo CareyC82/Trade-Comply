@@ -316,6 +316,9 @@ describe('trade opportunity insights', () => {
         assert.match(singapore.transitComparison.transitCostEvidence, /Second leg Singapore -> China/i);
         assert.ok(singapore.transitComparison.firstSourceBasis);
         assert.ok(singapore.transitComparison.secondSourceBasis);
+        assert.equal(singapore.transitComparison.transitLegalGate.origin_transformation_required, true);
+        assert.equal(singapore.transitComparison.transitLegalGate.anti_circumvention_review_required, true);
+        assert.match(singapore.transitComparison.transitAuthenticityDecision, /Control-gated|No cost-led|Conditional/i);
         assert.ok(singapore.transitComparison.secondParserPriority);
         assert.ok(singapore.transitComparison.secondParserNextAction);
         assert.match(singapore.transitComparison.decision.headline, /Do not use Singapore for cost reduction/i);

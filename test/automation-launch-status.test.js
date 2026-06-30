@@ -55,6 +55,10 @@ test('automation launch status exposes only safe public launch modes', () => {
         maintained_exact_map: 6,
         official_link_monitor: 1
     });
+    assert.deepEqual(payload.summary.duty_rate_launch_levels.official_exact, ['US']);
+    assert.equal(payload.summary.duty_rate_launch_levels.hybrid_official.length, 6);
+    assert.equal(payload.summary.duty_rate_launch_levels.maintained_benchmark.length, 6);
+    assert.equal(payload.summary.duty_rate_launch_levels.parser_gap.length, 13);
     assert.deepEqual(payload.summary.filing_grade_auto_countries, ['US']);
     assert.deepEqual(payload.summary.parser_gap_countries, ['CN', 'DE', 'EU', 'IN', 'JP', 'KR', 'MX', 'MY', 'NL', 'SG', 'TW', 'VN', 'RU']);
 

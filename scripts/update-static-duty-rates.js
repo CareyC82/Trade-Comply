@@ -282,20 +282,27 @@ function parseIndiaTariffRows(html = '') {
 
 function normalizeGenericRateText(value = '') {
     const text = stripHtml(value);
-    const match = text.match(/\b(free|nil|exempt|\d+(?:\.\d+)?\s*%)\b/i);
+    const match = text.match(/(free|nil|exempt|\d+(?:\.\d+)?\s*%)/i);
     return match ? match[1] : '';
 }
 
 function buildGenericTariffRow({ hsCode = '', text = '', rateText = '' } = {}) {
     const normalizedRateText = normalizeGenericRateText(rateText || text);
+    if (!normalizedRateText) return null;
     const baseRate = parsePercent(normalizedRateText);
     if (!hsCode || baseRate === null) return null;
+    const cleanedText = stripHtml(text);
+    const hasExplicitRateCell = Boolean(rateText);
+    const hasDescriptiveText = cleanedText.replace(hsCode, '').replace(normalizedRateText, '').trim().length >= 3;
+    const hasExactHsShape = /^\d{6,10}$/.test(hsCode);
     return {
         hs_code: hsCode,
         hs_prefix: hsCode.slice(0, 6),
-        item_name: stripHtml(text).replace(hsCode, '').replace(normalizedRateText, '').slice(0, 140).trim(),
+        item_name: cleanedText.replace(hsCode, '').replace(normalizedRateText, '').slice(0, 140).trim(),
         rate_text: normalizedRateText,
-        base_rate: baseRate
+        base_rate: baseRate,
+        confidence: hasExplicitRateCell && hasDescriptiveText && hasExactHsShape ? 'exact_row_candidate' : 'weak_row_candidate',
+        exact_rate_safe: hasExplicitRateCell && hasDescriptiveText && hasExactHsShape
     };
 }
 
@@ -306,7 +313,7 @@ function parseGenericTariffRows(html = '') {
         const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
         const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
         if (!hsCode) return;
-        const rateCell = cells.find(cell => /\b(free|nil|exempt|\d+(?:\.\d+)?\s*%)\b/i.test(cell)) || '';
+        const rateCell = cells.find(cell => /(free|nil|exempt|\d+(?:\.\d+)?\s*%)/i.test(cell)) || '';
         const row = buildGenericTariffRow({
             hsCode,
             text: cells.join(' '),
@@ -332,6 +339,16 @@ function parseGenericTariffRows(html = '') {
         seen.add(key);
         return true;
     });
+}
+
+function summarizeGenericTariffParserRows(rows = []) {
+    const safeRows = rows.filter(row => row.exact_rate_safe);
+    return {
+        row_count: rows.length,
+        safe_row_count: safeRows.length,
+        weak_row_count: Math.max(0, rows.length - safeRows.length),
+        exact_rate_safe: safeRows.length > 0 && safeRows.length === rows.length
+    };
 }
 
 function getOfficialProbeUrls(source = {}, fallbackUrl = '') {
@@ -374,12 +391,16 @@ async function fetchStaticOfficialProbe({
             const ok = response.status_code >= 200 && response.status_code < 400;
             const markers = detectOfficialProbeMarkers(code, response.body || '');
             const rows = parseGenericTariffRows(response.body || '');
+            const parserSummary = summarizeGenericTariffParserRows(rows);
             const attempt = {
                 ok,
                 status_code: response.status_code,
                 official_url: url,
                 rows,
                 row_count: rows.length,
+                safe_row_count: parserSummary.safe_row_count,
+                weak_row_count: parserSummary.weak_row_count,
+                exact_rate_safe: parserSummary.exact_rate_safe,
                 marker_count: markers.length,
                 markers,
                 partial: Boolean(response.partial),
@@ -389,6 +410,9 @@ async function fetchStaticOfficialProbe({
                 official_url: url,
                 status_code: response.status_code,
                 row_count: rows.length,
+                safe_row_count: parserSummary.safe_row_count,
+                weak_row_count: parserSummary.weak_row_count,
+                exact_rate_safe: parserSummary.exact_rate_safe,
                 marker_count: markers.length,
                 partial: Boolean(response.partial),
                 error: response.error || ''
@@ -403,6 +427,9 @@ async function fetchStaticOfficialProbe({
                 official_url: url,
                 rows: [],
                 row_count: 0,
+                safe_row_count: 0,
+                weak_row_count: 0,
+                exact_rate_safe: false,
                 marker_count: 0,
                 markers: [],
                 partial: false,
@@ -419,6 +446,9 @@ async function fetchStaticOfficialProbe({
         official_url: source?.official_url || '',
         rows: [],
         row_count: 0,
+        safe_row_count: 0,
+        weak_row_count: 0,
+        exact_rate_safe: false,
         marker_count: 0,
         markers: [],
         partial: false,
@@ -429,8 +459,13 @@ async function fetchStaticOfficialProbe({
         ...selected,
         attempts,
         row_count: selected.row_count || 0,
-        parser_note: selected.row_count
-            ? `${code || 'Static'} official page contains machine-readable tariff-like rows; keep exact HS validation before promotion.`
+        safe_row_count: selected.safe_row_count || 0,
+        weak_row_count: selected.weak_row_count || 0,
+        exact_rate_safe: Boolean(selected.exact_rate_safe),
+        parser_note: selected.exact_rate_safe
+            ? `${code || 'Static'} official page contains tariff rows that meet exact-rate promotion guards.`
+            : selected.row_count
+            ? `${code || 'Static'} official page contains tariff-like rows, but exact-rate promotion still needs safer row structure.`
             : `${code || 'Static'} official page reachable probe only; exact tariff-row parser is not promoted yet.`
     };
 }
@@ -657,6 +692,9 @@ async function probeStaticBenchmarkReadinessLive(country, {
         row_count: 0,
         marker_count: 0,
         markers: [],
+        safe_row_count: 0,
+        weak_row_count: 0,
+        exact_rate_safe: false,
         error: error.message,
         parser_note: `${readiness.country} official probe failed before parser readiness could be checked.`
     }));
@@ -673,7 +711,10 @@ async function probeStaticBenchmarkReadinessLive(country, {
             marker_count: officialProbe.marker_count || 0,
             markers: officialProbe.markers || [],
             parsed_rate_rows: officialProbe.row_count || 0,
-            machine_parser_ready: Boolean(officialProbe.row_count),
+            safe_rate_rows: officialProbe.safe_row_count || 0,
+            weak_rate_rows: officialProbe.weak_row_count || 0,
+            exact_rate_safe: Boolean(officialProbe.exact_rate_safe),
+            machine_parser_ready: Boolean(officialProbe.exact_rate_safe),
             parser_note: officialProbe.parser_note || `${readiness.country} exact tariff-row parser is not promoted yet.`,
             error: officialProbe.error || ''
         },

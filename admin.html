@@ -1160,12 +1160,16 @@
                     </details>
                 </article>
             `).join('');
+            const dutyLaunchLevels = summary.duty_rate_launch_levels || {};
             return `
                 <div class="quality-banner">
                     <h3>Automation Launch Board</h3>
                     <p class="desc">已上线可公开展示的自动化能力；Hybrid / Monitor 不会被包装成完整 filing-grade 自动税率。</p>
                     <div class="summary-grid">
-                        <div class="summary-card"><strong>${escapeHtml((summary.filing_grade_auto_countries || []).length)}</strong><span>Filing-grade auto markets</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.official_exact || summary.filing_grade_auto_countries || []).length)}</strong><span>Official exact</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.hybrid_official || []).length)}</strong><span>Hybrid official</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.maintained_benchmark || []).length)}</strong><span>Benchmark exact-map</span></div>
+                        <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.parser_gap || summary.parser_gap_countries || []).length)}</strong><span>Parser gaps</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.public_launch_countries || []).length)}</strong><span>Public launch duty markets</span></div>
                         <div class="summary-card"><strong>${escapeHtml(regulatory.length)}</strong><span>Official crawl jurisdictions</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.regulatory_health || {}).healthy || 0)}</strong><span>Healthy crawl jurisdictions</span></div>

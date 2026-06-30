@@ -229,6 +229,7 @@ test('generic static official probe detects tariff-like HS rows for Vietnam and 
     const genericRows = parseGenericTariffRows('<table><tr><td>85423100</td><td>Processors</td><td>0%</td></tr></table>');
     assert.equal(genericRows.length, 1);
     assert.equal(genericRows[0].base_rate, 0);
+    assert.equal(genericRows[0].exact_rate_safe, true);
 
     for (const country of ['VN', 'MY']) {
         const source = dutyRateSources.sources.find(row => row.country === country);
@@ -252,9 +253,35 @@ test('generic static official probe detects tariff-like HS rows for Vietnam and 
 
         assert.equal(official.row_count, 1);
         assert.equal(official.rows[0].base_rate, 0);
-        assert.equal(live.official_probe.machine_parser_ready, true);
+        assert.equal(official.safe_row_count, country === 'VN' ? 1 : 0);
+        assert.equal(official.exact_rate_safe, country === 'VN');
+        assert.equal(live.official_probe.safe_rate_rows, country === 'VN' ? 1 : 0);
+        assert.equal(live.official_probe.machine_parser_ready, country === 'VN');
         assert.equal(live.official_probe.parsed_rate_rows, 1);
     }
+});
+
+test('generic parser keeps weak text-only tariff rows out of exact-rate promotion', async () => {
+    const official = await fetchStaticOfficialProbe({
+        country: 'MY',
+        source: dutyRateSources.sources.find(row => row.country === 'MY'),
+        fetcher: async () => ({
+            status_code: 200,
+            body: '85423100 0%'
+        })
+    });
+    const live = await probeStaticBenchmarkReadinessLive('MY', {
+        fetcher: async () => ({
+            status_code: 200,
+            body: '85423100 0%'
+        })
+    });
+
+    assert.equal(official.row_count, 1);
+    assert.equal(official.weak_row_count, 1);
+    assert.equal(official.exact_rate_safe, false);
+    assert.equal(live.official_probe.machine_parser_ready, false);
+    assert.match(live.official_probe.parser_note, /needs safer row structure/);
 });
 
 test('Japan Customs live probe parses dated tariff schedule and chapter candidates without upgrading rate trust', async () => {
