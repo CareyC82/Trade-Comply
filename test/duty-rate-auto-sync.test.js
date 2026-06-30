@@ -146,6 +146,10 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
                     machine_readable: 'local_exact_map',
                     maintenance_priority: 'P2',
                     update_command: 'npm run update:duty-rates:static -- --countries=VN',
+                    probe_command: 'npm run probe:duty-rates:static -- --countries=VN --probe-live',
+                    official_probe_urls: ['https://www.customs.gov.vn/'],
+                    source_use_cases: ['direct import duty pre-check', 'two-leg transit comparison'],
+                    transit_route_priority: true,
                     next_action: 'Refresh official-link benchmark.'
                 }
             ]
@@ -170,6 +174,9 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
     assert.equal(plan.find(row => row.country === 'VN').applied, true);
     assert.equal(plan.find(row => row.country === 'VN').rate_automation_stage, 'maintained_exact_map');
     assert.equal(plan.find(row => row.country === 'VN').parser_gap, true);
+    assert.match(plan.find(row => row.country === 'VN').parser_gap_task.task, /machine-readable official tariff rows/);
+    assert.equal(plan.find(row => row.country === 'VN').parser_gap_task.source_use_cases.includes('two-leg transit comparison'), true);
+    assert.equal(plan.find(row => row.country === 'VN').parser_gap_task.transit_route_priority, true);
 });
 
 test('auto sync builds an automation digest for parser and probe gaps', () => {
@@ -255,6 +262,8 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     assert.ok(payload.source_run_plan.some(row => row.country === 'IN' && row.run_source === 'India Customs official-live'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'KR' && row.run_source === 'Korea Customs official-live'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'VN' && row.run_source === 'Static official-link benchmarks'));
+    assert.ok(payload.source_run_plan.some(row => row.country === 'MY' && row.parser_gap_task?.source_use_cases?.includes('two-leg transit comparison')));
+    assert.ok(payload.automation_upgrade_queue.some(row => row.country === 'MY' && row.parser_gap_task?.transit_route_priority === true));
     ['CN', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
         assert.equal(staticRun.countries.includes(country), true, `${country} should be refreshed by static benchmark sync`);
         assert.equal(staticRun.readiness[country].ok, true, `${country} readiness should be OK`);

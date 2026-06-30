@@ -1004,6 +1004,9 @@
                             ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
                             ${row.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
                             <div class="grade-note">Next: ${escapeHtml(row.run_plan_action || row.next_action || '—')}</div>
+                            ${row.parser_gap_task?.task ? `<div class="grade-note"><strong>Task:</strong> ${escapeHtml(row.parser_gap_task.task)}</div>` : ''}
+                            ${Array.isArray(row.source_use_cases) && row.source_use_cases.length ? `<div class="grade-note"><strong>Use cases:</strong> ${row.source_use_cases.map(escapeHtml).join(' · ')}</div>` : ''}
+                            ${Array.isArray(row.official_probe_urls) && row.official_probe_urls.length ? `<div class="grade-note"><strong>Probe URLs:</strong> ${row.official_probe_urls.slice(0, 2).map(url => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`).join(' · ')}</div>` : ''}
                         </article>
                     `).join('')}
                 </div>
@@ -1504,7 +1507,11 @@
                     rate_change_count: sync.rate_change_count ?? '',
                     degraded_reason: sync.degraded_reason || '',
                     degraded_detail: sync.degraded_detail || '',
-                    run_plan_action: sync.run_plan_action || ''
+                    run_plan_action: sync.run_plan_action || '',
+                    parser_gap_task: sync.parser_gap_task || row.parser_gap_task || null,
+                    official_probe_urls: sync.official_probe_urls || row.official_probe_urls || [],
+                    source_use_cases: sync.source_use_cases || row.source_use_cases || [],
+                    transit_route_priority: Boolean(sync.transit_route_priority || row.transit_route_priority)
                 };
             }).sort((a, b) => {
                 const rank = { degraded: 0, exception: 1, not_run: 2, ok: 3 };
@@ -1557,7 +1564,13 @@
                                         ${row.update_command ? `<code>${escapeHtml(row.update_command)}</code>` : '<span class="meta">—</span>'}
                                         ${row.probe_command ? `<div class="meta">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
                                     </td>
-                                    <td>${escapeHtml(row.run_plan_action || row.next_action || '')}</td>
+                                    <td>
+                                        ${escapeHtml(row.run_plan_action || row.next_action || '')}
+                                        ${row.parser_gap_task?.task ? `<div class="meta"><strong>Task:</strong> ${escapeHtml(row.parser_gap_task.task)}</div>` : ''}
+                                        ${Array.isArray(row.source_use_cases) && row.source_use_cases.length ? `<div class="meta">Use cases: ${row.source_use_cases.map(escapeHtml).join(' · ')}</div>` : ''}
+                                        ${row.transit_route_priority ? '<div class="meta">Transit-route priority</div>' : ''}
+                                        ${Array.isArray(row.official_probe_urls) && row.official_probe_urls.length ? `<div class="meta">Probe URLs: ${row.official_probe_urls.slice(0, 2).map(url => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`).join(' · ')}</div>` : ''}
+                                    </td>
                                 </tr>
                             `).join('')}
                         </tbody>

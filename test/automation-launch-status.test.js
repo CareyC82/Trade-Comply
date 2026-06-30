@@ -69,11 +69,14 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(byCountry.KR.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.IN.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.SG.rate_automation_stage, 'maintained_exact_map');
+    assert.ok(byCountry.MY.official_probe_urls.length >= 2);
+    assert.equal(byCountry.MY.transit_route_priority, true);
     assert.equal(byCountry.RU.launch_mode, 'live_monitor');
     assert.equal(byCountry.RU.rate_automation_stage, 'official_link_monitor');
     assert.equal(byCountry.RU.filing_grade_auto, false);
     assert.equal(payload.duty_rate_priority_queue.length, 13);
     assert.deepEqual(payload.duty_rate_priority_queue.slice(0, 3).map(row => row.country), ['DE', 'EU', 'NL']);
+    assert.ok(payload.duty_rate_priority_queue.some(row => row.country === 'MY' && row.parser_gap_task?.source_use_cases?.includes('two-leg transit comparison')));
     assert.equal(payload.duty_rates.every(row => row.public_launch), true);
 });
 

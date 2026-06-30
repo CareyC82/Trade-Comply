@@ -314,6 +314,9 @@ function buildDutyAutomation() {
             update_command: source.update_command || '',
             probe_command: source.probe_command || '',
             official_url: source.official_url || '',
+            official_probe_urls: Array.isArray(source.official_probe_urls) ? source.official_probe_urls : [],
+            source_use_cases: Array.isArray(source.source_use_cases) ? source.source_use_cases : [],
+            transit_route_priority: Boolean(source.transit_route_priority),
             current_scope: source.current_scope || '',
             next_action: source.next_action || '',
             ...stage,
@@ -341,6 +344,28 @@ function summarizeStages(rows) {
     }, {});
 }
 
+function buildDutyParserGapTask(row = {}) {
+    if (!row.parser_gap && row.filing_grade_auto) return null;
+    const taskByStage = {
+        official_hybrid_parser: 'Promote exact HS parser only after official tariff rows and rate fields are stable.',
+        official_probe_candidate: 'Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.',
+        maintained_exact_map: 'Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.',
+        official_link_monitor: 'Keep official link monitoring live and add parser only when machine-readable tariff rows become available.',
+        not_automated: 'Add an official source, probe URL, and parser path before claiming automated coverage.'
+    };
+    return {
+        country: row.country || '',
+        priority: row.maintenance_priority || 'Unassigned',
+        stage: row.rate_automation_stage || '',
+        task: taskByStage[row.rate_automation_stage] || row.next_upgrade || row.next_action || 'Review parser/source gap.',
+        probe_command: row.probe_command || '',
+        official_probe_urls: row.official_probe_urls || [],
+        source_use_cases: row.source_use_cases || [],
+        transit_route_priority: Boolean(row.transit_route_priority),
+        next_action: row.next_upgrade || row.next_action || ''
+    };
+}
+
 function buildDutyAutomationPriority(rows) {
     const rank = {
         official_hybrid_parser: 0,
@@ -360,6 +385,10 @@ function buildDutyAutomationPriority(rows) {
             public_claim: row.public_claim,
             update_command: row.update_command,
             probe_command: row.probe_command,
+            official_probe_urls: row.official_probe_urls || [],
+            source_use_cases: row.source_use_cases || [],
+            transit_route_priority: Boolean(row.transit_route_priority),
+            parser_gap_task: buildDutyParserGapTask(row),
             next_upgrade: row.next_upgrade,
             next_action: row.next_action
         }))

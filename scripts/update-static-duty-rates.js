@@ -280,6 +280,60 @@ function parseIndiaTariffRows(html = '') {
         .filter(Boolean);
 }
 
+function normalizeGenericRateText(value = '') {
+    const text = stripHtml(value);
+    const match = text.match(/\b(free|nil|exempt|\d+(?:\.\d+)?\s*%)\b/i);
+    return match ? match[1] : '';
+}
+
+function buildGenericTariffRow({ hsCode = '', text = '', rateText = '' } = {}) {
+    const normalizedRateText = normalizeGenericRateText(rateText || text);
+    const baseRate = parsePercent(normalizedRateText);
+    if (!hsCode || baseRate === null) return null;
+    return {
+        hs_code: hsCode,
+        hs_prefix: hsCode.slice(0, 6),
+        item_name: stripHtml(text).replace(hsCode, '').replace(normalizedRateText, '').slice(0, 140).trim(),
+        rate_text: normalizedRateText,
+        base_rate: baseRate
+    };
+}
+
+function parseGenericTariffRows(html = '') {
+    const rows = [];
+    const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    rowMatches.forEach((rowHtml) => {
+        const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
+        const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
+        if (!hsCode) return;
+        const rateCell = cells.find(cell => /\b(free|nil|exempt|\d+(?:\.\d+)?\s*%)\b/i.test(cell)) || '';
+        const row = buildGenericTariffRow({
+            hsCode,
+            text: cells.join(' '),
+            rateText: rateCell
+        });
+        if (row) rows.push(row);
+    });
+
+    if (!rows.length) {
+        stripHtml(html)
+            .split(/(?=\b\d{6,10}\b)/)
+            .forEach((line) => {
+                const hsCode = line.match(/\b\d{6,10}\b/)?.[0] || '';
+                const row = buildGenericTariffRow({ hsCode, text: line });
+                if (row) rows.push(row);
+            });
+    }
+
+    const seen = new Set();
+    return rows.filter((row) => {
+        const key = `${row.hs_code}:${row.rate_text}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
 function getOfficialProbeUrls(source = {}, fallbackUrl = '') {
     const urls = [
         ...(Array.isArray(source?.official_probe_urls) ? source.official_probe_urls : []),
@@ -319,17 +373,27 @@ async function fetchStaticOfficialProbe({
             const response = await fetcher(url, { timeoutMs });
             const ok = response.status_code >= 200 && response.status_code < 400;
             const markers = detectOfficialProbeMarkers(code, response.body || '');
+            const rows = parseGenericTariffRows(response.body || '');
             const attempt = {
                 ok,
                 status_code: response.status_code,
                 official_url: url,
+                rows,
+                row_count: rows.length,
                 marker_count: markers.length,
                 markers,
                 partial: Boolean(response.partial),
                 error: response.error || ''
             };
-            attempts.push(attempt);
-            if (!best || attempt.marker_count > best.marker_count || (!best.ok && attempt.ok)) {
+            attempts.push({
+                official_url: url,
+                status_code: response.status_code,
+                row_count: rows.length,
+                marker_count: markers.length,
+                partial: Boolean(response.partial),
+                error: response.error || ''
+            });
+            if (!best || attempt.row_count > best.row_count || attempt.marker_count > best.marker_count || (!best.ok && attempt.ok)) {
                 best = attempt;
             }
         } catch (error) {
@@ -337,6 +401,8 @@ async function fetchStaticOfficialProbe({
                 ok: false,
                 status_code: null,
                 official_url: url,
+                rows: [],
+                row_count: 0,
                 marker_count: 0,
                 markers: [],
                 partial: false,
@@ -351,6 +417,8 @@ async function fetchStaticOfficialProbe({
         ok: false,
         status_code: null,
         official_url: source?.official_url || '',
+        rows: [],
+        row_count: 0,
         marker_count: 0,
         markers: [],
         partial: false,
@@ -360,8 +428,10 @@ async function fetchStaticOfficialProbe({
     return {
         ...selected,
         attempts,
-        row_count: 0,
-        parser_note: `${code || 'Static'} official page reachable probe only; exact tariff-row parser is not promoted yet.`
+        row_count: selected.row_count || 0,
+        parser_note: selected.row_count
+            ? `${code || 'Static'} official page contains machine-readable tariff-like rows; keep exact HS validation before promotion.`
+            : `${code || 'Static'} official page reachable probe only; exact tariff-row parser is not promoted yet.`
     };
 }
 
@@ -603,7 +673,7 @@ async function probeStaticBenchmarkReadinessLive(country, {
             marker_count: officialProbe.marker_count || 0,
             markers: officialProbe.markers || [],
             parsed_rate_rows: officialProbe.row_count || 0,
-            machine_parser_ready: false,
+            machine_parser_ready: Boolean(officialProbe.row_count),
             parser_note: officialProbe.parser_note || `${readiness.country} exact tariff-row parser is not promoted yet.`,
             error: officialProbe.error || ''
         },
@@ -958,6 +1028,7 @@ module.exports = {
     fetchTextWithCurl,
     getOfficialProbeUrls,
     getMaintainedPrefixes,
+    parseGenericTariffRows,
     parseIndiaTariffRows,
     parsePercent,
     probeIndiaReadiness,

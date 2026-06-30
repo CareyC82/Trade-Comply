@@ -66,6 +66,7 @@ const {
     fetchIndiaOfficialRows,
     fetchStaticOfficialProbe,
     getOfficialProbeUrls,
+    parseGenericTariffRows,
     parseIndiaTariffRows,
     probeIndiaReadiness,
     probeStaticBenchmarkReadiness,
@@ -221,6 +222,38 @@ test('Vietnam and Malaysia static sources expose official probe and transit use-
         assert.equal(live.official_probe.checked, true);
         assert.equal(live.official_probe.machine_parser_ready, false);
         assert.equal(live.official_probe.parsed_rate_rows, 0);
+    }
+});
+
+test('generic static official probe detects tariff-like HS rows for Vietnam and Malaysia parser promotion', async () => {
+    const genericRows = parseGenericTariffRows('<table><tr><td>85423100</td><td>Processors</td><td>0%</td></tr></table>');
+    assert.equal(genericRows.length, 1);
+    assert.equal(genericRows[0].base_rate, 0);
+
+    for (const country of ['VN', 'MY']) {
+        const source = dutyRateSources.sources.find(row => row.country === country);
+        const body = country === 'VN'
+            ? '<table><tr><td>85423100</td><td>Processors</td><td>0%</td></tr></table>'
+            : '85423100 Processors customs duty 0%';
+        const official = await fetchStaticOfficialProbe({
+            country,
+            source,
+            fetcher: async () => ({
+                status_code: 200,
+                body
+            })
+        });
+        const live = await probeStaticBenchmarkReadinessLive(country, {
+            fetcher: async () => ({
+                status_code: 200,
+                body
+            })
+        });
+
+        assert.equal(official.row_count, 1);
+        assert.equal(official.rows[0].base_rate, 0);
+        assert.equal(live.official_probe.machine_parser_ready, true);
+        assert.equal(live.official_probe.parsed_rate_rows, 1);
     }
 });
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-29T20:11:23.109Z",
+  "updated_at": "2026-06-30T03:23:07.026Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -600,6 +600,9 @@
       "update_command": "npm run update:duty-rates:us",
       "probe_command": "",
       "official_url": "https://hts.usitc.gov/",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "General HTS base duty for maintained HS prefixes. Additional duties such as Section 301 and AD/CVD remain separate benchmark/scope checks.",
       "next_action": "Keep USITC sync running before releases and monitor changes in data/duty-rates.json.",
       "rate_automation_stage": "official_machine_sync",
@@ -622,6 +625,9 @@
       "update_command": "npm run update:duty-rates:static -- --countries=CN",
       "probe_command": "",
       "official_url": "https://www.customs.gov.cn/",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Maintained China exact-line MFN duty candidates plus 13% import VAT and product-control review reminders.",
       "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed.",
       "rate_automation_stage": "maintained_exact_map",
@@ -644,6 +650,9 @@
       "update_command": "npm run update:duty-rates:eu",
       "probe_command": "",
       "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Hybrid Germany coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Germany VAT benchmark separately.",
       "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
       "rate_automation_stage": "official_hybrid_parser",
@@ -666,6 +675,9 @@
       "update_command": "npm run update:duty-rates:eu",
       "probe_command": "npm run probe:duty-rates:eu",
       "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Hybrid EU coverage: official TARIC candidate duty for unambiguous HS prefixes, scope-check status for ambiguous prefixes, and benchmark member-state VAT shown separately.",
       "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated.",
       "rate_automation_stage": "official_hybrid_parser",
@@ -688,6 +700,11 @@
       "update_command": "npm run update:duty-rates:in:official",
       "probe_command": "npm run probe:duty-rates:in",
       "official_url": "https://www.icegate.gov.in/",
+      "official_probe_urls": [
+        "https://www.icegate.gov.in/"
+      ],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Official-live probe candidate plus maintained exact-line BCD fallback; SWS/IGST and product-control review reminders stay separate.",
       "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
       "rate_automation_stage": "official_probe_candidate",
@@ -710,6 +727,9 @@
       "update_command": "npm run update:duty-rates:jp",
       "probe_command": "npm run probe:duty-rates:jp",
       "official_url": "https://www.customs.go.jp/english/tariff/",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
       "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes.",
       "rate_automation_stage": "official_probe_candidate",
@@ -732,6 +752,9 @@
       "update_command": "npm run update:duty-rates:kr:official",
       "probe_command": "npm run probe:duty-rates:kr",
       "official_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Maintained Korea exact-line base-duty candidates plus 10% VAT and KC/origin review reminders.",
       "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows.",
       "rate_automation_stage": "official_probe_candidate",
@@ -754,6 +777,9 @@
       "update_command": "npm run update:duty-rates:mx",
       "probe_command": "",
       "official_url": "https://www.snice.gob.mx/",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Maintained Mexico exact-line IGI/base-duty candidates plus 16% VAT and NOM/origin review reminders.",
       "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed.",
       "rate_automation_stage": "maintained_exact_map",
@@ -774,10 +800,20 @@
       "machine_readable": "local_exact_map",
       "maintenance_priority": "P2",
       "update_command": "npm run update:duty-rates:static -- --countries=MY",
-      "probe_command": "",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_url": "https://mysst.customs.gov.my/",
+      "official_probe_urls": [
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
+      ],
+      "source_use_cases": [
+        "direct import duty pre-check",
+        "two-leg transit comparison",
+        "origin transformation evidence review"
+      ],
+      "transit_route_priority": true,
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
-      "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed.",
+      "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed.",
       "rate_automation_stage": "maintained_exact_map",
       "automation_claim": "Maintained exact-line map refreshed by source roadmap",
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
@@ -798,6 +834,9 @@
       "update_command": "npm run update:duty-rates:eu",
       "probe_command": "",
       "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Hybrid Netherlands coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Netherlands VAT benchmark separately.",
       "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
       "rate_automation_stage": "official_hybrid_parser",
@@ -820,6 +859,9 @@
       "update_command": "npm run update:duty-rates:sg",
       "probe_command": "",
       "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Maintained Singapore exact-line base-duty candidates plus 9% GST value treatment reminder.",
       "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed.",
       "rate_automation_stage": "maintained_exact_map",
@@ -842,6 +884,9 @@
       "update_command": "npm run update:duty-rates:static -- --countries=TW",
       "probe_command": "",
       "official_url": "https://web.customs.gov.tw/",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Maintained Taiwan exact-line base-duty candidates plus 5% business-tax and product-scope review reminders.",
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed.",
       "rate_automation_stage": "maintained_exact_map",
@@ -862,10 +907,20 @@
       "machine_readable": "local_exact_map",
       "maintenance_priority": "P2",
       "update_command": "npm run update:duty-rates:static -- --countries=VN",
-      "probe_command": "",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
       "official_url": "https://www.customs.gov.vn/",
+      "official_probe_urls": [
+        "https://www.customs.gov.vn/",
+        "https://www.customs.gov.vn/index.jsp?pageId=2281"
+      ],
+      "source_use_cases": [
+        "direct import duty pre-check",
+        "two-leg transit comparison",
+        "origin transformation evidence review"
+      ],
+      "transit_route_priority": true,
       "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
-      "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed.",
+      "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed.",
       "rate_automation_stage": "maintained_exact_map",
       "automation_claim": "Maintained exact-line map refreshed by source roadmap",
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
@@ -886,6 +941,9 @@
       "update_command": "npm run update:duty-rates:static -- --countries=RU",
       "probe_command": "",
       "official_url": "https://customs.gov.ru/",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
       "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
       "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math.",
       "rate_automation_stage": "official_link_monitor",
@@ -909,6 +967,20 @@
       "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
       "update_command": "npm run update:duty-rates:eu",
       "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "DE",
+        "priority": "P1",
+        "stage": "official_hybrid_parser",
+        "task": "Promote exact HS parser only after official tariff rows and rate fields are stable.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      },
       "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
       "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
     },
@@ -920,6 +992,20 @@
       "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
       "update_command": "npm run update:duty-rates:eu",
       "probe_command": "npm run probe:duty-rates:eu",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "EU",
+        "priority": "P1",
+        "stage": "official_hybrid_parser",
+        "task": "Promote exact HS parser only after official tariff rows and rate fields are stable.",
+        "probe_command": "npm run probe:duty-rates:eu",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      },
       "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
       "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated."
     },
@@ -931,6 +1017,20 @@
       "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
       "update_command": "npm run update:duty-rates:eu",
       "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "NL",
+        "priority": "P1",
+        "stage": "official_hybrid_parser",
+        "task": "Promote exact HS parser only after official tariff rows and rate fields are stable.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      },
       "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
       "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
     },
@@ -942,6 +1042,24 @@
       "public_claim": "Official-linked candidate coverage with parser caveat",
       "update_command": "npm run update:duty-rates:in:official",
       "probe_command": "npm run probe:duty-rates:in",
+      "official_probe_urls": [
+        "https://www.icegate.gov.in/"
+      ],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "IN",
+        "priority": "P2",
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
+        "probe_command": "npm run probe:duty-rates:in",
+        "official_probe_urls": [
+          "https://www.icegate.gov.in/"
+        ],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
+      },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
     },
@@ -953,6 +1071,20 @@
       "public_claim": "Official-linked candidate coverage with parser caveat",
       "update_command": "npm run update:duty-rates:jp",
       "probe_command": "npm run probe:duty-rates:jp",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "JP",
+        "priority": "P2",
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
+        "probe_command": "npm run probe:duty-rates:jp",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
+      },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes."
     },
@@ -964,6 +1096,20 @@
       "public_claim": "Official-linked candidate coverage with parser caveat",
       "update_command": "npm run update:duty-rates:kr:official",
       "probe_command": "npm run probe:duty-rates:kr",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "KR",
+        "priority": "P2",
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
+        "probe_command": "npm run probe:duty-rates:kr",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
+      },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows."
     },
@@ -975,6 +1121,20 @@
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
       "update_command": "npm run update:duty-rates:sg",
       "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "SG",
+        "priority": "P1",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Connect a machine-readable SG tariff parser or official API."
+      },
       "next_upgrade": "Connect a machine-readable SG tariff parser or official API.",
       "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed."
     },
@@ -986,6 +1146,20 @@
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
       "update_command": "npm run update:duty-rates:static -- --countries=CN",
       "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "CN",
+        "priority": "P2",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Connect a machine-readable CN tariff parser or official API."
+      },
       "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
       "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
     },
@@ -997,6 +1171,20 @@
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
       "update_command": "npm run update:duty-rates:mx",
       "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "MX",
+        "priority": "P2",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Connect a machine-readable MX tariff parser or official API."
+      },
       "next_upgrade": "Connect a machine-readable MX tariff parser or official API.",
       "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed."
     },
@@ -1007,9 +1195,37 @@
       "automation_claim": "Maintained exact-line map refreshed by source roadmap",
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
       "update_command": "npm run update:duty-rates:static -- --countries=MY",
-      "probe_command": "",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
+      "official_probe_urls": [
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
+      ],
+      "source_use_cases": [
+        "direct import duty pre-check",
+        "two-leg transit comparison",
+        "origin transformation evidence review"
+      ],
+      "transit_route_priority": true,
+      "parser_gap_task": {
+        "country": "MY",
+        "priority": "P2",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
+        "official_probe_urls": [
+          "https://mysst.customs.gov.my/",
+          "https://tariff.customs.gov.my/"
+        ],
+        "source_use_cases": [
+          "direct import duty pre-check",
+          "two-leg transit comparison",
+          "origin transformation evidence review"
+        ],
+        "transit_route_priority": true,
+        "next_action": "Connect a machine-readable MY tariff parser or official API."
+      },
       "next_upgrade": "Connect a machine-readable MY tariff parser or official API.",
-      "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed."
+      "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
     },
     {
       "country": "TW",
@@ -1019,6 +1235,20 @@
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
       "update_command": "npm run update:duty-rates:static -- --countries=TW",
       "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "TW",
+        "priority": "P2",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Connect a machine-readable TW tariff parser or official API."
+      },
       "next_upgrade": "Connect a machine-readable TW tariff parser or official API.",
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed."
     },
@@ -1029,9 +1259,37 @@
       "automation_claim": "Maintained exact-line map refreshed by source roadmap",
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
       "update_command": "npm run update:duty-rates:static -- --countries=VN",
-      "probe_command": "",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
+      "official_probe_urls": [
+        "https://www.customs.gov.vn/",
+        "https://www.customs.gov.vn/index.jsp?pageId=2281"
+      ],
+      "source_use_cases": [
+        "direct import duty pre-check",
+        "two-leg transit comparison",
+        "origin transformation evidence review"
+      ],
+      "transit_route_priority": true,
+      "parser_gap_task": {
+        "country": "VN",
+        "priority": "P2",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
+        "official_probe_urls": [
+          "https://www.customs.gov.vn/",
+          "https://www.customs.gov.vn/index.jsp?pageId=2281"
+        ],
+        "source_use_cases": [
+          "direct import duty pre-check",
+          "two-leg transit comparison",
+          "origin transformation evidence review"
+        ],
+        "transit_route_priority": true,
+        "next_action": "Connect a machine-readable VN tariff parser or official API."
+      },
       "next_upgrade": "Connect a machine-readable VN tariff parser or official API.",
-      "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed."
+      "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
     },
     {
       "country": "RU",
@@ -1041,6 +1299,20 @@
       "public_claim": "Source monitored; do not show as automated rate extraction",
       "update_command": "npm run update:duty-rates:static -- --countries=RU",
       "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "RU",
+        "priority": "P3",
+        "stage": "official_link_monitor",
+        "task": "Keep official link monitoring live and add parser only when machine-readable tariff rows become available.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Connect exact tariff-line parser before using rate math beyond screening."
+      },
       "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
       "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math."
     }

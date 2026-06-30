@@ -311,6 +311,11 @@ describe('trade opportunity insights', () => {
         assert.equal(singapore.transitComparison.secondLegRouteSpecific, true);
         assert.equal(singapore.transitComparison.secondLegTransitEvidence, true);
         assert.match(singapore.transitComparison.secondLegScopeNote, /Singapore -> China has maintained transit-route review evidence/i);
+        assert.match(singapore.transitComparison.transitCostEvidence, /Direct United States -> China/i);
+        assert.match(singapore.transitComparison.transitCostEvidence, /First leg United States -> Singapore/i);
+        assert.match(singapore.transitComparison.transitCostEvidence, /Second leg Singapore -> China/i);
+        assert.ok(singapore.transitComparison.firstSourceBasis);
+        assert.ok(singapore.transitComparison.secondSourceBasis);
         assert.ok(singapore.transitComparison.secondParserPriority);
         assert.ok(singapore.transitComparison.secondParserNextAction);
         assert.match(singapore.transitComparison.decision.headline, /Do not use Singapore for cost reduction/i);
@@ -320,6 +325,7 @@ describe('trade opportunity insights', () => {
         assert.match(singapore.transitWarning, /maintained transit-route review evidence/i);
         assert.match(singapore.transitWarning, /origin transformation/i);
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Combined cost' && /United States -> Singapore/.test(item.detail) && /\+\$90\.00 \/ \$1k/.test(item.detail)));
+        assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Source coverage' && /second source/i.test(item.detail)));
         assert.ok(singapore.sourceEvidence.some((item) => item.label === 'Origin / re-export gate' && /origin transformation/i.test(item.detail)));
         assert.match(singapore.routeDecisionSummary, /Not cheaper|cost reduction|direct/i);
         assert.ok(singapore.rejectionReasons.some((item) => /higher than direct|workaround|origin/i.test(item)));

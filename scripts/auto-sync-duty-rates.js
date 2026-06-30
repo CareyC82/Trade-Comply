@@ -163,6 +163,30 @@ function getSourceRunName(source = {}) {
     return source.name || country || 'Unknown source';
 }
 
+function buildParserGapTask(row = {}, source = {}) {
+    if (!row.parser_gap) return null;
+    const urls = Array.isArray(source.official_probe_urls) ? source.official_probe_urls : [];
+    const useCases = Array.isArray(source.source_use_cases) ? source.source_use_cases : [];
+    const taskByStage = {
+        official_hybrid_parser: 'Promote exact HS parser only after official tariff rows and rate fields are stable.',
+        official_probe_candidate: 'Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.',
+        maintained_exact_map: 'Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.',
+        official_link_monitor: 'Keep official link monitoring live and add parser only when machine-readable tariff rows become available.',
+        not_automated: 'Add an official source, probe URL, and parser path before claiming automated coverage.'
+    };
+    return {
+        country: row.country || source.country || '',
+        priority: row.maintenance_priority || source.maintenance_priority || 'Unassigned',
+        stage: row.rate_automation_stage || '',
+        task: taskByStage[row.rate_automation_stage] || row.run_plan_action || row.next_action || 'Review parser/source gap.',
+        probe_command: row.probe_command || source.probe_command || '',
+        official_probe_urls: urls,
+        source_use_cases: useCases,
+        transit_route_priority: Boolean(source.transit_route_priority),
+        next_action: row.run_plan_action || row.next_action || source.next_action || ''
+    };
+}
+
 function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
     const priorityRank = { P0: 0, P1: 1, P2: 2, P3: 3 };
     const runsBySource = new Map(runs.map(run => [run.source, run]));
@@ -184,7 +208,9 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 : stage.parser_gap
                     ? stage.next_upgrade
                     : 'Keep official machine-readable sync running.';
-            return {
+            const officialProbeUrls = Array.isArray(source.official_probe_urls) ? source.official_probe_urls : [];
+            const sourceUseCases = Array.isArray(source.source_use_cases) ? source.source_use_cases : [];
+            const row = {
                 country: source.country || '',
                 maintenance_priority: source.maintenance_priority || 'Unassigned',
                 source_status: source.source_status || '',
@@ -204,7 +230,14 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 degraded_reason: run?.official_fetch_degraded_reason || '',
                 degraded_detail: run?.official_fetch_degraded_detail || run?.official_fetch?.error || '',
                 next_action: source.next_action || '',
-                run_plan_action: runPlanAction
+                run_plan_action: runPlanAction,
+                official_probe_urls: officialProbeUrls,
+                source_use_cases: sourceUseCases,
+                transit_route_priority: Boolean(source.transit_route_priority)
+            };
+            return {
+                ...row,
+                parser_gap_task: buildParserGapTask(row, source)
             };
         })
         .sort((a, b) => (
@@ -244,6 +277,11 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
             rate_automation_stage: row.rate_automation_stage,
             run_status: row.run_status,
             update_command: row.update_command,
+            probe_command: row.probe_command,
+            official_probe_urls: row.official_probe_urls || [],
+            source_use_cases: row.source_use_cases || [],
+            transit_route_priority: Boolean(row.transit_route_priority),
+            parser_gap_task: row.parser_gap_task || null,
             next_action: row.run_plan_action || row.next_action || ''
         }))
         .slice(0, 8);
@@ -287,6 +325,10 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             rate_automation_stage: row.rate_automation_stage,
             run_status: row.run_status,
             parser_gap: Boolean(row.parser_gap),
+            official_probe_urls: row.official_probe_urls || [],
+            source_use_cases: row.source_use_cases || [],
+            transit_route_priority: Boolean(row.transit_route_priority),
+            parser_gap_task: row.parser_gap_task || null,
             next_upgrade: row.run_plan_action || row.next_action || ''
         }));
     if (health && health.ok === false) {
