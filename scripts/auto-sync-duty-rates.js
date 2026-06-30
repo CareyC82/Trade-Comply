@@ -17,6 +17,7 @@ const { updateKoreaRules, updateKoreaRulesFromOfficialSource } = require('./upda
 const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
     updateIndiaRulesFromOfficialSource,
+    probeStaticBenchmarkReadinessLive,
     updateStaticBenchmarkRules
 } = require('./update-static-duty-rates');
 const { runDutyRateHealthCheck } = require('./check-duty-rates');
@@ -26,6 +27,7 @@ const ROOT = path.join(__dirname, '..');
 const SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const MATERIAL_RATE_CHANGE_THRESHOLD = 0.03;
+const STATIC_OFFICIAL_LIVE_PROBE_COUNTRIES = ['VN', 'MY'];
 
 function writeJson(filePath, payload) {
     fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`);
@@ -73,6 +75,7 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         official_fetch_degraded_reason: result.official_fetch_degraded_reason || '',
         official_fetch_degraded_detail: result.official_fetch_degraded_detail || '',
         readiness: result.readiness || null,
+        static_official_probes: result.static_official_probes || null,
         changes,
         errors
     };
@@ -181,6 +184,7 @@ function buildParserGapTask(row = {}, source = {}) {
         task: taskByStage[row.rate_automation_stage] || row.run_plan_action || row.next_action || 'Review parser/source gap.',
         probe_command: row.probe_command || source.probe_command || '',
         official_probe_urls: urls,
+        official_probe_live_status: row.official_probe_live_status || null,
         source_use_cases: useCases,
         transit_route_priority: Boolean(source.transit_route_priority),
         next_action: row.run_plan_action || row.next_action || source.next_action || ''
@@ -195,6 +199,7 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
         .map((source) => {
             const runSource = getSourceRunName(source);
             const run = runsBySource.get(runSource);
+            const liveProbe = run?.static_official_probes?.[String(source.country || '').toUpperCase()] || null;
             const stage = dutyAutomationStage(source);
             const runStatus = run
                 ? run.official_fetch_degraded
@@ -229,6 +234,18 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 rate_change_count: run?.rate_change_count || 0,
                 degraded_reason: run?.official_fetch_degraded_reason || '',
                 degraded_detail: run?.official_fetch_degraded_detail || run?.official_fetch?.error || '',
+                official_probe_live_status: liveProbe ? {
+                    checked: Boolean(liveProbe.checked ?? liveProbe.official_probe?.checked),
+                    ok: liveProbe.ok ?? liveProbe.official_probe?.ok ?? null,
+                    official_url: liveProbe.official_url || liveProbe.official_probe?.official_url || '',
+                    parsed_rate_rows: Number(liveProbe.parsed_rate_rows ?? liveProbe.official_probe?.parsed_rate_rows ?? liveProbe.live_row_count ?? 0),
+                    safe_rate_rows: Number(liveProbe.safe_rate_rows ?? liveProbe.official_probe?.safe_rate_rows ?? 0),
+                    weak_rate_rows: Number(liveProbe.weak_rate_rows ?? liveProbe.official_probe?.weak_rate_rows ?? 0),
+                    exact_rate_safe: Boolean(liveProbe.exact_rate_safe ?? liveProbe.official_probe?.exact_rate_safe),
+                    machine_parser_ready: Boolean(liveProbe.machine_parser_ready ?? liveProbe.official_probe?.machine_parser_ready),
+                    parser_note: liveProbe.parser_note || liveProbe.official_probe?.parser_note || '',
+                    error: liveProbe.error || liveProbe.official_probe?.error || ''
+                } : null,
                 next_action: source.next_action || '',
                 run_plan_action: runPlanAction,
                 official_probe_urls: officialProbeUrls,
@@ -279,8 +296,10 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
             update_command: row.update_command,
             probe_command: row.probe_command,
             official_probe_urls: row.official_probe_urls || [],
+            official_probe_live_status: row.official_probe_live_status || null,
             source_use_cases: row.source_use_cases || [],
             transit_route_priority: Boolean(row.transit_route_priority),
+            official_probe_live_status: row.official_probe_live_status || null,
             parser_gap_task: row.parser_gap_task || null,
             next_action: row.run_plan_action || row.next_action || ''
         }))
@@ -404,7 +423,9 @@ async function runAutoDutyRateSync({
     dryRun = false,
     skipOfficialUs = false,
     koreaOfficialFetcher = null,
-    indiaOfficialFetcher = null
+    indiaOfficialFetcher = null,
+    staticOfficialFetcher = null,
+    skipStaticOfficialProbe = false
 } = {}) {
     const startedAt = new Date().toISOString();
     const runs = [];
@@ -489,10 +510,56 @@ async function runAutoDutyRateSync({
         mode: 'official-live'
     }));
 
+    const staticCountries = STATIC_BENCHMARK_COUNTRIES.filter(country => country !== 'IN');
     const staticResult = updateStaticBenchmarkRules({
-        countries: STATIC_BENCHMARK_COUNTRIES.filter(country => country !== 'IN'),
+        countries: staticCountries,
         dryRun
     });
+    const staticProbeCountries = staticCountries.filter(country => STATIC_OFFICIAL_LIVE_PROBE_COUNTRIES.includes(country));
+    const staticOfficialProbes = {};
+    if (!skipStaticOfficialProbe) {
+        await Promise.all(staticProbeCountries.map(async (country) => {
+            const readiness = await probeStaticBenchmarkReadinessLive(country, {
+                ...(staticOfficialFetcher ? { fetcher: staticOfficialFetcher } : {})
+            }).catch(error => ({
+                country,
+                ok: false,
+                official_url: '',
+                parsed_rate_rows: 0,
+                safe_rate_rows: 0,
+                weak_rate_rows: 0,
+                exact_rate_safe: false,
+                machine_parser_ready: false,
+                parser_note: `${country} live official probe failed.`,
+                error: error.message,
+                official_probe: {
+                    checked: true,
+                    ok: false,
+                    parsed_rate_rows: 0,
+                    safe_rate_rows: 0,
+                    weak_rate_rows: 0,
+                    exact_rate_safe: false,
+                    machine_parser_ready: false,
+                    parser_note: `${country} live official probe failed.`,
+                    error: error.message
+                }
+            }));
+            const probe = readiness.official_probe || readiness;
+            staticOfficialProbes[country] = {
+                checked: true,
+                ok: probe.ok ?? null,
+                official_url: probe.official_url || readiness.official_url || '',
+                parsed_rate_rows: Number(probe.parsed_rate_rows || readiness.live_row_count || 0),
+                safe_rate_rows: Number(probe.safe_rate_rows || 0),
+                weak_rate_rows: Number(probe.weak_rate_rows || 0),
+                exact_rate_safe: Boolean(probe.exact_rate_safe),
+                machine_parser_ready: Boolean(probe.machine_parser_ready),
+                parser_note: probe.parser_note || readiness.next_action || '',
+                error: probe.error || readiness.error || ''
+            };
+        }));
+    }
+    staticResult.static_official_probes = staticOfficialProbes;
     runs.push(buildRunSummary('Static official-link benchmarks', staticResult, {
         applied: !dryRun,
         mode: 'benchmark'

@@ -1076,6 +1076,7 @@
             const summary = status.summary || {};
             const regulatory = Array.isArray(status.regulatory) ? status.regulatory : [];
             const dutyRates = Array.isArray(status.duty_rates) ? status.duty_rates : [];
+            const weeklyRoutePriorities = Array.isArray(status.weekly_route_priorities) ? status.weekly_route_priorities : [];
             const modeLabel = {
                 live_auto: 'Live auto',
                 live_hybrid: 'Live hybrid',
@@ -1123,6 +1124,20 @@
                     </div>
                     <div class="grade-note">${escapeHtml(row.note || '')}</div>
                     ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
+                </article>
+            `).join('');
+            const weeklyRows = weeklyRoutePriorities.map(row => `
+                <article class="duty-source-grade-card">
+                    <strong>#${escapeHtml(row.rank || '')} ${escapeHtml(row.route || '')}</strong>
+                    <div class="grade-line">
+                        <span class="badge benchmark">${escapeHtml(row.maintenance_priority || '—')}</span>
+                        <span class="badge hybrid_official_candidate">${escapeHtml(row.rate_automation_stage || '')}</span>
+                        ${row.transit_route_priority ? '<span class="badge official_link_monitor">Transit priority</span>' : ''}
+                    </div>
+                    <div class="grade-note"><strong>${escapeHtml(row.product_label || row.product_id || '')}</strong> · HS ${escapeHtml(row.hs_code || '—')} · ${escapeHtml(row.expected_source_trust || '')}</div>
+                    <div class="grade-note">${escapeHtml(row.why_priority || '')}</div>
+                    <div class="grade-note">${escapeHtml(row.next_action || '')}</div>
+                    ${row.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
                 </article>
             `).join('');
             const regRows = regulatory.map(row => `
@@ -1177,7 +1192,10 @@
                         <div class="summary-card"><strong>${escapeHtml((summary.regulatory_marketing || {}).source_caveat || 0)}</strong><span>Use with source caveat</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_hybrid || 0)}</strong><span>Hybrid live markets</span></div>
                         <div class="summary-card"><strong>${escapeHtml((summary.duty_rate_modes || {}).live_monitor || 0)}</strong><span>Monitor-only markets</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(summary.weekly_route_priority_count || weeklyRoutePriorities.length || 0)}</strong><span>Weekly route priorities</span></div>
                     </div>
+                    <div class="crawl-section-title"><h3>This week's top 5 route gaps</h3><span class="meta">路线 + 产品 + HS，优先补这些</span></div>
+                    <div class="duty-sync-mini-grid">${weeklyRows || '<div class="empty">No weekly route priorities.</div>'}</div>
                     <div class="crawl-section-title"><h3>Regulatory automation live</h3><span class="meta">${regulatory.length} jurisdiction(s)</span></div>
                     <div class="duty-sync-mini-grid">${regRows || '<div class="empty">No live regulatory automation.</div>'}</div>
                     <div class="crawl-section-title"><h3>Duty-rate automation live</h3><span class="meta">${dutyRates.length} market(s)</span></div>
@@ -1511,6 +1529,7 @@
                     rate_change_count: sync.rate_change_count ?? '',
                     degraded_reason: sync.degraded_reason || '',
                     degraded_detail: sync.degraded_detail || '',
+                    official_probe_live_status: sync.official_probe_live_status || row.official_probe_live_status || null,
                     run_plan_action: sync.run_plan_action || '',
                     parser_gap_task: sync.parser_gap_task || row.parser_gap_task || null,
                     official_probe_urls: sync.official_probe_urls || row.official_probe_urls || [],
@@ -1562,6 +1581,8 @@
                                         ${row.latest_run_status ? `<div class="meta">Changes: ${escapeHtml(row.change_count ?? 0)} · Rate changes: ${escapeHtml(row.rate_change_count ?? 0)}</div>` : ''}
                                         ${row.degraded_reason ? `<div class="meta">${escapeHtml(row.degraded_reason)}</div>` : ''}
                                         ${row.degraded_detail ? `<div class="meta">${escapeHtml(row.degraded_detail)}</div>` : ''}
+                                        ${row.official_probe_live_status ? `<div class="meta">Live probe: ${escapeHtml(row.official_probe_live_status.safe_rate_rows || 0)} safe / ${escapeHtml(row.official_probe_live_status.weak_rate_rows || 0)} weak row(s)${row.official_probe_live_status.machine_parser_ready ? ' · parser-ready' : ''}</div>` : ''}
+                                        ${row.official_probe_live_status?.error ? `<div class="meta">Probe error: ${escapeHtml(row.official_probe_live_status.error)}</div>` : ''}
                                     </td>
                                     <td>${row.covered_by_rules ? '<span class="badge auto_updatable">rules covered</span>' : '<span class="badge benchmark">missing rules</span>'}<div class="meta">${escapeHtml(row.public_claim || '')}</div></td>
                                     <td>

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-30T07:04:28.419Z",
+  "updated_at": "2026-06-30T08:12:12.473Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -106,7 +106,8 @@
       "TW",
       "VN",
       "RU"
-    ]
+    ],
+    "weekly_route_priority_count": 5
   },
   "regulatory": [
     {
@@ -1354,6 +1355,108 @@
       },
       "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
       "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math."
+    }
+  ],
+  "weekly_route_priorities": [
+    {
+      "rank": 1,
+      "id": "tablet-cn-de-exact",
+      "rank_score": 120,
+      "country": "DE",
+      "route": "CN -> DE",
+      "product_id": "tablet",
+      "product_label": "Tablet computer",
+      "hs_code": "8471300000",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "parser_gap": true,
+      "transit_route_priority": false,
+      "probe_command": "",
+      "official_probe_urls": [],
+      "why_priority": "DE Tablet computer is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+    },
+    {
+      "rank": 2,
+      "id": "smartphone-us-de",
+      "rank_score": 121,
+      "country": "DE",
+      "route": "US -> DE",
+      "product_id": "smartphone",
+      "product_label": "Smartphone / 5G cellular",
+      "hs_code": "851713",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "parser_gap": true,
+      "transit_route_priority": false,
+      "probe_command": "",
+      "official_probe_urls": [],
+      "why_priority": "DE Smartphone / 5G cellular is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+    },
+    {
+      "rank": 3,
+      "id": "router-sg-eu",
+      "rank_score": 122,
+      "country": "EU",
+      "route": "SG -> EU",
+      "product_id": "router",
+      "product_label": "Wireless router / network equipment",
+      "hs_code": "851762",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "parser_gap": true,
+      "transit_route_priority": false,
+      "probe_command": "npm run probe:duty-rates:eu",
+      "official_probe_urls": [],
+      "why_priority": "EU Wireless router / network equipment is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+    },
+    {
+      "rank": 4,
+      "id": "ev-charger-us-de-exact",
+      "rank_score": 123,
+      "country": "DE",
+      "route": "US -> DE",
+      "product_id": "ev_charger",
+      "product_label": "EV charger / power converter",
+      "hs_code": "8504409990",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "parser_gap": true,
+      "transit_route_priority": false,
+      "probe_command": "",
+      "official_probe_urls": [],
+      "why_priority": "DE EV charger / power converter is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+    },
+    {
+      "rank": 5,
+      "id": "battery-cn-de-exact",
+      "rank_score": 124,
+      "country": "DE",
+      "route": "CN -> DE",
+      "product_id": "battery",
+      "product_label": "Lithium battery / ESS",
+      "hs_code": "8507600015",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_hybrid_parser",
+      "parser_gap": true,
+      "transit_route_priority": false,
+      "probe_command": "",
+      "official_probe_urls": [],
+      "why_priority": "DE Lithium battery / ESS is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
     }
   ]
 }

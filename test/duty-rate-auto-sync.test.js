@@ -233,7 +233,8 @@ test('auto duty-rate sync includes static maintained countries', async () => {
         dryRun: true,
         skipOfficialUs: true,
         koreaOfficialFetcher: emptyOfficialFetcher,
-        indiaOfficialFetcher: emptyOfficialFetcher
+        indiaOfficialFetcher: emptyOfficialFetcher,
+        staticOfficialFetcher: emptyOfficialFetcher
     });
     const staticRun = payload.runs.find(run => run.source === 'Static official-link benchmarks');
     const koreaRun = payload.runs.find(run => run.source === 'Korea Customs official-live');
@@ -263,12 +264,55 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     assert.ok(payload.source_run_plan.some(row => row.country === 'KR' && row.run_source === 'Korea Customs official-live'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'VN' && row.run_source === 'Static official-link benchmarks'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'MY' && row.parser_gap_task?.source_use_cases?.includes('two-leg transit comparison')));
+    assert.equal(payload.source_run_plan.find(row => row.country === 'VN').official_probe_live_status.checked, true);
+    assert.equal(payload.source_run_plan.find(row => row.country === 'MY').official_probe_live_status.checked, true);
     assert.ok(payload.automation_upgrade_queue.some(row => row.country === 'MY' && row.parser_gap_task?.transit_route_priority === true));
     ['CN', 'VN', 'MY', 'TW', 'RU'].forEach((country) => {
         assert.equal(staticRun.countries.includes(country), true, `${country} should be refreshed by static benchmark sync`);
         assert.equal(staticRun.readiness[country].ok, true, `${country} readiness should be OK`);
     });
     assert.equal(staticRun.countries.includes('IN'), false, 'India should run through the official-live updater, not static benchmark batch');
+});
+
+test('auto duty-rate sync records Vietnam and Malaysia static official live probe rows', async () => {
+    const emptyOfficialFetcher = async () => ({
+        status_code: 200,
+        body: '<html><body>No table in fixture</body></html>'
+    });
+    const staticOfficialFetcher = async (url) => {
+        if (String(url).includes('customs.gov.vn')) {
+            return {
+                status_code: 200,
+                body: '<table><tr><th>HS Code</th><th>Description</th><th>MFN rate</th></tr><tr><td>850760</td><td>Lithium ion accumulator battery pack</td><td>0%</td></tr></table>'
+            };
+        }
+        if (String(url).includes('customs.gov.my') || String(url).includes('mysst')) {
+            return {
+                status_code: 200,
+                body: '<html><body>Tariff lookup 850760 0% battery goods</body></html>'
+            };
+        }
+        return emptyOfficialFetcher();
+    };
+
+    const payload = await runAutoDutyRateSync({
+        dryRun: true,
+        skipOfficialUs: true,
+        koreaOfficialFetcher: emptyOfficialFetcher,
+        indiaOfficialFetcher: emptyOfficialFetcher,
+        staticOfficialFetcher
+    });
+    const staticRun = payload.runs.find(run => run.source === 'Static official-link benchmarks');
+    const vnPlan = payload.source_run_plan.find(row => row.country === 'VN');
+    const myPlan = payload.source_run_plan.find(row => row.country === 'MY');
+
+    assert.equal(staticRun.static_official_probes.VN.safe_rate_rows, 1);
+    assert.equal(staticRun.static_official_probes.VN.machine_parser_ready, true);
+    assert.equal(vnPlan.official_probe_live_status.safe_rate_rows, 1);
+    assert.equal(vnPlan.official_probe_live_status.machine_parser_ready, true);
+    assert.equal(myPlan.official_probe_live_status.parsed_rate_rows >= 1, true);
+    assert.equal(myPlan.parser_gap_task.official_probe_live_status.parsed_rate_rows >= 1, true);
+    assert.equal(payload.automation_upgrade_queue.some(row => row.country === 'MY' && row.parser_gap_task?.official_probe_live_status?.parsed_rate_rows >= 1), true);
 });
 
 test('auto duty-rate sync downgrades official-live transport failures without blocking daily sync', async () => {
@@ -279,7 +323,8 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
         dryRun: true,
         skipOfficialUs: true,
         koreaOfficialFetcher: failingOfficialFetcher,
-        indiaOfficialFetcher: failingOfficialFetcher
+        indiaOfficialFetcher: failingOfficialFetcher,
+        skipStaticOfficialProbe: true
     });
     const koreaRun = payload.runs.find(run => run.source === 'Korea Customs official-live');
     const indiaRun = payload.runs.find(run => run.source === 'India Customs official-live');

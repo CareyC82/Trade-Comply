@@ -7,6 +7,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const OUTPUT_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
+const POST_ENTRY_RATE_PRIORITY_MATRIX_PATH = path.join(ROOT, 'data', 'post-entry-rate-priority-matrix.json');
 const GLOBAL_CRAWL_HEALTH_PATH = path.join(ROOT, 'data', 'global-crawl-source-health.json');
 const INBOX_MANIFEST_PATH = path.join(ROOT, 'data', 'inbox', 'manifest.json');
 
@@ -409,6 +410,92 @@ function buildDutyAutomationPriority(rows) {
         ));
 }
 
+function buildWeeklyRoutePriorities(dutyRates = buildDutyAutomation()) {
+    const matrix = readJson(POST_ENTRY_RATE_PRIORITY_MATRIX_PATH, { routes: [], priority_products: [] });
+    const productById = new Map((matrix.priority_products || []).map(product => [product.id, product]));
+    const dutyByCountry = new Map((dutyRates || []).map(row => [row.country, row]));
+    const sourceStageRank = {
+        official_hybrid_parser: 0,
+        official_probe_candidate: 1,
+        maintained_exact_map: 2,
+        official_link_monitor: 3,
+        not_automated: 4,
+        official_machine_sync: 9
+    };
+    const priorityRank = { P0: 0, P1: 1, P2: 2, P3: 3 };
+    const trustRank = {
+        precheck_estimate: 0,
+        official_link_estimate: 1,
+        official_heading_only: 2,
+        mixed_official_estimate: 3,
+        official_duty_tax_estimate: 4,
+        official_exact: 9
+    };
+    const productRank = new Map((matrix.priority_products || []).map((product, index) => [product.id, index]));
+
+    const sortedRows = (matrix.routes || [])
+        .map(route => {
+            const market = String(route.import_country || '').toUpperCase();
+            const source = dutyByCountry.get(market) || {};
+            const stage = source.rate_automation_stage || 'not_automated';
+            const product = productById.get(route.product_id) || {};
+            const parserGap = Boolean(source.parser_gap);
+            const weeklyScore = (
+                ((priorityRank[source.maintenance_priority] ?? 5) * 100)
+                + ((sourceStageRank[stage] ?? 6) * 20)
+                + ((trustRank[route.expected_source_trust] ?? 5) * 5)
+                + (productRank.get(route.product_id) ?? 99)
+                - (source.transit_route_priority ? 8 : 0)
+            );
+            const label = product.label || route.product_id || 'Priority product';
+            return {
+                id: route.id,
+                rank_score: weeklyScore,
+                country: market,
+                route: `${route.origin_country || '?'} -> ${route.import_country || '?'}`,
+                product_id: route.product_id || '',
+                product_label: label,
+                hs_code: route.hs_code || product.hs_basis || '',
+                expected_source_trust: route.expected_source_trust || '',
+                automation_level: route.automation_level || '',
+                maintenance_priority: source.maintenance_priority || 'Unassigned',
+                rate_automation_stage: stage,
+                parser_gap: parserGap,
+                transit_route_priority: Boolean(source.transit_route_priority),
+                probe_command: source.probe_command || '',
+                official_probe_urls: source.official_probe_urls || [],
+                why_priority: parserGap
+                    ? `${market} ${label} is blocked by ${stage}; promote exact tariff-row parsing or official source mapping before filing-grade use.`
+                    : `${market} ${label} has filing-grade coverage; keep it in monitoring, not weekly backlog.`,
+                next_action: source.next_upgrade || source.next_action || 'Review exact tariff parser coverage for this route.'
+            };
+        })
+        .filter(row => row.parser_gap)
+        .sort((a, b) => (
+            a.rank_score - b.rank_score
+            || String(a.country).localeCompare(String(b.country))
+            || String(a.product_id).localeCompare(String(b.product_id))
+            || String(a.route).localeCompare(String(b.route))
+        ));
+    const selected = [];
+    const selectedProducts = new Set();
+    sortedRows.forEach(row => {
+        if (selected.length >= 5 || selectedProducts.has(row.product_id)) return;
+        selected.push(row);
+        selectedProducts.add(row.product_id);
+    });
+    sortedRows.forEach(row => {
+        if (selected.length >= 5 || selected.some(item => item.id === row.id)) return;
+        selected.push(row);
+    });
+    return selected
+        .slice(0, 5)
+        .map((row, index) => ({
+            rank: index + 1,
+            ...row
+        }));
+}
+
 function summarizeRegulatoryMarketing(rows) {
     return rows.reduce((acc, row) => {
         if (row.marketing_recommendation === 'Ready to market') {
@@ -430,6 +517,7 @@ function buildAutomationLaunchStatus() {
     const regulatory = buildRegulatoryAutomation();
     const duty_rates = buildDutyAutomation();
     const duty_rate_priority_queue = buildDutyAutomationPriority(duty_rates);
+    const weekly_route_priorities = buildWeeklyRoutePriorities(duty_rates);
     const duty_rate_launch_levels = summarizeDutyLaunchLevels(duty_rates);
     const payload = {
         schema_version: 1,
@@ -454,11 +542,13 @@ function buildAutomationLaunchStatus() {
             duty_rate_launch_levels,
             public_launch_countries: duty_rates.filter(row => row.public_launch).map(row => row.country),
             filing_grade_auto_countries: duty_rates.filter(row => row.filing_grade_auto).map(row => row.country),
-            parser_gap_countries: duty_rates.filter(row => row.parser_gap).map(row => row.country)
+            parser_gap_countries: duty_rates.filter(row => row.parser_gap).map(row => row.country),
+            weekly_route_priority_count: weekly_route_priorities.length
         },
         regulatory,
         duty_rates,
-        duty_rate_priority_queue
+        duty_rate_priority_queue,
+        weekly_route_priorities
     };
     return payload;
 }
@@ -482,5 +572,6 @@ module.exports = {
     buildAutomationLaunchStatus,
     writeAutomationLaunchStatus,
     dutyAutomationStage,
-    buildDutyAutomationPriority
+    buildDutyAutomationPriority,
+    buildWeeklyRoutePriorities
 };

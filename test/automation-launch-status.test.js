@@ -5,7 +5,8 @@ const path = require('path');
 
 const {
     buildAutomationLaunchStatus,
-    dutyAutomationStage
+    dutyAutomationStage,
+    buildWeeklyRoutePriorities
 } = require('../scripts/build-automation-launch-status');
 const {
     buildDutyRateStatusPayload
@@ -81,7 +82,21 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(payload.duty_rate_priority_queue.length, 13);
     assert.deepEqual(payload.duty_rate_priority_queue.slice(0, 3).map(row => row.country), ['DE', 'EU', 'NL']);
     assert.ok(payload.duty_rate_priority_queue.some(row => row.country === 'MY' && row.parser_gap_task?.source_use_cases?.includes('two-leg transit comparison')));
+    assert.equal(payload.summary.weekly_route_priority_count, 5);
+    assert.equal(payload.weekly_route_priorities.length, 5);
+    assert.ok(payload.weekly_route_priorities.every(row => row.route && row.product_label && row.hs_code && row.next_action));
     assert.equal(payload.duty_rates.every(row => row.public_launch), true);
+});
+
+test('weekly route priorities expose concrete product and HS route backlog', () => {
+    const rows = buildWeeklyRoutePriorities();
+
+    assert.equal(rows.length, 5);
+    assert.deepEqual(rows.map(row => row.rank), [1, 2, 3, 4, 5]);
+    assert.ok(rows.every(row => row.parser_gap));
+    assert.ok(rows.every(row => row.route.includes('->')));
+    assert.ok(rows.every(row => row.product_label));
+    assert.ok(rows.every(row => row.hs_code));
 });
 
 test('duty automation stage distinguishes machine sync, parser candidates, maps, and monitors', () => {
@@ -126,6 +141,7 @@ test('checked-in automation launch status is fresh enough for admin display', ()
     assert.equal(payload.summary.duty_rate_automation_stages.maintained_exact_map, 6);
     assert.equal(payload.summary.duty_rate_automation_stages.official_link_monitor, 1);
     assert.equal(payload.duty_rate_priority_queue.length, 13);
+    assert.equal(payload.weekly_route_priorities.length, 5);
 });
 
 test('admin duty-rate status includes automation launch board payload', () => {
@@ -144,4 +160,5 @@ test('admin duty-rate status includes automation launch board payload', () => {
         payload.automation_launch_status.duty_rate_priority_queue.some(row => row.country === 'RU' && row.rate_automation_stage === 'official_link_monitor'),
         true
     );
+    assert.equal(payload.automation_launch_status.weekly_route_priorities.length, 5);
 });
