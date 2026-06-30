@@ -528,6 +528,84 @@
       "expected_min_rules": 1,
       "expected_min_exact_rules": 1,
       "expected_min_cases": 1
+    },
+    {
+      "id": "cn-us-tws-earbuds-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "tws earbuds bluetooth wireless headphones",
+      "expected_top_rule": "CL-USAV-IMP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
+      "id": "us-eu-projector-import",
+      "from": "US",
+      "to": "EU",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "projector video player audio video equipment",
+      "expected_top_rule": "CL-EUAV-IMP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "cn-de-laptop-import",
+      "from": "CN",
+      "to": "DE",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "laptop notebook computer monitor keyboard mouse",
+      "expected_top_rule": "CL-DECOMP-IMP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "sg-us-computer-accessories-export",
+      "from": "SG",
+      "to": "US",
+      "focus": "export",
+      "vertical": "electronics",
+      "query": "desktop computer keyboard mouse computer accessory",
+      "expected_top_rule": "CL-SGCOMP-EXP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "cn-jp-portable-ssd-import",
+      "from": "CN",
+      "to": "JP",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "portable ssd external hard drive usb flash drive storage device",
+      "expected_top_rule": "CL-JPSTORAGE-IMP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-in-encrypted-storage-export",
+      "from": "US",
+      "to": "IN",
+      "focus": "export",
+      "vertical": "electronics",
+      "query": "encrypted storage device portable ssd data storage media",
+      "expected_top_rule": "CL-USSTORAGE-EXP-001",
+      "expected_min_rules": 1,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1,
+      "expected_inferred_selections": [
+        "encryption"
+      ]
     }
   ]
 }
