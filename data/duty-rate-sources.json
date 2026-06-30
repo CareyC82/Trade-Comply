@@ -167,30 +167,52 @@
       "name": "Vietnam Customs tariff / VAT",
       "authority": "Vietnam Customs",
       "official_url": "https://www.customs.gov.vn/",
+      "official_probe_urls": [
+        "https://www.customs.gov.vn/",
+        "https://www.customs.gov.vn/index.jsp?pageId=2281"
+      ],
       "machine_readable": "local_exact_map",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Vietnam maintained high-tech HS lines use exact-line base-duty candidates while VAT and preferential-origin scope remain separate checks.",
+      "status_reason": "Vietnam maintained high-tech HS lines use exact-line base-duty candidates while the updater probes official Vietnam Customs pages for parser readiness; VAT and preferential-origin scope remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=VN",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
-      "next_action": "Replace local exact map with machine-readable Vietnam Customs/VNACCS parser when available; keep VAT and origin scope separately refreshed."
+      "source_use_cases": [
+        "direct import duty pre-check",
+        "two-leg transit comparison",
+        "origin transformation evidence review"
+      ],
+      "transit_route_priority": true,
+      "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
     },
     {
       "country": "MY",
       "name": "Malaysia Customs SST / duty",
       "authority": "Royal Malaysian Customs Department",
       "official_url": "https://mysst.customs.gov.my/",
+      "official_probe_urls": [
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
+      ],
       "machine_readable": "local_exact_map",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
-      "status_reason": "Malaysia maintained high-tech HS lines use exact-line duty candidates while SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
+      "status_reason": "Malaysia maintained high-tech HS lines use exact-line duty candidates while the updater probes Royal Malaysian Customs/SST pages for parser readiness; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
       "update_command": "npm run update:duty-rates:static -- --countries=MY",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
-      "next_action": "Replace local exact map with machine-readable Royal Malaysian Customs/SST parser when available; keep SST, exemptions, and SIRIM/MCMC/ST checks refreshed."
+      "source_use_cases": [
+        "direct import duty pre-check",
+        "two-leg transit comparison",
+        "origin transformation evidence review"
+      ],
+      "transit_route_priority": true,
+      "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
     },
     {
       "country": "TW",

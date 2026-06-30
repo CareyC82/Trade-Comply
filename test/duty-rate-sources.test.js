@@ -64,10 +64,12 @@ const {
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,
     fetchIndiaOfficialRows,
+    fetchStaticOfficialProbe,
     getOfficialProbeUrls,
     parseIndiaTariffRows,
     probeIndiaReadiness,
-    probeStaticBenchmarkReadiness
+    probeStaticBenchmarkReadiness,
+    probeStaticBenchmarkReadinessLive
 } = require('../scripts/update-static-duty-rates');
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
@@ -181,7 +183,45 @@ test('static official-link benchmark updater covers China Vietnam Malaysia Taiwa
         assert.equal(readiness.writes_rates, true);
         assert.equal(readiness.writes_official_machine_rates, false);
         assert.ok(readiness.maintained_hs_prefixes.includes('8542'), `${country} should cover semiconductor HS 8542`);
+        assert.equal(readiness.official_probe.checked, false);
+        assert.equal(readiness.official_probe.machine_parser_ready, false);
     });
+});
+
+test('Vietnam and Malaysia static sources expose official probe and transit use-case metadata', async () => {
+    for (const country of ['VN', 'MY']) {
+        const readiness = probeStaticBenchmarkReadiness(country);
+        assert.ok(readiness.official_probe.official_probe_urls.length >= 2, `${country} should carry official probe URL candidates`);
+        assert.equal(readiness.official_probe.source_use_cases.includes('two-leg transit comparison'), true);
+        assert.equal(readiness.official_probe.transit_route_priority, true);
+
+        const source = dutyRateSources.sources.find(row => row.country === country);
+        const official = await fetchStaticOfficialProbe({
+            country,
+            source,
+            fetcher: async (url) => ({
+                status_code: 200,
+                body: country === 'VN'
+                    ? `<html><title>Vietnam Customs</title><p>customs tariff hải quan biểu thuế ${url}</p></html>`
+                    : `<html><title>Malaysia Customs</title><p>customs tariff SST kastam ${url}</p></html>`
+            })
+        });
+        assert.equal(official.ok, true);
+        assert.ok(official.marker_count >= 2, `${country} probe should detect official-source markers`);
+
+        const live = await probeStaticBenchmarkReadinessLive(country, {
+            fetcher: async () => ({
+                status_code: 200,
+                body: country === 'VN'
+                    ? '<html>Vietnam Customs tariff hải quan</html>'
+                    : '<html>Malaysia Customs tariff SST kastam</html>'
+            })
+        });
+        assert.equal(live.ok, true);
+        assert.equal(live.official_probe.checked, true);
+        assert.equal(live.official_probe.machine_parser_ready, false);
+        assert.equal(live.official_probe.parsed_rate_rows, 0);
+    }
 });
 
 test('Japan Customs live probe parses dated tariff schedule and chapter candidates without upgrading rate trust', async () => {

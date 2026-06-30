@@ -13,6 +13,14 @@ const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DEFAULT_COUNTRIES = ['CN', 'VN', 'MY', 'TW', 'RU', 'IN'];
 const REQUEST_TIMEOUT_MS = 15000;
 const INDIA_REQUEST_TIMEOUT_MS = 30000;
+const OFFICIAL_PROBE_MARKERS = {
+    CN: [/customs/i, /tariff/i, /海关|税则|关税/],
+    VN: [/customs/i, /tariff/i, /vietnam/i, /hải quan|biểu thuế|thuế nhập khẩu/i],
+    MY: [/customs/i, /tariff|sst/i, /malaysia|kastam/i],
+    TW: [/customs/i, /tariff/i, /海關|稅則|關稅/],
+    RU: [/customs|tariff|eaeu/i, /тамож|тариф/i],
+    IN: [/icegate|cbic|customs/i, /tariff|duty|igst|bcd/i]
+};
 
 const COUNTRY_NOTES = {
     CN: 'China maintained exact-line candidates refreshed locally. Confirm final customs tariff line, import VAT basis, origin preference, and any licensing condition before filing.',
@@ -284,6 +292,79 @@ function getOfficialProbeUrls(source = {}, fallbackUrl = '') {
     return Array.from(new Set(urls));
 }
 
+function detectOfficialProbeMarkers(country, body = '') {
+    const text = stripHtml(body).slice(0, 200000);
+    const markers = OFFICIAL_PROBE_MARKERS[String(country || '').toUpperCase()] || [/customs/i, /tariff|duty/i];
+    return markers
+        .map((pattern) => {
+            const match = text.match(pattern);
+            return match ? String(match[0]).slice(0, 60) : '';
+        })
+        .filter(Boolean);
+}
+
+async function fetchStaticOfficialProbe({
+    country,
+    source = getSource(String(country || '').toUpperCase()),
+    fetcher = fetchText,
+    timeoutMs = REQUEST_TIMEOUT_MS
+} = {}) {
+    const code = String(country || source?.country || '').toUpperCase();
+    const urls = getOfficialProbeUrls(source, source?.official_url || '');
+    const attempts = [];
+    let best = null;
+
+    for (const url of urls) {
+        try {
+            const response = await fetcher(url, { timeoutMs });
+            const ok = response.status_code >= 200 && response.status_code < 400;
+            const markers = detectOfficialProbeMarkers(code, response.body || '');
+            const attempt = {
+                ok,
+                status_code: response.status_code,
+                official_url: url,
+                marker_count: markers.length,
+                markers,
+                partial: Boolean(response.partial),
+                error: response.error || ''
+            };
+            attempts.push(attempt);
+            if (!best || attempt.marker_count > best.marker_count || (!best.ok && attempt.ok)) {
+                best = attempt;
+            }
+        } catch (error) {
+            const attempt = {
+                ok: false,
+                status_code: null,
+                official_url: url,
+                marker_count: 0,
+                markers: [],
+                partial: false,
+                error: error.message
+            };
+            attempts.push(attempt);
+            if (!best) best = attempt;
+        }
+    }
+
+    const selected = best || {
+        ok: false,
+        status_code: null,
+        official_url: source?.official_url || '',
+        marker_count: 0,
+        markers: [],
+        partial: false,
+        error: 'No official probe URL configured.'
+    };
+
+    return {
+        ...selected,
+        attempts,
+        row_count: 0,
+        parser_note: `${code || 'Static'} official page reachable probe only; exact tariff-row parser is not promoted yet.`
+    };
+}
+
 async function fetchIndiaOfficialRows({
     fetcher = fetchText,
     source = getSource('IN')
@@ -472,8 +553,61 @@ function probeStaticBenchmarkReadiness(country, {
         writes_rates: true,
         writes_official_machine_rates: false,
         live_row_count: 0,
+        official_probe: {
+            checked: false,
+            ok: null,
+            official_url: source?.official_url || '',
+            official_probe_urls: getOfficialProbeUrls(source, source?.official_url || ''),
+            parsed_rate_rows: 0,
+            machine_parser_ready: false,
+            source_use_cases: Array.isArray(source?.source_use_cases) ? source.source_use_cases : [],
+            transit_route_priority: Boolean(source?.transit_route_priority)
+        },
         next_action: source?.next_action || `Add ${code} source roadmap before updating.`,
         status_reason: source?.status_reason || ''
+    };
+}
+
+async function probeStaticBenchmarkReadinessLive(country, {
+    sourcesPayload = readJson(SOURCES_PATH),
+    dutyPayload = readJson(DUTY_RATES_PATH),
+    fetcher = fetchText
+} = {}) {
+    const readiness = probeStaticBenchmarkReadiness(country, { sourcesPayload, dutyPayload });
+    const source = getSource(readiness.country, sourcesPayload);
+    const officialProbe = await fetchStaticOfficialProbe({
+        country: readiness.country,
+        source,
+        fetcher
+    }).catch(error => ({
+        ok: false,
+        status_code: null,
+        official_url: readiness.official_url,
+        attempts: [],
+        row_count: 0,
+        marker_count: 0,
+        markers: [],
+        error: error.message,
+        parser_note: `${readiness.country} official probe failed before parser readiness could be checked.`
+    }));
+
+    return {
+        ...readiness,
+        official_probe: {
+            ...readiness.official_probe,
+            checked: true,
+            ok: officialProbe.ok,
+            status_code: officialProbe.status_code,
+            official_url: officialProbe.official_url || readiness.official_url,
+            attempts: officialProbe.attempts || [],
+            marker_count: officialProbe.marker_count || 0,
+            markers: officialProbe.markers || [],
+            parsed_rate_rows: officialProbe.row_count || 0,
+            machine_parser_ready: false,
+            parser_note: officialProbe.parser_note || `${readiness.country} exact tariff-row parser is not promoted yet.`,
+            error: officialProbe.error || ''
+        },
+        live_row_count: officialProbe.row_count || 0
     };
 }
 
@@ -786,8 +920,10 @@ function main() {
     const officialLive = process.argv.includes('--official-live');
     const countries = parseCountriesArg();
     Promise.resolve(
-        probeLive && countries.length === 1 && String(countries[0]).toUpperCase() === 'IN'
-            ? probeIndiaReadiness({ live: true })
+        probeLive
+            ? Promise.all(countries.map(country => String(country).toUpperCase() === 'IN'
+                ? probeIndiaReadiness({ live: true })
+                : probeStaticBenchmarkReadinessLive(country)))
             : officialLive && countries.includes('IN')
                 ? updateIndiaRulesFromOfficialSource({ dryRun })
                 : probeOnly
@@ -817,6 +953,7 @@ module.exports = {
     buildIndiaOfficialCandidateForRule,
     buildIndiaOfficialRateCandidate,
     fetchIndiaOfficialRows,
+    fetchStaticOfficialProbe,
     fetchText,
     fetchTextWithCurl,
     getOfficialProbeUrls,
@@ -825,6 +962,7 @@ module.exports = {
     parsePercent,
     probeIndiaReadiness,
     probeStaticBenchmarkReadiness,
+    probeStaticBenchmarkReadinessLive,
     updateIndiaRulesFromOfficialSource,
     updateStaticBenchmarkRules
 };
