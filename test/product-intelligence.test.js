@@ -8,6 +8,7 @@ const cases = require('../data/cases.json');
 const country = require('../lib/trade-country');
 const matchedResults = require('../lib/matched-results');
 const {
+    classifyMemorySubtype,
     inferProductAttributes,
     buildEnhancedProductQuery,
     prepareIntelligentSearch
@@ -70,11 +71,16 @@ describe('product intelligence', () => {
         assert.equal(hbmProfile.vertical, 'semiconductor');
         assert.ok(hbmProfile.precheckIds.includes('memory_ic'));
         assert.ok(hbmProfile.precheckIds.includes('semiconductor'));
+        assert.equal(hbmProfile.memorySubtype.id, 'hbm');
         assert.match(hbmProfile.expansionTerms.join(' '), /HBM|DRAM|memory chip/i);
 
         assert.equal(nandProfile.vertical, 'semiconductor');
         assert.ok(nandProfile.precheckIds.includes('memory_ic'));
+        assert.equal(nandProfile.memorySubtype.id, 'nand');
         assert.match(nandProfile.expansionTerms.join(' '), /NAND flash/i);
+
+        assert.equal(classifyMemorySubtype('DDR5 memory module').id, 'dram');
+        assert.equal(classifyMemorySubtype('SSD controller storage IC').id, 'ssd_controller');
     });
 
     it('detects industrial automation and healthcare lab product verticals', () => {

@@ -26,8 +26,11 @@ describe('trade opportunity insights', () => {
         assert.equal(detectProductSignal('H200').label, 'GPU / AI accelerator');
         assert.equal(detectProductSignal('NVIDIA B200').label, 'GPU / AI accelerator');
         assert.equal(detectProductSignal('HBM3E DRAM memory chip').id, 'memory_ic');
-        assert.equal(detectProductSignal('HBM3E DRAM memory chip').label, 'Memory / storage IC');
+        assert.equal(detectProductSignal('HBM3E DRAM memory chip').label, 'HBM / high-bandwidth memory');
+        assert.equal(detectProductSignal('HBM3E DRAM memory chip').memorySubtype.id, 'hbm');
         assert.equal(detectProductSignal('NAND flash memory IC').id, 'memory_ic');
+        assert.equal(detectProductSignal('NAND flash memory IC').memorySubtype.id, 'nand');
+        assert.equal(detectProductSignal('SSD controller IC').memorySubtype.id, 'ssd_controller');
         assert.equal(detectProductSignal('processor').id, 'semiconductor');
         assert.equal(detectProductSignal('router wifi network').id, 'network_equipment');
         assert.equal(detectProductSignal('ip camera network storage').id, 'surveillance_imaging');
@@ -372,6 +375,8 @@ describe('trade opportunity insights', () => {
         const samples = [
             { product: 'H200', from: 'US', to: 'CN', criticalControl: true },
             { product: 'GPU', from: 'US', to: 'CN', criticalControl: true },
+            { product: 'HBM3E high bandwidth memory', from: 'US', to: 'CN', criticalControl: true },
+            { product: 'DDR5 DRAM memory module', from: 'US', to: 'CN', criticalControl: true },
             { product: 'AI server GPU server', from: 'US', to: 'CN', criticalControl: true },
             { product: 'optical transceiver module', from: 'US', to: 'CN', controlled: true },
             { product: 'industrial robot arm', from: 'US', to: 'CN', controlled: true },
@@ -437,6 +442,10 @@ describe('trade opportunity insights', () => {
     it('surfaces export-control gates for controlled product families without flagging ordinary green or medical products', () => {
         const controlledProducts = [
             ['ai server gpu server', /AI server|data-center/i],
+            ['HBM3E high bandwidth memory', /HBM|high-bandwidth memory/i],
+            ['DDR5 DRAM memory module', /DRAM|memory-module/i],
+            ['NAND flash memory IC', /NAND|flash-memory/i],
+            ['SSD controller IC', /SSD controller|storage-controller/i],
             ['optical transceiver module', /optics|telecom/i],
             ['drone uav under 2kg', /UAV|drone/i],
             ['ip camera thermal imaging', /surveillance|sensitive-imaging/i],
