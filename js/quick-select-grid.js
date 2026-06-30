@@ -25,6 +25,7 @@ const NEW_ENERGY_QUICK_SELECT_CARDS = [
 
 const SEMICONDUCTOR_HUB_QUICK_SELECT_CARDS = [
     { icon: '⚡', label: 'GPU AI Chip Accelerator', hs_code: '8542.31', query_text: 'gpu ai accelerator chip', description: 'High-performance GPU or AI accelerator IC with HBM memory, advanced packaging, and export-controlled compute thresholds.' },
+    { icon: '💾', label: 'Memory & Storage IC', hs_code: '8542.32', query_text: 'HBM DRAM NAND memory chip', description: 'High-bandwidth memory, DRAM, NAND flash, or storage ICs for AI servers, data centers, and advanced electronics supply chains.' },
     { icon: '🔌', label: 'Optical Module', hs_code: '8517.70', query_text: 'optical transceiver module', description: 'High-speed optical transceiver or interconnect module for data center, telecom, or silicon photonics links.' },
     { icon: '🛸', label: 'Drone under 2kg', hs_code: '8525.89', query_text: 'drone uav under 2kg', vertical: 'electronics', description: 'Consumer or commercial UAV under 2 kg with camera, GPS, wireless link, and lithium battery for aerial imaging.' },
     { icon: '🦾', label: 'Industrial Robot', hs_code: '8479.50', query_text: 'industrial robot arm', description: 'Programmable industrial robot arm with servo controllers, sensors, and safety-rated motion systems for manufacturing.' },

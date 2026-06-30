@@ -22,6 +22,7 @@ const FACTORS = {
     semiconductor: { label: 'Semiconductor', keywords: ['chip', 'semiconductor'], nextChecks: [], signals: [], risk: 'high' },
     advanced_manufacturing: { label: 'Advanced manufacturing', keywords: ['semiconductor equipment', 'foundry'], nextChecks: [], signals: [], risk: 'high' },
     ai_chip: { label: 'AI chip', keywords: ['ai chip', 'gpu', 'accelerator'], nextChecks: [], signals: [], risk: 'high' },
+    memory_ic: { label: 'Memory IC', keywords: ['hbm', 'dram', 'nand'], nextChecks: [], signals: [], risk: 'high' },
     destination_end_use: { label: 'End use', keywords: ['end use', 'restricted party'], nextChecks: [], signals: [], risk: 'high' }
 };
 
@@ -60,6 +61,20 @@ describe('product intelligence', () => {
         assert.equal(serverProfile.vertical, 'data-center');
         assert.ok(serverProfile.precheckIds.includes('data_center_system'));
         assert.match(serverProfile.expansionTerms.join(' '), /data center equipment|server|edge computing/i);
+    });
+
+    it('promotes memory ICs as a distinct semiconductor subtype', () => {
+        const hbmProfile = inferProductAttributes('HBM3E DRAM memory chip for AI accelerator board');
+        const nandProfile = inferProductAttributes('NAND flash memory IC for enterprise storage device');
+
+        assert.equal(hbmProfile.vertical, 'semiconductor');
+        assert.ok(hbmProfile.precheckIds.includes('memory_ic'));
+        assert.ok(hbmProfile.precheckIds.includes('semiconductor'));
+        assert.match(hbmProfile.expansionTerms.join(' '), /HBM|DRAM|memory chip/i);
+
+        assert.equal(nandProfile.vertical, 'semiconductor');
+        assert.ok(nandProfile.precheckIds.includes('memory_ic'));
+        assert.match(nandProfile.expansionTerms.join(' '), /NAND flash/i);
     });
 
     it('detects industrial automation and healthcare lab product verticals', () => {

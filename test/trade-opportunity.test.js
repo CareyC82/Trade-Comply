@@ -25,6 +25,9 @@ describe('trade opportunity insights', () => {
         assert.equal(detectProductSignal('H200').id, 'semiconductor');
         assert.equal(detectProductSignal('H200').label, 'GPU / AI accelerator');
         assert.equal(detectProductSignal('NVIDIA B200').label, 'GPU / AI accelerator');
+        assert.equal(detectProductSignal('HBM3E DRAM memory chip').id, 'memory_ic');
+        assert.equal(detectProductSignal('HBM3E DRAM memory chip').label, 'Memory / storage IC');
+        assert.equal(detectProductSignal('NAND flash memory IC').id, 'memory_ic');
         assert.equal(detectProductSignal('processor').id, 'semiconductor');
         assert.equal(detectProductSignal('router wifi network').id, 'network_equipment');
         assert.equal(detectProductSignal('ip camera network storage').id, 'surveillance_imaging');

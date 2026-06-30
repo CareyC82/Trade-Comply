@@ -33,6 +33,7 @@ describe('quick-select-grid', () => {
         assert.ok(context.HEALTHCARE_LAB_QUICK_SELECT_CARDS.some((card) => card.label === 'Patient Monitor'));
 
         const semiconductorLabels = context.SEMICONDUCTOR_HUB_QUICK_SELECT_CARDS.map((card) => card.label);
+        assert.equal(semiconductorLabels.includes('Memory & Storage IC'), true);
         assert.equal(semiconductorLabels.includes('AI Server'), false);
         assert.equal(semiconductorLabels.includes('PLC Controller'), false);
         assert.equal(semiconductorLabels.includes('Patient Monitor'), false);
