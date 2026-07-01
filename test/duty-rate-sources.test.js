@@ -61,6 +61,7 @@ const {
 } = require('../scripts/update-kr-duty-rates');
 const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
+    STATIC_EXACT_CODE_CANDIDATES,
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,
     fetchIndiaOfficialRows,
@@ -122,6 +123,29 @@ test('duty-rate health check reports source roadmap status', () => {
     assert.equal(result.source_roadmap_summary.source_count, dutyRateSources.sources.length);
     assert.deepEqual(result.source_roadmap_summary.missing_coverage, []);
     assert.deepEqual(result.source_roadmap_summary.missing_roadmap, []);
+});
+
+test('static exact candidates include memory-specific HS lines for automated refresh', () => {
+    ['854231', '854232', '854239'].forEach((hsCode) => {
+        assert.ok(
+            STATIC_EXACT_CODE_CANDIDATES.includes(hsCode),
+            `${hsCode} should remain in the maintained static exact-code candidate list`
+        );
+    });
+
+    ['CN', 'VN', 'MY', 'TW', 'IN'].forEach((country) => {
+        const rule = (dutyRates.rules || []).find(item => (
+            item.import_country === country
+            && (item.hs_prefixes || []).includes('8542')
+        ));
+        assert.ok(rule, `${country} memory-capable electronics rule should exist`);
+        ['854232', '854239'].forEach((hsCode) => {
+            assert.ok(
+                (rule.exact_code_overrides || []).some(override => override.hs_code === hsCode),
+                `${country} should keep ${hsCode} as a maintained Memory exact-line candidate`
+            );
+        });
+    });
 });
 
 test('EU hybrid source and benchmark updater probes are wired by market', async () => {

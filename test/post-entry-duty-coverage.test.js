@@ -147,10 +147,10 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
     assert.equal(matrix.trust_counts.official_link_estimate || 0, 0);
     assert.equal(matrix.trust_counts.mixed_official_estimate, 5);
-    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 161);
+    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 177);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
     assert.equal(matrix.trust_counts.official_heading_only, 2);
-    assert.equal(matrix.trust_counts.official_exact, 46);
+    assert.equal(matrix.trust_counts.official_exact, 54);
     assert.equal(matrix.exact_base_rate_covered_count, matrix.route_count);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
@@ -201,7 +201,7 @@ test('memory subtype exact-rate routes stay official or hybrid covered', () => {
         ['memory_hbm', 'memory_dram', 'memory_nand', 'memory_ssd_controller'].includes(route.product_id)
     ));
 
-    assert.equal(memoryRoutes.length, 28);
+    assert.equal(memoryRoutes.length, 52);
     memoryRoutes.forEach((route) => {
         assert.equal(
             ['official_duty_tax_estimate', 'mixed_official_estimate', 'official_exact'].includes(route.expected_source_trust),
@@ -209,7 +209,11 @@ test('memory subtype exact-rate routes stay official or hybrid covered', () => {
             `${route.id} should not fall back to benchmark-only coverage`
         );
         assert.match(String(route.hs_code), /^85423[29]$/);
-        assert.equal(route.automation_level, 'hybrid_official', `${route.id} should stay in the automated official/hybrid queue`);
+        assert.equal(
+            ['hybrid_official', 'official_auto'].includes(route.automation_level),
+            true,
+            `${route.id} should stay in the automated official/hybrid queue`
+        );
     });
 });
 
