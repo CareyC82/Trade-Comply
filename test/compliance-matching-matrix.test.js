@@ -208,6 +208,34 @@ describe('compliance matching matrix', () => {
                 focus: 'export',
                 route: { from: 'US', to: 'MY' },
                 expected: ['CL-MYMEM-REEXPORT-001']
+            },
+            {
+                query: 'HBM3E high bandwidth memory IC',
+                market: 'EU',
+                focus: 'import',
+                route: { from: 'US', to: 'EU' },
+                expected: ['CL-EUMEM-IMP-001']
+            },
+            {
+                query: 'NAND flash memory IC',
+                market: 'EU',
+                focus: 'export',
+                route: { from: 'EU', to: 'US' },
+                expected: ['CL-EUMEM-EXP-001']
+            },
+            {
+                query: 'DDR5 DRAM memory module',
+                market: 'IN',
+                focus: 'import',
+                route: { from: 'US', to: 'IN' },
+                expected: ['CL-INMEM-IMP-001']
+            },
+            {
+                query: 'SSD controller IC',
+                market: 'IN',
+                focus: 'export',
+                route: { from: 'IN', to: 'US' },
+                expected: ['CL-INMEM-EXP-001']
             }
         ].forEach((sample) => {
             const result = runSearch(sample.query, 'export', sample.market, sample.focus, sample.route);
