@@ -439,6 +439,77 @@ describe('trade opportunity insights', () => {
         assert.ok(model.selectedMarket.exportControlGate.checks.some((item) => /Entity List|end use/i.test(item)));
     });
 
+    it('uses memory subtype HS basis and control-first language for memory opportunity routes', () => {
+        const samples = [
+            {
+                product: 'HBM3E high bandwidth memory',
+                from: 'US',
+                to: 'CN',
+                label: 'HBM / high-bandwidth memory',
+                subtype: 'hbm',
+                hs: '854232',
+                severity: 'Critical'
+            },
+            {
+                product: 'DDR5 DRAM memory module',
+                from: 'US',
+                to: 'CN',
+                label: 'DRAM / memory module',
+                subtype: 'dram',
+                hs: '854232',
+                severity: 'Critical'
+            },
+            {
+                product: 'NAND flash memory IC',
+                from: 'JP',
+                to: 'CN',
+                label: 'NAND / flash memory',
+                subtype: 'nand',
+                hs: '854232',
+                severity: 'Review Required'
+            },
+            {
+                product: 'SSD controller IC',
+                from: 'KR',
+                to: 'CN',
+                label: 'SSD controller / storage controller IC',
+                subtype: 'ssd_controller',
+                hs: '854239',
+                severity: 'Review Required'
+            }
+        ];
+
+        for (const sample of samples) {
+            const model = buildOpportunityInsights({
+                product: sample.product,
+                from: sample.from,
+                to: sample.to,
+                dutyRates,
+                priorityMatrix
+            });
+
+            assert.equal(model.productSignal.label, sample.label);
+            assert.equal(model.productSignal.memorySubtype.id, sample.subtype);
+            assert.equal(model.selectedMarket.hsCode, sample.hs);
+            assert.equal(model.selectedMarket.exportControlGate.severity, sample.severity);
+            assert.match(model.selectedMarket.exportControlGate.summary, /end[- ]use|re-export|bandwidth|controller/i);
+            assert.match(model.summary, /control-gated|export-control|re-export/i);
+        }
+
+        const transitModel = buildOpportunityInsights({
+            product: 'HBM3E high bandwidth memory',
+            from: 'US',
+            to: 'CN',
+            dutyRates,
+            priorityMatrix
+        });
+        const singapore = transitModel.transitRoutes.find((row) => row.market === 'SG');
+        assert.ok(singapore, 'Singapore transit route should be present for HBM');
+        assert.equal(singapore.hsCode, '854232');
+        assert.equal(singapore.transitComparison.secondDutyBreakdown.sourceBasis.includes('854232'), true);
+        assert.match(singapore.transitComparison.decision.reason, /origin|re-export|not simple tariff savings/i);
+    });
+
     it('surfaces export-control gates for controlled product families without flagging ordinary green or medical products', () => {
         const controlledProducts = [
             ['ai server gpu server', /AI server|data-center/i],

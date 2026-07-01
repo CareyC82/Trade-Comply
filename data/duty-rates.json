@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-29",
+  "updated_at": "2026-07-01",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -213,7 +213,31 @@
       "last_checked_at": "2026-06-29T20:11:11.786Z",
       "source_hts": "8542330001",
       "source_rate_text": "Free",
-      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8542&to=854299&format=JSON&styles=false"
+      "source_url": "https://hts.usitc.gov/reststop/exportList?from=8542&to=854299&format=JSON&styles=false",
+      "exact_code_overrides": [
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "US-CN-847130-TABLET-INDICATIVE",
@@ -471,7 +495,31 @@
       "source_hts": "8542 (TARIC ERGA OMNES third-country duty)",
       "source_rate_text": "TARIC third-country duty: 0.000%",
       "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
-      "last_checked_at": "2026-06-29T20:11:13.107Z"
+      "last_checked_at": "2026-06-29T20:11:13.107Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "EU TARIC duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "EU TARIC duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
@@ -700,7 +748,31 @@
       "source_hts": "8542 (TARIC ERGA OMNES third-country duty)",
       "source_rate_text": "TARIC third-country duty: 0.000%",
       "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
-      "last_checked_at": "2026-06-29T20:11:13.107Z"
+      "last_checked_at": "2026-06-29T20:11:13.107Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "EU TARIC / Germany VAT duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "EU TARIC / Germany VAT duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
@@ -929,7 +1001,31 @@
       "source_hts": "8542 (TARIC ERGA OMNES third-country duty)",
       "source_rate_text": "TARIC third-country duty: 0.000%",
       "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
-      "last_checked_at": "2026-06-29T20:11:13.107Z"
+      "last_checked_at": "2026-06-29T20:11:13.107Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "EU TARIC / Netherlands VAT duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "EU TARIC / Netherlands VAT duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "SG-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE",
@@ -1059,6 +1155,28 @@
           "source_rate_text": "Singapore customs duty candidate: 0.000%",
           "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
           "last_checked_at": "2026-06-29T20:11:13.110Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Singapore Customs/GST duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.gov.sg/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Singapore Customs/GST duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.gov.sg/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -1190,6 +1308,28 @@
           "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
           "source_url": "https://www.snice.gob.mx/",
           "last_checked_at": "2026-06-29T20:11:13.113Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Mexico LIGIE duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://www.snice.gob.mx/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Mexico LIGIE duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://www.snice.gob.mx/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -1321,6 +1461,28 @@
           "source_rate_text": "Japan customs duty candidate: 0.000%",
           "source_url": "https://www.customs.go.jp/english/tariff/",
           "last_checked_at": "2026-06-29T20:11:13.115Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Japan Customs duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.go.jp/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Japan Customs duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.go.jp/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -1452,6 +1614,28 @@
           "source_rate_text": "Korea customs duty candidate: 0.000%",
           "source_url": "https://www.customs.go.kr/english/main.do",
           "last_checked_at": "2026-06-29T20:11:17.800Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Korea Customs duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://unipass.customs.go.kr/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Korea Customs duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://unipass.customs.go.kr/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -1602,6 +1786,28 @@
           "source_rate_text": "India BCD candidate: 0.000%",
           "source_url": "https://www.icegate.gov.in/",
           "last_checked_at": "2026-06-29T20:11:22.793Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India Customs duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://www.cbic.gov.in/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "India Customs duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://www.cbic.gov.in/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -1744,6 +1950,28 @@
           "source_rate_text": "Vietnam customs duty candidate: 0.000%",
           "source_url": "https://www.customs.gov.vn/",
           "last_checked_at": "2026-06-29T20:11:22.796Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Vietnam Customs duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.gov.vn/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Vietnam Customs duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.gov.vn/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -1886,6 +2114,28 @@
           "source_rate_text": "Malaysia customs duty candidate: 0.000%",
           "source_url": "https://mysst.customs.gov.my/",
           "last_checked_at": "2026-06-29T20:11:22.796Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Malaysia Customs duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://mysst.customs.gov.my/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Malaysia Customs duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://mysst.customs.gov.my/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -2024,6 +2274,28 @@
           "source_rate_text": "Taiwan customs duty candidate: 0.000%",
           "source_url": "https://web.customs.gov.tw/",
           "last_checked_at": "2026-06-29T20:11:22.796Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Taiwan Customs duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://portal.sw.nat.gov.tw/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Taiwan Customs duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://portal.sw.nat.gov.tw/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -2206,6 +2478,28 @@
           "source_rate_text": "China MFN duty candidate: 0.000%",
           "source_url": "https://www.customs.gov.cn/",
           "last_checked_at": "2026-06-29T20:11:22.796Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China MFN duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "China MFN duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     },
@@ -2868,11 +3162,11 @@
           "base_rate": 0,
           "source_status": "official_source_checked",
           "confidence": "Official source checked",
-          "source_note": "USITC general duty candidate for non-China origin route. Confirm exact HTS and trade-remedy scope before filing.",
-          "source_hts": "854239 (USITC general duty candidate)",
-          "source_rate_text": "Other electronic IC candidate: Free",
+          "source_note": "USITC general duty candidate for Other IC / SSD controller candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854239 (Other IC / SSD controller candidate)",
+          "source_rate_text": "Other IC / SSD controller candidate: base duty candidate 0.000%",
           "source_url": "https://hts.usitc.gov/",
-          "last_checked_at": "2026-06-26T20:05:04.408Z"
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         },
         {
           "hs_code": "8543",
@@ -2884,6 +3178,17 @@
           "source_rate_text": "Electrical machines/apparatus candidate: 1.9%",
           "source_url": "https://hts.usitc.gov/",
           "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for Memory IC / HBM / DRAM / NAND candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "854232 (Memory IC / HBM / DRAM / NAND candidate)",
+          "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-01T00:00:00.000Z"
         }
       ]
     }

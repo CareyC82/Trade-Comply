@@ -123,6 +123,10 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
         'drone',
         'ev_charger',
         'industrial_automation',
+        'memory_dram',
+        'memory_hbm',
+        'memory_nand',
+        'memory_ssd_controller',
         'monitor',
         'optical_module',
         'router',
@@ -143,7 +147,7 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
     assert.equal(matrix.trust_counts.official_link_estimate || 0, 0);
     assert.equal(matrix.trust_counts.mixed_official_estimate, 5);
-    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 133);
+    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 161);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
     assert.equal(matrix.trust_counts.official_heading_only, 2);
     assert.equal(matrix.trust_counts.official_exact, 46);

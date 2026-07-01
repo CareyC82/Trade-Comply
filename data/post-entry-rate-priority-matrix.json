@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-27",
+  "updated_at": "2026-07-01",
   "notes": "High-frequency Post-Entry tariff-rate priority matrix. This is the product/data-coverage target for daily duty-rate sync: every row must be covered by maintained duty rules, and source trust must match the declared expectation.",
   "trust_tiers": {
     "official_exact": "All displayed duty layers are official-backed for the maintained route / HS basis.",
@@ -81,6 +81,31 @@
       "id": "industrial_automation",
       "label": "Industrial robot / automation equipment",
       "hs_basis": "847950 / 8479"
+    },
+    {
+      "id": "memory_hbm",
+      "label": "HBM / high-bandwidth memory",
+      "hs_basis": "854232"
+    },
+    {
+      "id": "memory_dram",
+      "label": "DRAM / memory module",
+      "hs_basis": "854232"
+    },
+    {
+      "id": "memory_nand",
+      "label": "NAND / flash memory IC",
+      "hs_basis": "854232"
+    },
+    {
+      "id": "memory_ssd_controller",
+      "label": "SSD controller / storage controller IC",
+      "hs_basis": "854239"
+    },
+    {
+      "id": "memory_ic",
+      "label": "Memory IC fallback",
+      "hs_basis": "854232 / 854239"
     }
   ],
   "routes": [
@@ -1757,6 +1782,258 @@
       "hs_code": "847950",
       "expected_source_trust": "official_exact",
       "automation_level": "official_auto"
+    },
+    {
+      "id": "memory_hbm-us-cn",
+      "product_id": "memory_hbm",
+      "origin_country": "US",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_dram-us-cn",
+      "product_id": "memory_dram",
+      "origin_country": "US",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_nand-us-cn",
+      "product_id": "memory_nand",
+      "origin_country": "US",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_ssd_controller-us-cn",
+      "product_id": "memory_ssd_controller",
+      "origin_country": "US",
+      "import_country": "CN",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_hbm-us-sg",
+      "product_id": "memory_hbm",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_dram-us-sg",
+      "product_id": "memory_dram",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_nand-us-sg",
+      "product_id": "memory_nand",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_ssd_controller-us-sg",
+      "product_id": "memory_ssd_controller",
+      "origin_country": "US",
+      "import_country": "SG",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_hbm-sg-cn",
+      "product_id": "memory_hbm",
+      "origin_country": "SG",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_dram-sg-cn",
+      "product_id": "memory_dram",
+      "origin_country": "SG",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_nand-sg-cn",
+      "product_id": "memory_nand",
+      "origin_country": "SG",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_ssd_controller-sg-cn",
+      "product_id": "memory_ssd_controller",
+      "origin_country": "SG",
+      "import_country": "CN",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_hbm-us-my",
+      "product_id": "memory_hbm",
+      "origin_country": "US",
+      "import_country": "MY",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_dram-us-my",
+      "product_id": "memory_dram",
+      "origin_country": "US",
+      "import_country": "MY",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_nand-us-my",
+      "product_id": "memory_nand",
+      "origin_country": "US",
+      "import_country": "MY",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_ssd_controller-us-my",
+      "product_id": "memory_ssd_controller",
+      "origin_country": "US",
+      "import_country": "MY",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_hbm-my-cn",
+      "product_id": "memory_hbm",
+      "origin_country": "MY",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_dram-my-cn",
+      "product_id": "memory_dram",
+      "origin_country": "MY",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_nand-my-cn",
+      "product_id": "memory_nand",
+      "origin_country": "MY",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_ssd_controller-my-cn",
+      "product_id": "memory_ssd_controller",
+      "origin_country": "MY",
+      "import_country": "CN",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_hbm-jp-cn",
+      "product_id": "memory_hbm",
+      "origin_country": "JP",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_dram-jp-cn",
+      "product_id": "memory_dram",
+      "origin_country": "JP",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_nand-jp-cn",
+      "product_id": "memory_nand",
+      "origin_country": "JP",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_ssd_controller-jp-cn",
+      "product_id": "memory_ssd_controller",
+      "origin_country": "JP",
+      "import_country": "CN",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_hbm-kr-cn",
+      "product_id": "memory_hbm",
+      "origin_country": "KR",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_dram-kr-cn",
+      "product_id": "memory_dram",
+      "origin_country": "KR",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_nand-kr-cn",
+      "product_id": "memory_nand",
+      "origin_country": "KR",
+      "import_country": "CN",
+      "hs_code": "854232",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
+    },
+    {
+      "id": "memory_ssd_controller-kr-cn",
+      "product_id": "memory_ssd_controller",
+      "origin_country": "KR",
+      "import_country": "CN",
+      "hs_code": "854239",
+      "expected_source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official"
     }
   ]
 }
