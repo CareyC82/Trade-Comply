@@ -165,6 +165,60 @@ describe('compliance matching matrix', () => {
         });
     });
 
+    it('surfaces memory subtype compliance cards for high-bandwidth and storage memory routes', () => {
+        [
+            {
+                query: 'HBM3E high bandwidth memory',
+                market: 'CN',
+                focus: 'import',
+                route: { from: 'US', to: 'CN' },
+                expected: ['CL-CNMEM-HBM-IMP-001']
+            },
+            {
+                query: 'HBM3E high bandwidth memory',
+                market: 'US',
+                focus: 'export',
+                route: { from: 'US', to: 'CN' },
+                expected: ['CL-USMEM-HBM-EXP-001']
+            },
+            {
+                query: 'NAND flash memory IC',
+                market: 'JP',
+                focus: 'export',
+                route: { from: 'JP', to: 'CN' },
+                expected: ['CL-JPMEM-NAND-EXP-001']
+            },
+            {
+                query: 'DDR5 DRAM memory module',
+                market: 'KR',
+                focus: 'export',
+                route: { from: 'KR', to: 'CN' },
+                expected: ['CL-KRMEM-DRAM-EXP-001']
+            },
+            {
+                query: 'HBM3E high bandwidth memory',
+                market: 'SG',
+                focus: 'export',
+                route: { from: 'US', to: 'SG' },
+                expected: ['CL-SGMEM-REEXPORT-001']
+            },
+            {
+                query: 'SSD controller IC',
+                market: 'MY',
+                focus: 'export',
+                route: { from: 'US', to: 'MY' },
+                expected: ['CL-MYMEM-REEXPORT-001']
+            }
+        ].forEach((sample) => {
+            const result = runSearch(sample.query, 'export', sample.market, sample.focus, sample.route);
+            for (const expectedId of sample.expected) {
+                assert.ok(ids(result).includes(expectedId), `expected ${expectedId} for ${sample.query}`);
+            }
+            assertNoOppositeRouteFocus(result, sample.focus, `${sample.market} ${sample.query}`);
+            assert.match(haystack(result), /HBM|DRAM|NAND|SSD|memory|re-export|end-use/i);
+        });
+    });
+
     it('surfaces Vietnam / Malaysia solar routing risk for ASEAN photovoltaic products', () => {
         const result = runSearch('solar panel photovoltaic', 'export', 'ASEAN');
         const text = haystack(result);

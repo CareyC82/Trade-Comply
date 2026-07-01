@@ -28540,5 +28540,431 @@
     "related_cases": [],
     "display_order": 50,
     "pipeline_source": "bis"
+  },
+  {
+    "tag_id": "CL-USMEM-HBM-EXP-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[US HBM Export]",
+    "short_description": "US-origin HBM and high-bandwidth memory require advanced-computing export-control review before shipment or transit.",
+    "description": "US-origin HBM, HBM2e/HBM3/HBM3E, and high-bandwidth memory supplied for AI accelerators, data-center servers, or advanced computing should be reviewed for ECCN, destination, end-use, end-user, restricted-party, and re-export controls before route or tax optimization.",
+    "content_en": "US-origin HBM, HBM2e/HBM3/HBM3E, and high-bandwidth memory supplied for AI accelerators, data-center servers, or advanced computing should be reviewed for ECCN, destination, end-use, end-user, restricted-party, and re-export controls before route or tax optimization.",
+    "content_zh": "US-origin HBM and high-bandwidth memory require advanced-computing export-control review before shipment or transit.：请确认具体Memory子类、HS 8542.32/8542.39、性能参数、原产地、最终用途、客户和再出口证据。",
+    "source_citation": "US official semiconductor / strategic goods baseline",
+    "source_url": "https://www.bis.doc.gov/index.php/policy-guidance/product-guidance/semiconductors",
+    "effective_date": "2026-07-01",
+    "status": "ACTIVE",
+    "direction": "both",
+    "country": "US",
+    "route_focus": "export",
+    "risk_level": "Critical",
+    "hs_code": "8542.32",
+    "related_hs_codes": [
+      "8542.32",
+      "854232",
+      "8542.39",
+      "854239",
+      "8542"
+    ],
+    "related_keywords": [
+      "hbm",
+      "hbm2e",
+      "hbm3",
+      "hbm3e",
+      "high bandwidth memory",
+      "advanced memory",
+      "ai accelerator memory",
+      "memory bandwidth",
+      "data center memory",
+      "memory",
+      "memory ic",
+      "memory component",
+      "semiconductor memory",
+      "854232",
+      "854239"
+    ],
+    "related_cases": [
+      "CASE-US-HBM-EXPORT-GATE"
+    ],
+    "display_order": 20,
+    "pipeline_source": "memory-specialty-seed",
+    "checklist": [
+      {
+        "id": "Memory subtype::Confirm exact memory subtype",
+        "phase": "Memory subtype",
+        "task": "Confirm exact memory subtype",
+        "desc": "Separate HBM/HBM3E, DRAM, NAND, SSD/storage controller IC, memory module, and finished storage device before applying one rule.",
+        "source": "official-source"
+      },
+      {
+        "id": "Technical evidence::Capture performance and configuration",
+        "phase": "Technical evidence",
+        "task": "Capture performance and configuration",
+        "desc": "Keep bandwidth, density, package/stack, controller pairing, firmware/encryption where applicable, wafer/fab origin, and customer/end-use evidence.",
+        "source": "official-source"
+      },
+      {
+        "id": "Route gate::Screen re-export and end-use exposure",
+        "phase": "Route gate",
+        "task": "Screen re-export and end-use exposure",
+        "desc": "Confirm the route is not being used to bypass export-control, restricted-party, origin, or end-use restrictions.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-CNMEM-HBM-IMP-001",
+    "category": "IMPORT_REG",
+    "category_label": "Import Regulation",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[CN HBM Import]",
+    "short_description": "China-bound HBM imports need HS 8542.32, origin, end-use, and foreign re-export evidence review.",
+    "description": "HBM and advanced DRAM memory entering China should be separated from generic semiconductor imports and checked for HS 8542.32 classification, wafer/fab origin, customer and end-use evidence, foreign-origin re-export conditions, and AI/data-center deployment risk.",
+    "content_en": "HBM and advanced DRAM memory entering China should be separated from generic semiconductor imports and checked for HS 8542.32 classification, wafer/fab origin, customer and end-use evidence, foreign-origin re-export conditions, and AI/data-center deployment risk.",
+    "content_zh": "China-bound HBM imports need HS 8542.32, origin, end-use, and foreign re-export evidence review.：请确认具体Memory子类、HS 8542.32/8542.39、性能参数、原产地、最终用途、客户和再出口证据。",
+    "source_citation": "CN official semiconductor / strategic goods baseline",
+    "source_url": "https://english.mofcom.gov.cn/",
+    "effective_date": "2026-07-01",
+    "status": "ACTIVE",
+    "direction": "both",
+    "country": "CN",
+    "route_focus": "import",
+    "risk_level": "High",
+    "hs_code": "8542.32",
+    "related_hs_codes": [
+      "8542.32",
+      "854232",
+      "8542.39",
+      "854239",
+      "8542"
+    ],
+    "related_keywords": [
+      "hbm",
+      "hbm2e",
+      "hbm3",
+      "hbm3e",
+      "high bandwidth memory",
+      "advanced dram",
+      "ai memory",
+      "china import memory",
+      "854232",
+      "memory",
+      "memory ic",
+      "memory component",
+      "semiconductor memory",
+      "854239"
+    ],
+    "related_cases": [
+      "CASE-CN-HBM-IMPORT-EVIDENCE"
+    ],
+    "display_order": 20,
+    "pipeline_source": "memory-specialty-seed",
+    "checklist": [
+      {
+        "id": "Memory subtype::Confirm exact memory subtype",
+        "phase": "Memory subtype",
+        "task": "Confirm exact memory subtype",
+        "desc": "Separate HBM/HBM3E, DRAM, NAND, SSD/storage controller IC, memory module, and finished storage device before applying one rule.",
+        "source": "official-source"
+      },
+      {
+        "id": "Technical evidence::Capture performance and configuration",
+        "phase": "Technical evidence",
+        "task": "Capture performance and configuration",
+        "desc": "Keep bandwidth, density, package/stack, controller pairing, firmware/encryption where applicable, wafer/fab origin, and customer/end-use evidence.",
+        "source": "official-source"
+      },
+      {
+        "id": "Route gate::Screen re-export and end-use exposure",
+        "phase": "Route gate",
+        "task": "Screen re-export and end-use exposure",
+        "desc": "Confirm the route is not being used to bypass export-control, restricted-party, origin, or end-use restrictions.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-JPMEM-NAND-EXP-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[JP NAND Export]",
+    "short_description": "Japan-origin NAND and flash-memory exports should document classification, destination, and sensitive end-use review.",
+    "description": "Japan-origin NAND flash, 3D NAND, and memory ICs should be checked for HS 8542.32 classification, METI export-control screening, destination/end-use restrictions, and re-export conditions when used in AI servers, storage arrays, or controlled technology environments.",
+    "content_en": "Japan-origin NAND flash, 3D NAND, and memory ICs should be checked for HS 8542.32 classification, METI export-control screening, destination/end-use restrictions, and re-export conditions when used in AI servers, storage arrays, or controlled technology environments.",
+    "content_zh": "Japan-origin NAND and flash-memory exports should document classification, destination, and sensitive end-use review.：请确认具体Memory子类、HS 8542.32/8542.39、性能参数、原产地、最终用途、客户和再出口证据。",
+    "source_citation": "JP official semiconductor / strategic goods baseline",
+    "source_url": "https://www.meti.go.jp/policy/anpo/englishpage.html",
+    "effective_date": "2026-07-01",
+    "status": "ACTIVE",
+    "direction": "both",
+    "country": "JP",
+    "route_focus": "export",
+    "risk_level": "Medium",
+    "hs_code": "8542.32",
+    "related_hs_codes": [
+      "8542.32",
+      "854232",
+      "8542.39",
+      "854239",
+      "8542"
+    ],
+    "related_keywords": [
+      "nand",
+      "nand flash",
+      "3d nand",
+      "flash memory",
+      "memory ic",
+      "storage array",
+      "japan memory export",
+      "memory",
+      "memory component",
+      "semiconductor memory",
+      "854232",
+      "854239"
+    ],
+    "related_cases": [
+      "CASE-JP-NAND-EXPORT-REVIEW"
+    ],
+    "display_order": 20,
+    "pipeline_source": "memory-specialty-seed",
+    "checklist": [
+      {
+        "id": "Memory subtype::Confirm exact memory subtype",
+        "phase": "Memory subtype",
+        "task": "Confirm exact memory subtype",
+        "desc": "Separate HBM/HBM3E, DRAM, NAND, SSD/storage controller IC, memory module, and finished storage device before applying one rule.",
+        "source": "official-source"
+      },
+      {
+        "id": "Technical evidence::Capture performance and configuration",
+        "phase": "Technical evidence",
+        "task": "Capture performance and configuration",
+        "desc": "Keep bandwidth, density, package/stack, controller pairing, firmware/encryption where applicable, wafer/fab origin, and customer/end-use evidence.",
+        "source": "official-source"
+      },
+      {
+        "id": "Route gate::Screen re-export and end-use exposure",
+        "phase": "Route gate",
+        "task": "Screen re-export and end-use exposure",
+        "desc": "Confirm the route is not being used to bypass export-control, restricted-party, origin, or end-use restrictions.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-KRMEM-DRAM-EXP-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[KR DRAM Export]",
+    "short_description": "Korea-origin DRAM/HBM exports require subtype, bandwidth, origin, and end-use evidence before onward shipment.",
+    "description": "Korea-origin DRAM, DDR/LPDDR/GDDR modules, HBM stacks, and memory ICs should be screened for export classification, density/bandwidth thresholds, customer/end-use, and re-export restrictions before shipment or transit routing.",
+    "content_en": "Korea-origin DRAM, DDR/LPDDR/GDDR modules, HBM stacks, and memory ICs should be screened for export classification, density/bandwidth thresholds, customer/end-use, and re-export restrictions before shipment or transit routing.",
+    "content_zh": "Korea-origin DRAM/HBM exports require subtype, bandwidth, origin, and end-use evidence before onward shipment.：请确认具体Memory子类、HS 8542.32/8542.39、性能参数、原产地、最终用途、客户和再出口证据。",
+    "source_citation": "KR official semiconductor / strategic goods baseline",
+    "source_url": "https://www.kosti.or.kr/eng/",
+    "effective_date": "2026-07-01",
+    "status": "ACTIVE",
+    "direction": "both",
+    "country": "KR",
+    "route_focus": "export",
+    "risk_level": "Medium",
+    "hs_code": "8542.32",
+    "related_hs_codes": [
+      "8542.32",
+      "854232",
+      "8542.39",
+      "854239",
+      "8542"
+    ],
+    "related_keywords": [
+      "dram",
+      "ddr5",
+      "lpddr5",
+      "gddr6",
+      "gddr7",
+      "hbm",
+      "memory module",
+      "korea memory export",
+      "memory",
+      "memory ic",
+      "memory component",
+      "semiconductor memory",
+      "854232",
+      "854239"
+    ],
+    "related_cases": [
+      "CASE-KR-DRAM-EXPORT-REVIEW"
+    ],
+    "display_order": 20,
+    "pipeline_source": "memory-specialty-seed",
+    "checklist": [
+      {
+        "id": "Memory subtype::Confirm exact memory subtype",
+        "phase": "Memory subtype",
+        "task": "Confirm exact memory subtype",
+        "desc": "Separate HBM/HBM3E, DRAM, NAND, SSD/storage controller IC, memory module, and finished storage device before applying one rule.",
+        "source": "official-source"
+      },
+      {
+        "id": "Technical evidence::Capture performance and configuration",
+        "phase": "Technical evidence",
+        "task": "Capture performance and configuration",
+        "desc": "Keep bandwidth, density, package/stack, controller pairing, firmware/encryption where applicable, wafer/fab origin, and customer/end-use evidence.",
+        "source": "official-source"
+      },
+      {
+        "id": "Route gate::Screen re-export and end-use exposure",
+        "phase": "Route gate",
+        "task": "Screen re-export and end-use exposure",
+        "desc": "Confirm the route is not being used to bypass export-control, restricted-party, origin, or end-use restrictions.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-SGMEM-REEXPORT-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[SG Memory Re-export]",
+    "short_description": "Singapore memory transit/re-export routes require strategic-goods and origin-transformation evidence.",
+    "description": "Memory components routed through Singapore, including HBM, DRAM, NAND, and SSD controller ICs, should be reviewed for strategic goods controls, permit/transhipment requirements, origin transformation support, customer/end-use documentation, and foreign-origin re-export restrictions. Singapore should not be treated as a simple tariff workaround.",
+    "content_en": "Memory components routed through Singapore, including HBM, DRAM, NAND, and SSD controller ICs, should be reviewed for strategic goods controls, permit/transhipment requirements, origin transformation support, customer/end-use documentation, and foreign-origin re-export restrictions. Singapore should not be treated as a simple tariff workaround.",
+    "content_zh": "Singapore memory transit/re-export routes require strategic-goods and origin-transformation evidence.：请确认具体Memory子类、HS 8542.32/8542.39、性能参数、原产地、最终用途、客户和再出口证据。",
+    "source_citation": "SG official semiconductor / strategic goods baseline",
+    "source_url": "https://www.customs.gov.sg/businesses/strategic-goods-control/",
+    "effective_date": "2026-07-01",
+    "status": "ACTIVE",
+    "direction": "both",
+    "country": "SG",
+    "route_focus": "export",
+    "risk_level": "High",
+    "hs_code": "8542.32",
+    "related_hs_codes": [
+      "8542.32",
+      "854232",
+      "8542.39",
+      "854239",
+      "8542"
+    ],
+    "related_keywords": [
+      "singapore memory re-export",
+      "transit",
+      "transhipment",
+      "hbm",
+      "dram",
+      "nand",
+      "ssd controller",
+      "origin transformation",
+      "strategic goods",
+      "memory",
+      "memory ic",
+      "memory component",
+      "semiconductor memory",
+      "854232",
+      "854239"
+    ],
+    "related_cases": [
+      "CASE-SG-MEMORY-REEXPORT-GATE"
+    ],
+    "display_order": 20,
+    "pipeline_source": "memory-specialty-seed",
+    "checklist": [
+      {
+        "id": "Memory subtype::Confirm exact memory subtype",
+        "phase": "Memory subtype",
+        "task": "Confirm exact memory subtype",
+        "desc": "Separate HBM/HBM3E, DRAM, NAND, SSD/storage controller IC, memory module, and finished storage device before applying one rule.",
+        "source": "official-source"
+      },
+      {
+        "id": "Technical evidence::Capture performance and configuration",
+        "phase": "Technical evidence",
+        "task": "Capture performance and configuration",
+        "desc": "Keep bandwidth, density, package/stack, controller pairing, firmware/encryption where applicable, wafer/fab origin, and customer/end-use evidence.",
+        "source": "official-source"
+      },
+      {
+        "id": "Route gate::Screen re-export and end-use exposure",
+        "phase": "Route gate",
+        "task": "Screen re-export and end-use exposure",
+        "desc": "Confirm the route is not being used to bypass export-control, restricted-party, origin, or end-use restrictions.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-MYMEM-REEXPORT-001",
+    "category": "EXPORT_CTRL",
+    "category_label": "Export Control",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[MY Memory Re-export]",
+    "short_description": "Malaysia memory transit/re-export routes require documented transformation, origin, and end-use review.",
+    "description": "Memory components routed through Malaysia should be reviewed for import/export declarations, origin transformation evidence, controlled-technology exposure, end-use/end-user documentation, and foreign-origin re-export restrictions before claiming route or duty-cost advantage.",
+    "content_en": "Memory components routed through Malaysia should be reviewed for import/export declarations, origin transformation evidence, controlled-technology exposure, end-use/end-user documentation, and foreign-origin re-export restrictions before claiming route or duty-cost advantage.",
+    "content_zh": "Malaysia memory transit/re-export routes require documented transformation, origin, and end-use review.：请确认具体Memory子类、HS 8542.32/8542.39、性能参数、原产地、最终用途、客户和再出口证据。",
+    "source_citation": "MY official semiconductor / strategic goods baseline",
+    "source_url": "https://www.customs.gov.my/",
+    "effective_date": "2026-07-01",
+    "status": "ACTIVE",
+    "direction": "both",
+    "country": "MY",
+    "route_focus": "export",
+    "risk_level": "High",
+    "hs_code": "8542.32",
+    "related_hs_codes": [
+      "8542.32",
+      "854232",
+      "8542.39",
+      "854239",
+      "8542"
+    ],
+    "related_keywords": [
+      "malaysia memory re-export",
+      "transit",
+      "hbm",
+      "dram",
+      "nand",
+      "ssd controller",
+      "origin transformation",
+      "re-export",
+      "memory",
+      "memory ic",
+      "memory component",
+      "semiconductor memory",
+      "854232",
+      "854239"
+    ],
+    "related_cases": [
+      "CASE-MY-MEMORY-REEXPORT-GATE"
+    ],
+    "display_order": 20,
+    "pipeline_source": "memory-specialty-seed",
+    "checklist": [
+      {
+        "id": "Memory subtype::Confirm exact memory subtype",
+        "phase": "Memory subtype",
+        "task": "Confirm exact memory subtype",
+        "desc": "Separate HBM/HBM3E, DRAM, NAND, SSD/storage controller IC, memory module, and finished storage device before applying one rule.",
+        "source": "official-source"
+      },
+      {
+        "id": "Technical evidence::Capture performance and configuration",
+        "phase": "Technical evidence",
+        "task": "Capture performance and configuration",
+        "desc": "Keep bandwidth, density, package/stack, controller pairing, firmware/encryption where applicable, wafer/fab origin, and customer/end-use evidence.",
+        "source": "official-source"
+      },
+      {
+        "id": "Route gate::Screen re-export and end-use exposure",
+        "phase": "Route gate",
+        "task": "Screen re-export and end-use exposure",
+        "desc": "Confirm the route is not being used to bypass export-control, restricted-party, origin, or end-use restrictions.",
+        "source": "official-source"
+      }
+    ]
   }
 ]

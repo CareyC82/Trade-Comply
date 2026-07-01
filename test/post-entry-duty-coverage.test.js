@@ -196,6 +196,23 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN'), false);
 });
 
+test('memory subtype exact-rate routes stay official or hybrid covered', () => {
+    const memoryRoutes = (priorityMatrix.routes || []).filter((route) => (
+        ['memory_hbm', 'memory_dram', 'memory_nand', 'memory_ssd_controller'].includes(route.product_id)
+    ));
+
+    assert.equal(memoryRoutes.length, 28);
+    memoryRoutes.forEach((route) => {
+        assert.equal(
+            ['official_duty_tax_estimate', 'mixed_official_estimate', 'official_exact'].includes(route.expected_source_trust),
+            true,
+            `${route.id} should not fall back to benchmark-only coverage`
+        );
+        assert.match(String(route.hs_code), /^85423[29]$/);
+        assert.equal(route.automation_level, 'hybrid_official', `${route.id} should stay in the automated official/hybrid queue`);
+    });
+});
+
 test('exact tariff parser priorities mirror the live upgrade queue', () => {
     const result = runDutyRateHealthCheck();
     const payload = buildExactTariffParserPriorities({ generatedAt: '2026-06-22T00:00:00.000Z' });

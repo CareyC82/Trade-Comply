@@ -1,5 +1,5 @@
 {
-  "version": "2026-06-22",
+  "version": "2026-07-01",
   "products": [
     {
       "id": "h200-us-cn",
@@ -10,9 +10,16 @@
       "expected_signal": "semiconductor",
       "expected_label": "GPU / AI accelerator",
       "expected_export_control_severity": "Critical",
-      "expected_control_terms": ["BIS", "advanced", "ECCN"],
+      "expected_control_terms": [
+        "BIS",
+        "advanced",
+        "ECCN"
+      ],
       "expected_hs_destination": "CN",
-      "expected_post_entry_route": { "import_country": "CN", "origin_country": "US" }
+      "expected_post_entry_route": {
+        "import_country": "CN",
+        "origin_country": "US"
+      }
     },
     {
       "id": "ai-server-us-cn",
@@ -22,9 +29,16 @@
       "hs_code": "847150",
       "expected_signal": "ai_compute",
       "expected_export_control_severity": "Critical",
-      "expected_control_terms": ["AI server", "4A090", "data-center"],
+      "expected_control_terms": [
+        "AI server",
+        "4A090",
+        "data-center"
+      ],
       "expected_hs_destination": "CN",
-      "expected_post_entry_route": { "import_country": "CN", "origin_country": "US" }
+      "expected_post_entry_route": {
+        "import_country": "CN",
+        "origin_country": "US"
+      }
     },
     {
       "id": "optical-module-cn-in",
@@ -35,7 +49,10 @@
       "expected_signal": "optical_module",
       "expected_label": "Optical module / high-speed interconnect",
       "expected_hs_destination": "IN",
-      "expected_post_entry_route": { "import_country": "IN", "origin_country": "CN" }
+      "expected_post_entry_route": {
+        "import_country": "IN",
+        "origin_country": "CN"
+      }
     },
     {
       "id": "drone-cn-us",
@@ -46,7 +63,10 @@
       "expected_signal": "drone",
       "expected_label": "Drone / UAV",
       "expected_hs_destination": "US",
-      "expected_post_entry_route": { "import_country": "US", "origin_country": "CN" }
+      "expected_post_entry_route": {
+        "import_country": "US",
+        "origin_country": "CN"
+      }
     },
     {
       "id": "thermal-camera-us-in",
@@ -56,9 +76,16 @@
       "hs_code": "852589",
       "expected_signal": "surveillance_imaging",
       "expected_export_control_severity": "Review Required",
-      "expected_control_terms": ["imaging", "military", "surveillance"],
+      "expected_control_terms": [
+        "imaging",
+        "military",
+        "surveillance"
+      ],
       "expected_hs_destination": "IN",
-      "expected_post_entry_route": { "import_country": "IN", "origin_country": "US" }
+      "expected_post_entry_route": {
+        "import_country": "IN",
+        "origin_country": "US"
+      }
     },
     {
       "id": "industrial-robot-de-us",
@@ -69,7 +96,90 @@
       "expected_signal": "industrial_automation",
       "expected_label": "Industrial automation / robotics",
       "expected_hs_destination": "US",
-      "expected_post_entry_route": { "import_country": "US", "origin_country": "DE" }
+      "expected_post_entry_route": {
+        "import_country": "US",
+        "origin_country": "DE"
+      }
+    },
+    {
+      "id": "memory_hbm-us-cn",
+      "product": "HBM3E high bandwidth memory IC",
+      "from": "US",
+      "to": "CN",
+      "hs_code": "854232",
+      "expected_signal": "memory_ic",
+      "expected_label": "HBM / high-bandwidth memory",
+      "expected_export_control_severity": "Critical",
+      "expected_control_terms": [
+        "HBM",
+        "bandwidth",
+        "re-export"
+      ],
+      "expected_hs_destination": "CN",
+      "expected_post_entry_route": {
+        "import_country": "CN",
+        "origin_country": "US"
+      }
+    },
+    {
+      "id": "memory_dram-us-cn",
+      "product": "DDR5 DRAM memory module",
+      "from": "US",
+      "to": "CN",
+      "hs_code": "854232",
+      "expected_signal": "memory_ic",
+      "expected_label": "DRAM / memory module",
+      "expected_export_control_severity": "Critical",
+      "expected_control_terms": [
+        "DRAM",
+        "bandwidth",
+        "end-use"
+      ],
+      "expected_hs_destination": "CN",
+      "expected_post_entry_route": {
+        "import_country": "CN",
+        "origin_country": "US"
+      }
+    },
+    {
+      "id": "memory_nand-jp-cn",
+      "product": "NAND flash memory IC for enterprise storage array",
+      "from": "JP",
+      "to": "CN",
+      "hs_code": "854232",
+      "expected_signal": "memory_ic",
+      "expected_label": "NAND / flash memory",
+      "expected_export_control_severity": "Review Required",
+      "expected_control_terms": [
+        "NAND",
+        "storage",
+        "end-use"
+      ],
+      "expected_hs_destination": "CN",
+      "expected_post_entry_route": {
+        "import_country": "CN",
+        "origin_country": "JP"
+      }
+    },
+    {
+      "id": "memory_ssd_controller-kr-cn",
+      "product": "SSD controller IC with storage encryption firmware",
+      "from": "KR",
+      "to": "CN",
+      "hs_code": "854239",
+      "expected_signal": "memory_ic",
+      "expected_label": "SSD controller / storage controller IC",
+      "expected_export_control_severity": "Review Required",
+      "expected_control_terms": [
+        "controller",
+        "encryption",
+        "firmware"
+      ],
+      "expected_hs_destination": "CN",
+      "expected_post_entry_route": {
+        "import_country": "CN",
+        "origin_country": "KR"
+      }
     }
   ]
 }
