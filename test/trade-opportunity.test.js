@@ -371,6 +371,33 @@ describe('trade opportunity insights', () => {
         });
     });
 
+    it('keeps EU-bound transit routes backed by second-leg EU compliance evidence', () => {
+        const model = buildOpportunityInsights({
+            product: 'AI server GPU rack PDU liquid cooling',
+            from: 'US',
+            to: 'EU',
+            dutyRates,
+            priorityMatrix
+        });
+
+        assert.equal(model.routeComparison[0].routeKind, 'direct');
+        assert.equal(model.routeComparison[0].market, 'EU');
+        assert.equal(model.transitRoutes.length, 2);
+
+        for (const transit of model.transitRoutes) {
+            assert.equal(transit.routeKind, 'transit');
+            assert.equal(transit.transitComparison.secondLegRouteSpecific, true);
+            assert.equal(transit.transitComparison.secondLegTransitEvidence, true);
+            assert.match(transit.transitComparison.secondLegScopeNote, /European Union|EU TARIC|Germany|Netherlands/i);
+            assert.match(transit.transitComparison.secondLegScopeNote, /VAT/i);
+            assert.match(transit.transitComparison.secondLegScopeNote, /CE\/RoHS/i);
+            assert.equal(transit.transitComparison.transitLegalGate.origin_transformation_required, true);
+            assert.ok(transit.transitComparison.secondParserPriority);
+            assert.ok(transit.transitComparison.secondParserNextAction);
+            assert.match(transit.transitWarning, /origin transformation/i);
+        }
+    });
+
     it('keeps high-frequency opportunity routes evidence-backed and compliance-gated', () => {
         const samples = [
             { product: 'H200', from: 'US', to: 'CN', criticalControl: true },
