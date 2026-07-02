@@ -622,6 +622,35 @@ test('EU TARIC selector promotes an exact 10-digit TARIC goods-code match', () =
     assert.equal(candidate.base_rate, 0.027);
 });
 
+test('EU TARIC exact-code matching tolerates common user formatting', () => {
+    const rows = [
+        {
+            goods_code: '8471300000',
+            origin: 'ERGA OMNES',
+            measure_type: 'Third country duty',
+            duty: '0.000 %',
+            origin_code: '1011',
+            measure_type_code: '103'
+        },
+        {
+            goods_code: '8471410000',
+            origin: 'ERGA OMNES',
+            measure_type: 'Third country duty',
+            duty: '2.200 %',
+            origin_code: '1011',
+            measure_type_code: '103'
+        }
+    ];
+
+    assert.equal(normalizeTaricGoodsCode('8471.30.00-00'), '8471300000');
+    const candidate = buildEuOfficialRateCandidate(rows, '8471', { exactTaricCode: '8471.30.00-00' });
+
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.exact_taric_code, '8471300000');
+    assert.equal(candidate.base_rate, 0);
+    assert.match(candidate.reason, /Exact TARIC goods code matched/i);
+});
+
 test('EU official candidate can update a single-prefix rule without changing VAT layers', () => {
     const rows = [
         {

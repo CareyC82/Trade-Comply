@@ -14673,10 +14673,16 @@
       "imda",
       "safety mark",
       "cybersecurity labelling",
-      "gst"
+      "gst",
+      "transit",
+      "re-export",
+      "origin transformation",
+      "strategic goods",
+      "transhipment"
     ],
     "related_cases": [
-      "CASE-SG-HIGHTECH-IMPORT"
+      "CASE-SG-HIGHTECH-IMPORT",
+      "CASE-SG-DATACENTER-TRANSIT-GATE"
     ],
     "display_order": 52,
     "pipeline_source": "official-seed"
@@ -14975,10 +14981,16 @@
       "vietnamese label",
       "vat",
       "import duty",
-      "cybersecurity"
+      "cybersecurity",
+      "transit",
+      "re-export",
+      "origin transformation",
+      "VNACCS",
+      "controlled technology"
     ],
     "related_cases": [
-      "CASE-VN-HIGHTECH-IMPORT"
+      "CASE-VN-HIGHTECH-IMPORT",
+      "CASE-VN-DATACENTER-TRANSIT-GATE"
     ],
     "display_order": 52,
     "pipeline_source": "official-seed"
@@ -15125,10 +15137,16 @@
       "customs declaration",
       "sst",
       "import duty",
-      "electrical safety"
+      "electrical safety",
+      "transit",
+      "re-export",
+      "origin transformation",
+      "SIRIM",
+      "MCMC"
     ],
     "related_cases": [
-      "CASE-MY-HIGHTECH-IMPORT"
+      "CASE-MY-HIGHTECH-IMPORT",
+      "CASE-MY-DATACENTER-TRANSIT-GATE"
     ],
     "display_order": 52,
     "pipeline_source": "official-seed"
@@ -19964,6 +19982,85 @@
         "task": "Collect market-access evidence",
         "desc": "Keep product safety, EMC, wireless, labeling, importer, and environmental evidence where applicable.",
         "source": "official-source"
+      }
+    ]
+  },
+  {
+    "tag_id": "CL-EUDC-001",
+    "category": "IMPORT_REG",
+    "category_label": "Data Center Import Compliance",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[EU Data Center Import]",
+    "short_description": "EU-bound AI servers and data-center equipment require TARIC, VAT, CE/RED/RoHS, energy, and dual-use review.",
+    "description": "AI servers, GPU servers, storage servers, network switches, UPS/PDU, rack power units, liquid-cooling systems, and data center infrastructure imported into the European Union should be checked for exact TARIC classification, customs value, member-state VAT treatment, CE/EMC/RED/RoHS exposure, Ecodesign or energy scope, dual-use/end-use concerns, and importer evidence before market placement.",
+    "content_en": "EU-bound AI servers and data-center equipment should be checked for exact TARIC classification, customs value, member-state VAT, CE/EMC/RED/RoHS exposure, energy scope, dual-use/end-use concerns, and importer evidence.",
+    "content_zh": "进入欧盟的 AI 服务器和数据中心设备应检查精确 TARIC 归类、完税价格、成员国 VAT、CE/EMC/RED/RoHS、能效范围、两用/最终用途风险和进口商证据。",
+    "source_citation": "European Commission TARIC consultation, CE marking / market surveillance, RoHS, RED, and EU dual-use baseline",
+    "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp",
+    "effective_date": "2026-07-02",
+    "status": "ACTIVE",
+    "direction": "both",
+    "country": "EU",
+    "route_focus": "import",
+    "risk_level": "Medium",
+    "hs_code": "8471.50",
+    "related_hs_codes": [
+      "8471",
+      "8471.50",
+      "847150",
+      "8471500000",
+      "8517",
+      "8504",
+      "8419"
+    ],
+    "related_keywords": [
+      "eu import",
+      "european union import",
+      "ai server",
+      "gpu server",
+      "accelerator server",
+      "data center",
+      "datacenter",
+      "rack server",
+      "server rack",
+      "rack power",
+      "pdu",
+      "ups",
+      "liquid cooling",
+      "cooling system",
+      "storage server",
+      "network switch",
+      "taric",
+      "exact taric code",
+      "member-state vat",
+      "ce marking",
+      "emc",
+      "red directive",
+      "rohs",
+      "ecodesign",
+      "dual-use",
+      "end-use",
+      "importer evidence"
+    ],
+    "related_cases": [
+      "CASE-EU-DATACENTER-TARIC-REVIEW"
+    ],
+    "display_order": 22,
+    "pipeline_source": "official-seed",
+    "checklist": [
+      {
+        "id": "EU data-center scope::Confirm exact TARIC line",
+        "phase": "EU data-center scope",
+        "task": "Confirm exact TARIC line",
+        "desc": "Separate AI server, rack server, storage server, network appliance, UPS/PDU, and cooling equipment before relying on one 8471 tariff line.",
+        "source": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp"
+      },
+      {
+        "id": "EU data-center evidence::Collect market-access and end-use evidence",
+        "phase": "EU data-center evidence",
+        "task": "Collect market-access and end-use evidence",
+        "desc": "Keep CE/EMC/RED/RoHS, VAT member-state treatment, technical specs, importer evidence, customer, and end-use records with the filing file.",
+        "source": "https://single-market-economy.ec.europa.eu/single-market/ce-marking_en"
       }
     ]
   },
@@ -25620,7 +25717,8 @@
     ],
     "related_cases": [
       "CASE-EU-MEMORY-BASELINE",
-      "CASE-EU-MEMORY-DUALUSE-REVIEW"
+      "CASE-EU-MEMORY-DUALUSE-REVIEW",
+      "CASE-EU-DATACENTER-TARIC-REVIEW"
     ],
     "display_order": 21,
     "pipeline_source": "coverage-seed",
@@ -26875,7 +26973,8 @@
       "memory component"
     ],
     "related_cases": [
-      "CASE-VN-MEMORY-BASELINE"
+      "CASE-VN-MEMORY-BASELINE",
+      "CASE-VN-DATACENTER-TRANSIT-GATE"
     ],
     "display_order": 21,
     "pipeline_source": "coverage-seed",
@@ -28872,7 +28971,8 @@
       "854239"
     ],
     "related_cases": [
-      "CASE-SG-MEMORY-REEXPORT-GATE"
+      "CASE-SG-MEMORY-REEXPORT-GATE",
+      "CASE-SG-DATACENTER-TRANSIT-GATE"
     ],
     "display_order": 20,
     "pipeline_source": "memory-specialty-seed",
@@ -28943,7 +29043,8 @@
       "854239"
     ],
     "related_cases": [
-      "CASE-MY-MEMORY-REEXPORT-GATE"
+      "CASE-MY-MEMORY-REEXPORT-GATE",
+      "CASE-MY-DATACENTER-TRANSIT-GATE"
     ],
     "display_order": 20,
     "pipeline_source": "memory-specialty-seed",

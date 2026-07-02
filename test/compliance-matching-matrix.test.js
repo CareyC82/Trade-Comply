@@ -165,6 +165,48 @@ describe('compliance matching matrix', () => {
         });
     });
 
+    it('surfaces data-center transit and exact-route evidence for EU, Singapore, Vietnam, and Malaysia', () => {
+        [
+            {
+                query: 'ai server gpu server data center rack power liquid cooling TARIC',
+                market: 'EU',
+                focus: 'import',
+                route: { from: 'US', to: 'EU' },
+                expected: 'CL-EUDC-001',
+                text: /TARIC|member-state VAT|dual-use|liquid cooling|rack power/i
+            },
+            {
+                query: 'ai server gpu server data center transit re-export origin transformation Singapore',
+                market: 'SG',
+                focus: 'import',
+                route: { from: 'US', to: 'SG' },
+                expected: 'CL-SGDC-001',
+                text: /TradeNet|AHTN|transit|re-export|origin transformation|strategic goods/i
+            },
+            {
+                query: 'ai server gpu server data center rack power liquid cooling VNACCS',
+                market: 'VN',
+                focus: 'import',
+                route: { from: 'US', to: 'VN' },
+                expected: 'CL-VNDC-001',
+                text: /VNACCS|MIC|transit|origin transformation|controlled technology/i
+            },
+            {
+                query: 'ai server gpu server data center storage server rack power liquid cooling',
+                market: 'MY',
+                focus: 'import',
+                route: { from: 'US', to: 'MY' },
+                expected: 'CL-MYDC-001',
+                text: /SIRIM|MCMC|transit|origin transformation|re-export/i
+            }
+        ].forEach((sample) => {
+            const result = runSearch(sample.query, 'export', sample.market, sample.focus, sample.route);
+            assert.ok(ids(result).includes(sample.expected), `expected ${sample.expected}`);
+            assertNoOppositeRouteFocus(result, sample.focus, `${sample.market} data-center transit focus`);
+            assert.match(haystack(result), sample.text);
+        });
+    });
+
     it('surfaces memory subtype compliance cards for high-bandwidth and storage memory routes', () => {
         [
             {

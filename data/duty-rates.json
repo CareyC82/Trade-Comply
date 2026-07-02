@@ -340,6 +340,48 @@
       ]
     },
     {
+      "id": "EU-GLOBAL-847150-AI-SERVER-IMPORT-SCOPE",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847150"
+      ],
+      "label": "EU import AI server / data-center processing unit signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Exact TARIC code and member-state VAT treatment required before filing; dual-use/end-use checks remain separate from customs duty.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Exact TARIC code override for data-processing units; VAT varies by member state and product configuration.",
+      "source_hts": "8471500000 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "TARIC third-country duty: 0.000%",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-07-02T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "8471500000",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_hts": "8471500000 (TARIC ERGA OMNES third-country duty)",
+          "source_rate_text": "TARIC third-country duty: 0.000%",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+          "source_note": "Exact TARIC code override for processing units; verify member-state VAT, origin preference, and dual-use/end-use scope before filing.",
+          "last_checked_at": "2026-07-02T00:00:00.000Z"
+        }
+      ]
+    },
+    {
       "id": "EU-GLOBAL-850760-BATTERY-IMPORT-OFFICIAL",
       "import_country": "EU",
       "origin_country": "*",
