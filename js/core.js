@@ -367,8 +367,10 @@ function updateElementText(id, text) {
 function getTagCategoryLabel(tag) {
     const label = tag.category_label || tag.category || 'General';
     const normalizedLabel = String(label || '').trim().toLowerCase();
+    const importFocused = (AppState.currentDirection || 'export') === 'import'
+        || AppState.complianceFocus === 'import';
     if (
-        (AppState.currentDirection || 'export') === 'import'
+        importFocused
         && (tag.category === 'EXPORT_CTRL' || normalizedLabel === 'export control')
     ) {
         return 'Import Controls & Trade Remedies';
@@ -466,11 +468,14 @@ const CATEGORY_LABEL_THEME_RULES = [
 ];
 
 function getCategoryTheme(categoryCode, categoryLabel = '') {
+    const normalizedLabel = String(categoryLabel || '').toLowerCase();
+    if (/import clearance|import regulation|import control|trade remed|tariff|ad\/cvd/.test(normalizedLabel)) {
+        return { class: 'import-regulation', icon: '📦' };
+    }
     const categoryTheme = CATEGORY_THEME[categoryCode];
     if (categoryTheme && categoryCode !== 'OTHER') {
         return categoryTheme;
     }
-    const normalizedLabel = String(categoryLabel || '').toLowerCase();
     const labelTheme = CATEGORY_LABEL_THEME_RULES.find((rule) => rule.pattern.test(normalizedLabel));
     if (labelTheme) return labelTheme.theme;
     return categoryTheme || CATEGORY_THEME.OTHER;

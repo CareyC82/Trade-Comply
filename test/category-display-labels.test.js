@@ -71,6 +71,13 @@ describe('category display labels', () => {
             context.__categoryApi.getTagCategoryLabel({ category: 'OTHER', category_label: 'Export Control' }),
             'Import Controls & Trade Remedies'
         );
+
+        context.AppState.currentDirection = 'export';
+        context.AppState.complianceFocus = 'import';
+        assert.equal(
+            context.__categoryApi.getTagCategoryLabel({ category: 'EXPORT_CTRL', category_label: 'Export Control' }),
+            'Import Controls & Trade Remedies'
+        );
     });
 
     it('uses dedicated themes for filing and origin evidence cards', () => {
@@ -87,5 +94,9 @@ describe('category display labels', () => {
         const greenTheme = getCategoryTheme('ENVIRONMENT_BATTERY', 'Green Compliance & ESG');
         assert.equal(greenTheme.class, 'green-compliance');
         assert.equal(greenTheme.icon, '🌱');
+
+        const importOverrideTheme = getCategoryTheme('EXPORT_CTRL', 'Import Controls & Trade Remedies');
+        assert.equal(importOverrideTheme.class, 'import-regulation');
+        assert.equal(importOverrideTheme.icon, '📦');
     });
 });
