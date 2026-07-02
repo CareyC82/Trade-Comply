@@ -78,6 +78,10 @@ describe('category display labels', () => {
             context.__categoryApi.getTagCategoryLabel({ category: 'EXPORT_CTRL', category_label: 'Export Control' }),
             'Import Controls & Trade Remedies'
         );
+        assert.equal(
+            context.__categoryApi.getTagCategoryLabel({ category: 'EXPORT_CTRL', category_label: 'Export Control', route_focus: 'import' }),
+            'Import Controls & Trade Remedies'
+        );
     });
 
     it('uses dedicated themes for filing and origin evidence cards', () => {

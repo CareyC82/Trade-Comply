@@ -368,7 +368,9 @@ function getTagCategoryLabel(tag) {
     const label = tag.category_label || tag.category || 'General';
     const normalizedLabel = String(label || '').trim().toLowerCase();
     const importFocused = (AppState.currentDirection || 'export') === 'import'
-        || AppState.complianceFocus === 'import';
+        || AppState.complianceFocus === 'import'
+        || tag.route_focus === 'import'
+        || tag.compliance_focus === 'import';
     if (
         importFocused
         && (tag.category === 'EXPORT_CTRL' || normalizedLabel === 'export control')
