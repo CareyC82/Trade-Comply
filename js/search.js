@@ -297,6 +297,66 @@ function sortTagsForDisplay(tags, selectedCountry = 'US', routeContext = {}, que
     });
 }
 
+function normalizeUrlForDedupe(value) {
+    const raw = String(value || '').trim().toLowerCase();
+    if (!raw) {
+        return '';
+    }
+    try {
+        const url = new URL(raw);
+        return `${url.hostname}${url.pathname}`.replace(/\/+$/, '');
+    } catch (err) {
+        return raw.split(/[?#]/)[0].replace(/\/+$/, '');
+    }
+}
+
+function normalizeTextForDedupe(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/https?:\/\/\S+/g, ' ')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\b(the|and|or|for|with|from|into|this|that|may|will|must|should)\b/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function getTagSemanticDedupeKey(tag) {
+    if (!tag) {
+        return '';
+    }
+    const country = String(tag.country || 'GLOBAL').trim().toUpperCase();
+    const direction = String(tag.direction || 'both').trim().toLowerCase();
+    const focus = String(tag.route_focus || tag.compliance_focus || '').trim().toLowerCase();
+    const source = normalizeUrlForDedupe(tag.source_url || tag.source || tag.source_link);
+    const category = String(tag.category || tag.category_label || 'OTHER').trim().toLowerCase();
+    const title = normalizeTextForDedupe(tag.short_name || tag.title || tag.short_description || '');
+    if (source) {
+        return [country, direction, focus, category, source, title.slice(0, 90)].join('|');
+    }
+    const body = normalizeTextForDedupe([
+        tag.short_name,
+        tag.short_description,
+        tag.description,
+        tag.content_en
+    ].filter(Boolean).join(' '));
+    return [country, direction, focus, category, body.slice(0, 180)].join('|');
+}
+
+function dedupeTagsByPolicySignal(tags) {
+    const seen = new Set();
+    return (tags || []).filter((tag) => {
+        const key = getTagSemanticDedupeKey(tag) || tag?.tag_id;
+        if (!key) {
+            return true;
+        }
+        if (seen.has(key)) {
+            return false;
+        }
+        seen.add(key);
+        return true;
+    });
+}
+
 /**
  * Search logic core
  */
@@ -371,7 +431,9 @@ function search(query) {
         }
     }
 
-    matchedTags = sortTagsForDisplay(matchedTags, selectedCountry, routeContext, query);
+    matchedTags = dedupeTagsByPolicySignal(
+        sortTagsForDisplay(matchedTags, selectedCountry, routeContext, query)
+    );
 
     const caseScoreFn = globalThis.TradeComplyMatchedResults?.scoreCaseAgainstQuery;
 
@@ -528,9 +590,10 @@ function searchWithPrecheck(query, selections, searchFn = search, relevanceQuery
     const filtered = applyCountryFilterToSearchResults(allResults);
     const selectedCountry = AppState.currentCountry || 'US';
     const routeContext = buildCurrentRouteContext(selectedCountry);
+    const sortedTags = sortTagsForDisplay(filtered.tags, selectedCountry, routeContext, relevanceAnchor);
     return {
         ...filtered,
-        tags: sortTagsForDisplay(filtered.tags, selectedCountry, routeContext, relevanceAnchor)
+        tags: dedupeTagsByPolicySignal(sortedTags)
     };
 }
 
@@ -548,6 +611,8 @@ if (typeof module !== 'undefined' && module.exports) {
         tagMatchesProductTerms,
         filterTagsByProductRelevance,
         sortTagsForDisplay,
+        getTagSemanticDedupeKey,
+        dedupeTagsByPolicySignal,
         mergeById,
         applyCountryFilterToSearchResults,
         searchWithPrecheck

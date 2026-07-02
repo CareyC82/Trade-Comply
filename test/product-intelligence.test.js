@@ -13,7 +13,7 @@ const {
     buildEnhancedProductQuery,
     prepareIntelligentSearch
 } = require('../lib/product-intelligence');
-const { search, searchWithPrecheck } = require('../js/search');
+const { search, searchWithPrecheck, dedupeTagsByPolicySignal } = require('../js/search');
 
 const FACTORS = {
     wireless: { label: 'Wireless', keywords: ['wireless', 'wifi', 'radio'], nextChecks: [], signals: [], risk: 'medium' },
@@ -45,6 +45,36 @@ function ids(result) {
 }
 
 describe('product intelligence', () => {
+    it('dedupes repeated auto-crawled policy variants from the same source', () => {
+        const duplicateSourceTags = [
+            {
+                tag_id: 'RS-US-847130-A',
+                country: 'US',
+                direction: 'import',
+                category: 'OTHER',
+                category_label: 'Export Control',
+                source_url: 'https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions',
+                short_name: '[US High]',
+                short_description: 'The U.S. Trade Representative has initiated a forced labor Section 301 investigation and proposed additional tariffs.'
+            },
+            {
+                tag_id: 'RS-US-847130-B',
+                country: 'US',
+                direction: 'import',
+                category: 'OTHER',
+                category_label: 'Export Control',
+                source_url: 'https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions?utm=copy',
+                short_name: '[US High]',
+                short_description: 'The U.S. Trade Representative has initiated a forced labor Section 301 investigation and proposed additional tariffs. This action may lead to increased scrutiny.'
+            }
+        ];
+
+        const deduped = dedupeTagsByPolicySignal(duplicateSourceTags);
+
+        assert.equal(deduped.length, 1);
+        assert.equal(deduped[0].tag_id, 'RS-US-847130-A');
+    });
+
     it('infers AI accelerator attributes from short natural-language input', () => {
         const profile = inferProductAttributes('NVIDIA style AI GPU accelerator card with HBM');
         assert.equal(profile.vertical, 'semiconductor');

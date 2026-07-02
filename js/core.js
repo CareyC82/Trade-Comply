@@ -366,7 +366,11 @@ function updateElementText(id, text) {
 
 function getTagCategoryLabel(tag) {
     const label = tag.category_label || tag.category || 'General';
-    if ((AppState.currentDirection || 'export') === 'import' && tag.category === 'EXPORT_CTRL') {
+    const normalizedLabel = String(label || '').trim().toLowerCase();
+    if (
+        (AppState.currentDirection || 'export') === 'import'
+        && (tag.category === 'EXPORT_CTRL' || normalizedLabel === 'export control')
+    ) {
         return 'Import Controls & Trade Remedies';
     }
     return getDisplayCategoryLabel(label, tag.category);
