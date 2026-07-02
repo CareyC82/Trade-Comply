@@ -1,8 +1,8 @@
 {
-  "version": "2026-07-01",
-  "generated_at": "2026-07-01T20:11:06.916Z",
+  "version": "2026-07-02",
+  "generated_at": "2026-07-02T07:38:29.184Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
-  "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows",
+  "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
     {
       "id": "solar-cn-us",
@@ -475,6 +475,97 @@
       ],
       "scope_components": [],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    }
+  ],
+  "exact_route_scope_priorities": [
+    {
+      "id": "exact-route-ai-server-rack-us-eu",
+      "route_id": "ai-server-rack-us-eu",
+      "route": "US->EU",
+      "product_id": "ai_compute",
+      "import_country": "EU",
+      "origin_country": "US",
+      "hs_code": "8471500000",
+      "source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "parser_target": "EU exact TARIC route-scope parser",
+      "next_action": "Add exact TARIC-code input and route-scope evidence checks for US->EU ai_compute before treating this as filing-grade.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "US->EU ai_compute already has official duty/tax estimate coverage, but exact TARIC code, product scope, CE/RoHS, and member-state VAT evidence should be automated next.",
+      "rate_change_drivers": [
+        "Semiconductor scope can depend on exact HS line, end-use, and technology classification.",
+        "Exact TARIC goods-code scope can change whether the official estimate is filing-grade.",
+        "AI server configuration, accelerator content, and end-use scope can change classification and control review."
+      ],
+      "scope_components": [
+        "official_base_duty",
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "dual_use_end_use_scope",
+        "ce_rohs_market_surveillance",
+        "member_state_vat"
+      ],
+      "parser_scope": "Add exact TARIC-code input and route-scope evidence checks for US->EU ai_compute before treating this as filing-grade."
+    },
+    {
+      "id": "exact-route-optical-module-us-eu",
+      "route_id": "optical-module-us-eu",
+      "route": "US->EU",
+      "product_id": "optical_module",
+      "import_country": "EU",
+      "origin_country": "US",
+      "hs_code": "851770",
+      "source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "parser_target": "EU exact TARIC route-scope parser",
+      "next_action": "Add exact TARIC-code input and route-scope evidence checks for US->EU optical_module before treating this as filing-grade.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "US->EU optical_module already has official duty/tax estimate coverage, but exact TARIC code, product scope, CE/RoHS, and member-state VAT evidence should be automated next.",
+      "rate_change_drivers": [
+        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment.",
+        "Exact TARIC goods-code scope can change whether the official estimate is filing-grade.",
+        "Optical-module speed, telecom/security function, and exact subheading can change certification and tariff evidence."
+      ],
+      "scope_components": [
+        "official_base_duty",
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "taric_exact_code_scope",
+        "telecom_security_scope",
+        "ce_rohs_market_surveillance",
+        "member_state_vat"
+      ],
+      "parser_scope": "Add exact TARIC-code input and route-scope evidence checks for US->EU optical_module before treating this as filing-grade."
+    },
+    {
+      "id": "exact-route-data-center-infra-us-eu",
+      "route_id": "data-center-infra-us-eu",
+      "route": "US->EU",
+      "product_id": "data_center_infrastructure",
+      "import_country": "EU",
+      "origin_country": "US",
+      "hs_code": "850440",
+      "source_trust": "official_duty_tax_estimate",
+      "automation_level": "hybrid_official",
+      "parser_target": "EU exact TARIC route-scope parser",
+      "next_action": "Add exact TARIC-code input and route-scope evidence checks for US->EU data_center_infrastructure before treating this as filing-grade.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "US->EU data_center_infrastructure already has official duty/tax estimate coverage, but exact TARIC code, product scope, CE/RoHS, and member-state VAT evidence should be automated next.",
+      "rate_change_drivers": [
+        "Exact TARIC goods-code scope can change whether the official estimate is filing-grade.",
+        "Power/cooling function, installation use, CE safety, and RoHS evidence can change filing support."
+      ],
+      "scope_components": [
+        "official_base_duty",
+        "taric_exact_code_scope",
+        "electrical_safety_scope",
+        "ce_rohs_market_surveillance",
+        "member_state_vat"
+      ],
+      "parser_scope": "Add exact TARIC-code input and route-scope evidence checks for US->EU data_center_infrastructure before treating this as filing-grade."
     }
   ]
 }

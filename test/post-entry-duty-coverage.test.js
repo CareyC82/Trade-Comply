@@ -223,6 +223,7 @@ test('exact tariff parser priorities mirror the live upgrade queue', () => {
     const payload = buildExactTariffParserPriorities({ generatedAt: '2026-06-22T00:00:00.000Z' });
     const liveIds = result.priority_rate_matrix.priority_upgrade_queue.map((row) => row.id);
     const payloadIds = payload.priorities.map((row) => row.id);
+    const exactRouteScopeIds = payload.exact_route_scope_priorities.map((row) => row.route_id);
 
     assert.deepEqual(payloadIds, liveIds);
     assert.equal(payload.priorities.length, 7);
@@ -237,6 +238,14 @@ test('exact tariff parser priorities mirror the live upgrade queue', () => {
     assert.ok(payload.rule_scope_priorities.some((row) => row.rule_id === 'DE-GLOBAL-8543-ELECTRICAL-MACHINES-IMPORT-SCOPE'));
     assert.ok(payload.rule_scope_priorities.some((row) => row.rule_id === 'RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE'));
     assert.ok(payload.rule_scope_priorities.every((row) => row.parser_scope && row.parser_target && row.next_action));
+    assert.deepEqual(
+        exactRouteScopeIds.sort(),
+        ['ai-server-rack-us-eu', 'data-center-infra-us-eu', 'optical-module-us-eu'].sort()
+    );
+    assert.ok(payload.exact_route_scope_priorities.every((row) => row.parser_target.includes('exact TARIC')));
+    assert.ok(payload.exact_route_scope_priorities.every((row) => row.scope_components.includes('taric_exact_code_scope')));
+    assert.ok(payload.exact_route_scope_priorities.every((row) => row.scope_components.includes('ce_rohs_market_surveillance')));
+    assert.ok(payload.exact_route_scope_priorities.every((row) => row.scope_components.includes('member_state_vat')));
 });
 
 test('daily duty-rate sync refreshes exact tariff parser priorities', () => {

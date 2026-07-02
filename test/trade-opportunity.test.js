@@ -288,6 +288,10 @@ describe('trade opportunity insights', () => {
         assert.match(model.businessDecisionSummary.headline, /Control check comes before route optimization/i);
         assert.match(model.businessDecisionSummary.primaryAction, /export-control/i);
         assert.match(model.businessDecisionSummary.primaryAction, /Do not use any route as a commercial recommendation/i);
+        assert.equal(model.routeRecommendation.decision, 'control_first');
+        assert.match(model.routeRecommendation.headline, /Do not optimize route yet/i);
+        assert.match(model.routeRecommendation.nextMove, /license|end-use|re-export/i);
+        assert.match(model.routeRecommendation.reason, /not a workaround/i);
         assert.ok(model.businessDecisionSummary.rows.every((row) => row.label === 'Control first' || row.type === 'Direct route' || row.type === 'Transit option'));
         assert.match(china.salesAngle, /manufacturing ecosystem/i);
         assert.doesNotMatch(china.salesAngle, /agency reference systems/i);
@@ -364,6 +368,8 @@ describe('trade opportunity insights', () => {
             assert.equal(model.routeComparison[0].market, to);
             assert.equal(model.transitRoutes.length, 2);
             assert.equal(model.routeComparison.filter((row) => row.routeKind === 'transit').length, 2);
+            assert.ok(model.routeRecommendation?.decision);
+            assert.match(model.routeRecommendation.headline, /direct route|transit|optimize/i);
             assert.ok(model.transitRoutes.every((row) => row.transitComparison.combinedCostPer1000));
             assert.ok(model.transitRoutes.every((row) => row.transitComparison.deltaCostPer1000));
             assert.ok(model.transitRoutes.every((row) => /transit-route review evidence|route-specific|origin transformation/i.test(`${row.transitReason} ${row.transitWarning}`)));
@@ -396,6 +402,23 @@ describe('trade opportunity insights', () => {
             assert.ok(transit.transitComparison.secondParserNextAction);
             assert.match(transit.transitWarning, /origin transformation/i);
         }
+    });
+
+    it('turns opportunity output into a concise route recommendation', () => {
+        const solar = buildOpportunityInsights({
+            product: 'solar panel photovoltaic',
+            from: 'CN',
+            to: 'US',
+            dutyRates,
+            priorityMatrix
+        });
+
+        assert.ok(solar.routeRecommendation);
+        assert.match(solar.routeRecommendation.headline, /direct route|transit|Compare/i);
+        assert.ok(solar.routeRecommendation.recommendedRoute);
+        assert.ok(solar.routeRecommendation.nextMove);
+        assert.ok(solar.routeRecommendation.reason);
+        assert.doesNotMatch(solar.routeRecommendation.headline, /lowest landed cost/i);
     });
 
     it('keeps high-frequency opportunity routes evidence-backed and compliance-gated', () => {

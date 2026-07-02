@@ -747,6 +747,76 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
         ));
 }
 
+function buildExactRouteScopeBacklog(rows = []) {
+    const exactScopeProducts = new Set([
+        'ai_compute',
+        'optical_module',
+        'data_center_infrastructure'
+    ]);
+    const exactScopeMarkets = new Set(['EU', 'DE', 'NL']);
+    const marketRank = { EU: 1, DE: 2, NL: 3 };
+    const productRank = { ai_compute: 1, optical_module: 2, data_center_infrastructure: 3 };
+
+    return rows
+        .filter((row) => (
+            exactScopeMarkets.has(row.import_country)
+            && exactScopeProducts.has(row.product_id)
+            && row.source_trust === 'official_duty_tax_estimate'
+        ))
+        .map((row) => {
+            const route = row.route || `${row.origin_country || '?'}->${row.import_country || '?'}`;
+            const isAiCompute = row.product_id === 'ai_compute';
+            const isOptical = row.product_id === 'optical_module';
+            const isDataCenter = row.product_id === 'data_center_infrastructure';
+            const scopeComponents = Array.from(new Set([
+                ...(row.scope_components || []),
+                'taric_exact_code_scope',
+                isAiCompute ? 'dual_use_end_use_scope' : '',
+                isOptical ? 'telecom_security_scope' : '',
+                isDataCenter ? 'electrical_safety_scope' : '',
+                'ce_rohs_market_surveillance',
+                'member_state_vat'
+            ].filter(Boolean)));
+            const rateDrivers = Array.from(new Set([
+                ...(row.rate_change_drivers || []),
+                'Exact TARIC goods-code scope can change whether the official estimate is filing-grade.',
+                isAiCompute ? 'AI server configuration, accelerator content, and end-use scope can change classification and control review.' : '',
+                isOptical ? 'Optical-module speed, telecom/security function, and exact subheading can change certification and tariff evidence.' : '',
+                isDataCenter ? 'Power/cooling function, installation use, CE safety, and RoHS evidence can change filing support.' : ''
+            ].filter(Boolean)));
+
+            return {
+                id: `exact-route-${row.id}`,
+                route_id: row.id,
+                product_id: row.product_id,
+                market: row.import_country,
+                import_country: row.import_country,
+                origin_country: row.origin_country,
+                route,
+                hs_code: row.hs_code,
+                source_trust: row.source_trust,
+                automation_level: row.automation_level,
+                estimated_total_rate: row.total_rate,
+                impact_score: row.impact_score || 0,
+                priority: 5,
+                priority_band: 'P2',
+                market_priority: marketRank[row.import_country] || 99,
+                product_priority: productRank[row.product_id] || 99,
+                parser_target: `${row.import_country} exact TARIC route-scope parser`,
+                next_action: `Add exact TARIC-code input and route-scope evidence checks for ${route} ${row.product_id} before treating this as filing-grade.`,
+                why_priority: `${route} ${row.product_id} already has official duty/tax estimate coverage, but exact TARIC code, product scope, CE/RoHS, and member-state VAT evidence should be automated next.`,
+                rate_change_drivers: rateDrivers,
+                scope_components: scopeComponents,
+                parser_scope: row.next_action || 'Confirm exact TARIC line, CE/RoHS evidence, product function, origin, and member-state VAT before filing.'
+            };
+        })
+        .sort((a, b) => (
+            a.market_priority - b.market_priority
+            || a.product_priority - b.product_priority
+            || String(a.route).localeCompare(String(b.route))
+        ));
+}
+
 function buildExactRateProgress({
     priorityMatrix = {},
     sourceRoadmap = {},
@@ -855,6 +925,7 @@ function buildExactRateProgress({
         mixed_official_estimate: 4
     };
     const ruleScopeBacklogRows = buildRuleScopeBacklog(dutyPayload);
+    const exactRouteScopeRows = buildExactRouteScopeBacklog(rows);
     const matrixBacklogRows = marketRows
         .flatMap(row => (row.backlog_rows || []).map(item => ({
             ...item,
@@ -862,6 +933,7 @@ function buildExactRateProgress({
         })));
     const topBacklogRows = matrixBacklogRows
         .concat(ruleScopeBacklogRows)
+        .concat(exactRouteScopeRows)
         .sort((a, b) => (
             (trustBacklogRank[a.source_trust] || 9) - (trustBacklogRank[b.source_trust] || 9)
             || (b.impact_score || 0) - (a.impact_score || 0)
@@ -876,6 +948,7 @@ function buildExactRateProgress({
         roadmap_status: roadmapStatus,
         top_backlog_rows: topBacklogRows,
         rule_scope_backlog_rows: ruleScopeBacklogRows,
+        exact_route_scope_rows: exactRouteScopeRows,
         rows: marketRows
     };
 }
