@@ -214,70 +214,70 @@ describe('compliance matching matrix', () => {
                 market: 'CN',
                 focus: 'import',
                 route: { from: 'US', to: 'CN' },
-                expected: ['CL-CNMEM-HBM-IMP-001']
+                expected: ['CL-CNMEMHBMIMP-001']
             },
             {
                 query: 'HBM3E high bandwidth memory',
                 market: 'US',
                 focus: 'export',
                 route: { from: 'US', to: 'CN' },
-                expected: ['CL-USMEM-HBM-EXP-001']
+                expected: ['CL-USMEMHBMEXP-001']
             },
             {
                 query: 'NAND flash memory IC',
                 market: 'JP',
                 focus: 'export',
                 route: { from: 'JP', to: 'CN' },
-                expected: ['CL-JPMEM-NAND-EXP-001']
+                expected: ['CL-JPMEMNANDEXP-001']
             },
             {
                 query: 'DDR5 DRAM memory module',
                 market: 'KR',
                 focus: 'export',
                 route: { from: 'KR', to: 'CN' },
-                expected: ['CL-KRMEM-DRAM-EXP-001']
+                expected: ['CL-KRMEMDRAMEXP-001']
             },
             {
                 query: 'HBM3E high bandwidth memory',
                 market: 'SG',
                 focus: 'export',
                 route: { from: 'US', to: 'SG' },
-                expected: ['CL-SGMEM-REEXPORT-001']
+                expected: ['CL-SGMEMREEXPORT-001']
             },
             {
                 query: 'SSD controller IC',
                 market: 'MY',
                 focus: 'export',
                 route: { from: 'US', to: 'MY' },
-                expected: ['CL-MYMEM-REEXPORT-001']
+                expected: ['CL-MYMEMREEXPORT-001']
             },
             {
                 query: 'HBM3E high bandwidth memory IC',
                 market: 'EU',
                 focus: 'import',
                 route: { from: 'US', to: 'EU' },
-                expected: ['CL-EUMEM-IMP-001']
+                expected: ['CL-EUMEMIMP-001']
             },
             {
                 query: 'NAND flash memory IC',
                 market: 'EU',
                 focus: 'export',
                 route: { from: 'EU', to: 'US' },
-                expected: ['CL-EUMEM-EXP-001']
+                expected: ['CL-EUMEMEXP-001']
             },
             {
                 query: 'DDR5 DRAM memory module',
                 market: 'IN',
                 focus: 'import',
                 route: { from: 'US', to: 'IN' },
-                expected: ['CL-INMEM-IMP-001']
+                expected: ['CL-INMEMIMP-001']
             },
             {
                 query: 'SSD controller IC',
                 market: 'IN',
                 focus: 'export',
                 route: { from: 'IN', to: 'US' },
-                expected: ['CL-INMEM-EXP-001']
+                expected: ['CL-INMEMEXP-001']
             }
         ].forEach((sample) => {
             const result = runSearch(sample.query, 'export', sample.market, sample.focus, sample.route);
