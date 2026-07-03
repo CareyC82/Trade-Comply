@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-13",
+  "updated_at": "2026-07-03",
   "notes": "High-frequency Post-Entry Check samples used to verify value math, duty-rate coverage, and source-status behavior. Amounts are synthetic test values, not customer data.",
   "samples": [
     {
@@ -870,6 +870,92 @@
         "official_source_checked"
       ],
       "expect_source_trust": "official_duty_tax_estimate"
+    },
+    {
+      "id": "PE-US-CN-LABANALYZER-9027",
+      "product": "laboratory analyzer electronic diagnostic device",
+      "focus": "import",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "9027",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 9000,
+      "freight": 450,
+      "insurance": 70,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_min_total_rate": 0,
+      "expect_source_statuses": [
+        "official_source_checked"
+      ],
+      "expect_source_trust": "official_exact"
+    },
+    {
+      "id": "PE-US-CN-ROBOT-847950",
+      "product": "industrial robot arm PLC servo drive machine vision",
+      "focus": "import",
+      "origin_country": "CN",
+      "import_country": "US",
+      "hs_code": "847950",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 24000,
+      "freight": 1200,
+      "insurance": 180,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_min_total_rate": 0.025,
+      "expect_source_statuses": [
+        "official_source_checked"
+      ],
+      "expect_source_trust": "official_exact"
+    },
+    {
+      "id": "PE-CN-US-MEDDIAGNOSTIC-9018",
+      "product": "patient monitor medical diagnostic equipment",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "CN",
+      "hs_code": "9018",
+      "incoterm": "FOB",
+      "currency": "USD",
+      "declared_amount": 11000,
+      "freight": 500,
+      "insurance": 80,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_min_total_rate": 0.13,
+      "expect_source_statuses": [
+        "scope_check_required",
+        "indicative"
+      ],
+      "expect_source_trust": "official_heading_only"
+    },
+    {
+      "id": "PE-DE-US-ROBOT-847950",
+      "product": "industrial robot arm servo drive factory automation",
+      "focus": "import",
+      "origin_country": "US",
+      "import_country": "DE",
+      "hs_code": "847950",
+      "incoterm": "FOB",
+      "currency": "EUR",
+      "declared_amount": 26000,
+      "freight": 1300,
+      "insurance": 190,
+      "other_charges": 0,
+      "declared_duty": 0,
+      "expect_covered": true,
+      "expect_min_total_rate": 0.19,
+      "expect_source_statuses": [
+        "scope_check_required",
+        "indicative"
+      ],
+      "expect_source_trust": "official_heading_only"
     }
   ]
 }

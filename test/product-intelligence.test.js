@@ -75,6 +75,38 @@ describe('product intelligence', () => {
         assert.equal(deduped[0].tag_id, 'RS-US-847130-A');
     });
 
+    it('dedupes same-source policy variants even when generated titles differ', () => {
+        const duplicateSourceTags = [
+            {
+                tag_id: 'RS-US-8542-A',
+                country: 'US',
+                direction: 'import',
+                route_focus: 'import',
+                category: 'EXPORT_CTRL',
+                category_label: 'US Export Control',
+                source_url: 'https://www.bis.gov/press-release/entity-list-advanced-computing',
+                short_name: '[US BIS]',
+                short_description: 'Commerce adds entities to the Entity List for advanced computing and semiconductor manufacturing support. BIS published a rule adding entities to the Entity List.'
+            },
+            {
+                tag_id: 'RS-US-8542-B',
+                country: 'US',
+                direction: 'import',
+                route_focus: 'import',
+                category: 'EXPORT_CTRL',
+                category_label: 'Export Control',
+                source_url: 'https://www.bis.gov/press-release/entity-list-advanced-computing?utm_source=crawler',
+                short_name: '[US High]',
+                short_description: 'Commerce adds entities to the Entity List for advanced computing and semiconductor manufacturing support. BIS published a rule adding entities to the Entity List and related affiliates.'
+            }
+        ];
+
+        const deduped = dedupeTagsByPolicySignal(duplicateSourceTags);
+
+        assert.equal(deduped.length, 1);
+        assert.equal(deduped[0].tag_id, 'RS-US-8542-A');
+    });
+
     it('infers AI accelerator attributes from short natural-language input', () => {
         const profile = inferProductAttributes('NVIDIA style AI GPU accelerator card with HBM');
         assert.equal(profile.vertical, 'semiconductor');

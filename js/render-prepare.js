@@ -395,6 +395,7 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         isBrowseAllQuery,
         resolveCasesForMatchedTags,
+        groupTagsByCategory,
         prepareResultsViewModel,
         prepareAiQuerySectionViewModel
     };

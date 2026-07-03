@@ -24,6 +24,15 @@ function loadCore() {
     return context;
 }
 
+function loadRenderPrepareWithCore() {
+    const context = loadCore();
+    global.AppState = context.AppState;
+    global.getTagCategoryLabel = context.__categoryApi.getTagCategoryLabel;
+    const renderPath = path.join(__dirname, '..', 'js', 'render-prepare.js');
+    delete require.cache[require.resolve(renderPath)];
+    return require(renderPath);
+}
+
 describe('category display labels', () => {
     it('maps internal category labels to user-facing card titles', () => {
         const context = loadCore();
@@ -109,5 +118,25 @@ describe('category display labels', () => {
         const importOverrideTheme = getCategoryTheme('EXPORT_CTRL', 'Import Controls & Trade Remedies');
         assert.equal(importOverrideTheme.class, 'import-regulation');
         assert.equal(importOverrideTheme.icon, '📦');
+    });
+
+    it('groups import-focused legacy export-control cards under import wording', () => {
+        const { groupTagsByCategory } = loadRenderPrepareWithCore();
+        const grouped = groupTagsByCategory([
+            {
+                tag_id: 'RS-US-8542-TEST',
+                country: 'US',
+                direction: 'import',
+                route_focus: 'import',
+                category: 'EXPORT_CTRL',
+                category_label: 'US Export Control',
+                short_name: '[US High]'
+            }
+        ], {
+            direction: 'export',
+            routeContext: { from: 'CN', to: 'US', focus: 'import' }
+        });
+
+        assert.deepEqual(Object.keys(grouped), ['Import Controls & Trade Remedies']);
     });
 });

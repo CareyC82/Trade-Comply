@@ -330,15 +330,24 @@ function getTagSemanticDedupeKey(tag) {
     const source = normalizeUrlForDedupe(tag.source_url || tag.source || tag.source_link);
     const category = String(tag.category || tag.category_label || 'OTHER').trim().toLowerCase();
     const title = normalizeTextForDedupe(tag.short_name || tag.title || tag.short_description || '');
-    if (source) {
-        return [country, direction, focus, category, source, title.slice(0, 90)].join('|');
-    }
+    const sourceBody = normalizeTextForDedupe([
+        tag.short_description,
+        tag.description,
+        tag.content_en
+    ].filter(Boolean).join(' '));
     const body = normalizeTextForDedupe([
         tag.short_name,
         tag.short_description,
         tag.description,
         tag.content_en
     ].filter(Boolean).join(' '));
+    if (source) {
+        if (/^RS-/i.test(String(tag.tag_id || ''))) {
+            return [country, direction, focus, category, source].join('|');
+        }
+        const policyFingerprint = (sourceBody || title).split(' ').slice(0, 14).join(' ');
+        return [country, direction, focus, category, source, policyFingerprint].join('|');
+    }
     return [country, direction, focus, category, body.slice(0, 180)].join('|');
 }
 
