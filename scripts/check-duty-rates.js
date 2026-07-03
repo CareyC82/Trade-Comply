@@ -25,7 +25,20 @@ const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json')
 const SAMPLES_PATH = path.join(ROOT, 'data', 'post-entry-samples.json');
 const PRIORITY_MATRIX_PATH = path.join(ROOT, 'data', 'post-entry-rate-priority-matrix.json');
 const PRIORITY_IMPORT_MARKETS = ['US', 'CN', 'EU', 'DE', 'NL', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW', 'RU'];
-const PRIORITY_HS_PREFIXES = ['847130', '850440', '850760', '8517', '8525', '8528', '8541', '8542', '8543'];
+const PRIORITY_HS_PREFIXES = [
+    '847130',
+    '8479',
+    '850440',
+    '850760',
+    '8517',
+    '8525',
+    '8528',
+    '8541',
+    '8542',
+    '8543',
+    '9018',
+    '9027'
+];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));

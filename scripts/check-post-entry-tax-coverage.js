@@ -10,13 +10,23 @@ const fs = require('fs');
 const path = require('path');
 
 const {
-    PRIORITY_HS_PREFIXES,
     runDutyRateHealthCheck
 } = require('./check-duty-rates');
 
 const ROOT = path.join(__dirname, '..');
 const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
 const COUNTRY_REGISTRY_PATH = path.join(ROOT, 'data', 'country-registry.json');
+const EXPORT_TAX_PRIORITY_HS_PREFIXES = [
+    '847130',
+    '850440',
+    '850760',
+    '8517',
+    '8525',
+    '8528',
+    '8541',
+    '8542',
+    '8543'
+];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -51,7 +61,7 @@ function ruleCoversPrefix(rule, prefix) {
 
 function summarizeExportTaxCoverage(exportPayload, {
     countries = getPostEntryRouteCountries(),
-    prefixes = PRIORITY_HS_PREFIXES
+    prefixes = EXPORT_TAX_PRIORITY_HS_PREFIXES
 } = {}) {
     const rules = (Array.isArray(exportPayload?.rules) ? exportPayload.rules : []).map(normalizeExportRule);
     const byOrigin = new Map();
@@ -178,6 +188,7 @@ if (require.main === module) {
 
 module.exports = {
     EXPORT_TAX_RATES_PATH,
+    EXPORT_TAX_PRIORITY_HS_PREFIXES,
     getPostEntryRouteCountries,
     normalizeExportRule,
     runPostEntryTaxCoverageCheck,

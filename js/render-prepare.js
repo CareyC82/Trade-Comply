@@ -84,9 +84,9 @@ function applyCountryFilterToResults(tags, cases) {
     return applyCountryFilterToSearchResults({ tags, cases });
 }
 
-function groupTagsByCategory(tags) {
+function groupTagsByCategory(tags, context = {}) {
     return tags.reduce((acc, tag) => {
-        const categoryLabel = getTagCategoryLabel(tag);
+        const categoryLabel = getTagCategoryLabel(tag, context);
         if (!acc[categoryLabel]) {
             acc[categoryLabel] = {
                 category: categoryLabel,
@@ -341,7 +341,7 @@ function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
     const showPolicyCorrection = !browseAll;
     const policyCorrectionVariant = tags.length === 0 ? 'no_match' : 'has_results';
 
-    const grouped = groupTagsByCategory(tags);
+    const grouped = groupTagsByCategory(tags, renderContext);
     const categoryGroups = Object.values(grouped).map((group) => prepareCategoryGroupViewModel(group, renderContext));
 
     return {

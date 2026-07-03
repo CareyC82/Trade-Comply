@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-02",
+  "updated_at": "2026-07-03",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -2106,7 +2106,10 @@
         "8528",
         "8541",
         "8542",
-        "8543"
+        "8543",
+        "8479",
+        "9018",
+        "9027"
       ],
       "label": "Taiwan import electronics business tax signal",
       "base_rate": 0,
@@ -2250,6 +2253,39 @@
           "source_rate_text": "Taiwan customs duty candidate: 0.000%",
           "source_url": "https://web.customs.gov.tw/",
           "last_checked_at": "2026-07-02T19:46:03.538Z"
+        },
+        {
+          "hs_code": "8479",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Official heading only",
+          "source_note": "Taiwan Customs official tariff heading is monitored for Industrial automation machinery. Confirm exact tariff line, product configuration, origin, and any local tax/trade-remedy layer before filing.",
+          "source_hts": "8479 (Industrial automation machinery; official heading monitored)",
+          "source_rate_text": "Industrial automation machinery: exact tariff line required before filing-grade duty use",
+          "source_url": "https://web.customs.gov.tw/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
+        },
+        {
+          "hs_code": "9018",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Official heading only",
+          "source_note": "Taiwan Customs official tariff heading is monitored for Medical / diagnostic equipment. Confirm exact tariff line, product configuration, origin, and any local tax/trade-remedy layer before filing.",
+          "source_hts": "9018 (Medical / diagnostic equipment; official heading monitored)",
+          "source_rate_text": "Medical / diagnostic equipment: exact tariff line required before filing-grade duty use",
+          "source_url": "https://web.customs.gov.tw/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
+        },
+        {
+          "hs_code": "9027",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Official heading only",
+          "source_note": "Taiwan Customs official tariff heading is monitored for Laboratory analyzer / measuring equipment. Confirm exact tariff line, product configuration, origin, and any local tax/trade-remedy layer before filing.",
+          "source_hts": "9027 (Laboratory analyzer / measuring equipment; official heading monitored)",
+          "source_rate_text": "Laboratory analyzer / measuring equipment: exact tariff line required before filing-grade duty use",
+          "source_url": "https://web.customs.gov.tw/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
         }
       ]
     },
@@ -2266,7 +2302,10 @@
         "8528",
         "8541",
         "8542",
-        "8543"
+        "8543",
+        "8479",
+        "9018",
+        "9027"
       ],
       "label": "Russia import electronics VAT / EAEU duty signal",
       "base_rate": 0.05,
@@ -2310,7 +2349,10 @@
         "8541",
         "8542",
         "8543",
-        "847150"
+        "847150",
+        "8479",
+        "9018",
+        "9027"
       ],
       "label": "China import electronics VAT/duty review signal",
       "base_rate": 0.08,
@@ -2454,6 +2496,39 @@
           "source_rate_text": "China MFN duty candidate: 0.000%",
           "source_url": "https://www.customs.gov.cn/",
           "last_checked_at": "2026-07-02T19:46:03.538Z"
+        },
+        {
+          "hs_code": "8479",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Official heading only",
+          "source_note": "China Customs official tariff heading is monitored for Industrial automation machinery. Confirm exact tariff line, product configuration, origin, and any local tax/trade-remedy layer before filing.",
+          "source_hts": "8479 (Industrial automation machinery; official heading monitored)",
+          "source_rate_text": "Industrial automation machinery: exact tariff line required before filing-grade duty use",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
+        },
+        {
+          "hs_code": "9018",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Official heading only",
+          "source_note": "China Customs official tariff heading is monitored for Medical / diagnostic equipment. Confirm exact tariff line, product configuration, origin, and any local tax/trade-remedy layer before filing.",
+          "source_hts": "9018 (Medical / diagnostic equipment; official heading monitored)",
+          "source_rate_text": "Medical / diagnostic equipment: exact tariff line required before filing-grade duty use",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
+        },
+        {
+          "hs_code": "9027",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Official heading only",
+          "source_note": "China Customs official tariff heading is monitored for Laboratory analyzer / measuring equipment. Confirm exact tariff line, product configuration, origin, and any local tax/trade-remedy layer before filing.",
+          "source_hts": "9027 (Laboratory analyzer / measuring equipment; official heading monitored)",
+          "source_rate_text": "Laboratory analyzer / measuring equipment: exact tariff line required before filing-grade duty use",
+          "source_url": "https://www.customs.gov.cn/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
         }
       ]
     },
@@ -2698,6 +2773,37 @@
       "last_checked_at": "2026-07-02T19:45:48.103Z"
     },
     {
+      "id": "EU-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8479",
+        "9018",
+        "9027"
+      ],
+      "label": "EU import automation / medical / lab equipment heading signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "EU import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / member-state VAT benchmark"
+        }
+      ],
+      "trade_remedy": "EU import heading monitored for automation, medical, and laboratory equipment; verify exact TARIC code, origin preference, and VAT treatment before filing.",
+      "confidence": "Official heading only",
+      "source_status": "scope_check_required",
+      "source_note": "Official TARIC heading is monitored, but exact 10-digit TARIC line can change the payable rate and scope. Use for pre-check coverage only until exact parser coverage is promoted.",
+      "source_hts": "8479 / 9018 / 9027 (TARIC heading monitored)",
+      "source_rate_text": "Exact TARIC line required before filing-grade duty use; VAT benchmark handled separately.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-07-03T00:00:00.000Z"
+    },
+    {
       "id": "DE-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "import_country": "DE",
       "origin_country": "*",
@@ -2756,6 +2862,37 @@
       "last_checked_at": "2026-07-02T19:45:48.103Z"
     },
     {
+      "id": "DE-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8479",
+        "9018",
+        "9027"
+      ],
+      "label": "Germany import automation / medical / lab equipment heading signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Germany import VAT benchmark",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Germany VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Germany import heading monitored for automation, medical, and laboratory equipment; verify exact TARIC code, origin preference, and VAT treatment before filing.",
+      "confidence": "Official heading only",
+      "source_status": "scope_check_required",
+      "source_note": "Official TARIC heading is monitored, but exact 10-digit TARIC line can change the payable rate and scope. Use for pre-check coverage only until exact parser coverage is promoted.",
+      "source_hts": "8479 / 9018 / 9027 (TARIC heading monitored)",
+      "source_rate_text": "Exact TARIC line required before filing-grade duty use; VAT benchmark handled separately.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-07-03T00:00:00.000Z"
+    },
+    {
       "id": "NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "import_country": "NL",
       "origin_country": "*",
@@ -2812,6 +2949,37 @@
       "source_rate_text": "Exact TARIC code required before using an official EU duty rate.",
       "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
       "last_checked_at": "2026-07-02T19:45:48.103Z"
+    },
+    {
+      "id": "NL-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "8479",
+        "9018",
+        "9027"
+      ],
+      "label": "Netherlands import automation / medical / lab equipment heading signal",
+      "base_rate": 0,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_vat",
+          "label": "Netherlands import VAT benchmark",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "indicative",
+          "source": "EU TARIC / Netherlands VAT benchmark"
+        }
+      ],
+      "trade_remedy": "Netherlands import heading monitored for automation, medical, and laboratory equipment; verify exact TARIC code, origin preference, and VAT treatment before filing.",
+      "confidence": "Official heading only",
+      "source_status": "scope_check_required",
+      "source_note": "Official TARIC heading is monitored, but exact 10-digit TARIC line can change the payable rate and scope. Use for pre-check coverage only until exact parser coverage is promoted.",
+      "source_hts": "8479 / 9018 / 9027 (TARIC heading monitored)",
+      "source_rate_text": "Exact TARIC line required before filing-grade duty use; VAT benchmark handled separately.",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+      "last_checked_at": "2026-07-03T00:00:00.000Z"
     },
     {
       "id": "CN-US-847150-AI-SERVER-HYBRID",
@@ -3022,6 +3190,7 @@
       "origin_country": "*",
       "hs_prefixes": [
         "847130",
+        "8479",
         "847950",
         "850440",
         "850760",
@@ -3030,7 +3199,9 @@
         "8528",
         "8541",
         "8542",
-        "8543"
+        "8543",
+        "9018",
+        "9027"
       ],
       "label": "US import non-China high-tech general duty signal",
       "base_rate": 0,
@@ -3055,6 +3226,17 @@
           "source_rate_text": "Portable ADP/tablet candidate: Free",
           "source_url": "https://hts.usitc.gov/",
           "last_checked_at": "2026-06-26T20:05:04.408Z"
+        },
+        {
+          "hs_code": "8479",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Official heading only",
+          "source_note": "USITC 8479 heading is monitored for industrial automation and special-purpose machinery. Confirm exact HTS, software/assist treatment, origin, and trade-remedy scope before filing.",
+          "source_hts": "8479 (USITC official heading monitored)",
+          "source_rate_text": "Industrial automation / special-purpose machinery: exact HTS required before filing-grade duty use",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
         },
         {
           "hs_code": "847950",
@@ -3187,6 +3369,28 @@
           "source_rate_text": "Memory IC / HBM / DRAM / NAND candidate: base duty candidate 0.000%",
           "source_url": "https://hts.usitc.gov/",
           "last_checked_at": "2026-07-01T00:00:00.000Z"
+        },
+        {
+          "hs_code": "9018",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC maintained duty candidate for Medical / diagnostic instrument candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "9018 (Medical / diagnostic instrument candidate)",
+          "source_rate_text": "Medical / diagnostic instrument candidate: official heading candidate; exact HTS required",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
+        },
+        {
+          "hs_code": "9027",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC maintained duty candidate for Laboratory analyzer / measuring instrument candidate. Confirm exact tariff line, product configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "9027 (Laboratory analyzer / measuring instrument candidate)",
+          "source_rate_text": "Laboratory analyzer / measuring instrument candidate: official heading candidate; exact HTS required",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-03T00:00:00.000Z"
         }
       ]
     }

@@ -364,16 +364,20 @@ function updateElementText(id, text) {
     if (el) el.textContent = text;
 }
 
-function getTagCategoryLabel(tag) {
+function getTagCategoryLabel(tag, context = {}) {
     const label = tag.category_label || tag.category || 'General';
     const normalizedLabel = String(label || '').trim().toLowerCase();
-    const importFocused = (AppState.currentDirection || 'export') === 'import'
+    const contextFocus = context.focus || context.routeContext?.focus || '';
+    const contextDirection = context.direction || '';
+    const importFocused = contextFocus === 'import'
+        || contextDirection === 'import'
+        || (AppState.currentDirection || 'export') === 'import'
         || AppState.complianceFocus === 'import'
         || tag.route_focus === 'import'
         || tag.compliance_focus === 'import';
     if (
         importFocused
-        && (tag.category === 'EXPORT_CTRL' || normalizedLabel === 'export control')
+        && (tag.category === 'EXPORT_CTRL' || /export control/.test(normalizedLabel))
     ) {
         return 'Import Controls & Trade Remedies';
     }

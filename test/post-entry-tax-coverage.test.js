@@ -4,9 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const {
-    PRIORITY_HS_PREFIXES
-} = require('../scripts/check-duty-rates');
-const {
+    EXPORT_TAX_PRIORITY_HS_PREFIXES,
     getPostEntryRouteCountries,
     runPostEntryTaxCoverageCheck,
     summarizeExportTaxCoverage
@@ -23,7 +21,7 @@ test('export-side Post-Entry coverage covers every maintained route country', ()
     assert.equal(summary.missing_total, 0);
     assert.equal(summary.rows.length, countries.length);
     summary.rows.forEach((row) => {
-        assert.deepEqual(row.covered, PRIORITY_HS_PREFIXES, `${row.origin_country} should cover every priority HS prefix`);
+        assert.deepEqual(row.covered, EXPORT_TAX_PRIORITY_HS_PREFIXES, `${row.origin_country} should cover every export-side priority HS prefix`);
     });
 });
 
