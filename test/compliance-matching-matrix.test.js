@@ -24,9 +24,9 @@ const PRODUCTS = [
     'laboratory analyzer electronic diagnostic device'
 ];
 
-const EXPORT_MARKETS = ['US', 'EU', 'ASEAN', 'RU'];
+const ROUTE_COUNTRIES = ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'IN', 'TW', 'RU', 'ASEAN'];
+const EXPORT_MARKETS = ROUTE_COUNTRIES;
 const IMPORT_ORIGINS = ['US', 'TW', 'JP', 'KR', 'GLOBAL'];
-const ROUTE_COUNTRIES = ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'ASEAN', 'RU', 'TW', 'JP', 'KR'];
 
 function setupSearch(direction, selectedCountry, route = {}) {
     globalThis.AppState = {
@@ -133,6 +133,26 @@ describe('compliance matching matrix', () => {
             }
         });
     }
+
+    it('keeps maintained route-country coverage for import and export focus', () => {
+        for (const market of ROUTE_COUNTRIES) {
+            for (const product of PRODUCTS) {
+                const importRoute = { from: market === 'US' ? 'CN' : 'US', to: market };
+                const importResult = runSearch(product, 'export', market, 'import', importRoute);
+                assert.ok(importResult.tags.length > 0, `expected import focus matches for ${product} into ${market}`);
+                assertHasSelectedMarketRule(importResult, market, 'import focus', product);
+                assertNoWrongMarketRules(importResult, market, 'import focus', product);
+                assertNoOppositeRouteFocus(importResult, 'import', `import ${importRoute.from}->${importRoute.to} ${product}`);
+
+                const exportRoute = { from: market, to: market === 'US' ? 'CN' : 'US' };
+                const exportResult = runSearch(product, 'export', market, 'export', exportRoute);
+                assert.ok(exportResult.tags.length > 0, `expected export focus matches for ${product} from ${market}`);
+                assertHasSelectedMarketRule(exportResult, market, 'export focus', product);
+                assertNoWrongMarketRules(exportResult, market, 'export focus', product);
+                assertNoOppositeRouteFocus(exportResult, 'export', `export ${exportRoute.from}->${exportRoute.to} ${product}`);
+            }
+        }
+    });
 
     it('surfaces US solar import controls for China-to-US photovoltaic products', () => {
         const result = runSearch('solar panel photovoltaic', 'export', 'US');
