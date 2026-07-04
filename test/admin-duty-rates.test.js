@@ -124,6 +124,15 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.equal(typeof payload.duty.parser_priority_bands, 'object');
     assert.ok((payload.duty.parser_priority_bands.P2 || []).length > 0);
     assert.ok((payload.duty.parser_priority_bands.P2 || []).every(row => row.parser_target && row.next_action));
+    assert.ok((payload.duty.parser_priority_bands.P2 || []).every(row => (
+        Array.isArray(row.scope_components)
+        && row.scope_components.includes('official_base_duty')
+        && row.scope_components.includes('chapter_99_section_301')
+    )));
+    assert.ok((payload.duty.parser_priority_bands.P2 || []).every(row => (
+        Array.isArray(row.rate_change_drivers)
+        && row.rate_change_drivers.length > 0
+    )));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.some(row => (
         row.rate_change_drivers.join(' ').includes('Section 301')
     )));

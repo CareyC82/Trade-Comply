@@ -1472,7 +1472,7 @@
                                     <td><strong>${escapeHtml(row.band || '')}</strong></td>
                                     <td>${escapeHtml(row.route || '')}</td>
                                     <td>${escapeHtml(row.product_id || '')}<div class="meta">HS ${escapeHtml(row.hs_code || '')}</div></td>
-                                    <td>${escapeHtml(row.parser_target || '')}</td>
+                                    <td>${escapeHtml(row.parser_target || '')}<div class="meta">${(row.scope_components || []).slice(0, 4).map(component => escapeHtml(component)).join(' · ')}</div></td>
                                     <td>${escapeHtml(row.why_priority || '')}<div class="meta">${(row.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div></td>
                                     <td>${escapeHtml(row.next_action || '')}</td>
                                 </tr>

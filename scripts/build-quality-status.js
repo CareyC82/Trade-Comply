@@ -127,7 +127,8 @@ function summarizeDutyHealth(dutyHealth) {
             parser_target: row.parser_target,
             next_action: row.next_action,
             why_priority: row.why_priority,
-            rate_change_drivers: row.rate_change_drivers || []
+            rate_change_drivers: row.rate_change_drivers || [],
+            scope_components: row.scope_components || []
         });
         return acc;
     }, {});

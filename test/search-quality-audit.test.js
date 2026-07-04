@@ -8,6 +8,7 @@ const path = require('node:path');
 
 const {
     DEFAULT_SAMPLES,
+    auditSample,
     duplicateSemanticTagKeys,
     formatAuditMarkdown,
     runQualityAudit,
@@ -85,6 +86,88 @@ describe('search quality audit', () => {
         for (const result of gated) {
             assert.deepEqual(result.issues.failures, [], result.id);
         }
+    });
+
+    it('keeps high-risk product intent pinned for live customer examples', () => {
+        const samples = [
+            {
+                id: 'h200-china-import',
+                from: 'US',
+                to: 'CN',
+                focus: 'import',
+                vertical: 'semiconductor',
+                query: 'H200 GPU AI accelerator',
+                topRule: 'CL-CHIP-005',
+                inferred: ['ai_chip', 'semiconductor']
+            },
+            {
+                id: 'lab-analyzer-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'healthcare-lab',
+                query: 'laboratory analyzer electronic diagnostic device',
+                topRule: 'CL-USMED-001'
+            },
+            {
+                id: 'dram-china-import',
+                from: 'KR',
+                to: 'CN',
+                focus: 'import',
+                vertical: 'semiconductor',
+                query: 'DRAM DDR5 memory chip import China',
+                topRule: 'CL-CNMEMIMP-001',
+                inferred: ['semiconductor']
+            },
+            {
+                id: 'nand-taiwan-export',
+                from: 'TW',
+                to: 'US',
+                focus: 'export',
+                vertical: 'semiconductor',
+                query: 'NAND flash memory IC 3D NAND storage controller',
+                topRule: 'CL-TWMEMEXP-001',
+                inferred: ['semiconductor']
+            },
+            {
+                id: 'solar-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'new-energy',
+                query: 'solar panel photovoltaic',
+                topRule: 'CL-USSOLARUFLPA-001'
+            },
+            {
+                id: 'industrial-robot-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'industrial-automation',
+                query: 'industrial robot arm plc servo drive machine vision',
+                topRule: 'CL-USROBOT-001'
+            },
+            {
+                id: 'ev-charger-germany-import',
+                from: 'US',
+                to: 'DE',
+                focus: 'import',
+                vertical: 'new-energy',
+                query: 'ev charger wallbox charging station',
+                topRule: 'CL-DEEV-001',
+                inferred: ['battery']
+            }
+        ];
+
+        samples.forEach((sample) => {
+            const result = auditSample(sample);
+            assert.deepEqual(result.issues.failures, [], result.id);
+            assert.equal(result.topRules[0]?.id, sample.topRule, result.id);
+            assert.equal(result.route.focus, sample.focus, result.id);
+            (sample.inferred || []).forEach((selection) => {
+                assert.ok(result.inferredSelections.includes(selection), `${result.id} should infer ${selection}`);
+            });
+        });
     });
 
     it('can write readable markdown and json audit artifacts', () => {
