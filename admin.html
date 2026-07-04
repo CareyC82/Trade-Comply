@@ -1399,6 +1399,140 @@
             `;
         }
 
+        function renderRateTrustTiers(duty = {}) {
+            const tiers = duty.rate_trust_tiers || {};
+            const parserBands = duty.parser_priority_bands || {};
+            const tierConfig = [
+                {
+                    key: 'official_exact',
+                    label: 'Official exact',
+                    badge: 'auto_updatable',
+                    note: '官方精确税率或官方税费估算，可作为强参考。'
+                },
+                {
+                    key: 'hybrid_scope_check',
+                    label: 'Hybrid / scope check',
+                    badge: 'hybrid_official_candidate',
+                    note: '有官方依据，但仍需确认细分 HS、附加税、案件范围或适用期。'
+                },
+                {
+                    key: 'benchmark_only',
+                    label: 'Benchmark only',
+                    badge: 'benchmark',
+                    note: '只用于预筛和优先级判断，不能用于报价或申报。'
+                }
+            ];
+            const tierCards = tierConfig.map((tier) => {
+                const data = tiers[tier.key] || { count: 0, samples: [] };
+                const samples = Array.isArray(data.samples) ? data.samples : [];
+                return `
+                    <article class="quality-row">
+                        <strong>${escapeHtml(tier.label)} <span class="badge ${escapeHtml(tier.badge)}">${escapeHtml(data.count || 0)} route(s)</span></strong>
+                        <div class="meta">${escapeHtml(tier.note)}</div>
+                        <div class="quality-chip-list" style="margin-top:8px">
+                            ${samples.slice(0, 8).map((row) => `
+                                <span class="quality-chip">
+                                    ${escapeHtml(row.route || '')} · ${escapeHtml(row.product_id || '')} · HS ${escapeHtml(row.hs_code || '')}
+                                </span>
+                            `).join('') || '<span class="meta">No samples.</span>'}
+                        </div>
+                    </article>
+                `;
+            }).join('');
+            const p1p2Rows = ['P1', 'P2']
+                .flatMap((band) => (parserBands[band] || []).map((row) => ({ ...row, band })));
+
+            return `
+                <div class="summary-grid">
+                    ${tierConfig.map((tier) => `
+                        <div class="summary-card">
+                            <strong>${escapeHtml((tiers[tier.key] || {}).count || 0)}</strong>
+                            <span>${escapeHtml(tier.label)}</span>
+                        </div>
+                    `).join('')}
+                    <div class="summary-card"><strong>${escapeHtml(p1p2Rows.length)}</strong><span>P1/P2 parser priorities</span></div>
+                </div>
+                <div class="quality-list">${tierCards}</div>
+                <div class="crawl-section-title"><h3>P1/P2 exact parser focus</h3><span class="meta">最高优先级税率解析任务</span></div>
+                <div class="coverage-table-wrap">
+                    <table class="quality-gap-table">
+                        <thead>
+                            <tr>
+                                <th>Band</th>
+                                <th>Route</th>
+                                <th>Product / HS</th>
+                                <th>Parser target</th>
+                                <th>Why priority</th>
+                                <th>Next action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${p1p2Rows.length ? p1p2Rows.map((row) => `
+                                <tr>
+                                    <td><strong>${escapeHtml(row.band || '')}</strong></td>
+                                    <td>${escapeHtml(row.route || '')}</td>
+                                    <td>${escapeHtml(row.product_id || '')}<div class="meta">HS ${escapeHtml(row.hs_code || '')}</div></td>
+                                    <td>${escapeHtml(row.parser_target || '')}</td>
+                                    <td>${escapeHtml(row.why_priority || '')}<div class="meta">${(row.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div></td>
+                                    <td>${escapeHtml(row.next_action || '')}</td>
+                                </tr>
+                            `).join('') : '<tr><td colspan="6"><span class="meta">No P1/P2 exact parser priorities.</span></td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderRouteCoverageQualityMatrix(routeCoverage = {}) {
+            const rows = Array.isArray(routeCoverage.focus_summary) ? routeCoverage.focus_summary : [];
+            const failures = Array.isArray(routeCoverage.failures) ? routeCoverage.failures : [];
+            if (!rows.length) {
+                return '<div class="empty">No route coverage matrix available.</div>';
+            }
+            const sortedRows = [...rows].sort((a, b) => (
+                (b.failed || 0) - (a.failed || 0)
+                || String(a.market || '').localeCompare(String(b.market || ''))
+                || String(a.focus || '').localeCompare(String(b.focus || ''))
+            ));
+            return `
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${escapeHtml(routeCoverage.market_count || 0)}</strong><span>Markets checked</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(routeCoverage.product_count || 0)}</strong><span>Products checked</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(routeCoverage.sample_count || 0)}</strong><span>Route/product samples</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(routeCoverage.failed_sample_count || 0)}</strong><span>Failed samples</span></div>
+                </div>
+                ${failures.length ? `<div class="empty">Route failures: ${escapeHtml(failures.map(row => `${row.focus} ${row.route} ${row.product}: ${(row.failures || []).join(', ')}`).join(' | '))}</div>` : ''}
+                <div class="coverage-table-wrap">
+                    <table class="quality-gap-table">
+                        <thead>
+                            <tr>
+                                <th>Market</th>
+                                <th>Focus</th>
+                                <th>Samples</th>
+                                <th>Failures</th>
+                                <th>Matched rules</th>
+                                <th>Selected-market rules</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedRows.map((row) => `
+                                <tr>
+                                    <td><strong>${escapeHtml(row.market || '')}</strong></td>
+                                    <td>${escapeHtml(row.focus || '')}</td>
+                                    <td>${escapeHtml(row.samples || 0)}</td>
+                                    <td>${escapeHtml(row.failed || 0)}</td>
+                                    <td>${escapeHtml(row.matched_rules || 0)}</td>
+                                    <td>${escapeHtml(row.selected_market_rules || 0)}</td>
+                                    <td><span class="badge ${row.failed ? 'benchmark' : 'auto_updatable'}">${row.failed ? 'Needs review' : 'Clean'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         function renderOpportunityPriority(opportunity = {}) {
             const rows = Array.isArray(opportunity.rows) ? opportunity.rows : [];
             if (!rows.length) {
@@ -1725,6 +1859,7 @@
             const search = data.search || {};
             const duty = data.duty || {};
             const opportunity = data.opportunity || {};
+            const routeCoverage = data.route_coverage_matrix || {};
             const gap = duty.gap_matrix || {};
             const priorityMatrix = duty.priority_rate_matrix || {};
             const statusClass = data.ok ? '' : search.failed ? 'fail' : 'warn';
@@ -1744,6 +1879,7 @@
                         <div class="summary-card"><strong>${search.samples ?? 0}</strong><span>Search samples</span></div>
                         <div class="summary-card"><strong>${search.failed ?? 0}</strong><span>Search failures</span></div>
                         <div class="summary-card"><strong>${search.warned ?? 0}</strong><span>Search warnings</span></div>
+                        <div class="summary-card"><strong>${routeCoverage.failed_sample_count ?? 0}</strong><span>Route matrix failures</span></div>
                         <div class="summary-card"><strong>${duty.sample_count ?? 0}</strong><span>Post-Entry samples</span></div>
                         <div class="summary-card"><strong>${gap.full_count ?? 0}/${(gap.rows || []).length}</strong><span>Markets with full HS coverage</span></div>
                         <div class="summary-card"><strong>${priorityMatrix.covered_route_count ?? 0}/${priorityMatrix.route_count ?? 0}</strong><span>Priority exact-rate routes</span></div>
@@ -1754,6 +1890,10 @@
                 <div class="crawl-section-title"><h3>Search quality exceptions</h3><span class="meta">${(search.failing_samples || []).length} failed · ${(search.warning_samples || []).length} warned</span></div>
                 ${renderQualitySamples(search.failing_samples || [], 'failures')}
                 ${(search.failing_samples || []).length ? '' : renderQualitySamples((search.warning_samples || []).slice(0, 5), 'warnings')}
+                <div class="crawl-section-title"><h3>Route Coverage Matrix</h3><span class="meta">${routeCoverage.sample_count || 0} route/product/focus sample(s)</span></div>
+                ${renderRouteCoverageQualityMatrix(routeCoverage)}
+                <div class="crawl-section-title"><h3>Rate Trust Tiers</h3><span class="meta">把税率分成可强参考、需范围确认、仅预筛三层</span></div>
+                ${renderRateTrustTiers(duty)}
                 <div class="crawl-section-title"><h3>Trade Opportunity priority list</h3><span class="meta">${opportunity.row_count || 0} ranked route(s)</span></div>
                 ${renderOpportunityPriority(opportunity)}
                 <div class="crawl-section-title"><h3>Post-Entry priority HS coverage</h3><span class="meta">${gap.missing_total || 0} missing cells</span></div>

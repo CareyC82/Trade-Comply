@@ -116,6 +116,14 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.equal(payload.duty.exact_tariff_parser_queue.priorities[0].id, 'solar-cn-us');
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => row.parser_target && row.next_action && row.why_priority));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => row.priority_band && Array.isArray(row.rate_change_drivers)));
+    assert.equal(typeof payload.duty.rate_trust_tiers, 'object');
+    assert.ok(payload.duty.rate_trust_tiers.official_exact.count > 0);
+    assert.ok(payload.duty.rate_trust_tiers.hybrid_scope_check.count > 0);
+    assert.equal(Array.isArray(payload.duty.rate_trust_tiers.official_exact.samples), true);
+    assert.equal(Array.isArray(payload.duty.rate_trust_tiers.hybrid_scope_check.samples), true);
+    assert.equal(typeof payload.duty.parser_priority_bands, 'object');
+    assert.ok((payload.duty.parser_priority_bands.P2 || []).length > 0);
+    assert.ok((payload.duty.parser_priority_bands.P2 || []).every(row => row.parser_target && row.next_action));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.some(row => (
         row.rate_change_drivers.join(' ').includes('Section 301')
     )));

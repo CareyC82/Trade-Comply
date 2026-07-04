@@ -76,6 +76,61 @@ function summarizeDutyHealth(dutyHealth) {
     const gapMatrix = dutyHealth?.duty_rate_gap_matrix || {};
     const rows = Array.isArray(gapMatrix.rows) ? gapMatrix.rows : [];
     const exactTariffParserQueue = readJson('data/exact-tariff-parser-priorities.json', { priorities: [] });
+    const priorityRows = Array.isArray(dutyHealth?.priority_rate_matrix?.rows)
+        ? dutyHealth.priority_rate_matrix.rows
+        : [];
+    const trustTierForRow = (row) => {
+        if (row.source_trust === 'official_exact' || row.source_trust === 'official_duty_tax_estimate') {
+            return 'official_exact';
+        }
+        if (row.source_trust === 'mixed_official_estimate'
+            || row.source_trust === 'official_heading_only'
+            || row.source_trust === 'official_link_estimate'
+            || row.source_trust === 'scope_check_required') {
+            return 'hybrid_scope_check';
+        }
+        return 'benchmark_only';
+    };
+    const trustTiers = priorityRows.reduce((acc, row) => {
+        const tier = trustTierForRow(row);
+        acc[tier].count += 1;
+        if (acc[tier].samples.length < 12) {
+            acc[tier].samples.push({
+                id: row.id,
+                route: row.route,
+                product_id: row.product_id,
+                hs_code: row.hs_code,
+                source_trust: row.source_trust,
+                automation_level: row.automation_level,
+                next_action: row.next_action || ''
+            });
+        }
+        return acc;
+    }, {
+        official_exact: { count: 0, samples: [] },
+        hybrid_scope_check: { count: 0, samples: [] },
+        benchmark_only: { count: 0, samples: [] }
+    });
+    const parserPriorities = Array.isArray(exactTariffParserQueue.priorities)
+        ? exactTariffParserQueue.priorities
+        : [];
+    const parserPriorityBands = parserPriorities.reduce((acc, row) => {
+        const band = row.priority_band || `P${row.priority || ''}` || 'unranked';
+        acc[band] ||= [];
+        acc[band].push({
+            id: row.id,
+            route: row.route,
+            product_id: row.product_id,
+            hs_code: row.hs_code,
+            impact_score: row.impact_score,
+            source_trust: row.source_trust,
+            parser_target: row.parser_target,
+            next_action: row.next_action,
+            why_priority: row.why_priority,
+            rate_change_drivers: row.rate_change_drivers || []
+        });
+        return acc;
+    }, {});
     return {
         ok: Boolean(dutyHealth?.ok) && Number(gapMatrix.missing_total || 0) === 0,
         sample_count: dutyHealth?.sample_count || 0,
@@ -86,6 +141,8 @@ function summarizeDutyHealth(dutyHealth) {
         source_quality_summary: dutyHealth?.source_quality_summary || [],
         priority_rate_matrix: dutyHealth?.priority_rate_matrix || null,
         exact_tariff_parser_queue: exactTariffParserQueue,
+        rate_trust_tiers: trustTiers,
+        parser_priority_bands: parserPriorityBands,
         gap_matrix: gapMatrix,
         markets_missing_priority_hs: rows
             .filter((row) => (row.missing || []).length > 0)
