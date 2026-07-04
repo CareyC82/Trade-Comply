@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-02",
-  "generated_at": "2026-07-02T19:46:15.560Z",
+  "version": "2026-07-04",
+  "generated_at": "2026-07-04T07:56:18.101Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -192,14 +192,14 @@
       "product_id": "Russia import electronics VAT / EAEU duty signal",
       "import_country": "RU",
       "origin_country": "*",
-      "hs_code": "847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543",
+      "hs_code": "847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 / 8479 / 9018 / 9027",
       "source_status": "official_link_checked",
       "source_trust": "official_heading_only",
       "parser_target": "RU exact tariff-line scope resolver",
       "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
       "priority_band": "P2",
       "impact_score": 2500,
-      "why_priority": "*->RU 847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 remains a rule-level exact-rate gap: Russia import electronics VAT / EAEU duty signal is official_link_checked.",
+      "why_priority": "*->RU 847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 / 8479 / 9018 / 9027 remains a rule-level exact-rate gap: Russia import electronics VAT / EAEU duty signal is official_link_checked.",
       "rate_change_drivers": [
         "Russia/EAEU duty and sanctions scope should stay review-only until official machine-readable coverage is available."
       ],
@@ -289,6 +289,28 @@
       "priority_band": "P2",
       "impact_score": 2170,
       "why_priority": "*->EU 8543 remains a rule-level exact-rate gap: EU import other electrical machines signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-EU-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "rule_id": "EU-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "route": "*->EU",
+      "product_id": "EU import automation / medical / lab equipment heading signal",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_code": "8479 / 9018 / 9027",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "EU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "*->EU 8479 / 9018 / 9027 remains a rule-level exact-rate gap: EU import automation / medical / lab equipment heading signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
@@ -387,6 +409,28 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
+      "id": "rule-DE-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "rule_id": "DE-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "route": "*->DE",
+      "product_id": "Germany import automation / medical / lab equipment heading signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "8479 / 9018 / 9027",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "*->DE 8479 / 9018 / 9027 remains a rule-level exact-rate gap: Germany import automation / medical / lab equipment heading signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
       "id": "rule-NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "rule_id": "NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "route": "*->NL",
@@ -469,6 +513,28 @@
       "priority_band": "P2",
       "impact_score": 2370,
       "why_priority": "*->NL 8543 remains a rule-level exact-rate gap: Netherlands import other electrical machines signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NL-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "rule_id": "NL-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
+      "route": "*->NL",
+      "product_id": "Netherlands import automation / medical / lab equipment heading signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "8479 / 9018 / 9027",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2100,
+      "why_priority": "*->NL 8479 / 9018 / 9027 remains a rule-level exact-rate gap: Netherlands import automation / medical / lab equipment heading signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
