@@ -104,11 +104,18 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.equal(payload.ok, true, JSON.stringify(payload, null, 2));
     assert.equal(payload.search.failed, 0);
     assert.equal(payload.search.warned, 0);
+    assert.equal(payload.route_coverage_matrix.ok, true);
+    assert.equal(payload.route_coverage_matrix.failed_sample_count, 0);
+    assert.equal(payload.route_coverage_matrix.market_count >= 14, true);
+    assert.equal(payload.route_coverage_matrix.product_count >= 14, true);
+    assert.ok(payload.route_coverage_matrix.focus_summary.some(row => row.market === 'US' && row.focus === 'import'));
+    assert.ok(payload.route_coverage_matrix.focus_summary.some(row => row.market === 'IN' && row.focus === 'export'));
     assert.equal(payload.duty.gap_matrix.missing_total, 0);
     assert.equal(payload.duty.gap_matrix.full_count, payload.duty.gap_matrix.rows.length);
     assert.equal(Array.isArray(payload.duty.exact_tariff_parser_queue.priorities), true);
     assert.equal(payload.duty.exact_tariff_parser_queue.priorities[0].id, 'solar-cn-us');
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => row.parser_target && row.next_action && row.why_priority));
+    assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => row.priority_band && Array.isArray(row.rate_change_drivers)));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.some(row => (
         row.rate_change_drivers.join(' ').includes('Section 301')
     )));

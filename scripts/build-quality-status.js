@@ -14,6 +14,9 @@ const {
 const {
     buildOpportunityPriorityList
 } = require('../lib/trade-opportunity');
+const {
+    runRouteCoverageMatrixCheck
+} = require('./check-route-coverage-matrix');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -179,18 +182,42 @@ function summarizeOpportunityPriority() {
     };
 }
 
+function summarizeRouteCoverageMatrix(routeCoverage) {
+    const failures = Array.isArray(routeCoverage.failures) ? routeCoverage.failures : [];
+    return {
+        ok: Boolean(routeCoverage.ok),
+        market_count: routeCoverage.market_count || 0,
+        product_count: routeCoverage.product_count || 0,
+        sample_count: routeCoverage.sample_count || 0,
+        failed_sample_count: routeCoverage.failed_sample_count || failures.length,
+        failure_types: routeCoverage.failure_types || {},
+        focus_summary: Array.isArray(routeCoverage.focus_summary) ? routeCoverage.focus_summary : [],
+        failures: failures.slice(0, 40).map((row) => ({
+            market: row.market,
+            focus: row.focus,
+            route: row.route,
+            product: row.product,
+            failures: row.failures,
+            top_rules: row.top_rules
+        }))
+    };
+}
+
 function buildQualityStatus() {
     const searchAudit = runQualityAudit();
     const dutyHealth = runDutyRateHealthCheck();
     const taxHealth = runPostEntryTaxCoverageCheck();
+    const routeCoverage = runRouteCoverageMatrixCheck();
     const search = summarizeSearchAudit(searchAudit);
     const duty = summarizeDutyHealth(dutyHealth);
     const postEntryTax = summarizePostEntryTaxCoverage(taxHealth);
     const opportunity = summarizeOpportunityPriority();
+    const routeCoverageMatrix = summarizeRouteCoverageMatrix(routeCoverage);
     return {
-        ok: search.ok && duty.ok && postEntryTax.ok && opportunity.ok,
+        ok: search.ok && duty.ok && postEntryTax.ok && opportunity.ok && routeCoverageMatrix.ok,
         generated_at: new Date().toISOString(),
         search,
+        route_coverage_matrix: routeCoverageMatrix,
         duty,
         post_entry_tax: postEntryTax,
         opportunity,
@@ -213,5 +240,6 @@ module.exports = {
     summarizeSearchAudit,
     summarizeDutyHealth,
     summarizePostEntryTaxCoverage,
-    summarizeOpportunityPriority
+    summarizeOpportunityPriority,
+    summarizeRouteCoverageMatrix
 };

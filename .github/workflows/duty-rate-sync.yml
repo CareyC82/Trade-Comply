@@ -36,6 +36,9 @@ jobs:
       - name: Refresh exact tariff parser priorities
         run: npm run update:exact-tariff-parser-priorities
 
+      - name: Verify maintained route coverage
+        run: npm run check:route-coverage
+
       - name: Verify duty-rate sync output
         run: npm test
 

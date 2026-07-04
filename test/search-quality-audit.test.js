@@ -8,6 +8,7 @@ const path = require('node:path');
 
 const {
     DEFAULT_SAMPLES,
+    duplicateSemanticTagKeys,
     formatAuditMarkdown,
     runQualityAudit,
     writeAuditReport
@@ -28,8 +29,38 @@ describe('search quality audit', () => {
             assert.deepEqual(result.issues.offRouteTags, [], result.id);
             assert.deepEqual(result.issues.focusMismatchTags, [], result.id);
             assert.deepEqual(result.issues.duplicateTagIds, [], result.id);
+            assert.deepEqual(result.issues.duplicatePolicySignals, [], result.id);
             assert.deepEqual(result.issues.productFamilyMismatchTags, [], result.id);
         }
+    });
+
+    it('detects duplicate policy signals even when tag ids differ', () => {
+        const duplicatePolicySignals = duplicateSemanticTagKeys([
+            {
+                tag_id: 'TWZ-US-ONE',
+                country: 'US',
+                route_focus: 'import',
+                category_label: 'Import Regulation',
+                source_url: 'https://example.com/rule',
+                short_description: 'Same policy signal for duplicate card detection.'
+            },
+            {
+                tag_id: 'TWZ-US-TWO',
+                country: 'US',
+                route_focus: 'import',
+                category_label: 'Import Regulation',
+                source_url: 'https://example.com/rule',
+                short_description: 'Same policy signal for duplicate card detection.'
+            }
+        ]);
+
+        assert.deepEqual(duplicatePolicySignals, [
+            {
+                key: 'US|both|import|import regulation|example.com/rule|same policy signal duplicate card detection',
+                first: 'TWZ-US-ONE',
+                duplicate: 'TWZ-US-TWO'
+            }
+        ]);
     });
 
     it('keeps product-specific rules ahead of generic market baselines for pinned samples', () => {

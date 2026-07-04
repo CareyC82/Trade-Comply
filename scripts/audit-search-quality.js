@@ -13,6 +13,7 @@ const {
 } = require('../lib/product-intelligence');
 const {
     getProductRelevanceTerms,
+    getTagSemanticDedupeKey,
     tagMatchesProductTerms,
     search,
     searchWithPrecheck
@@ -72,6 +73,25 @@ function duplicateIds(items, getId) {
     return [...duplicates];
 }
 
+function duplicateSemanticTagKeys(tags) {
+    const seen = new Map();
+    const duplicates = [];
+    (tags || []).forEach((tag) => {
+        const key = getTagSemanticDedupeKey(tag);
+        if (!key) return;
+        if (seen.has(key)) {
+            duplicates.push({
+                key,
+                first: seen.get(key),
+                duplicate: tag.tag_id
+            });
+            return;
+        }
+        seen.set(key, tag.tag_id);
+    });
+    return duplicates;
+}
+
 function auditSample(sample) {
     const routeContext = setupSearchState(sample);
     const intelligence = prepareIntelligentSearch(sample.query, [], PRECHECK_FACTORS, {
@@ -100,6 +120,7 @@ function auditSample(sample) {
         : [];
     const duplicateTagIds = duplicateIds(results.tags, (tag) => tag.tag_id);
     const duplicateCaseIds = duplicateIds(results.cases, (caseItem) => caseItem.case_id);
+    const duplicatePolicySignals = duplicateSemanticTagKeys(results.tags);
     const queryLower = String(sample.query || '').toLowerCase();
     const hasDroneIntent = /\b(drone|uav|uas|quadcopter)\b/.test(queryLower);
     const droneCategoryTags = results.tags.filter((tag) => {
@@ -118,7 +139,7 @@ function auditSample(sample) {
     if (focusMismatchTags.length > 0) {
         failures.push('FOCUS_MISMATCH');
     }
-    if (duplicateTagIds.length > 0 || duplicateCaseIds.length > 0) {
+    if (duplicateTagIds.length > 0 || duplicateCaseIds.length > 0 || duplicatePolicySignals.length > 0) {
         failures.push('DUPLICATE_RESULTS');
     }
     if (productNoiseTags.length > 0) {
@@ -178,6 +199,7 @@ function auditSample(sample) {
             focusMismatchTags: focusMismatchTags.map(summarizeTag),
             duplicateTagIds,
             duplicateCaseIds,
+            duplicatePolicySignals,
             productFamilyMismatchTags: hasDroneIntent ? [] : droneCategoryTags.map(summarizeTag),
             productNoiseTags: productNoiseTags.slice(0, 5).map(summarizeTag)
         }
@@ -311,6 +333,7 @@ module.exports = {
     DEFAULT_SAMPLES,
     PRECHECK_FACTORS,
     auditSample,
+    duplicateSemanticTagKeys,
     runQualityAudit,
     formatAuditReport,
     formatAuditMarkdown,
