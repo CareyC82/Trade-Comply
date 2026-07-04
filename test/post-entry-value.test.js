@@ -147,6 +147,29 @@ test('keeps AD/CVD as a flag-only add-on layer', () => {
     assert.ok(duty.sourceBreakdown.some(source => /AD\/CVD/.test(source.label) && source.status === 'scope_check_required'));
 });
 
+test('builds scope checklist for official-heading-only US product rates', () => {
+    const valueResult = calculatePostEntryValue({
+        incoterm: 'FOB',
+        declaredAmount: 10000
+    });
+    const solarDuty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'US',
+        originCountryCode: 'CN',
+        hsCode: '854143'
+    });
+    const droneDuty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'US',
+        originCountryCode: 'CN',
+        hsCode: '880622'
+    });
+
+    assert.match(solarDuty.filingGradeFocus, /AD\/CVD case scope/);
+    assert.ok(solarDuty.filingGradeChecklist.some(item => /UFLPA/.test(item)));
+    assert.match(droneDuty.filingGradeFocus, /Chapter 99/);
+    assert.ok(droneDuty.filingGradeChecklist.some(item => /8806/.test(item)));
+    assert.equal(classifyRateSourceTrust(droneDuty.sourceBreakdown).level, 'official_heading_only');
+});
+
 test('uses exact TARIC override when a precise EU code is entered', () => {
     const valueResult = calculatePostEntryValue({
         incoterm: 'FOB',
@@ -295,12 +318,15 @@ test('builds US export-side post-entry review without treating it as import duty
 test('Post-Entry result shows rate confidence without opening details', () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'post-entry-result.html'), 'utf8');
     const confidenceIndex = html.indexOf('id="post-entry-confidence-card"');
+    const scopeIndex = html.indexOf('id="post-entry-scope-card"');
     const syncIndex = html.indexOf('id="post-entry-duty-sync-card"');
     const detailsIndex = html.indexOf('<details class="post-entry-detail-panel">');
 
     assert.ok(confidenceIndex > -1, 'rate confidence card should exist');
+    assert.ok(scopeIndex > -1, 'scope checklist card should exist');
     assert.ok(syncIndex > -1, 'duty sync status card should exist');
     assert.ok(detailsIndex > -1, 'details panel should exist');
     assert.ok(confidenceIndex < detailsIndex, 'rate confidence card should appear before the collapsible details panel');
+    assert.ok(scopeIndex < detailsIndex, 'scope checklist card should appear before the collapsible details panel');
     assert.ok(syncIndex < detailsIndex, 'duty sync status should appear before the collapsible details panel');
 });

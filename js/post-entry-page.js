@@ -922,8 +922,36 @@
             coverageNote: [buildCoverageNote(dutyImpact.sourceBreakdown || []), buildJurisdictionScopeNote(context)].filter(Boolean).join(' '),
             rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
             rateDecision: buildRateDecisionSummary(dutyImpact.sourceBreakdown || []),
+            scopeReview: dutyImpact.filingGradeFocus ? {
+                summary: dutyImpact.filingGradeFocus,
+                checklist: dutyImpact.filingGradeChecklist || []
+            } : null,
             evidence: valueApi.buildEvidenceList(context)
         };
+    }
+
+    function renderScopeReview(scopeReview) {
+        const card = $('post-entry-scope-card');
+        if (!card) return;
+        const summary = $('post-entry-scope-summary');
+        const list = $('post-entry-scope-list');
+        const items = Array.isArray(scopeReview?.checklist) ? scopeReview.checklist.filter(Boolean) : [];
+        if (!scopeReview?.summary && !items.length) {
+            card.hidden = true;
+            if (summary) summary.textContent = '—';
+            if (list) list.innerHTML = '';
+            return;
+        }
+        card.hidden = false;
+        if (summary) summary.textContent = scopeReview.summary || 'Confirm exact tariff-line and trade-remedy scope before filing.';
+        if (list) {
+            list.innerHTML = '';
+            items.slice(0, 3).forEach((item) => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                list.appendChild(li);
+            });
+        }
     }
 
     function renderRateConfidence(confidence) {
@@ -1053,6 +1081,7 @@
         const coverageNote = $('post-entry-coverage-note');
         if (coverageNote) coverageNote.textContent = snapshot.coverageNote || buildCoverageNote(snapshot.sourceBreakdown || []);
         renderRateConfidence(snapshot.rateConfidence || buildRateConfidence(snapshot.sourceBreakdown || []));
+        renderScopeReview(snapshot.scopeReview);
         if (snapshot.labels) {
             const customLabel = $('post-entry-customs-value-label');
             const rebateLabel = $('post-entry-rebate-base-label');

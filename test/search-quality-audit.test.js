@@ -156,6 +156,55 @@ describe('search quality audit', () => {
                 query: 'ev charger wallbox charging station',
                 topRule: 'CL-DEEV-001',
                 inferred: ['battery']
+            },
+            {
+                id: 'optical-module-eu-import',
+                from: 'US',
+                to: 'EU',
+                focus: 'import',
+                vertical: 'electronics',
+                query: 'optical transceiver laser telecom module',
+                topRule: 'CL-EUOPTICAL-001'
+            },
+            {
+                id: 'ai-server-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'data-center',
+                query: 'ai server gpu server data center rack power liquid cooling',
+                topRule: 'CL-USDC-001',
+                inferred: ['ai_chip', 'semiconductor']
+            },
+            {
+                id: 'power-adapter-japan-import',
+                from: 'US',
+                to: 'JP',
+                focus: 'import',
+                vertical: 'electronics',
+                query: 'power adapter charger pse',
+                topRule: 'CL-JP-004',
+                inferred: ['battery']
+            },
+            {
+                id: 'surveillance-camera-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'electronics',
+                query: 'surveillance camera ip camera network video recorder',
+                topRule: 'CL-USMARKET-002',
+                inferred: ['destination_end_use']
+            },
+            {
+                id: 'medical-wearable-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'healthcare-lab',
+                query: 'medical wearable health monitor bluetooth sensor',
+                topRule: 'CL-USMED-001',
+                inferred: ['wireless']
             }
         ];
 
