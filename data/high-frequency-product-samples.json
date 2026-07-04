@@ -623,6 +623,76 @@
       ]
     },
     {
+      "id": "cn-us-lab-analyzer-diagnostic-import",
+      "from": "CN",
+      "to": "US",
+      "focus": "import",
+      "vertical": "healthcare",
+      "query": "laboratory analyzer electronic diagnostic device",
+      "expected_top_rule": "CL-USMED-001",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1
+    },
+    {
+      "id": "us-cn-h200-import",
+      "from": "US",
+      "to": "CN",
+      "focus": "import",
+      "vertical": "semiconductor",
+      "query": "H200 GPU AI accelerator",
+      "expected_top_rule": "CL-CHIP-005",
+      "expected_min_rules": 2,
+      "expected_min_exact_rules": 1,
+      "expected_min_cases": 1,
+      "expected_inferred_selections": [
+        "ai_chip",
+        "semiconductor"
+      ]
+    },
+    {
+      "id": "us-jp-smartphone-5g-import",
+      "from": "US",
+      "to": "JP",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "smartphone 5G cellular",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 3,
+      "expected_min_cases": 1,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
+      "id": "us-mx-smartphone-5g-import",
+      "from": "US",
+      "to": "MX",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "smartphone 5G cellular",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
+      "id": "us-in-smartphone-5g-import",
+      "from": "US",
+      "to": "IN",
+      "focus": "import",
+      "vertical": "electronics",
+      "query": "smartphone 5G cellular",
+      "expected_min_rules": 3,
+      "expected_min_exact_rules": 2,
+      "expected_min_cases": 1,
+      "expected_inferred_selections": [
+        "wireless"
+      ]
+    },
+    {
       "id": "kr-cn-dram-import",
       "from": "KR",
       "to": "CN",
