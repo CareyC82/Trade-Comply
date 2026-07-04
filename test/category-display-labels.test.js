@@ -139,4 +139,30 @@ describe('category display labels', () => {
 
         assert.deepEqual(Object.keys(grouped), ['Import Controls & Trade Remedies']);
     });
+
+    it('keeps high-frequency import-focused control cards out of Export Control display wording', () => {
+        const { groupTagsByCategory } = loadRenderPrepareWithCore();
+        const highFrequencyImportControls = [
+            'solar panel photovoltaic',
+            'H200',
+            'HBM3E high bandwidth memory',
+            'optical transceiver module',
+            'industrial robot arm',
+            'laboratory analyzer electronic diagnostic device'
+        ].map((product, index) => ({
+            tag_id: `IMPORT-RENDER-${index}`,
+            country: 'US',
+            route_focus: 'import',
+            category: 'EXPORT_CTRL',
+            category_label: `${product} Export Control`,
+            short_name: `[${product}]`
+        }));
+        const grouped = groupTagsByCategory(highFrequencyImportControls, {
+            direction: 'export',
+            routeContext: { from: 'CN', to: 'US', focus: 'import' }
+        });
+
+        assert.deepEqual(Object.keys(grouped), ['Import Controls & Trade Remedies']);
+        assert.equal(grouped['Import Controls & Trade Remedies'].tags.length, highFrequencyImportControls.length);
+    });
 });

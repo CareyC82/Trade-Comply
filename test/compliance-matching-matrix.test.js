@@ -9,13 +9,19 @@ const { search, searchWithPrecheck } = require('../js/search');
 
 const PRODUCTS = [
     'gpu ai accelerator chip',
+    'H200',
+    'HBM3E high bandwidth memory',
+    'NAND flash memory IC',
+    'optical transceiver module',
     'solar panel photovoltaic',
     'lithium battery pack',
     'drone uav under 2kg',
     'ip camera network storage',
     'wireless router',
     'ev charger',
-    'semiconductor lithography equipment'
+    'semiconductor lithography equipment',
+    'industrial robot arm',
+    'laboratory analyzer electronic diagnostic device'
 ];
 
 const EXPORT_MARKETS = ['US', 'EU', 'ASEAN', 'RU'];

@@ -71,6 +71,37 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
     });
 });
 
+test('P1 markets keep exact-rate trust gaps visible until parser promotion is complete', () => {
+    const result = runDutyRateHealthCheck();
+    const backlogByCountry = new Map(
+        result.source_roadmap_summary.automation_backlog.map((row) => [row.country, row])
+    );
+    const exactBacklogMarkets = new Set(
+        result.exact_rate_progress.rule_scope_backlog_rows.map((row) => row.import_country)
+    );
+
+    ['EU', 'DE', 'NL'].forEach((country) => {
+        const backlog = backlogByCountry.get(country);
+        assert.ok(backlog, `${country} should stay visible in the P1 parser backlog`);
+        assert.equal(backlog.maintenance_priority, 'P1');
+        assert.equal(backlog.rate_automation_stage, 'official_hybrid_parser');
+        assert.equal(backlog.workstream, 'exact-code parser');
+        assert.equal(backlog.parser_gap, true);
+        assert.match(backlog.public_claim, /Hybrid official coverage; exact tariff-line scope stays gated/);
+        assert.match(backlog.next_action, /exact tariff-code input/i);
+        assert.equal(exactBacklogMarkets.has(country), true, `${country} should expose exact-rate scope backlog rows`);
+    });
+
+    const singapore = backlogByCountry.get('SG');
+    assert.ok(singapore, 'SG should stay visible in the P1 source connector backlog');
+    assert.equal(singapore.maintenance_priority, 'P1');
+    assert.equal(singapore.rate_automation_stage, 'maintained_exact_map');
+    assert.equal(singapore.workstream, 'machine-readable source connector');
+    assert.equal(singapore.parser_gap, true);
+    assert.match(singapore.public_claim, /Maintained exact candidates; not fully machine-parsed/);
+    assert.match(singapore.next_action, /machine-readable SG tariff parser|official API/i);
+});
+
 test('priority Post-Entry samples cover common global electronics routes', () => {
     const routeKeys = new Set(samples.samples.map(sample => (
         `${sample.origin_country}->${sample.import_country}:${sample.hs_code}`
