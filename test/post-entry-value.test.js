@@ -170,6 +170,36 @@ test('builds scope checklist for official-heading-only US product rates', () => 
     assert.equal(classifyRateSourceTrust(droneDuty.sourceBreakdown).level, 'official_heading_only');
 });
 
+test('builds filing-grade focus for power, tablet, and chip tariff scopes', () => {
+    const valueResult = calculatePostEntryValue({
+        incoterm: 'FOB',
+        declaredAmount: 10000
+    });
+    const context = {
+        importCountryCode: 'US',
+        originCountryCode: 'CN'
+    };
+    const powerDuty = calculateDutyImpact(valueResult, {
+        ...context,
+        hsCode: '850440'
+    });
+    const tabletDuty = calculateDutyImpact(valueResult, {
+        ...context,
+        hsCode: '847130'
+    });
+    const chipDuty = calculateDutyImpact(valueResult, {
+        ...context,
+        hsCode: '854231'
+    });
+
+    assert.match(powerDuty.filingGradeFocus, /power-conversion line/);
+    assert.ok(powerDuty.filingGradeChecklist.some(item => /EV charger/.test(item)));
+    assert.match(tabletDuty.filingGradeFocus, /portable ADP\/tablet/);
+    assert.ok(tabletDuty.filingGradeChecklist.some(item => /wireless\/FCC/.test(item)));
+    assert.match(chipDuty.filingGradeFocus, /integrated-circuit line/);
+    assert.ok(chipDuty.filingGradeChecklist.some(item => /end-use/.test(item)));
+});
+
 test('uses exact TARIC override when a precise EU code is entered', () => {
     const valueResult = calculatePostEntryValue({
         incoterm: 'FOB',

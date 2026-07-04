@@ -1,6 +1,6 @@
 {
   "version": "2026-07-04",
-  "generated_at": "2026-07-04T08:25:40.735Z",
+  "generated_at": "2026-07-04T13:45:17.462Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -155,6 +155,7 @@
       "scope_components": [
         "official_base_duty",
         "chapter_99_section_301",
+        "power_conversion_scope",
         "active_exclusion_or_case_period"
       ],
       "parser_scope": "Resolve exact power-conversion subheading, EV-charger function scope, origin evidence, and Section 301 add-on duty treatment."
@@ -179,6 +180,7 @@
       "scope_components": [
         "official_base_duty",
         "chapter_99_section_301",
+        "portable_adp_scope",
         "active_exclusion_or_case_period"
       ],
       "parser_scope": "Resolve exact portable ADP/tablet classification, origin evidence, and Section 301 add-on duty or exclusion status."
@@ -203,7 +205,23 @@
       "rate_change_drivers": [
         "Russia/EAEU duty and sanctions scope should stay review-only until official machine-readable coverage is available."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "ad_cvd_scope",
+        "origin_route_evidence",
+        "battery_chemistry_scope",
+        "power_conversion_scope",
+        "portable_adp_scope",
+        "camera_transmission_scope",
+        "medical_device_scope",
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "technology_end_use_scope",
+        "eaeu_tariff_scope",
+        "sanctions_scope",
+        "active_exclusion_or_case_period",
+        "official_source_link",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -225,7 +243,13 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "camera_transmission_scope",
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -248,7 +272,14 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "portable_adp_scope",
+        "taric_exact_code_scope",
+        "eaeu_tariff_scope",
+        "sanctions_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -271,7 +302,11 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -293,7 +328,12 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -315,7 +355,12 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "medical_device_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -337,7 +382,13 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "camera_transmission_scope",
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -360,7 +411,14 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "portable_adp_scope",
+        "taric_exact_code_scope",
+        "eaeu_tariff_scope",
+        "sanctions_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -383,7 +441,13 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "taric_exact_code_scope",
+        "eaeu_tariff_scope",
+        "sanctions_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -405,7 +469,12 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -427,7 +496,12 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "medical_device_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -449,7 +523,13 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "camera_transmission_scope",
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -472,7 +552,14 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "portable_adp_scope",
+        "taric_exact_code_scope",
+        "eaeu_tariff_scope",
+        "sanctions_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -495,7 +582,13 @@
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "taric_exact_code_scope",
+        "eaeu_tariff_scope",
+        "sanctions_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -517,7 +610,12 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -539,7 +637,12 @@
         "Broad HS prefix has multiple possible official tariff lines.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
-      "scope_components": [],
+      "scope_components": [
+        "medical_device_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     }
   ],
@@ -626,7 +729,10 @@
       ],
       "scope_components": [
         "official_base_duty",
+        "power_conversion_scope",
         "taric_exact_code_scope",
+        "eaeu_tariff_scope",
+        "sanctions_scope",
         "electrical_safety_scope",
         "ce_rohs_market_surveillance",
         "member_state_vat"

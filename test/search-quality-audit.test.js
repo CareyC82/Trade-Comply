@@ -101,6 +101,16 @@ describe('search quality audit', () => {
                 inferred: ['ai_chip', 'semiconductor']
             },
             {
+                id: 'hbm3e-us-export',
+                from: 'US',
+                to: 'CN',
+                focus: 'export',
+                vertical: 'semiconductor',
+                query: 'H200 HBM3E high bandwidth memory AI accelerator memory',
+                topRule: 'CL-USMEMHBMEXP-001',
+                inferred: ['ai_chip', 'semiconductor']
+            },
+            {
                 id: 'lab-analyzer-us-import',
                 from: 'CN',
                 to: 'US',
@@ -167,6 +177,15 @@ describe('search quality audit', () => {
                 topRule: 'CL-EUOPTICAL-001'
             },
             {
+                id: 'optical-module-india-import',
+                from: 'CN',
+                to: 'IN',
+                focus: 'import',
+                vertical: 'electronics',
+                query: '800G coherent optical transceiver module',
+                topRule: 'CL-IN-001'
+            },
+            {
                 id: 'ai-server-us-import',
                 from: 'CN',
                 to: 'US',
@@ -184,6 +203,26 @@ describe('search quality audit', () => {
                 vertical: 'electronics',
                 query: 'power adapter charger pse',
                 topRule: 'CL-JP-004',
+                inferred: ['battery']
+            },
+            {
+                id: 'tablet-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'electronics',
+                query: 'tablet computer portable touchscreen cellular wifi',
+                topRule: 'CL-USCPSC-001',
+                inferred: ['wireless']
+            },
+            {
+                id: 'power-adapter-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'electronics',
+                query: 'switching power adapter charger ac dc supply',
+                topRule: 'CL-USCPSC-001',
                 inferred: ['battery']
             },
             {
@@ -205,6 +244,15 @@ describe('search quality audit', () => {
                 query: 'medical wearable health monitor bluetooth sensor',
                 topRule: 'CL-USMED-001',
                 inferred: ['wireless']
+            },
+            {
+                id: 'medical-power-supply-us-import',
+                from: 'CN',
+                to: 'US',
+                focus: 'import',
+                vertical: 'healthcare-lab',
+                query: 'medical power supply patient monitor',
+                topRule: 'CL-USMED-001'
             }
         ];
 

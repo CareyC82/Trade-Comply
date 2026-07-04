@@ -198,6 +198,18 @@ function getRateScopeComponents(result = {}) {
     if (/battery|850760/.test(text)) {
         components.push('battery_chemistry_scope');
     }
+    if (/850440|power|charger|adapter|inverter/.test(text)) {
+        components.push('power_conversion_scope');
+    }
+    if (/847130|tablet|portable|computer|laptop/.test(text)) {
+        components.push('portable_adp_scope');
+    }
+    if (/8525|camera|surveillance|nvr|video/.test(text)) {
+        components.push('camera_transmission_scope');
+    }
+    if (/9018|9027|medical|diagnostic|laboratory|analyzer|patient/.test(text)) {
+        components.push('medical_device_scope');
+    }
     if (/8517|router|smartphone|telecom/.test(text)) {
         components.push('telecom_subheading_scope');
         components.push('wireless_module_scope');
@@ -205,8 +217,54 @@ function getRateScopeComponents(result = {}) {
     if (/semiconductor|8542|gpu|ai/.test(text)) {
         components.push('technology_end_use_scope');
     }
+    if (/taric/.test(text) || ['EU', 'DE', 'NL'].includes(result.import_country)) {
+        components.push('taric_exact_code_scope');
+    }
+    if (/ru|russia|eaeu|sanction/.test(text) || result.import_country === 'RU') {
+        components.push('eaeu_tariff_scope');
+        components.push('sanctions_scope');
+    }
     if (result.source_trust === 'official_heading_only' || result.source_trust === 'mixed_official_estimate') {
         components.push('active_exclusion_or_case_period');
+    }
+
+    return Array.from(new Set(components));
+}
+
+function getRuleScopeComponents({ rule = {}, route = '', importCountry = '', originCountry = '', hsCode = '', sourceStatus = '', sourceTrust = '' } = {}) {
+    const text = [
+        rule.id,
+        rule.label,
+        rule.source_note,
+        rule.trade_remedy,
+        sourceStatus
+    ].join(' ').toLowerCase();
+    const components = getRateScopeComponents({
+        id: rule.id,
+        product_id: rule.label || '',
+        route,
+        hs_code: hsCode,
+        import_country: importCountry,
+        origin_country: originCountry,
+        source_trust: sourceTrust,
+        source_statuses: [sourceStatus, text],
+        exact_base_rate_covered: false
+    });
+
+    if (sourceStatus === 'official_link_checked') {
+        components.push('official_source_link');
+    }
+    if (sourceStatus === 'scope_check_required' || sourceTrust === 'official_heading_only') {
+        components.push('tariff_exact_code_scope');
+    }
+    if (/ad\/cvd|anti|countervailing|trade remedy|remedy|case/.test(text)) {
+        components.push('trade_remedy_scope');
+    }
+    if (sourceStatus === 'benchmark_source_checked') {
+        components.push('official_rate_source_mapping');
+    }
+    if (!components.length) {
+        components.push('tariff_exact_code_scope');
     }
 
     return Array.from(new Set(components));
@@ -704,6 +762,7 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
             const hasOverrides = exactOverrides.length > 0;
             const sourceStatus = rule.source_status || 'indicative';
             const route = `${originCountry || '*'}->${importCountry}`;
+            const sourceTrust = sourceStatus === 'benchmark_source_checked' ? 'precheck_estimate' : 'official_heading_only';
             const drivers = [];
 
             if (sourceStatus === 'scope_check_required') {
@@ -731,7 +790,7 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
                 origin_country: originCountry,
                 route,
                 hs_code: hsCode,
-                source_trust: sourceStatus === 'benchmark_source_checked' ? 'precheck_estimate' : 'official_heading_only',
+                source_trust: sourceTrust,
                 source_status: sourceStatus,
                 automation_level: sourceStatus === 'benchmark_source_checked' ? 'benchmark_auto' : 'hybrid_official',
                 estimated_total_rate: Number(rule.base_rate || 0) + Number(rule.additional_rate || 0),
@@ -748,6 +807,15 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
                     : 'Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.',
                 why_priority: `${route} ${hsCode} remains a rule-level exact-rate gap: ${rule.label || 'duty rule'} is ${sourceStatus}.`,
                 rate_change_drivers: Array.from(new Set(drivers)),
+                scope_components: getRuleScopeComponents({
+                    rule,
+                    route,
+                    importCountry,
+                    originCountry,
+                    hsCode,
+                    sourceStatus,
+                    sourceTrust
+                }),
                 parser_scope: rule.source_note || rule.trade_remedy || 'Exact tariff-line scope is required before using a final rate.'
             };
         })

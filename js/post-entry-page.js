@@ -795,22 +795,31 @@
         const estimatedDuty = formatMoney(dutyImpact.estimatedDuty, currency);
         const dutyGap = formatMoney(dutyImpact.dutyVariance, currency);
         const confidence = buildRateConfidence(dutyImpact.sourceBreakdown || []);
-        const basePart = `Base duty ${formatRate(dutyImpact.baseRate)} = ${formatMoney(dutyImpact.baseDuty, currency)}`;
+        const basePart = `base ${formatRate(dutyImpact.baseRate)} (${formatMoney(dutyImpact.baseDuty, currency)})`;
         const addOnParts = (dutyImpact.addOnLayers || [])
             .filter(layer => layer.rate !== null)
-            .map(layer => `${layer.label} ${formatRate(layer.rate)} = ${formatMoney(layer.amount, currency)}`);
+            .map(layer => `${layer.label} ${formatRate(layer.rate)} (${formatMoney(layer.amount, currency)})`);
         const flagParts = (dutyImpact.flagOnlyLayers || [])
-            .map(layer => `${layer.label}: official case-scope check required`);
+            .map(layer => layer.label);
         return [
             `${confidence.label}: ${basePart}.`,
             addOnParts.length ? `Add-ons: ${addOnParts.join('; ')}.` : '',
-            flagParts.length ? `Flags: ${flagParts.join('; ')}.` : '',
-            `Estimated duty: ${estimatedDuty}; gap vs declared duty paid: ${dutyGap}.`
+            flagParts.length ? `Scope flags: ${flagParts.join('; ')}.` : '',
+            `Duty ${estimatedDuty}; gap ${dutyGap}.`
         ].filter(Boolean).join(' ');
     }
 
     function buildExportImpactText(exportReview) {
         return `${exportReview.label}: ${exportReview.impact}`;
+    }
+
+    function buildScopeReviewSummary(dutyImpact) {
+        const focus = String(dutyImpact?.filingGradeFocus || '').trim();
+        if (!focus) return '';
+        return focus
+            .replace(/^Before correction,\s*/i, '')
+            .replace(/^Base duty is official-backed, but final payable duty still depends on\s*/i, 'Confirm ')
+            .replace(/\.$/, '.');
     }
 
     function setResultModeLabels(focus) {
@@ -923,7 +932,7 @@
             rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
             rateDecision: buildRateDecisionSummary(dutyImpact.sourceBreakdown || []),
             scopeReview: dutyImpact.filingGradeFocus ? {
-                summary: dutyImpact.filingGradeFocus,
+                summary: buildScopeReviewSummary(dutyImpact),
                 checklist: dutyImpact.filingGradeChecklist || []
             } : null,
             evidence: valueApi.buildEvidenceList(context)
