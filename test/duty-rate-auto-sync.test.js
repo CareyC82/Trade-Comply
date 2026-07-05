@@ -7,6 +7,7 @@ const {
     MATERIAL_RATE_CHANGE_THRESHOLD,
     isMaterialRateChange,
     buildRunSummary,
+    downgradeOfficialTransportFailure,
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
@@ -81,6 +82,44 @@ test('source failures and material rate changes become admin-visible exceptions'
     assert.equal(payload.status, 'exceptions');
     assert.equal(payload.counts.exceptions, 2);
     assert.equal(payload.exceptions.some(item => item.type === 'material_rate_change' && item.auto_applied), true);
+});
+
+test('official source transport failures downgrade without blocking daily sync', () => {
+    const failedRun = buildRunSummary('USITC', {
+        ok: false,
+        changes: [],
+        errors: [
+            { rule: 'US-TEST-1', prefix: '850760', error: 'getaddrinfo ENOTFOUND hts.usitc.gov' },
+            { rule: 'US-TEST-2', prefix: '8517', error: 'HTTP 503 for https://hts.usitc.gov/reststop/exportList' }
+        ]
+    }, {
+        applied: false,
+        mode: 'official-dry-run'
+    });
+    const downgraded = downgradeOfficialTransportFailure(failedRun);
+    const payload = buildSyncStatusPayload({
+        runs: [downgraded],
+        sourceRunPlan: buildSourceRunPlan({
+            sourcesPayload: {
+                sources: [{
+                    country: 'US',
+                    source_status: 'auto_updatable',
+                    machine_readable: true,
+                    update_command: 'npm run update:duty-rates:us',
+                    next_action: 'Keep USITC sync running.'
+                }]
+            },
+            runs: [downgraded]
+        }),
+        health: { ok: true, sample_count: 1, failed_sample_count: 0, failures: [] }
+    });
+
+    assert.equal(downgraded.ok, true);
+    assert.equal(downgraded.official_fetch_degraded, true);
+    assert.equal(downgraded.errors.length, 0);
+    assert.equal(payload.status, 'ok');
+    assert.equal(payload.counts.exceptions, 0);
+    assert.equal(payload.source_run_plan.find(row => row.country === 'US').run_status, 'degraded');
 });
 
 test('conflicting official rates inside one multi-prefix rule block auto-apply', () => {

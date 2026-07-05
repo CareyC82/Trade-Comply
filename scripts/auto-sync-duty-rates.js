@@ -81,6 +81,51 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
     };
 }
 
+function isOfficialTransportError(error = {}) {
+    const text = String(error.error || error.message || error || '').toLowerCase();
+    return [
+        'fetch failed',
+        'getaddrinfo',
+        'enotfound',
+        'econnreset',
+        'econnrefused',
+        'etimedout',
+        'socket hang up',
+        'tls',
+        'ssl certificate',
+        'http 403',
+        'http 429',
+        'http 500',
+        'http 502',
+        'http 503',
+        'http 504'
+    ].some(fragment => text.includes(fragment));
+}
+
+function downgradeOfficialTransportFailure(run, {
+    reason = 'official_fetch_failed'
+} = {}) {
+    const errors = Array.isArray(run?.errors) ? run.errors : [];
+    if (!errors.length || !errors.every(isOfficialTransportError)) {
+        return run;
+    }
+    const detail = errors
+        .slice(0, 5)
+        .map(error => [error.rule, error.prefix, error.error || error.message].filter(Boolean).join(': '))
+        .join(' | ');
+    return {
+        ...run,
+        ok: true,
+        applied: false,
+        error_count: 0,
+        errors: [],
+        writes_official_machine_rates: false,
+        official_fetch_degraded: true,
+        official_fetch_degraded_reason: reason,
+        official_fetch_degraded_detail: detail
+    };
+}
+
 function buildExceptionsForRun(run, { threshold = MATERIAL_RATE_CHANGE_THRESHOLD } = {}) {
     const exceptions = [];
     if (!run.ok || run.error_count > 0) {
@@ -436,7 +481,9 @@ async function runAutoDutyRateSync({
             applied: false,
             mode: 'official-dry-run'
         });
-        const { run: usDrySummary } = appendMultiPrefixConflicts(rawUsDrySummary);
+        const { run: usDrySummary } = appendMultiPrefixConflicts(
+            downgradeOfficialTransportFailure(rawUsDrySummary)
+        );
         if (usDrySummary.ok && !dryRun) {
             const usApplied = await updateUsRules({ dryRun: false });
             runs.push(buildRunSummary('USITC', usApplied, {
@@ -609,6 +656,7 @@ module.exports = {
     MATERIAL_RATE_CHANGE_THRESHOLD,
     isMaterialRateChange,
     buildRunSummary,
+    downgradeOfficialTransportFailure,
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
