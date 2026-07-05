@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-04",
-  "generated_at": "2026-07-04T13:45:17.462Z",
+  "version": "2026-07-05",
+  "generated_at": "2026-07-05T08:49:06.623Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -206,21 +206,11 @@
         "Russia/EAEU duty and sanctions scope should stay review-only until official machine-readable coverage is available."
       ],
       "scope_components": [
-        "ad_cvd_scope",
-        "origin_route_evidence",
-        "battery_chemistry_scope",
-        "power_conversion_scope",
-        "portable_adp_scope",
-        "camera_transmission_scope",
-        "medical_device_scope",
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "technology_end_use_scope",
+        "official_source_link",
+        "tariff_exact_code_scope",
         "eaeu_tariff_scope",
         "sanctions_scope",
-        "active_exclusion_or_case_period",
-        "official_source_link",
-        "tariff_exact_code_scope"
+        "active_exclusion_or_case_period"
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -245,7 +235,6 @@
       ],
       "scope_components": [
         "camera_transmission_scope",
-        "technology_end_use_scope",
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
@@ -275,8 +264,6 @@
       "scope_components": [
         "portable_adp_scope",
         "taric_exact_code_scope",
-        "eaeu_tariff_scope",
-        "sanctions_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
@@ -329,7 +316,6 @@
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
-        "technology_end_use_scope",
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
@@ -384,7 +370,6 @@
       ],
       "scope_components": [
         "camera_transmission_scope",
-        "technology_end_use_scope",
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
@@ -414,8 +399,6 @@
       "scope_components": [
         "portable_adp_scope",
         "taric_exact_code_scope",
-        "eaeu_tariff_scope",
-        "sanctions_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
@@ -443,8 +426,6 @@
       ],
       "scope_components": [
         "taric_exact_code_scope",
-        "eaeu_tariff_scope",
-        "sanctions_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
@@ -470,7 +451,6 @@
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
-        "technology_end_use_scope",
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
@@ -525,7 +505,6 @@
       ],
       "scope_components": [
         "camera_transmission_scope",
-        "technology_end_use_scope",
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
@@ -555,8 +534,6 @@
       "scope_components": [
         "portable_adp_scope",
         "taric_exact_code_scope",
-        "eaeu_tariff_scope",
-        "sanctions_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
@@ -584,8 +561,6 @@
       ],
       "scope_components": [
         "taric_exact_code_scope",
-        "eaeu_tariff_scope",
-        "sanctions_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
@@ -611,7 +586,6 @@
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
-        "technology_end_use_scope",
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
@@ -663,13 +637,11 @@
       "impact_score": 1900,
       "why_priority": "US->EU ai_compute already has official duty/tax estimate coverage, but exact TARIC code, product scope, CE/RoHS, and member-state VAT evidence should be automated next.",
       "rate_change_drivers": [
-        "Semiconductor scope can depend on exact HS line, end-use, and technology classification.",
         "Exact TARIC goods-code scope can change whether the official estimate is filing-grade.",
         "AI server configuration, accelerator content, and end-use scope can change classification and control review."
       ],
       "scope_components": [
         "official_base_duty",
-        "technology_end_use_scope",
         "taric_exact_code_scope",
         "dual_use_end_use_scope",
         "ce_rohs_market_surveillance",
@@ -693,14 +665,11 @@
       "impact_score": 1900,
       "why_priority": "US->EU optical_module already has official duty/tax estimate coverage, but exact TARIC code, product scope, CE/RoHS, and member-state VAT evidence should be automated next.",
       "rate_change_drivers": [
-        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment.",
         "Exact TARIC goods-code scope can change whether the official estimate is filing-grade.",
         "Optical-module speed, telecom/security function, and exact subheading can change certification and tariff evidence."
       ],
       "scope_components": [
         "official_base_duty",
-        "telecom_subheading_scope",
-        "wireless_module_scope",
         "taric_exact_code_scope",
         "telecom_security_scope",
         "ce_rohs_market_surveillance",
@@ -731,8 +700,6 @@
         "official_base_duty",
         "power_conversion_scope",
         "taric_exact_code_scope",
-        "eaeu_tariff_scope",
-        "sanctions_scope",
         "electrical_safety_scope",
         "ce_rohs_market_surveillance",
         "member_state_vat"

@@ -279,6 +279,40 @@ test('exact tariff parser priorities mirror the live upgrade queue', () => {
     assert.ok(payload.exact_route_scope_priorities.every((row) => row.scope_components.includes('member_state_vat')));
 });
 
+test('rule scope backlog avoids broad keyword false positives', () => {
+    const payload = buildExactTariffParserPriorities({ generatedAt: '2026-06-22T00:00:00.000Z' });
+    const byRuleId = new Map(payload.rule_scope_priorities.map((row) => [row.rule_id, row]));
+    const ruElectronics = byRuleId.get('RU-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE');
+    const euTablet = byRuleId.get('EU-GLOBAL-847130-TABLET-IMPORT-SCOPE');
+    const euCamera = byRuleId.get('EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE');
+
+    assert.ok(ruElectronics);
+    assert.deepEqual(
+        ruElectronics.scope_components.sort(),
+        ['active_exclusion_or_case_period', 'eaeu_tariff_scope', 'official_source_link', 'sanctions_scope', 'tariff_exact_code_scope'].sort()
+    );
+    [
+        'battery_chemistry_scope',
+        'power_conversion_scope',
+        'portable_adp_scope',
+        'camera_transmission_scope',
+        'medical_device_scope',
+        'telecom_subheading_scope',
+        'technology_end_use_scope'
+    ].forEach((component) => {
+        assert.equal(ruElectronics.scope_components.includes(component), false);
+    });
+
+    assert.ok(euTablet);
+    assert.equal(euTablet.scope_components.includes('portable_adp_scope'), true);
+    assert.equal(euTablet.scope_components.includes('eaeu_tariff_scope'), false);
+    assert.equal(euTablet.scope_components.includes('sanctions_scope'), false);
+
+    assert.ok(euCamera);
+    assert.equal(euCamera.scope_components.includes('camera_transmission_scope'), true);
+    assert.equal(euCamera.scope_components.includes('technology_end_use_scope'), false);
+});
+
 test('daily duty-rate sync refreshes exact tariff parser priorities', () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
     const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'duty-rate-sync.yml'), 'utf8');

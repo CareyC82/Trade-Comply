@@ -158,20 +158,38 @@ function getRateChangeDrivers(result = {}) {
     if (result.import_country === 'US' && result.origin_country === 'CN') {
         drivers.push('US Section 301 Chapter 99 coverage and exclusion status can change add-on duty.');
     }
-    if (/solar|8541|photovoltaic/.test(text)) {
+    if (matchesScopeText(text, [/\bsolar\b/, /\b8541\b/, /\bphotovoltaic\b/])) {
         drivers.push('Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure.');
     }
-    if (/battery|850760/.test(text)) {
+    if (matchesScopeText(text, [/\bbatter(?:y|ies)\b/, /\b850760\b/])) {
         drivers.push('Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment.');
     }
-    if (/semiconductor|8542|gpu|ai/.test(text)) {
+    if (matchesTechnologyScope(text)) {
         drivers.push('Semiconductor scope can depend on exact HS line, end-use, and technology classification.');
     }
-    if (/8517|router|smartphone|telecom/.test(text)) {
+    if (matchesScopeText(text, [/\b8517\b/, /\brouter\b/, /\bsmartphone\b/, /\btelecom\b/, /\btelecommunications?\b/])) {
         drivers.push('Telecom electronics may need exact subheading, wireless module scope, and local tax treatment.');
     }
 
     return Array.from(new Set(drivers));
+}
+
+function matchesScopeText(text = '', patterns = []) {
+    const normalized = String(text || '').toLowerCase();
+    return patterns.some((pattern) => pattern.test(normalized));
+}
+
+function matchesTechnologyScope(text = '') {
+    return matchesScopeText(text, [
+        /\bsemiconductor(s)?\b/,
+        /\b8542\b/,
+        /\bgpu(s)?\b/,
+        /\bai\s+(chip|accelerator|hardware|compute|computing|server|processor|gpu)\b/,
+        /\badvanced\s+comput(?:e|ing)\b/,
+        /\bhbm(?:2|3|3e)?\b/,
+        /\bhigh\s+bandwidth\s+memory\b/,
+        /\bmemory\s+(chip|component|module|device)\b/
+    ]);
 }
 
 function getRateScopeComponents(result = {}) {
@@ -191,36 +209,36 @@ function getRateScopeComponents(result = {}) {
     if (result.import_country === 'US' && result.origin_country === 'CN') {
         components.push('chapter_99_section_301');
     }
-    if (/solar|8541|photovoltaic/.test(text)) {
+    if (matchesScopeText(text, [/\bsolar\b/, /\b8541\b/, /\bphotovoltaic\b/])) {
         components.push('ad_cvd_scope');
         components.push('origin_route_evidence');
     }
-    if (/battery|850760/.test(text)) {
+    if (matchesScopeText(text, [/\bbatter(?:y|ies)\b/, /\b850760\b/])) {
         components.push('battery_chemistry_scope');
     }
-    if (/850440|power|charger|adapter|inverter/.test(text)) {
+    if (matchesScopeText(text, [/\b850440\b/, /\bpower\b/, /\bcharger\b/, /\badapter\b/, /\binverter\b/])) {
         components.push('power_conversion_scope');
     }
-    if (/847130|tablet|portable|computer|laptop/.test(text)) {
+    if (matchesScopeText(text, [/\b847130\b/, /\btablet\b/, /\bportable\b/, /\bcomputer\b/, /\blaptop\b/])) {
         components.push('portable_adp_scope');
     }
-    if (/8525|camera|surveillance|nvr|video/.test(text)) {
+    if (matchesScopeText(text, [/\b8525\b/, /\bcamera\b/, /\bsurveillance\b/, /\bnvr\b/, /\bvideo\b/])) {
         components.push('camera_transmission_scope');
     }
-    if (/9018|9027|medical|diagnostic|laboratory|analyzer|patient/.test(text)) {
+    if (matchesScopeText(text, [/\b9018\b/, /\b9027\b/, /\bmedical\b/, /\bdiagnostic\b/, /\blaborator(?:y|ies)\b/, /\banaly[sz]er\b/, /\bpatient\b/])) {
         components.push('medical_device_scope');
     }
-    if (/8517|router|smartphone|telecom/.test(text)) {
+    if (matchesScopeText(text, [/\b8517\b/, /\brouter\b/, /\bsmartphone\b/, /\btelecom\b/, /\btelecommunications?\b/])) {
         components.push('telecom_subheading_scope');
         components.push('wireless_module_scope');
     }
-    if (/semiconductor|8542|gpu|ai/.test(text)) {
+    if (matchesTechnologyScope(text)) {
         components.push('technology_end_use_scope');
     }
     if (/taric/.test(text) || ['EU', 'DE', 'NL'].includes(result.import_country)) {
         components.push('taric_exact_code_scope');
     }
-    if (/ru|russia|eaeu|sanction/.test(text) || result.import_country === 'RU') {
+    if (matchesScopeText(text, [/\bru\b/, /\brussia\b/, /\beaeu\b/, /\bsanctions?\b/, /\brestricted-party\b/]) || result.import_country === 'RU') {
         components.push('eaeu_tariff_scope');
         components.push('sanctions_scope');
     }
@@ -232,6 +250,7 @@ function getRateScopeComponents(result = {}) {
 }
 
 function getRuleScopeComponents({ rule = {}, route = '', importCountry = '', originCountry = '', hsCode = '', sourceStatus = '', sourceTrust = '' } = {}) {
+    const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes.map(String) : [];
     const text = [
         rule.id,
         rule.label,
@@ -239,6 +258,15 @@ function getRuleScopeComponents({ rule = {}, route = '', importCountry = '', ori
         rule.trade_remedy,
         sourceStatus
     ].join(' ').toLowerCase();
+
+    if (importCountry === 'RU' && prefixes.length > 4) {
+        const routeLevelComponents = ['official_source_link', 'tariff_exact_code_scope', 'eaeu_tariff_scope', 'sanctions_scope'];
+        if (sourceTrust === 'official_heading_only') {
+            routeLevelComponents.push('active_exclusion_or_case_period');
+        }
+        return Array.from(new Set(routeLevelComponents));
+    }
+
     const components = getRateScopeComponents({
         id: rule.id,
         product_id: rule.label || '',
