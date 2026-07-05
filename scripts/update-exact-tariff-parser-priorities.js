@@ -40,6 +40,7 @@ function buildExactTariffParserPriorities({ generatedAt = new Date().toISOString
         why_priority: row.why_priority,
         rate_change_drivers: row.rate_change_drivers || [],
         scope_components: row.scope_components || [],
+        parser_subtasks: row.parser_subtasks || [],
         parser_scope: buildParserScope(row)
     }));
     const ruleScopePriorities = (health.exact_rate_progress?.rule_scope_backlog_rows || []).map((row) => ({

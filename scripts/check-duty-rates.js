@@ -340,6 +340,47 @@ function getUsBacklogFocus(result = {}) {
     return 'Resolve exact HTS line, country of origin evidence, Section 301 coverage, and active exclusion status.';
 }
 
+function getRateParserSubtasks(result = {}) {
+    const subtasks = [];
+    const product = String(result.product_id || '').toLowerCase();
+    const hsCode = String(result.hs_code || '');
+
+    if (result.import_country === 'US' && result.origin_country === 'CN') {
+        subtasks.push('Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.');
+        if (product === 'solar' || hsCode.startsWith('8541')) {
+            subtasks.push('Attach AD/CVD case-scope resolver for solar module origin, cell source, and deposit period.');
+            subtasks.push('Keep UFLPA / forced-labor evidence separate from customs-duty math.');
+        }
+        if (product === 'battery' || hsCode.startsWith('850760')) {
+            subtasks.push('Split lithium battery chemistry, capacity, and ESS pack scope before add-on duty review.');
+        }
+        if (product === 'router' || product === 'smartphone' || hsCode.startsWith('8517')) {
+            subtasks.push('Resolve exact 8517 telecom subheading and wireless module scope before add-on duty use.');
+        }
+        if (product === 'ev_charger' || hsCode.startsWith('850440')) {
+            subtasks.push('Resolve power-conversion function, EV charger scope, and active add-on duty layer.');
+        }
+        if (product === 'tablet' || hsCode.startsWith('847130')) {
+            subtasks.push('Resolve portable ADP/tablet classification and origin evidence before Section 301 treatment.');
+        }
+        if (product === 'drone' || hsCode.startsWith('8806') || hsCode.startsWith('8525')) {
+            subtasks.push('Resolve UAV aircraft/camera classification and active tariff-exclusion scope.');
+        }
+    }
+
+    if (result.source_trust === 'official_heading_only') {
+        subtasks.push('Keep official base duty, but block filing-grade use until case/exclusion scope is resolved.');
+    }
+    if (result.source_trust === 'mixed_official_estimate') {
+        subtasks.push('Separate official base duty from maintained estimate layers before promoting to filing-grade.');
+    }
+    if (!subtasks.length) {
+        subtasks.push(result.next_action || 'Attach official exact-rate source mapping before filing-grade use.');
+    }
+
+    return Array.from(new Set(subtasks));
+}
+
 function runPriorityMatrixRoute(route) {
     const value = calculatePostEntryValue({
         incoterm: route.incoterm || 'FOB',
@@ -399,6 +440,7 @@ function runPriorityMatrixRoute(route) {
     result.next_action = getRateNextAction(result);
     result.priority_band = getRatePriorityBand(result.source_trust);
     result.us_backlog_focus = getUsBacklogFocus(result);
+    result.parser_subtasks = getRateParserSubtasks(result);
     return result;
 }
 
@@ -479,6 +521,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
             why_priority: result.why_priority,
             rate_change_drivers: result.rate_change_drivers,
             scope_components: result.scope_components,
+            parser_subtasks: result.parser_subtasks,
             us_backlog_focus: result.us_backlog_focus
         }))
         .sort((a, b) => (

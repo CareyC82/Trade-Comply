@@ -11,6 +11,7 @@ const {
     auditSample,
     duplicateSemanticTagKeys,
     formatAuditMarkdown,
+    isFocusSemanticMismatch,
     runQualityAudit,
     writeAuditReport
 } = require('../scripts/audit-search-quality');
@@ -29,10 +30,35 @@ describe('search quality audit', () => {
         for (const result of report.results) {
             assert.deepEqual(result.issues.offRouteTags, [], result.id);
             assert.deepEqual(result.issues.focusMismatchTags, [], result.id);
+            assert.deepEqual(result.issues.focusSemanticMismatchTags, [], result.id);
             assert.deepEqual(result.issues.duplicateTagIds, [], result.id);
             assert.deepEqual(result.issues.duplicatePolicySignals, [], result.id);
             assert.deepEqual(result.issues.productFamilyMismatchTags, [], result.id);
         }
+    });
+
+    it('flags display-semantic focus drift even when the raw focus matches', () => {
+        assert.equal(
+            isFocusSemanticMismatch(
+                { route_focus: 'import', category_label: 'Export Control', short_name: '[US Export Control]' },
+                { focus: 'import' }
+            ),
+            true
+        );
+        assert.equal(
+            isFocusSemanticMismatch(
+                { route_focus: 'import', category_label: 'US Destination Barrier', short_name: '[US Import Control]' },
+                { focus: 'import' }
+            ),
+            false
+        );
+        assert.equal(
+            isFocusSemanticMismatch(
+                { route_focus: 'export', category_label: 'Import Regulation', short_name: '[Origin export filing]' },
+                { focus: 'export' }
+            ),
+            false
+        );
     });
 
     it('detects duplicate policy signals even when tag ids differ', () => {

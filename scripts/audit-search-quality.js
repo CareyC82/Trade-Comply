@@ -92,6 +92,27 @@ function duplicateSemanticTagKeys(tags) {
     return duplicates;
 }
 
+function isFocusSemanticMismatch(tag = {}, routeContext = {}) {
+    const focus = routeContext.focus || '';
+    const tagFocus = tag.route_focus || tag.compliance_focus || '';
+    const categoryLabel = String(tag.category_label || '').toLowerCase();
+    const displayLabel = `${tag.category_label || ''} ${tag.short_name || ''} ${tag.short_description || ''}`.toLowerCase();
+
+    if (tagFocus !== focus) {
+        return false;
+    }
+
+    if (focus === 'import') {
+        return /export control/.test(categoryLabel)
+            && !/import|destination|trade remed|market|entry|customs/.test(displayLabel);
+    }
+    if (focus === 'export') {
+        return /import regulation|import control|destination barrier|entry/.test(categoryLabel)
+            && !/export|origin|filing|customs/.test(displayLabel);
+    }
+    return false;
+}
+
 function auditSample(sample) {
     const routeContext = setupSearchState(sample);
     const intelligence = prepareIntelligentSearch(sample.query, [], PRECHECK_FACTORS, {
@@ -115,6 +136,7 @@ function auditSample(sample) {
         const focus = tag.route_focus || tag.compliance_focus || '';
         return focus && focus !== routeContext.focus;
     });
+    const focusSemanticMismatchTags = results.tags.filter((tag) => isFocusSemanticMismatch(tag, routeContext));
     const productNoiseTags = productTerms.length
         ? results.tags.filter((tag) => !tagMatchesProductTerms(tag, productTerms))
         : [];
@@ -138,6 +160,9 @@ function auditSample(sample) {
     }
     if (focusMismatchTags.length > 0) {
         failures.push('FOCUS_MISMATCH');
+    }
+    if (focusSemanticMismatchTags.length > 0) {
+        failures.push('FOCUS_SEMANTIC_MISMATCH');
     }
     if (duplicateTagIds.length > 0 || duplicateCaseIds.length > 0 || duplicatePolicySignals.length > 0) {
         failures.push('DUPLICATE_RESULTS');
@@ -197,6 +222,7 @@ function auditSample(sample) {
             warnings,
             offRouteTags: offRouteTags.map(summarizeTag),
             focusMismatchTags: focusMismatchTags.map(summarizeTag),
+            focusSemanticMismatchTags: focusSemanticMismatchTags.map(summarizeTag),
             duplicateTagIds,
             duplicateCaseIds,
             duplicatePolicySignals,
@@ -334,6 +360,7 @@ module.exports = {
     PRECHECK_FACTORS,
     auditSample,
     duplicateSemanticTagKeys,
+    isFocusSemanticMismatch,
     runQualityAudit,
     formatAuditReport,
     formatAuditMarkdown,

@@ -190,6 +190,7 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.priority_band), 'upgrade queue should show business priority band');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.why_priority), 'upgrade queue should explain why the route is a priority');
     assert.ok(matrix.priority_upgrade_queue.every((row) => Array.isArray(row.rate_change_drivers) && row.rate_change_drivers.length > 0), 'upgrade queue should expose rate-change drivers');
+    assert.ok(matrix.priority_upgrade_queue.every((row) => Array.isArray(row.parser_subtasks) && row.parser_subtasks.length > 0), 'upgrade queue should expose executable parser subtasks');
     assert.ok(
         matrix.priority_upgrade_queue
             .filter(row => row.id === 'solar-cn-us' || row.id === 'drone-cn-us')
@@ -204,9 +205,21 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     );
     assert.ok(
         matrix.priority_upgrade_queue
+            .filter(row => row.import_country === 'US' && row.origin_country === 'CN')
+            .every(row => row.parser_subtasks.some(task => /Section 301/.test(task))),
+        'US origin China routes should expose Section 301 as an executable parser subtask'
+    );
+    assert.ok(
+        matrix.priority_upgrade_queue
             .find(row => row.id === 'solar-cn-us')
             .scope_components.includes('ad_cvd_scope'),
         'US solar backlog should expose AD/CVD scope as a parser component'
+    );
+    assert.ok(
+        matrix.priority_upgrade_queue
+            .find(row => row.id === 'solar-cn-us')
+            .parser_subtasks.some(task => /AD\/CVD/.test(task)),
+        'US solar backlog should expose AD/CVD as an executable parser subtask'
     );
     assert.ok(matrix.priority_upgrade_queue.some((row) => (
         row.import_country === 'US'

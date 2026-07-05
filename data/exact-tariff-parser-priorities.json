@@ -1,6 +1,6 @@
 {
   "version": "2026-07-05",
-  "generated_at": "2026-07-05T08:49:06.623Z",
+  "generated_at": "2026-07-05T10:03:50.884Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -29,6 +29,12 @@
         "origin_route_evidence",
         "active_exclusion_or_case_period"
       ],
+      "parser_subtasks": [
+        "Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.",
+        "Attach AD/CVD case-scope resolver for solar module origin, cell source, and deposit period.",
+        "Keep UFLPA / forced-labor evidence separate from customs-duty math.",
+        "Keep official base duty, but block filing-grade use until case/exclusion scope is resolved."
+      ],
       "parser_scope": "Resolve exact HTS 854143 line, AD/CVD case scope, origin-route evidence, and Section 301 Chapter 99/exclusion before using the rate for filing."
     },
     {
@@ -52,6 +58,11 @@
         "official_base_duty",
         "chapter_99_section_301",
         "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.",
+        "Resolve UAV aircraft/camera classification and active tariff-exclusion scope.",
+        "Keep official base duty, but block filing-grade use until case/exclusion scope is resolved."
       ],
       "parser_scope": "Resolve exact HTS line, country of origin evidence, Section 301 coverage, and active exclusion status."
     },
@@ -78,6 +89,11 @@
         "chapter_99_section_301",
         "battery_chemistry_scope",
         "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.",
+        "Split lithium battery chemistry, capacity, and ESS pack scope before add-on duty review.",
+        "Separate official base duty from maintained estimate layers before promoting to filing-grade."
       ],
       "parser_scope": "Resolve battery chemistry, capacity, exact 850760 subheading, Section 301 coverage, and any battery-specific trade-remedy scope."
     },
@@ -106,6 +122,11 @@
         "wireless_module_scope",
         "active_exclusion_or_case_period"
       ],
+      "parser_subtasks": [
+        "Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.",
+        "Resolve exact 8517 telecom subheading and wireless module scope before add-on duty use.",
+        "Separate official base duty from maintained estimate layers before promoting to filing-grade."
+      ],
       "parser_scope": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
     },
     {
@@ -133,6 +154,11 @@
         "wireless_module_scope",
         "active_exclusion_or_case_period"
       ],
+      "parser_subtasks": [
+        "Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.",
+        "Resolve exact 8517 telecom subheading and wireless module scope before add-on duty use.",
+        "Separate official base duty from maintained estimate layers before promoting to filing-grade."
+      ],
       "parser_scope": "Resolve exact 8517 telecom subheading, wireless module scope, FCC/entry classification evidence, and Section 301 exclusion status."
     },
     {
@@ -158,6 +184,11 @@
         "power_conversion_scope",
         "active_exclusion_or_case_period"
       ],
+      "parser_subtasks": [
+        "Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.",
+        "Resolve power-conversion function, EV charger scope, and active add-on duty layer.",
+        "Separate official base duty from maintained estimate layers before promoting to filing-grade."
+      ],
       "parser_scope": "Resolve exact power-conversion subheading, EV-charger function scope, origin evidence, and Section 301 add-on duty treatment."
     },
     {
@@ -182,6 +213,11 @@
         "chapter_99_section_301",
         "portable_adp_scope",
         "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Map exact HTS line to current Section 301 Chapter 99 coverage and exclusion status.",
+        "Resolve portable ADP/tablet classification and origin evidence before Section 301 treatment.",
+        "Separate official base duty from maintained estimate layers before promoting to filing-grade."
       ],
       "parser_scope": "Resolve exact portable ADP/tablet classification, origin evidence, and Section 301 add-on duty or exclusion status."
     }
