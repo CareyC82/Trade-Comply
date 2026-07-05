@@ -1364,7 +1364,18 @@
                                         <td>${escapeHtml(row.impact_score ?? 0)}<div class="meta">${Number.isFinite(Number(row.estimated_total_rate)) ? `${(Number(row.estimated_total_rate) * 100).toFixed(1)}% est.` : ''}</div></td>
                                         <td><span class="badge ${row.source_trust === 'precheck_estimate' ? 'benchmark' : row.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(row.source_trust || '')}</span></td>
                                         <td>${escapeHtml(row.why_priority || row.parser_target || '')}</td>
-                                        <td>${escapeHtml(row.next_action || '')}<div class="meta">${(row.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div></td>
+                                        <td>
+                                            ${escapeHtml(row.next_action || '')}
+                                            <div class="meta">${(row.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div>
+                                            ${(row.parser_subtasks || []).length ? `
+                                                <details style="margin-top:8px">
+                                                    <summary>Executable parser tasks (${escapeHtml(row.parser_subtasks.length)})</summary>
+                                                    <ol class="duty-exception-list">
+                                                        ${row.parser_subtasks.map(task => `<li>${escapeHtml(task)}</li>`).join('')}
+                                                    </ol>
+                                                </details>
+                                            ` : ''}
+                                        </td>
                                     </tr>
                                 `).join('') : '<tr><td colspan="8"><span class="meta">All priority routes are official exact or official duty + tax estimate.</span></td></tr>'}
                             </tbody>
@@ -1472,7 +1483,18 @@
                                     <td><strong>${escapeHtml(row.band || '')}</strong></td>
                                     <td>${escapeHtml(row.route || '')}</td>
                                     <td>${escapeHtml(row.product_id || '')}<div class="meta">HS ${escapeHtml(row.hs_code || '')}</div></td>
-                                    <td>${escapeHtml(row.parser_target || '')}<div class="meta">${(row.scope_components || []).slice(0, 4).map(component => escapeHtml(component)).join(' · ')}</div></td>
+                                    <td>
+                                        ${escapeHtml(row.parser_target || '')}
+                                        <div class="meta">${(row.scope_components || []).slice(0, 4).map(component => escapeHtml(component)).join(' · ')}</div>
+                                        ${(row.parser_subtasks || []).length ? `
+                                            <details style="margin-top:8px">
+                                                <summary>Tasks (${escapeHtml(row.parser_subtasks.length)})</summary>
+                                                <ol class="duty-exception-list">
+                                                    ${row.parser_subtasks.map(task => `<li>${escapeHtml(task)}</li>`).join('')}
+                                                </ol>
+                                            </details>
+                                        ` : ''}
+                                    </td>
                                     <td>${escapeHtml(row.why_priority || '')}<div class="meta">${(row.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div></td>
                                     <td>${escapeHtml(row.next_action || '')}</td>
                                 </tr>
@@ -1789,7 +1811,17 @@
                                         <td>${escapeHtml(item.impact_score ?? 0)}<div class="meta">${Number.isFinite(Number(item.estimated_total_rate)) ? `${(Number(item.estimated_total_rate) * 100).toFixed(1)}% est.` : ''}</div></td>
                                         <td><span class="badge ${item.source_trust === 'precheck_estimate' ? 'benchmark' : item.source_trust === 'official_link_estimate' ? 'official_link_monitor' : 'auto_updatable'}">${escapeHtml(item.source_trust || '')}</span></td>
                                         <td>${escapeHtml(item.why_priority || '')}<div class="meta">${(item.rate_change_drivers || []).slice(0, 2).map(driver => escapeHtml(driver)).join(' ')}</div></td>
-                                        <td>${escapeHtml(item.next_action || '')}</td>
+                                        <td>
+                                            ${escapeHtml(item.next_action || '')}
+                                            ${(item.parser_subtasks || []).length ? `
+                                                <details style="margin-top:8px">
+                                                    <summary>Parser tasks (${escapeHtml(item.parser_subtasks.length)})</summary>
+                                                    <ol class="duty-exception-list">
+                                                        ${item.parser_subtasks.map(task => `<li>${escapeHtml(task)}</li>`).join('')}
+                                                    </ol>
+                                                </details>
+                                            ` : ''}
+                                        </td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -1840,7 +1872,7 @@
                                                     `).join('')}
                                                 </div>
                                                 <ul class="duty-exception-list">
-                                                    ${backlogRows.map((item) => `<li>${escapeHtml(item.id || item.product_id || '')}: ${escapeHtml(item.next_action || '')}</li>`).join('')}
+                                                    ${backlogRows.map((item) => `<li>${escapeHtml(item.id || item.product_id || '')}: ${escapeHtml(item.next_action || '')}${(item.parser_subtasks || []).length ? `<ol>${item.parser_subtasks.map(task => `<li>${escapeHtml(task)}</li>`).join('')}</ol>` : ''}</li>`).join('')}
                                                     ${backlogRows.map((item) => item.why_priority ? `<li>${escapeHtml(item.id || item.product_id || '')} priority reason: ${escapeHtml(item.why_priority)}</li>` : '').join('')}
                                                 </ul>
                                             </details>

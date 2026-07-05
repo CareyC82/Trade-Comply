@@ -165,4 +165,59 @@ describe('category display labels', () => {
         assert.deepEqual(Object.keys(grouped), ['Import Controls & Trade Remedies']);
         assert.equal(grouped['Import Controls & Trade Remedies'].tags.length, highFrequencyImportControls.length);
     });
+
+    it('keeps result-page card groups aligned with selected import/export focus', () => {
+        const { groupTagsByCategory } = loadRenderPrepareWithCore();
+        const importGrouped = groupTagsByCategory([
+            {
+                tag_id: 'IMPORT-FOCUS-CONTROL',
+                country: 'US',
+                route_focus: 'import',
+                category: 'EXPORT_CTRL',
+                category_label: 'Export Control',
+                short_name: '[US High]'
+            },
+            {
+                tag_id: 'IMPORT-FOCUS-ENTRY',
+                country: 'US',
+                route_focus: 'import',
+                category: 'IMPORT_REG',
+                category_label: 'Import Regulation',
+                short_name: '[US CBP Import Entry]'
+            }
+        ], {
+            direction: 'export',
+            routeContext: { from: 'CN', to: 'US', focus: 'import' }
+        });
+
+        assert.equal(Object.keys(importGrouped).includes('Export Control'), false);
+        assert.ok(importGrouped['Import Controls & Trade Remedies']);
+        assert.ok(importGrouped['Import Clearance & Tariff']);
+
+        const exportGrouped = groupTagsByCategory([
+            {
+                tag_id: 'EXPORT-FOCUS-CONTROL',
+                country: 'US',
+                route_focus: 'export',
+                category: 'EXPORT_CTRL',
+                category_label: 'Export Control',
+                short_name: '[US EAR Export Control]'
+            },
+            {
+                tag_id: 'EXPORT-FOCUS-DOCS',
+                country: 'US',
+                route_focus: 'export',
+                category: 'EXPORT_DECLARATION',
+                category_label: 'Export Customs',
+                short_name: '[US AES Filing]'
+            }
+        ], {
+            direction: 'export',
+            routeContext: { from: 'US', to: 'IN', focus: 'export' }
+        });
+
+        assert.ok(exportGrouped['Export Control']);
+        assert.ok(exportGrouped['Export Filing & Documents']);
+        assert.equal(Object.keys(exportGrouped).includes('Import Controls & Trade Remedies'), false);
+    });
 });

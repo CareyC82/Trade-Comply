@@ -49,6 +49,7 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => Number.isFinite(row.impact_score)));
     assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => row.why_priority));
     assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => Array.isArray(row.rate_change_drivers) && row.rate_change_drivers.length > 0));
+    assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => Array.isArray(row.parser_subtasks) && row.parser_subtasks.length > 0));
     assert.ok(payload.exact_rate_progress.top_backlog_rows.some(row => (
         `${row.why_priority} ${(row.rate_change_drivers || []).join(' ')}`.includes('Section 301')
     )));
@@ -134,12 +135,17 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
         Array.isArray(row.rate_change_drivers)
         && row.rate_change_drivers.length > 0
     )));
+    assert.ok((payload.duty.parser_priority_bands.P2 || []).every(row => (
+        Array.isArray(row.parser_subtasks)
+        && row.parser_subtasks.length > 0
+    )));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.some(row => (
         row.rate_change_drivers.join(' ').includes('Section 301')
     )));
     assert.equal(Array.isArray(payload.duty.exact_tariff_parser_queue.rule_scope_priorities), true);
     assert.ok(payload.duty.exact_tariff_parser_queue.rule_scope_priorities.length > 0);
     assert.ok(payload.duty.exact_tariff_parser_queue.rule_scope_priorities.every(row => row.rule_id && row.parser_target && row.next_action && row.why_priority));
+    assert.ok(payload.duty.exact_tariff_parser_queue.rule_scope_priorities.every(row => Array.isArray(row.parser_subtasks) && row.parser_subtasks.length > 0));
     assert.ok(payload.duty.exact_tariff_parser_queue.rule_scope_priorities.some(row => row.rule_id === 'EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE'));
     assert.equal(payload.post_entry_tax.export_missing_countries.length, 0);
     assert.equal(payload.post_entry_tax.false_official_rate_claims.length, 0);

@@ -1,6 +1,6 @@
 {
   "version": "2026-07-05",
-  "generated_at": "2026-07-05T10:03:50.884Z",
+  "generated_at": "2026-07-05T11:48:34.107Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -248,6 +248,11 @@
         "sanctions_scope",
         "active_exclusion_or_case_period"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -274,6 +279,11 @@
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -303,6 +313,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -330,6 +345,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -355,6 +375,11 @@
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -383,6 +408,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -409,6 +439,11 @@
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -438,6 +473,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -465,6 +505,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -490,6 +535,11 @@
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -518,6 +568,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -544,6 +599,11 @@
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -573,6 +633,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -600,6 +665,11 @@
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
@@ -625,6 +695,11 @@
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -652,6 +727,11 @@
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     }
@@ -683,6 +763,11 @@
         "ce_rohs_market_surveillance",
         "member_state_vat"
       ],
+      "parser_subtasks": [
+        "Accept or derive the exact TARIC goods code instead of relying only on HS prefix.",
+        "Attach CE/RoHS and product-function evidence checks to the tariff-line scope.",
+        "Resolve member-state VAT and route evidence before promoting the estimate to filing-grade."
+      ],
       "parser_scope": "Add exact TARIC-code input and route-scope evidence checks for US->EU ai_compute before treating this as filing-grade."
     },
     {
@@ -710,6 +795,11 @@
         "telecom_security_scope",
         "ce_rohs_market_surveillance",
         "member_state_vat"
+      ],
+      "parser_subtasks": [
+        "Accept or derive the exact TARIC goods code instead of relying only on HS prefix.",
+        "Attach CE/RoHS and product-function evidence checks to the tariff-line scope.",
+        "Resolve member-state VAT and route evidence before promoting the estimate to filing-grade."
       ],
       "parser_scope": "Add exact TARIC-code input and route-scope evidence checks for US->EU optical_module before treating this as filing-grade."
     },
@@ -739,6 +829,11 @@
         "electrical_safety_scope",
         "ce_rohs_market_surveillance",
         "member_state_vat"
+      ],
+      "parser_subtasks": [
+        "Accept or derive the exact TARIC goods code instead of relying only on HS prefix.",
+        "Attach CE/RoHS and product-function evidence checks to the tariff-line scope.",
+        "Resolve member-state VAT and route evidence before promoting the estimate to filing-grade."
       ],
       "parser_scope": "Add exact TARIC-code input and route-scope evidence checks for US->EU data_center_infrastructure before treating this as filing-grade."
     }

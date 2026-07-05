@@ -887,6 +887,15 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
                     sourceStatus,
                     sourceTrust
                 }),
+                parser_subtasks: [
+                    sourceStatus === 'benchmark_source_checked'
+                        ? 'Find and attach the official machine-readable tariff source for this country / HS scope.'
+                        : 'Map the broad HS prefix to exact official tariff-line candidates.',
+                    'Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.',
+                    hasOverrides
+                        ? 'Backfill remaining exact-code overrides that are still missing parser coverage.'
+                        : 'Create exact-code override rows before promoting this rule beyond screening.'
+                ],
                 parser_scope: rule.source_note || rule.trade_remedy || 'Exact tariff-line scope is required before using a final rate.'
             };
         })
@@ -959,6 +968,11 @@ function buildExactRouteScopeBacklog(rows = []) {
                 why_priority: `${route} ${row.product_id} already has official duty/tax estimate coverage, but exact TARIC code, product scope, CE/RoHS, and member-state VAT evidence should be automated next.`,
                 rate_change_drivers: rateDrivers,
                 scope_components: scopeComponents,
+                parser_subtasks: [
+                    'Accept or derive the exact TARIC goods code instead of relying only on HS prefix.',
+                    'Attach CE/RoHS and product-function evidence checks to the tariff-line scope.',
+                    'Resolve member-state VAT and route evidence before promoting the estimate to filing-grade.'
+                ],
                 parser_scope: row.next_action || 'Confirm exact TARIC line, CE/RoHS evidence, product function, origin, and member-state VAT before filing.'
             };
         })
@@ -1009,6 +1023,8 @@ function buildExactRateProgress({
                 impact_score: row.impact_score || 0,
                 why_priority: row.why_priority || getRatePriorityReason(row),
                 rate_change_drivers: row.rate_change_drivers || getRateChangeDrivers(row),
+                scope_components: row.scope_components || getRateScopeComponents(row),
+                parser_subtasks: row.parser_subtasks || getRateParserSubtasks(row),
                 us_backlog_focus: row.us_backlog_focus || getUsBacklogFocus(row),
                 next_action: row.next_action || getRateNextAction(row)
             }))
@@ -1169,6 +1185,7 @@ function buildDutyRateBusinessSummary({
             estimated_total_rate: row.estimated_total_rate,
             why_priority: row.why_priority || '',
             rate_change_drivers: row.rate_change_drivers || [],
+            parser_subtasks: row.parser_subtasks || [],
             next_action: row.next_action || '',
             us_backlog_focus: row.us_backlog_focus || ''
         })),
@@ -1180,6 +1197,7 @@ function buildDutyRateBusinessSummary({
             priority_band: row.priority_band,
             why_priority: row.why_priority,
             rate_change_drivers: row.rate_change_drivers,
+            parser_subtasks: row.parser_subtasks || [],
             us_backlog_focus: row.us_backlog_focus
         }))
     };
