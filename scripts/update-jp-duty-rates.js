@@ -24,6 +24,7 @@ const JP_BENCHMARK = {
 };
 
 const JP_EXACT_CODE_CANDIDATES = [
+    '847150',
     '847130',
     '850440',
     '850760',
@@ -31,8 +32,12 @@ const JP_EXACT_CODE_CANDIDATES = [
     '851762',
     '852852',
     '854143',
-    '854231'
+    '854231',
+    '854232',
+    '854239'
 ];
+
+const JP_EXACT_STATISTICAL_CODE_CANDIDATES = [...JP_EXACT_CODE_CANDIDATES];
 
 function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -500,6 +505,14 @@ function applyJapanBenchmarkToRule(rule, checkedAt) {
         changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
         rule.exact_code_overrides = exactOverrides;
     }
+    if (JSON.stringify(rule.exact_statistical_codes || []) !== JSON.stringify(JP_EXACT_STATISTICAL_CODE_CANDIDATES)) {
+        changes.push({
+            field: 'exact_statistical_codes',
+            old_value: rule.exact_statistical_codes || [],
+            new_value: JP_EXACT_STATISTICAL_CODE_CANDIDATES
+        });
+        rule.exact_statistical_codes = JP_EXACT_STATISTICAL_CODE_CANDIDATES;
+    }
     return changes;
 }
 
@@ -618,6 +631,7 @@ module.exports = {
     JP_BENCHMARK,
     JP_CUSTOMS_URL,
     JP_EXACT_CODE_CANDIDATES,
+    JP_EXACT_STATISTICAL_CODE_CANDIDATES,
     parseJapanTariffScheduleHtml,
     parseJapanScheduleChapterLinks,
     parseJapanTariffChapterRows,

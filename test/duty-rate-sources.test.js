@@ -41,6 +41,7 @@ const {
     buildJapanOfficialCandidateForRule,
     buildJapanOfficialExactRateCandidate,
     buildJapanOfficialRateCandidate,
+    JP_EXACT_STATISTICAL_CODE_CANDIDATES,
     japanRowCandidateCodes,
     parseJapanAdValoremRate,
     parseJapanScheduleChapterLinks,
@@ -903,6 +904,8 @@ test('Mexico updater keeps exact candidates separate from VAT layer', () => {
     assert.equal(rule.source_status, 'official_source_checked');
     assert.equal(rule.confidence, 'Official duty + tax estimate');
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854232'));
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854239'));
     assert.equal(rule.add_on_layers[0].rate, 0.16);
     assert.equal(rule.additional_rate, 0.16);
 });
@@ -924,6 +927,9 @@ test('Japan updater keeps exact candidates separate from consumption tax layer',
     assert.equal(rule.source_status, 'official_source_checked');
     assert.equal(rule.confidence, 'Official duty + tax estimate');
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854232'));
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854239'));
+    assert.deepEqual(rule.exact_statistical_codes, JP_EXACT_STATISTICAL_CODE_CANDIDATES);
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
 });
@@ -1010,6 +1016,8 @@ test('Korea updater keeps exact candidates separate from VAT layer', () => {
     assert.equal(rule.source_status, 'official_source_checked');
     assert.equal(rule.confidence, 'Official duty + tax estimate');
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854232'));
+    assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854239'));
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
 });

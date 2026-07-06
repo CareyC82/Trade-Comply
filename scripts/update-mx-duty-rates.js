@@ -22,6 +22,7 @@ const MX_BENCHMARK = {
 };
 
 const MX_EXACT_CODE_CANDIDATES = [
+    '847150',
     '847130',
     '850440',
     '850760',
@@ -29,7 +30,9 @@ const MX_EXACT_CODE_CANDIDATES = [
     '851762',
     '852852',
     '854143',
-    '854231'
+    '854231',
+    '854232',
+    '854239'
 ];
 
 function readJson(filePath) {
