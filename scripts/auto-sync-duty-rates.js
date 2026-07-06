@@ -12,7 +12,7 @@ const { updateUsRules } = require('./update-us-duty-rates');
 const { updateEuRules } = require('./update-eu-duty-rates');
 const { updateSingaporeRules } = require('./update-sg-duty-rates');
 const { updateMexicoRules } = require('./update-mx-duty-rates');
-const { updateJapanRules } = require('./update-jp-duty-rates');
+const { updateJapanRules, updateJapanRulesFromOfficialSource } = require('./update-jp-duty-rates');
 const { updateKoreaRules, updateKoreaRulesFromOfficialSource } = require('./update-kr-duty-rates');
 const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
@@ -204,7 +204,7 @@ function getSourceRunName(source = {}) {
     if (['EU', 'DE', 'NL'].includes(country)) return 'EU TARIC benchmark';
     if (country === 'SG') return 'Singapore Customs benchmark';
     if (country === 'MX') return 'Mexico SNICE benchmark';
-    if (country === 'JP') return 'Japan Customs benchmark';
+    if (country === 'JP') return 'Japan Customs official-live';
     if (country === 'KR') return 'Korea Customs official-live';
     if (country === 'IN') return 'India Customs official-live';
     if (['CN', 'VN', 'MY', 'TW', 'RU'].includes(country)) return 'Static official-link benchmarks';
@@ -541,6 +541,7 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
 async function runAutoDutyRateSync({
     dryRun = false,
     skipOfficialUs = false,
+    japanOfficialFetcher = null,
     koreaOfficialFetcher = null,
     indiaOfficialFetcher = null,
     staticOfficialFetcher = null,
@@ -587,10 +588,23 @@ async function runAutoDutyRateSync({
         mode: 'benchmark'
     }));
 
-    const jpResult = updateJapanRules({ dryRun });
-    runs.push(buildRunSummary('Japan Customs benchmark', jpResult, {
+    let jpResult;
+    try {
+        jpResult = await updateJapanRulesFromOfficialSource({
+            dryRun,
+            ...(japanOfficialFetcher ? { fetcher: japanOfficialFetcher } : {})
+        });
+    } catch (error) {
+        jpResult = updateJapanRules({ dryRun });
+        jpResult.errors = [
+            ...(jpResult.errors || []),
+            { country: 'JP', error: `Official-live fetch failed: ${error.message}` }
+        ];
+        jpResult.ok = false;
+    }
+    runs.push(buildRunSummary('Japan Customs official-live', jpResult, {
         applied: !dryRun,
-        mode: 'benchmark'
+        mode: jpResult.writes_official_machine_rates ? 'official-live' : 'benchmark'
     }));
 
     let krResult;

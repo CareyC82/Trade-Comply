@@ -280,11 +280,13 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     const payload = await runAutoDutyRateSync({
         dryRun: true,
         skipOfficialUs: true,
+        japanOfficialFetcher: emptyOfficialFetcher,
         koreaOfficialFetcher: emptyOfficialFetcher,
         indiaOfficialFetcher: emptyOfficialFetcher,
         staticOfficialFetcher: emptyOfficialFetcher
     });
     const staticRun = payload.runs.find(run => run.source === 'Static official-link benchmarks');
+    const japanRun = payload.runs.find(run => run.source === 'Japan Customs official-live');
     const koreaRun = payload.runs.find(run => run.source === 'Korea Customs official-live');
     const indiaRun = payload.runs.find(run => run.source === 'India Customs official-live');
 
@@ -293,6 +295,9 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     assert.equal(staticRun.applied, false);
     assert.equal(staticRun.ok, true, JSON.stringify(staticRun.errors, null, 2));
     assert.equal(staticRun.writes_official_machine_rates, false);
+    assert.ok(japanRun, 'Japan official-live run should be included');
+    assert.equal(japanRun.mode, 'benchmark');
+    assert.equal(japanRun.writes_official_machine_rates, false);
     assert.ok(koreaRun, 'Korea official-live run should be included');
     assert.equal(koreaRun.mode, 'official-live');
     assert.ok(indiaRun, 'India official-live run should be included');
@@ -308,6 +313,7 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     assert.ok(payload.source_run_plan_summary.parser_gap_count >= 1);
     assert.ok(payload.automation_upgrade_queue.some(row => row.country === 'KR' && row.rate_automation_stage === 'official_probe_candidate'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'US' && row.run_status === 'not_run'));
+    assert.ok(payload.source_run_plan.some(row => row.country === 'JP' && row.run_source === 'Japan Customs official-live'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'IN' && row.run_source === 'India Customs official-live'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'KR' && row.run_source === 'Korea Customs official-live'));
     assert.ok(payload.source_run_plan.some(row => row.country === 'VN' && row.run_source === 'Static official-link benchmarks'));
@@ -346,6 +352,7 @@ test('auto duty-rate sync records Vietnam and Malaysia static official live prob
     const payload = await runAutoDutyRateSync({
         dryRun: true,
         skipOfficialUs: true,
+        japanOfficialFetcher: emptyOfficialFetcher,
         koreaOfficialFetcher: emptyOfficialFetcher,
         indiaOfficialFetcher: emptyOfficialFetcher,
         staticOfficialFetcher
@@ -370,39 +377,52 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     const payload = await runAutoDutyRateSync({
         dryRun: true,
         skipOfficialUs: true,
+        japanOfficialFetcher: failingOfficialFetcher,
         koreaOfficialFetcher: failingOfficialFetcher,
         indiaOfficialFetcher: failingOfficialFetcher,
         skipStaticOfficialProbe: true
     });
+    const japanRun = payload.runs.find(run => run.source === 'Japan Customs official-live');
     const koreaRun = payload.runs.find(run => run.source === 'Korea Customs official-live');
     const indiaRun = payload.runs.find(run => run.source === 'India Customs official-live');
 
+    assert.equal(japanRun.ok, true);
     assert.equal(koreaRun.ok, true);
     assert.equal(indiaRun.ok, true);
+    assert.equal(japanRun.writes_official_machine_rates, false);
     assert.equal(koreaRun.writes_official_machine_rates, false);
     assert.equal(indiaRun.writes_official_machine_rates, false);
+    assert.equal(japanRun.official_fetch_degraded, true);
     assert.equal(koreaRun.official_fetch_degraded, true);
     assert.equal(indiaRun.official_fetch_degraded, true);
+    assert.equal(japanRun.official_fetch_degraded_reason, 'official_fetch_failed');
     assert.equal(koreaRun.official_fetch_degraded_reason, 'official_fetch_failed');
     assert.equal(indiaRun.official_fetch_degraded_reason, 'official_fetch_failed');
+    assert.equal(japanRun.errors.length, 0);
     assert.equal(koreaRun.errors.length, 0);
     assert.equal(indiaRun.errors.length, 0);
     assert.equal(payload.status, 'ok');
     assert.equal(payload.exceptions.length, 0);
+    assert.equal(payload.source_run_plan.find(row => row.country === 'JP').run_status, 'degraded');
     assert.equal(payload.source_run_plan.find(row => row.country === 'KR').run_status, 'degraded');
     assert.equal(payload.source_run_plan.find(row => row.country === 'IN').run_status, 'degraded');
+    assert.equal(payload.source_run_plan.find(row => row.country === 'JP').degraded_reason, 'official_fetch_failed');
     assert.equal(payload.source_run_plan.find(row => row.country === 'KR').degraded_reason, 'official_fetch_failed');
     assert.equal(payload.source_run_plan.find(row => row.country === 'IN').degraded_reason, 'official_fetch_failed');
+    assert.ok(payload.automation_digest.official_probe_countries.includes('JP'));
     assert.ok(payload.automation_digest.official_probe_countries.includes('KR'));
     assert.ok(payload.automation_digest.official_probe_countries.includes('IN'));
+    assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('Japan Customs official-live'));
     assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('Korea Customs official-live'));
     assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('India Customs official-live'));
+    assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => row.source === 'Japan Customs official-live' && row.reason === 'official_fetch_failed'));
     assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => row.source === 'Korea Customs official-live' && row.reason === 'official_fetch_failed'));
     assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => row.source === 'India Customs official-live' && row.reason === 'official_fetch_failed'));
+    assert.ok(payload.automation_digest.degraded_countries.includes('JP'));
     assert.ok(payload.automation_digest.degraded_countries.includes('KR'));
     assert.ok(payload.automation_digest.degraded_countries.includes('IN'));
-    assert.equal(payload.counts.degraded_sources, 2);
-    assert.equal(payload.source_run_plan_summary.degraded_count, 2);
+    assert.equal(payload.counts.degraded_sources, 3);
+    assert.equal(payload.source_run_plan_summary.degraded_count, 3);
     assert.equal(payload.ci_diagnostics.outcome, 'completed_with_degraded_sources');
     assert.match(payload.ci_diagnostics.summary, /official probe/);
     assert.ok(payload.ci_diagnostics.degraded_sources.includes('KR'));

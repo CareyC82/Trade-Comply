@@ -560,7 +560,14 @@ async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fe
         ok: official.ok,
         status_code: official.status_code,
         official_url: official.official_url,
+        lookup_url: official.lookup_url || KR_TARIFF_LOOKUP_URL,
         row_count: official.row_count,
+        query_attempts: official.query_attempts || [],
+        exact_query_summary: {
+            attempted: (official.query_attempts || []).length,
+            matched: (official.query_attempts || []).filter(attempt => Number(attempt.row_count || 0) > 0).length,
+            failed: (official.query_attempts || []).filter(attempt => attempt.error || (attempt.status_code && attempt.status_code >= 400)).length
+        },
         error: official.error || ''
     };
     result.official_fetch_degraded = !official.ok;

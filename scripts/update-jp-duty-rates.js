@@ -430,6 +430,54 @@ async function probeJapanOfficialSource({ fetcher = fetchText, maintainedPrefixe
     }
 }
 
+async function fetchJapanOfficialRows({
+    fetcher = fetchText,
+    maintainedPrefixes = JP_EXACT_CODE_CANDIDATES
+} = {}) {
+    const response = await fetcher(JP_CUSTOMS_URL);
+    const parsed = parseJapanTariffScheduleHtml(response.body || '');
+    const chapterLinks = [];
+    const rows = [];
+    const chapterFetches = [];
+    if (parsed.ok && parsed.latest_schedule_url) {
+        const scheduleResponse = await fetcher(parsed.latest_schedule_url);
+        chapterLinks.push(...parseJapanScheduleChapterLinks(scheduleResponse.body || '', {
+            baseUrl: parsed.latest_schedule_url
+        }));
+        const chapterMap = new Map(chapterLinks.map(link => [link.chapter, link]));
+        const chapters = Array.from(new Set((maintainedPrefixes || [])
+            .map(prefix => String(prefix || '').replace(/\D/g, '').slice(0, 2))
+            .filter(Boolean)));
+        for (const chapter of chapters) {
+            const chapterLink = chapterMap.get(chapter);
+            if (!chapterLink) {
+                chapterFetches.push({ chapter, ok: false, row_count: 0, reason: 'chapter_link_not_found' });
+                continue;
+            }
+            const chapterResponse = await fetcher(chapterLink.url);
+            const chapterRows = parseJapanTariffChapterRows(chapterResponse.body || '');
+            rows.push(...chapterRows);
+            chapterFetches.push({
+                chapter,
+                ok: chapterResponse.status_code >= 200 && chapterResponse.status_code < 400,
+                status_code: chapterResponse.status_code,
+                row_count: chapterRows.length,
+                url: chapterLink.url
+            });
+        }
+    }
+    return {
+        ok: response.status_code >= 200 && response.status_code < 400 && parsed.ok && rows.length > 0,
+        status_code: response.status_code,
+        official_url: JP_CUSTOMS_URL,
+        ...parsed,
+        chapter_links: chapterLinks,
+        chapter_fetches: chapterFetches,
+        rows,
+        row_count: rows.length
+    };
+}
+
 async function probeJapanReadiness({ live = false, fetcher = fetchText } = {}) {
     const source = getSource('JP');
     const rules = getJapanDutyRules();
@@ -609,12 +657,70 @@ function updateJapanRules({ dryRun = false, officialChapterRows = null } = {}) {
     return payload.last_jp_customs_benchmark_sync;
 }
 
+async function updateJapanRulesFromOfficialSource({ dryRun = false, fetcher = fetchText } = {}) {
+    const payload = readJson(DUTY_RATES_PATH);
+    const maintainedPrefixes = Array.from(new Set((payload.rules || [])
+        .filter(rule => rule.import_country === 'JP')
+        .flatMap(rule => [
+            ...(rule.exact_statistical_codes || []),
+            ...(rule.hs_prefixes || [])
+        ])
+        .map(code => String(code || '').replace(/\D/g, ''))
+        .filter(Boolean)));
+    let official;
+    try {
+        official = await fetchJapanOfficialRows({ fetcher, maintainedPrefixes });
+    } catch (error) {
+        official = {
+            ok: false,
+            status_code: null,
+            official_url: JP_CUSTOMS_URL,
+            rows: [],
+            row_count: 0,
+            error: error.message
+        };
+    }
+    const degradedReason = official.ok
+        ? ''
+        : official.error
+            ? 'official_fetch_failed'
+            : official.status_code && official.status_code >= 400
+                ? 'official_http_error'
+                : 'official_source_returned_no_rate_rows';
+    const result = updateJapanRules({
+        dryRun,
+        officialChapterRows: official.rows.length ? official.rows : null
+    });
+    result.official_fetch = {
+        ok: official.ok,
+        status_code: official.status_code,
+        official_url: official.official_url,
+        latest_schedule_url: official.latest_schedule_url || '',
+        latest_schedule_date: official.latest_schedule_date || '',
+        row_count: official.row_count || 0,
+        chapter_fetches: official.chapter_fetches || [],
+        error: official.error || ''
+    };
+    result.official_fetch_degraded = !official.ok;
+    result.official_fetch_degraded_reason = degradedReason;
+    result.official_fetch_degraded_detail = official.error || (
+        degradedReason === 'official_http_error'
+            ? `HTTP ${official.status_code}`
+            : 'Official source was reachable but no machine-readable Japan tariff rows were parsed.'
+    );
+    result.writes_official_machine_rates = official.ok;
+    return result;
+}
+
 async function main() {
     const dryRun = process.argv.includes('--dry-run');
     const probeOnly = process.argv.includes('--probe');
     const probeLive = process.argv.includes('--probe-live');
+    const officialLive = process.argv.includes('--official-live');
     const result = probeOnly || probeLive
         ? await probeJapanReadiness({ live: probeLive })
+        : officialLive
+            ? await updateJapanRulesFromOfficialSource({ dryRun })
         : updateJapanRules({ dryRun });
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.ok ? 0 : 1);
@@ -640,9 +746,11 @@ module.exports = {
     buildJapanOfficialExactRateCandidate,
     buildJapanOfficialRateCandidate,
     buildJapanOfficialCandidateForRule,
+    fetchJapanOfficialRows,
     probeJapanOfficialSource,
     probeJapanReadiness,
     updateJapanRules,
+    updateJapanRulesFromOfficialSource,
     buildJapanExactOverrides,
     applyJapanBenchmarkToRule,
     applyJapanOfficialCandidateToRule

@@ -47,7 +47,8 @@ const {
     parseJapanScheduleChapterLinks,
     parseJapanTariffChapterRows,
     parseJapanTariffScheduleHtml,
-    probeJapanReadiness
+    probeJapanReadiness,
+    updateJapanRulesFromOfficialSource
 } = require('../scripts/update-jp-duty-rates');
 const {
     applyKoreaBenchmarkToRule,
@@ -60,7 +61,8 @@ const {
     parseKoreaOfficialJsonRows,
     parseKoreaTariffRateRows,
     parseKoreaTariffDbHtml,
-    probeKoreaReadiness
+    probeKoreaReadiness,
+    updateKoreaRulesFromOfficialSource
 } = require('../scripts/update-kr-duty-rates');
 const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
@@ -442,6 +444,58 @@ test('Japan official parser gates conflicting supplied exact statistical codes',
     assert.deepEqual(candidate.unique_base_rates, [0, 0.039]);
 });
 
+test('Japan official-live updater verifies exact statistical code candidates from chapter rows', async () => {
+    const indexHtml = `
+        <h1>Japan's Tariff Schedule</h1>
+        <a href="./2026_04_01/index.htm">April 1, 2026</a>
+    `;
+    const scheduleHtml = `
+        <h1>Japan's Tariff Schedule as of April 1 2026</h1>
+        <a href="data/e_84.htm">Tariff rate</a>
+        <a href="data/e_85.htm">Tariff rate</a>
+        <a href="data/e_90.htm">Tariff rate</a>
+    `;
+    const rowFor = (code) => {
+        const digits = String(code).replace(/\D/g, '');
+        const heading = `${digits.slice(0, 4)}.${digits.slice(4, 6)}`;
+        const statistical = digits.slice(6);
+        return `
+            <tr>
+                <td class="shell_var1_CSTNO">${heading}</td>
+                <td class="shell_var1_HSCODE">${statistical}</td>
+                <td class="shell_var1_ITEM_NAME">${digits} exact candidate</td>
+                <td>Free</td>
+            </tr>
+        `;
+    };
+    const chapterHtml = `<table>${JP_EXACT_STATISTICAL_CODE_CANDIDATES.map(rowFor).join('')}</table>`;
+
+    const result = await updateJapanRulesFromOfficialSource({
+        dryRun: true,
+        fetcher: async (url) => {
+            const textUrl = String(url);
+            if (textUrl.endsWith('/2026_04_01/index.htm')) {
+                return { status_code: 200, body: scheduleHtml };
+            }
+            if (textUrl.includes('/data/e_')) {
+                return { status_code: 200, body: chapterHtml };
+            }
+            return { status_code: 200, body: indexHtml };
+        }
+    });
+    const outcome = result.official_candidate_outcomes.find(item => item.rule === 'JP-GLOBAL-ELECTRONICS-IMPORT-INDICATIVE');
+
+    assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
+    assert.equal(result.writes_official_machine_rates, true);
+    assert.equal(result.official_fetch.ok, true);
+    assert.equal(result.official_fetch.latest_schedule_date, 'April 1, 2026');
+    assert.ok(result.official_fetch.row_count >= JP_EXACT_STATISTICAL_CODE_CANDIDATES.length);
+    assert.ok(outcome);
+    assert.equal(outcome.ok, true);
+    assert.equal(outcome.source_status, 'official_source_checked');
+    assert.equal(outcome.exact_code_candidates.length, JP_EXACT_STATISTICAL_CODE_CANDIDATES.length);
+});
+
 test('Korea Customs live probe detects tariff DB lookup without upgrading rate trust', async () => {
     assert.equal(KR_TARIFF_DB_URL.includes('/english/ad/ct/CustomsTariffList.do?mi=8037'), true);
     assert.equal(KR_TARIFF_LOOKUP_URL.includes('/english/ad/ct/CustomsTariffView.do'), true);
@@ -509,6 +563,33 @@ test('Korea official lookup JSON rows are parsed into guarded candidates', async
     assert.equal(official.ok, true);
     assert.equal(official.query_attempts.length, 1);
     assert.equal(official.query_attempts[0].row_count, 1);
+});
+
+test('Korea official-live updater records exact HS query attempts', async () => {
+    const result = await updateKoreaRulesFromOfficialSource({
+        dryRun: true,
+        fetcher: async (url, options = {}) => {
+            if (String(url).includes('CustomsTariffView.do')) {
+                const match = String(options.body || '').match(/hsCode=([^&]+)/);
+                const hsCode = match ? decodeURIComponent(match[1]) : '8542310000';
+                return {
+                    status_code: 200,
+                    body: JSON.stringify([{ hsCode, goodsName: 'Korea exact HS candidate', taxRate: '0%' }])
+                };
+            }
+            return {
+                status_code: 200,
+                body: '<h1>KCS Tariff D/B(Inquiry)</h1><p>HS code must be 10 digits.</p>'
+            };
+        }
+    });
+
+    assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
+    assert.equal(result.writes_official_machine_rates, true);
+    assert.equal(result.official_fetch.ok, true);
+    assert.ok(result.official_fetch.query_attempts.length >= 1);
+    assert.equal(result.official_fetch.exact_query_summary.attempted, result.official_fetch.query_attempts.length);
+    assert.ok(result.official_fetch.exact_query_summary.matched >= 1);
 });
 
 test('EU TARIC official probe parses consultation metadata without upgrading rate trust', async () => {
