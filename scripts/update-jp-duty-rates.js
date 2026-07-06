@@ -184,6 +184,55 @@ function parseJapanTariffChapterRows(html = '') {
     return rows;
 }
 
+function japanRowCandidateCodes(row = {}) {
+    const hsDigits = normalizeHsCode(row.hs_digits || row.hs_heading || '');
+    const statisticalDigits = normalizeHsCode(row.statistical_code || '');
+    return Array.from(new Set([
+        hsDigits,
+        statisticalDigits ? `${hsDigits}${statisticalDigits}` : ''
+    ].filter(Boolean)));
+}
+
+function buildJapanOfficialExactRateCandidate(chapterRows = [], exactCode = '') {
+    const normalizedExactCode = normalizeHsCode(exactCode);
+    const matches = chapterRows.filter(row => (
+        japanRowCandidateCodes(row).includes(normalizedExactCode)
+    ));
+    const rateRows = matches.filter(row => row.general_rate_text);
+    if (!normalizedExactCode || !rateRows.length) {
+        return {
+            ok: false,
+            exact_code: exactCode,
+            status: 'not_found',
+            reason: 'No Japan tariff rate rows matched this exact statistical code.',
+            match_count: matches.length,
+            rate_row_count: 0
+        };
+    }
+    const parsedRates = rateRows
+        .map(row => row.parsed_base_rate)
+        .filter(rate => Number.isFinite(rate));
+    const uniqueRates = Array.from(new Set(parsedRates)).sort((a, b) => a - b);
+    return {
+        ok: uniqueRates.length === 1 && parsedRates.length === rateRows.length,
+        exact_code: exactCode,
+        status: uniqueRates.length === 1 && parsedRates.length === rateRows.length ? 'official_source_candidate' : 'scope_check_required',
+        base_rate: uniqueRates.length === 1 ? uniqueRates[0] : null,
+        unique_base_rates: uniqueRates,
+        match_count: matches.length,
+        rate_row_count: rateRows.length,
+        sample_rows: rateRows.slice(0, 5).map(row => ({
+            hs_heading: row.hs_heading,
+            statistical_code: row.statistical_code,
+            item_name: row.item_name,
+            general_rate_text: row.general_rate_text
+        })),
+        reason: uniqueRates.length === 1 && parsedRates.length === rateRows.length
+            ? 'Japan tariff row for this exact statistical code has one parseable general rate.'
+            : 'Japan tariff rows for this exact statistical code require rate-scope review.'
+    };
+}
+
 function buildJapanOfficialRateCandidate(chapterRows = [], prefix = '') {
     const normalizedPrefix = normalizeHsCode(prefix);
     const matches = chapterRows.filter(row => row.hs_digits.startsWith(normalizedPrefix));
@@ -222,6 +271,52 @@ function buildJapanOfficialRateCandidate(chapterRows = [], prefix = '') {
 }
 
 function buildJapanOfficialCandidateForRule(rule = {}, chapterRows = []) {
+    const exactCodes = Array.isArray(rule.exact_statistical_codes) ? rule.exact_statistical_codes : [];
+    if (exactCodes.length) {
+        const candidates = exactCodes.map(code => buildJapanOfficialExactRateCandidate(chapterRows, code));
+        const matched = candidates.filter(candidate => candidate.rate_row_count > 0);
+        if (!matched.length) {
+            return {
+                ok: false,
+                rule: rule.id || '',
+                source_status: 'official_link_checked',
+                reason: 'No Japan official tariff rows matched the supplied exact statistical code(s).',
+                exact_code_candidates: candidates
+            };
+        }
+        const blocking = matched.filter(candidate => !candidate.ok);
+        if (blocking.length) {
+            return {
+                ok: false,
+                rule: rule.id || '',
+                source_status: 'scope_check_required',
+                reason: 'Japan official tariff rows require rate-scope review for at least one exact statistical code.',
+                exact_code_candidates: candidates
+            };
+        }
+        const rates = Array.from(new Set(matched.map(candidate => candidate.base_rate).filter(Number.isFinite))).sort((a, b) => a - b);
+        if (rates.length !== 1) {
+            return {
+                ok: false,
+                rule: rule.id || '',
+                source_status: 'scope_check_required',
+                reason: 'Supplied Japan exact statistical codes returned different official rates; split the rule.',
+                unique_base_rates: rates,
+                exact_code_candidates: candidates
+            };
+        }
+        return {
+            ok: true,
+            rule: rule.id || '',
+            source_status: 'official_source_checked',
+            base_rate: rates[0],
+            source_hts: `${exactCodes.join(', ')} (Japan Customs exact statistical code)`,
+            source_rate_text: `Japan Customs general duty: ${(rates[0] * 100).toFixed(3)}%`,
+            reason: 'All supplied Japan exact statistical codes share one official general duty rate.',
+            exact_code_candidates: candidates
+        };
+    }
+
     const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes : [];
     const candidates = prefixes.map(prefix => buildJapanOfficialRateCandidate(chapterRows, prefix));
     const matched = candidates.filter(candidate => candidate.rate_row_count > 0);
@@ -527,6 +622,8 @@ module.exports = {
     parseJapanScheduleChapterLinks,
     parseJapanTariffChapterRows,
     parseJapanAdValoremRate,
+    japanRowCandidateCodes,
+    buildJapanOfficialExactRateCandidate,
     buildJapanOfficialRateCandidate,
     buildJapanOfficialCandidateForRule,
     probeJapanOfficialSource,

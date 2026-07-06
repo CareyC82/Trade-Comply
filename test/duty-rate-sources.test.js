@@ -39,7 +39,9 @@ const {
     applyJapanBenchmarkToRule,
     applyJapanOfficialCandidateToRule,
     buildJapanOfficialCandidateForRule,
+    buildJapanOfficialExactRateCandidate,
     buildJapanOfficialRateCandidate,
+    japanRowCandidateCodes,
     parseJapanAdValoremRate,
     parseJapanScheduleChapterLinks,
     parseJapanTariffChapterRows,
@@ -368,6 +370,75 @@ test('Japan Customs live probe parses dated tariff schedule and chapter candidat
     assert.equal(readiness.official_probe.chapter_links.some(link => link.chapter === '85'), true);
     assert.equal(readiness.official_probe.prefix_candidates.some(item => item.hs_prefix === '8542' && item.status === 'official_source_candidate'), true);
     assert.equal(readiness.writes_official_machine_rates, false);
+});
+
+test('Japan official parser promotes supplied exact statistical code only when unambiguous', () => {
+    const rows = [
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            statistical_code: '000',
+            item_name: 'Processors and controllers',
+            general_rate_text: 'Free',
+            parsed_base_rate: 0
+        },
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            statistical_code: '900',
+            item_name: 'Other processors and controllers',
+            general_rate_text: '3.9%',
+            parsed_base_rate: 0.039
+        }
+    ];
+
+    assert.deepEqual(japanRowCandidateCodes(rows[0]), ['854231', '854231000']);
+
+    const exact = buildJapanOfficialExactRateCandidate(rows, '8542.31-000');
+    assert.equal(exact.ok, true);
+    assert.equal(exact.base_rate, 0);
+
+    const candidate = buildJapanOfficialCandidateForRule({
+        id: 'TEST-JP-EXACT',
+        hs_prefixes: ['8542'],
+        exact_statistical_codes: ['854231000']
+    }, rows);
+
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.source_status, 'official_source_checked');
+    assert.equal(candidate.base_rate, 0);
+    assert.match(candidate.source_hts, /854231000/);
+});
+
+test('Japan official parser gates conflicting supplied exact statistical codes', () => {
+    const rows = [
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            statistical_code: '000',
+            item_name: 'Processors and controllers',
+            general_rate_text: 'Free',
+            parsed_base_rate: 0
+        },
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            statistical_code: '900',
+            item_name: 'Other processors and controllers',
+            general_rate_text: '3.9%',
+            parsed_base_rate: 0.039
+        }
+    ];
+
+    const candidate = buildJapanOfficialCandidateForRule({
+        id: 'TEST-JP-CONFLICT',
+        hs_prefixes: ['8542'],
+        exact_statistical_codes: ['854231000', '854231900']
+    }, rows);
+
+    assert.equal(candidate.ok, false);
+    assert.equal(candidate.source_status, 'scope_check_required');
+    assert.deepEqual(candidate.unique_base_rates, [0, 0.039]);
 });
 
 test('Korea Customs live probe detects tariff DB lookup without upgrading rate trust', async () => {
