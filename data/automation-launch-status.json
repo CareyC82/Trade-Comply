@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-06T07:27:52.189Z",
+  "updated_at": "2026-07-06T13:26:24.429Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -872,7 +872,7 @@
       "source_status": "hybrid_official_candidate",
       "machine_readable": "candidate",
       "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:jp",
+      "update_command": "npm run update:duty-rates:jp:official",
       "probe_command": "npm run probe:duty-rates:jp",
       "official_url": "https://www.customs.go.jp/english/tariff/",
       "official_probe_urls": [],
@@ -889,7 +889,7 @@
       ],
       "transit_route_priority": false,
       "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
-      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes.",
+      "next_action": "Keep Japan Customs chapter parser running daily; preserve statistical-code gates for mixed-rate prefixes and consumption-tax separation.",
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
@@ -1234,7 +1234,7 @@
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "npm run update:duty-rates:jp",
+      "update_command": "npm run update:duty-rates:jp:official",
       "probe_command": "npm run probe:duty-rates:jp",
       "official_probe_urls": [],
       "source_use_cases": [],
@@ -1271,7 +1271,7 @@
         "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
       },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
-      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes."
+      "next_action": "Keep Japan Customs chapter parser running daily; preserve statistical-code gates for mixed-rate prefixes and consumption-tax separation."
     },
     {
       "country": "IN",

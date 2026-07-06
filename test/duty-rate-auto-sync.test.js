@@ -198,7 +198,18 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
             ]
         },
         runs: [
-            buildRunSummary('USITC', { ok: true, changes: [], errors: [] }, { applied: true, mode: 'official' }),
+            buildRunSummary('USITC', {
+                ok: true,
+                changes: [],
+                errors: [],
+                official_fetch: {
+                    ok: true,
+                    row_count: 3,
+                    lookup_url: 'https://hts.usitc.gov/search?query=854231',
+                    exact_query_summary: { attempted: 2, matched: 1 },
+                    query_attempts: [{ code: '854231', row_count: 1 }, { code: '850760', row_count: 0 }]
+                }
+            }, { applied: true, mode: 'official' }),
             buildRunSummary('India Customs official-live', { ok: false, changes: [], errors: [{ error: 'fixture' }] }, { applied: false, mode: 'official-live' }),
             buildRunSummary('Static official-link benchmarks', { ok: true, changes: [], errors: [], countries: ['VN'] }, { applied: true, mode: 'benchmark' })
         ]
@@ -209,6 +220,10 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
     assert.equal(plan.find(row => row.country === 'US').run_status, 'ok');
     assert.equal(plan.find(row => row.country === 'US').rate_automation_stage, 'official_machine_sync');
     assert.equal(plan.find(row => row.country === 'US').parser_gap, false);
+    assert.equal(plan.find(row => row.country === 'US').official_fetch_summary.status_label, 'Official exact query matched');
+    assert.equal(plan.find(row => row.country === 'US').official_fetch_summary.exact_query_attempted, 2);
+    assert.equal(plan.find(row => row.country === 'US').official_fetch_summary.exact_query_matched, 1);
+    assert.match(plan.find(row => row.country === 'US').official_fetch_summary.lookup_url, /hts\.usitc/);
     assert.equal(plan.find(row => row.country === 'IN').run_source, 'India Customs official-live');
     assert.equal(plan.find(row => row.country === 'IN').run_status, 'exception');
     assert.equal(plan.find(row => row.country === 'IN').rate_automation_stage, 'official_probe_candidate');

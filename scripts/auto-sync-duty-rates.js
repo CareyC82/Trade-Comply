@@ -81,6 +81,41 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
     };
 }
 
+function buildOfficialFetchSummary(run = {}) {
+    const officialFetch = run?.official_fetch || null;
+    if (!officialFetch && !run?.official_fetch_degraded) {
+        return null;
+    }
+    const queryAttempts = Array.isArray(officialFetch?.query_attempts)
+        ? officialFetch.query_attempts
+        : [];
+    const exactQuerySummary = officialFetch?.exact_query_summary || null;
+    const matchedQueries = Number(exactQuerySummary?.matched ?? queryAttempts.filter(row => Number(row?.row_count || 0) > 0).length);
+    const attemptedQueries = Number(exactQuerySummary?.attempted ?? queryAttempts.length);
+    return {
+        ok: officialFetch?.ok ?? !run?.official_fetch_degraded,
+        degraded: Boolean(run?.official_fetch_degraded),
+        degraded_reason: run?.official_fetch_degraded_reason || '',
+        degraded_detail: run?.official_fetch_degraded_detail || officialFetch?.error || '',
+        row_count: Number(officialFetch?.row_count || 0),
+        latest_schedule_date: officialFetch?.latest_schedule_date || '',
+        official_url: officialFetch?.official_url || '',
+        lookup_url: officialFetch?.lookup_url || officialFetch?.latest_schedule_url || '',
+        exact_query_attempted: Number.isFinite(attemptedQueries) ? attemptedQueries : 0,
+        exact_query_matched: Number.isFinite(matchedQueries) ? matchedQueries : 0,
+        parser_ready: Boolean(officialFetch?.machine_parser_ready || officialFetch?.writes_official_machine_rates || run?.writes_official_machine_rates),
+        status_label: run?.official_fetch_degraded
+            ? 'Official fetch degraded'
+            : matchedQueries > 0
+                ? 'Official exact query matched'
+                : Number(officialFetch?.row_count || 0) > 0
+                    ? 'Official source parsed'
+                    : officialFetch
+                        ? 'Official source checked'
+                        : 'Official source not checked'
+    };
+}
+
 function isOfficialTransportError(error = {}) {
     const text = String(error.error || error.message || error || '').toLowerCase();
     return [
@@ -285,6 +320,7 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 rate_change_count: run?.rate_change_count || 0,
                 degraded_reason: run?.official_fetch_degraded_reason || '',
                 degraded_detail: run?.official_fetch_degraded_detail || run?.official_fetch?.error || '',
+                official_fetch_summary: buildOfficialFetchSummary(run),
                 official_probe_live_status: liveProbe ? {
                     checked: Boolean(liveProbe.checked ?? liveProbe.official_probe?.checked),
                     ok: liveProbe.ok ?? liveProbe.official_probe?.ok ?? null,

@@ -987,6 +987,29 @@
                 official_link_monitor: 'Link monitor',
                 not_automated: 'Not automated'
             };
+            const renderOfficialFetchSummary = (summary = null) => {
+                if (!summary) return '';
+                const attempted = Number(summary.exact_query_attempted || 0);
+                const matched = Number(summary.exact_query_matched || 0);
+                const queryText = attempted
+                    ? `${matched}/${attempted} exact HS query match(es)`
+                    : `${Number(summary.row_count || 0)} official row(s) parsed`;
+                const badgeClass = summary.degraded
+                    ? 'benchmark'
+                    : (summary.parser_ready || matched > 0)
+                        ? 'auto_updatable'
+                        : 'official_link_monitor';
+                return `
+                    <div class="grade-line">
+                        <span class="badge ${escapeHtml(badgeClass)}">${escapeHtml(summary.status_label || 'Official source checked')}</span>
+                        <span class="badge official_reachable">${escapeHtml(queryText)}</span>
+                    </div>
+                    ${summary.latest_schedule_date ? `<div class="grade-note">Schedule: ${escapeHtml(summary.latest_schedule_date)}</div>` : ''}
+                    ${summary.lookup_url ? `<div class="grade-note">Lookup: <a href="${escapeHtml(summary.lookup_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(summary.lookup_url)}</a></div>` : ''}
+                    ${summary.official_url && summary.official_url !== summary.lookup_url ? `<div class="grade-note">Source: <a href="${escapeHtml(summary.official_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(summary.official_url)}</a></div>` : ''}
+                    ${summary.degraded_reason ? `<div class="grade-note">Official fetch: ${escapeHtml(summary.degraded_reason)}${summary.degraded_detail ? ` · ${escapeHtml(summary.degraded_detail)}` : ''}</div>` : ''}
+                `;
+            };
             return `
                 <div class="crawl-section-title" style="margin-top:14px"><h3>Duty-rate source run plan</h3><span class="meta">${rows.length} source(s)</span></div>
                 <div class="duty-sync-mini-grid">
@@ -1003,6 +1026,7 @@
                             ${row.degraded_reason ? `<div class="grade-note">Reason: ${escapeHtml(row.degraded_reason)}${row.degraded_detail ? ` · ${escapeHtml(row.degraded_detail)}` : ''}</div>` : ''}
                             ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
                             ${row.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
+                            ${renderOfficialFetchSummary(row.official_fetch_summary)}
                             <div class="grade-note">Next: ${escapeHtml(row.run_plan_action || row.next_action || '—')}</div>
                             ${row.parser_gap_task?.task ? `<div class="grade-note"><strong>Task:</strong> ${escapeHtml(row.parser_gap_task.task)}</div>` : ''}
                             ${Array.isArray(row.source_use_cases) && row.source_use_cases.length ? `<div class="grade-note"><strong>Use cases:</strong> ${row.source_use_cases.map(escapeHtml).join(' · ')}</div>` : ''}
