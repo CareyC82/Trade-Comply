@@ -355,6 +355,68 @@ function summarizeDutyLaunchLevels(rows) {
     };
 }
 
+function buildDutyRateHealthBoard(rows = [], weeklyRoutePriorities = []) {
+    const levels = summarizeDutyLaunchLevels(rows);
+    const priorityRows = rows.filter(row => ['P0', 'P1'].includes(row.maintenance_priority));
+    const transitRows = rows.filter(row => row.transit_route_priority);
+    const parserRows = rows.filter(row => row.parser_gap);
+    const firstParserRow = parserRows[0] || {};
+    const nextPriority = weeklyRoutePriorities[0] || {};
+
+    return {
+        headline: `${levels.official_exact.length} official exact market(s), ${levels.hybrid_official.length} hybrid official market(s), ${levels.maintained_benchmark.length} maintained exact-map market(s).`,
+        next_action: nextPriority.country
+            ? `Next route parser priority: ${nextPriority.country} ${nextPriority.product_label || nextPriority.product_id || ''} (${nextPriority.hs_code || 'HS pending'}).`
+            : firstParserRow.country
+                ? `Next source parser priority: ${firstParserRow.country} (${firstParserRow.rate_automation_stage || 'parser gap'}).`
+                : 'Keep official machine-readable sync running.',
+        cards: [
+            {
+                key: 'official_exact',
+                label: 'Official exact',
+                count: levels.official_exact.length,
+                countries: levels.official_exact,
+                note: 'Machine-readable source can feed maintained HS-rate checks.'
+            },
+            {
+                key: 'hybrid_official',
+                label: 'Hybrid official',
+                count: levels.hybrid_official.length,
+                countries: levels.hybrid_official,
+                note: 'Official-linked coverage is live, but exact tariff-line parser gates stay visible.'
+            },
+            {
+                key: 'maintained_exact_map',
+                label: 'Maintained exact-map',
+                count: levels.maintained_benchmark.length,
+                countries: levels.maintained_benchmark,
+                note: 'Exact candidates are maintained from source roadmap until official parsers are promoted.'
+            },
+            {
+                key: 'p0_p1',
+                label: 'P0/P1 source priorities',
+                count: priorityRows.length,
+                countries: priorityRows.map(row => row.country),
+                note: 'Highest-value markets to keep fresh first.'
+            },
+            {
+                key: 'transit_priority',
+                label: 'Transit route priority',
+                count: transitRows.length,
+                countries: transitRows.map(row => row.country),
+                note: 'Used by two-leg opportunity comparisons.'
+            },
+            {
+                key: 'parser_gap',
+                label: 'Parser gaps',
+                count: parserRows.length,
+                countries: parserRows.map(row => row.country),
+                note: 'Needs exact official tariff-row parser before filing-grade automation claims.'
+            }
+        ]
+    };
+}
+
 function buildDutyParserGapTask(row = {}) {
     if (!row.parser_gap && row.filing_grade_auto) return null;
     const taskByStage = {
@@ -519,6 +581,7 @@ function buildAutomationLaunchStatus() {
     const duty_rate_priority_queue = buildDutyAutomationPriority(duty_rates);
     const weekly_route_priorities = buildWeeklyRoutePriorities(duty_rates);
     const duty_rate_launch_levels = summarizeDutyLaunchLevels(duty_rates);
+    const duty_rate_health_board = buildDutyRateHealthBoard(duty_rates, weekly_route_priorities);
     const payload = {
         schema_version: 1,
         updated_at: new Date().toISOString(),
@@ -545,6 +608,7 @@ function buildAutomationLaunchStatus() {
             parser_gap_countries: duty_rates.filter(row => row.parser_gap).map(row => row.country),
             weekly_route_priority_count: weekly_route_priorities.length
         },
+        duty_rate_health_board,
         regulatory,
         duty_rates,
         duty_rate_priority_queue,
@@ -572,6 +636,7 @@ module.exports = {
     buildAutomationLaunchStatus,
     writeAutomationLaunchStatus,
     dutyAutomationStage,
+    buildDutyRateHealthBoard,
     buildDutyAutomationPriority,
     buildWeeklyRoutePriorities
 };

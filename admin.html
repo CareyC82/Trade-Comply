@@ -1074,6 +1074,7 @@
 
         function renderAutomationLaunchStatus(status = {}) {
             const summary = status.summary || {};
+            const healthBoard = status.duty_rate_health_board || {};
             const regulatory = Array.isArray(status.regulatory) ? status.regulatory : [];
             const dutyRates = Array.isArray(status.duty_rates) ? status.duty_rates : [];
             const weeklyRoutePriorities = Array.isArray(status.weekly_route_priorities) ? status.weekly_route_priorities : [];
@@ -1176,10 +1177,25 @@
                 </article>
             `).join('');
             const dutyLaunchLevels = summary.duty_rate_launch_levels || {};
+            const healthCards = Array.isArray(healthBoard.cards) ? healthBoard.cards : [];
+            const healthBoardHtml = healthBoard.headline ? `
+                <div class="crawl-section-title"><h3>Duty-rate health board</h3><span class="meta">${escapeHtml(healthBoard.next_action || '')}</span></div>
+                <p class="meta">${escapeHtml(healthBoard.headline)}</p>
+                <div class="summary-grid">
+                    ${healthCards.map(card => `
+                        <div class="summary-card">
+                            <strong>${escapeHtml(card.count ?? 0)}</strong>
+                            <span>${escapeHtml(card.label || card.key || '')}</span>
+                            <small>${escapeHtml((card.countries || []).join(', ') || '—')}</small>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : '';
             return `
                 <div class="quality-banner">
                     <h3>Automation Launch Board</h3>
                     <p class="desc">已上线可公开展示的自动化能力；Hybrid / Monitor 不会被包装成完整 filing-grade 自动税率。</p>
+                    ${healthBoardHtml}
                     <div class="summary-grid">
                         <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.official_exact || summary.filing_grade_auto_countries || []).length)}</strong><span>Official exact</span></div>
                         <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.hybrid_official || []).length)}</strong><span>Hybrid official</span></div>

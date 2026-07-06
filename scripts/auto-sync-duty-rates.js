@@ -373,6 +373,69 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
     };
 }
 
+function buildCiDiagnostics({ exceptions = [], runs = [], sourceRunPlan = [], health = null } = {}) {
+    const degraded = sourceRunPlan.filter(row => row.run_status === 'degraded');
+    const parserGaps = sourceRunPlan.filter(row => row.parser_gap);
+    const failedHealth = health && health.ok === false;
+    const firstException = exceptions[0] || null;
+    const firstDegraded = degraded[0] || null;
+    const changedRuns = runs.filter(run => Number(run.change_count || 0) > 0);
+
+    if (firstException) {
+        return {
+            outcome: 'action_required',
+            summary: `Duty-rate sync needs attention: ${exceptions.length} exception(s). First issue: ${firstException.source || 'source'} - ${firstException.reason || firstException.type || 'unknown issue'}.`,
+            failed_step_hint: firstException.type === 'health_check_failed'
+                ? 'Verify duty-rate sync output / Post-Entry coverage health check.'
+                : 'Run duty-rate auto sync source parser.',
+            next_action: firstException.type === 'health_check_failed'
+                ? 'Open the health failure details, update the maintained route/sample expectation, then rerun npm test.'
+                : 'Open the source error details, fix the updater/parser or downgrade transport-only failures, then rerun the Duty Rate Auto Sync workflow.',
+            exception_sources: Array.from(new Set(exceptions.map(row => row.source).filter(Boolean))),
+            degraded_sources: degraded.map(row => row.country).filter(Boolean),
+            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+        };
+    }
+
+    if (failedHealth) {
+        return {
+            outcome: 'action_required',
+            summary: 'Duty-rate sync ran, but the Post-Entry health check failed.',
+            failed_step_hint: 'Verify maintained route coverage / Verify duty-rate sync output.',
+            next_action: 'Review health.failures in data/duty-rate-sync-status.json and update the relevant rate rule or sample expectation.',
+            exception_sources: [],
+            degraded_sources: degraded.map(row => row.country).filter(Boolean),
+            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+        };
+    }
+
+    if (degraded.length) {
+        return {
+            outcome: 'completed_with_degraded_sources',
+            summary: `Duty-rate sync completed; ${degraded.length} official probe(s) were degraded and kept on maintained/candidate coverage.`,
+            failed_step_hint: '',
+            next_action: firstDegraded?.run_plan_action || 'Keep daily sync running and promote exact parsers only after official rows are stable.',
+            exception_sources: [],
+            degraded_sources: degraded.map(row => row.country).filter(Boolean),
+            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+        };
+    }
+
+    return {
+        outcome: 'ok',
+        summary: changedRuns.length
+            ? `Duty-rate sync completed with ${changedRuns.reduce((sum, run) => sum + Number(run.change_count || 0), 0)} change(s) and no exceptions.`
+            : 'Duty-rate sync completed with no exceptions.',
+        failed_step_hint: '',
+        next_action: parserGaps.length
+            ? `Next parser backlog: ${parserGaps.slice(0, 3).map(row => row.country).join(', ')}.`
+            : 'Keep daily duty-rate sync running.',
+        exception_sources: [],
+        degraded_sources: [],
+        parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+    };
+}
+
 function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt, sourceRunPlan = [] } = {}) {
     const autoApplied = runs.filter(run => run.applied);
     const exceptions = runs.flatMap(run => buildExceptionsForRun(run));
@@ -411,6 +474,7 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
         started_at: startedAt || null,
         finished_at: finishedAt || null,
         status: exceptions.length ? 'exceptions' : 'ok',
+        ci_diagnostics: buildCiDiagnostics({ exceptions, runs, sourceRunPlan, health }),
         policy: {
             safe_updates_auto_applied: true,
             manual_review_required: false,
@@ -662,6 +726,7 @@ module.exports = {
     appendMultiPrefixConflicts,
     buildSourceRunPlan,
     buildAutomationDigest,
+    buildCiDiagnostics,
     buildSyncStatusPayload,
     runAutoDutyRateSync
 };

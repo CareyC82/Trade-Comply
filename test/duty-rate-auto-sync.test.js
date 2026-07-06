@@ -155,6 +155,8 @@ test('GitHub duty-rate workflow runs tests before committing sync output', () =>
     assert.match(workflow, /cron:\s*"12 18 \* \* \*"/);
     assert.match(workflow, /npm run sync:duty-rates:auto/);
     assert.match(workflow, /npm test/);
+    assert.match(workflow, /node scripts\/print-duty-rate-sync-diagnostics\.js/);
+    assert.match(workflow, /if:\s*always\(\)/);
     assert.match(workflow, /data\/duty-rate-sources\.json/);
     assert.match(workflow, /git pull --ff-only/);
 });
@@ -261,6 +263,9 @@ test('auto sync builds an automation digest for parser and probe gaps', () => {
     const payload = buildSyncStatusPayload({ runs, sourceRunPlan, health: { ok: true } });
     assert.ok(payload.automation_digest);
     assert.equal(payload.automation_digest.health_ok, true);
+    assert.equal(payload.ci_diagnostics.outcome, 'action_required');
+    assert.match(payload.ci_diagnostics.summary, /exception/);
+    assert.match(payload.ci_diagnostics.next_action, /source error|updater|parser/i);
 });
 
 test('auto duty-rate sync includes static maintained countries', async () => {
@@ -394,4 +399,7 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.ok(payload.automation_digest.degraded_countries.includes('IN'));
     assert.equal(payload.counts.degraded_sources, 2);
     assert.equal(payload.source_run_plan_summary.degraded_count, 2);
+    assert.equal(payload.ci_diagnostics.outcome, 'completed_with_degraded_sources');
+    assert.match(payload.ci_diagnostics.summary, /official probe/);
+    assert.ok(payload.ci_diagnostics.degraded_sources.includes('KR'));
 });

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-06T04:51:59.314Z",
+  "updated_at": "2026-07-06T06:52:15.284Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -108,6 +108,96 @@
       "RU"
     ],
     "weekly_route_priority_count": 5
+  },
+  "duty_rate_health_board": {
+    "headline": "1 official exact market(s), 6 hybrid official market(s), 6 maintained exact-map market(s).",
+    "next_action": "Next route parser priority: DE Tablet computer (8471300000).",
+    "cards": [
+      {
+        "key": "official_exact",
+        "label": "Official exact",
+        "count": 1,
+        "countries": [
+          "US"
+        ],
+        "note": "Machine-readable source can feed maintained HS-rate checks."
+      },
+      {
+        "key": "hybrid_official",
+        "label": "Hybrid official",
+        "count": 6,
+        "countries": [
+          "DE",
+          "EU",
+          "IN",
+          "JP",
+          "KR",
+          "NL"
+        ],
+        "note": "Official-linked coverage is live, but exact tariff-line parser gates stay visible."
+      },
+      {
+        "key": "maintained_exact_map",
+        "label": "Maintained exact-map",
+        "count": 6,
+        "countries": [
+          "CN",
+          "MX",
+          "MY",
+          "SG",
+          "TW",
+          "VN"
+        ],
+        "note": "Exact candidates are maintained from source roadmap until official parsers are promoted."
+      },
+      {
+        "key": "p0_p1",
+        "label": "P0/P1 source priorities",
+        "count": 8,
+        "countries": [
+          "US",
+          "CN",
+          "DE",
+          "EU",
+          "JP",
+          "MX",
+          "NL",
+          "SG"
+        ],
+        "note": "Highest-value markets to keep fresh first."
+      },
+      {
+        "key": "transit_priority",
+        "label": "Transit route priority",
+        "count": 2,
+        "countries": [
+          "MY",
+          "VN"
+        ],
+        "note": "Used by two-leg opportunity comparisons."
+      },
+      {
+        "key": "parser_gap",
+        "label": "Parser gaps",
+        "count": 13,
+        "countries": [
+          "CN",
+          "DE",
+          "EU",
+          "IN",
+          "JP",
+          "KR",
+          "MX",
+          "MY",
+          "NL",
+          "SG",
+          "TW",
+          "VN",
+          "RU"
+        ],
+        "note": "Needs exact official tariff-row parser before filing-grade automation claims."
+      }
+    ]
   },
   "regulatory": [
     {
@@ -661,7 +751,7 @@
       "name": "China import tariff / VAT",
       "source_status": "hybrid_official_candidate",
       "machine_readable": "local_exact_map",
-      "maintenance_priority": "P2",
+      "maintenance_priority": "P1",
       "update_command": "npm run update:duty-rates:static -- --countries=CN",
       "probe_command": "",
       "official_url": "https://www.customs.gov.cn/",
@@ -763,7 +853,7 @@
       "name": "Japan Customs tariff",
       "source_status": "hybrid_official_candidate",
       "machine_readable": "candidate",
-      "maintenance_priority": "P2",
+      "maintenance_priority": "P1",
       "update_command": "npm run update:duty-rates:jp",
       "probe_command": "npm run probe:duty-rates:jp",
       "official_url": "https://www.customs.go.jp/english/tariff/",
@@ -813,7 +903,7 @@
       "name": "Mexico tariff / VAT",
       "source_status": "hybrid_official_candidate",
       "machine_readable": "local_exact_map",
-      "maintenance_priority": "P2",
+      "maintenance_priority": "P1",
       "update_command": "npm run update:duty-rates:mx",
       "probe_command": "",
       "official_url": "https://www.snice.gob.mx/",
@@ -1075,6 +1165,31 @@
       "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
     },
     {
+      "country": "JP",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "npm run update:duty-rates:jp",
+      "probe_command": "npm run probe:duty-rates:jp",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "JP",
+        "priority": "P1",
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
+        "probe_command": "npm run probe:duty-rates:jp",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
+      },
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
+      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes."
+    },
+    {
       "country": "IN",
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
@@ -1104,31 +1219,6 @@
       "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
     },
     {
-      "country": "JP",
-      "maintenance_priority": "P2",
-      "rate_automation_stage": "official_probe_candidate",
-      "automation_claim": "Official source probe wired; parser promotion still gated",
-      "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "npm run update:duty-rates:jp",
-      "probe_command": "npm run probe:duty-rates:jp",
-      "official_probe_urls": [],
-      "source_use_cases": [],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "JP",
-        "priority": "P2",
-        "stage": "official_probe_candidate",
-        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
-        "probe_command": "npm run probe:duty-rates:jp",
-        "official_probe_urls": [],
-        "source_use_cases": [],
-        "transit_route_priority": false,
-        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
-      },
-      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
-      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes."
-    },
-    {
       "country": "KR",
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
@@ -1154,6 +1244,56 @@
       "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows."
     },
     {
+      "country": "CN",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:static -- --countries=CN",
+      "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "CN",
+        "priority": "P1",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Connect a machine-readable CN tariff parser or official API."
+      },
+      "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
+      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
+    },
+    {
+      "country": "MX",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "maintained_exact_map",
+      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
+      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "update_command": "npm run update:duty-rates:mx",
+      "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "MX",
+        "priority": "P1",
+        "stage": "maintained_exact_map",
+        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "transit_route_priority": false,
+        "next_action": "Connect a machine-readable MX tariff parser or official API."
+      },
+      "next_upgrade": "Connect a machine-readable MX tariff parser or official API.",
+      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed."
+    },
+    {
       "country": "SG",
       "maintenance_priority": "P1",
       "rate_automation_stage": "maintained_exact_map",
@@ -1177,56 +1317,6 @@
       },
       "next_upgrade": "Connect a machine-readable SG tariff parser or official API.",
       "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed."
-    },
-    {
-      "country": "CN",
-      "maintenance_priority": "P2",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:static -- --countries=CN",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "CN",
-        "priority": "P2",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [],
-        "transit_route_priority": false,
-        "next_action": "Connect a machine-readable CN tariff parser or official API."
-      },
-      "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
-      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
-    },
-    {
-      "country": "MX",
-      "maintenance_priority": "P2",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:mx",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "MX",
-        "priority": "P2",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [],
-        "transit_route_priority": false,
-        "next_action": "Connect a machine-readable MX tariff parser or official API."
-      },
-      "next_upgrade": "Connect a machine-readable MX tariff parser or official API.",
-      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed."
     },
     {
       "country": "MY",

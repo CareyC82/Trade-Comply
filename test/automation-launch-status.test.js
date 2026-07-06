@@ -86,6 +86,11 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(payload.weekly_route_priorities.length, 5);
     assert.ok(payload.weekly_route_priorities.every(row => row.route && row.product_label && row.hs_code && row.next_action));
     assert.equal(payload.duty_rates.every(row => row.public_launch), true);
+    assert.equal(typeof payload.duty_rate_health_board, 'object');
+    assert.match(payload.duty_rate_health_board.headline, /official exact/);
+    assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'official_exact' && card.countries.includes('US')), true);
+    assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'p0_p1' && card.countries.includes('CN') && card.countries.includes('MX')), true);
+    assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'parser_gap' && card.count === 13), true);
 });
 
 test('weekly route priorities expose concrete product and HS route backlog', () => {
@@ -142,6 +147,7 @@ test('checked-in automation launch status is fresh enough for admin display', ()
     assert.equal(payload.summary.duty_rate_automation_stages.official_link_monitor, 1);
     assert.equal(payload.duty_rate_priority_queue.length, 13);
     assert.equal(payload.weekly_route_priorities.length, 5);
+    assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'p0_p1' && card.countries.includes('CN')), true);
 });
 
 test('admin duty-rate status includes automation launch board payload', () => {
