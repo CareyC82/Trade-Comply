@@ -190,6 +190,8 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
                     probe_command: 'npm run probe:duty-rates:static -- --countries=VN --probe-live',
                     official_probe_urls: ['https://www.customs.gov.vn/'],
                     source_use_cases: ['direct import duty pre-check', 'two-leg transit comparison'],
+                    parser_subtasks: ['Parse AHTN exact rows before filing-grade promotion.'],
+                    rate_change_drivers: ['VAT layer changes'],
                     transit_route_priority: true,
                     next_action: 'Refresh official-link benchmark.'
                 }
@@ -217,6 +219,8 @@ test('source run plan maps roadmap sources to daily updater runs', () => {
     assert.equal(plan.find(row => row.country === 'VN').parser_gap, true);
     assert.match(plan.find(row => row.country === 'VN').parser_gap_task.task, /machine-readable official tariff rows/);
     assert.equal(plan.find(row => row.country === 'VN').parser_gap_task.source_use_cases.includes('two-leg transit comparison'), true);
+    assert.equal(plan.find(row => row.country === 'VN').parser_gap_task.parser_subtasks.includes('Parse AHTN exact rows before filing-grade promotion.'), true);
+    assert.equal(plan.find(row => row.country === 'VN').parser_gap_task.rate_change_drivers.includes('VAT layer changes'), true);
     assert.equal(plan.find(row => row.country === 'VN').parser_gap_task.transit_route_priority, true);
 });
 

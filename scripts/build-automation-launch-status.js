@@ -317,6 +317,8 @@ function buildDutyAutomation() {
             official_url: source.official_url || '',
             official_probe_urls: Array.isArray(source.official_probe_urls) ? source.official_probe_urls : [],
             source_use_cases: Array.isArray(source.source_use_cases) ? source.source_use_cases : [],
+            parser_subtasks: Array.isArray(source.parser_subtasks) ? source.parser_subtasks : [],
+            rate_change_drivers: Array.isArray(source.rate_change_drivers) ? source.rate_change_drivers : [],
             transit_route_priority: Boolean(source.transit_route_priority),
             current_scope: source.current_scope || '',
             next_action: source.next_action || '',
@@ -434,6 +436,8 @@ function buildDutyParserGapTask(row = {}) {
         probe_command: row.probe_command || '',
         official_probe_urls: row.official_probe_urls || [],
         source_use_cases: row.source_use_cases || [],
+        parser_subtasks: row.parser_subtasks || [],
+        rate_change_drivers: row.rate_change_drivers || [],
         transit_route_priority: Boolean(row.transit_route_priority),
         next_action: row.next_upgrade || row.next_action || ''
     };
@@ -460,6 +464,8 @@ function buildDutyAutomationPriority(rows) {
             probe_command: row.probe_command,
             official_probe_urls: row.official_probe_urls || [],
             source_use_cases: row.source_use_cases || [],
+            parser_subtasks: row.parser_subtasks || [],
+            rate_change_drivers: row.rate_change_drivers || [],
             transit_route_priority: Boolean(row.transit_route_priority),
             parser_gap_task: buildDutyParserGapTask(row),
             next_upgrade: row.next_upgrade,

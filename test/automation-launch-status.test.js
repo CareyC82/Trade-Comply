@@ -74,6 +74,10 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(byCountry.KR.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.IN.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.SG.rate_automation_stage, 'maintained_exact_map');
+    assert.ok(byCountry.CN.parser_subtasks.some(task => /China Customs tariff rows/.test(task)));
+    assert.ok(byCountry.MX.parser_subtasks.some(task => /TIGIE\/NICO/.test(task)));
+    assert.ok(byCountry.JP.parser_subtasks.some(task => /statistical code/.test(task)));
+    assert.ok(byCountry.CN.rate_change_drivers.some(driver => /import VAT/.test(driver)));
     assert.ok(byCountry.MY.official_probe_urls.length >= 2);
     assert.equal(byCountry.MY.transit_route_priority, true);
     assert.equal(byCountry.RU.launch_mode, 'live_monitor');
@@ -81,6 +85,14 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(byCountry.RU.filing_grade_auto, false);
     assert.equal(payload.duty_rate_priority_queue.length, 13);
     assert.deepEqual(payload.duty_rate_priority_queue.slice(0, 3).map(row => row.country), ['DE', 'EU', 'NL']);
+    assert.ok(payload.duty_rate_priority_queue.some(row => (
+        row.country === 'CN'
+        && row.parser_gap_task?.parser_subtasks?.some(task => /8\/10-digit/.test(task))
+    )));
+    assert.ok(payload.duty_rate_priority_queue.some(row => (
+        row.country === 'MX'
+        && row.parser_gap_task?.rate_change_drivers?.some(driver => /TIGIE\/NICO/.test(driver))
+    )));
     assert.ok(payload.duty_rate_priority_queue.some(row => row.country === 'MY' && row.parser_gap_task?.source_use_cases?.includes('two-leg transit comparison')));
     assert.equal(payload.summary.weekly_route_priority_count, 5);
     assert.equal(payload.weekly_route_priorities.length, 5);
@@ -146,6 +158,10 @@ test('checked-in automation launch status is fresh enough for admin display', ()
     assert.equal(payload.summary.duty_rate_automation_stages.maintained_exact_map, 6);
     assert.equal(payload.summary.duty_rate_automation_stages.official_link_monitor, 1);
     assert.equal(payload.duty_rate_priority_queue.length, 13);
+    assert.equal(
+        payload.duty_rate_priority_queue.some(row => row.country === 'JP' && row.parser_gap_task?.parser_subtasks?.some(task => /statistical code/.test(task))),
+        true
+    );
     assert.equal(payload.weekly_route_priorities.length, 5);
     assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'p0_p1' && card.countries.includes('CN')), true);
 });

@@ -93,7 +93,17 @@
       "update_command": "npm run update:duty-rates:mx",
       "last_sync_field": "last_mx_snice_benchmark_sync_at",
       "current_scope": "Maintained Mexico exact-line IGI/base-duty candidates plus 16% VAT and NOM/origin review reminders.",
-      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed."
+      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed.",
+      "parser_subtasks": [
+        "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
+        "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
+        "Flag routes where USMCA or other origin-transformation evidence is required before cost comparison."
+      ],
+      "rate_change_drivers": [
+        "TIGIE/NICO tariff schedule changes",
+        "VAT or customs-fee layer updates",
+        "NOM and preferential-origin evidence changes"
+      ]
     },
     {
       "country": "JP",
@@ -109,7 +119,17 @@
       "probe_command": "npm run probe:duty-rates:jp",
       "last_sync_field": "last_jp_customs_benchmark_sync_at",
       "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
-      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes."
+      "next_action": "Replace local exact map with Japan Customs chapter parser output where unambiguous; keep statistical-code gates for mixed-rate prefixes.",
+      "parser_subtasks": [
+        "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
+        "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
+        "Gate promotion when one HS prefix maps to multiple statistical-code rates or product-scope notes."
+      ],
+      "rate_change_drivers": [
+        "Japan Customs tariff schedule revisions",
+        "Consumption tax layer changes",
+        "Statistical-code scope changes"
+      ]
     },
     {
       "country": "KR",
@@ -160,7 +180,17 @@
       "update_command": "npm run update:duty-rates:static -- --countries=CN",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained China exact-line MFN duty candidates plus 13% import VAT and product-control review reminders.",
-      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
+      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed.",
+      "parser_subtasks": [
+        "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
+        "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
+        "Block promotion when one HS prefix maps to multiple tax rates or product-control notes."
+      ],
+      "rate_change_drivers": [
+        "MFN duty, preferential-origin duty, or import VAT changes",
+        "Retaliatory tariff or trade-remedy changes",
+        "CCC, SRRC, dual-use, or other product-control overlays"
+      ]
     },
     {
       "country": "VN",

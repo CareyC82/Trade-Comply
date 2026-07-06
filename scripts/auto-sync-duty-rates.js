@@ -215,6 +215,8 @@ function buildParserGapTask(row = {}, source = {}) {
     if (!row.parser_gap) return null;
     const urls = Array.isArray(source.official_probe_urls) ? source.official_probe_urls : [];
     const useCases = Array.isArray(source.source_use_cases) ? source.source_use_cases : [];
+    const parserSubtasks = Array.isArray(source.parser_subtasks) ? source.parser_subtasks : [];
+    const rateChangeDrivers = Array.isArray(source.rate_change_drivers) ? source.rate_change_drivers : [];
     const taskByStage = {
         official_hybrid_parser: 'Promote exact HS parser only after official tariff rows and rate fields are stable.',
         official_probe_candidate: 'Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.',
@@ -231,6 +233,8 @@ function buildParserGapTask(row = {}, source = {}) {
         official_probe_urls: urls,
         official_probe_live_status: row.official_probe_live_status || null,
         source_use_cases: useCases,
+        parser_subtasks: parserSubtasks,
+        rate_change_drivers: rateChangeDrivers,
         transit_route_priority: Boolean(source.transit_route_priority),
         next_action: row.run_plan_action || row.next_action || source.next_action || ''
     };
@@ -260,6 +264,8 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                     : 'Keep official machine-readable sync running.';
             const officialProbeUrls = Array.isArray(source.official_probe_urls) ? source.official_probe_urls : [];
             const sourceUseCases = Array.isArray(source.source_use_cases) ? source.source_use_cases : [];
+            const parserSubtasks = Array.isArray(source.parser_subtasks) ? source.parser_subtasks : [];
+            const rateChangeDrivers = Array.isArray(source.rate_change_drivers) ? source.rate_change_drivers : [];
             const row = {
                 country: source.country || '',
                 maintenance_priority: source.maintenance_priority || 'Unassigned',
@@ -295,6 +301,8 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 run_plan_action: runPlanAction,
                 official_probe_urls: officialProbeUrls,
                 source_use_cases: sourceUseCases,
+                parser_subtasks: parserSubtasks,
+                rate_change_drivers: rateChangeDrivers,
                 transit_route_priority: Boolean(source.transit_route_priority)
             };
             return {
@@ -343,6 +351,8 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
             official_probe_urls: row.official_probe_urls || [],
             official_probe_live_status: row.official_probe_live_status || null,
             source_use_cases: row.source_use_cases || [],
+            parser_subtasks: row.parser_subtasks || [],
+            rate_change_drivers: row.rate_change_drivers || [],
             transit_route_priority: Boolean(row.transit_route_priority),
             official_probe_live_status: row.official_probe_live_status || null,
             parser_gap_task: row.parser_gap_task || null,
