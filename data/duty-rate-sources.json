@@ -303,6 +303,16 @@
         "two-leg transit comparison",
         "origin transformation evidence review"
       ],
+      "parser_subtasks": [
+        "Parse exact Vietnam HS/AHTN rows for priority high-tech lines and preserve preferential-origin duty separately from ordinary MFN duty.",
+        "Keep VAT, import licensing, MIC/ICT product approval, battery safety, and origin-transformation evidence outside the base-duty parser.",
+        "Gate transit recommendations until the second-leg duty, origin transformation, and anti-circumvention evidence are checked together."
+      ],
+      "rate_change_drivers": [
+        "Vietnam Customs tariff or preferential-origin duty updates",
+        "VAT or import tax layer changes",
+        "ICT approval, energy-efficiency, battery safety, or origin evidence changes"
+      ],
       "transit_route_priority": true,
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
     },
@@ -329,6 +339,16 @@
         "two-leg transit comparison",
         "origin transformation evidence review"
       ],
+      "parser_subtasks": [
+        "Parse exact Malaysia HS/AHTN rows from Royal Malaysian Customs or SST sources for priority high-tech product lines.",
+        "Keep import duty, SST, exemptions, SIRIM/MCMC/ST approval, and preferential-origin treatment as separate decision layers.",
+        "Gate transit recommendations until first-leg and second-leg duty, origin transformation, and anti-circumvention evidence are all checked."
+      ],
+      "rate_change_drivers": [
+        "Malaysia tariff or SST schedule updates",
+        "Preferential-origin, exemption, or customs-fee changes",
+        "SIRIM/MCMC/ST product-approval or origin-evidence changes"
+      ],
       "transit_route_priority": true,
       "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
     },
@@ -345,6 +365,21 @@
       "update_command": "npm run update:duty-rates:static -- --countries=TW",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Taiwan exact-line base-duty candidates plus 5% business-tax and product-scope review reminders.",
+      "source_use_cases": [
+        "Taiwan import duty and business-tax pre-check",
+        "electronics component route pricing",
+        "BSMI/NCC product inspection and telecom approval review"
+      ],
+      "parser_subtasks": [
+        "Parse exact Taiwan Customs tariff rows for maintained high-tech HS lines before promoting official base-duty output.",
+        "Separate customs duty, business tax, commodity inspection, NCC telecom approval, and origin preference into distinct layers.",
+        "Flag mixed-rate tariff prefixes as exact-code required instead of using broad heading-level estimates."
+      ],
+      "rate_change_drivers": [
+        "Taiwan Customs tariff schedule changes",
+        "Business tax or import tax treatment changes",
+        "BSMI/NCC product-scope or origin-preference updates"
+      ],
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed."
     },
     {
@@ -360,6 +395,21 @@
       "update_command": "npm run update:duty-rates:static -- --countries=RU",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
+      "source_use_cases": [
+        "Russia/EAEU duty and VAT screening",
+        "sanctions and restricted-party scope review",
+        "high-risk electronics export feasibility screening"
+      ],
+      "parser_subtasks": [
+        "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
+        "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
+        "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
+      ],
+      "rate_change_drivers": [
+        "EAEU tariff schedule or VAT changes",
+        "Russia sanctions, restricted-party, or export-control updates",
+        "Import licensing or controlled-technology scope changes"
+      ],
       "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math."
     }
   ]

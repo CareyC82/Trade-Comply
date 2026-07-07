@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-07T06:16:38.604Z",
+  "updated_at": "2026-07-07T08:42:34.565Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -169,9 +169,10 @@
       {
         "key": "transit_priority",
         "label": "Transit route priority",
-        "count": 2,
+        "count": 3,
         "countries": [
           "MY",
+          "SG",
           "VN"
         ],
         "note": "Used by two-leg opportunity comparisons."
@@ -871,9 +872,21 @@
       "official_probe_urls": [
         "https://www.icegate.gov.in/"
       ],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "India import duty, SWS, and IGST pre-check",
+        "semiconductor, electronics, and telecom import route pricing",
+        "BIS/QCO, WPC, and SCOMET scope review"
+      ],
+      "parser_subtasks": [
+        "Parse exact HSN rows from ICEGATE/CIP or official tariff data and split BCD, SWS, IGST, and exemption layers.",
+        "Keep BIS/QCO, WPC, SCOMET, and electronics product-control checks separate from duty-rate math.",
+        "Gate promotion where exemption notifications or effective-date conditions change the payable rate."
+      ],
+      "rate_change_drivers": [
+        "India Customs tariff or exemption notification changes",
+        "SWS/IGST layer changes",
+        "BIS/QCO, WPC, or SCOMET product-control updates"
+      ],
       "transit_route_priority": false,
       "current_scope": "Official-live probe candidate plus maintained exact-line BCD fallback; SWS/IGST and product-control review reminders stay separate.",
       "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
@@ -933,9 +946,21 @@
       "probe_command": "npm run probe:duty-rates:kr",
       "official_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "Korea import duty and VAT pre-check",
+        "semiconductor and electronics route pricing",
+        "KC/KCC product-approval scope review"
+      ],
+      "parser_subtasks": [
+        "Parse KCS 10-digit tariff rows and normalize Korean/English tariff descriptions for maintained high-tech HS lines.",
+        "Separate customs duty, VAT, FTA/preferential-origin treatment, and KC/KCC product approval checks.",
+        "Treat official source responses with zero parsed rows as parser-selector gaps, not generic network failures."
+      ],
+      "rate_change_drivers": [
+        "KCS tariff schedule revisions",
+        "VAT or preferential-origin treatment changes",
+        "KC/KCC certification or electronics safety scope changes"
+      ],
       "transit_route_priority": false,
       "current_scope": "Maintained Korea exact-line base-duty candidates plus 10% VAT and KC/origin review reminders.",
       "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows.",
@@ -1003,8 +1028,16 @@
         "two-leg transit comparison",
         "origin transformation evidence review"
       ],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "parser_subtasks": [
+        "Parse exact Malaysia HS/AHTN rows from Royal Malaysian Customs or SST sources for priority high-tech product lines.",
+        "Keep import duty, SST, exemptions, SIRIM/MCMC/ST approval, and preferential-origin treatment as separate decision layers.",
+        "Gate transit recommendations until first-leg and second-leg duty, origin transformation, and anti-circumvention evidence are all checked."
+      ],
+      "rate_change_drivers": [
+        "Malaysia tariff or SST schedule updates",
+        "Preferential-origin, exemption, or customs-fee changes",
+        "SIRIM/MCMC/ST product-approval or origin-evidence changes"
+      ],
       "transit_route_priority": true,
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
       "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed.",
@@ -1067,10 +1100,22 @@
       "probe_command": "",
       "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
-      "transit_route_priority": false,
+      "source_use_cases": [
+        "Singapore import duty and GST pre-check",
+        "two-leg transit comparison",
+        "origin transformation and re-export evidence review"
+      ],
+      "parser_subtasks": [
+        "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
+        "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
+        "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
+      ],
+      "rate_change_drivers": [
+        "Singapore Customs dutiable-goods or tariff schedule updates",
+        "GST rate or relief updates",
+        "Strategic Goods Control, IMDA, or controlled-goods scope changes"
+      ],
+      "transit_route_priority": true,
       "current_scope": "Maintained Singapore exact-line base-duty candidates plus 9% GST value treatment reminder.",
       "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed.",
       "rate_automation_stage": "maintained_exact_map",
@@ -1094,9 +1139,21 @@
       "probe_command": "",
       "official_url": "https://web.customs.gov.tw/",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "Taiwan import duty and business-tax pre-check",
+        "electronics component route pricing",
+        "BSMI/NCC product inspection and telecom approval review"
+      ],
+      "parser_subtasks": [
+        "Parse exact Taiwan Customs tariff rows for maintained high-tech HS lines before promoting official base-duty output.",
+        "Separate customs duty, business tax, commodity inspection, NCC telecom approval, and origin preference into distinct layers.",
+        "Flag mixed-rate tariff prefixes as exact-code required instead of using broad heading-level estimates."
+      ],
+      "rate_change_drivers": [
+        "Taiwan Customs tariff schedule changes",
+        "Business tax or import tax treatment changes",
+        "BSMI/NCC product-scope or origin-preference updates"
+      ],
       "transit_route_priority": false,
       "current_scope": "Maintained Taiwan exact-line base-duty candidates plus 5% business-tax and product-scope review reminders.",
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed.",
@@ -1129,8 +1186,16 @@
         "two-leg transit comparison",
         "origin transformation evidence review"
       ],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "parser_subtasks": [
+        "Parse exact Vietnam HS/AHTN rows for priority high-tech lines and preserve preferential-origin duty separately from ordinary MFN duty.",
+        "Keep VAT, import licensing, MIC/ICT product approval, battery safety, and origin-transformation evidence outside the base-duty parser.",
+        "Gate transit recommendations until the second-leg duty, origin transformation, and anti-circumvention evidence are checked together."
+      ],
+      "rate_change_drivers": [
+        "Vietnam Customs tariff or preferential-origin duty updates",
+        "VAT or import tax layer changes",
+        "ICT approval, energy-efficiency, battery safety, or origin evidence changes"
+      ],
       "transit_route_priority": true,
       "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed.",
@@ -1155,9 +1220,21 @@
       "probe_command": "",
       "official_url": "https://customs.gov.ru/",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "Russia/EAEU duty and VAT screening",
+        "sanctions and restricted-party scope review",
+        "high-risk electronics export feasibility screening"
+      ],
+      "parser_subtasks": [
+        "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
+        "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
+        "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
+      ],
+      "rate_change_drivers": [
+        "EAEU tariff schedule or VAT changes",
+        "Russia sanctions, restricted-party, or export-control updates",
+        "Import licensing or controlled-technology scope changes"
+      ],
       "transit_route_priority": false,
       "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
       "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math.",
@@ -1383,9 +1460,21 @@
       "official_probe_urls": [
         "https://www.icegate.gov.in/"
       ],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "India import duty, SWS, and IGST pre-check",
+        "semiconductor, electronics, and telecom import route pricing",
+        "BIS/QCO, WPC, and SCOMET scope review"
+      ],
+      "parser_subtasks": [
+        "Parse exact HSN rows from ICEGATE/CIP or official tariff data and split BCD, SWS, IGST, and exemption layers.",
+        "Keep BIS/QCO, WPC, SCOMET, and electronics product-control checks separate from duty-rate math.",
+        "Gate promotion where exemption notifications or effective-date conditions change the payable rate."
+      ],
+      "rate_change_drivers": [
+        "India Customs tariff or exemption notification changes",
+        "SWS/IGST layer changes",
+        "BIS/QCO, WPC, or SCOMET product-control updates"
+      ],
       "transit_route_priority": false,
       "parser_gap_task": {
         "country": "IN",
@@ -1396,9 +1485,21 @@
         "official_probe_urls": [
           "https://www.icegate.gov.in/"
         ],
-        "source_use_cases": [],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
+        "source_use_cases": [
+          "India import duty, SWS, and IGST pre-check",
+          "semiconductor, electronics, and telecom import route pricing",
+          "BIS/QCO, WPC, and SCOMET scope review"
+        ],
+        "parser_subtasks": [
+          "Parse exact HSN rows from ICEGATE/CIP or official tariff data and split BCD, SWS, IGST, and exemption layers.",
+          "Keep BIS/QCO, WPC, SCOMET, and electronics product-control checks separate from duty-rate math.",
+          "Gate promotion where exemption notifications or effective-date conditions change the payable rate."
+        ],
+        "rate_change_drivers": [
+          "India Customs tariff or exemption notification changes",
+          "SWS/IGST layer changes",
+          "BIS/QCO, WPC, or SCOMET product-control updates"
+        ],
         "transit_route_priority": false,
         "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
       },
@@ -1414,9 +1515,21 @@
       "update_command": "npm run update:duty-rates:kr:official",
       "probe_command": "npm run probe:duty-rates:kr",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "Korea import duty and VAT pre-check",
+        "semiconductor and electronics route pricing",
+        "KC/KCC product-approval scope review"
+      ],
+      "parser_subtasks": [
+        "Parse KCS 10-digit tariff rows and normalize Korean/English tariff descriptions for maintained high-tech HS lines.",
+        "Separate customs duty, VAT, FTA/preferential-origin treatment, and KC/KCC product approval checks.",
+        "Treat official source responses with zero parsed rows as parser-selector gaps, not generic network failures."
+      ],
+      "rate_change_drivers": [
+        "KCS tariff schedule revisions",
+        "VAT or preferential-origin treatment changes",
+        "KC/KCC certification or electronics safety scope changes"
+      ],
       "transit_route_priority": false,
       "parser_gap_task": {
         "country": "KR",
@@ -1425,9 +1538,21 @@
         "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
         "probe_command": "npm run probe:duty-rates:kr",
         "official_probe_urls": [],
-        "source_use_cases": [],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
+        "source_use_cases": [
+          "Korea import duty and VAT pre-check",
+          "semiconductor and electronics route pricing",
+          "KC/KCC product-approval scope review"
+        ],
+        "parser_subtasks": [
+          "Parse KCS 10-digit tariff rows and normalize Korean/English tariff descriptions for maintained high-tech HS lines.",
+          "Separate customs duty, VAT, FTA/preferential-origin treatment, and KC/KCC product approval checks.",
+          "Treat official source responses with zero parsed rows as parser-selector gaps, not generic network failures."
+        ],
+        "rate_change_drivers": [
+          "KCS tariff schedule revisions",
+          "VAT or preferential-origin treatment changes",
+          "KC/KCC certification or electronics safety scope changes"
+        ],
         "transit_route_priority": false,
         "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
       },
@@ -1533,10 +1658,22 @@
       "update_command": "npm run update:duty-rates:sg",
       "probe_command": "",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
-      "transit_route_priority": false,
+      "source_use_cases": [
+        "Singapore import duty and GST pre-check",
+        "two-leg transit comparison",
+        "origin transformation and re-export evidence review"
+      ],
+      "parser_subtasks": [
+        "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
+        "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
+        "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
+      ],
+      "rate_change_drivers": [
+        "Singapore Customs dutiable-goods or tariff schedule updates",
+        "GST rate or relief updates",
+        "Strategic Goods Control, IMDA, or controlled-goods scope changes"
+      ],
+      "transit_route_priority": true,
       "parser_gap_task": {
         "country": "SG",
         "priority": "P1",
@@ -1544,10 +1681,22 @@
         "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
         "probe_command": "",
         "official_probe_urls": [],
-        "source_use_cases": [],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
-        "transit_route_priority": false,
+        "source_use_cases": [
+          "Singapore import duty and GST pre-check",
+          "two-leg transit comparison",
+          "origin transformation and re-export evidence review"
+        ],
+        "parser_subtasks": [
+          "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
+          "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
+          "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
+        ],
+        "rate_change_drivers": [
+          "Singapore Customs dutiable-goods or tariff schedule updates",
+          "GST rate or relief updates",
+          "Strategic Goods Control, IMDA, or controlled-goods scope changes"
+        ],
+        "transit_route_priority": true,
         "next_action": "Connect a machine-readable SG tariff parser or official API."
       },
       "next_upgrade": "Connect a machine-readable SG tariff parser or official API.",
@@ -1570,8 +1719,16 @@
         "two-leg transit comparison",
         "origin transformation evidence review"
       ],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "parser_subtasks": [
+        "Parse exact Malaysia HS/AHTN rows from Royal Malaysian Customs or SST sources for priority high-tech product lines.",
+        "Keep import duty, SST, exemptions, SIRIM/MCMC/ST approval, and preferential-origin treatment as separate decision layers.",
+        "Gate transit recommendations until first-leg and second-leg duty, origin transformation, and anti-circumvention evidence are all checked."
+      ],
+      "rate_change_drivers": [
+        "Malaysia tariff or SST schedule updates",
+        "Preferential-origin, exemption, or customs-fee changes",
+        "SIRIM/MCMC/ST product-approval or origin-evidence changes"
+      ],
       "transit_route_priority": true,
       "parser_gap_task": {
         "country": "MY",
@@ -1588,8 +1745,16 @@
           "two-leg transit comparison",
           "origin transformation evidence review"
         ],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
+        "parser_subtasks": [
+          "Parse exact Malaysia HS/AHTN rows from Royal Malaysian Customs or SST sources for priority high-tech product lines.",
+          "Keep import duty, SST, exemptions, SIRIM/MCMC/ST approval, and preferential-origin treatment as separate decision layers.",
+          "Gate transit recommendations until first-leg and second-leg duty, origin transformation, and anti-circumvention evidence are all checked."
+        ],
+        "rate_change_drivers": [
+          "Malaysia tariff or SST schedule updates",
+          "Preferential-origin, exemption, or customs-fee changes",
+          "SIRIM/MCMC/ST product-approval or origin-evidence changes"
+        ],
         "transit_route_priority": true,
         "next_action": "Connect a machine-readable MY tariff parser or official API."
       },
@@ -1605,9 +1770,21 @@
       "update_command": "npm run update:duty-rates:static -- --countries=TW",
       "probe_command": "",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "Taiwan import duty and business-tax pre-check",
+        "electronics component route pricing",
+        "BSMI/NCC product inspection and telecom approval review"
+      ],
+      "parser_subtasks": [
+        "Parse exact Taiwan Customs tariff rows for maintained high-tech HS lines before promoting official base-duty output.",
+        "Separate customs duty, business tax, commodity inspection, NCC telecom approval, and origin preference into distinct layers.",
+        "Flag mixed-rate tariff prefixes as exact-code required instead of using broad heading-level estimates."
+      ],
+      "rate_change_drivers": [
+        "Taiwan Customs tariff schedule changes",
+        "Business tax or import tax treatment changes",
+        "BSMI/NCC product-scope or origin-preference updates"
+      ],
       "transit_route_priority": false,
       "parser_gap_task": {
         "country": "TW",
@@ -1616,9 +1793,21 @@
         "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
         "probe_command": "",
         "official_probe_urls": [],
-        "source_use_cases": [],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
+        "source_use_cases": [
+          "Taiwan import duty and business-tax pre-check",
+          "electronics component route pricing",
+          "BSMI/NCC product inspection and telecom approval review"
+        ],
+        "parser_subtasks": [
+          "Parse exact Taiwan Customs tariff rows for maintained high-tech HS lines before promoting official base-duty output.",
+          "Separate customs duty, business tax, commodity inspection, NCC telecom approval, and origin preference into distinct layers.",
+          "Flag mixed-rate tariff prefixes as exact-code required instead of using broad heading-level estimates."
+        ],
+        "rate_change_drivers": [
+          "Taiwan Customs tariff schedule changes",
+          "Business tax or import tax treatment changes",
+          "BSMI/NCC product-scope or origin-preference updates"
+        ],
         "transit_route_priority": false,
         "next_action": "Connect a machine-readable TW tariff parser or official API."
       },
@@ -1642,8 +1831,16 @@
         "two-leg transit comparison",
         "origin transformation evidence review"
       ],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "parser_subtasks": [
+        "Parse exact Vietnam HS/AHTN rows for priority high-tech lines and preserve preferential-origin duty separately from ordinary MFN duty.",
+        "Keep VAT, import licensing, MIC/ICT product approval, battery safety, and origin-transformation evidence outside the base-duty parser.",
+        "Gate transit recommendations until the second-leg duty, origin transformation, and anti-circumvention evidence are checked together."
+      ],
+      "rate_change_drivers": [
+        "Vietnam Customs tariff or preferential-origin duty updates",
+        "VAT or import tax layer changes",
+        "ICT approval, energy-efficiency, battery safety, or origin evidence changes"
+      ],
       "transit_route_priority": true,
       "parser_gap_task": {
         "country": "VN",
@@ -1660,8 +1857,16 @@
           "two-leg transit comparison",
           "origin transformation evidence review"
         ],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
+        "parser_subtasks": [
+          "Parse exact Vietnam HS/AHTN rows for priority high-tech lines and preserve preferential-origin duty separately from ordinary MFN duty.",
+          "Keep VAT, import licensing, MIC/ICT product approval, battery safety, and origin-transformation evidence outside the base-duty parser.",
+          "Gate transit recommendations until the second-leg duty, origin transformation, and anti-circumvention evidence are checked together."
+        ],
+        "rate_change_drivers": [
+          "Vietnam Customs tariff or preferential-origin duty updates",
+          "VAT or import tax layer changes",
+          "ICT approval, energy-efficiency, battery safety, or origin evidence changes"
+        ],
         "transit_route_priority": true,
         "next_action": "Connect a machine-readable VN tariff parser or official API."
       },
@@ -1677,9 +1882,21 @@
       "update_command": "npm run update:duty-rates:static -- --countries=RU",
       "probe_command": "",
       "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
+      "source_use_cases": [
+        "Russia/EAEU duty and VAT screening",
+        "sanctions and restricted-party scope review",
+        "high-risk electronics export feasibility screening"
+      ],
+      "parser_subtasks": [
+        "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
+        "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
+        "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
+      ],
+      "rate_change_drivers": [
+        "EAEU tariff schedule or VAT changes",
+        "Russia sanctions, restricted-party, or export-control updates",
+        "Import licensing or controlled-technology scope changes"
+      ],
       "transit_route_priority": false,
       "parser_gap_task": {
         "country": "RU",
@@ -1688,9 +1905,21 @@
         "task": "Keep official link monitoring live and add parser only when machine-readable tariff rows become available.",
         "probe_command": "",
         "official_probe_urls": [],
-        "source_use_cases": [],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
+        "source_use_cases": [
+          "Russia/EAEU duty and VAT screening",
+          "sanctions and restricted-party scope review",
+          "high-risk electronics export feasibility screening"
+        ],
+        "parser_subtasks": [
+          "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
+          "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
+          "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
+        ],
+        "rate_change_drivers": [
+          "EAEU tariff schedule or VAT changes",
+          "Russia sanctions, restricted-party, or export-control updates",
+          "Import licensing or controlled-technology scope changes"
+        ],
         "transit_route_priority": false,
         "next_action": "Connect exact tariff-line parser before using rate math beyond screening."
       },

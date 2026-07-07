@@ -124,6 +124,26 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     );
 });
 
+test('parser-gap roadmap entries include concrete automation work items', () => {
+    const requiredCountries = ['CN', 'VN', 'MY', 'TW', 'IN', 'KR', 'RU'];
+    requiredCountries.forEach((country) => {
+        const source = dutyRateSources.sources.find(item => item.country === country);
+        assert.ok(source, `${country} source roadmap should exist`);
+        assert.ok(
+            Array.isArray(source.parser_subtasks) && source.parser_subtasks.length >= 3,
+            `${country} should list concrete parser subtasks`
+        );
+        assert.ok(
+            Array.isArray(source.rate_change_drivers) && source.rate_change_drivers.length >= 2,
+            `${country} should list rate-change drivers`
+        );
+        assert.ok(
+            source.parser_subtasks.some(item => /exact|tariff|HS|HSN|EAEU|AHTN/i.test(item)),
+            `${country} parser subtasks should mention exact tariff-line work`
+        );
+    });
+});
+
 test('duty-rate health check reports source roadmap status', () => {
     const result = runDutyRateHealthCheck();
 
@@ -1164,6 +1184,7 @@ test('Korea official candidate promotes unambiguous tariff rows and keeps VAT se
             <tr><th>HS Code</th><th>Description</th><th>Basic Rate</th></tr>
             <tr><td>8542310000</td><td>Processors</td><td>Free</td></tr>
             <tr><td>8542320000</td><td>Memories</td><td>0%</td></tr>
+            <tr><td>9018900000</td><td>Medical electronic instruments</td><td>0%</td></tr>
         </table>
     `;
     const rows = parseKoreaTariffRateRows(html);
@@ -1177,7 +1198,7 @@ test('Korea official candidate promotes unambiguous tariff rows and keeps VAT se
     };
 
     assert.equal(parseKoreaAdValoremRate('Free'), 0);
-    assert.equal(rows.length, 2);
+    assert.equal(rows.length, 3);
     const candidate = buildKoreaOfficialCandidateForRule(rule, rows);
     assert.equal(candidate.ok, true);
     assert.equal(candidate.source_status, 'official_source_checked');
@@ -1187,6 +1208,17 @@ test('Korea official candidate promotes unambiguous tariff rows and keeps VAT se
     assert.equal(rule.base_rate, 0);
     assert.equal(rule.source_status, 'official_source_checked');
     assert.equal(rule.additional_rate, 0.1);
+
+    const medicalCandidate = buildKoreaOfficialCandidateForRule({
+        id: 'TEST-KR-9018',
+        import_country: 'KR',
+        hs_prefixes: ['9018'],
+        base_rate: 0.08,
+        additional_rate: 0.1,
+        add_on_layers: [{ type: 'import_vat', rate: 0.1, status: 'indicative' }]
+    }, rows);
+    assert.equal(medicalCandidate.ok, true);
+    assert.equal(medicalCandidate.base_rate, 0);
 });
 
 test('Korea official parser accepts text rows when the tariff page is not a simple table', () => {
@@ -1223,6 +1255,7 @@ test('India official candidate can parse BCD SWS and IGST rows', () => {
             <tr><th>HS</th><th>Goods</th><th>BCD</th><th>SWS</th><th>IGST</th></tr>
             <tr><td>85423100</td><td>Processors</td><td>BCD 0%</td><td>SWS 10%</td><td>IGST 18%</td></tr>
             <tr><td>85423200</td><td>Memories</td><td>BCD 0%</td><td>SWS 10%</td><td>IGST 18%</td></tr>
+            <tr><td>90189000</td><td>Medical electronic instruments</td><td>BCD 7.5%</td><td>SWS 10%</td><td>IGST 18%</td></tr>
         </table>
     `;
     const rows = parseIndiaTariffRows(html);
@@ -1239,7 +1272,7 @@ test('India official candidate can parse BCD SWS and IGST rows', () => {
         source_url: 'https://www.icegate.gov.in/'
     };
 
-    assert.equal(rows.length, 2);
+    assert.equal(rows.length, 3);
     const candidate = buildIndiaOfficialCandidateForRule(rule, rows);
     assert.equal(candidate.ok, true);
     assert.equal(candidate.source_status, 'official_source_checked');
@@ -1255,6 +1288,21 @@ test('India official candidate can parse BCD SWS and IGST rows', () => {
     assert.equal(rule.source_status, 'official_source_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.add_on_layers[1].rate, 0.18);
+
+    const medicalCandidate = buildIndiaOfficialCandidateForRule({
+        id: 'TEST-IN-9018',
+        import_country: 'IN',
+        hs_prefixes: ['9018'],
+        base_rate: 0,
+        add_on_layers: [
+            { type: 'social_welfare_surcharge', rate: 0, status: 'indicative' },
+            { type: 'igst', rate: 0, status: 'indicative' }
+        ]
+    }, rows);
+    assert.equal(medicalCandidate.ok, true);
+    assert.equal(medicalCandidate.base_rate, 0.075);
+    assert.equal(medicalCandidate.sws_rate, 0.1);
+    assert.equal(medicalCandidate.igst_rate, 0.18);
 });
 
 test('India official live probe can parse tariff rows from injected official source', async () => {
