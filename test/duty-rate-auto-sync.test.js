@@ -208,13 +208,18 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
             maintenance_priority: 'P1',
             parser_gap: true,
             run_plan_action: 'Promote exact parser after stable official rows.',
+            degraded_category: 'network_transport',
+            degraded_label: 'Network transport',
+            degraded_action: 'Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.',
             official_fetch_summary: {
                 status_label: 'Official fetch degraded',
                 exact_query_attempted: 2,
                 exact_query_matched: 0,
                 degraded: true,
                 degraded_reason: 'official_fetch_failed',
-                degraded_detail: 'fetch failed'
+                degraded_detail: 'fetch failed',
+                degraded_category: 'network_transport',
+                degraded_action: 'Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.'
             }
         }]
     }).join('\n');
@@ -222,6 +227,11 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
     assert.match(lines, /Source run plan watchlist/);
     assert.match(lines, /JP: degraded · Japan Customs official-live/);
     assert.match(lines, /Official fetch degraded; 0\/2 exact HS matched/);
+    assert.match(lines, /Degraded source repair hints/);
+    assert.match(lines, /Network transport/);
+    assert.match(lines, /fix: Retry with system CA/i);
+    assert.match(lines, /Parser gap repair hints/);
+    assert.match(lines, /diagnosis: Network transport/);
     assert.match(lines, /Automation priority queue/);
     assert.match(lines, /Promote Japan Customs parser/);
 });
@@ -514,5 +524,13 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.equal(payload.source_run_plan_summary.degraded_count, 3);
     assert.equal(payload.ci_diagnostics.outcome, 'completed_with_degraded_sources');
     assert.match(payload.ci_diagnostics.summary, /official probe/);
+    assert.match(payload.ci_diagnostics.summary, /Network transport|Official fetch failed/);
+    assert.match(payload.ci_diagnostics.next_action, /Retry|Inspect|official parser/i);
     assert.ok(payload.ci_diagnostics.degraded_sources.includes('KR'));
+    assert.ok(payload.ci_diagnostics.degraded_details.some(row => (
+        row.country === 'KR'
+        && row.category === 'network_transport'
+        && /Retry/.test(row.action)
+    )));
+    assert.ok(payload.ci_diagnostics.parser_gap_details.some(row => row.country === 'KR'));
 });

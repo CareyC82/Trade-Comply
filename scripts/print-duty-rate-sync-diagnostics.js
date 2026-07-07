@@ -50,6 +50,49 @@ function buildDiagnosticLines(payload) {
     lines.push(`- Next action: ${diagnostics.next_action || digest.next_best_action || 'Review duty-rate sync status JSON.'}`);
     lines.push(`- Sources checked: ${counts.sources_checked ?? 0}; exceptions: ${counts.exceptions ?? exceptions.length}; parser gaps: ${counts.parser_gap_sources ?? 0}; degraded: ${counts.degraded_sources ?? 0}`);
 
+    const degradedDetails = Array.isArray(diagnostics.degraded_details) && diagnostics.degraded_details.length
+        ? diagnostics.degraded_details
+        : sourceRunPlan
+            .filter(row => row.run_status === 'degraded' || row.degraded_label || row.degraded_category || row.degraded_action)
+            .map(row => ({
+                country: row.country,
+                source: row.run_source || '',
+                category: row.degraded_category || row.official_fetch_summary?.degraded_category || '',
+                label: row.degraded_label || '',
+                reason: row.degraded_reason || row.official_fetch_summary?.degraded_reason || '',
+                action: row.degraded_action || row.official_fetch_summary?.degraded_action || row.run_plan_action || ''
+            }));
+    const parserGapDetails = Array.isArray(diagnostics.parser_gap_details) && diagnostics.parser_gap_details.length
+        ? diagnostics.parser_gap_details
+        : sourceRunPlan
+            .filter(row => row.parser_gap)
+            .map(row => ({
+                country: row.country,
+                stage: row.rate_automation_stage || '',
+                priority: row.maintenance_priority || '',
+                action: row.parser_gap_task?.task || row.run_plan_action || row.next_action || ''
+            }));
+
+    if (degradedDetails.length) {
+        lines.push('- Degraded source repair hints:');
+        degradedDetails.slice(0, 8).forEach((row, index) => {
+            lines.push(`  ${index + 1}. ${row.country || 'market'}${row.source ? ` (${row.source})` : ''}: ${row.label || row.category || row.reason || 'official probe degraded'}`);
+            if (row.action) {
+                lines.push(`     fix: ${row.action}`);
+            }
+        });
+    }
+
+    if (parserGapDetails.length) {
+        lines.push('- Parser gap repair hints:');
+        parserGapDetails.slice(0, 8).forEach((row, index) => {
+            lines.push(`  ${index + 1}. ${row.country || 'market'}: ${row.priority || 'priority'} · ${row.stage || 'stage'}`);
+            if (row.action) {
+                lines.push(`     next: ${row.action}`);
+            }
+        });
+    }
+
     if (exceptions.length) {
         lines.push('- First exceptions:');
         exceptions.slice(0, 5).forEach((exception, index) => {
@@ -72,6 +115,12 @@ function buildDiagnosticLines(payload) {
             lines.push(`     official: ${summarizeOfficialFetch(row.official_fetch_summary)}`);
             if (row.degraded_reason || row.degraded_detail) {
                 lines.push(`     degraded: ${row.degraded_reason || 'degraded'}${row.degraded_detail ? ` (${row.degraded_detail})` : ''}`);
+            }
+            if (row.degraded_label || row.degraded_category) {
+                lines.push(`     diagnosis: ${row.degraded_label || row.degraded_category}`);
+            }
+            if (row.degraded_action) {
+                lines.push(`     fix: ${row.degraded_action}`);
             }
             lines.push(`     next: ${row.run_plan_action || row.next_action || 'Review source roadmap.'}`);
         });

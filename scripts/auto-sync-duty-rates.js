@@ -500,6 +500,20 @@ function buildCiDiagnostics({ exceptions = [], runs = [], sourceRunPlan = [], he
     const firstException = exceptions[0] || null;
     const firstDegraded = degraded[0] || null;
     const changedRuns = runs.filter(run => Number(run.change_count || 0) > 0);
+    const degradedDetails = degraded.map(row => ({
+        country: row.country,
+        source: row.run_source || '',
+        category: row.degraded_category || '',
+        label: row.degraded_label || '',
+        reason: row.degraded_reason || '',
+        action: row.degraded_action || row.run_plan_action || ''
+    }));
+    const parserGapDetails = parserGaps.map(row => ({
+        country: row.country,
+        stage: row.rate_automation_stage || '',
+        priority: row.maintenance_priority || '',
+        action: row.parser_gap_task?.task || row.run_plan_action || row.next_action || ''
+    }));
 
     if (firstException) {
         return {
@@ -513,7 +527,9 @@ function buildCiDiagnostics({ exceptions = [], runs = [], sourceRunPlan = [], he
                 : 'Open the source error details, fix the updater/parser or downgrade transport-only failures, then rerun the Duty Rate Auto Sync workflow.',
             exception_sources: Array.from(new Set(exceptions.map(row => row.source).filter(Boolean))),
             degraded_sources: degraded.map(row => row.country).filter(Boolean),
-            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+            degraded_details: degradedDetails,
+            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean),
+            parser_gap_details: parserGapDetails
         };
     }
 
@@ -525,19 +541,24 @@ function buildCiDiagnostics({ exceptions = [], runs = [], sourceRunPlan = [], he
             next_action: 'Review health.failures in data/duty-rate-sync-status.json and update the relevant rate rule or sample expectation.',
             exception_sources: [],
             degraded_sources: degraded.map(row => row.country).filter(Boolean),
-            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+            degraded_details: degradedDetails,
+            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean),
+            parser_gap_details: parserGapDetails
         };
     }
 
     if (degraded.length) {
+        const repairLabel = firstDegraded?.degraded_label || firstDegraded?.degraded_category || 'official probe';
         return {
             outcome: 'completed_with_degraded_sources',
-            summary: `Duty-rate sync completed; ${degraded.length} official probe(s) were degraded and kept on maintained/candidate coverage.`,
+            summary: `Duty-rate sync completed; ${degraded.length} official probe(s) were degraded and kept on maintained/candidate coverage. First diagnosis: ${repairLabel}.`,
             failed_step_hint: '',
-            next_action: firstDegraded?.run_plan_action || 'Keep daily sync running and promote exact parsers only after official rows are stable.',
+            next_action: firstDegraded?.degraded_action || firstDegraded?.run_plan_action || 'Keep daily sync running and promote exact parsers only after official rows are stable.',
             exception_sources: [],
             degraded_sources: degraded.map(row => row.country).filter(Boolean),
-            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+            degraded_details: degradedDetails,
+            parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean),
+            parser_gap_details: parserGapDetails
         };
     }
 
@@ -552,7 +573,9 @@ function buildCiDiagnostics({ exceptions = [], runs = [], sourceRunPlan = [], he
             : 'Keep daily duty-rate sync running.',
         exception_sources: [],
         degraded_sources: [],
-        parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean)
+        degraded_details: [],
+        parser_gap_countries: parserGaps.map(row => row.country).filter(Boolean),
+        parser_gap_details: parserGapDetails
     };
 }
 

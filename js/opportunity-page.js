@@ -125,12 +125,10 @@ function bootstrapTradeOpportunityPage() {
             ? card.rejectionReasons.slice(0, 3)
             : [];
         const metricItems = transit ? [
-            { label: 'Status', value: transitStatusLabel(card.transitCostStatus) },
-            { label: 'Transit total', value: transit.combinedRate || 'Not covered' },
-            { label: 'Transit cost / $1k', value: transit.combinedCostPer1000 || 'Pending' },
-            { label: 'Delta / $1k', value: transit.deltaCostPer1000 || 'Pending' },
-            { label: 'First leg', value: `${transit.firstLegRate || 'Pending'} · ${transit.firstLegCostPer1000 || 'Pending'}` },
-            { label: 'Second leg', value: `${transit.secondLegRate || 'Pending'} · ${transit.secondLegCostPer1000 || 'Pending'}` }
+            { label: 'Route type', value: 'Transit route' },
+            { label: 'Combined duty/tax', value: transit.combinedRate || 'Not covered' },
+            { label: 'Vs direct', value: `${transit.deltaRate || 'Pending'} · ${transit.deltaCostPer1000 || 'Pending'}` },
+            { label: 'Legal gate', value: transit.transitLegalGate?.origin_transformation_required ? 'Origin proof required' : 'Review required' }
         ] : [
             { label: 'Route type', value: 'Direct route' },
             { label: 'Direct total', value: card.dutyBreakdown?.totalRate || 'Not covered' },
@@ -150,6 +148,7 @@ function bootstrapTradeOpportunityPage() {
                 </div>
                 <span class="opportunity-pill">${escapeHtml(card.tag)}</span>
                 <p>${escapeHtml(displaySummary)}</p>
+                ${transit?.costScopeNote ? `<p class="opportunity-cost-scope-note">${escapeHtml(transit.costScopeNote)}</p>` : ''}
                 ${card.originSavingsCaveat ? `<p class="opportunity-origin-caveat">${escapeHtml(card.originSavingsCaveat)}</p>` : ''}
                 ${card.transitReason ? `<p class="opportunity-transit-reason">${escapeHtml(card.transitReason)}</p>` : ''}
                 <div class="opportunity-rate-mini-grid">
@@ -308,7 +307,7 @@ function bootstrapTradeOpportunityPage() {
             <section class="opportunity-section">
                 <div class="opportunity-section-heading">
                     <h3>Direct route and top transit options</h3>
-                    <p>Showing the selected direct route plus the two strongest transit comparisons. Transit totals combine both maintained duty/tax legs and still require origin-transformation, re-export, and logistics evidence.</p>
+                    <p>Showing the selected direct route plus up to two transit comparisons. Transit is only a commercial option when combined duty/tax, legal origin transformation, re-export controls, and logistics still work together.</p>
                 </div>
                 <div class="opportunity-market-grid">
                     ${model.markets.map(renderMarketCard).join('')}
