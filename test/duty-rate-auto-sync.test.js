@@ -16,6 +16,9 @@ const {
     buildSyncStatusPayload,
     runAutoDutyRateSync
 } = require('../scripts/auto-sync-duty-rates');
+const {
+    buildDiagnosticLines
+} = require('../scripts/print-duty-rate-sync-diagnostics');
 
 test('material duty-rate changes are detected by percentage-point threshold', () => {
     assert.equal(isMaterialRateChange({
@@ -159,6 +162,53 @@ test('GitHub duty-rate workflow runs tests before committing sync output', () =>
     assert.match(workflow, /if:\s*always\(\)/);
     assert.match(workflow, /data\/duty-rate-sources\.json/);
     assert.match(workflow, /git pull --ff-only/);
+});
+
+test('duty-rate diagnostics print source watchlist and parser priority queue', () => {
+    const lines = buildDiagnosticLines({
+        status: 'ok',
+        counts: {
+            sources_checked: 2,
+            exceptions: 0,
+            parser_gap_sources: 1,
+            degraded_sources: 1
+        },
+        ci_diagnostics: {
+            outcome: 'ok_with_parser_gaps',
+            summary: 'Official source degraded but sync can continue.',
+            next_action: 'Promote exact parser for JP.'
+        },
+        automation_digest: {
+            priority_queue: [{
+                country: 'JP',
+                workstream: 'exact-code parser',
+                next_action: 'Promote Japan Customs parser.'
+            }]
+        },
+        source_run_plan: [{
+            country: 'JP',
+            run_status: 'degraded',
+            run_source: 'Japan Customs official-live',
+            rate_automation_stage: 'official_probe_candidate',
+            maintenance_priority: 'P1',
+            parser_gap: true,
+            run_plan_action: 'Promote exact parser after stable official rows.',
+            official_fetch_summary: {
+                status_label: 'Official fetch degraded',
+                exact_query_attempted: 2,
+                exact_query_matched: 0,
+                degraded: true,
+                degraded_reason: 'official_fetch_failed',
+                degraded_detail: 'fetch failed'
+            }
+        }]
+    }).join('\n');
+
+    assert.match(lines, /Source run plan watchlist/);
+    assert.match(lines, /JP: degraded · Japan Customs official-live/);
+    assert.match(lines, /Official fetch degraded; 0\/2 exact HS matched/);
+    assert.match(lines, /Automation priority queue/);
+    assert.match(lines, /Promote Japan Customs parser/);
 });
 
 test('source run plan maps roadmap sources to daily updater runs', () => {

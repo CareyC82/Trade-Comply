@@ -1037,6 +1037,78 @@
             `;
         }
 
+        function renderDutyAutomationHealthQueue(rows = []) {
+            if (!rows.length) {
+                return '';
+            }
+            const rank = {
+                exception: 0,
+                degraded: 1,
+                not_run: 2,
+                ok: 3
+            };
+            const statusLabel = {
+                ok: 'OK',
+                degraded: 'Parser pending',
+                exception: 'Exception',
+                not_run: 'Not run'
+            };
+            const statusClass = {
+                ok: 'auto_updatable',
+                degraded: 'parser_pending',
+                exception: 'benchmark',
+                not_run: 'official_link'
+            };
+            const watchRows = rows
+                .filter(row => (
+                    row.run_status !== 'ok'
+                    || row.parser_gap
+                    || row.official_fetch_summary?.degraded
+                    || Number(row.official_fetch_summary?.exact_query_attempted || 0) > Number(row.official_fetch_summary?.exact_query_matched || 0)
+                ))
+                .sort((a, b) => (
+                    (rank[a.run_status] ?? 4) - (rank[b.run_status] ?? 4)
+                    || String(a.maintenance_priority || '').localeCompare(String(b.maintenance_priority || ''))
+                    || String(a.country || '').localeCompare(String(b.country || ''))
+                ))
+                .slice(0, 6);
+            if (!watchRows.length) {
+                return `
+                    <div class="crawl-section-title" style="margin-top:14px"><h3>Duty-rate automation health queue</h3><span class="meta">No watched source issues</span></div>
+                    <div class="empty">All watched duty-rate sources are currently green.</div>
+                `;
+            }
+            const fetchSummary = (summary = null) => {
+                if (!summary) return 'No official fetch summary yet.';
+                const attempted = Number(summary.exact_query_attempted || 0);
+                const matched = Number(summary.exact_query_matched || 0);
+                const parsed = Number(summary.row_count || 0);
+                const exactText = attempted
+                    ? `${matched}/${attempted} exact HS query match(es)`
+                    : `${parsed} official row(s) parsed`;
+                return `${summary.status_label || 'Official source checked'} · ${exactText}`;
+            };
+            return `
+                <div class="crawl-section-title" style="margin-top:14px"><h3>Duty-rate automation health queue</h3><span class="meta">${watchRows.length} source(s) to watch</span></div>
+                <div class="duty-sync-mini-grid">
+                    ${watchRows.map(row => `
+                        <article class="duty-source-grade-card">
+                            <strong>${escapeHtml(row.country || '—')}</strong>
+                            <div class="grade-line">
+                                <span class="badge ${escapeHtml(statusClass[row.run_status] || 'official_link')}">${escapeHtml(statusLabel[row.run_status] || row.run_status || 'Unknown')}</span>
+                                <span class="badge hybrid_official_candidate">${escapeHtml(row.maintenance_priority || '—')}</span>
+                            </div>
+                            <div class="grade-note"><strong>${escapeHtml(row.run_source || 'No run source')}</strong> · ${escapeHtml(row.rate_automation_stage || 'unknown stage')}</div>
+                            <div class="grade-note">${escapeHtml(fetchSummary(row.official_fetch_summary))}</div>
+                            ${row.degraded_reason ? `<div class="grade-note">Reason: ${escapeHtml(row.degraded_reason)}${row.degraded_detail ? ` · ${escapeHtml(row.degraded_detail)}` : ''}</div>` : ''}
+                            <div class="grade-note">Next: ${escapeHtml(row.run_plan_action || row.next_action || 'Review source roadmap.')}</div>
+                            ${row.parser_gap_task?.task ? `<div class="grade-note"><strong>Parser task:</strong> ${escapeHtml(row.parser_gap_task.task)}</div>` : ''}
+                        </article>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         function renderDutySyncStatus(syncStatus = {}, roadmap = {}) {
             const status = String(syncStatus.status || 'not_run');
             const counts = syncStatus.counts || {};
@@ -1091,6 +1163,7 @@
                     </div>
                     <p class="meta" style="margin:10px 0 0">${escapeHtml(nextAction)}</p>
                     ${exceptionList}
+                    ${renderDutyAutomationHealthQueue(sourceRunPlan)}
                     ${renderDutySourceRunPlan(sourceRunPlan)}
                 </div>
             `;

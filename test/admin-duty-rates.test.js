@@ -1,10 +1,20 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const {
     buildDutyRateStatusPayload,
     buildQualityStatusPayload
 } = require('../scripts/admin-server');
+
+test('admin page includes duty-rate automation health queue', () => {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
+
+    assert.match(html, /Duty-rate automation health queue/);
+    assert.match(html, /No watched source issues/);
+    assert.match(html, /exact HS query match/);
+});
 
 test('admin duty-rate payload exposes source roadmap status', () => {
     const payload = buildDutyRateStatusPayload();
