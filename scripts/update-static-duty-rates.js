@@ -42,7 +42,8 @@ const STATIC_EXACT_CODE_CANDIDATES = [
     '854143',
     '854231',
     '854232',
-    '854239'
+    '854239',
+    '901890'
 ];
 const EXACT_CANDIDATE_COUNTRY_META = {
     CN: {

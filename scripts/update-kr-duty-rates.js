@@ -35,7 +35,8 @@ const KR_EXACT_CODE_CANDIDATES = [
     '854143',
     '854231',
     '854232',
-    '854239'
+    '854239',
+    '901890'
 ];
 
 function readJson(filePath) {

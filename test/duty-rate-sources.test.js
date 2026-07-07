@@ -29,7 +29,8 @@ const {
 } = require('../scripts/update-eu-duty-rates');
 const {
     applySingaporeBenchmarkToRule,
-    probeSingaporeReadiness
+    probeSingaporeReadiness,
+    SG_EXACT_CODE_CANDIDATES
 } = require('../scripts/update-sg-duty-rates');
 const {
     applyMexicoBenchmarkToRule,
@@ -55,6 +56,7 @@ const {
     applyKoreaOfficialCandidateToRule,
     buildKoreaOfficialCandidateForRule,
     fetchKoreaOfficialRows,
+    KR_EXACT_CODE_CANDIDATES,
     KR_TARIFF_DB_URL,
     KR_TARIFF_LOOKUP_URL,
     parseKoreaAdValoremRate,
@@ -67,6 +69,7 @@ const {
 const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
     STATIC_EXACT_CODE_CANDIDATES,
+    applyStaticBenchmarkToRule,
     applyIndiaOfficialCandidateToRule,
     buildIndiaOfficialCandidateForRule,
     fetchIndiaOfficialRows,
@@ -130,8 +133,8 @@ test('duty-rate health check reports source roadmap status', () => {
     assert.deepEqual(result.source_roadmap_summary.missing_roadmap, []);
 });
 
-test('static exact candidates include memory-specific HS lines for automated refresh', () => {
-    ['854231', '854232', '854239'].forEach((hsCode) => {
+test('static exact candidates include memory and medical HS lines for automated refresh', () => {
+    ['854231', '854232', '854239', '901890'].forEach((hsCode) => {
         assert.ok(
             STATIC_EXACT_CODE_CANDIDATES.includes(hsCode),
             `${hsCode} should remain in the maintained static exact-code candidate list`
@@ -151,6 +154,58 @@ test('static exact candidates include memory-specific HS lines for automated ref
             );
         });
     });
+});
+
+test('SG KR and static updaters keep high-tech exact candidates aligned', () => {
+    ['854231', '854232', '854239', '901890'].forEach((hsCode) => {
+        assert.ok(
+            SG_EXACT_CODE_CANDIDATES.includes(hsCode),
+            `Singapore updater should include ${hsCode} in exact-line candidates`
+        );
+        assert.ok(
+            KR_EXACT_CODE_CANDIDATES.includes(hsCode),
+            `Korea updater should include ${hsCode} in exact-line candidates`
+        );
+        assert.ok(
+            STATIC_EXACT_CODE_CANDIDATES.includes(hsCode),
+            `Static updater should include ${hsCode} in exact-line candidates`
+        );
+    });
+
+    const sgRule = {
+        id: 'TEST-SG-MED',
+        import_country: 'SG',
+        base_rate: 0,
+        additional_rate: 0,
+        add_on_layers: [{ type: 'import_gst', rate: 0.09, status: 'indicative' }],
+        source_status: 'indicative'
+    };
+    applySingaporeBenchmarkToRule(sgRule, '2026-07-07T00:00:00.000Z');
+    assert.ok(sgRule.exact_code_overrides.some(override => override.hs_code === '901890'));
+
+    const krRule = {
+        id: 'TEST-KR-MED',
+        import_country: 'KR',
+        base_rate: 0,
+        additional_rate: 0,
+        add_on_layers: [{ type: 'import_vat', rate: 0.1, status: 'indicative' }],
+        source_status: 'indicative'
+    };
+    applyKoreaBenchmarkToRule(krRule, '2026-07-07T00:00:00.000Z');
+    assert.ok(krRule.exact_code_overrides.some(override => override.hs_code === '901890'));
+
+    const staticRule = {
+        id: 'TEST-IN-MED',
+        import_country: 'IN',
+        base_rate: 0,
+        additional_rate: 0,
+        source_status: 'indicative'
+    };
+    applyStaticBenchmarkToRule(staticRule, {
+        source: { official_url: 'https://www.icegate.gov.in/' },
+        checkedAt: '2026-07-07T00:00:00.000Z'
+    });
+    assert.ok(staticRule.exact_code_overrides.some(override => override.hs_code === '901890'));
 });
 
 test('EU hybrid source and benchmark updater probes are wired by market', async () => {

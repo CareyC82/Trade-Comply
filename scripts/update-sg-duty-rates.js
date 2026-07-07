@@ -30,7 +30,10 @@ const SG_EXACT_CODE_CANDIDATES = [
     '851762',
     '852852',
     '854143',
-    '854231'
+    '854231',
+    '854232',
+    '854239',
+    '901890'
 ];
 
 function readJson(filePath) {
