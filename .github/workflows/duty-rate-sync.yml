@@ -46,10 +46,22 @@ jobs:
         if: always()
         run: node scripts/print-duty-rate-sync-diagnostics.js
 
+      - name: Upload duty-rate diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: duty-rate-sync-diagnostics
+          path: |
+            data/duty-rate-sync-status.json
+            data/automation-launch-status.json
+            data/exact-tariff-parser-priorities.json
+          if-no-files-found: ignore
+
       - name: Commit duty-rate sync data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
           git add \
             data/duty-rate-sources.json \
             data/duty-rates.json \
@@ -63,5 +75,5 @@ jobs:
           fi
 
           git commit -m "auto-data: daily duty-rate sync [auto-publish]"
-          git pull --ff-only
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
           git push

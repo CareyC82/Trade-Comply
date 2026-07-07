@@ -180,8 +180,10 @@ test('GitHub duty-rate workflow runs tests before committing sync output', () =>
     assert.match(workflow, /npm test/);
     assert.match(workflow, /node scripts\/print-duty-rate-sync-diagnostics\.js/);
     assert.match(workflow, /if:\s*always\(\)/);
+    assert.match(workflow, /actions\/upload-artifact@v4/);
+    assert.match(workflow, /data\/duty-rate-sync-status\.json/);
     assert.match(workflow, /data\/duty-rate-sources\.json/);
-    assert.match(workflow, /git pull --ff-only/);
+    assert.match(workflow, /git pull --rebase --autostash origin/);
 });
 
 test('duty-rate diagnostics print source watchlist and parser priority queue', () => {
