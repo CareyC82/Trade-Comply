@@ -33,7 +33,21 @@
       "full_probe_command": "npm run probe:duty-rates:eu:full",
       "last_sync_field": "last_eu_taric_benchmark_sync_at",
       "current_scope": "Hybrid EU coverage: official TARIC candidate duty for unambiguous HS prefixes, scope-check status for ambiguous prefixes, and benchmark member-state VAT shown separately.",
-      "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated."
+      "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated.",
+      "source_use_cases": [
+        "EU import duty pre-check",
+        "EU-bound direct and transit route pricing"
+      ],
+      "parser_subtasks": [
+        "Accept exact 8/10-digit TARIC code input and normalize spaces, dots, and national suffixes before lookup.",
+        "Map ERGA OMNES third-country duty rows to official base duty only when one active measure applies for the entry date.",
+        "Keep VAT, anti-dumping, countervailing, quota, and suspension layers outside the base-duty parser until separately sourced."
+      ],
+      "rate_change_drivers": [
+        "EU TARIC duty measure changes",
+        "Suspensions, quotas, anti-dumping, or countervailing duty updates",
+        "Member-state VAT updates"
+      ]
     },
     {
       "country": "DE",
@@ -48,7 +62,21 @@
       "update_command": "npm run update:duty-rates:eu",
       "last_sync_field": "last_eu_taric_benchmark_sync_at",
       "current_scope": "Hybrid Germany coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Germany VAT benchmark separately.",
-      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
+      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
+      "source_use_cases": [
+        "Germany import VAT plus EU TARIC duty pre-check",
+        "EU-bound direct and transit route pricing"
+      ],
+      "parser_subtasks": [
+        "Resolve exact TARIC code against EU duty rows before applying Germany-specific VAT as a separate tax layer.",
+        "Preserve Germany VAT treatment separately from EU customs duty so Post-Entry math does not overstate base duty certainty.",
+        "Flag ambiguous EU TARIC prefixes as exact-code required instead of promoting them to filing-grade rates."
+      ],
+      "rate_change_drivers": [
+        "EU TARIC duty measure changes",
+        "Germany VAT updates",
+        "EU trade-remedy or suspension changes affecting Germany entries"
+      ]
     },
     {
       "country": "NL",
@@ -63,7 +91,21 @@
       "update_command": "npm run update:duty-rates:eu",
       "last_sync_field": "last_eu_taric_benchmark_sync_at",
       "current_scope": "Hybrid Netherlands coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Netherlands VAT benchmark separately.",
-      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
+      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
+      "source_use_cases": [
+        "Netherlands import VAT plus EU TARIC duty pre-check",
+        "EU-bound direct and transit route pricing"
+      ],
+      "parser_subtasks": [
+        "Resolve exact TARIC code against EU duty rows before applying Netherlands-specific VAT as a separate tax layer.",
+        "Keep Dutch VAT and import VAT accounting separate from EU base-duty parser output.",
+        "Flag ambiguous EU TARIC prefixes as exact-code required before using the route in pricing comparison."
+      ],
+      "rate_change_drivers": [
+        "EU TARIC duty measure changes",
+        "Netherlands VAT updates",
+        "EU trade-remedy or suspension changes affecting Netherlands entries"
+      ]
     },
     {
       "country": "SG",

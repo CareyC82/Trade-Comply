@@ -60,6 +60,8 @@ function countRateChanges(changes = []) {
 function buildRunSummary(source, result = {}, { applied = true, mode = 'official' } = {}) {
     const changes = Array.isArray(result.changes) ? result.changes : [];
     const errors = Array.isArray(result.errors) ? result.errors : [];
+    const degradedDetail = result.official_fetch_degraded_detail || result.official_fetch?.error || '';
+    const degradedDiagnosis = classifyOfficialFetchDegradation(degradedDetail);
     return {
         source,
         ok: result.ok !== false && errors.length === 0,
@@ -73,7 +75,9 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         official_fetch: result.official_fetch || null,
         official_fetch_degraded: Boolean(result.official_fetch_degraded),
         official_fetch_degraded_reason: result.official_fetch_degraded_reason || '',
-        official_fetch_degraded_detail: result.official_fetch_degraded_detail || '',
+        official_fetch_degraded_detail: degradedDetail,
+        official_fetch_degraded_category: result.official_fetch_degraded_category || degradedDiagnosis.category || '',
+        official_fetch_degraded_action: result.official_fetch_degraded_action || degradedDiagnosis.action || '',
         readiness: result.readiness || null,
         static_official_probes: result.static_official_probes || null,
         changes,
@@ -97,6 +101,8 @@ function buildOfficialFetchSummary(run = {}) {
         degraded: Boolean(run?.official_fetch_degraded),
         degraded_reason: run?.official_fetch_degraded_reason || '',
         degraded_detail: run?.official_fetch_degraded_detail || officialFetch?.error || '',
+        degraded_category: run?.official_fetch_degraded_category || '',
+        degraded_action: run?.official_fetch_degraded_action || '',
         row_count: Number(officialFetch?.row_count || 0),
         latest_schedule_date: officialFetch?.latest_schedule_date || '',
         official_url: officialFetch?.official_url || '',
@@ -137,6 +143,57 @@ function isOfficialTransportError(error = {}) {
     ].some(fragment => text.includes(fragment));
 }
 
+function classifyOfficialFetchDegradation(detail = '') {
+    const text = String(detail || '').toLowerCase();
+    if (!text) {
+        return {
+            category: '',
+            label: '',
+            action: ''
+        };
+    }
+    if (text.includes('ssl certificate') || text.includes('unable to get local issuer certificate') || text.includes('certificate problem')) {
+        return {
+            category: 'certificate',
+            label: 'Certificate / CA validation',
+            action: 'Use system CA in CI, verify the source certificate chain, then rerun the official probe.'
+        };
+    }
+    if (text.includes('http 403') || text.includes('http 429')) {
+        return {
+            category: 'access_limited',
+            label: 'Official site access limited',
+            action: 'Add a polite official-source probe strategy, rate limiting, or fallback official download before parser promotion.'
+        };
+    }
+    if (text.includes('http 500') || text.includes('http 502') || text.includes('http 503') || text.includes('http 504')) {
+        return {
+            category: 'official_site_unstable',
+            label: 'Official site unstable',
+            action: 'Keep maintained exact candidates and retry the official probe on the next sync window.'
+        };
+    }
+    if (text.includes('getaddrinfo') || text.includes('enotfound')) {
+        return {
+            category: 'dns',
+            label: 'DNS / host resolution',
+            action: 'Check whether the official endpoint changed or the CI runner cannot resolve the host.'
+        };
+    }
+    if (text.includes('tls') || text.includes('econnreset') || text.includes('socket hang up') || text.includes('fetch failed')) {
+        return {
+            category: 'network_transport',
+            label: 'Network transport',
+            action: 'Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.'
+        };
+    }
+    return {
+        category: 'official_fetch_failed',
+        label: 'Official fetch failed',
+        action: 'Inspect the source response and keep maintained exact candidates until the official parser is stable.'
+    };
+}
+
 function downgradeOfficialTransportFailure(run, {
     reason = 'official_fetch_failed'
 } = {}) {
@@ -148,6 +205,7 @@ function downgradeOfficialTransportFailure(run, {
         .slice(0, 5)
         .map(error => [error.rule, error.prefix, error.error || error.message].filter(Boolean).join(': '))
         .join(' | ');
+    const diagnosis = classifyOfficialFetchDegradation(detail);
     return {
         ...run,
         ok: true,
@@ -157,7 +215,9 @@ function downgradeOfficialTransportFailure(run, {
         writes_official_machine_rates: false,
         official_fetch_degraded: true,
         official_fetch_degraded_reason: reason,
-        official_fetch_degraded_detail: detail
+        official_fetch_degraded_detail: detail,
+        official_fetch_degraded_category: diagnosis.category,
+        official_fetch_degraded_action: diagnosis.action
     };
 }
 
@@ -290,10 +350,13 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                     ? 'degraded'
                     : run.ok ? 'ok' : 'exception'
                 : 'not_run';
+            const degradationDiagnosis = classifyOfficialFetchDegradation(
+                run?.official_fetch_degraded_detail || run?.official_fetch?.error || ''
+            );
             const runPlanAction = runStatus === 'exception'
                 ? 'Fix updater exception before relying on this source.'
                 : runStatus === 'degraded'
-                    ? 'Official source probe degraded; keep maintained exact candidates and promote parser when rows are machine-readable.'
+                    ? (run?.official_fetch_degraded_action || degradationDiagnosis.action || 'Official source probe degraded; keep maintained exact candidates and promote parser when rows are machine-readable.')
                 : stage.parser_gap
                     ? stage.next_upgrade
                     : 'Keep official machine-readable sync running.';
@@ -320,6 +383,9 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 rate_change_count: run?.rate_change_count || 0,
                 degraded_reason: run?.official_fetch_degraded_reason || '',
                 degraded_detail: run?.official_fetch_degraded_detail || run?.official_fetch?.error || '',
+                degraded_category: run?.official_fetch_degraded_category || degradationDiagnosis.category || '',
+                degraded_label: degradationDiagnosis.label || '',
+                degraded_action: run?.official_fetch_degraded_action || degradationDiagnosis.action || '',
                 official_fetch_summary: buildOfficialFetchSummary(run),
                 official_probe_live_status: liveProbe ? {
                     checked: Boolean(liveProbe.checked ?? liveProbe.official_probe?.checked),
@@ -364,11 +430,17 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
         .map(run => run.source);
     const officialProbeDegradedReasons = runs
         .filter(run => run.official_fetch_degraded)
-        .map(run => ({
-            source: run.source,
-            reason: run.official_fetch_degraded_reason || 'official_probe_degraded',
-            detail: run.official_fetch_degraded_detail || run.official_fetch?.error || ''
-        }));
+        .map((run) => {
+            const detail = run.official_fetch_degraded_detail || run.official_fetch?.error || '';
+            const diagnosis = classifyOfficialFetchDegradation(detail);
+            return {
+                source: run.source,
+                reason: run.official_fetch_degraded_reason || 'official_probe_degraded',
+                detail,
+                category: run.official_fetch_degraded_category || diagnosis.category,
+                action: run.official_fetch_degraded_action || diagnosis.action
+            };
+        });
     const rateChanges = runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0);
     const priorityQueue = parserGaps
         .map(row => ({
@@ -390,7 +462,9 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
             parser_subtasks: row.parser_subtasks || [],
             rate_change_drivers: row.rate_change_drivers || [],
             transit_route_priority: Boolean(row.transit_route_priority),
-            official_probe_live_status: row.official_probe_live_status || null,
+            degraded_category: row.degraded_category || '',
+            degraded_label: row.degraded_label || '',
+            degraded_action: row.degraded_action || '',
             parser_gap_task: row.parser_gap_task || null,
             next_action: row.run_plan_action || row.next_action || ''
         }))
@@ -501,6 +575,9 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             official_probe_urls: row.official_probe_urls || [],
             source_use_cases: row.source_use_cases || [],
             transit_route_priority: Boolean(row.transit_route_priority),
+            degraded_category: row.degraded_category || '',
+            degraded_label: row.degraded_label || '',
+            degraded_action: row.degraded_action || '',
             parser_gap_task: row.parser_gap_task || null,
             next_upgrade: row.run_plan_action || row.next_action || ''
         }));
@@ -781,6 +858,7 @@ module.exports = {
     isMaterialRateChange,
     buildRunSummary,
     downgradeOfficialTransportFailure,
+    classifyOfficialFetchDegradation,
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,

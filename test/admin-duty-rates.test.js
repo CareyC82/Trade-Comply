@@ -14,6 +14,8 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Duty-rate automation health queue/);
     assert.match(html, /No watched source issues/);
     assert.match(html, /exact HS query match/);
+    assert.match(html, /Diagnosis:/);
+    assert.match(html, /Fix:/);
 });
 
 test('admin duty-rate payload exposes source roadmap status', () => {

@@ -71,6 +71,12 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(byCountry.EU.rate_automation_stage, 'official_hybrid_parser');
     assert.equal(byCountry.DE.launch_mode, 'live_hybrid');
     assert.equal(byCountry.NL.launch_mode, 'live_hybrid');
+    assert.ok(byCountry.EU.source_use_cases.includes('EU-bound direct and transit route pricing'));
+    assert.ok(byCountry.EU.parser_subtasks.some(task => /TARIC code input/.test(task)));
+    assert.ok(byCountry.DE.source_use_cases.includes('EU-bound direct and transit route pricing'));
+    assert.ok(byCountry.DE.rate_change_drivers.some(driver => /Germany VAT/.test(driver)));
+    assert.ok(byCountry.NL.parser_subtasks.some(task => /Netherlands-specific VAT/.test(task)));
+    assert.ok(byCountry.NL.rate_change_drivers.some(driver => /Netherlands VAT/.test(driver)));
     assert.equal(byCountry.KR.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.IN.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.SG.rate_automation_stage, 'maintained_exact_map');
@@ -88,6 +94,11 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.ok(payload.duty_rate_priority_queue.some(row => (
         row.country === 'CN'
         && row.parser_gap_task?.parser_subtasks?.some(task => /8\/10-digit/.test(task))
+    )));
+    assert.ok(payload.duty_rate_priority_queue.some(row => (
+        row.country === 'EU'
+        && row.parser_gap_task?.source_use_cases?.includes('EU-bound direct and transit route pricing')
+        && row.parser_gap_task?.parser_subtasks?.some(task => /TARIC code input/.test(task))
     )));
     assert.ok(payload.duty_rate_priority_queue.some(row => (
         row.country === 'MX'

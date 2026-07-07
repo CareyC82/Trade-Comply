@@ -8,6 +8,7 @@ const {
     isMaterialRateChange,
     buildRunSummary,
     downgradeOfficialTransportFailure,
+    classifyOfficialFetchDegradation,
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
     appendMultiPrefixConflicts,
@@ -30,6 +31,20 @@ test('material duty-rate changes are detected by percentage-point threshold', ()
         new_base_rate: 0.035
     }), false);
     assert.equal(MATERIAL_RATE_CHANGE_THRESHOLD, 0.03);
+});
+
+test('official fetch degradation classifier gives repair-focused categories', () => {
+    const cert = classifyOfficialFetchDegradation('curl: (60) SSL certificate problem: unable to get local issuer certificate');
+    assert.equal(cert.category, 'certificate');
+    assert.match(cert.action, /system CA/i);
+
+    const limited = classifyOfficialFetchDegradation('HTTP 429: too many requests');
+    assert.equal(limited.category, 'access_limited');
+    assert.match(limited.action, /rate limiting/i);
+
+    const transport = classifyOfficialFetchDegradation('fetch failed');
+    assert.equal(transport.category, 'network_transport');
+    assert.match(transport.action, /Retry/i);
 });
 
 test('auto sync status treats safe updates as auto-applied without manual review', () => {
@@ -463,6 +478,8 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.equal(japanRun.official_fetch_degraded_reason, 'official_fetch_failed');
     assert.equal(koreaRun.official_fetch_degraded_reason, 'official_fetch_failed');
     assert.equal(indiaRun.official_fetch_degraded_reason, 'official_fetch_failed');
+    assert.equal(koreaRun.official_fetch_degraded_category, 'network_transport');
+    assert.match(koreaRun.official_fetch_degraded_action, /Retry/);
     assert.equal(japanRun.errors.length, 0);
     assert.equal(koreaRun.errors.length, 0);
     assert.equal(indiaRun.errors.length, 0);
@@ -474,6 +491,8 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.equal(payload.source_run_plan.find(row => row.country === 'JP').degraded_reason, 'official_fetch_failed');
     assert.equal(payload.source_run_plan.find(row => row.country === 'KR').degraded_reason, 'official_fetch_failed');
     assert.equal(payload.source_run_plan.find(row => row.country === 'IN').degraded_reason, 'official_fetch_failed');
+    assert.equal(payload.source_run_plan.find(row => row.country === 'KR').degraded_category, 'network_transport');
+    assert.match(payload.source_run_plan.find(row => row.country === 'KR').degraded_action, /Retry/);
     assert.ok(payload.automation_digest.official_probe_countries.includes('JP'));
     assert.ok(payload.automation_digest.official_probe_countries.includes('KR'));
     assert.ok(payload.automation_digest.official_probe_countries.includes('IN'));
@@ -481,7 +500,12 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('Korea Customs official-live'));
     assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('India Customs official-live'));
     assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => row.source === 'Japan Customs official-live' && row.reason === 'official_fetch_failed'));
-    assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => row.source === 'Korea Customs official-live' && row.reason === 'official_fetch_failed'));
+    assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => (
+        row.source === 'Korea Customs official-live'
+        && row.reason === 'official_fetch_failed'
+        && row.category === 'network_transport'
+        && /Retry/.test(row.action)
+    )));
     assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => row.source === 'India Customs official-live' && row.reason === 'official_fetch_failed'));
     assert.ok(payload.automation_digest.degraded_countries.includes('JP'));
     assert.ok(payload.automation_digest.degraded_countries.includes('KR'));

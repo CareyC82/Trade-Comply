@@ -1008,6 +1008,8 @@
                     ${summary.lookup_url ? `<div class="grade-note">Lookup: <a href="${escapeHtml(summary.lookup_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(summary.lookup_url)}</a></div>` : ''}
                     ${summary.official_url && summary.official_url !== summary.lookup_url ? `<div class="grade-note">Source: <a href="${escapeHtml(summary.official_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(summary.official_url)}</a></div>` : ''}
                     ${summary.degraded_reason ? `<div class="grade-note">Official fetch: ${escapeHtml(summary.degraded_reason)}${summary.degraded_detail ? ` · ${escapeHtml(summary.degraded_detail)}` : ''}</div>` : ''}
+                    ${summary.degraded_category ? `<div class="grade-note">Diagnosis: ${escapeHtml(summary.degraded_category)}</div>` : ''}
+                    ${summary.degraded_action ? `<div class="grade-note">Fix: ${escapeHtml(summary.degraded_action)}</div>` : ''}
                 `;
             };
             return `
@@ -1024,6 +1026,8 @@
                             <div class="grade-note">${escapeHtml(row.public_claim || row.automation_claim || '—')}</div>
                             <div class="grade-note">${escapeHtml(row.source_status || '')} · ${escapeHtml(row.run_source || '')}</div>
                             ${row.degraded_reason ? `<div class="grade-note">Reason: ${escapeHtml(row.degraded_reason)}${row.degraded_detail ? ` · ${escapeHtml(row.degraded_detail)}` : ''}</div>` : ''}
+                            ${row.degraded_label ? `<div class="grade-note">Diagnosis: ${escapeHtml(row.degraded_label)}${row.degraded_category ? ` · ${escapeHtml(row.degraded_category)}` : ''}</div>` : ''}
+                            ${row.degraded_action ? `<div class="grade-note">Fix: ${escapeHtml(row.degraded_action)}</div>` : ''}
                             ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
                             ${row.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}
                             ${renderOfficialFetchSummary(row.official_fetch_summary)}
@@ -1101,6 +1105,8 @@
                             <div class="grade-note"><strong>${escapeHtml(row.run_source || 'No run source')}</strong> · ${escapeHtml(row.rate_automation_stage || 'unknown stage')}</div>
                             <div class="grade-note">${escapeHtml(fetchSummary(row.official_fetch_summary))}</div>
                             ${row.degraded_reason ? `<div class="grade-note">Reason: ${escapeHtml(row.degraded_reason)}${row.degraded_detail ? ` · ${escapeHtml(row.degraded_detail)}` : ''}</div>` : ''}
+                            ${row.degraded_label ? `<div class="grade-note">Diagnosis: ${escapeHtml(row.degraded_label)}${row.degraded_category ? ` · ${escapeHtml(row.degraded_category)}` : ''}</div>` : ''}
+                            ${row.degraded_action ? `<div class="grade-note">Fix: ${escapeHtml(row.degraded_action)}</div>` : ''}
                             <div class="grade-note">Next: ${escapeHtml(row.run_plan_action || row.next_action || 'Review source roadmap.')}</div>
                             ${row.parser_gap_task?.task ? `<div class="grade-note"><strong>Parser task:</strong> ${escapeHtml(row.parser_gap_task.task)}</div>` : ''}
                         </article>
@@ -1798,6 +1804,9 @@
                     rate_change_count: sync.rate_change_count ?? '',
                     degraded_reason: sync.degraded_reason || '',
                     degraded_detail: sync.degraded_detail || '',
+                    degraded_category: sync.degraded_category || '',
+                    degraded_label: sync.degraded_label || '',
+                    degraded_action: sync.degraded_action || '',
                     official_probe_live_status: sync.official_probe_live_status || row.official_probe_live_status || null,
                     run_plan_action: sync.run_plan_action || '',
                     parser_gap_task: sync.parser_gap_task || row.parser_gap_task || null,
@@ -1850,6 +1859,8 @@
                                         ${row.latest_run_status ? `<div class="meta">Changes: ${escapeHtml(row.change_count ?? 0)} · Rate changes: ${escapeHtml(row.rate_change_count ?? 0)}</div>` : ''}
                                         ${row.degraded_reason ? `<div class="meta">${escapeHtml(row.degraded_reason)}</div>` : ''}
                                         ${row.degraded_detail ? `<div class="meta">${escapeHtml(row.degraded_detail)}</div>` : ''}
+                                        ${row.degraded_label ? `<div class="meta">Diagnosis: ${escapeHtml(row.degraded_label)}${row.degraded_category ? ` · ${escapeHtml(row.degraded_category)}` : ''}</div>` : ''}
+                                        ${row.degraded_action ? `<div class="meta">Fix: ${escapeHtml(row.degraded_action)}</div>` : ''}
                                         ${row.official_probe_live_status ? `<div class="meta">Live probe: ${escapeHtml(row.official_probe_live_status.safe_rate_rows || 0)} safe / ${escapeHtml(row.official_probe_live_status.weak_rate_rows || 0)} weak row(s)${row.official_probe_live_status.machine_parser_ready ? ' · parser-ready' : ''}</div>` : ''}
                                         ${row.official_probe_live_status?.error ? `<div class="meta">Probe error: ${escapeHtml(row.official_probe_live_status.error)}</div>` : ''}
                                     </td>
