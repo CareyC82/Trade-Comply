@@ -61,7 +61,10 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
     const changes = Array.isArray(result.changes) ? result.changes : [];
     const errors = Array.isArray(result.errors) ? result.errors : [];
     const degradedDetail = result.official_fetch_degraded_detail || result.official_fetch?.error || '';
-    const degradedDiagnosis = classifyOfficialFetchDegradation(degradedDetail);
+    const degradedDiagnosis = classifyOfficialFetchDegradation([
+        result.official_fetch_degraded_reason,
+        degradedDetail
+    ].filter(Boolean).join(' '));
     return {
         source,
         ok: result.ok !== false && errors.length === 0,
@@ -150,6 +153,19 @@ function classifyOfficialFetchDegradation(detail = '') {
             category: '',
             label: '',
             action: ''
+        };
+    }
+    if (
+        text.includes('official_source_returned_no_rate_rows')
+        || text.includes('no machine-readable tariff rows')
+        || text.includes('no machine readable tariff rows')
+        || text.includes('no rate rows')
+        || text.includes('no tariff rows')
+    ) {
+        return {
+            category: 'parser_no_rows',
+            label: 'Official source reachable, parser found no rate rows',
+            action: 'Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.'
         };
     }
     if (text.includes('ssl certificate') || text.includes('unable to get local issuer certificate') || text.includes('certificate problem')) {
@@ -351,7 +367,11 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                     : run.ok ? 'ok' : 'exception'
                 : 'not_run';
             const degradationDiagnosis = classifyOfficialFetchDegradation(
-                run?.official_fetch_degraded_detail || run?.official_fetch?.error || ''
+                [
+                    run?.official_fetch_degraded_reason,
+                    run?.official_fetch_degraded_detail,
+                    run?.official_fetch?.error
+                ].filter(Boolean).join(' ')
             );
             const runPlanAction = runStatus === 'exception'
                 ? 'Fix updater exception before relying on this source.'
@@ -432,7 +452,10 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
         .filter(run => run.official_fetch_degraded)
         .map((run) => {
             const detail = run.official_fetch_degraded_detail || run.official_fetch?.error || '';
-            const diagnosis = classifyOfficialFetchDegradation(detail);
+            const diagnosis = classifyOfficialFetchDegradation([
+                run.official_fetch_degraded_reason,
+                detail
+            ].filter(Boolean).join(' '));
             return {
                 source: run.source,
                 reason: run.official_fetch_degraded_reason || 'official_probe_degraded',

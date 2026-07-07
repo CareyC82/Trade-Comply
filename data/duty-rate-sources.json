@@ -120,7 +120,23 @@
       "update_command": "npm run update:duty-rates:sg",
       "last_sync_field": "last_sg_customs_benchmark_sync_at",
       "current_scope": "Maintained Singapore exact-line base-duty candidates plus 9% GST value treatment reminder.",
-      "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed."
+      "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed.",
+      "source_use_cases": [
+        "Singapore import duty and GST pre-check",
+        "two-leg transit comparison",
+        "origin transformation and re-export evidence review"
+      ],
+      "parser_subtasks": [
+        "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
+        "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
+        "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
+      ],
+      "rate_change_drivers": [
+        "Singapore Customs dutiable-goods or tariff schedule updates",
+        "GST rate or relief updates",
+        "Strategic Goods Control, IMDA, or controlled-goods scope changes"
+      ],
+      "transit_route_priority": true
     },
     {
       "country": "MX",
@@ -188,7 +204,22 @@
       "probe_command": "npm run probe:duty-rates:kr",
       "last_sync_field": "last_kr_customs_benchmark_sync_at",
       "current_scope": "Maintained Korea exact-line base-duty candidates plus 10% VAT and KC/origin review reminders.",
-      "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows."
+      "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows.",
+      "source_use_cases": [
+        "Korea import duty and VAT pre-check",
+        "semiconductor and electronics route pricing",
+        "KC/KCC product-approval scope review"
+      ],
+      "parser_subtasks": [
+        "Parse KCS 10-digit tariff rows and normalize Korean/English tariff descriptions for maintained high-tech HS lines.",
+        "Separate customs duty, VAT, FTA/preferential-origin treatment, and KC/KCC product approval checks.",
+        "Treat official source responses with zero parsed rows as parser-selector gaps, not generic network failures."
+      ],
+      "rate_change_drivers": [
+        "KCS tariff schedule revisions",
+        "VAT or preferential-origin treatment changes",
+        "KC/KCC certification or electronics safety scope changes"
+      ]
     },
     {
       "country": "IN",
@@ -207,7 +238,22 @@
       "probe_command": "npm run probe:duty-rates:in",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Official-live probe candidate plus maintained exact-line BCD fallback; SWS/IGST and product-control review reminders stay separate.",
-      "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed."
+      "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
+      "source_use_cases": [
+        "India import duty, SWS, and IGST pre-check",
+        "semiconductor, electronics, and telecom import route pricing",
+        "BIS/QCO, WPC, and SCOMET scope review"
+      ],
+      "parser_subtasks": [
+        "Parse exact HSN rows from ICEGATE/CIP or official tariff data and split BCD, SWS, IGST, and exemption layers.",
+        "Keep BIS/QCO, WPC, SCOMET, and electronics product-control checks separate from duty-rate math.",
+        "Gate promotion where exemption notifications or effective-date conditions change the payable rate."
+      ],
+      "rate_change_drivers": [
+        "India Customs tariff or exemption notification changes",
+        "SWS/IGST layer changes",
+        "BIS/QCO, WPC, or SCOMET product-control updates"
+      ]
     },
     {
       "country": "CN",

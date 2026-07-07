@@ -45,6 +45,11 @@ test('official fetch degradation classifier gives repair-focused categories', ()
     const transport = classifyOfficialFetchDegradation('fetch failed');
     assert.equal(transport.category, 'network_transport');
     assert.match(transport.action, /Retry/i);
+
+    const noRows = classifyOfficialFetchDegradation('official_source_returned_no_rate_rows: official source returned no machine-readable tariff rows');
+    assert.equal(noRows.category, 'parser_no_rows');
+    assert.match(noRows.label, /parser found no rate rows/i);
+    assert.match(noRows.action, /parser fixture/i);
 });
 
 test('auto sync status treats safe updates as auto-applied without manual review', () => {
@@ -221,6 +226,27 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
                 degraded_category: 'network_transport',
                 degraded_action: 'Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.'
             }
+        }, {
+            country: 'KR',
+            run_status: 'degraded',
+            run_source: 'Korea Customs official-live',
+            rate_automation_stage: 'official_probe_candidate',
+            maintenance_priority: 'P2',
+            parser_gap: true,
+            run_plan_action: 'Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.',
+            degraded_category: 'parser_no_rows',
+            degraded_label: 'Official source reachable, parser found no rate rows',
+            degraded_action: 'Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.',
+            official_fetch_summary: {
+                status_label: 'Official fetch degraded',
+                exact_query_attempted: 1,
+                exact_query_matched: 0,
+                degraded: true,
+                degraded_reason: 'official_source_returned_no_rate_rows',
+                degraded_detail: 'no machine-readable tariff rows',
+                degraded_category: 'parser_no_rows',
+                degraded_action: 'Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.'
+            }
         }]
     }).join('\n');
 
@@ -229,7 +255,9 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
     assert.match(lines, /Official fetch degraded; 0\/2 exact HS matched/);
     assert.match(lines, /Degraded source repair hints/);
     assert.match(lines, /Network transport/);
+    assert.match(lines, /Official source reachable, parser found no rate rows/);
     assert.match(lines, /fix: Retry with system CA/i);
+    assert.match(lines, /source-specific parser fixture/i);
     assert.match(lines, /Parser gap repair hints/);
     assert.match(lines, /diagnosis: Network transport/);
     assert.match(lines, /Automation priority queue/);
