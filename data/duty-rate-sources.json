@@ -152,6 +152,11 @@
       "last_sync_field": "last_mx_snice_benchmark_sync_at",
       "current_scope": "Maintained Mexico exact-line IGI/base-duty candidates plus 16% VAT and NOM/origin review reminders.",
       "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed.",
+      "source_use_cases": [
+        "Mexico import duty and VAT pre-check",
+        "USMCA or alternate-route pricing comparison",
+        "NOM certification and preferential-origin evidence review"
+      ],
       "parser_subtasks": [
         "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
         "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
@@ -178,6 +183,11 @@
       "last_sync_field": "last_jp_customs_official_live_sync_at",
       "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
       "next_action": "Keep Japan Customs chapter parser running daily; preserve statistical-code gates for mixed-rate prefixes and consumption-tax separation.",
+      "source_use_cases": [
+        "Japan import duty and consumption-tax pre-check",
+        "electronics and semiconductor route pricing",
+        "statistical-code scope and temporary tariff measure review"
+      ],
       "parser_subtasks": [
         "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
         "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
@@ -269,6 +279,11 @@
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained China exact-line MFN duty candidates plus 13% import VAT and product-control review reminders.",
       "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed.",
+      "source_use_cases": [
+        "China import duty and VAT pre-check",
+        "direct and alternate-route landed duty/tax comparison",
+        "CCC/SRRC/licensing and preferential-origin evidence review"
+      ],
       "parser_subtasks": [
         "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
         "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",

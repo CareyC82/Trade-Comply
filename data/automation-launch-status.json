@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-07T20:09:41.468Z",
+  "updated_at": "2026-07-08T07:44:37.916Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -759,7 +759,11 @@
       "probe_command": "",
       "official_url": "https://www.customs.gov.cn/",
       "official_probe_urls": [],
-      "source_use_cases": [],
+      "source_use_cases": [
+        "China import duty and VAT pre-check",
+        "direct and alternate-route landed duty/tax comparison",
+        "CCC/SRRC/licensing and preferential-origin evidence review"
+      ],
       "parser_subtasks": [
         "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
         "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
@@ -911,7 +915,11 @@
       "probe_command": "npm run probe:duty-rates:jp",
       "official_url": "https://www.customs.go.jp/english/tariff/",
       "official_probe_urls": [],
-      "source_use_cases": [],
+      "source_use_cases": [
+        "Japan import duty and consumption-tax pre-check",
+        "electronics and semiconductor route pricing",
+        "statistical-code scope and temporary tariff measure review"
+      ],
       "parser_subtasks": [
         "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
         "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
@@ -985,7 +993,11 @@
       "probe_command": "",
       "official_url": "https://www.snice.gob.mx/",
       "official_probe_urls": [],
-      "source_use_cases": [],
+      "source_use_cases": [
+        "Mexico import duty and VAT pre-check",
+        "USMCA or alternate-route pricing comparison",
+        "NOM certification and preferential-origin evidence review"
+      ],
       "parser_subtasks": [
         "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
         "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
@@ -1413,7 +1425,11 @@
       "update_command": "npm run update:duty-rates:jp:official",
       "probe_command": "npm run probe:duty-rates:jp",
       "official_probe_urls": [],
-      "source_use_cases": [],
+      "source_use_cases": [
+        "Japan import duty and consumption-tax pre-check",
+        "electronics and semiconductor route pricing",
+        "statistical-code scope and temporary tariff measure review"
+      ],
       "parser_subtasks": [
         "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
         "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
@@ -1432,7 +1448,11 @@
         "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
         "probe_command": "npm run probe:duty-rates:jp",
         "official_probe_urls": [],
-        "source_use_cases": [],
+        "source_use_cases": [
+          "Japan import duty and consumption-tax pre-check",
+          "electronics and semiconductor route pricing",
+          "statistical-code scope and temporary tariff measure review"
+        ],
         "parser_subtasks": [
           "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
           "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
@@ -1568,7 +1588,11 @@
       "update_command": "npm run update:duty-rates:static -- --countries=CN",
       "probe_command": "",
       "official_probe_urls": [],
-      "source_use_cases": [],
+      "source_use_cases": [
+        "China import duty and VAT pre-check",
+        "direct and alternate-route landed duty/tax comparison",
+        "CCC/SRRC/licensing and preferential-origin evidence review"
+      ],
       "parser_subtasks": [
         "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
         "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
@@ -1587,7 +1611,11 @@
         "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
         "probe_command": "",
         "official_probe_urls": [],
-        "source_use_cases": [],
+        "source_use_cases": [
+          "China import duty and VAT pre-check",
+          "direct and alternate-route landed duty/tax comparison",
+          "CCC/SRRC/licensing and preferential-origin evidence review"
+        ],
         "parser_subtasks": [
           "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
           "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
@@ -1613,7 +1641,11 @@
       "update_command": "npm run update:duty-rates:mx",
       "probe_command": "",
       "official_probe_urls": [],
-      "source_use_cases": [],
+      "source_use_cases": [
+        "Mexico import duty and VAT pre-check",
+        "USMCA or alternate-route pricing comparison",
+        "NOM certification and preferential-origin evidence review"
+      ],
       "parser_subtasks": [
         "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
         "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
@@ -1632,7 +1664,11 @@
         "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
         "probe_command": "",
         "official_probe_urls": [],
-        "source_use_cases": [],
+        "source_use_cases": [
+          "Mexico import duty and VAT pre-check",
+          "USMCA or alternate-route pricing comparison",
+          "NOM certification and preferential-origin evidence review"
+        ],
         "parser_subtasks": [
           "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
           "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",

@@ -125,10 +125,14 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
 });
 
 test('parser-gap roadmap entries include concrete automation work items', () => {
-    const requiredCountries = ['CN', 'VN', 'MY', 'TW', 'IN', 'KR', 'RU'];
+    const requiredCountries = ['CN', 'DE', 'EU', 'IN', 'JP', 'KR', 'MX', 'MY', 'NL', 'RU', 'SG', 'TW', 'VN'];
     requiredCountries.forEach((country) => {
         const source = dutyRateSources.sources.find(item => item.country === country);
         assert.ok(source, `${country} source roadmap should exist`);
+        assert.ok(
+            Array.isArray(source.source_use_cases) && source.source_use_cases.length >= 2,
+            `${country} should list concrete source use cases`
+        );
         assert.ok(
             Array.isArray(source.parser_subtasks) && source.parser_subtasks.length >= 3,
             `${country} should list concrete parser subtasks`
