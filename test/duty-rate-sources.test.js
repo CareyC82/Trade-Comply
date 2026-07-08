@@ -84,6 +84,7 @@ const {
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const dutyRateSources = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rate-sources.json'), 'utf8'));
+const exactParserPriorities = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'exact-tariff-parser-priorities.json'), 'utf8'));
 
 test('duty-rate source roadmap covers every maintained duty-rate country', () => {
     const summary = summarizeDutyRateCoverage(dutyRates);
@@ -146,6 +147,47 @@ test('parser-gap roadmap entries include concrete automation work items', () => 
             `${country} parser subtasks should mention exact tariff-line work`
         );
     });
+});
+
+test('exact parser priority queue stays filing-grade and customer-impact oriented', () => {
+    assert.ok(exactParserPriorities.priorities.length >= 5);
+    assert.ok(exactParserPriorities.rule_scope_priorities.length >= 10);
+    assert.ok(exactParserPriorities.exact_route_scope_priorities.length >= 3);
+
+    const topBacklog = exactParserPriorities.priorities.slice(0, 7);
+    topBacklog.forEach((item) => {
+        assert.match(item.route, /->/);
+        assert.match(item.hs_code, /^\d{4,10}$/);
+        assert.match(item.priority_band, /^P[0-3]$/);
+        assert.match(item.parser_target, /add-on|case-scope|trade-remedy|scope parser/i);
+        assert.match(item.next_action, /official|scope|filing|trade-remedy|add-on|Chapter 99|case/i);
+        assert.ok(
+            Array.isArray(item.rate_change_drivers) && item.rate_change_drivers.length >= 2,
+            `${item.id} should explain why rates can change`
+        );
+        assert.ok(
+            Array.isArray(item.scope_components) && item.scope_components.includes('official_base_duty'),
+            `${item.id} should keep official base duty separate from add-on scope`
+        );
+        assert.ok(
+            Array.isArray(item.parser_subtasks) && item.parser_subtasks.length >= 3,
+            `${item.id} should list concrete parser subtasks`
+        );
+    });
+
+    const solar = exactParserPriorities.priorities.find(item => item.id === 'solar-cn-us');
+    const drone = exactParserPriorities.priorities.find(item => item.id === 'drone-cn-us');
+    assert.equal(solar.priority_band, 'P2');
+    assert.equal(drone.priority_band, 'P2');
+    assert.ok(solar.scope_components.includes('ad_cvd_scope'));
+    assert.ok(solar.parser_subtasks.some(item => /AD\/CVD|UFLPA|Section 301/i.test(item)));
+    assert.ok(drone.parser_subtasks.some(item => /UAV|aircraft|exclusion/i.test(item)));
+
+    const exactRoutes = exactParserPriorities.exact_route_scope_priorities;
+    assert.ok(exactRoutes.every(item => item.automation_level === 'hybrid_official'));
+    assert.ok(exactRoutes.every(item => item.source_trust === 'official_duty_tax_estimate'));
+    assert.ok(exactRoutes.every(item => item.parser_subtasks.some(task => /exact TARIC|TARIC goods code/i.test(task))));
+    assert.ok(exactRoutes.every(item => item.scope_components.includes('member_state_vat')));
 });
 
 test('duty-rate health check reports source roadmap status', () => {
