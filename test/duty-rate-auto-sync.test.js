@@ -46,6 +46,11 @@ test('official fetch degradation classifier gives repair-focused categories', ()
     assert.equal(transport.category, 'network_transport');
     assert.match(transport.action, /Retry/i);
 
+    const dns = classifyOfficialFetchDegradation('getaddrinfo ENOTFOUND hts.usitc.gov');
+    assert.equal(dns.category, 'dns');
+    assert.match(dns.label, /DNS/i);
+    assert.match(dns.action, /endpoint|runner|resolve/i);
+
     const noRows = classifyOfficialFetchDegradation('official_source_returned_no_rate_rows: official source returned no machine-readable tariff rows');
     assert.equal(noRows.category, 'parser_no_rows');
     assert.match(noRows.label, /parser found no rate rows/i);
@@ -143,6 +148,57 @@ test('official source transport failures downgrade without blocking daily sync',
     assert.equal(payload.status, 'ok');
     assert.equal(payload.counts.exceptions, 0);
     assert.equal(payload.source_run_plan.find(row => row.country === 'US').run_status, 'degraded');
+});
+
+test('DNS-only official source outages stay non-blocking with endpoint repair guidance', () => {
+    const failedRun = buildRunSummary('Japan Customs official-live', {
+        ok: false,
+        changes: [],
+        errors: [
+            { rule: 'JP-TEST-1', prefix: '854231', error: 'getaddrinfo ENOTFOUND www.customs.go.jp' }
+        ]
+    }, {
+        applied: false,
+        mode: 'official-live'
+    });
+    const downgraded = downgradeOfficialTransportFailure(failedRun);
+    const sourceRunPlan = buildSourceRunPlan({
+        sourcesPayload: {
+            sources: [{
+                country: 'JP',
+                source_status: 'hybrid_official_candidate',
+                machine_readable: 'candidate',
+                maintenance_priority: 'P1',
+                update_command: 'npm run update:duty-rates:jp:official',
+                probe_command: 'npm run probe:duty-rates:jp',
+                next_action: 'Keep Japan Customs chapter parser running daily.'
+            }]
+        },
+        runs: [downgraded]
+    });
+    const payload = buildSyncStatusPayload({
+        runs: [downgraded],
+        sourceRunPlan,
+        health: { ok: true, sample_count: 1, failed_sample_count: 0, failures: [] }
+    });
+    const japan = payload.source_run_plan.find(row => row.country === 'JP');
+
+    assert.equal(downgraded.ok, true);
+    assert.equal(downgraded.official_fetch_degraded_category, 'dns');
+    assert.equal(payload.status, 'ok');
+    assert.equal(payload.counts.exceptions, 0);
+    assert.equal(payload.ci_diagnostics.outcome, 'completed_with_degraded_sources');
+    assert.equal(payload.ci_diagnostics.failed_step_hint, '');
+    assert.equal(japan.run_status, 'degraded');
+    assert.equal(japan.degraded_category, 'dns');
+    assert.match(japan.degraded_label, /DNS/i);
+    assert.match(japan.degraded_action, /endpoint|runner|resolve/i);
+    assert.match(payload.ci_diagnostics.next_action, /endpoint|runner|resolve/i);
+    assert.ok(payload.automation_digest.official_probe_degraded_reasons.some(row => (
+        row.source === 'Japan Customs official-live'
+        && row.category === 'dns'
+        && /endpoint|runner|resolve/i.test(row.action)
+    )));
 });
 
 test('conflicting official rates inside one multi-prefix rule block auto-apply', () => {
