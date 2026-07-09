@@ -22,6 +22,13 @@ function renderResults(query, tags, cases, precheckSelections = []) {
         );
     }
 
+    if (typeof mountTariffWatchAlert === 'function') {
+        mountTariffWatchAlert(
+            document.getElementById('tariff-watch-alert-container'),
+            viewModel.renderContext?.routeContext
+        );
+    }
+
     mountOpportunityTeaser(
         document.getElementById('opportunity-teaser-container'),
         query,

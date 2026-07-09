@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tariff Watch | TraceWize</title>
+    <link rel="stylesheet" href="css/style.css?v=20260709-tariff-watch">
+</head>
+<body class="tariff-watch-page-body">
+    <main class="tariff-watch-page view-container active">
+        <header class="tariff-watch-header">
+            <div class="home-header tariff-watch-home-header">
+                <h1 class="home-title tariff-watch-page-title">📈 Tariff Watch</h1>
+                <p class="home-subtitle">Monitor duty-rate changes, route impact, and source/parser readiness before quoting or filing.</p>
+            </div>
+        </header>
+
+        <div class="disclaimer-bar tariff-watch-disclaimer">
+            <span>Change monitor only. Use official tariff lines and entry-date evidence before filing, correction, or customer quotation.</span>
+        </div>
+
+        <div id="tariff-watch-root" class="tariff-watch-root" aria-live="polite">
+            <section class="tariff-watch-loading">
+                Loading tariff watch status…
+            </section>
+        </div>
+    </main>
+
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a id="nav-home" class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a id="nav-incoterm" class="nav-btn nav-btn-link" href="index.html#incoterm">📦 Incoterm</a>
+        <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code</a>
+        <a id="nav-post-entry" class="nav-btn nav-btn-link" href="post-entry.html">🧾 Post-Entry</a>
+        <a id="nav-opportunity" class="nav-btn nav-btn-link" href="opportunity.html">🌐 Opportunity</a>
+        <span id="nav-tariff-watch" class="nav-btn active" aria-current="page">📈 Tariff Watch</span>
+    </nav>
+
+    <script src="js/main.js?v=20260709-tariff-watch" data-app="tariff-watch"></script>
+</body>
+</html>

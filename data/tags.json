@@ -31445,5 +31445,94 @@
     "related_cases": [],
     "display_order": 50,
     "pipeline_source": "bis"
+  },
+  {
+    "tag_id": "CL-GAMING-GLOBAL-001",
+    "category": "PRODUCT_COMPLIANCE",
+    "category_label": "Gaming Device Compliance",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[Gaming Device Market Access]",
+    "short_description": "Gaming consoles and handheld gaming devices need HS, safety, wireless accessory, content-rating, and labeling checks.",
+    "description": "Gaming consoles, handheld gaming devices, controllers, charging docks, and bundled wireless accessories should be checked for HS 9504 classification, product safety, power adapter/charger compliance, battery transport, radio module approvals, consumer labeling, and market-specific game/content rating rules before import or export.",
+    "content_en": "Gaming devices should be checked for HS 9504 classification, safety, wireless accessory approvals, battery/charger evidence, labeling, and content-rating rules before shipment.",
+    "content_zh": "游戏主机、掌机、手柄、充电底座和无线配件应检查 HS 9504 归类、安全、电池/充电器资料、无线准入、标签和内容分级要求。",
+    "source_citation": "WCO HS 9504 classification and national market-access baseline",
+    "source_url": "https://www.wcoomd.org/",
+    "effective_date": "2026-07-09",
+    "status": "ACTIVE",
+    "direction": "both",
+    "countries": [
+      "CN",
+      "US",
+      "EU",
+      "DE",
+      "NL",
+      "SG",
+      "MX",
+      "VN",
+      "MY",
+      "RU",
+      "TW",
+      "JP",
+      "KR",
+      "IN"
+    ],
+    "route_focus": "import",
+    "risk_level": "Medium",
+    "hs_code": "9504.50",
+    "related_hs_codes": [
+      "9504.50",
+      "9504.90",
+      "8471.60",
+      "8504.40",
+      "8517.62",
+      "8523.51"
+    ],
+    "related_keywords": [
+      "gaming",
+      "gaming console",
+      "game console",
+      "video game console",
+      "handheld game",
+      "playstation",
+      "xbox",
+      "nintendo",
+      "switch",
+      "steam deck",
+      "game controller",
+      "joystick",
+      "gamepad",
+      "charging dock",
+      "wireless controller",
+      "vr gaming"
+    ],
+    "related_cases": [
+      "CASE-GAMING-GLOBAL-BASELINE"
+    ],
+    "display_order": 47,
+    "pipeline_source": "coverage-baseline",
+    "checklist": [
+      {
+        "id": "Classification::Confirm HS 9504 scope",
+        "phase": "Classification",
+        "task": "Confirm HS 9504 scope",
+        "desc": "Confirm whether the product is a video game console/device, an ADP machine, a controller/accessory, or a mixed retail bundle.",
+        "source": "official-source"
+      },
+      {
+        "id": "Market access::Check wireless and charger scope",
+        "phase": "Market access",
+        "task": "Check wireless and charger scope",
+        "desc": "Review Bluetooth/Wi-Fi controller approvals, power adapter safety, battery evidence, and labeling for the destination market.",
+        "source": "official-source"
+      },
+      {
+        "id": "Content controls::Confirm game/content rating rules",
+        "phase": "Content controls",
+        "task": "Confirm game/content rating rules",
+        "desc": "Check whether pre-installed games, online services, or media content require rating, import approval, or localization review.",
+        "source": "official-source"
+      }
+    ]
   }
 ]

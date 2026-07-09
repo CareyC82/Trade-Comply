@@ -3610,6 +3610,69 @@ a.hub-core-card--link {
     color: var(--color-primary);
 }
 
+.tariff-watch-alert {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    margin: 0 0 16px;
+    padding: 14px 16px;
+    border: 1px solid rgba(26, 58, 92, 0.14);
+    border-left: 5px solid #64748b;
+    border-radius: 10px;
+    background: #f8fafc;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.tariff-watch-alert--changed {
+    border-left-color: #b91c1c;
+    background: #fff5f5;
+}
+
+.tariff-watch-alert--watch {
+    border-left-color: #b7791f;
+    background: #fffaf0;
+}
+
+.tariff-watch-alert--stable {
+    border-left-color: #0f766e;
+    background: #f0fdfa;
+}
+
+.tariff-watch-alert strong {
+    display: block;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.tariff-watch-alert p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+}
+
+.tariff-watch-alert a {
+    color: var(--color-primary);
+    border: 1px solid rgba(26, 58, 92, 0.28);
+    border-radius: 999px;
+    padding: 8px 12px;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .tariff-watch-alert {
+        grid-template-columns: 1fr;
+    }
+
+    .tariff-watch-alert a {
+        justify-self: flex-start;
+    }
+}
+
 .opportunity-teaser {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
@@ -4759,6 +4822,354 @@ button.feedback-link:hover {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.12);
+}
+
+.tariff-watch-page-body {
+    min-height: 100vh;
+    background: var(--color-bg);
+    padding-bottom: 96px;
+}
+
+.tariff-watch-page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+}
+
+.tariff-watch-header {
+    margin-bottom: 16px;
+}
+
+.tariff-watch-page-title {
+    font-size: 2.1rem;
+}
+
+.tariff-watch-disclaimer {
+    max-width: 100%;
+}
+
+.tariff-watch-loading {
+    padding: 32px;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--color-text-secondary);
+    text-align: center;
+}
+
+.tariff-watch-hero,
+.tariff-watch-section {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    margin-bottom: 18px;
+}
+
+.tariff-watch-hero {
+    border-left: 6px solid #0f766e;
+}
+
+.tariff-watch-hero--changed {
+    border-left-color: #b91c1c;
+}
+
+.tariff-watch-kicker,
+.tariff-watch-section-heading h2,
+.tariff-watch-item span,
+.tariff-watch-metric-card span,
+.tariff-watch-admin-grid span {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--color-text-secondary);
+}
+
+.tariff-watch-hero h2 {
+    margin: 8px 0;
+    color: var(--color-primary);
+    font-size: 1.6rem;
+}
+
+.tariff-watch-hero p,
+.tariff-watch-section-heading p {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.tariff-watch-hero small {
+    display: block;
+    margin-top: 12px;
+    color: var(--color-text-secondary);
+}
+
+.tariff-watch-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.tariff-watch-metric-card {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.tariff-watch-metric-card strong {
+    display: block;
+    margin: 8px 0 6px;
+    color: var(--color-primary);
+    font-size: 2rem;
+}
+
+.tariff-watch-metric-card p {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.tariff-watch-section-heading {
+    margin-bottom: 14px;
+}
+
+.tariff-watch-section-heading h2 {
+    margin: 0 0 6px;
+    color: var(--color-primary);
+    font-size: 1.1rem;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.tariff-watch-list {
+    display: grid;
+    gap: 12px;
+}
+
+.tariff-current-table {
+    display: grid;
+    gap: 10px;
+}
+
+.tariff-current-row {
+    display: grid;
+    grid-template-columns: 1.05fr 1.45fr 0.65fr 0.75fr 0.75fr 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-left: 5px solid #0f766e;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #f0fdfa 0%, #fff 70%);
+}
+
+.tariff-current-row span,
+.tariff-market-card span {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: var(--color-text-secondary);
+}
+
+.tariff-current-row strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-primary);
+    font-size: 0.98rem;
+}
+
+.tariff-current-row small {
+    display: block;
+    margin-top: 5px;
+    color: var(--color-text-secondary);
+    line-height: 1.35;
+}
+
+.tariff-market-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.tariff-market-card {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.tariff-market-card:hover,
+.tariff-market-card:focus-visible {
+    border-color: rgba(15, 118, 110, 0.45);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.tariff-market-card > strong {
+    color: var(--color-primary);
+    font-size: 1.05rem;
+}
+
+.tariff-market-card p,
+.tariff-market-card small {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.tariff-market-card div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border);
+}
+
+.tariff-market-card b {
+    color: var(--color-primary);
+}
+
+.tariff-market-detail-page {
+    border-left: 6px solid #0f766e;
+}
+
+.tariff-watch-back-link {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 14px;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 900;
+}
+
+.tariff-watch-back-link:hover,
+.tariff-watch-back-link:focus-visible {
+    text-decoration: underline;
+    outline: none;
+}
+
+.tariff-watch-empty {
+    margin: 0;
+    padding: 18px;
+    border: 1px dashed var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text-secondary);
+}
+
+.tariff-watch-item {
+    display: grid;
+    grid-template-columns: 1.4fr 1.1fr 1fr 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-left: 5px solid #64748b;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.tariff-watch-item--changed {
+    border-left-color: #b91c1c;
+    background: #fff5f5;
+}
+
+.tariff-watch-item--watch,
+.tariff-watch-item--review {
+    border-left-color: #b7791f;
+    background: #fffaf0;
+}
+
+.tariff-watch-item--stable {
+    border-left-color: #0f766e;
+}
+
+.tariff-watch-item strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+}
+
+.tariff-watch-item p {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.tariff-watch-item__actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.tariff-watch-item__actions a {
+    color: #fff;
+    background: var(--color-primary);
+    border-radius: 999px;
+    padding: 8px 12px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+
+.tariff-watch-item__actions span {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+}
+
+.tariff-watch-section--admin {
+    background: #f8fafc;
+}
+
+.tariff-watch-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.tariff-watch-admin-grid div {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.tariff-watch-admin-grid strong {
+    display: block;
+    margin-top: 6px;
+    color: var(--color-primary);
+}
+
+@media (max-width: 900px) {
+    .tariff-watch-metrics,
+    .tariff-market-grid,
+    .tariff-watch-admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tariff-current-row,
+    .tariff-watch-item {
+        grid-template-columns: 1fr;
+    }
+
+    .tariff-watch-item p,
+    .tariff-watch-item__actions {
+        grid-column: auto;
+    }
 }
 
 .opportunity-submit-btn {

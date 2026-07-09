@@ -1,9 +1,9 @@
 /**
  * Single application entry — loads modules in order, then boots the active page.
- * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity"></script>
+ * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity|tariff-watch"></script>
  */
 (function () {
-    const BUILD = '20260702-import-card-label-fix';
+    const BUILD = '20260709-tariff-watch';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -20,6 +20,9 @@
         }
         if (/\/opportunity\.html/i.test(path)) {
             return 'opportunity';
+        }
+        if (/\/tariff-watch\.html/i.test(path)) {
+            return 'tariff-watch';
         }
         if (/\/electronics\.html/i.test(path)
             || /\/new-energy\.html/i.test(path)
@@ -47,6 +50,7 @@
         'lib/industry-checklist-baseline.js',
         'lib/product-intelligence.js',
         'lib/trade-opportunity.js',
+        'lib/tariff-watch.js',
         'lib/deep-link.js',
         'js/tag-enrich.js',
         'js/trade-country-ui.js',
@@ -72,6 +76,7 @@
         'js/ai-query-bindings.js',
         'js/search-actions.js',
         'js/render-results.js',
+        'js/tariff-watch-page.js',
         'js/render.js',
         'js/feedback.js',
         'compliance-feedback-codec.js',
@@ -131,6 +136,14 @@
         'lib/country-registry.js',
         'lib/trade-opportunity.js',
         'js/opportunity-page.js'
+    ];
+
+    const TARIFF_WATCH_MODULES = [
+        'js/app-state.js',
+        'js/dom-mount.js',
+        'js/core.js',
+        'lib/tariff-watch.js',
+        'js/tariff-watch-page.js'
     ];
 
     function withVersion(src) {
@@ -203,6 +216,8 @@
                 modules = POST_ENTRY_MODULES;
             } else if (app === 'opportunity') {
                 modules = OPPORTUNITY_MODULES;
+            } else if (app === 'tariff-watch') {
+                modules = TARIFF_WATCH_MODULES;
             } else if (app === 'category') {
                 modules = CATEGORY_MODULES;
             }
@@ -234,6 +249,12 @@
                 if (app === 'opportunity') {
                     if (typeof bootstrapTradeOpportunityPage === 'function') {
                         bootstrapTradeOpportunityPage();
+                    }
+                    return;
+                }
+                if (app === 'tariff-watch') {
+                    if (typeof bootstrapTariffWatchPage === 'function') {
+                        bootstrapTariffWatchPage();
                     }
                     return;
                 }

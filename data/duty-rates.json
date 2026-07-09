@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-08",
+  "updated_at": "2026-07-09T00:00:00.000Z",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
   "rules": [
@@ -570,7 +570,7 @@
       "hs_prefixes": [
         "847130"
       ],
-      "label": "Germany import tablet / portable ADP equipment signal",
+      "label": "Germany import tablet / portable ADP tariff scope signal",
       "base_rate": 0.027,
       "additional_rate": 0.19,
       "add_on_layers": [
@@ -823,7 +823,7 @@
       "hs_prefixes": [
         "847130"
       ],
-      "label": "Netherlands import tablet / portable ADP equipment signal",
+      "label": "Netherlands import tablet / portable ADP tariff scope signal",
       "base_rate": 0.027,
       "additional_rate": 0.21,
       "add_on_layers": [
@@ -2472,7 +2472,21 @@
         "8543",
         "8479",
         "9018",
-        "9027"
+        "9027",
+        "847150",
+        "851713",
+        "851762",
+        "852580",
+        "852589",
+        "852852",
+        "854143",
+        "854231",
+        "854232",
+        "854239",
+        "847950",
+        "901890",
+        "902750",
+        "8471"
       ],
       "label": "Russia import electronics VAT / EAEU duty signal",
       "base_rate": 0.05,
@@ -2502,7 +2516,185 @@
       "source_hts": "RU / EAEU electronics official-link scope",
       "source_rate_text": "Official link monitored; exact EAEU tariff line required before using a filing-grade duty rate. 20% VAT benchmark retained for screening.",
       "source_url": "https://customs.gov.ru/",
-      "last_checked_at": "2026-07-08T19:50:22.705Z"
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "847130",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "847130 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "847150",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "847150 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "850440",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "850440 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "850760",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "850760 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "851713",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "851713 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "851762",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "851762 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "852580",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "852580 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "852589",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "852589 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "852852",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "852852 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854143",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "854143 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854231",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "854231 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854232",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "854232 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "854239",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "854239 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "847950",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "847950 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "901890",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "901890 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        },
+        {
+          "hs_code": "902750",
+          "base_rate": 0.05,
+          "source_status": "official_link_checked",
+          "confidence": "Official link monitored",
+          "source_note": "Russia/EAEU maintained exact-code candidate for screening only. Confirm exact EAEU tariff line, VAT basis, sanctions, restricted-party, licensing, and technical-regulation scope before filing.",
+          "source_hts": "902750 (Russia/EAEU maintained candidate)",
+          "source_rate_text": "Russia/EAEU screening candidate: 5.0% duty benchmark + 20.0% VAT benchmark; exact line required",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "CN-GLOBAL-ELECTRONICS-INDICATIVE",
@@ -3368,7 +3560,8 @@
         "8542",
         "8543",
         "9018",
-        "9027"
+        "9027",
+        "847150"
       ],
       "label": "US import non-China high-tech general duty signal",
       "base_rate": 0,
@@ -3558,6 +3751,666 @@
           "source_rate_text": "Laboratory analyzer / measuring instrument candidate: official heading candidate; exact HTS required",
           "source_url": "https://hts.usitc.gov/",
           "last_checked_at": "2026-07-03T00:00:00.000Z"
+        },
+        {
+          "hs_code": "847150",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "USITC general duty candidate for AI servers and data-processing units. Confirm exact HTS, configuration, origin, and trade-remedy scope before filing.",
+          "source_hts": "847150 (USITC general duty candidate)",
+          "source_rate_text": "AI server / data-processing unit candidate: Free",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "CN-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "CN",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "China import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.13,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "China import tax / VAT / GST pre-check layer",
+          "rate": 0.13,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "China maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "China gaming device official heading monitor: base 0.0% + tax/add-on 13.0%; exact tariff line and product scope required",
+      "source_url": "http://www.customs.gov.cn/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "China 950450 official heading monitored base duty 0.0%; tax/add-on 13.0% tracked separately",
+          "source_url": "http://www.customs.gov.cn/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "US-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "US",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "United States import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0,
+      "add_on_layers": [],
+      "trade_remedy": "Confirm HTS 9504.50, origin, Section 301 / Chapter 99 / trade-remedy scope, and any product-safety or FCC accessory exposure before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "United States gaming device official heading monitor: base 0.0% + tax/add-on 0.0%; exact tariff line and product scope required",
+      "source_url": "https://hts.usitc.gov/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "United States 950450 official heading monitored base duty 0.0%; tax/add-on 0.0% tracked separately",
+          "source_url": "https://hts.usitc.gov/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "EU-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "European Union import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "European Union import tax / VAT / GST pre-check layer",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "European Union maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Pre-check estimate",
+      "source_status": "scope_check_required",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "European Union gaming device official heading monitor: base 0.0% + tax/add-on 19.0%; exact tariff line and product scope required",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Pre-check estimate",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "European Union 950450 official heading monitored base duty 0.0%; tax/add-on 19.0% tracked separately",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "DE-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Germany import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Germany import tax / VAT / GST pre-check layer",
+          "rate": 0.19,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Germany maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Pre-check estimate",
+      "source_status": "scope_check_required",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Germany gaming device official heading monitor: base 0.0% + tax/add-on 19.0%; exact tariff line and product scope required",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Pre-check estimate",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Germany 950450 official heading monitored base duty 0.0%; tax/add-on 19.0% tracked separately",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "NL-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Netherlands import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Netherlands import tax / VAT / GST pre-check layer",
+          "rate": 0.21,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Netherlands maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Pre-check estimate",
+      "source_status": "scope_check_required",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Netherlands gaming device official heading monitor: base 0.0% + tax/add-on 21.0%; exact tariff line and product scope required",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Pre-check estimate",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Netherlands 950450 official heading monitored base duty 0.0%; tax/add-on 21.0% tracked separately",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "SG-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "SG",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Singapore import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.09,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Singapore import tax / VAT / GST pre-check layer",
+          "rate": 0.09,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Singapore maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Singapore gaming device official heading monitor: base 0.0% + tax/add-on 9.0%; exact tariff line and product scope required",
+      "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Singapore 950450 official heading monitored base duty 0.0%; tax/add-on 9.0% tracked separately",
+          "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "MX-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "MX",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Mexico import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.16,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Mexico import tax / VAT / GST pre-check layer",
+          "rate": 0.16,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Mexico maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Mexico gaming device official heading monitor: base 0.0% + tax/add-on 16.0%; exact tariff line and product scope required",
+      "source_url": "https://www.snice.gob.mx/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Mexico 950450 official heading monitored base duty 0.0%; tax/add-on 16.0% tracked separately",
+          "source_url": "https://www.snice.gob.mx/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "VN-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "VN",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Vietnam import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Vietnam import tax / VAT / GST pre-check layer",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Vietnam maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Vietnam gaming device official heading monitor: base 0.0% + tax/add-on 10.0%; exact tariff line and product scope required",
+      "source_url": "https://www.customs.gov.vn/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Vietnam 950450 official heading monitored base duty 0.0%; tax/add-on 10.0% tracked separately",
+          "source_url": "https://www.customs.gov.vn/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "MY-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "MY",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Malaysia import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Malaysia import tax / VAT / GST pre-check layer",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Malaysia maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Malaysia gaming device official heading monitor: base 0.0% + tax/add-on 10.0%; exact tariff line and product scope required",
+      "source_url": "https://mysst.customs.gov.my/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Malaysia 950450 official heading monitored base duty 0.0%; tax/add-on 10.0% tracked separately",
+          "source_url": "https://mysst.customs.gov.my/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "RU-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "RU",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Russia import gaming device / console tariff pre-check signal",
+      "base_rate": 0.05,
+      "additional_rate": 0.2,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Russia import tax / VAT / GST pre-check layer",
+          "rate": 0.2,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Russia maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Russia gaming device official heading monitor: base 5.0% + tax/add-on 20.0%; exact tariff line and product scope required",
+      "source_url": "https://customs.gov.ru/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0.05,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Russia 950450 official heading monitored base duty 5.0%; tax/add-on 20.0% tracked separately",
+          "source_url": "https://customs.gov.ru/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "TW-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "TW",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Taiwan import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.05,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Taiwan import tax / VAT / GST pre-check layer",
+          "rate": 0.05,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Taiwan maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Taiwan gaming device official heading monitor: base 0.0% + tax/add-on 5.0%; exact tariff line and product scope required",
+      "source_url": "https://portal.sw.nat.gov.tw/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Taiwan 950450 official heading monitored base duty 0.0%; tax/add-on 5.0% tracked separately",
+          "source_url": "https://portal.sw.nat.gov.tw/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "JP-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "JP",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "Japan import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "Japan import tax / VAT / GST pre-check layer",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "Japan maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "Japan gaming device official heading monitor: base 0.0% + tax/add-on 10.0%; exact tariff line and product scope required",
+      "source_url": "https://www.customs.go.jp/english/tariff/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "Japan 950450 official heading monitored base duty 0.0%; tax/add-on 10.0% tracked separately",
+          "source_url": "https://www.customs.go.jp/english/tariff/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "KR-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "KR",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "South Korea import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.1,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "South Korea import tax / VAT / GST pre-check layer",
+          "rate": 0.1,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "South Korea maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "South Korea gaming device official heading monitor: base 0.0% + tax/add-on 10.0%; exact tariff line and product scope required",
+      "source_url": "https://unipass.customs.go.kr/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "South Korea 950450 official heading monitored base duty 0.0%; tax/add-on 10.0% tracked separately",
+          "source_url": "https://unipass.customs.go.kr/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "IN-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "950450"
+      ],
+      "label": "India import gaming device / console tariff pre-check signal",
+      "base_rate": 0,
+      "additional_rate": 0.18,
+      "add_on_layers": [
+        {
+          "type": "import_tax",
+          "label": "India import tax / VAT / GST pre-check layer",
+          "rate": 0.18,
+          "basis": "customs_value_plus_duty",
+          "status": "precheck",
+          "source": "India maintained gaming-device tariff/tax pre-check signal"
+        }
+      ],
+      "trade_remedy": "Confirm exact HS 9504.50 subheading, customs value, VAT/GST/import tax basis, game/content rating, power adapter, wireless accessory, and product-safety scope before filing.",
+      "confidence": "Official source checked",
+      "source_status": "official_source_checked",
+      "source_note": "Gaming devices are added as maintained pre-check coverage. Confirm exact national tariff line, product bundle, accessories, software/content rating, wireless module, and origin before relying on this for filing.",
+      "source_hts": "950450 gaming consoles / video game machines pre-check scope",
+      "source_rate_text": "India gaming device official heading monitor: base 0.0% + tax/add-on 18.0%; exact tariff line and product scope required",
+      "source_url": "https://www.icegate.gov.in/",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "950450",
+          "base_rate": 0,
+          "source_status": "official_source_checked",
+          "confidence": "Official source checked",
+          "source_note": "Gaming-device exact-code candidate for screening only. Verify country-specific 8/10-digit tariff line, bundled accessories, wireless module, content-rating rules, and origin before filing.",
+          "source_hts": "950450",
+          "source_rate_text": "India 950450 official heading monitored base duty 0.0%; tax/add-on 18.0% tracked separately",
+          "source_url": "https://www.icegate.gov.in/",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "DE-GLOBAL-847150-AI-SERVER-IMPORT-SCOPE",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847150"
+      ],
+      "label": "Germany import AI server / data-processing unit signal",
+      "base_rate": 0,
+      "additional_rate": 0.19,
+      "add_on_layers": [
+        "Germany import VAT estimate: 19%"
+      ],
+      "trade_remedy": "TARIC data-processing unit candidate; verify exact TARIC subdivision, origin preference, and member-state VAT before filing.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC data-processing unit candidate for AI servers and non-portable processing units. Verify exact TARIC subdivision, origin preference, and member-state VAT before filing.",
+      "source_hts": "8471500000 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "Data-processing unit / AI server candidate: 0% third-country duty; VAT tracked separately",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "8471500000",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Scope check required",
+          "source_note": "Exact TARIC candidate for data-processing units; verify origin preference and member-state VAT before filing.",
+          "source_hts": "8471500000 (TARIC ERGA OMNES third-country duty)",
+          "source_rate_text": "Data-processing unit / AI server candidate: 0% third-country duty; VAT tracked separately",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "NL-GLOBAL-847150-AI-SERVER-IMPORT-SCOPE",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_prefixes": [
+        "847150"
+      ],
+      "label": "Netherlands import AI server / data-processing unit signal",
+      "base_rate": 0,
+      "additional_rate": 0.21,
+      "add_on_layers": [
+        "Netherlands import VAT estimate: 21%"
+      ],
+      "trade_remedy": "TARIC data-processing unit candidate; verify exact TARIC subdivision, origin preference, and member-state VAT before filing.",
+      "confidence": "Scope check required",
+      "source_status": "scope_check_required",
+      "source_note": "TARIC data-processing unit candidate for AI servers and non-portable processing units. Verify exact TARIC subdivision, origin preference, and member-state VAT before filing.",
+      "source_hts": "8471500000 (TARIC ERGA OMNES third-country duty)",
+      "source_rate_text": "Data-processing unit / AI server candidate: 0% third-country duty; VAT tracked separately",
+      "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp",
+      "last_checked_at": "2026-07-09T00:00:00.000Z",
+      "exact_code_overrides": [
+        {
+          "hs_code": "8471500000",
+          "base_rate": 0,
+          "source_status": "scope_check_required",
+          "confidence": "Scope check required",
+          "source_note": "Exact TARIC candidate for data-processing units; verify origin preference and member-state VAT before filing.",
+          "source_hts": "8471500000 (TARIC ERGA OMNES third-country duty)",
+          "source_rate_text": "Data-processing unit / AI server candidate: 0% third-country duty; VAT tracked separately",
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp",
+          "last_checked_at": "2026-07-09T00:00:00.000Z"
         }
       ]
     }
