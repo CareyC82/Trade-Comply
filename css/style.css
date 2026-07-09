@@ -4994,6 +4994,34 @@ button.feedback-link:hover {
     gap: 12px;
 }
 
+.tariff-watch-guide {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.tariff-watch-guide article {
+    border: 1px solid rgba(15, 118, 110, 0.18);
+    border-radius: 10px;
+    background: #f8fffd;
+    padding: 12px;
+}
+
+.tariff-watch-guide strong {
+    display: block;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.tariff-watch-guide span {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
 .tariff-market-card {
     display: grid;
     gap: 8px;
@@ -5043,6 +5071,37 @@ button.feedback-link:hover {
 
 .tariff-market-detail-page {
     border-left: 6px solid #0f766e;
+}
+
+.tariff-market-brief {
+    display: grid;
+    grid-template-columns: 0.85fr 1.3fr 1.15fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.tariff-market-brief div {
+    border: 1px solid rgba(15, 118, 110, 0.18);
+    border-radius: 10px;
+    background: #f8fffd;
+    padding: 12px;
+}
+
+.tariff-market-brief span {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.tariff-market-brief strong {
+    display: block;
+    color: var(--color-primary);
+    font-size: 0.92rem;
+    line-height: 1.35;
 }
 
 .tariff-watch-back-link {
@@ -5157,6 +5216,8 @@ button.feedback-link:hover {
 @media (max-width: 900px) {
     .tariff-watch-metrics,
     .tariff-market-grid,
+    .tariff-watch-guide,
+    .tariff-market-brief,
     .tariff-watch-admin-grid {
         grid-template-columns: 1fr;
     }

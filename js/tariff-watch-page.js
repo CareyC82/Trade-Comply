@@ -108,7 +108,7 @@
         return `
             <a class="tariff-market-card" href="tariff-watch.html?market=${encodeURIComponent(row.marketKey)}" data-market="${escapeHtml(row.marketKey)}">
                 <strong>${escapeHtml(row.country)}</strong>
-                <p>${escapeHtml(row.rules)} maintained rule(s) · ${escapeHtml(row.official)} official/hybrid</p>
+                <p>${escapeHtml(row.coverageLabel || `${row.rules} maintained rule(s)`)}</p>
                 <div>
                     <span>HS lines</span>
                     <b>${escapeHtml(row.hsCoverage)}</b>
@@ -117,6 +117,11 @@
                     <span>Highest signal</span>
                     <b>${escapeHtml(row.highestSignal)}</b>
                 </div>
+                <div>
+                    <span>Use for</span>
+                    <b>${escapeHtml(row.official === row.rules ? 'Quote screen' : 'Pre-check')}</b>
+                </div>
+                <small>${escapeHtml(row.nextAction || 'Confirm exact HS before filing.')}</small>
                 <small>Last checked ${escapeHtml(row.lastChecked)}</small>
             </a>
         `;
@@ -131,6 +136,20 @@
                 <div class="tariff-watch-section-heading">
                     <h2>${escapeHtml(market?.country || 'Selected market')} tariff details</h2>
                     <p>${escapeHtml(rows.length)} maintained import duty / tax signal(s) for this market.</p>
+                </div>
+                <div class="tariff-market-brief" aria-label="How to use this tariff market">
+                    <div>
+                        <span>Coverage quality</span>
+                        <strong>${escapeHtml(market?.coverageLabel || 'Maintained coverage')}</strong>
+                    </div>
+                    <div>
+                        <span>Use this for</span>
+                        <strong>${escapeHtml(market?.useCase || 'Market-level tariff pre-check before quote or filing.')}</strong>
+                    </div>
+                    <div>
+                        <span>Before filing</span>
+                        <strong>${escapeHtml(market?.nextAction || 'Confirm exact HS, origin, entry date, and add-on tax layers.')}</strong>
+                    </div>
                 </div>
                 <div class="tariff-current-table">
                     ${rows.length
@@ -168,6 +187,20 @@
                 <div class="tariff-watch-section-heading">
                     <h2>Coverage by market</h2>
                     <p>Select a market to open its maintained tariff signals on a detail page.</p>
+                </div>
+                <div class="tariff-watch-guide" aria-label="How to read tariff coverage">
+                    <article>
+                        <strong>Exact HS lines</strong>
+                        <span>Best for quote screening and Post-Entry pre-check when the product matches the maintained HS line.</span>
+                    </article>
+                    <article>
+                        <strong>Official maintained</strong>
+                        <span>Good market signal, but still confirm exact HS, origin, and entry date before filing.</span>
+                    </article>
+                    <article>
+                        <strong>Pre-check coverage</strong>
+                        <span>Use only as a directional signal until the official tariff line is verified.</span>
+                    </article>
                 </div>
                 <div class="tariff-market-grid">
                     ${model.marketCoverageRows.map(renderMarketCoverageRow).join('')}
