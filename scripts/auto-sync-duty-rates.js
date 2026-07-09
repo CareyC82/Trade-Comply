@@ -384,6 +384,19 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
             const sourceUseCases = Array.isArray(source.source_use_cases) ? source.source_use_cases : [];
             const parserSubtasks = Array.isArray(source.parser_subtasks) ? source.parser_subtasks : [];
             const rateChangeDrivers = Array.isArray(source.rate_change_drivers) ? source.rate_change_drivers : [];
+            const recoveryCommand = source.recovery_command
+                || source.full_probe_command
+                || source.probe_command
+                || source.update_command
+                || '';
+            const recoveryHint = source.recovery_hint
+                || (source.full_probe_command
+                    ? 'Run the full probe first, then promote only stable exact rows.'
+                    : source.probe_command
+                        ? 'Run the official probe before promoting this source.'
+                        : source.update_command
+                            ? 'Run the updater and review generated rate changes before committing.'
+                            : 'Review the source roadmap and add a probe/update command.');
             const row = {
                 country: source.country || '',
                 maintenance_priority: source.maintenance_priority || 'Unassigned',
@@ -406,6 +419,8 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 degraded_category: run?.official_fetch_degraded_category || degradationDiagnosis.category || '',
                 degraded_label: degradationDiagnosis.label || '',
                 degraded_action: run?.official_fetch_degraded_action || degradationDiagnosis.action || '',
+                recovery_command: recoveryCommand,
+                recovery_hint: recoveryHint,
                 official_fetch_summary: buildOfficialFetchSummary(run),
                 official_probe_live_status: liveProbe ? {
                     checked: Boolean(liveProbe.checked ?? liveProbe.official_probe?.checked),
@@ -488,6 +503,8 @@ function buildAutomationDigest({ runs = [], sourceRunPlan = [], health = null } 
             degraded_category: row.degraded_category || '',
             degraded_label: row.degraded_label || '',
             degraded_action: row.degraded_action || '',
+            recovery_command: row.recovery_command || '',
+            recovery_hint: row.recovery_hint || '',
             parser_gap_task: row.parser_gap_task || null,
             next_action: row.run_plan_action || row.next_action || ''
         }))
@@ -529,13 +546,17 @@ function buildCiDiagnostics({ exceptions = [], runs = [], sourceRunPlan = [], he
         category: row.degraded_category || '',
         label: row.degraded_label || '',
         reason: row.degraded_reason || '',
-        action: row.degraded_action || row.run_plan_action || ''
+        action: row.degraded_action || row.run_plan_action || '',
+        recovery_command: row.recovery_command || '',
+        recovery_hint: row.recovery_hint || ''
     }));
     const parserGapDetails = parserGaps.map(row => ({
         country: row.country,
         stage: row.rate_automation_stage || '',
         priority: row.maintenance_priority || '',
-        action: row.parser_gap_task?.task || row.run_plan_action || row.next_action || ''
+        action: row.parser_gap_task?.task || row.run_plan_action || row.next_action || '',
+        recovery_command: row.recovery_command || '',
+        recovery_hint: row.recovery_hint || ''
     }));
 
     if (firstException) {
@@ -624,6 +645,8 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             degraded_category: row.degraded_category || '',
             degraded_label: row.degraded_label || '',
             degraded_action: row.degraded_action || '',
+            recovery_command: row.recovery_command || '',
+            recovery_hint: row.recovery_hint || '',
             parser_gap_task: row.parser_gap_task || null,
             next_upgrade: row.run_plan_action || row.next_action || ''
         }));

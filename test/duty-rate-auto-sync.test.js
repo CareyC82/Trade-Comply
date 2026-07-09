@@ -274,6 +274,8 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
             degraded_category: 'network_transport',
             degraded_label: 'Network transport',
             degraded_action: 'Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.',
+            recovery_command: 'npm run probe:duty-rates:jp',
+            recovery_hint: 'Run the official probe before promoting this source.',
             official_fetch_summary: {
                 status_label: 'Official fetch degraded',
                 exact_query_attempted: 2,
@@ -295,6 +297,8 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
             degraded_category: 'parser_no_rows',
             degraded_label: 'Official source reachable, parser found no rate rows',
             degraded_action: 'Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.',
+            recovery_command: 'npm run probe:duty-rates:kr',
+            recovery_hint: 'Run the official probe before promoting this source.',
             official_fetch_summary: {
                 status_label: 'Official fetch degraded',
                 exact_query_attempted: 1,
@@ -315,6 +319,8 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
     assert.match(lines, /Network transport/);
     assert.match(lines, /Official source reachable, parser found no rate rows/);
     assert.match(lines, /fix: Retry with system CA/i);
+    assert.match(lines, /rerun: npm run probe:duty-rates:jp/);
+    assert.match(lines, /hint: Run the official probe before promoting this source/);
     assert.match(lines, /source-specific parser fixture/i);
     assert.match(lines, /Parser gap repair hints/);
     assert.match(lines, /diagnosis: Network transport/);
@@ -419,7 +425,8 @@ test('auto sync builds an automation digest for parser and probe gaps', () => {
                     source_status: 'hybrid_official_candidate',
                     machine_readable: 'partial',
                     maintenance_priority: 'P1',
-                    update_command: 'npm run update:duty-rates:eu'
+                    update_command: 'npm run update:duty-rates:eu',
+                    full_probe_command: 'npm run probe:duty-rates:eu:full'
                 },
                 {
                     country: 'IN',
@@ -439,9 +446,11 @@ test('auto sync builds an automation digest for parser and probe gaps', () => {
     assert.deepEqual(digest.exact_code_gate_countries, ['EU']);
     assert.deepEqual(digest.official_probe_countries, ['IN']);
     assert.ok(digest.priority_queue.some(row => row.country === 'EU' && row.workstream === 'exact-code parser'));
+    assert.ok(digest.priority_queue.some(row => row.country === 'EU' && row.recovery_command === 'npm run probe:duty-rates:eu:full'));
 
     const payload = buildSyncStatusPayload({ runs, sourceRunPlan, health: { ok: true } });
     assert.ok(payload.automation_digest);
+    assert.ok(payload.automation_upgrade_queue.some(row => row.country === 'EU' && row.recovery_command === 'npm run probe:duty-rates:eu:full'));
     assert.equal(payload.automation_digest.health_ok, true);
     assert.equal(payload.ci_diagnostics.outcome, 'action_required');
     assert.match(payload.ci_diagnostics.summary, /exception/);

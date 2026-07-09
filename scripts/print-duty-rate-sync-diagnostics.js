@@ -60,7 +60,9 @@ function buildDiagnosticLines(payload) {
                 category: row.degraded_category || row.official_fetch_summary?.degraded_category || '',
                 label: row.degraded_label || '',
                 reason: row.degraded_reason || row.official_fetch_summary?.degraded_reason || '',
-                action: row.degraded_action || row.official_fetch_summary?.degraded_action || row.run_plan_action || ''
+                action: row.degraded_action || row.official_fetch_summary?.degraded_action || row.run_plan_action || '',
+                recovery_command: row.recovery_command || '',
+                recovery_hint: row.recovery_hint || ''
             }));
     const parserGapDetails = Array.isArray(diagnostics.parser_gap_details) && diagnostics.parser_gap_details.length
         ? diagnostics.parser_gap_details
@@ -70,7 +72,9 @@ function buildDiagnosticLines(payload) {
                 country: row.country,
                 stage: row.rate_automation_stage || '',
                 priority: row.maintenance_priority || '',
-                action: row.parser_gap_task?.task || row.run_plan_action || row.next_action || ''
+                action: row.parser_gap_task?.task || row.run_plan_action || row.next_action || '',
+                recovery_command: row.recovery_command || '',
+                recovery_hint: row.recovery_hint || ''
             }));
 
     if (degradedDetails.length) {
@@ -79,6 +83,12 @@ function buildDiagnosticLines(payload) {
             lines.push(`  ${index + 1}. ${row.country || 'market'}${row.source ? ` (${row.source})` : ''}: ${row.label || row.category || row.reason || 'official probe degraded'}`);
             if (row.action) {
                 lines.push(`     fix: ${row.action}`);
+            }
+            if (row.recovery_command) {
+                lines.push(`     rerun: ${row.recovery_command}`);
+            }
+            if (row.recovery_hint) {
+                lines.push(`     hint: ${row.recovery_hint}`);
             }
         });
     }
@@ -89,6 +99,12 @@ function buildDiagnosticLines(payload) {
             lines.push(`  ${index + 1}. ${row.country || 'market'}: ${row.priority || 'priority'} · ${row.stage || 'stage'}`);
             if (row.action) {
                 lines.push(`     next: ${row.action}`);
+            }
+            if (row.recovery_command) {
+                lines.push(`     rerun: ${row.recovery_command}`);
+            }
+            if (row.recovery_hint) {
+                lines.push(`     hint: ${row.recovery_hint}`);
             }
         });
     }
@@ -121,6 +137,12 @@ function buildDiagnosticLines(payload) {
             }
             if (row.degraded_action) {
                 lines.push(`     fix: ${row.degraded_action}`);
+            }
+            if (row.recovery_command) {
+                lines.push(`     rerun: ${row.recovery_command}`);
+            }
+            if (row.recovery_hint) {
+                lines.push(`     hint: ${row.recovery_hint}`);
             }
             lines.push(`     next: ${row.run_plan_action || row.next_action || 'Review source roadmap.'}`);
         });
