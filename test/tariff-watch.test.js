@@ -40,6 +40,8 @@ test('tariff watch model separates material rate changes from source/parser upda
     assert.ok(model.metrics.some((metric) => metric.label === 'Action needed'));
     assert.ok(model.watchItems.length > 0);
     assert.ok(model.watchItems.every((item) => item.changeType && item.impact));
+    assert.ok(model.automationActions.length > 0);
+    assert.ok(model.automationActions.every((item) => item.country && item.nextAction));
     assert.ok(model.currentTariffRows.length > 0);
     assert.ok(model.marketTariffRows.length >= model.currentTariffRows.length);
     assert.ok(model.marketCoverageRows.length > 0);
@@ -53,6 +55,7 @@ test('tariff watch summarizes current maintained tariff rates for users', () => 
     assert.ok(tariffRows.length > 0);
     assert.ok(tariffRows.some((row) => row.importMarket === 'United States'));
     assert.ok(tariffRows.every((row) => row.baseRate && row.addOnRate && row.totalRate));
+    assert.ok(tariffRows.every((row) => row.productGroup && row.trustLabel && row.trustTone));
     assert.ok(coverageRows.some((row) => row.country === 'China'));
     assert.ok(coverageRows.every((row) => row.rules > 0 && row.hsCoverage > 0));
     assert.ok(coverageRows.every((row) => row.coverageLabel && row.useCase && row.nextAction));
@@ -183,6 +186,9 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
     assert.match(readFile('js/tariff-watch-page.js'), /How to use this tariff market/);
     assert.match(readFile('js/tariff-watch-page.js'), /Before filing/);
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff coverage summary/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Market tariff signal list/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Source trust/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Automation action list/);
     assert.match(readFile('js/tariff-watch-page.js'), /Exact HS lines/);
     assert.match(readFile('js/tariff-watch-page.js'), /Highest signal/);
     assert.match(readFile('js/tariff-watch-page.js'), /const introHtml = selectedMarket \? ''/);

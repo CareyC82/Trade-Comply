@@ -97,11 +97,15 @@
                 </div>
                 <div>
                     <span>Source</span>
-                    <strong>${escapeHtml(row.confidence)}</strong>
+                    <strong>${escapeHtml(row.trustLabel || row.confidence)}</strong>
                     <small>${escapeHtml(row.lastChecked)}</small>
                 </div>
             </article>
         `;
+    }
+
+    function renderTrustBadge(row) {
+        return `<span class="tariff-trust-badge tariff-trust-badge--${escapeHtml(row.trustTone || 'estimate')}">${escapeHtml(row.trustLabel || row.confidence || 'Pre-check')}</span>`;
     }
 
     function renderMarketCoverageRow(row) {
@@ -157,6 +161,29 @@
         `;
     }
 
+    function renderMarketSignalCard(row) {
+        return `
+            <article class="tariff-market-signal-card">
+                <div class="tariff-market-signal-card__head">
+                    <div>
+                        <span>Product / HS group</span>
+                        <strong>${escapeHtml(row.productGroup || 'High-tech goods')}</strong>
+                        <small>HS ${escapeHtml(row.hsScope)} · Origin: ${escapeHtml(row.originScope)}</small>
+                    </div>
+                    ${renderTrustBadge(row)}
+                </div>
+                <p>${escapeHtml(row.label)}</p>
+                <div class="tariff-rate-mini-grid" aria-label="Tariff rate breakdown">
+                    <div><span>Base duty</span><strong>${escapeHtml(row.baseRate)}</strong></div>
+                    <div><span>Add-on / tax</span><strong>${escapeHtml(row.addOnRate)}</strong></div>
+                    <div><span>Total signal</span><strong>${escapeHtml(row.totalRate)}</strong></div>
+                    <div><span>Source trust</span><strong>${escapeHtml(row.confidence)}</strong></div>
+                </div>
+                <small>${escapeHtml(row.trustDetail || row.sourceText || 'Confirm exact HS, origin, and entry date before filing.')}</small>
+            </article>
+        `;
+    }
+
     function renderMarketDetailPage(model, marketKey) {
         const market = model.marketCoverageRows.find((row) => row.marketKey === marketKey) || model.marketCoverageRows[0];
         const rows = model.marketTariffRows.filter((row) => row.marketKey === market?.marketKey);
@@ -182,12 +209,28 @@
                     </div>
                 </div>
                 ${renderMarketDetailSummary(market, rows)}
-                <div class="tariff-current-table">
+                <div class="tariff-market-signal-list" aria-label="Market tariff signal list">
                     ${rows.length
-                        ? rows.map(renderCurrentTariffRow).join('')
+                        ? rows.map(renderMarketSignalCard).join('')
                         : '<p class="tariff-watch-empty">No maintained tariff rows are available for this market yet.</p>'}
                 </div>
             </section>
+        `;
+    }
+
+    function renderAutomationAction(action) {
+        return `
+            <article class="tariff-automation-action tariff-automation-action--${escapeHtml(action.tone || 'stable')}">
+                <div>
+                    <span>${escapeHtml(action.priority || 'Action')}</span>
+                    <strong>${escapeHtml(action.country || 'Market')}</strong>
+                </div>
+                <div>
+                    <b>${escapeHtml(action.title || 'Source follow-up')}</b>
+                    <p>${escapeHtml(action.nextAction || 'Keep this source under review.')}</p>
+                    <small>${escapeHtml(action.evidence || 'Maintained automation signal')}</small>
+                </div>
+            </article>
         `;
     }
 
@@ -241,14 +284,16 @@
         const adminHtml = selectedMarket ? '' : `
             <section class="tariff-watch-section tariff-watch-section--admin">
                 <div class="tariff-watch-section-heading">
-                    <h2>Automation status</h2>
-                    <p>Use this to separate real duty-rate changes from parser/source maintenance.</p>
+                    <h2>Automation action list</h2>
+                    <p>Only source/parser follow-up that affects rate confidence is shown here.</p>
                 </div>
-                <div class="tariff-watch-admin-grid">
+                <div class="tariff-automation-summary">
                     <div><span>Sources checked</span><strong>${escapeHtml(model.sourcesChecked)}</strong></div>
                     <div><span>Source/parser updates</span><strong>${escapeHtml(model.sourceUpdates)}</strong></div>
-                    <div><span>Degraded sources</span><strong>${escapeHtml(model.degradedSources.join(', ') || 'None')}</strong></div>
-                    <div><span>Parser backlog</span><strong>${escapeHtml(model.parserGapCountries.slice(0, 8).join(', ') || 'None')}</strong></div>
+                    <div><span>Markets needing follow-up</span><strong>${escapeHtml(model.automationActions.length)}</strong></div>
+                </div>
+                <div class="tariff-automation-action-list">
+                    ${model.automationActions.map(renderAutomationAction).join('')}
                 </div>
             </section>
         `;

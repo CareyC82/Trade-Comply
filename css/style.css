@@ -5141,6 +5141,108 @@ button.feedback-link:hover {
     line-height: 1.3;
 }
 
+.tariff-market-signal-list {
+    display: grid;
+    gap: 12px;
+}
+
+.tariff-market-signal-card {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-left: 5px solid #0f766e;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #f0fdfa 0%, #fff 75%);
+}
+
+.tariff-market-signal-card__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.tariff-market-signal-card__head span,
+.tariff-rate-mini-grid span,
+.tariff-automation-summary span,
+.tariff-automation-action span {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--color-text-secondary);
+}
+
+.tariff-market-signal-card__head strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-primary);
+    font-size: 1.05rem;
+}
+
+.tariff-market-signal-card p {
+    margin: 0;
+    color: var(--color-text-main);
+    font-weight: 700;
+}
+
+.tariff-market-signal-card small {
+    color: var(--color-text-secondary);
+    line-height: 1.35;
+}
+
+.tariff-trust-badge {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 7px 10px;
+    background: #e0f2fe;
+    color: #075985;
+    font-weight: 900;
+    font-size: 0.78rem;
+}
+
+.tariff-trust-badge--exact {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.tariff-trust-badge--official {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.tariff-trust-badge--heading {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.tariff-trust-badge--estimate {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.tariff-rate-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.tariff-rate-mini-grid div {
+    border: 1px solid rgba(15, 118, 110, 0.14);
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px;
+}
+
+.tariff-rate-mini-grid strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--color-primary);
+    font-size: 1rem;
+}
+
 .tariff-watch-back-link {
     display: inline-flex;
     align-items: center;
@@ -5231,23 +5333,65 @@ button.feedback-link:hover {
     background: #f8fafc;
 }
 
-.tariff-watch-admin-grid {
+.tariff-watch-admin-grid,
+.tariff-automation-summary {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
+    margin-bottom: 12px;
 }
 
-.tariff-watch-admin-grid div {
+.tariff-watch-admin-grid div,
+.tariff-automation-summary div {
     background: #fff;
     border: 1px solid var(--color-border);
     border-radius: 10px;
     padding: 14px;
 }
 
-.tariff-watch-admin-grid strong {
+.tariff-watch-admin-grid strong,
+.tariff-automation-summary strong {
     display: block;
     margin-top: 6px;
     color: var(--color-primary);
+}
+
+.tariff-automation-action-list {
+    display: grid;
+    gap: 10px;
+}
+
+.tariff-automation-action {
+    display: grid;
+    grid-template-columns: 0.35fr 1fr;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--color-border);
+    border-left: 5px solid #0f766e;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.tariff-automation-action--watch,
+.tariff-automation-action--review {
+    border-left-color: #b7791f;
+    background: #fffaf0;
+}
+
+.tariff-automation-action b,
+.tariff-automation-action strong {
+    display: block;
+    color: var(--color-primary);
+}
+
+.tariff-automation-action p {
+    margin: 4px 0;
+    color: var(--color-text-main);
+}
+
+.tariff-automation-action small {
+    color: var(--color-text-secondary);
+    line-height: 1.35;
 }
 
 @media (max-width: 900px) {
@@ -5256,13 +5400,20 @@ button.feedback-link:hover {
     .tariff-watch-guide,
     .tariff-market-brief,
     .tariff-market-detail-summary,
+    .tariff-rate-mini-grid,
+    .tariff-automation-summary,
     .tariff-watch-admin-grid {
         grid-template-columns: 1fr;
     }
 
     .tariff-current-row,
-    .tariff-watch-item {
+    .tariff-watch-item,
+    .tariff-automation-action {
         grid-template-columns: 1fr;
+    }
+
+    .tariff-market-signal-card__head {
+        display: grid;
     }
 
     .tariff-watch-item p,
