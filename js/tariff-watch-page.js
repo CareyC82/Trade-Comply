@@ -262,6 +262,49 @@
         `;
     }
 
+    function renderSpecialProgram(program) {
+        const codes = program.declarationCodes || {};
+        const codeText = [
+            Array.isArray(codes.measureTypes) && codes.measureTypes.length ? `Measure ${codes.measureTypes.join('/')}` : '',
+            codes.preferenceCode ? `Preference ${codes.preferenceCode}` : '',
+            codes.originDocument ? `Document ${codes.originDocument}` : ''
+        ].filter(Boolean).join(' · ');
+        return `
+            <article class="tariff-special-program">
+                <div class="tariff-special-program__head">
+                    <div>
+                        <span>Special tariff program · effective ${escapeHtml(program.effectiveFrom)}</span>
+                        <h3>${escapeHtml(program.label)}</h3>
+                        <p>Origin: ${escapeHtml(program.originScope)} · ${escapeHtml(program.legalBasis)}</p>
+                    </div>
+                    <a href="${escapeHtml(program.officialUrl)}" target="_blank" rel="noopener noreferrer">Official regulation</a>
+                </div>
+                <div class="tariff-special-program__gate">
+                    <strong>Exact Annex CN confirmation required</strong>
+                    <p>${escapeHtml(program.scopeNote)}</p>
+                </div>
+                <ul>
+                    ${(program.treatments || []).map((row) => `<li><b>Annex ${escapeHtml(row.annex)}</b><span>${escapeHtml(row.treatment)}</span></li>`).join('')}
+                </ul>
+                <small>${escapeHtml(codeText)} · Article 59a origin and transport evidence required</small>
+            </article>
+        `;
+    }
+
+    function renderSpecialPrograms(model, market) {
+        const programs = (model.specialPrograms || []).filter((row) => row.marketKey === market?.marketKey);
+        if (!programs.length) return '';
+        return `
+            <section class="tariff-special-programs" aria-label="Special tariff programs">
+                <div class="tariff-watch-section-heading">
+                    <h2>Special tariff programs</h2>
+                    <p>Conditional treatments are shown separately from standard market tariff signals.</p>
+                </div>
+                ${programs.map(renderSpecialProgram).join('')}
+            </section>
+        `;
+    }
+
     function renderMarketDetailPage(model, marketKey) {
         const market = model.marketCoverageRows.find((row) => row.marketKey === marketKey) || model.marketCoverageRows[0];
         const rows = model.marketTariffRows.filter((row) => row.marketKey === market?.marketKey);
@@ -286,6 +329,7 @@
                         <strong>${escapeHtml(market?.nextAction || 'Confirm exact HS, origin, entry date, and add-on tax layers.')}</strong>
                     </div>
                 </div>
+                ${renderSpecialPrograms(model, market)}
                 ${renderMarketDetailSummary(market, rows)}
                 ${renderMarketActionPanel(model, market)}
                 <div class="tariff-market-signal-groups" aria-label="Market tariff signal list">

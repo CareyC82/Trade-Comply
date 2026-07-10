@@ -184,6 +184,7 @@ describe('compliance matching matrix', () => {
         );
         assert.ok(ids(usOrigin).includes('CL-EUORIGIN-059'));
         assert.match(haystack(usOrigin), /Article 59a|direct transport|non-alteration|ELAN/i);
+        assert.match(haystack(usOrigin), /Annex I|Annex II|Annex III|U190|measure type 142/i);
 
         const chinaOrigin = runSearch(
             'gpu ai accelerator chip',

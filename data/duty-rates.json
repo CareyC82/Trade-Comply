@@ -3,6 +3,65 @@
   "updated_at": "2026-07-10",
   "status": "indicative_precheck",
   "notes": "Indicative duty signals for post-entry value review. Confirm exact 10-digit tariff line, entry date, origin, exclusions, and trade-remedy scope in official tariff databases before filing or correction.",
+  "special_programs": [
+    {
+      "id": "EU-US-2026-1455",
+      "import_markets": [
+        "EU",
+        "DE",
+        "NL"
+      ],
+      "origin_countries": [
+        "US"
+      ],
+      "effective_from": "2026-07-01",
+      "status": "in_force",
+      "label": "EU adjusted duties and tariff quotas for US-origin goods",
+      "legal_basis": "Regulation (EU) 2026/1455",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1455",
+      "origin_procedure_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1422",
+      "scope_status": "official_annex_confirmation_required",
+      "scope_note": "Apply only when the declared CN line is listed in Annex I, II, or III of Regulation (EU) 2026/1455. Do not infer eligibility from a broad HS heading.",
+      "treatments": [
+        {
+          "annex": "I",
+          "treatment": "Common Customs Tariff duty becomes 0% for listed US-origin CN lines."
+        },
+        {
+          "annex": "II",
+          "treatment": "The ad valorem component is not applied; any specific duty linked to the entry-price system remains."
+        },
+        {
+          "annex": "III",
+          "treatment": "The listed in-quota rate applies only while the applicable 12-month quota volume remains available."
+        }
+      ],
+      "declaration_codes": {
+        "taric_measure_types": [
+          "142",
+          "145"
+        ],
+        "preference_code": "300",
+        "origin_document_code": "U190"
+      },
+      "origin_evidence": {
+        "article": "Article 59a UCC-IA",
+        "direct_transport_or_non_alteration_required": true,
+        "free_evidence_principle": true,
+        "certificate_alone_sufficient": false
+      },
+      "suspension_watch": {
+        "cn_chapters": [
+          "72",
+          "73",
+          "76"
+        ],
+        "review_date": "2026-12-31",
+        "note": "Monitor possible suspension if the reciprocal US tariff condition for covered steel and aluminium derivatives is not met."
+      },
+      "last_verified_at": "2026-07-10"
+    }
+  ],
   "rules": [
     {
       "id": "US-CN-850760-LIB-INDICATIVE",

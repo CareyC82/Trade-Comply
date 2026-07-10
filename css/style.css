@@ -5196,6 +5196,97 @@ button.feedback-link:hover {
     color: #92400e;
 }
 
+.tariff-special-programs {
+    margin: 0 0 16px;
+    padding: 16px;
+    border: 1px solid rgba(29, 78, 216, 0.2);
+    border-radius: 12px;
+    background: #f8fbff;
+}
+
+.tariff-special-programs .tariff-watch-section-heading {
+    margin-bottom: 12px;
+}
+
+.tariff-special-program {
+    padding: 16px;
+    border: 1px solid rgba(29, 78, 216, 0.2);
+    border-left: 5px solid #1d4ed8;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.tariff-special-program__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.tariff-special-program__head span,
+.tariff-special-program__gate strong {
+    color: #1d4ed8;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.tariff-special-program__head h3 {
+    margin: 5px 0;
+    color: var(--color-primary);
+}
+
+.tariff-special-program__head p,
+.tariff-special-program__gate p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.tariff-special-program__head a {
+    flex: 0 0 auto;
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.tariff-special-program__gate {
+    margin: 14px 0;
+    padding: 12px;
+    border-radius: 8px;
+    background: #eff6ff;
+}
+
+.tariff-special-program__gate strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.tariff-special-program ul {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.tariff-special-program li {
+    display: grid;
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 8px;
+    color: var(--color-text-main);
+    line-height: 1.4;
+}
+
+.tariff-special-program li b {
+    color: var(--color-primary);
+}
+
+.tariff-special-program > small {
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
 .tariff-market-signal-list {
     display: grid;
     gap: 12px;
@@ -5550,10 +5641,15 @@ button.feedback-link:hover {
     .tariff-market-brief,
     .tariff-market-detail-summary,
     .tariff-market-action-panel,
+    .tariff-special-program__head,
     .tariff-rate-mini-grid,
     .tariff-automation-summary,
     .tariff-watch-admin-grid {
         grid-template-columns: 1fr;
+    }
+
+    .tariff-special-program__head {
+        display: grid;
     }
 
     .tariff-current-row,

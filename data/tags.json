@@ -31737,10 +31737,10 @@
     "category_label": "Origin & Import Evidence",
     "tag_type": "CHECK_REQUIRED",
     "short_name": "[EU Article 59a / ELAN Origin Proof]",
-    "short_description": "US-origin goods using EU adjusted duties or tariff quotas require non-preferential origin plus direct-transport or non-alteration evidence.",
-    "description": "For goods originating in the United States that enter the European Union and claim adjusted customs duties or tariff quotas under Regulation (EU) 2026/1455, Article 59a UCC-IA requires the proof of non-preferential origin to include evidence of direct transport to the Union or evidence that the goods remained under customs supervision and were not altered while routed, stored, or split through another country. Electronic certificates of origin may be accepted through ELAN for special non-preferential import arrangements under Articles 57-59 and Annex 22-14.",
-    "content_en": "US-origin goods using Regulation (EU) 2026/1455 treatment must retain non-preferential origin, direct-transport or customs-supervision/non-alteration evidence, plus an ELAN electronic certificate where the special import arrangement requires it.",
-    "content_zh": "美国原产货物进入欧盟并申请 Regulation (EU) 2026/1455 调整税率或配额时，应保留非优惠原产地、直接运输，或第三国中转期间海关监管与未改变状态证明；特殊非优惠进口安排要求时可使用 ELAN 电子原产地证书。",
+    "short_description": "US-origin goods may use Regulation 2026/1455 only after the declared CN line and Annex treatment are confirmed, with Article 59a transport/origin evidence retained.",
+    "description": "For goods originating in the United States that enter the European Union, Regulation (EU) 2026/1455 applies only when the declared CN line is listed in Annex I, II, or III. Annex I sets 0% Common Customs Tariff duty, Annex II removes only the ad valorem component while retaining any entry-price specific duty, and Annex III provides quota-limited in-quota rates. Article 59a UCC-IA additionally requires direct-transport or customs-supervision/non-alteration evidence. TARIC measure types 142/145, preference code 300, and document code U190 may be required for the claim. Electronic certificates through ELAN apply only where the special non-preferential arrangement requires one.",
+    "content_en": "Confirm the exact Regulation 2026/1455 Annex and CN line before claiming adjusted duty treatment. Retain non-preferential origin and Article 59a direct-transport/non-alteration evidence, and use the applicable TARIC, preference, and document codes.",
+    "content_zh": "申请 Regulation (EU) 2026/1455 调整税率前，必须确认申报 CN 行及所属附件：Annex I 为0%关税，Annex II 仅免从价税部分，Annex III 为配额内税率。还应保留非优惠原产地及 Article 59a 直接运输/未改变状态证明，并使用适用的TARIC、优惠和文件代码。",
     "source_citation": "Commission Implementing Regulation (EU) 2026/1422, Article 59a UCC-IA",
     "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1422",
     "effective_date": "2026-07-01",
@@ -31817,12 +31817,34 @@
       "review_status": "confirmed",
       "last_verified_at": "2026-07-10"
     },
+    "regulation_2026_1455": {
+      "scope_status": "official_annex_confirmation_required",
+      "effective_from": "2026-07-01",
+      "annex_treatments": {
+        "I": "0% Common Customs Tariff duty for listed CN lines",
+        "II": "ad valorem component removed; entry-price specific duty retained",
+        "III": "quota-limited in-quota rate"
+      },
+      "taric_measure_types": [
+        "142",
+        "145"
+      ],
+      "preference_code": "300",
+      "document_code": "U190"
+    },
     "checklist": [
       {
         "id": "EU origin evidence::Confirm Regulation 2026/1455 scope",
         "phase": "EU origin evidence",
         "task": "Confirm Regulation 2026/1455 scope",
-        "desc": "Confirm whether the declared US-origin tariff line uses an adjusted duty or tariff quota under Regulation (EU) 2026/1455.",
+        "desc": "Confirm the exact declared CN line in Annex I, II, or III and apply only that Annex's treatment; a broad HS-heading match is not sufficient.",
+        "source": "official-source"
+      },
+      {
+        "id": "EU origin evidence::Validate declaration codes",
+        "phase": "EU origin evidence",
+        "task": "Validate declaration codes",
+        "desc": "Confirm the applicable TARIC measure type 142/145, preference code 300, and origin document code U190 before claiming the adjustment.",
         "source": "official-source"
       },
       {

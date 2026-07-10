@@ -21,10 +21,16 @@ describe('trade opportunity insights', () => {
         });
         assert.ok(direct.selectedMarket.originEvidenceGate);
         assert.match(direct.selectedMarket.originEvidenceGate.summary, /2026\/1455|direct transport|non-alteration/i);
+        assert.equal(direct.selectedMarket.originEvidenceGate.annexConfirmationRequired, true);
+        assert.equal(direct.selectedMarket.originEvidenceGate.scopeStatus, 'official_annex_confirmation_required');
+        assert.deepEqual(direct.selectedMarket.originEvidenceGate.declarationCodes.measureTypes, ['142', '145']);
+        assert.equal(direct.selectedMarket.originEvidenceGate.declarationCodes.supportingDocument, 'U190');
+        assert.equal(direct.selectedMarket.originEvidenceGate.treatments.length, 3);
         assert.ok(direct.selectedMarket.sourceEvidence.some((item) => item.label === 'Origin evidence gate'));
 
         assert.ok(direct.transitRoutes.every((route) => route.originEvidenceGate));
         assert.ok(direct.transitRoutes.every((route) => /Article 59a|direct transport|non-alteration/i.test(route.transitWarning)));
+        assert.ok(direct.transitRoutes.every((route) => route.transitComparison.transitLegalGate.document_evidence_required.some((item) => /Annex line/i.test(item))));
 
         const nonUsOrigin = buildOpportunityInsights({
             product: 'AI GPU chip',

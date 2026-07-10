@@ -11,6 +11,7 @@ const {
     buildTariffRows,
     buildCurrentTariffRows,
     buildMarketCoverageRows,
+    buildSpecialProgramRows,
     classifyTariffUse
 } = require('../lib/tariff-watch');
 
@@ -46,6 +47,23 @@ test('tariff watch model separates material rate changes from source/parser upda
     assert.ok(model.currentTariffRows.length > 0);
     assert.ok(model.marketTariffRows.length >= model.currentTariffRows.length);
     assert.ok(model.marketCoverageRows.length > 0);
+    assert.equal(model.specialPrograms.length, 3);
+});
+
+test('tariff watch models EU adjusted-duty program without inferring broad HS eligibility', () => {
+    const dutyRates = readJson('data/duty-rates.json');
+    const programs = buildSpecialProgramRows(dutyRates);
+
+    assert.deepEqual(programs.map((row) => row.marketKey), ['EU', 'DE', 'NL']);
+    programs.forEach((program) => {
+        assert.equal(program.originScope, 'United States');
+        assert.equal(program.scopeStatus, 'official_annex_confirmation_required');
+        assert.match(program.scopeNote, /Annex I, II, or III|Do not infer/i);
+        assert.equal(program.treatments.length, 3);
+        assert.deepEqual(program.declarationCodes.measureTypes, ['142', '145']);
+        assert.equal(program.declarationCodes.preferenceCode, '300');
+        assert.equal(program.declarationCodes.originDocument, 'U190');
+    });
 });
 
 test('tariff watch summarizes current maintained tariff rates for users', () => {
@@ -207,6 +225,9 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
     assert.match(readFile('js/tariff-watch-page.js'), /Before filing/);
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff coverage summary/);
     assert.match(readFile('js/tariff-watch-page.js'), /Coverage upgrade next/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Special tariff programs/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Exact Annex CN confirmation required/);
+    assert.match(readFile('js/tariff-watch-page.js'), /codes\.measureTypes\.join/);
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff signal list/);
     assert.match(readFile('js/tariff-watch-page.js'), /Source trust/);
     assert.match(readFile('js/tariff-watch-page.js'), /Quote-ready screen/);

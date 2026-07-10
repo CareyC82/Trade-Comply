@@ -108,9 +108,16 @@ test('adds EU Article 59a evidence for US-origin EU imports only', () => {
     const gate = buildOriginEvidenceGate(context);
     assert.ok(gate);
     assert.match(gate.summary, /Article 59a|2026\/1455/);
-    assert.match(gate.checklist.join(' '), /direct-transport|non-alteration|ELAN/i);
+    assert.equal(gate.annexConfirmationRequired, true);
+    assert.equal(gate.scopeStatus, 'official_annex_confirmation_required');
+    assert.equal(gate.hsCode, '854231');
+    assert.deepEqual(gate.declarationCodes.measureTypes, ['142', '145']);
+    assert.equal(gate.declarationCodes.preferenceCode, '300');
+    assert.equal(gate.declarationCodes.supportingDocument, 'U190');
+    assert.equal(gate.treatments.length, 3);
+    assert.match(gate.checklist.join(' '), /Annex I|direct-transport|non-alteration|ELAN|U190/i);
     assert.match(buildReviewChecklist(context).join(' '), /customs supervision|ELAN/i);
-    assert.match(buildEvidenceList(context).join(' '), /non-preferential|non-alteration|ELAN/i);
+    assert.match(buildEvidenceList(context).join(' '), /official Annex|non-preferential|non-alteration|ELAN|U190/i);
 
     assert.equal(buildOriginEvidenceGate({ ...context, originCountryCode: 'CN' }), null);
     assert.equal(buildOriginEvidenceGate({ ...context, importCountryCode: 'US' }), null);

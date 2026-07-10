@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-10T09:24:12.280Z",
+  "updated_at": "2026-07-10T14:01:33.723Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -282,11 +282,11 @@
       "launch_mode": "live_auto",
       "public_launch": true,
       "filing_grade_auto": false,
-      "source_count": 3,
+      "source_count": 4,
       "source_health_grade": "healthy",
       "source_health_counts": {
         "fetch_ok": 2,
-        "pending_first_run": 1
+        "pending_first_run": 2
       },
       "sources": [
         {
@@ -309,6 +309,19 @@
           "type": "import",
           "method": "fetch",
           "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1422",
+          "health_status": "pending_first_run",
+          "last_fetch_at": null,
+          "byte_length": 0,
+          "error": "",
+          "transport": "",
+          "fetched_url": ""
+        },
+        {
+          "id": "eu-us-adjusted-duties-2026",
+          "label": "EU adjusted duties and tariff quotas for US-origin goods",
+          "type": "import",
+          "method": "fetch",
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1455",
           "health_status": "pending_first_run",
           "last_fetch_at": null,
           "byte_length": 0,
