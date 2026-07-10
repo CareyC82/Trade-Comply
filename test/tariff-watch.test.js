@@ -186,6 +186,7 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
     assert.match(readFile('js/tariff-watch-page.js'), /How to use this tariff market/);
     assert.match(readFile('js/tariff-watch-page.js'), /Before filing/);
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff coverage summary/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Coverage upgrade next/);
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff signal list/);
     assert.match(readFile('js/tariff-watch-page.js'), /Source trust/);
     assert.match(readFile('js/tariff-watch-page.js'), /Automation action list/);

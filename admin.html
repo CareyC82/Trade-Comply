@@ -1108,6 +1108,8 @@
                             ${row.degraded_label ? `<div class="grade-note">Diagnosis: ${escapeHtml(row.degraded_label)}${row.degraded_category ? ` · ${escapeHtml(row.degraded_category)}` : ''}</div>` : ''}
                             ${row.degraded_action ? `<div class="grade-note">Fix: ${escapeHtml(row.degraded_action)}</div>` : ''}
                             <div class="grade-note">Next: ${escapeHtml(row.run_plan_action || row.next_action || 'Review source roadmap.')}</div>
+                            <div class="grade-note">Priority: ${escapeHtml(row.maintenance_priority || row.parser_gap_task?.priority || 'tracked')}</div>
+                            ${row.update_command ? `<div class="grade-note"><strong>Run:</strong> <code>${escapeHtml(row.update_command)}</code></div>` : ''}
                             ${row.parser_gap_task?.task ? `<div class="grade-note"><strong>Parser task:</strong> ${escapeHtml(row.parser_gap_task.task)}</div>` : ''}
                         </article>
                     `).join('')}

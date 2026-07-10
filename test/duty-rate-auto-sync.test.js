@@ -8,6 +8,7 @@ const {
     isMaterialRateChange,
     buildRunSummary,
     downgradeOfficialTransportFailure,
+    shouldRunOfficialWritePass,
     classifyOfficialFetchDegradation,
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,
@@ -55,6 +56,36 @@ test('official fetch degradation classifier gives repair-focused categories', ()
     assert.equal(noRows.category, 'parser_no_rows');
     assert.match(noRows.label, /parser found no rate rows/i);
     assert.match(noRows.action, /parser fixture/i);
+});
+
+test('official write pass is blocked after dry-run source degradation', () => {
+    const failedRun = buildRunSummary('USITC', {
+        ok: false,
+        changes: [],
+        errors: [{
+            rule: 'US-CN-850760-LIB-INDICATIVE',
+            prefix: '850760',
+            error: 'getaddrinfo ENOTFOUND hts.usitc.gov'
+        }]
+    }, {
+        applied: false,
+        mode: 'official-dry-run'
+    });
+    const downgraded = downgradeOfficialTransportFailure(failedRun);
+    const cleanRun = buildRunSummary('USITC', {
+        ok: true,
+        changes: [],
+        errors: []
+    }, {
+        applied: false,
+        mode: 'official-dry-run'
+    });
+
+    assert.equal(downgraded.ok, true);
+    assert.equal(downgraded.official_fetch_degraded, true);
+    assert.equal(shouldRunOfficialWritePass(downgraded, { dryRun: false }), false);
+    assert.equal(shouldRunOfficialWritePass(cleanRun, { dryRun: false }), true);
+    assert.equal(shouldRunOfficialWritePass(cleanRun, { dryRun: true }), false);
 });
 
 test('auto sync status treats safe updates as auto-applied without manual review', () => {

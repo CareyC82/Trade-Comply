@@ -237,6 +237,10 @@ function downgradeOfficialTransportFailure(run, {
     };
 }
 
+function shouldRunOfficialWritePass(run, { dryRun = false } = {}) {
+    return Boolean(run?.ok) && !run?.official_fetch_degraded && !dryRun;
+}
+
 function buildExceptionsForRun(run, { threshold = MATERIAL_RATE_CHANGE_THRESHOLD } = {}) {
     const exceptions = [];
     if (!run.ok || run.error_count > 0) {
@@ -741,12 +745,16 @@ async function runAutoDutyRateSync({
         const { run: usDrySummary } = appendMultiPrefixConflicts(
             downgradeOfficialTransportFailure(rawUsDrySummary)
         );
-        if (usDrySummary.ok && !dryRun) {
+        if (shouldRunOfficialWritePass(usDrySummary, { dryRun })) {
             const usApplied = await updateUsRules({ dryRun: false });
-            runs.push(buildRunSummary('USITC', usApplied, {
+            const rawUsAppliedSummary = buildRunSummary('USITC', usApplied, {
                 applied: true,
                 mode: 'official'
-            }));
+            });
+            const { run: usAppliedSummary } = appendMultiPrefixConflicts(
+                downgradeOfficialTransportFailure(rawUsAppliedSummary)
+            );
+            runs.push(usAppliedSummary);
         } else {
             runs.push(usDrySummary);
         }
@@ -927,6 +935,7 @@ module.exports = {
     isMaterialRateChange,
     buildRunSummary,
     downgradeOfficialTransportFailure,
+    shouldRunOfficialWritePass,
     classifyOfficialFetchDegradation,
     buildExceptionsForRun,
     findMultiPrefixRateConflicts,

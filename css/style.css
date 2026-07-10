@@ -5141,6 +5141,61 @@ button.feedback-link:hover {
     line-height: 1.3;
 }
 
+.tariff-market-action-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+    gap: 14px;
+    margin: 0 0 14px;
+    padding: 14px;
+    border: 1px solid rgba(180, 83, 9, 0.24);
+    border-left: 5px solid #b45309;
+    border-radius: 12px;
+    background: #fffbeb;
+}
+
+.tariff-market-action-panel span {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: var(--color-text-secondary);
+}
+
+.tariff-market-action-panel strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--color-primary);
+    font-size: 1.02rem;
+}
+
+.tariff-market-action-panel p {
+    margin: 6px 0 0;
+    color: var(--color-text-secondary);
+    line-height: 1.35;
+}
+
+.tariff-market-action-panel ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tariff-market-action-panel li {
+    display: grid;
+    gap: 2px;
+    padding: 9px;
+    border: 1px solid rgba(180, 83, 9, 0.18);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.tariff-market-action-panel li b {
+    color: #92400e;
+}
+
 .tariff-market-signal-list {
     display: grid;
     gap: 12px;
@@ -5400,6 +5455,7 @@ button.feedback-link:hover {
     .tariff-watch-guide,
     .tariff-market-brief,
     .tariff-market-detail-summary,
+    .tariff-market-action-panel,
     .tariff-rate-mini-grid,
     .tariff-automation-summary,
     .tariff-watch-admin-grid {

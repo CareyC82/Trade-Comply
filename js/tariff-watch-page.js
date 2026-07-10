@@ -184,6 +184,31 @@
         `;
     }
 
+    function renderMarketActionPanel(model, market) {
+        const marketName = String(market?.country || '').toLowerCase();
+        const actions = (model.automationActions || [])
+            .filter((action) => String(action.country || '').toLowerCase() === marketName)
+            .slice(0, 3);
+        if (!actions.length) return '';
+        return `
+            <div class="tariff-market-action-panel" aria-label="Coverage upgrade next">
+                <div>
+                    <span>Coverage upgrade next</span>
+                    <strong>${escapeHtml(actions[0].title || 'Source follow-up')}</strong>
+                    <p>${escapeHtml(actions[0].nextAction || 'Keep this source under review before filing-grade use.')}</p>
+                </div>
+                <ul>
+                    ${actions.map((action) => `
+                        <li>
+                            <b>${escapeHtml(action.priority || 'Tracked')}</b>
+                            <span>${escapeHtml(action.evidence || 'Maintained automation queue')}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
     function renderMarketDetailPage(model, marketKey) {
         const market = model.marketCoverageRows.find((row) => row.marketKey === marketKey) || model.marketCoverageRows[0];
         const rows = model.marketTariffRows.filter((row) => row.marketKey === market?.marketKey);
@@ -209,6 +234,7 @@
                     </div>
                 </div>
                 ${renderMarketDetailSummary(market, rows)}
+                ${renderMarketActionPanel(model, market)}
                 <div class="tariff-market-signal-list" aria-label="Market tariff signal list">
                     ${rows.length
                         ? rows.map(renderMarketSignalCard).join('')
