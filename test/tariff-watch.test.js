@@ -87,7 +87,7 @@ test('tariff watch keeps gaming device HS coverage across maintained markets', (
             `${marketKey} should cover gaming HS 950450`
         );
     });
-    assert.ok(tags.some((tag) => tag.tag_id === 'CL-GAMING-GLOBAL-001'));
+    assert.ok(tags.some((tag) => tag.tag_id === 'CL-GAMING-001'));
     assert.ok(cases.some((row) => row.case_id === 'CASE-GAMING-GLOBAL-BASELINE'));
 });
 
