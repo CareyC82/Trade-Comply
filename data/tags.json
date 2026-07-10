@@ -31730,5 +31730,115 @@
     "related_cases": [],
     "display_order": 50,
     "pipeline_source": "bis"
+  },
+  {
+    "tag_id": "CL-EUORIGIN-059",
+    "category": "IMPORT_REG",
+    "category_label": "Origin & Import Evidence",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[EU Article 59a / ELAN Origin Proof]",
+    "short_description": "US-origin goods using EU adjusted duties or tariff quotas require non-preferential origin plus direct-transport or non-alteration evidence.",
+    "description": "For goods originating in the United States that enter the European Union and claim adjusted customs duties or tariff quotas under Regulation (EU) 2026/1455, Article 59a UCC-IA requires the proof of non-preferential origin to include evidence of direct transport to the Union or evidence that the goods remained under customs supervision and were not altered while routed, stored, or split through another country. Electronic certificates of origin may be accepted through ELAN for special non-preferential import arrangements under Articles 57-59 and Annex 22-14.",
+    "content_en": "US-origin goods using Regulation (EU) 2026/1455 treatment must retain non-preferential origin, direct-transport or customs-supervision/non-alteration evidence, plus an ELAN electronic certificate where the special import arrangement requires it.",
+    "content_zh": "美国原产货物进入欧盟并申请 Regulation (EU) 2026/1455 调整税率或配额时，应保留非优惠原产地、直接运输，或第三国中转期间海关监管与未改变状态证明；特殊非优惠进口安排要求时可使用 ELAN 电子原产地证书。",
+    "source_citation": "Commission Implementing Regulation (EU) 2026/1422, Article 59a UCC-IA",
+    "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1422",
+    "effective_date": "2026-07-01",
+    "status": "ACTIVE",
+    "direction": "export",
+    "country": "EU",
+    "route_focus": "import",
+    "origin_countries": [
+      "US"
+    ],
+    "destination_countries": [
+      "EU",
+      "DE",
+      "NL"
+    ],
+    "risk_level": "High",
+    "hs_code": "8471",
+    "related_hs_codes": [
+      "8471",
+      "8479",
+      "8486",
+      "8504",
+      "8507",
+      "8517",
+      "8525",
+      "8528",
+      "8541",
+      "8542",
+      "9030"
+    ],
+    "related_keywords": [
+      "electronics",
+      "electronic components",
+      "computer",
+      "tablet",
+      "smartphone",
+      "network equipment",
+      "router",
+      "optical module",
+      "battery",
+      "energy storage",
+      "ev charger",
+      "solar panel",
+      "photovoltaic",
+      "semiconductor",
+      "chip",
+      "gpu",
+      "ai accelerator",
+      "memory",
+      "hbm",
+      "industrial robot",
+      "laboratory analyzer",
+      "non-preferential origin",
+      "direct transport",
+      "non-alteration",
+      "customs supervision",
+      "elan",
+      "electronic certificate of origin",
+      "article 59a",
+      "2026/1422",
+      "2026/1455",
+      "tariff quota"
+    ],
+    "related_cases": [
+      "CASE-EU-IMPORT-CUSTOMS"
+    ],
+    "display_order": 1,
+    "pipeline_source": "official-eu-origin-update",
+    "policy_tracker": {
+      "source_id": "eu-nonpreferential-origin",
+      "source_type": "official_gazette",
+      "jurisdiction": "EU",
+      "effective_status": "in_force",
+      "review_status": "confirmed",
+      "last_verified_at": "2026-07-10"
+    },
+    "checklist": [
+      {
+        "id": "EU origin evidence::Confirm Regulation 2026/1455 scope",
+        "phase": "EU origin evidence",
+        "task": "Confirm Regulation 2026/1455 scope",
+        "desc": "Confirm whether the declared US-origin tariff line uses an adjusted duty or tariff quota under Regulation (EU) 2026/1455.",
+        "source": "official-source"
+      },
+      {
+        "id": "EU origin evidence::Retain direct transport or non-alteration proof",
+        "phase": "EU origin evidence",
+        "task": "Retain direct transport or non-alteration proof",
+        "desc": "Keep through transport records or, for third-country routing, customs-supervision, storage/splitting, seal, handling, and non-alteration evidence.",
+        "source": "official-source"
+      },
+      {
+        "id": "EU origin evidence::Check ELAN certificate requirement",
+        "phase": "EU origin evidence",
+        "task": "Check ELAN certificate requirement",
+        "desc": "For special non-preferential import arrangements, confirm whether the required certificate of origin is issued and verifiable electronically through ELAN.",
+        "source": "official-source"
+      }
+    ]
   }
 ]

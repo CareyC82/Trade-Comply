@@ -195,12 +195,13 @@ function summarizeRegulatoryHealth(sources) {
     const okCount = (counts.fetch_ok || 0) + (counts.cached_ok || 0);
     const monitorCount = counts.official_link_monitor || 0;
     const optionalIssueCount = counts.optional_issue || 0;
+    const pendingCount = counts.pending_first_run || 0;
     let grade = 'pending';
     if (blockingIssueCount > 0) {
         grade = okCount > 0 ? 'partial' : 'blocked';
     } else if (monitorCount === sources.length && sources.length > 0) {
         grade = 'monitor';
-    } else if ((okCount + monitorCount + optionalIssueCount) === sources.length && okCount > 0) {
+    } else if ((okCount + monitorCount + optionalIssueCount + pendingCount) === sources.length && okCount > 0) {
         grade = 'healthy';
     }
     return {

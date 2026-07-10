@@ -11,6 +11,31 @@ const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 
 const priorityMatrix = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'post-entry-rate-priority-matrix.json'), 'utf8'));
 
 describe('trade opportunity insights', () => {
+    it('gates US-origin EU opportunity routes on Article 59a origin evidence', () => {
+        const direct = buildOpportunityInsights({
+            product: 'AI GPU chip',
+            from: 'US',
+            to: 'EU',
+            dutyRates,
+            priorityMatrix
+        });
+        assert.ok(direct.selectedMarket.originEvidenceGate);
+        assert.match(direct.selectedMarket.originEvidenceGate.summary, /2026\/1455|direct transport|non-alteration/i);
+        assert.ok(direct.selectedMarket.sourceEvidence.some((item) => item.label === 'Origin evidence gate'));
+
+        assert.ok(direct.transitRoutes.every((route) => route.originEvidenceGate));
+        assert.ok(direct.transitRoutes.every((route) => /Article 59a|direct transport|non-alteration/i.test(route.transitWarning)));
+
+        const nonUsOrigin = buildOpportunityInsights({
+            product: 'AI GPU chip',
+            from: 'CN',
+            to: 'EU',
+            dutyRates,
+            priorityMatrix
+        });
+        assert.equal(nonUsOrigin.selectedMarket.originEvidenceGate, null);
+    });
+
     it('detects green and supply-chain heavy product categories', () => {
         const battery = detectProductSignal('energy storage lithium battery system');
         const solar = detectProductSignal('solar panel photovoltaic module');

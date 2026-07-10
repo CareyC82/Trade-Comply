@@ -15,6 +15,7 @@ const {
     classifyRateSourceTrust,
     buildImportPostEntryDecision,
     buildExportPostEntryReview,
+    buildOriginEvidenceGate,
     buildEvidenceList
 } = require('../lib/post-entry-value');
 
@@ -93,6 +94,26 @@ test('adds valuation and evidence context for US import review', () => {
     assert.match(buildComplianceMeaning(result), /reconciled/i);
     assert.match(buildRecommendedAction(result), /Amend/i);
     assert.match(buildEvidenceList(context).join(' '), /Customs entry/);
+});
+
+test('adds EU Article 59a evidence for US-origin EU imports only', () => {
+    const context = {
+        importCountryCode: 'EU',
+        importCountry: 'European Union',
+        originCountryCode: 'US',
+        originCountry: 'United States',
+        hsCode: '854231',
+        entryDate: '2026-07-10'
+    };
+    const gate = buildOriginEvidenceGate(context);
+    assert.ok(gate);
+    assert.match(gate.summary, /Article 59a|2026\/1455/);
+    assert.match(gate.checklist.join(' '), /direct-transport|non-alteration|ELAN/i);
+    assert.match(buildReviewChecklist(context).join(' '), /customs supervision|ELAN/i);
+    assert.match(buildEvidenceList(context).join(' '), /non-preferential|non-alteration|ELAN/i);
+
+    assert.equal(buildOriginEvidenceGate({ ...context, originCountryCode: 'CN' }), null);
+    assert.equal(buildOriginEvidenceGate({ ...context, importCountryCode: 'US' }), null);
 });
 
 test('calculates indicative duty impact for US imports from China', () => {

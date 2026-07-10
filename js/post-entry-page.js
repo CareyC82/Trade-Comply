@@ -902,6 +902,9 @@
         const importDecision = valueApi.buildImportPostEntryDecision
             ? valueApi.buildImportPostEntryDecision(result, dutyImpact, { currency })
             : null;
+        const originEvidenceGate = valueApi.buildOriginEvidenceGate
+            ? valueApi.buildOriginEvidenceGate(context)
+            : null;
         const action = importDecision?.nextAction
             || (dutyImpact.covered && dutyImpact.dutyVariance > 0.01
                 ? dutyImpact.action
@@ -931,9 +934,15 @@
             coverageNote: [buildCoverageNote(dutyImpact.sourceBreakdown || []), buildJurisdictionScopeNote(context)].filter(Boolean).join(' '),
             rateConfidence: buildRateConfidence(dutyImpact.sourceBreakdown || []),
             rateDecision: buildRateDecisionSummary(dutyImpact.sourceBreakdown || []),
-            scopeReview: dutyImpact.filingGradeFocus ? {
-                summary: buildScopeReviewSummary(dutyImpact),
-                checklist: dutyImpact.filingGradeChecklist || []
+            scopeReview: dutyImpact.filingGradeFocus || originEvidenceGate ? {
+                summary: [
+                    dutyImpact.filingGradeFocus ? buildScopeReviewSummary(dutyImpact) : '',
+                    originEvidenceGate?.summary || ''
+                ].filter(Boolean).join(' '),
+                checklist: [
+                    ...(dutyImpact.filingGradeChecklist || []),
+                    ...(originEvidenceGate?.checklist || [])
+                ]
             } : null,
             evidence: valueApi.buildEvidenceList(context)
         };

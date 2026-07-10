@@ -266,6 +266,29 @@ function buildCurrentRouteContext(selectedCountry = 'US') {
     };
 }
 
+function tagMatchesExplicitRoute(tag, routeContext = {}) {
+    const countryApi = globalThis.TradeComplyCountry;
+    const normalize = (value) => countryApi?.normalizeCountryCode
+        ? countryApi.normalizeCountryCode(value)
+        : String(value || '').trim().toUpperCase();
+    const from = normalize(routeContext.from);
+    const to = normalize(routeContext.to);
+    const allowedOrigins = Array.isArray(tag?.origin_countries)
+        ? tag.origin_countries.map(normalize).filter(Boolean)
+        : [];
+    const allowedDestinations = Array.isArray(tag?.destination_countries)
+        ? tag.destination_countries.map(normalize).filter(Boolean)
+        : [];
+
+    if (allowedOrigins.length && !allowedOrigins.includes(from)) {
+        return false;
+    }
+    if (allowedDestinations.length && !allowedDestinations.includes(to)) {
+        return false;
+    }
+    return true;
+}
+
 function sortTagsForDisplay(tags, selectedCountry = 'US', routeContext = {}, query = '') {
     const countryApi = globalThis.TradeComplyCountry;
     const riskOrder = { High: 3, Medium: 2, Low: 1 };
@@ -413,6 +436,8 @@ function search(query) {
     } else if (countryApi?.countryMatchesSelection) {
         matchedTags = matchedTags.filter((tag) => countryApi.countryMatchesSelection(tag, selectedCountry, routeContext));
     }
+
+    matchedTags = matchedTags.filter((tag) => tagMatchesExplicitRoute(tag, routeContext));
 
     if (
         countryApi?.normalizeCountryCode?.(selectedCountry) === 'ASEAN'

@@ -14,7 +14,7 @@ const REQUIRED_KEYS = ['id', 'country', 'type', 'url', 'method'];
 
 describe('global-crawl-sources', () => {
     it('defines official configuration-driven sources across core jurisdictions', () => {
-        assert.equal(GLOBAL_CRAWL_SOURCES.length, 20);
+        assert.equal(GLOBAL_CRAWL_SOURCES.length, 21);
         const ids = GLOBAL_CRAWL_SOURCES.map((row) => row.id);
         assert.deepEqual(ids, [
             'zh-mofcom',
@@ -25,6 +25,7 @@ describe('global-crawl-sources', () => {
             'us-ofac',
             'us-fcc',
             'eu-lex',
+            'eu-nonpreferential-origin',
             'eu-trade',
             'de-zoll',
             'nl-customs',
@@ -60,6 +61,8 @@ describe('global-crawl-sources', () => {
         assert.equal(byId['us-ofac'].url, 'https://ofac.treasury.gov/recent-actions');
         assert.equal(byId['us-fcc'].url, 'https://www.fcc.gov/news-events/headlines');
         assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/homepage.html?ihcl=en');
+        assert.equal(byId['eu-nonpreferential-origin'].url, 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1422');
+        assert.equal(byId['eu-nonpreferential-origin'].type, 'import');
         assert.equal(byId['eu-trade'].url, 'https://policy.trade.ec.europa.eu/news_en');
         assert.equal(byId['de-zoll'].url, 'https://www.zoll.de/EN/Home/home_node.html');
         assert.equal(byId['nl-customs'].url, 'https://www.belastingdienst.nl/wps/wcm/connect/en/customs/customs');

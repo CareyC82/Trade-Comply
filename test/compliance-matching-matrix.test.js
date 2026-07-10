@@ -174,6 +174,27 @@ describe('compliance matching matrix', () => {
         assertNoOppositeRouteFocus(sgResult, 'import', 'Singapore green compliance import focus');
     });
 
+    it('applies EU Article 59a origin evidence only to US-origin EU imports', () => {
+        const usOrigin = runSearch(
+            'gpu ai accelerator chip',
+            'export',
+            'EU',
+            'import',
+            { from: 'US', to: 'EU' }
+        );
+        assert.ok(ids(usOrigin).includes('CL-EUORIGIN-059'));
+        assert.match(haystack(usOrigin), /Article 59a|direct transport|non-alteration|ELAN/i);
+
+        const chinaOrigin = runSearch(
+            'gpu ai accelerator chip',
+            'export',
+            'EU',
+            'import',
+            { from: 'CN', to: 'EU' }
+        );
+        assert.equal(ids(chinaOrigin).includes('CL-EUORIGIN-059'), false);
+    });
+
     it('surfaces ESG coverage for Japan, Korea, Vietnam, Malaysia, and Mexico electronics imports', () => {
         [
             ['JP', 'CL-JPGREEN-001', /Japan|J-MOSS|recycling/i],
