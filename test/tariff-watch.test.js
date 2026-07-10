@@ -10,7 +10,8 @@ const {
     buildRouteTariffAlert,
     buildTariffRows,
     buildCurrentTariffRows,
-    buildMarketCoverageRows
+    buildMarketCoverageRows,
+    classifyTariffUse
 } = require('../lib/tariff-watch');
 
 const rootDir = path.join(__dirname, '..');
@@ -60,6 +61,25 @@ test('tariff watch summarizes current maintained tariff rates for users', () => 
     assert.ok(coverageRows.every((row) => row.rules > 0 && row.hsCoverage > 0));
     assert.ok(coverageRows.every((row) => row.coverageLabel && row.useCase && row.nextAction));
     assert.ok(coverageRows.every((row) => row.sourceMix && Number.isInteger(row.sourceMix.exact)));
+    assert.ok(coverageRows.every((row) => row.useBuckets && Number.isInteger(row.useBuckets.quoteReady)));
+});
+
+test('tariff watch classifies market rows by practical use', () => {
+    assert.equal(classifyTariffUse({
+        rank: 3,
+        confidence: 'official exact',
+        sourceStatus: 'official'
+    }).bucket, 'quote');
+    assert.equal(classifyTariffUse({
+        rank: 2,
+        confidence: 'official heading only',
+        sourceStatus: 'official'
+    }).bucket, 'precheck');
+    assert.equal(classifyTariffUse({
+        rank: 0,
+        confidence: 'pre-check estimate',
+        sourceStatus: 'candidate'
+    }).bucket, 'source');
 });
 
 test('tariff watch expands exact HS overrides in market detail rows', () => {
@@ -189,6 +209,9 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
     assert.match(readFile('js/tariff-watch-page.js'), /Coverage upgrade next/);
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff signal list/);
     assert.match(readFile('js/tariff-watch-page.js'), /Source trust/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Quote-ready screen/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Pre-check only/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Needs source \/ parser work/);
     assert.match(readFile('js/tariff-watch-page.js'), /Automation action list/);
     assert.match(readFile('js/tariff-watch-page.js'), /Exact HS lines/);
     assert.match(readFile('js/tariff-watch-page.js'), /Highest signal/);

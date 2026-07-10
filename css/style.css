@@ -5201,6 +5201,68 @@ button.feedback-link:hover {
     gap: 12px;
 }
 
+.tariff-market-signal-groups {
+    display: grid;
+    gap: 14px;
+}
+
+.tariff-market-signal-group {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.tariff-market-signal-group--quote {
+    border-color: rgba(22, 101, 52, 0.22);
+    background: #f7fdf9;
+}
+
+.tariff-market-signal-group--precheck {
+    border-color: rgba(146, 64, 14, 0.2);
+    background: #fffaf0;
+}
+
+.tariff-market-signal-group--source {
+    border-color: rgba(71, 85, 105, 0.22);
+    background: #f8fafc;
+}
+
+.tariff-market-signal-group__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.tariff-market-signal-group__head h3 {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 1rem;
+}
+
+.tariff-market-signal-group__head p {
+    margin: 4px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.35;
+}
+
+.tariff-market-signal-group__head > strong {
+    flex: 0 0 auto;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e2e8f0;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+}
+
 .tariff-market-signal-card {
     display: grid;
     gap: 12px;
@@ -5216,6 +5278,13 @@ button.feedback-link:hover {
     justify-content: space-between;
     gap: 12px;
     align-items: flex-start;
+}
+
+.tariff-signal-badge-stack {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
 }
 
 .tariff-market-signal-card__head span,
@@ -5256,6 +5325,31 @@ button.feedback-link:hover {
     color: #075985;
     font-weight: 900;
     font-size: 0.78rem;
+}
+
+.tariff-use-badge {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 7px 10px;
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 900;
+    font-size: 0.78rem;
+}
+
+.tariff-use-badge--quote {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.tariff-use-badge--precheck {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.tariff-use-badge--source {
+    background: #e2e8f0;
+    color: #475569;
 }
 
 .tariff-trust-badge--exact {

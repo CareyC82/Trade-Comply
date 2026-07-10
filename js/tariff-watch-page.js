@@ -108,6 +108,11 @@
         return `<span class="tariff-trust-badge tariff-trust-badge--${escapeHtml(row.trustTone || 'estimate')}">${escapeHtml(row.trustLabel || row.confidence || 'Pre-check')}</span>`;
     }
 
+    function renderUseStatusBadge(row) {
+        const status = row.useStatus || {};
+        return `<span class="tariff-use-badge tariff-use-badge--${escapeHtml(status.tone || 'source')}">${escapeHtml(status.label || 'Pre-check signal')}</span>`;
+    }
+
     function renderMarketCoverageRow(row) {
         return `
             <a class="tariff-market-card" href="tariff-watch.html?market=${encodeURIComponent(row.marketKey)}" data-market="${escapeHtml(row.marketKey)}">
@@ -134,7 +139,7 @@
     function renderMarketDetailSummary(market, rows) {
         const sourceMix = market?.sourceMix || {};
         const exactCount = Number(sourceMix.exact || 0);
-        const officialCount = Number(market?.official || 0);
+        const useBuckets = market?.useBuckets || {};
         return `
             <div class="tariff-market-detail-summary" aria-label="Market tariff coverage summary">
                 <article>
@@ -148,14 +153,14 @@
                     <small>${escapeHtml(exactCount > 0 ? 'Use when product matches' : 'Exact HS still required')}</small>
                 </article>
                 <article>
-                    <span>Official / hybrid</span>
-                    <strong>${escapeHtml(officialCount)}</strong>
-                    <small>Maintained source coverage</small>
+                    <span>Quote-ready screen</span>
+                    <strong>${escapeHtml(useBuckets.quoteReady || 0)}</strong>
+                    <small>Best maintained rows for quote review</small>
                 </article>
                 <article>
-                    <span>Highest signal</span>
-                    <strong>${escapeHtml(market?.highestSignal || 'n/a')}</strong>
-                    <small>Duty + tax / add-on screen</small>
+                    <span>Pre-check / source work</span>
+                    <strong>${escapeHtml((useBuckets.precheckOnly || 0) + (useBuckets.needsSource || 0))}</strong>
+                    <small>Confirm exact line before filing</small>
                 </article>
             </div>
         `;
@@ -170,7 +175,10 @@
                         <strong>${escapeHtml(row.productGroup || 'High-tech goods')}</strong>
                         <small>HS ${escapeHtml(row.hsScope)} · Origin: ${escapeHtml(row.originScope)}</small>
                     </div>
-                    ${renderTrustBadge(row)}
+                    <div class="tariff-signal-badge-stack">
+                        ${renderUseStatusBadge(row)}
+                        ${renderTrustBadge(row)}
+                    </div>
                 </div>
                 <p>${escapeHtml(row.label)}</p>
                 <div class="tariff-rate-mini-grid" aria-label="Tariff rate breakdown">
@@ -179,9 +187,54 @@
                     <div><span>Total signal</span><strong>${escapeHtml(row.totalRate)}</strong></div>
                     <div><span>Source trust</span><strong>${escapeHtml(row.confidence)}</strong></div>
                 </div>
-                <small>${escapeHtml(row.trustDetail || row.sourceText || 'Confirm exact HS, origin, and entry date before filing.')}</small>
+                <small>${escapeHtml(row.useStatus?.guidance || row.trustDetail || row.sourceText || 'Confirm exact HS, origin, and entry date before filing.')}</small>
             </article>
         `;
+    }
+
+    function renderMarketSignalGroup(title, description, rows, tone) {
+        return `
+            <section class="tariff-market-signal-group tariff-market-signal-group--${escapeHtml(tone)}">
+                <div class="tariff-market-signal-group__head">
+                    <div>
+                        <h3>${escapeHtml(title)}</h3>
+                        <p>${escapeHtml(description)}</p>
+                    </div>
+                    <strong>${escapeHtml(rows.length)}</strong>
+                </div>
+                <div class="tariff-market-signal-list" aria-label="${escapeHtml(title)}">
+                    ${rows.length
+                        ? rows.map(renderMarketSignalCard).join('')
+                        : '<p class="tariff-watch-empty">No maintained rows in this bucket yet.</p>'}
+                </div>
+            </section>
+        `;
+    }
+
+    function renderMarketSignalGroups(rows) {
+        const quoteRows = rows.filter((row) => row.useStatus?.bucket === 'quote');
+        const precheckRows = rows.filter((row) => row.useStatus?.bucket === 'precheck');
+        const sourceRows = rows.filter((row) => row.useStatus?.bucket === 'source');
+        return [
+            renderMarketSignalGroup(
+                'Quote-ready screen',
+                'Most usable rows for early customer quote review when product, origin, and date match.',
+                quoteRows,
+                'quote'
+            ),
+            renderMarketSignalGroup(
+                'Pre-check only',
+                'Official or heading-level signals that still need exact HS, origin, and add-on layer confirmation.',
+                precheckRows,
+                'precheck'
+            ),
+            renderMarketSignalGroup(
+                'Needs source / parser work',
+                'Directional rows or source gaps that should not be used as filing-grade rates yet.',
+                sourceRows,
+                'source'
+            )
+        ].join('');
     }
 
     function renderMarketActionPanel(model, market) {
@@ -235,9 +288,9 @@
                 </div>
                 ${renderMarketDetailSummary(market, rows)}
                 ${renderMarketActionPanel(model, market)}
-                <div class="tariff-market-signal-list" aria-label="Market tariff signal list">
+                <div class="tariff-market-signal-groups" aria-label="Market tariff signal list">
                     ${rows.length
-                        ? rows.map(renderMarketSignalCard).join('')
+                        ? renderMarketSignalGroups(rows)
                         : '<p class="tariff-watch-empty">No maintained tariff rows are available for this market yet.</p>'}
                 </div>
             </section>
