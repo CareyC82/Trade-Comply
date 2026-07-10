@@ -127,6 +127,36 @@
         `;
     }
 
+    function renderMarketDetailSummary(market, rows) {
+        const sourceMix = market?.sourceMix || {};
+        const exactCount = Number(sourceMix.exact || 0);
+        const officialCount = Number(market?.official || 0);
+        return `
+            <div class="tariff-market-detail-summary" aria-label="Market tariff coverage summary">
+                <article>
+                    <span>Maintained signals</span>
+                    <strong>${escapeHtml(rows.length)}</strong>
+                    <small>Import duty / tax rows</small>
+                </article>
+                <article>
+                    <span>Exact HS lines</span>
+                    <strong>${escapeHtml(exactCount)}</strong>
+                    <small>${escapeHtml(exactCount > 0 ? 'Use when product matches' : 'Exact HS still required')}</small>
+                </article>
+                <article>
+                    <span>Official / hybrid</span>
+                    <strong>${escapeHtml(officialCount)}</strong>
+                    <small>Maintained source coverage</small>
+                </article>
+                <article>
+                    <span>Highest signal</span>
+                    <strong>${escapeHtml(market?.highestSignal || 'n/a')}</strong>
+                    <small>Duty + tax / add-on screen</small>
+                </article>
+            </div>
+        `;
+    }
+
     function renderMarketDetailPage(model, marketKey) {
         const market = model.marketCoverageRows.find((row) => row.marketKey === marketKey) || model.marketCoverageRows[0];
         const rows = model.marketTariffRows.filter((row) => row.marketKey === market?.marketKey);
@@ -151,6 +181,7 @@
                         <strong>${escapeHtml(market?.nextAction || 'Confirm exact HS, origin, entry date, and add-on tax layers.')}</strong>
                     </div>
                 </div>
+                ${renderMarketDetailSummary(market, rows)}
                 <div class="tariff-current-table">
                     ${rows.length
                         ? rows.map(renderCurrentTariffRow).join('')

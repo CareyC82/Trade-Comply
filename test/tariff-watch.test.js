@@ -182,6 +182,9 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
     assert.match(readFile('js/tariff-watch-page.js'), /Exact HS lines/);
     assert.match(readFile('js/tariff-watch-page.js'), /How to use this tariff market/);
     assert.match(readFile('js/tariff-watch-page.js'), /Before filing/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Market tariff coverage summary/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Exact HS lines/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Highest signal/);
     assert.match(readFile('js/tariff-watch-page.js'), /const introHtml = selectedMarket \? ''/);
     assert.match(readFile('js/tariff-watch-page.js'), /const adminHtml = selectedMarket \? ''/);
     assert.match(readFile('js/tariff-watch-page.js'), /data-market/);
