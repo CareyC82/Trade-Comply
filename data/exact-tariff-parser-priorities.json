@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-08",
-  "generated_at": "2026-07-08T19:50:34.747Z",
+  "version": "2026-07-10",
+  "generated_at": "2026-07-10T02:28:13.971Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -230,15 +230,16 @@
       "product_id": "Russia import electronics VAT / EAEU duty signal",
       "import_country": "RU",
       "origin_country": "*",
-      "hs_code": "847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 / 8479 / 9018 / 9027",
+      "hs_code": "847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 / 8479 / 9018 / 9027 / 847150 / 851713 / 851762 / 852580 / 852589 / 852852 / 854143 / 854231 / 854232 / 854239 / 847950 / 901890 / 902750 / 8471",
       "source_status": "official_link_checked",
       "source_trust": "official_heading_only",
       "parser_target": "RU exact tariff-line scope resolver",
       "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
       "priority_band": "P2",
       "impact_score": 2500,
-      "why_priority": "*->RU 847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 / 8479 / 9018 / 9027 remains a rule-level exact-rate gap: Russia import electronics VAT / EAEU duty signal is official_link_checked.",
+      "why_priority": "*->RU 847130 / 850440 / 850760 / 8517 / 8525 / 8528 / 8541 / 8542 / 8543 / 8479 / 9018 / 9027 / 847150 / 851713 / 851762 / 852580 / 852589 / 852852 / 854143 / 854231 / 854232 / 854239 / 847950 / 901890 / 902750 / 8471 remains a rule-level exact-rate gap: Russia import electronics VAT / EAEU duty signal is official_link_checked.",
       "rate_change_drivers": [
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "Russia/EAEU duty and sanctions scope should stay review-only until official machine-readable coverage is available."
       ],
       "scope_components": [
@@ -251,7 +252,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -416,6 +417,39 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
+      "id": "rule-EU-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "rule_id": "EU-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "route": "*->EU",
+      "product_id": "European Union import gaming device / console tariff pre-check signal",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_code": "950450",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "EU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "*->EU 950450 remains a rule-level exact-rate gap: European Union import gaming device / console tariff pre-check signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "power_conversion_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
       "id": "rule-DE-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "rule_id": "DE-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "route": "*->DE",
@@ -451,7 +485,7 @@
       "id": "rule-DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
       "rule_id": "DE-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
       "route": "*->DE",
-      "product_id": "Germany import tablet / portable ADP equipment signal",
+      "product_id": "Germany import tablet / portable ADP tariff scope signal",
       "import_country": "DE",
       "origin_country": "*",
       "hs_code": "847130",
@@ -461,7 +495,7 @@
       "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
       "priority_band": "P2",
       "impact_score": 2170,
-      "why_priority": "*->DE 847130 remains a rule-level exact-rate gap: Germany import tablet / portable ADP equipment signal is scope_check_required.",
+      "why_priority": "*->DE 847130 remains a rule-level exact-rate gap: Germany import tablet / portable ADP tariff scope signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
@@ -544,6 +578,40 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
+      "id": "rule-DE-GLOBAL-847150-AI-SERVER-IMPORT-SCOPE",
+      "rule_id": "DE-GLOBAL-847150-AI-SERVER-IMPORT-SCOPE",
+      "route": "*->DE",
+      "product_id": "Germany import AI server / data-processing unit signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "847150",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "*->DE 847150 remains a rule-level exact-rate gap: Germany import AI server / data-processing unit signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "portable_adp_scope",
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
       "id": "rule-DE-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
       "rule_id": "DE-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
       "route": "*->DE",
@@ -572,6 +640,39 @@
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
         "Create exact-code override rows before promoting this rule beyond screening."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-DE-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "rule_id": "DE-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "route": "*->DE",
+      "product_id": "Germany import gaming device / console tariff pre-check signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "950450",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 1900,
+      "why_priority": "*->DE 950450 remains a rule-level exact-rate gap: Germany import gaming device / console tariff pre-check signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "power_conversion_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -611,7 +712,7 @@
       "id": "rule-NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
       "rule_id": "NL-GLOBAL-847130-TABLET-IMPORT-INDICATIVE",
       "route": "*->NL",
-      "product_id": "Netherlands import tablet / portable ADP equipment signal",
+      "product_id": "Netherlands import tablet / portable ADP tariff scope signal",
       "import_country": "NL",
       "origin_country": "*",
       "hs_code": "847130",
@@ -621,7 +722,7 @@
       "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
       "priority_band": "P2",
       "impact_score": 2370,
-      "why_priority": "*->NL 847130 remains a rule-level exact-rate gap: Netherlands import tablet / portable ADP equipment signal is scope_check_required.",
+      "why_priority": "*->NL 847130 remains a rule-level exact-rate gap: Netherlands import tablet / portable ADP tariff scope signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
         "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
@@ -704,6 +805,40 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
+      "id": "rule-NL-GLOBAL-847150-AI-SERVER-IMPORT-SCOPE",
+      "rule_id": "NL-GLOBAL-847150-AI-SERVER-IMPORT-SCOPE",
+      "route": "*->NL",
+      "product_id": "Netherlands import AI server / data-processing unit signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "847150",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2100,
+      "why_priority": "*->NL 847150 remains a rule-level exact-rate gap: Netherlands import AI server / data-processing unit signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "portable_adp_scope",
+        "technology_end_use_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
       "id": "rule-NL-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
       "rule_id": "NL-GLOBAL-8479-9018-9027-AUTOMATION-MEDLAB-SCOPE",
       "route": "*->NL",
@@ -732,6 +867,39 @@
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
         "Create exact-code override rows before promoting this rule beyond screening."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NL-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "rule_id": "NL-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
+      "route": "*->NL",
+      "product_id": "Netherlands import gaming device / console tariff pre-check signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "950450",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2100,
+      "why_priority": "*->NL 950450 remains a rule-level exact-rate gap: Netherlands import gaming device / console tariff pre-check signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "power_conversion_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     }
