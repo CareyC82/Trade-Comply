@@ -16,6 +16,7 @@ const {
     buildImportPostEntryDecision,
     buildExportPostEntryReview,
     buildOriginEvidenceGate,
+    buildSpecialProgramDutyAdjustment,
     buildEvidenceList
 } = require('../lib/post-entry-value');
 
@@ -129,6 +130,76 @@ test('adds EU Article 59a evidence for US-origin EU imports only', () => {
     assert.equal(unlisted.annexMatched, false);
     assert.equal(unlisted.treatmentConfirmed, false);
     assert.equal(unlisted.scopeStatus, 'not_listed_in_annex');
+});
+
+test('calculates a conditional Annex I duty saving without replacing the conservative duty result', () => {
+    const value = calculatePostEntryValue({ incoterm: 'FOB', declaredAmount: 10000 });
+    const duty = calculateDutyImpact(value, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '850760',
+        entryDate: '07 / 10 / 26'
+    }, { declaredDuty: 0 });
+
+    assert.equal(duty.baseRate, 0.027);
+    assert.equal(Number(duty.estimatedDuty.toFixed(2)), 2170);
+    assert.equal(duty.specialProgramAdjustment.annex, 'I');
+    assert.equal(duty.specialProgramAdjustment.adjustedBaseRate, 0);
+    assert.equal(Number(duty.specialProgramAdjustment.adjustedEstimatedDuty.toFixed(2)), 1900);
+    assert.equal(Number(duty.specialProgramAdjustment.potentialSavings.toFixed(2)), 270);
+    assert.equal(duty.specialProgramAdjustment.calculationComplete, true);
+    assert.match(duty.specialProgramAdjustment.summary, /Article 59a|2\.70% to 0%/i);
+});
+
+test('does not apply Regulation 2026/1455 before its effective date', () => {
+    const value = calculatePostEntryValue({ incoterm: 'FOB', declaredAmount: 10000 });
+    const duty = calculateDutyImpact(value, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '850760',
+        entryDate: '06 / 30 / 26'
+    }, { declaredDuty: 0 });
+
+    assert.equal(duty.specialProgramAdjustment.scopeStatus, 'not_effective_on_entry_date');
+    assert.equal(duty.specialProgramAdjustment.calculationComplete, false);
+    assert.equal(duty.specialProgramAdjustment.adjustedEstimatedDuty, null);
+});
+
+test('keeps Annex II specific duty and Annex III quota availability as explicit gates', () => {
+    const value = calculatePostEntryValue({ incoterm: 'FOB', declaredAmount: 10000 });
+    const annexII = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.088 }, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '07020000',
+        entryDate: '2026-07-10'
+    }, 0);
+    assert.equal(annexII.annex, 'II');
+    assert.equal(annexII.adjustedBaseRate, 0);
+    assert.equal(Number(annexII.potentialSavings.toFixed(2)), 880);
+    assert.equal(annexII.calculationComplete, false);
+    assert.match(annexII.summary, /specific duty remains/i);
+
+    const quotaPending = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.12 }, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '02032219',
+        entryDate: '2026-07-10'
+    }, 0);
+    assert.equal(quotaPending.annex, 'III');
+    assert.equal(quotaPending.calculationComplete, false);
+    assert.equal(quotaPending.adjustedEstimatedDuty, null);
+
+    const quotaConfirmed = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.12 }, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '02032219',
+        entryDate: '2026-07-10',
+        quotaAvailable: true
+    }, 0);
+    assert.equal(quotaConfirmed.calculationComplete, true);
+    assert.equal(quotaConfirmed.adjustedBaseRate, 0);
+    assert.equal(quotaConfirmed.adjustedEstimatedDuty, 0);
+    assert.equal(quotaConfirmed.potentialSavings, 1200);
 });
 
 test('calculates indicative duty impact for US imports from China', () => {
@@ -384,15 +455,18 @@ test('builds US export-side post-entry review without treating it as import duty
 test('Post-Entry result shows rate confidence without opening details', () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'post-entry-result.html'), 'utf8');
     const confidenceIndex = html.indexOf('id="post-entry-confidence-card"');
+    const programIndex = html.indexOf('id="post-entry-program-card"');
     const scopeIndex = html.indexOf('id="post-entry-scope-card"');
     const syncIndex = html.indexOf('id="post-entry-duty-sync-card"');
     const detailsIndex = html.indexOf('<details class="post-entry-detail-panel">');
 
     assert.ok(confidenceIndex > -1, 'rate confidence card should exist');
+    assert.ok(programIndex > -1, 'special tariff treatment card should exist');
     assert.ok(scopeIndex > -1, 'scope checklist card should exist');
     assert.ok(syncIndex > -1, 'duty sync status card should exist');
     assert.ok(detailsIndex > -1, 'details panel should exist');
     assert.ok(confidenceIndex < detailsIndex, 'rate confidence card should appear before the collapsible details panel');
+    assert.ok(programIndex < scopeIndex, 'special tariff treatment should appear before the supporting scope checklist');
     assert.ok(scopeIndex < detailsIndex, 'scope checklist card should appear before the collapsible details panel');
     assert.ok(syncIndex < detailsIndex, 'duty sync status should appear before the collapsible details panel');
 });

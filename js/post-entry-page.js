@@ -201,6 +201,7 @@
     function getSourceStatusHelp(status) {
         const labels = {
             official_source_checked: 'A maintained official tariff source is attached and the rate is usable for this pre-check.',
+            conditional_program: 'The official special-program treatment is matched, but origin, transport, and declaration evidence must be complete before filing at the adjusted rate.',
             official_link_checked: 'An official tariff source is attached and monitored, but exact machine-readable tariff-line parsing is still pending.',
             official_link_estimate: 'An official tariff source is attached and monitored, but exact machine-readable tariff-line parsing is still pending.',
             official_heading_benchmark: 'An official source exists, but the broader HS heading/prefix can contain multiple rates.',
@@ -222,6 +223,7 @@
         const status = item.status || 'indicative';
         const detail = `${item.detail || ''} ${item.source || ''}`.toLowerCase();
         if (status === 'not_covered') return 'not_covered';
+        if (status === 'conditional_program') return 'conditional_program';
         if (['review_basis', 'export_review_only', 'regional_route_not_exact_rate', 'sanctions_scope_separate'].includes(status)) return status;
         if (status === 'exact_hs_required') return 'exact_hs_required';
         if (status === 'scope_check_required' || status === 'flag_only') return 'official_heading_benchmark';
@@ -239,6 +241,7 @@
     function getRateTierLabel(tier) {
         const labels = {
             official_source_checked: 'Official exact rate',
+            conditional_program: 'Conditional program',
             official_heading_benchmark: 'Official source, exact code needed',
             official_link_estimate: 'Official link estimate',
             benchmark_source_checked: 'Pre-check estimate',
@@ -259,6 +262,7 @@
 
     function getSourceCoverageLevel(items = []) {
         const tiers = new Set(items.map(normalizeRateTier));
+        tiers.delete('conditional_program');
         if (tiers.has('not_covered')) return 'not_covered';
         if (tiers.has('official_heading_benchmark')) return 'official_heading_benchmark';
         if (tiers.has('official_link_estimate')) return 'official_link_estimate';
@@ -699,6 +703,10 @@
     }
 
     function buildImportTopConclusion(result, dutyImpact, currency) {
+        const adjustment = dutyImpact?.specialProgramAdjustment;
+        if (adjustment?.calculationComplete) {
+            return `Conditional Annex ${adjustment.annex} treatment changes the base rate from ${formatRate(adjustment.standardBaseRate)} to ${formatRate(adjustment.adjustedBaseRate)} and could reduce duty by ${formatMoney(adjustment.potentialSavings, currency)}. Keep the standard calculation until Article 59a evidence is complete.`;
+        }
         const valueApi = getValueApi();
         const decision = valueApi?.buildImportPostEntryDecision
             ? valueApi.buildImportPostEntryDecision(result, dutyImpact, { currency })
@@ -905,8 +913,10 @@
         const originEvidenceGate = valueApi.buildOriginEvidenceGate
             ? valueApi.buildOriginEvidenceGate(context)
             : null;
-        const action = importDecision?.nextAction
-            || (dutyImpact.covered && dutyImpact.dutyVariance > 0.01
+        const programAdjustment = dutyImpact.specialProgramAdjustment || null;
+        const action = programAdjustment?.calculationComplete
+            ? 'Use the adjusted amount only after confirming the Annex CN match, US non-preferential origin, and direct-transport or customs-supervision/non-alteration evidence.'
+            : importDecision?.nextAction || (dutyImpact.covered && dutyImpact.dutyVariance > 0.01
                 ? dutyImpact.action
                 : valueApi.buildRecommendedAction(result, context));
         return {
@@ -922,6 +932,20 @@
                 addOnDuty: dutyImpact.covered ? formatMoney(dutyImpact.addOnDuty, currency) : '—',
                 dutyGap: dutyImpact.covered ? formatMoney(dutyImpact.dutyVariance, currency) : '—'
             },
+            specialProgram: programAdjustment ? {
+                title: `${programAdjustment.legalBasis}${programAdjustment.annex ? ` · Annex ${programAdjustment.annex}` : ''}`,
+                sourceUrl: programAdjustment.sourceUrl,
+                standardRate: formatRate(programAdjustment.standardBaseRate),
+                adjustedRate: programAdjustment.adjustedBaseRate === null
+                    ? 'Pending exact condition'
+                    : formatRate(programAdjustment.adjustedBaseRate),
+                saving: programAdjustment.potentialSavings === null
+                    ? 'Not calculable yet'
+                    : formatMoney(programAdjustment.potentialSavings, currency),
+                calculationComplete: programAdjustment.calculationComplete,
+                summary: programAdjustment.summary,
+                evidence: `Conditional only: Article 59a origin/transport evidence and declaration codes ${programAdjustment.declarationCodes?.measureTypes?.join('/') || '142/145'}, preference ${programAdjustment.declarationCodes?.preferenceCode || '300'}, document ${programAdjustment.declarationCodes?.supportingDocument || 'U190'} must be supported. Standard duty estimate: ${programAdjustment.standardEstimatedDuty === null ? 'not covered' : formatMoney(programAdjustment.standardEstimatedDuty, currency)}${programAdjustment.adjustedEstimatedDuty === null ? '.' : `; conditional adjusted estimate: ${formatMoney(programAdjustment.adjustedEstimatedDuty, currency)}.`}`
+            } : null,
             topConclusion: buildImportTopConclusion(result, dutyImpact, currency),
             conclusion: buildPrimaryConclusion(result, currency),
             insights: {
@@ -969,6 +993,28 @@
                 li.textContent = item;
                 list.appendChild(li);
             });
+        }
+    }
+
+    function renderSpecialProgram(program) {
+        const card = $('post-entry-program-card');
+        if (!card) return;
+        if (!program) {
+            card.hidden = true;
+            return;
+        }
+        card.hidden = false;
+        card.classList.toggle('post-entry-program-card--pending', !program.calculationComplete);
+        $('post-entry-program-title').textContent = program.title || 'Conditional tariff treatment';
+        $('post-entry-program-standard-rate').textContent = program.standardRate || '—';
+        $('post-entry-program-adjusted-rate').textContent = program.adjustedRate || '—';
+        $('post-entry-program-saving').textContent = program.saving || '—';
+        $('post-entry-program-summary').textContent = program.summary || '—';
+        $('post-entry-program-evidence').textContent = program.evidence || '—';
+        const source = $('post-entry-program-source');
+        if (source) {
+            source.href = program.sourceUrl || '#';
+            source.hidden = !program.sourceUrl;
         }
     }
 
@@ -1100,6 +1146,7 @@
         if (coverageNote) coverageNote.textContent = snapshot.coverageNote || buildCoverageNote(snapshot.sourceBreakdown || []);
         renderRateConfidence(snapshot.rateConfidence || buildRateConfidence(snapshot.sourceBreakdown || []));
         renderScopeReview(snapshot.scopeReview);
+        renderSpecialProgram(snapshot.specialProgram);
         if (snapshot.labels) {
             const customLabel = $('post-entry-customs-value-label');
             const rebateLabel = $('post-entry-rebate-base-label');

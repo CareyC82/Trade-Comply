@@ -70,3 +70,24 @@ test('requires product-description confirmation for ex CN entries', () => {
     assert.equal(result.scopeStatus, 'description_confirmation_required');
     assert.ok(result.matches.some((row) => row.annex === 'I' && row.cnCode === 'ex 29'));
 });
+
+test('honors the program effective date in ISO and UI date formats', () => {
+    const before = resolveProgramTreatment({
+        programs: dutyRates.special_programs,
+        importCountry: 'EU',
+        originCountry: 'US',
+        hsCode: '850760',
+        entryDate: '06 / 30 / 26'
+    });
+    const after = resolveProgramTreatment({
+        programs: dutyRates.special_programs,
+        importCountry: 'EU',
+        originCountry: 'US',
+        hsCode: '850760',
+        entryDate: '2026-07-01'
+    });
+    assert.equal(before.eligible, false);
+    assert.equal(before.scopeStatus, 'not_effective_on_entry_date');
+    assert.equal(after.eligible, true);
+    assert.equal(after.scopeStatus, 'annex_matched');
+});

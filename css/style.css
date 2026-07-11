@@ -6774,6 +6774,93 @@ button.feedback-link:hover {
     line-height: 1.45;
 }
 
+.post-entry-program-card {
+    margin-bottom: 14px;
+    padding: 14px;
+    border: 1px solid rgba(15, 118, 110, 0.24);
+    border-left: 5px solid #0f766e;
+    border-radius: 10px;
+    background: #f0fdfa;
+}
+
+.post-entry-program-card[hidden] {
+    display: none;
+}
+
+.post-entry-program-card--pending {
+    border-color: rgba(180, 83, 9, 0.24);
+    border-left-color: #b45309;
+    background: #fffbeb;
+}
+
+.post-entry-program-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.post-entry-program-card__head strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-primary);
+}
+
+.post-entry-program-card__head a {
+    color: #0f766e;
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.post-entry-program-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.post-entry-program-metrics > div {
+    padding: 10px 12px;
+    border: 1px solid rgba(15, 118, 110, 0.16);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.post-entry-program-metrics span,
+.post-entry-program-metrics strong {
+    display: block;
+}
+
+.post-entry-program-metrics span {
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.post-entry-program-metrics strong {
+    margin-top: 4px;
+    color: var(--color-primary);
+}
+
+.post-entry-program-card p,
+.post-entry-program-card small {
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+}
+
+.post-entry-program-card p {
+    margin: 0 0 6px;
+}
+
+@media (max-width: 679px) {
+    .post-entry-program-card__head,
+    .post-entry-program-metrics {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}
+
 .post-entry-confidence-kicker {
     display: block;
     color: var(--color-text-secondary);
@@ -6817,7 +6904,8 @@ button.feedback-link:hover {
 }
 
 .post-entry-confidence-chip--official_source_checked,
-.post-entry-source-status--official_source_checked {
+.post-entry-source-status--official_source_checked,
+.post-entry-source-status--conditional_program {
     background: rgba(46, 125, 50, 0.12);
     color: var(--color-success);
 }
