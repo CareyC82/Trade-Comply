@@ -34,6 +34,31 @@ test('material duty-rate changes are detected by percentage-point threshold', ()
     assert.equal(MATERIAL_RATE_CHANGE_THRESHOLD, 0.03);
 });
 
+test('EU-US Annex hash changes are counted and preserved in sync status', () => {
+    const specialProgram = {
+        id: 'EU-US-2026-1455',
+        counts: { annex_i: 150, annex_ii: 21, annex_iii: 71, quotas: 20 },
+        content_hash: 'a'.repeat(64)
+    };
+    const run = buildRunSummary('EU-US 2026/1455 official annexes', {
+        ok: true,
+        changes: [{
+            rule: 'EU-US-2026-1455',
+            change_type: 'special_program_annex_change',
+            old_content_hash: 'b'.repeat(64),
+            new_content_hash: specialProgram.content_hash
+        }],
+        errors: [],
+        special_program: specialProgram
+    }, {
+        applied: true,
+        mode: 'official-special-program'
+    });
+
+    assert.equal(run.rate_change_count, 1);
+    assert.deepEqual(run.special_program, specialProgram);
+});
+
 test('official fetch degradation classifier gives repair-focused categories', () => {
     const cert = classifyOfficialFetchDegradation('curl: (60) SSL certificate problem: unable to get local issuer certificate');
     assert.equal(cert.category, 'certificate');
@@ -496,6 +521,7 @@ test('auto duty-rate sync includes static maintained countries', async () => {
     const payload = await runAutoDutyRateSync({
         dryRun: true,
         skipOfficialUs: true,
+        skipEuUsSpecialProgram: true,
         japanOfficialFetcher: emptyOfficialFetcher,
         koreaOfficialFetcher: emptyOfficialFetcher,
         indiaOfficialFetcher: emptyOfficialFetcher,
@@ -568,6 +594,7 @@ test('auto duty-rate sync records Vietnam and Malaysia static official live prob
     const payload = await runAutoDutyRateSync({
         dryRun: true,
         skipOfficialUs: true,
+        skipEuUsSpecialProgram: true,
         japanOfficialFetcher: emptyOfficialFetcher,
         koreaOfficialFetcher: emptyOfficialFetcher,
         indiaOfficialFetcher: emptyOfficialFetcher,
@@ -593,6 +620,7 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     const payload = await runAutoDutyRateSync({
         dryRun: true,
         skipOfficialUs: true,
+        skipEuUsSpecialProgram: true,
         japanOfficialFetcher: failingOfficialFetcher,
         koreaOfficialFetcher: failingOfficialFetcher,
         indiaOfficialFetcher: failingOfficialFetcher,

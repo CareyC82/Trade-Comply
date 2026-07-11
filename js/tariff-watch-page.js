@@ -264,6 +264,13 @@
 
     function renderSpecialProgram(program) {
         const codes = program.declarationCodes || {};
+        const counts = program.annexCounts || {};
+        const annexSummary = [
+            ['I', counts.annex_i],
+            ['II', counts.annex_ii],
+            ['III', counts.annex_iii],
+            ['Quota groups', counts.quotas]
+        ].filter(([, count]) => Number.isFinite(Number(count)));
         const codeText = [
             Array.isArray(codes.measureTypes) && codes.measureTypes.length ? `Measure ${codes.measureTypes.join('/')}` : '',
             codes.preferenceCode ? `Preference ${codes.preferenceCode}` : '',
@@ -280,13 +287,18 @@
                     <a href="${escapeHtml(program.officialUrl)}" target="_blank" rel="noopener noreferrer">Official regulation</a>
                 </div>
                 <div class="tariff-special-program__gate">
-                    <strong>Exact Annex CN confirmation required</strong>
+                    <strong>Official Annex scope parsed</strong>
                     <p>${escapeHtml(program.scopeNote)}</p>
                 </div>
+                ${annexSummary.length ? `
+                    <ul class="tariff-special-program__counts" aria-label="Official Annex coverage">
+                        ${annexSummary.map(([label, count]) => `<li><b>${escapeHtml(label)}</b><span>${escapeHtml(count)} entries</span></li>`).join('')}
+                    </ul>
+                ` : ''}
                 <ul>
                     ${(program.treatments || []).map((row) => `<li><b>Annex ${escapeHtml(row.annex)}</b><span>${escapeHtml(row.treatment)}</span></li>`).join('')}
                 </ul>
-                <small>${escapeHtml(codeText)} · Article 59a origin and transport evidence required</small>
+                <small>${escapeHtml(codeText)} · Article 59a origin and transport evidence required${program.annexLastChecked ? ` · Annex checked ${escapeHtml(program.annexLastChecked)}` : ''}</small>
             </article>
         `;
     }

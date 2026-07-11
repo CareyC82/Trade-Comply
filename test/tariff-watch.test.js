@@ -57,8 +57,10 @@ test('tariff watch models EU adjusted-duty program without inferring broad HS el
     assert.deepEqual(programs.map((row) => row.marketKey), ['EU', 'DE', 'NL']);
     programs.forEach((program) => {
         assert.equal(program.originScope, 'United States');
-        assert.equal(program.scopeStatus, 'official_annex_confirmation_required');
-        assert.match(program.scopeNote, /Annex I, II, or III|Do not infer/i);
+        assert.equal(program.scopeStatus, 'official_annex_parsed');
+        assert.match(program.scopeNote, /official Annex I\/II\/III|marked ex/i);
+        assert.deepEqual(program.annexCounts, { annex_i: 150, annex_ii: 21, annex_iii: 71, quotas: 20 });
+        assert.match(program.annexContentHash, /^[a-f0-9]{64}$/);
         assert.equal(program.treatments.length, 3);
         assert.deepEqual(program.declarationCodes.measureTypes, ['142', '145']);
         assert.equal(program.declarationCodes.preferenceCode, '300');
@@ -226,7 +228,8 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff coverage summary/);
     assert.match(readFile('js/tariff-watch-page.js'), /Coverage upgrade next/);
     assert.match(readFile('js/tariff-watch-page.js'), /Special tariff programs/);
-    assert.match(readFile('js/tariff-watch-page.js'), /Exact Annex CN confirmation required/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Official Annex scope parsed/);
+    assert.match(readFile('js/tariff-watch-page.js'), /Official Annex coverage/);
     assert.match(readFile('js/tariff-watch-page.js'), /codes\.measureTypes\.join/);
     assert.match(readFile('js/tariff-watch-page.js'), /Market tariff signal list/);
     assert.match(readFile('js/tariff-watch-page.js'), /Source trust/);

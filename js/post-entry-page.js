@@ -1356,7 +1356,11 @@
             if (!response.ok) return;
             const payload = await response.json();
             if (Array.isArray(payload.rules)) {
-                valueApi.setDutyRulesForTest(payload.rules);
+                if (valueApi.setDutyRateData) {
+                    valueApi.setDutyRateData(payload);
+                } else {
+                    valueApi.setDutyRulesForTest(payload.rules);
+                }
             }
         } catch (error) {
             // Bundled fallback rules still keep the page usable offline.

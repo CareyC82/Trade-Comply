@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity|tariff-watch"></script>
  */
 (function () {
-    const BUILD = '20260709-tariff-watch';
+    const BUILD = '20260711-eu-us-annex-sync';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -49,6 +49,7 @@
         'lib/enterprise-print-report.js',
         'lib/industry-checklist-baseline.js',
         'lib/product-intelligence.js',
+        'lib/eu-us-special-program.js',
         'lib/trade-opportunity.js',
         'lib/tariff-watch.js',
         'lib/deep-link.js',
@@ -125,6 +126,7 @@
         'lib/country-registry.js',
         'js/feedback.js',
         'compliance-feedback-codec.js',
+        'lib/eu-us-special-program.js',
         'lib/post-entry-value.js',
         'js/post-entry-page.js'
     ];
@@ -134,6 +136,7 @@
         'js/dom-mount.js',
         'js/core.js',
         'lib/country-registry.js',
+        'lib/eu-us-special-program.js',
         'lib/trade-opportunity.js',
         'js/opportunity-page.js'
     ];

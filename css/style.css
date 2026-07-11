@@ -5270,6 +5270,29 @@ button.feedback-link:hover {
     list-style: none;
 }
 
+.tariff-special-program .tariff-special-program__counts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.tariff-special-program__counts li {
+    display: block;
+    padding: 10px 12px;
+    border: 1px solid rgba(29, 78, 216, 0.16);
+    border-radius: 8px;
+    background: #f8fbff;
+}
+
+.tariff-special-program__counts li b,
+.tariff-special-program__counts li span {
+    display: block;
+}
+
+.tariff-special-program__counts li span {
+    margin-top: 3px;
+    color: var(--color-text-secondary);
+}
+
 .tariff-special-program li {
     display: grid;
     grid-template-columns: 74px minmax(0, 1fr);
@@ -5642,6 +5665,7 @@ button.feedback-link:hover {
     .tariff-market-detail-summary,
     .tariff-market-action-panel,
     .tariff-special-program__head,
+    .tariff-special-program .tariff-special-program__counts,
     .tariff-rate-mini-grid,
     .tariff-automation-summary,
     .tariff-watch-admin-grid {

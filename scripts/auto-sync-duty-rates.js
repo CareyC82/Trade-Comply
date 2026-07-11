@@ -10,6 +10,7 @@ const path = require('path');
 
 const { updateUsRules } = require('./update-us-duty-rates');
 const { updateEuRules } = require('./update-eu-duty-rates');
+const { updateEuUsSpecialProgram } = require('./update-eu-us-special-program');
 const { updateSingaporeRules } = require('./update-sg-duty-rates');
 const { updateMexicoRules } = require('./update-mx-duty-rates');
 const { updateJapanRules, updateJapanRulesFromOfficialSource } = require('./update-jp-duty-rates');
@@ -54,6 +55,7 @@ function countRateChanges(changes = []) {
     return changes.filter(change => (
         Object.prototype.hasOwnProperty.call(change, 'old_base_rate')
         || (Array.isArray(change.changes) && change.changes.some(row => row.field === 'base_rate'))
+        || change.change_type === 'special_program_annex_change'
     )).length;
 }
 
@@ -82,6 +84,7 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         official_fetch_degraded_category: result.official_fetch_degraded_category || degradedDiagnosis.category || '',
         official_fetch_degraded_action: result.official_fetch_degraded_action || degradedDiagnosis.action || '',
         readiness: result.readiness || null,
+        special_program: result.special_program || null,
         static_official_probes: result.static_official_probes || null,
         changes,
         errors
@@ -731,7 +734,9 @@ async function runAutoDutyRateSync({
     koreaOfficialFetcher = null,
     indiaOfficialFetcher = null,
     staticOfficialFetcher = null,
-    skipStaticOfficialProbe = false
+    skipStaticOfficialProbe = false,
+    euUsSpecialProgramFetcher = null,
+    skipEuUsSpecialProgram = false
 } = {}) {
     const startedAt = new Date().toISOString();
     const runs = [];
@@ -758,6 +763,22 @@ async function runAutoDutyRateSync({
         } else {
             runs.push(usDrySummary);
         }
+    }
+
+    if (!skipEuUsSpecialProgram) {
+        const specialProgramResult = await updateEuUsSpecialProgram({
+            dryRun,
+            ...(euUsSpecialProgramFetcher ? { fetcher: euUsSpecialProgramFetcher } : {})
+        });
+        const specialProgramSummary = downgradeOfficialTransportFailure(buildRunSummary(
+            'EU-US 2026/1455 official annexes',
+            specialProgramResult,
+            {
+                applied: !dryRun && specialProgramResult.ok,
+                mode: 'official-special-program'
+            }
+        ));
+        runs.push(specialProgramSummary);
     }
 
     const euResult = updateEuRules({ dryRun });

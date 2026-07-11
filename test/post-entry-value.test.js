@@ -108,8 +108,11 @@ test('adds EU Article 59a evidence for US-origin EU imports only', () => {
     const gate = buildOriginEvidenceGate(context);
     assert.ok(gate);
     assert.match(gate.summary, /Article 59a|2026\/1455/);
-    assert.equal(gate.annexConfirmationRequired, true);
-    assert.equal(gate.scopeStatus, 'official_annex_confirmation_required');
+    assert.equal(gate.annexMatched, true);
+    assert.equal(gate.treatmentConfirmed, true);
+    assert.equal(gate.annexConfirmationRequired, false);
+    assert.equal(gate.scopeStatus, 'annex_matched');
+    assert.ok(gate.annexMatches.some((row) => row.annex === 'I' && row.cnCode === '85'));
     assert.equal(gate.hsCode, '854231');
     assert.deepEqual(gate.declarationCodes.measureTypes, ['142', '145']);
     assert.equal(gate.declarationCodes.preferenceCode, '300');
@@ -121,6 +124,11 @@ test('adds EU Article 59a evidence for US-origin EU imports only', () => {
 
     assert.equal(buildOriginEvidenceGate({ ...context, originCountryCode: 'CN' }), null);
     assert.equal(buildOriginEvidenceGate({ ...context, importCountryCode: 'US' }), null);
+
+    const unlisted = buildOriginEvidenceGate({ ...context, hsCode: '010121' });
+    assert.equal(unlisted.annexMatched, false);
+    assert.equal(unlisted.treatmentConfirmed, false);
+    assert.equal(unlisted.scopeStatus, 'not_listed_in_annex');
 });
 
 test('calculates indicative duty impact for US imports from China', () => {

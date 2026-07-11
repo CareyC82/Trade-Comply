@@ -21,8 +21,11 @@ describe('trade opportunity insights', () => {
         });
         assert.ok(direct.selectedMarket.originEvidenceGate);
         assert.match(direct.selectedMarket.originEvidenceGate.summary, /2026\/1455|direct transport|non-alteration/i);
-        assert.equal(direct.selectedMarket.originEvidenceGate.annexConfirmationRequired, true);
-        assert.equal(direct.selectedMarket.originEvidenceGate.scopeStatus, 'official_annex_confirmation_required');
+        assert.equal(direct.selectedMarket.originEvidenceGate.annexMatched, true);
+        assert.equal(direct.selectedMarket.originEvidenceGate.treatmentConfirmed, true);
+        assert.equal(direct.selectedMarket.originEvidenceGate.annexConfirmationRequired, false);
+        assert.equal(direct.selectedMarket.originEvidenceGate.scopeStatus, 'annex_matched');
+        assert.ok(direct.selectedMarket.originEvidenceGate.annexMatches.some((row) => row.annex === 'I' && row.cnCode === '85'));
         assert.deepEqual(direct.selectedMarket.originEvidenceGate.declarationCodes.measureTypes, ['142', '145']);
         assert.equal(direct.selectedMarket.originEvidenceGate.declarationCodes.supportingDocument, 'U190');
         assert.equal(direct.selectedMarket.originEvidenceGate.treatments.length, 3);
@@ -40,6 +43,24 @@ describe('trade opportunity insights', () => {
             priorityMatrix
         });
         assert.equal(nonUsOrigin.selectedMarket.originEvidenceGate, null);
+    });
+
+    it('keeps common high-tech US routes to EU member markets inside official Annex I scope', () => {
+        const scenarios = [
+            ['AI server', 'EU'],
+            ['HBM memory IC', 'DE'],
+            ['800G optical transceiver module', 'NL'],
+            ['laboratory analyzer electronic diagnostic device', 'EU']
+        ];
+        scenarios.forEach(([product, to]) => {
+            const model = buildOpportunityInsights({ product, from: 'US', to, dutyRates, priorityMatrix });
+            const gate = model.selectedMarket.originEvidenceGate;
+            assert.ok(gate, `${product} should include the EU origin-evidence gate`);
+            assert.equal(gate.annexMatched, true, `${product} should match an official Annex I CN scope`);
+            assert.equal(gate.treatmentConfirmed, true, `${product} should not require an ex-description confirmation`);
+            assert.equal(gate.scopeStatus, 'annex_matched');
+            assert.ok(gate.annexMatches.some((row) => row.annex === 'I'));
+        });
     });
 
     it('detects green and supply-chain heavy product categories', () => {
