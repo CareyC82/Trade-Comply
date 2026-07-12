@@ -21,6 +21,7 @@ test('keeps high-risk product, date, route, and evidence eligibility regression 
             transportEvidenceConfirmed: true,
             declarationCodesConfirmed: true,
             descriptionConfirmed: row.descriptionConfirmed !== false,
+            specificDutyConfirmed: true,
             quotaAvailable: row.quotaAvailable === undefined ? true : row.quotaAvailable
         } : {
             quotaAvailable: row.quotaAvailable === true,

@@ -11,6 +11,7 @@ const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const PROGRAM_ID = 'EU-US-2026-1455';
 const OFFICIAL_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1455';
 const ORIGIN_PROCEDURE_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1422';
+const QUOTA_URL = 'https://ec.europa.eu/taxation_customs/dds2/taric/quota_list.jsp';
 
 function asArray(value) {
     return Array.isArray(value) ? value : [];
@@ -157,6 +158,72 @@ function hashOfficialText(value) {
         .digest('hex');
 }
 
+function parseQuotaStatusHtml(html, orderNumber = '') {
+    const cells = [...String(html || '').matchAll(/<td[^>]*data-ecl-table-header=["']?\s*([^"'>]+)["']?[^>]*>([\s\S]*?)<\/td>/gi)]
+        .map((match) => ({ key: decodeHtml(match[1]).toLowerCase(), value: decodeHtml(match[2]) }));
+    const find = (name) => cells.find((cell) => cell.key.includes(name))?.value || '';
+    const normalizedOrder = normalizeCnCode(find('order number') || orderNumber);
+    const balanceText = find('balance');
+    const balanceMatch = balanceText.match(/([\d.,]+)\s*(.*)/);
+    const balance = balanceMatch ? Number(balanceMatch[1].replace(/,/g, '')) : null;
+    const unit = balanceMatch ? balanceMatch[2].trim() : '';
+    const startDate = find('start date');
+    const endDate = find('end date');
+    const origin = find('origins');
+    if (!normalizedOrder || !startDate || !endDate || balance === null || !Number.isFinite(balance)) {
+        return null;
+    }
+    return {
+        order_number: `${normalizedOrder.slice(0, 2)}.${normalizedOrder.slice(2)}`,
+        origin,
+        start_date: startDate,
+        end_date: endDate,
+        balance,
+        unit,
+        available: balance > 0,
+        exhausted: balance <= 0
+    };
+}
+
+function quotaLookupUrl(orderNumber, year = new Date().getUTCFullYear()) {
+    const code = normalizeCnCode(orderNumber);
+    return `${QUOTA_URL}?Lang=en&Code=${encodeURIComponent(code)}&Year=${encodeURIComponent(year)}&Status=&Critical=&Expand=false&Offset=0`;
+}
+
+async function fetchQuotaStatuses(orderNumbers = [], fetcher = fetchOfficialHtml) {
+    const uniqueOrders = [...new Set(asArray(orderNumbers).filter(Boolean))];
+    const rows = [];
+    const errors = [];
+    for (const orderNumber of uniqueOrders) {
+        try {
+            const url = quotaLookupUrl(orderNumber);
+            const html = await fetcher(url);
+            const parsed = parseQuotaStatusHtml(html, orderNumber);
+            if (!parsed) throw new Error('Quota response did not contain a complete balance row.');
+            rows.push({ ...parsed, official_url: url });
+        } catch (error) {
+            errors.push({ order_number: orderNumber, error: error.message });
+        }
+    }
+    return { rows, errors };
+}
+
+function diffAnnexes(previous = {}, next = {}) {
+    const flatten = (annexes) => ['I', 'II', 'III'].flatMap((annex) => asArray(annexes?.[annex]?.entries).map((row) => ({
+        key: `${annex}|${row.normalized_code || normalizeCnCode(row.cn_code)}|${row.order_number || ''}`,
+        annex,
+        cn_code: row.cn_code,
+        order_number: row.order_number || '',
+        fingerprint: JSON.stringify(row)
+    })));
+    const before = new Map(flatten(previous).map((row) => [row.key, row]));
+    const after = new Map(flatten(next).map((row) => [row.key, row]));
+    const added = [...after.values()].filter((row) => !before.has(row.key));
+    const removed = [...before.values()].filter((row) => !after.has(row.key));
+    const changed = [...after.values()].filter((row) => before.has(row.key) && before.get(row.key).fingerprint !== row.fingerprint);
+    return { added, removed, changed };
+}
+
 function parseRegulationHtml(html) {
     const annexI = parseAnnexI(html);
     const annexII = parseAnnexII(html);
@@ -220,7 +287,9 @@ async function updateEuUsSpecialProgram({
     html = '',
     originProcedureHtml = '',
     fetcher = fetchOfficialHtml,
-    originProcedureFetcher = null
+    originProcedureFetcher = null,
+    quotaFetcher = fetchOfficialHtml,
+    skipQuotaStatus = false
 } = {}) {
     const checkedAt = new Date().toISOString();
     try {
@@ -234,6 +303,13 @@ async function updateEuUsSpecialProgram({
         const oldHash = program.annex_content_hash || '';
         const oldCounts = program.annex_counts || null;
         const oldProcedureHash = program.origin_procedure_content_hash || '';
+        const annexDiff = diffAnnexes(program.annexes, parsed.annexes);
+        const quotaOrders = [...new Set(parsed.annexes.III.entries.map((row) => row.order_number).filter(Boolean))];
+        const quotaResult = skipQuotaStatus
+            ? { rows: asArray(program.quota_status?.rows), errors: [] }
+            : await fetchQuotaStatuses(quotaOrders, quotaFetcher);
+        const previousQuotaHash = program.quota_status?.content_hash || '';
+        const quotaHash = hashOfficialText(JSON.stringify(quotaResult.rows));
         const initialized = !oldHash;
         const changed = Boolean(oldHash && oldHash !== parsed.content_hash);
         const nextProgram = {
@@ -247,6 +323,13 @@ async function updateEuUsSpecialProgram({
             annex_last_checked_at: checkedAt,
             origin_procedure_content_hash: procedureHash,
             origin_procedure_last_checked_at: checkedAt,
+            quota_status: {
+                source_url: QUOTA_URL,
+                checked_at: checkedAt,
+                content_hash: quotaHash,
+                rows: quotaResult.rows,
+                errors: quotaResult.errors
+            },
             last_verified_at: checkedAt.slice(0, 10)
         };
         payload.special_programs = asArray(payload.special_programs).map((row) => row.id === PROGRAM_ID ? nextProgram : row);
@@ -258,7 +341,11 @@ async function updateEuUsSpecialProgram({
             new_content_hash: parsed.content_hash,
             old_counts: oldCounts,
             new_counts: parsed.counts,
-            source_url: OFFICIAL_URL
+            source_url: OFFICIAL_URL,
+            affected_hs: [...annexDiff.added, ...annexDiff.removed, ...annexDiff.changed].map((row) => row.cn_code),
+            added_hs: annexDiff.added.map((row) => row.cn_code),
+            removed_hs: annexDiff.removed.map((row) => row.cn_code),
+            changed_hs: annexDiff.changed.map((row) => row.cn_code)
         }] : [];
         if (oldProcedureHash && oldProcedureHash !== procedureHash) {
             changes.push({
@@ -267,6 +354,23 @@ async function updateEuUsSpecialProgram({
                 old_content_hash: oldProcedureHash,
                 new_content_hash: procedureHash,
                 source_url: ORIGIN_PROCEDURE_URL
+            });
+        }
+        if (previousQuotaHash && previousQuotaHash !== quotaHash) {
+            const beforeRows = new Map(asArray(program.quota_status?.rows).map((row) => [row.order_number, row]));
+            const quotaChanges = quotaResult.rows.filter((row) => {
+                const before = beforeRows.get(row.order_number);
+                return !before || before.balance !== row.balance || before.available !== row.available;
+            });
+            changes.push({
+                rule: PROGRAM_ID,
+                change_type: 'special_program_quota_change',
+                affected_order_numbers: quotaChanges.map((row) => row.order_number),
+                before_after: quotaChanges.map((row) => {
+                    const before = beforeRows.get(row.order_number);
+                    return `${row.order_number}: ${before?.balance ?? 'new'} -> ${row.balance} ${row.unit}`;
+                }),
+                source_url: QUOTA_URL
             });
         }
         return {
@@ -281,7 +385,9 @@ async function updateEuUsSpecialProgram({
                 changed,
                 counts: parsed.counts,
                 content_hash: parsed.content_hash,
-                origin_procedure_content_hash: procedureHash
+                origin_procedure_content_hash: procedureHash,
+                quota_checked: quotaResult.rows.length,
+                quota_errors: quotaResult.errors.length
             },
             official_fetch: {
                 ok: true,
@@ -328,6 +434,7 @@ if (require.main === module) {
 module.exports = {
     OFFICIAL_URL,
     ORIGIN_PROCEDURE_URL,
+    QUOTA_URL,
     decodeHtml,
     normalizeCnCode,
     parseTableGrid,
@@ -336,5 +443,9 @@ module.exports = {
     parseAnnexIII,
     parseRegulationHtml,
     hashOfficialText,
+    parseQuotaStatusHtml,
+    quotaLookupUrl,
+    fetchQuotaStatuses,
+    diffAnnexes,
     updateEuUsSpecialProgram
 };

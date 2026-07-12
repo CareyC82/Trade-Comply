@@ -271,6 +271,8 @@
             ['III', counts.annex_iii],
             ['Quota groups', counts.quotas]
         ].filter(([, count]) => Number.isFinite(Number(count)));
+        const quotaRows = Array.isArray(program.quotaStatus?.rows) ? program.quotaStatus.rows : [];
+        const availableQuotas = quotaRows.filter((row) => row.available === true).length;
         const codeText = [
             Array.isArray(codes.measureTypes) && codes.measureTypes.length ? `Measure ${codes.measureTypes.join('/')}` : '',
             codes.preferenceCode ? `Preference ${codes.preferenceCode}` : '',
@@ -295,6 +297,7 @@
                         ${annexSummary.map(([label, count]) => `<li><b>${escapeHtml(label)}</b><span>${escapeHtml(count)} entries</span></li>`).join('')}
                     </ul>
                 ` : ''}
+                ${quotaRows.length ? `<p class="tariff-special-program__quota"><b>Live quota status</b> ${availableQuotas}/${quotaRows.length} order numbers currently show available balance. Allocation remains first-come, first-served.</p>` : ''}
                 <ul>
                     ${(program.treatments || []).map((row) => `<li><b>Annex ${escapeHtml(row.annex)}</b><span>${escapeHtml(row.treatment)}</span></li>`).join('')}
                 </ul>

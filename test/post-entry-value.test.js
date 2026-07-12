@@ -197,6 +197,36 @@ test('keeps Annex II specific duty and Annex III quota availability as explicit 
     assert.equal(annexII.calculationComplete, false);
     assert.match(annexII.summary, /specific duty remains/i);
 
+    const annexIIComplete = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.088 }, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '07020000',
+        entryDate: '2026-07-10',
+        specificDutyConfirmed: true,
+        netWeightKg: 500,
+        specificDutyRatePer100Kg: 12
+    }, 0);
+    assert.equal(annexIIComplete.calculationComplete, true);
+    assert.equal(annexIIComplete.specificDutyAmount, 60);
+    assert.equal(annexIIComplete.adjustedEstimatedDuty, 60);
+    assert.match(annexIIComplete.summary, /retained TARIC specific duty is 60\.00/i);
+
+    const annexIIDutyImpact = calculateDutyImpact(value, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '07020000',
+        entryDate: '2026-07-10',
+        originEvidenceConfirmed: true,
+        transportEvidenceConfirmed: true,
+        declarationCodesConfirmed: true,
+        specificDutyConfirmed: true,
+        netWeightKg: 500,
+        specificDutyRatePer100Kg: 12
+    }, { declaredDuty: 0 });
+    assert.equal(annexIIDutyImpact.covered, true);
+    assert.equal(annexIIDutyImpact.estimatedDuty, 60);
+    assert.equal(annexIIDutyImpact.sourceBreakdown.at(-1).status, 'conditional_program');
+
     const quotaPending = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.12 }, {
         importCountryCode: 'EU',
         originCountryCode: 'US',
@@ -204,8 +234,11 @@ test('keeps Annex II specific duty and Annex III quota availability as explicit 
         entryDate: '2026-07-10'
     }, 0);
     assert.equal(quotaPending.annex, 'III');
-    assert.equal(quotaPending.calculationComplete, false);
-    assert.equal(quotaPending.adjustedEstimatedDuty, null);
+    assert.equal(quotaPending.calculationComplete, true);
+    assert.equal(quotaPending.adjustedEstimatedDuty, 0);
+    assert.equal(quotaPending.eligibility.status, 'potentially_eligible');
+    assert.ok(quotaPending.quotaStatus.some((row) => row.order_number === '09.9001' && row.available));
+    assert.match(quotaPending.summary, /first-come, first-served/i);
 
     const quotaConfirmed = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.12 }, {
         importCountryCode: 'EU',

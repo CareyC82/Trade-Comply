@@ -1353,7 +1353,11 @@
             transportEvidenceConfirmed: Boolean($('post-entry-transport-evidence')?.checked),
             declarationCodesConfirmed: Boolean($('post-entry-declaration-codes')?.checked),
             descriptionConfirmed: Boolean($('post-entry-description-confirmed')?.checked),
-            quotaAvailable: Boolean($('post-entry-quota-available')?.checked)
+            quotaAvailable: Boolean($('post-entry-quota-available')?.checked),
+            specificDutyConfirmed: Boolean($('post-entry-specific-duty-confirmed')?.checked),
+            netWeightKg: $('post-entry-net-weight')?.value === '' ? null : numberInput('post-entry-net-weight'),
+            specificDutyRatePer100Kg: $('post-entry-specific-rate')?.value === '' ? null : numberInput('post-entry-specific-rate'),
+            specificDutyAmount: $('post-entry-specific-duty-amount')?.value === '' ? null : numberInput('post-entry-specific-duty-amount')
         };
         const snapshot = buildReviewSnapshot(valueApi, result, context, {
             currency,

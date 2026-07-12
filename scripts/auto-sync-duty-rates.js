@@ -57,6 +57,7 @@ function countRateChanges(changes = []) {
         || (Array.isArray(change.changes) && change.changes.some(row => row.field === 'base_rate'))
         || change.change_type === 'special_program_annex_change'
         || change.change_type === 'special_program_origin_procedure_change'
+        || change.change_type === 'special_program_quota_change'
     )).length;
 }
 

@@ -86,6 +86,22 @@ test('tariff watch surfaces official special-program Annex or origin-procedure c
     assert.ok(model.watchItems.some((row) => /Origin evidence procedure changed/i.test(row.changeType)));
 });
 
+test('tariff watch names affected CN lines and quota order numbers', () => {
+    const dutyRates = readJson('data/duty-rates.json');
+    const model = buildTariffWatchModel({
+        dutyRates,
+        syncStatus: {
+            counts: { total_rate_changes: 2, total_changes: 2 },
+            runs: [{ changes: [
+                { change_type: 'special_program_annex_change', affected_hs: ['850760'], added_hs: ['850760'] },
+                { change_type: 'special_program_quota_change', affected_order_numbers: ['09.9001'], before_after: ['09.9001: 100 -> 50 Kilogram'] }
+            ] }]
+        }
+    });
+    assert.ok(model.watchItems.some((row) => /CN 850760/.test(row.product)));
+    assert.ok(model.watchItems.some((row) => /Quota 09\.9001/.test(row.product) && /100 -> 50/.test(row.beforeAfter)));
+});
+
 test('tariff watch summarizes current maintained tariff rates for users', () => {
     const dutyRates = readJson('data/duty-rates.json');
     const tariffRows = buildCurrentTariffRows(dutyRates, 12);

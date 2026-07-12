@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity|tariff-watch"></script>
  */
 (function () {
-    const BUILD = '20260711-eu-us-adjusted-duty';
+    const BUILD = '20260712-eu-us-quota-specific-duty';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
