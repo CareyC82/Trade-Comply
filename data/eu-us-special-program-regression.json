@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "program_id": "EU-US-2026-1455",
+  "cases": [
+    { "id": "battery-evidence-pending", "importCountry": "EU", "originCountry": "US", "hsCode": "850760", "entryDate": "2026-07-10", "expected": "potentially_eligible" },
+    { "id": "battery-evidence-complete", "importCountry": "EU", "originCountry": "US", "hsCode": "850760", "entryDate": "2026-07-10", "allEvidence": true, "expected": "eligible" },
+    { "id": "ai-chip-complete", "importCountry": "DE", "originCountry": "US", "hsCode": "854231", "entryDate": "2026-07-10", "allEvidence": true, "expected": "eligible" },
+    { "id": "server-complete", "importCountry": "NL", "originCountry": "US", "hsCode": "847150", "entryDate": "2026-07-10", "allEvidence": true, "expected": "eligible" },
+    { "id": "smartphone-complete", "importCountry": "EU", "originCountry": "US", "hsCode": "851713", "entryDate": "2026-07-10", "allEvidence": true, "expected": "eligible" },
+    { "id": "solar-complete", "importCountry": "EU", "originCountry": "US", "hsCode": "854143", "entryDate": "2026-07-10", "allEvidence": true, "expected": "eligible" },
+    { "id": "before-effective-date", "importCountry": "EU", "originCountry": "US", "hsCode": "850760", "entryDate": "2026-06-30", "allEvidence": true, "expected": "not_eligible" },
+    { "id": "wrong-origin", "importCountry": "EU", "originCountry": "CN", "hsCode": "850760", "entryDate": "2026-07-10", "allEvidence": true, "expected": "not_eligible" },
+    { "id": "wrong-destination", "importCountry": "JP", "originCountry": "US", "hsCode": "850760", "entryDate": "2026-07-10", "allEvidence": true, "expected": "not_eligible" },
+    { "id": "unlisted-chapter", "importCountry": "EU", "originCountry": "US", "hsCode": "990000", "entryDate": "2026-07-10", "allEvidence": true, "expected": "not_eligible" },
+    { "id": "annex-ii-evidence-pending", "importCountry": "EU", "originCountry": "US", "hsCode": "07020000", "entryDate": "2026-07-10", "expected": "potentially_eligible" },
+    { "id": "annex-ii-evidence-complete", "importCountry": "EU", "originCountry": "US", "hsCode": "07020000", "entryDate": "2026-07-10", "allEvidence": true, "expected": "eligible" },
+    { "id": "annex-iii-quota-pending", "importCountry": "EU", "originCountry": "US", "hsCode": "02032219", "entryDate": "2026-07-10", "allEvidence": true, "quotaAvailable": false, "expected": "potentially_eligible" },
+    { "id": "annex-iii-quota-confirmed", "importCountry": "EU", "originCountry": "US", "hsCode": "02032219", "entryDate": "2026-07-10", "allEvidence": true, "quotaAvailable": true, "expected": "eligible" },
+    { "id": "ex-description-pending", "importCountry": "EU", "originCountry": "US", "hsCode": "290110", "entryDate": "2026-07-10", "allEvidence": true, "descriptionConfirmed": false, "expected": "potentially_eligible" }
+  ]
+}

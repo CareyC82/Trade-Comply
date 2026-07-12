@@ -7210,3 +7210,70 @@ button.feedback-link:hover {
         page-break-inside: avoid;
     }
 }
+.post-entry-section-note {
+    margin: -6px 0 16px;
+    color: var(--color-text-secondary);
+}
+
+.post-entry-evidence-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.post-entry-evidence-options label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.post-entry-evidence-options input {
+    margin-top: 3px;
+}
+
+.post-entry-program-eligibility {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 14px 0;
+    padding: 12px 14px;
+    border: 1px solid #f0c36a;
+    border-radius: 8px;
+    background: #fff8e8;
+}
+
+.post-entry-program-eligibility[data-status="eligible"] {
+    border-color: #86c89a;
+    background: #edf8f0;
+}
+
+.post-entry-program-eligibility[data-status="not_eligible"] {
+    border-color: #e4a1a1;
+    background: #fff0f0;
+}
+
+.post-entry-program-eligibility strong {
+    flex: 0 0 auto;
+    color: var(--color-primary);
+}
+
+.post-entry-program-eligibility span {
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 720px) {
+    .post-entry-evidence-options {
+        grid-template-columns: 1fr;
+    }
+
+    .post-entry-program-eligibility {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

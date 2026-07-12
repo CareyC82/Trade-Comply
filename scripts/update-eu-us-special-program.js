@@ -10,6 +10,7 @@ const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const PROGRAM_ID = 'EU-US-2026-1455';
 const OFFICIAL_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1455';
+const ORIGIN_PROCEDURE_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1422';
 
 function asArray(value) {
     return Array.isArray(value) ? value : [];
@@ -150,6 +151,12 @@ function hashAnnexes(annexes) {
     return crypto.createHash('sha256').update(JSON.stringify(annexes)).digest('hex');
 }
 
+function hashOfficialText(value) {
+    return crypto.createHash('sha256')
+        .update(decodeHtml(String(value || '')))
+        .digest('hex');
+}
+
 function parseRegulationHtml(html) {
     const annexI = parseAnnexI(html);
     const annexII = parseAnnexII(html);
@@ -208,16 +215,25 @@ function writeDutyRates(payload) {
     fs.writeFileSync(DUTY_RATES_PATH, `${JSON.stringify(payload, null, 2)}\n`);
 }
 
-async function updateEuUsSpecialProgram({ dryRun = false, html = '', fetcher = fetchOfficialHtml } = {}) {
+async function updateEuUsSpecialProgram({
+    dryRun = false,
+    html = '',
+    originProcedureHtml = '',
+    fetcher = fetchOfficialHtml,
+    originProcedureFetcher = null
+} = {}) {
     const checkedAt = new Date().toISOString();
     try {
         const officialHtml = html || await fetcher(OFFICIAL_URL);
+        const procedureHtml = originProcedureHtml || await (originProcedureFetcher || fetcher)(ORIGIN_PROCEDURE_URL);
         const parsed = parseRegulationHtml(officialHtml);
+        const procedureHash = hashOfficialText(procedureHtml);
         const payload = readDutyRates();
         const program = asArray(payload.special_programs).find((row) => row.id === PROGRAM_ID);
         if (!program) throw new Error(`${PROGRAM_ID} is missing from duty-rates.json.`);
         const oldHash = program.annex_content_hash || '';
         const oldCounts = program.annex_counts || null;
+        const oldProcedureHash = program.origin_procedure_content_hash || '';
         const initialized = !oldHash;
         const changed = Boolean(oldHash && oldHash !== parsed.content_hash);
         const nextProgram = {
@@ -229,6 +245,8 @@ async function updateEuUsSpecialProgram({ dryRun = false, html = '', fetcher = f
             annex_content_hash: parsed.content_hash,
             annex_source_url: OFFICIAL_URL,
             annex_last_checked_at: checkedAt,
+            origin_procedure_content_hash: procedureHash,
+            origin_procedure_last_checked_at: checkedAt,
             last_verified_at: checkedAt.slice(0, 10)
         };
         payload.special_programs = asArray(payload.special_programs).map((row) => row.id === PROGRAM_ID ? nextProgram : row);
@@ -242,6 +260,15 @@ async function updateEuUsSpecialProgram({ dryRun = false, html = '', fetcher = f
             new_counts: parsed.counts,
             source_url: OFFICIAL_URL
         }] : [];
+        if (oldProcedureHash && oldProcedureHash !== procedureHash) {
+            changes.push({
+                rule: PROGRAM_ID,
+                change_type: 'special_program_origin_procedure_change',
+                old_content_hash: oldProcedureHash,
+                new_content_hash: procedureHash,
+                source_url: ORIGIN_PROCEDURE_URL
+            });
+        }
         return {
             ok: true,
             countries: ['EU', 'DE', 'NL'],
@@ -253,7 +280,8 @@ async function updateEuUsSpecialProgram({ dryRun = false, html = '', fetcher = f
                 initialized,
                 changed,
                 counts: parsed.counts,
-                content_hash: parsed.content_hash
+                content_hash: parsed.content_hash,
+                origin_procedure_content_hash: procedureHash
             },
             official_fetch: {
                 ok: true,
@@ -299,6 +327,7 @@ if (require.main === module) {
 
 module.exports = {
     OFFICIAL_URL,
+    ORIGIN_PROCEDURE_URL,
     decodeHtml,
     normalizeCnCode,
     parseTableGrid,
@@ -306,5 +335,6 @@ module.exports = {
     parseAnnexII,
     parseAnnexIII,
     parseRegulationHtml,
+    hashOfficialText,
     updateEuUsSpecialProgram
 };

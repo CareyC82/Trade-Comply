@@ -56,6 +56,7 @@ function countRateChanges(changes = []) {
         Object.prototype.hasOwnProperty.call(change, 'old_base_rate')
         || (Array.isArray(change.changes) && change.changes.some(row => row.field === 'base_rate'))
         || change.change_type === 'special_program_annex_change'
+        || change.change_type === 'special_program_origin_procedure_change'
     )).length;
 }
 

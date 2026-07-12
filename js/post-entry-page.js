@@ -943,6 +943,7 @@
                     ? 'Not calculable yet'
                     : formatMoney(programAdjustment.potentialSavings, currency),
                 calculationComplete: programAdjustment.calculationComplete,
+                eligibility: programAdjustment.eligibility || originEvidenceGate?.eligibility || null,
                 summary: programAdjustment.summary,
                 evidence: `Conditional only: Article 59a origin/transport evidence and declaration codes ${programAdjustment.declarationCodes?.measureTypes?.join('/') || '142/145'}, preference ${programAdjustment.declarationCodes?.preferenceCode || '300'}, document ${programAdjustment.declarationCodes?.supportingDocument || 'U190'} must be supported. Standard duty estimate: ${programAdjustment.standardEstimatedDuty === null ? 'not covered' : formatMoney(programAdjustment.standardEstimatedDuty, currency)}${programAdjustment.adjustedEstimatedDuty === null ? '.' : `; conditional adjusted estimate: ${formatMoney(programAdjustment.adjustedEstimatedDuty, currency)}.`}`
             } : null,
@@ -1011,6 +1012,22 @@
         $('post-entry-program-saving').textContent = program.saving || '—';
         $('post-entry-program-summary').textContent = program.summary || '—';
         $('post-entry-program-evidence').textContent = program.evidence || '—';
+        const eligibility = program.eligibility || {
+            status: 'potentially_eligible',
+            label: 'Potentially eligible',
+            reason: 'Filing evidence still needs confirmation.'
+        };
+        const eligibilityCard = $('post-entry-program-eligibility');
+        if (eligibilityCard) eligibilityCard.dataset.status = eligibility.status || 'potentially_eligible';
+        if ($('post-entry-program-eligibility-label')) {
+            $('post-entry-program-eligibility-label').textContent = eligibility.label || 'Potentially eligible';
+        }
+        if ($('post-entry-program-eligibility-reason')) {
+            const missing = Array.isArray(eligibility.missing) && eligibility.missing.length
+                ? ` Missing: ${eligibility.missing.join('; ')}.`
+                : '';
+            $('post-entry-program-eligibility-reason').textContent = `${eligibility.reason || ''}${missing}`;
+        }
         const source = $('post-entry-program-source');
         if (source) {
             source.href = program.sourceUrl || '#';
@@ -1203,6 +1220,14 @@
         });
     }
 
+    function updateSpecialEvidenceVisibility() {
+        const section = $('post-entry-special-evidence');
+        if (!section) return;
+        const origin = String($('post-entry-origin-country')?.value || '').toUpperCase();
+        const destination = String($('post-entry-import-country')?.value || '').toUpperCase();
+        section.hidden = !(origin === 'US' && ['EU', 'DE', 'NL'].includes(destination));
+    }
+
     function normalizeCountryParam(value) {
         const registry = getRegistryApi();
         if (registry?.normalizeCountryCode) {
@@ -1323,7 +1348,12 @@
             importCountry: getCountryLabel($('post-entry-import-country').value),
             originCountry: getCountryLabel($('post-entry-origin-country').value),
             entryDate: $('post-entry-date').value,
-            hsCode: $('post-entry-hs-code').value.trim()
+            hsCode: $('post-entry-hs-code').value.trim(),
+            originEvidenceConfirmed: Boolean($('post-entry-origin-evidence')?.checked),
+            transportEvidenceConfirmed: Boolean($('post-entry-transport-evidence')?.checked),
+            declarationCodesConfirmed: Boolean($('post-entry-declaration-codes')?.checked),
+            descriptionConfirmed: Boolean($('post-entry-description-confirmed')?.checked),
+            quotaAvailable: Boolean($('post-entry-quota-available')?.checked)
         };
         const snapshot = buildReviewSnapshot(valueApi, result, context, {
             currency,
@@ -1358,6 +1388,13 @@
             });
             button.setAttribute('aria-pressed', 'false');
         });
+    }
+
+    function bindSpecialEvidenceVisibility() {
+        ['post-entry-origin-country', 'post-entry-import-country'].forEach((id) => {
+            $(id)?.addEventListener('change', updateSpecialEvidenceVisibility);
+        });
+        updateSpecialEvidenceVisibility();
     }
 
     function bindPostEntryFeedback() {
@@ -1475,6 +1512,7 @@
         bindEntryDateMask();
         bindPostEntryFocusToggle();
         applyPostEntryQueryParams();
+        bindSpecialEvidenceVisibility();
         bindForm();
     }
 

@@ -11,6 +11,32 @@ const {
 
 const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
 const program = dutyRates.special_programs.find((row) => row.id === 'EU-US-2026-1455');
+const regression = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'eu-us-special-program-regression.json'), 'utf8'));
+
+test('keeps high-risk product, date, route, and evidence eligibility regression cases stable', () => {
+    assert.ok(regression.cases.length >= 15);
+    regression.cases.forEach((row) => {
+        const evidence = row.allEvidence ? {
+            originEvidenceConfirmed: true,
+            transportEvidenceConfirmed: true,
+            declarationCodesConfirmed: true,
+            descriptionConfirmed: row.descriptionConfirmed !== false,
+            quotaAvailable: row.quotaAvailable === undefined ? true : row.quotaAvailable
+        } : {
+            quotaAvailable: row.quotaAvailable === true,
+            descriptionConfirmed: row.descriptionConfirmed === true
+        };
+        const result = resolveProgramTreatment({
+            programs: dutyRates.special_programs,
+            importCountry: row.importCountry,
+            originCountry: row.originCountry,
+            hsCode: row.hsCode,
+            entryDate: row.entryDate,
+            ...evidence
+        });
+        assert.equal(result.eligibility.status, row.expected, row.id);
+    });
+});
 
 test('stores the complete official Regulation 2026/1455 Annex inventory', () => {
     assert.ok(program);

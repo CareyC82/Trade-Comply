@@ -149,6 +149,24 @@ test('calculates a conditional Annex I duty saving without replacing the conserv
     assert.equal(Number(duty.specialProgramAdjustment.potentialSavings.toFixed(2)), 270);
     assert.equal(duty.specialProgramAdjustment.calculationComplete, true);
     assert.match(duty.specialProgramAdjustment.summary, /Article 59a|2\.70% to 0%/i);
+    assert.equal(duty.specialProgramAdjustment.eligibility.status, 'potentially_eligible');
+});
+
+test('promotes EU-US special treatment to eligible only when filing evidence is confirmed', () => {
+    const value = calculatePostEntryValue({ incoterm: 'FOB', declaredAmount: 10000 });
+    const duty = calculateDutyImpact(value, {
+        importCountryCode: 'EU',
+        originCountryCode: 'US',
+        hsCode: '850760',
+        entryDate: '07 / 10 / 26',
+        originEvidenceConfirmed: true,
+        transportEvidenceConfirmed: true,
+        declarationCodesConfirmed: true,
+        descriptionConfirmed: true
+    }, { declaredDuty: 0 });
+
+    assert.equal(duty.specialProgramAdjustment.eligibility.status, 'eligible');
+    assert.equal(duty.specialProgramAdjustment.eligibility.missing.length, 0);
 });
 
 test('does not apply Regulation 2026/1455 before its effective date', () => {
@@ -469,4 +487,14 @@ test('Post-Entry result shows rate confidence without opening details', () => {
     assert.ok(programIndex < scopeIndex, 'special tariff treatment should appear before the supporting scope checklist');
     assert.ok(scopeIndex < detailsIndex, 'scope checklist card should appear before the collapsible details panel');
     assert.ok(syncIndex < detailsIndex, 'duty sync status should appear before the collapsible details panel');
+});
+
+test('Post-Entry exposes EU-US evidence inputs and three-state eligibility result', () => {
+    const formHtml = fs.readFileSync(path.join(__dirname, '..', 'post-entry.html'), 'utf8');
+    const resultHtml = fs.readFileSync(path.join(__dirname, '..', 'post-entry-result.html'), 'utf8');
+    assert.match(formHtml, /post-entry-origin-evidence/);
+    assert.match(formHtml, /post-entry-transport-evidence/);
+    assert.match(formHtml, /post-entry-declaration-codes/);
+    assert.match(resultHtml, /post-entry-program-eligibility/);
+    assert.match(resultHtml, /Potentially eligible/);
 });

@@ -68,6 +68,24 @@ test('tariff watch models EU adjusted-duty program without inferring broad HS el
     });
 });
 
+test('tariff watch surfaces official special-program Annex or origin-procedure changes', () => {
+    const dutyRates = readJson('data/duty-rates.json');
+    const model = buildTariffWatchModel({
+        dutyRates,
+        syncStatus: {
+            counts: { total_rate_changes: 1, total_changes: 1 },
+            runs: [{
+                changes: [{
+                    change_type: 'special_program_origin_procedure_change',
+                    source_url: 'https://eur-lex.europa.eu/'
+                }]
+            }]
+        }
+    });
+    assert.equal(model.specialProgramChanges.length, 1);
+    assert.ok(model.watchItems.some((row) => /Origin evidence procedure changed/i.test(row.changeType)));
+});
+
 test('tariff watch summarizes current maintained tariff rates for users', () => {
     const dutyRates = readJson('data/duty-rates.json');
     const tariffRows = buildCurrentTariffRows(dutyRates, 12);
