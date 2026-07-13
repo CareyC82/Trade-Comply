@@ -6,6 +6,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {
     findAnnexMatches,
+    findSpecificDutyRows,
+    selectAutoSpecificDuty,
     resolveProgramTreatment
 } = require('../lib/eu-us-special-program');
 
@@ -117,4 +119,41 @@ test('honors the program effective date in ISO and UI date formats', () => {
     assert.equal(before.scopeStatus, 'not_effective_on_entry_date');
     assert.equal(after.eligible, true);
     assert.equal(after.scopeStatus, 'annex_matched');
+});
+
+test('resolves synchronized TARIC specific-duty rows by CN code and entry date', () => {
+    const fixture = {
+        ...program,
+        specific_duty_status: {
+            checked_at: '2026-07-13T00:00:00.000Z',
+            rows: [{
+                goods_code: '0702000000',
+                start_date: '01-07-2026',
+                end_date: '31-12-2026',
+                duty: '12.500 EUR DTN',
+                simple_specific_duty: {
+                    amount: 12.5,
+                    currency: 'EUR',
+                    unit: 'DTN',
+                    rate_per_100kg: 12.5
+                }
+            }]
+        }
+    };
+    const rows = findSpecificDutyRows(fixture, '07020000', '07 / 13 / 26');
+    assert.equal(rows.length, 1);
+    assert.equal(selectAutoSpecificDuty(rows).rate_per_100kg, 12.5);
+
+    const result = resolveProgramTreatment({
+        programs: [fixture],
+        importCountry: 'EU',
+        originCountry: 'US',
+        hsCode: '07020000',
+        entryDate: '2026-07-13',
+        originEvidenceConfirmed: true,
+        transportEvidenceConfirmed: true,
+        declarationCodesConfirmed: true
+    });
+    assert.equal(result.autoSpecificDuty.rate_per_100kg, 12.5);
+    assert.equal(result.eligibility.missing.includes('Annex II TARIC specific-duty amount'), false);
 });

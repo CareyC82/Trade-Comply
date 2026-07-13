@@ -1180,6 +1180,7 @@
         function renderAutomationLaunchStatus(status = {}) {
             const summary = status.summary || {};
             const healthBoard = status.duty_rate_health_board || {};
+            const euProgram = status.eu_us_special_program_health || {};
             const regulatory = Array.isArray(status.regulatory) ? status.regulatory : [];
             const dutyRates = Array.isArray(status.duty_rates) ? status.duty_rates : [];
             const weeklyRoutePriorities = Array.isArray(status.weekly_route_priorities) ? status.weekly_route_priorities : [];
@@ -1296,11 +1297,21 @@
                     `).join('')}
                 </div>
             ` : '';
+            const euProgramHtml = euProgram.id ? `
+                <div class="crawl-section-title"><h3>EU-US 2026/1455 health</h3><span class="badge ${escapeHtml(euProgram.status === 'healthy' ? 'auto_updatable' : 'benchmark')}">${escapeHtml(euProgram.status || 'unknown')}</span></div>
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${escapeHtml(euProgram.annex_total || 0)}</strong><span>Annex rows</span><small>I ${escapeHtml(euProgram.annex_counts?.annex_i || 0)} · II ${escapeHtml(euProgram.annex_counts?.annex_ii || 0)} · III ${escapeHtml(euProgram.annex_counts?.annex_iii || 0)}</small></div>
+                    <div class="summary-card"><strong>${escapeHtml(euProgram.quota_checked || 0)}/${escapeHtml(euProgram.quota_expected || 0)}</strong><span>Live quota balances</span><small>Available ${escapeHtml(euProgram.quota_alerts?.available || 0)} · Low ${escapeHtml(euProgram.quota_alerts?.low || 0)} · Critical ${escapeHtml(euProgram.quota_alerts?.critical || 0)} · Exhausted ${escapeHtml(euProgram.quota_alerts?.exhausted || 0)}</small></div>
+                    <div class="summary-card"><strong>${escapeHtml(euProgram.specific_duty_exact_codes || 0)}</strong><span>Annex II exact TARIC codes</span><small>${escapeHtml(euProgram.specific_duty_rows || 0)} formula rows · ${escapeHtml(euProgram.specific_duty_auto_rows || 0)} auto-safe</small></div>
+                    <div class="summary-card"><strong>${escapeHtml((euProgram.quota_errors || 0) + (euProgram.specific_duty_errors || 0))}</strong><span>Sync failures</span><small>Last Annex ${escapeHtml(formatDateTime(euProgram.annex_last_checked_at) || '—')}</small></div>
+                </div>
+            ` : '';
             return `
                 <div class="quality-banner">
                     <h3>Automation Launch Board</h3>
                     <p class="desc">已上线可公开展示的自动化能力；Hybrid / Monitor 不会被包装成完整 filing-grade 自动税率。</p>
                     ${healthBoardHtml}
+                    ${euProgramHtml}
                     <div class="summary-grid">
                         <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.official_exact || summary.filing_grade_auto_countries || []).length)}</strong><span>Official exact</span></div>
                         <div class="summary-card"><strong>${escapeHtml((dutyLaunchLevels.hybrid_official || []).length)}</strong><span>Hybrid official</span></div>

@@ -7,6 +7,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const OUTPUT_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
+const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const POST_ENTRY_RATE_PRIORITY_MATRIX_PATH = path.join(ROOT, 'data', 'post-entry-rate-priority-matrix.json');
 const GLOBAL_CRAWL_HEALTH_PATH = path.join(ROOT, 'data', 'global-crawl-source-health.json');
 const INBOX_MANIFEST_PATH = path.join(ROOT, 'data', 'inbox', 'manifest.json');
@@ -420,6 +421,48 @@ function buildDutyRateHealthBoard(rows = [], weeklyRoutePriorities = []) {
     };
 }
 
+function buildEuUsSpecialProgramHealth(dutyRates = readJson(DUTY_RATES_PATH, {})) {
+    const program = (dutyRates.special_programs || []).find(row => row.id === 'EU-US-2026-1455') || {};
+    const annexCounts = program.annex_counts || {};
+    const quotaRows = program.quota_status?.rows || [];
+    const quotaAlerts = quotaRows.reduce((acc, row) => {
+        const key = row.status || 'unknown';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+    const specific = program.specific_duty_status || {};
+    const quotaExpected = Number(annexCounts.quotas || 0);
+    const quotaComplete = quotaExpected > 0 && quotaRows.length === quotaExpected;
+    const specificComplete = Number(specific.matched_rows || 0) > 0
+        && Number(specific.exact_goods_codes || 0) > 0;
+    const hasErrors = (program.quota_status?.errors || []).length > 0
+        || (specific.errors || []).length > 0;
+    return {
+        id: program.id || 'EU-US-2026-1455',
+        source_url: program.annex_source_url || '',
+        annex_last_checked_at: program.annex_last_checked_at || '',
+        annex_counts: annexCounts,
+        annex_total: Number(annexCounts.annex_i || 0) + Number(annexCounts.annex_ii || 0) + Number(annexCounts.annex_iii || 0),
+        quota_checked_at: program.quota_status?.checked_at || '',
+        quota_expected: quotaExpected,
+        quota_checked: quotaRows.length,
+        quota_errors: (program.quota_status?.errors || []).length,
+        quota_alerts: quotaAlerts,
+        specific_duty_checked_at: specific.checked_at || specific.last_attempt_at || '',
+        specific_duty_annex_lines: Number(specific.annex_ii_lines || annexCounts.annex_ii || 0),
+        specific_duty_exact_codes: Number(specific.exact_goods_codes || 0),
+        specific_duty_rows: Number(specific.matched_rows || 0),
+        specific_duty_auto_rows: Number(specific.simple_auto_rows || 0),
+        specific_duty_conditional_rows: Number(specific.conditional_rows || 0),
+        specific_duty_errors: (specific.errors || []).length,
+        status: !program.id
+            ? 'missing'
+            : hasErrors || !quotaComplete || !specificComplete
+                ? 'degraded'
+                : 'healthy'
+    };
+}
+
 function buildDutyParserGapTask(row = {}) {
     if (!row.parser_gap && row.filing_grade_auto) return null;
     const taskByStage = {
@@ -589,6 +632,7 @@ function buildAutomationLaunchStatus() {
     const weekly_route_priorities = buildWeeklyRoutePriorities(duty_rates);
     const duty_rate_launch_levels = summarizeDutyLaunchLevels(duty_rates);
     const duty_rate_health_board = buildDutyRateHealthBoard(duty_rates, weekly_route_priorities);
+    const eu_us_special_program_health = buildEuUsSpecialProgramHealth();
     const payload = {
         schema_version: 1,
         updated_at: new Date().toISOString(),
@@ -616,6 +660,7 @@ function buildAutomationLaunchStatus() {
             weekly_route_priority_count: weekly_route_priorities.length
         },
         duty_rate_health_board,
+        eu_us_special_program_health,
         regulatory,
         duty_rates,
         duty_rate_priority_queue,
@@ -644,6 +689,7 @@ module.exports = {
     writeAutomationLaunchStatus,
     dutyAutomationStage,
     buildDutyRateHealthBoard,
+    buildEuUsSpecialProgramHealth,
     buildDutyAutomationPriority,
     buildWeeklyRoutePriorities
 };

@@ -6,7 +6,8 @@ const path = require('path');
 const {
     buildAutomationLaunchStatus,
     dutyAutomationStage,
-    buildWeeklyRoutePriorities
+    buildWeeklyRoutePriorities,
+    buildEuUsSpecialProgramHealth
 } = require('../scripts/build-automation-launch-status');
 const {
     buildDutyRateStatusPayload
@@ -114,6 +115,30 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'official_exact' && card.countries.includes('US')), true);
     assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'p0_p1' && card.countries.includes('CN') && card.countries.includes('MX')), true);
     assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'parser_gap' && card.count === 13), true);
+    assert.equal(payload.eu_us_special_program_health.id, 'EU-US-2026-1455');
+    assert.equal(payload.eu_us_special_program_health.annex_total, 242);
+    assert.equal(payload.eu_us_special_program_health.quota_expected, 20);
+});
+
+test('EU-US special-program health distinguishes complete and degraded syncs', () => {
+    const healthy = buildEuUsSpecialProgramHealth({ special_programs: [{
+        id: 'EU-US-2026-1455',
+        annex_counts: { annex_i: 150, annex_ii: 21, annex_iii: 71, quotas: 20 },
+        quota_status: { rows: Array.from({ length: 20 }, () => ({ status: 'available' })), errors: [] },
+        specific_duty_status: { matched_rows: 64, exact_goods_codes: 27, simple_auto_rows: 3, conditional_rows: 61, errors: [] }
+    }] });
+    assert.equal(healthy.status, 'healthy');
+    assert.equal(healthy.annex_total, 242);
+    assert.equal(healthy.quota_checked, 20);
+    assert.equal(healthy.specific_duty_rows, 64);
+
+    const degraded = buildEuUsSpecialProgramHealth({ special_programs: [{
+        id: 'EU-US-2026-1455',
+        annex_counts: { annex_i: 150, annex_ii: 21, annex_iii: 71, quotas: 20 },
+        quota_status: { rows: [], errors: [{ error: 'network' }] },
+        specific_duty_status: { rows: [], errors: [] }
+    }] });
+    assert.equal(degraded.status, 'degraded');
 });
 
 test('weekly route priorities expose concrete product and HS route backlog', () => {

@@ -4,7 +4,12 @@
  */
 const crypto = require('crypto');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const {
+    probeEuTaricFullDatabase,
+    parseTaricWorkbookRows
+} = require('./update-eu-duty-rates');
 
 const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
@@ -12,6 +17,7 @@ const PROGRAM_ID = 'EU-US-2026-1455';
 const OFFICIAL_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1455';
 const ORIGIN_PROCEDURE_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1422';
 const QUOTA_URL = 'https://ec.europa.eu/taxation_customs/dds2/taric/quota_list.jsp';
+const TARIC_FULL_DATABASE_URL = 'https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b/library/64db9d0f-e7c9-4084-afe9-f47e70e53c10';
 
 function asArray(value) {
     return Array.isArray(value) ? value : [];
@@ -185,6 +191,141 @@ function parseQuotaStatusHtml(html, orderNumber = '') {
     };
 }
 
+function parseQuotaVolume(value = '') {
+    const match = String(value || '').replace(/\u00a0/g, ' ').match(/([\d\s.,]+)\s*(kg|kilograms?|t|tonnes?)\b/i);
+    if (!match) return null;
+    const amount = Number(match[1].replace(/[\s,]/g, ''));
+    if (!Number.isFinite(amount)) return null;
+    const unit = match[2].toLowerCase();
+    return {
+        amount,
+        unit,
+        kilograms: /^(t|tonne)/.test(unit) ? amount * 1000 : amount
+    };
+}
+
+function classifyQuotaAvailability(balance, quotaVolume = '') {
+    const parsedVolume = parseQuotaVolume(quotaVolume);
+    const numericBalance = Number(balance);
+    if (!Number.isFinite(numericBalance) || !parsedVolume?.kilograms) {
+        return { status: 'unknown', label: 'Unknown', remaining_ratio: null, initial_volume_kg: parsedVolume?.kilograms || null };
+    }
+    const ratio = Math.max(0, numericBalance / parsedVolume.kilograms);
+    if (numericBalance <= 0) return { status: 'exhausted', label: 'Exhausted', remaining_ratio: 0, initial_volume_kg: parsedVolume.kilograms };
+    if (ratio <= 0.05) return { status: 'critical', label: 'Critical', remaining_ratio: ratio, initial_volume_kg: parsedVolume.kilograms };
+    if (ratio <= 0.20) return { status: 'low', label: 'Low', remaining_ratio: ratio, initial_volume_kg: parsedVolume.kilograms };
+    return { status: 'available', label: 'Available', remaining_ratio: ratio, initial_volume_kg: parsedVolume.kilograms };
+}
+
+function attachQuotaAlerts(rows = [], annexEntries = []) {
+    const volumes = new Map();
+    asArray(annexEntries).forEach((entry) => {
+        if (entry.order_number && !volumes.has(entry.order_number)) volumes.set(entry.order_number, entry.quota_volume || '');
+    });
+    return asArray(rows).map((row) => ({
+        ...row,
+        quota_volume: volumes.get(row.order_number) || '',
+        ...classifyQuotaAvailability(row.balance, volumes.get(row.order_number) || '')
+    }));
+}
+
+function isEuUsAnnexIiTaricRow(row = {}) {
+    return row.origin_code === 'US'
+        && row.measure_type_code === '142'
+        && /1455\/26/i.test(row.legal_base || '')
+        && String(row.duty || '').trim();
+}
+
+function parseSimpleSpecificDuty(duty = '') {
+    const text = String(duty || '').trim();
+    if (!text || /\bCond:/i.test(text)) return null;
+    if (/^0(?:\.0+)?\s*%$/.test(text)) {
+        return { amount: 0, currency: 'EUR', unit: 'NONE', rate_per_100kg: 0 };
+    }
+    const match = text.match(/^(\d+(?:\.\d+)?)\s+EUR\s+(DTN|HLT|KGM|TNE|NAR)$/i);
+    if (!match) return null;
+    const unit = match[2].toUpperCase();
+    return {
+        amount: Number(match[1]),
+        currency: 'EUR',
+        unit,
+        rate_per_100kg: unit === 'DTN' ? Number(match[1]) : null
+    };
+}
+
+function buildSpecificDutyStatus(rows = [], annexEntries = [], metadata = {}) {
+    const prefixes = asArray(annexEntries).map((entry) => entry.normalized_code || normalizeCnCode(entry.cn_code));
+    const filtered = asArray(rows)
+        .filter(isEuUsAnnexIiTaricRow)
+        .filter((row) => prefixes.some((prefix) => String(row.goods_code || '').startsWith(prefix)))
+        .map((row) => ({
+            goods_code: row.goods_code,
+            start_date: row.start_date,
+            end_date: row.end_date,
+            duty: row.duty,
+            legal_base: row.legal_base,
+            origin_code: row.origin_code,
+            measure_type: row.measure_type,
+            measure_type_code: row.measure_type_code,
+            simple_specific_duty: parseSimpleSpecificDuty(row.duty)
+        }));
+    const exactCodes = new Set(filtered.map((row) => row.goods_code));
+    const simpleRows = filtered.filter((row) => row.simple_specific_duty);
+    return {
+        source_url: metadata.download_url || TARIC_FULL_DATABASE_URL,
+        checked_at: metadata.checked_at || new Date().toISOString(),
+        workbook: metadata.workbook || {},
+        annex_ii_lines: prefixes.length,
+        matched_rows: filtered.length,
+        exact_goods_codes: exactCodes.size,
+        simple_auto_rows: simpleRows.length,
+        conditional_rows: filtered.length - simpleRows.length,
+        rows: filtered,
+        errors: []
+    };
+}
+
+async function downloadTaricWorkbook(url, targetPath) {
+    const response = await fetch(url, {
+        headers: { 'User-Agent': 'TraceWize tariff monitor (+https://tracewize.com)' },
+        redirect: 'follow'
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    fs.writeFileSync(targetPath, buffer);
+    return targetPath;
+}
+
+async function fetchSpecificDutyStatus(annexEntries = [], { taricWorkbookPath = '', taricRows = null } = {}) {
+    if (Array.isArray(taricRows)) return buildSpecificDutyStatus(taricRows, annexEntries, { checked_at: new Date().toISOString() });
+    const probe = taricWorkbookPath ? null : await probeEuTaricFullDatabase();
+    if (!taricWorkbookPath && (!probe?.ok || !probe.import_duties_file?.download_url)) {
+        throw new Error(probe?.error || 'Latest TARIC import duties workbook was not found.');
+    }
+    const temporary = !taricWorkbookPath;
+    const workbookPath = taricWorkbookPath || path.join(os.tmpdir(), `tracewize-taric-${Date.now()}.xlsx`);
+    try {
+        if (temporary) await downloadTaricWorkbook(probe.import_duties_file.download_url, workbookPath);
+        const prefixes = asArray(annexEntries).map((entry) => entry.normalized_code || normalizeCnCode(entry.cn_code));
+        const rows = parseTaricWorkbookRows(workbookPath, { prefixes });
+        return buildSpecificDutyStatus(rows, annexEntries, {
+            checked_at: new Date().toISOString(),
+            download_url: probe?.import_duties_file?.download_url || TARIC_FULL_DATABASE_URL,
+            workbook: probe ? {
+                year: probe.latest_year?.name || '',
+                month: probe.latest_month?.name || '',
+                name: probe.import_duties_file.name || '',
+                modified: probe.import_duties_file.modified || ''
+            } : {
+                name: path.basename(taricWorkbookPath),
+                supplied_locally: true
+            }
+        });
+    } finally {
+        if (temporary && fs.existsSync(workbookPath)) fs.unlinkSync(workbookPath);
+    }
+}
+
 function quotaLookupUrl(orderNumber, year = new Date().getUTCFullYear()) {
     const code = normalizeCnCode(orderNumber);
     return `${QUOTA_URL}?Lang=en&Code=${encodeURIComponent(code)}&Year=${encodeURIComponent(year)}&Status=&Critical=&Expand=false&Offset=0`;
@@ -289,17 +430,30 @@ async function updateEuUsSpecialProgram({
     fetcher = fetchOfficialHtml,
     originProcedureFetcher = null,
     quotaFetcher = fetchOfficialHtml,
-    skipQuotaStatus = false
+    skipQuotaStatus = false,
+    skipSpecificDutyStatus = false,
+    reuseExistingAnnex = false,
+    taricWorkbookPath = '',
+    taricRows = null
 } = {}) {
     const checkedAt = new Date().toISOString();
     try {
-        const officialHtml = html || await fetcher(OFFICIAL_URL);
-        const procedureHtml = originProcedureHtml || await (originProcedureFetcher || fetcher)(ORIGIN_PROCEDURE_URL);
-        const parsed = parseRegulationHtml(officialHtml);
-        const procedureHash = hashOfficialText(procedureHtml);
         const payload = readDutyRates();
         const program = asArray(payload.special_programs).find((row) => row.id === PROGRAM_ID);
         if (!program) throw new Error(`${PROGRAM_ID} is missing from duty-rates.json.`);
+        const parsed = reuseExistingAnnex
+            ? {
+                annexes: program.annexes,
+                content_hash: program.annex_content_hash,
+                counts: program.annex_counts
+            }
+            : parseRegulationHtml(html || await fetcher(OFFICIAL_URL));
+        if (!parsed.annexes || !parsed.content_hash || !parsed.counts) {
+            throw new Error('The stored official Annex snapshot is incomplete and cannot be reused.');
+        }
+        const procedureHash = reuseExistingAnnex
+            ? program.origin_procedure_content_hash
+            : hashOfficialText(originProcedureHtml || await (originProcedureFetcher || fetcher)(ORIGIN_PROCEDURE_URL));
         const oldHash = program.annex_content_hash || '';
         const oldCounts = program.annex_counts || null;
         const oldProcedureHash = program.origin_procedure_content_hash || '';
@@ -308,6 +462,19 @@ async function updateEuUsSpecialProgram({
         const quotaResult = skipQuotaStatus
             ? { rows: asArray(program.quota_status?.rows), errors: [] }
             : await fetchQuotaStatuses(quotaOrders, quotaFetcher);
+        quotaResult.rows = attachQuotaAlerts(quotaResult.rows, parsed.annexes.III.entries);
+        let specificDutyStatus = program.specific_duty_status || { rows: [], errors: [] };
+        if (!skipSpecificDutyStatus) {
+            try {
+                specificDutyStatus = await fetchSpecificDutyStatus(parsed.annexes.II.entries, { taricWorkbookPath, taricRows });
+            } catch (error) {
+                specificDutyStatus = {
+                    ...specificDutyStatus,
+                    last_attempt_at: checkedAt,
+                    errors: [{ error: error.message }]
+                };
+            }
+        }
         const previousQuotaHash = program.quota_status?.content_hash || '';
         const quotaHash = hashOfficialText(JSON.stringify(quotaResult.rows));
         const initialized = !oldHash;
@@ -320,9 +487,9 @@ async function updateEuUsSpecialProgram({
             annexes: parsed.annexes,
             annex_content_hash: parsed.content_hash,
             annex_source_url: OFFICIAL_URL,
-            annex_last_checked_at: checkedAt,
+            annex_last_checked_at: reuseExistingAnnex ? program.annex_last_checked_at : checkedAt,
             origin_procedure_content_hash: procedureHash,
-            origin_procedure_last_checked_at: checkedAt,
+            origin_procedure_last_checked_at: reuseExistingAnnex ? program.origin_procedure_last_checked_at : checkedAt,
             quota_status: {
                 source_url: QUOTA_URL,
                 checked_at: checkedAt,
@@ -330,6 +497,7 @@ async function updateEuUsSpecialProgram({
                 rows: quotaResult.rows,
                 errors: quotaResult.errors
             },
+            specific_duty_status: specificDutyStatus,
             last_verified_at: checkedAt.slice(0, 10)
         };
         payload.special_programs = asArray(payload.special_programs).map((row) => row.id === PROGRAM_ID ? nextProgram : row);
@@ -387,7 +555,16 @@ async function updateEuUsSpecialProgram({
                 content_hash: parsed.content_hash,
                 origin_procedure_content_hash: procedureHash,
                 quota_checked: quotaResult.rows.length,
-                quota_errors: quotaResult.errors.length
+                quota_errors: quotaResult.errors.length,
+                reused_annex_snapshot: reuseExistingAnnex,
+                quota_alerts: quotaResult.rows.reduce((acc, row) => {
+                    acc[row.status || 'unknown'] = (acc[row.status || 'unknown'] || 0) + 1;
+                    return acc;
+                }, {}),
+                specific_duty_rows: specificDutyStatus.matched_rows || 0,
+                specific_duty_exact_codes: specificDutyStatus.exact_goods_codes || 0,
+                specific_duty_auto_rows: specificDutyStatus.simple_auto_rows || 0,
+                specific_duty_errors: asArray(specificDutyStatus.errors).length
             },
             official_fetch: {
                 ok: true,
@@ -417,9 +594,19 @@ async function updateEuUsSpecialProgram({
 
 async function main() {
     const dryRun = process.argv.includes('--dry-run');
+    const reuseExistingAnnex = process.argv.includes('--reuse-annex');
+    const skipQuotaStatus = process.argv.includes('--skip-quota-status');
     const htmlArg = process.argv.find((arg) => arg.startsWith('--html-file='));
+    const taricWorkbookArg = process.argv.find((arg) => arg.startsWith('--taric-workbook='));
     const html = htmlArg ? fs.readFileSync(htmlArg.split('=').slice(1).join('='), 'utf8') : '';
-    const result = await updateEuUsSpecialProgram({ dryRun, html });
+    const taricWorkbookPath = taricWorkbookArg ? taricWorkbookArg.split('=').slice(1).join('=') : '';
+    const result = await updateEuUsSpecialProgram({
+        dryRun,
+        html,
+        taricWorkbookPath,
+        reuseExistingAnnex,
+        skipQuotaStatus
+    });
     console.log(JSON.stringify(result, null, 2));
     if (!result.ok) process.exitCode = 1;
 }
@@ -446,6 +633,12 @@ module.exports = {
     parseQuotaStatusHtml,
     quotaLookupUrl,
     fetchQuotaStatuses,
+    parseQuotaVolume,
+    classifyQuotaAvailability,
+    attachQuotaAlerts,
+    parseSimpleSpecificDuty,
+    buildSpecificDutyStatus,
+    fetchSpecificDutyStatus,
     diffAnnexes,
     updateEuUsSpecialProgram
 };
