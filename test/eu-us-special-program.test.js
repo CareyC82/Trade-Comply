@@ -157,3 +157,44 @@ test('resolves synchronized TARIC specific-duty rows by CN code and entry date',
     assert.equal(result.autoSpecificDuty.rate_per_100kg, 12.5);
     assert.equal(result.eligibility.missing.includes('Annex II TARIC specific-duty amount'), false);
 });
+
+test('keeps committed Annex II exact, Annex III quota, and conditional-duty paths distinct', () => {
+    const commonEvidence = {
+        importCountry: 'EU',
+        originCountry: 'US',
+        entryDate: '2026-07-13',
+        originEvidenceConfirmed: true,
+        transportEvidenceConfirmed: true,
+        declarationCodesConfirmed: true,
+        descriptionConfirmed: true
+    };
+
+    const exactAnnexIi = resolveProgramTreatment({
+        programs: dutyRates.special_programs,
+        ...commonEvidence,
+        hsCode: '0806101005'
+    });
+    assert.ok(exactAnnexIi.matches.some((row) => row.annex === 'II'));
+    assert.equal(exactAnnexIi.autoSpecificDuty?.rate_per_100kg, 0);
+    assert.equal(exactAnnexIi.eligibility.status, 'eligible');
+
+    const quotaAnnexIii = resolveProgramTreatment({
+        programs: dutyRates.special_programs,
+        ...commonEvidence,
+        hsCode: '02032219',
+        quotaAvailable: true
+    });
+    assert.ok(quotaAnnexIii.matches.some((row) => row.annex === 'III' && row.orderNumber === '09.9001'));
+    assert.equal(quotaAnnexIii.quotaAlert, 'available');
+    assert.equal(quotaAnnexIii.eligibility.status, 'eligible');
+
+    const conditionalAnnexIi = resolveProgramTreatment({
+        programs: dutyRates.special_programs,
+        ...commonEvidence,
+        hsCode: '07020000'
+    });
+    assert.ok(conditionalAnnexIi.matches.some((row) => row.annex === 'II'));
+    assert.equal(conditionalAnnexIi.autoSpecificDuty, null);
+    assert.equal(conditionalAnnexIi.eligibility.status, 'potentially_eligible');
+    assert.ok(conditionalAnnexIi.eligibility.missing.includes('Annex II TARIC specific-duty amount'));
+});

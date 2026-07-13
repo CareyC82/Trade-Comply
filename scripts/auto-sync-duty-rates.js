@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { updateUsRules } = require('./update-us-duty-rates');
-const { updateEuRules } = require('./update-eu-duty-rates');
+const { updateEuRules, updateEuRulesFromOfficialSource } = require('./update-eu-duty-rates');
 const { updateEuUsSpecialProgram } = require('./update-eu-us-special-program');
 const { updateSingaporeRules } = require('./update-sg-duty-rates');
 const { updateMexicoRules } = require('./update-mx-duty-rates');
@@ -28,7 +28,7 @@ const ROOT = path.join(__dirname, '..');
 const SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const MATERIAL_RATE_CHANGE_THRESHOLD = 0.03;
-const STATIC_OFFICIAL_LIVE_PROBE_COUNTRIES = ['VN', 'MY'];
+const STATIC_OFFICIAL_LIVE_PROBE_COUNTRIES = ['CN', 'VN', 'MY'];
 
 function writeJson(filePath, payload) {
     fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`);
@@ -321,7 +321,7 @@ function appendMultiPrefixConflicts(run) {
 function getSourceRunName(source = {}) {
     const country = String(source.country || '').toUpperCase();
     if (country === 'US') return 'USITC';
-    if (['EU', 'DE', 'NL'].includes(country)) return 'EU TARIC benchmark';
+    if (['EU', 'DE', 'NL'].includes(country)) return 'EU TARIC official-live';
     if (country === 'SG') return 'Singapore Customs benchmark';
     if (country === 'MX') return 'Mexico SNICE benchmark';
     if (country === 'JP') return 'Japan Customs official-live';
@@ -737,6 +737,8 @@ async function runAutoDutyRateSync({
     indiaOfficialFetcher = null,
     staticOfficialFetcher = null,
     skipStaticOfficialProbe = false,
+    euTaricFetcher = null,
+    euTaricBinaryFetcher = null,
     euUsSpecialProgramFetcher = null,
     skipEuUsSpecialProgram = false
 } = {}) {
@@ -783,11 +785,18 @@ async function runAutoDutyRateSync({
         runs.push(specialProgramSummary);
     }
 
-    const euResult = updateEuRules({ dryRun });
-    runs.push(buildRunSummary('EU TARIC benchmark', euResult, {
+    const euResult = dryRun
+        ? updateEuRules({ dryRun: true })
+        : await updateEuRulesFromOfficialSource({
+            dryRun: false,
+            ...(euTaricFetcher ? { fetcher: euTaricFetcher } : {}),
+            ...(euTaricBinaryFetcher ? { binaryFetcher: euTaricBinaryFetcher } : {})
+        });
+    const euSummary = downgradeOfficialTransportFailure(buildRunSummary('EU TARIC official-live', euResult, {
         applied: !dryRun,
-        mode: 'benchmark'
+        mode: euResult.writes_official_machine_rates ? 'official-live' : dryRun ? 'official-dry-run' : 'benchmark-fallback'
     }));
+    runs.push(euSummary);
 
     const sgResult = updateSingaporeRules({ dryRun });
     runs.push(buildRunSummary('Singapore Customs benchmark', sgResult, {

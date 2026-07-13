@@ -8,6 +8,7 @@
  * machine-readable updates such as USITC.
  */
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const https = require('https');
 const { execFileSync } = require('child_process');
@@ -98,6 +99,43 @@ function fetchText(url, { timeoutMs = 25000 } = {}) {
                 resolve({
                     status_code: response.statusCode,
                     body
+                });
+            });
+        });
+        request.setTimeout(timeoutMs, () => {
+            request.destroy(new Error(`Timeout after ${timeoutMs}ms for ${url}`));
+        });
+        request.on('error', reject);
+    });
+}
+
+function fetchBuffer(url, { timeoutMs = 45000, redirects = 5 } = {}) {
+    return new Promise((resolve, reject) => {
+        const request = https.get(url, {
+            headers: {
+                'User-Agent': 'TraceWize duty-rate updater (+https://tracewize.com)'
+            }
+        }, (response) => {
+            if ([301, 302, 303, 307, 308].includes(response.statusCode) && response.headers.location) {
+                response.resume();
+                if (redirects <= 0) {
+                    reject(new Error(`Too many redirects for ${url}`));
+                    return;
+                }
+                const nextUrl = new URL(response.headers.location, url).toString();
+                fetchBuffer(nextUrl, { timeoutMs, redirects: redirects - 1 }).then(resolve, reject);
+                return;
+            }
+            const chunks = [];
+            response.on('data', chunk => chunks.push(Buffer.from(chunk)));
+            response.on('end', () => {
+                if (response.statusCode < 200 || response.statusCode >= 300) {
+                    reject(new Error(`HTTP ${response.statusCode} for ${url}`));
+                    return;
+                }
+                resolve({
+                    status_code: response.statusCode,
+                    body: Buffer.concat(chunks)
                 });
             });
         });
@@ -684,6 +722,64 @@ function updateEuRules({ dryRun = false, taricRows = null, taricWorkbookPath = '
     return payload.last_eu_taric_benchmark_sync;
 }
 
+async function updateEuRulesFromOfficialSource({
+    dryRun = false,
+    fetcher = fetchText,
+    binaryFetcher = fetchBuffer
+} = {}) {
+    const probe = await probeEuTaricFullDatabase({ fetcher });
+    if (!probe.ok || !probe.import_duties_file?.download_url) {
+        const fallback = updateEuRules({ dryRun });
+        return {
+            ...fallback,
+            ok: true,
+            writes_official_machine_rates: false,
+            official_fetch_degraded: true,
+            official_fetch_degraded_reason: 'official_fetch_failed',
+            official_fetch_degraded_detail: probe.error || probe.reason,
+            official_fetch: probe
+        };
+    }
+
+    const tempPath = path.join(os.tmpdir(), `tracewize-taric-${process.pid}-${Date.now()}.xlsx`);
+    try {
+        const response = await binaryFetcher(probe.import_duties_file.download_url);
+        const workbook = Buffer.isBuffer(response) ? response : response?.body;
+        if (!Buffer.isBuffer(workbook) || workbook.length === 0) {
+            throw new Error('Official TARIC workbook download returned no binary content.');
+        }
+        fs.writeFileSync(tempPath, workbook);
+        const result = updateEuRules({ dryRun, taricWorkbookPath: tempPath });
+        return {
+            ...result,
+            official_fetch: {
+                ...probe,
+                downloaded_bytes: workbook.length,
+                machine_parser_ready: true
+            }
+        };
+    } catch (error) {
+        const fallback = updateEuRules({ dryRun });
+        return {
+            ...fallback,
+            ok: true,
+            writes_official_machine_rates: false,
+            official_fetch_degraded: true,
+            official_fetch_degraded_reason: 'official_fetch_failed',
+            official_fetch_degraded_detail: error.message,
+            official_fetch: {
+                ...probe,
+                ok: false,
+                error: error.message
+            }
+        };
+    } finally {
+        if (fs.existsSync(tempPath)) {
+            fs.unlinkSync(tempPath);
+        }
+    }
+}
+
 async function main() {
     const dryRun = process.argv.includes('--dry-run');
     const probeOnly = process.argv.includes('--probe');
@@ -731,5 +827,7 @@ module.exports = {
     probeEuTaricOfficialSource,
     probeEuTaricReadiness,
     updateEuRules,
+    updateEuRulesFromOfficialSource,
+    fetchBuffer,
     applyBenchmarkToRule
 };
