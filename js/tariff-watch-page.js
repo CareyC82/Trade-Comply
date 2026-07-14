@@ -98,7 +98,7 @@
                 <div>
                     <span>Source</span>
                     <strong>${escapeHtml(row.trustLabel || row.confidence)}</strong>
-                    <small>${escapeHtml(row.lastChecked)}</small>
+                    <small>${escapeHtml(row.freshnessLabel || 'Date unavailable')} · ${escapeHtml(row.lastChecked)}</small>
                 </div>
             </article>
         `;
@@ -186,6 +186,7 @@
                     <div><span>Add-on / tax</span><strong>${escapeHtml(row.addOnRate)}</strong></div>
                     <div><span>Total signal</span><strong>${escapeHtml(row.totalRate)}</strong></div>
                     <div><span>Source trust</span><strong>${escapeHtml(row.confidence)}</strong></div>
+                    <div><span>Freshness</span><strong>${escapeHtml(row.freshnessLabel || 'Date unavailable')}</strong></div>
                 </div>
                 <small>${escapeHtml(row.useStatus?.guidance || row.trustDetail || row.sourceText || 'Confirm exact HS, origin, and entry date before filing.')}</small>
             </article>

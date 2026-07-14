@@ -659,6 +659,13 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             parser_gap_task: row.parser_gap_task || null,
             next_upgrade: row.run_plan_action || row.next_action || ''
         }));
+    const degradationCounts = runs
+        .filter(run => run.official_fetch_degraded)
+        .reduce((counts, run) => {
+            const category = run.official_fetch_degraded_category || 'official_fetch_failed';
+            counts[category] = (counts[category] || 0) + 1;
+            return counts;
+        }, {});
     if (health && health.ok === false) {
         exceptions.push({
             source: 'coverage-health',
@@ -680,6 +687,7 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             safe_updates_auto_applied: true,
             manual_review_required: false,
             exception_only_admin_visibility: true,
+            preserve_last_valid_rates_on_degraded_probe: true,
             material_rate_change_threshold: MATERIAL_RATE_CHANGE_THRESHOLD
         },
         counts: {
@@ -691,6 +699,11 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             filing_grade_auto_sources: sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync').length,
             parser_gap_sources: sourceRunPlan.filter(row => row.parser_gap).length,
             degraded_sources: sourceRunPlan.filter(row => row.run_status === 'degraded').length
+        },
+        source_failure_classification: {
+            real_rate_changes: runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0),
+            degraded_probe_counts: degradationCounts,
+            previous_valid_rates_preserved: runs.filter(run => run.official_fetch_degraded).map(run => run.source)
         },
         source_run_plan_summary: {
             stages: stageCounts,

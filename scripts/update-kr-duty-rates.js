@@ -406,8 +406,8 @@ function buildKoreaExactOverrides(checkedAt, hsPrefixes = []) {
     return scopedCandidates.map((code) => ({
         hs_code: code,
         base_rate: 0,
-        source_status: 'official_source_checked',
-        confidence: 'Official source checked',
+        source_status: 'scope_check_required',
+        confidence: 'Pre-check candidate',
         source_note: 'Korea maintained exact-line candidate for covered high-tech electronics. Customs duty is treated as 0%; VAT and origin-preference scope remain separate checks.',
         source_hts: `${code} (KR maintained exact-line candidate)`,
         source_rate_text: 'Korea customs duty candidate: 0.000%',
@@ -425,8 +425,8 @@ function applyKoreaBenchmarkToRule(rule, checkedAt) {
     refreshVatLayer(rule);
 
     const updates = {
-        source_status: 'official_source_checked',
-        confidence: 'Official duty + tax estimate',
+        source_status: 'scope_check_required',
+        confidence: 'Pre-check candidate',
         source_note: KR_BENCHMARK.source_note,
         source_hts: KR_BENCHMARK.source_hts,
         source_rate_text: KR_BENCHMARK.source_rate_text,

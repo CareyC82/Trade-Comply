@@ -1261,8 +1261,8 @@ test('Korea updater keeps exact candidates separate from VAT layer', () => {
     const changes = applyKoreaBenchmarkToRule(rule, '2026-06-10T00:00:00.000Z');
 
     assert.ok(changes.some(change => change.field === 'source_status'));
-    assert.equal(rule.source_status, 'official_source_checked');
-    assert.equal(rule.confidence, 'Official duty + tax estimate');
+    assert.equal(rule.source_status, 'scope_check_required');
+    assert.equal(rule.confidence, 'Pre-check candidate');
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854232'));
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854239'));

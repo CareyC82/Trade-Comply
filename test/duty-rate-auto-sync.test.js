@@ -206,6 +206,26 @@ test('official source transport failures downgrade without blocking daily sync',
     assert.equal(payload.source_run_plan.find(row => row.country === 'US').run_status, 'degraded');
 });
 
+test('sync status preserves last valid rates when an official probe degrades', () => {
+    const failedRun = downgradeOfficialTransportFailure(buildRunSummary('India Customs', {
+        ok: false,
+        changes: [],
+        errors: [{ rule: 'IN-TEST', prefix: '847950', error: 'fetch failed' }]
+    }, {
+        applied: false,
+        mode: 'official-dry-run'
+    }));
+    const payload = buildSyncStatusPayload({
+        runs: [failedRun],
+        health: { ok: true, sample_count: 1, failed_sample_count: 0, failures: [] }
+    });
+
+    assert.equal(payload.policy.preserve_last_valid_rates_on_degraded_probe, true);
+    assert.equal(payload.source_failure_classification.real_rate_changes, 0);
+    assert.equal(payload.source_failure_classification.degraded_probe_counts.network_transport, 1);
+    assert.deepEqual(payload.source_failure_classification.previous_valid_rates_preserved, ['India Customs']);
+});
+
 test('DNS-only official source outages stay non-blocking with endpoint repair guidance', () => {
     const failedRun = buildRunSummary('Japan Customs official-live', {
         ok: false,

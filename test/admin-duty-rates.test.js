@@ -55,10 +55,13 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(Array.isArray(payload.exact_rate_progress.top_backlog_rows), true);
     assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'MX' && row.status === 'exact_ready'));
     assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'JP' && row.status === 'exact_ready'));
-    assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'KR' && row.status === 'exact_ready'));
-    assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'IN' && row.status === 'exact_ready'));
-    assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'MY' && row.status === 'exact_ready'));
-    assert.ok(payload.exact_rate_progress.rows.some(row => row.market === 'TW' && row.status === 'exact_ready'));
+    ['KR', 'IN', 'MY', 'TW'].forEach((market) => {
+        assert.ok(payload.exact_rate_progress.rows.some(row => (
+            row.market === market
+            && row.status === 'hybrid_in_progress'
+            && row.backlog_routes > 0
+        )), `${market} should expose its exact-rate verification backlog`);
+    });
     assert.ok(payload.exact_rate_progress.top_backlog_rows.length > 0);
     assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => Number.isFinite(row.impact_score)));
     assert.ok(payload.exact_rate_progress.top_backlog_rows.every(row => row.why_priority));

@@ -775,8 +775,8 @@ function refreshExactCandidateLayers(rule, country) {
     layers.forEach((layer) => {
         if (/sws|social_welfare/i.test(layer.type || layer.label || '')) {
             layer.rate = 0.1;
-            layer.status = 'official_source_checked';
-            layer.source = layer.source || 'CBIC / ICEGATE maintained SWS treatment; amount is zero when BCD is 0%';
+            layer.status = 'indicative';
+            layer.source = layer.source || 'India pre-check SWS treatment; confirm the official notification and exact HSN before filing';
         }
         if (/igst|integrated/i.test(layer.type || layer.label || '')) {
             layer.rate = 0.18;
@@ -785,8 +785,8 @@ function refreshExactCandidateLayers(rule, country) {
         }
         if (/basic_customs_duty/i.test(layer.type || layer.label || '')) {
             layer.rate = 0;
-            layer.status = 'official_source_checked';
-            layer.source = layer.source || 'ICEGATE/CIP maintained BCD candidate';
+            layer.status = 'scope_check_required';
+            layer.source = layer.source || 'India maintained BCD candidate; exact official tariff row has not been parsed yet';
         }
     });
     rule.additional_rate = layers.reduce((sum, layer) => sum + Number(layer.rate || 0), 0);
@@ -801,8 +801,8 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
     const exactCandidateCountry = Boolean(exactCandidateMeta);
     const officialLinkEstimate = OFFICIAL_LINK_ESTIMATE_COUNTRIES.has(country);
     const updates = {
-        source_status: exactCandidateCountry ? 'official_source_checked' : officialLinkEstimate ? 'official_link_checked' : 'benchmark_source_checked',
-        confidence: exactCandidateCountry ? 'Official duty + tax estimate' : officialLinkEstimate ? 'Official link monitored' : 'Indicative',
+        source_status: exactCandidateCountry ? 'scope_check_required' : officialLinkEstimate ? 'official_link_checked' : 'benchmark_source_checked',
+        confidence: exactCandidateCountry ? 'Pre-check candidate' : officialLinkEstimate ? 'Official link monitored' : 'Indicative',
         source_note: exactCandidateMeta?.source_note || COUNTRY_NOTES[country] || `${country} benchmark refreshed locally. Confirm exact tariff-line treatment before filing.`,
         source_hts: exactCandidateMeta?.source_hts || rule.source_hts,
         source_rate_text: exactCandidateMeta?.source_rate_text || rule.source_rate_text,
@@ -828,8 +828,8 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
         const exactOverrides = scopedCandidates.map((code) => ({
             hs_code: code,
             base_rate: 0,
-            source_status: 'official_source_checked',
-            confidence: 'Official source checked',
+            source_status: 'scope_check_required',
+            confidence: 'Pre-check candidate',
             source_note: exactCandidateMeta.override_note,
             source_hts: `${code} (${exactCandidateMeta.override_hts_label})`,
             source_rate_text: exactCandidateMeta.override_rate_text,

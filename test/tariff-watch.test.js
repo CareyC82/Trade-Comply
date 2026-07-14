@@ -12,7 +12,9 @@ const {
     buildCurrentTariffRows,
     buildMarketCoverageRows,
     buildSpecialProgramRows,
-    classifyTariffUse
+    classifyTariffUse,
+    getRateFreshness,
+    describeRateTrust
 } = require('../lib/tariff-watch');
 
 const rootDir = path.join(__dirname, '..');
@@ -134,6 +136,26 @@ test('tariff watch classifies market rows by practical use', () => {
         confidence: 'pre-check estimate',
         sourceStatus: 'candidate'
     }).bucket, 'source');
+});
+
+test('tariff watch labels unverified exact-code candidates as pre-check only', () => {
+    const trust = describeRateTrust({
+        source_status: 'scope_check_required',
+        confidence: 'Pre-check candidate',
+        hs_code: '847950'
+    }, '2026-07-14T00:00:00.000Z');
+
+    assert.equal(trust.label, 'Pre-check candidate');
+    assert.equal(trust.tone, 'candidate');
+    assert.equal(trust.freshness.label, 'Fresh');
+});
+
+test('tariff watch exposes stale rate evidence instead of presenting it as current', () => {
+    const freshness = getRateFreshness('2026-06-01T00:00:00.000Z', new Date('2026-07-14T00:00:00.000Z'));
+
+    assert.match(freshness.label, /^Stale/);
+    assert.equal(freshness.tone, 'stale');
+    assert.equal(freshness.stale, true);
 });
 
 test('tariff watch expands exact HS overrides in market detail rows', () => {

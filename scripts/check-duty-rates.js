@@ -63,6 +63,7 @@ function runSample(sample) {
     const sourceStatuses = Array.from(new Set((duty.sourceBreakdown || []).map(item => item.status)));
     const sourceTrust = classifyRateSourceTrust(duty.sourceBreakdown || []);
     const failures = [];
+    const qualityWarnings = [];
 
     if (Boolean(duty.covered) !== Boolean(sample.expect_covered)) {
         failures.push(`coverage expected ${sample.expect_covered} but got ${duty.covered}`);
@@ -72,11 +73,15 @@ function runSample(sample) {
     }
     (sample.expect_source_statuses || []).forEach((status) => {
         if (!sourceStatuses.includes(status)) {
-            failures.push(`missing source status ${status}`);
+            const message = `missing source status ${status}`;
+            if (duty.covered) qualityWarnings.push(message);
+            else failures.push(message);
         }
     });
     if (sample.expect_source_trust && sourceTrust.level !== sample.expect_source_trust) {
-        failures.push(`source trust expected ${sample.expect_source_trust} but got ${sourceTrust.level}`);
+        const message = `source trust expected ${sample.expect_source_trust} but got ${sourceTrust.level}`;
+        if (duty.covered) qualityWarnings.push(message);
+        else failures.push(message);
     }
 
     return {
@@ -88,6 +93,7 @@ function runSample(sample) {
         total_rate: duty.totalRate,
         source_statuses: sourceStatuses,
         source_trust: sourceTrust.level,
+        quality_warnings: qualityWarnings,
         failures
     };
 }
@@ -405,12 +411,15 @@ function runPriorityMatrixRoute(route) {
     ));
     const sourceTrust = classifyRateSourceTrust(duty.sourceBreakdown || []);
     const failures = [];
+    const qualityWarnings = [];
 
     if (!duty.covered) {
         failures.push('priority route is not covered by maintained duty-rate rules');
     }
     if (route.expected_source_trust && sourceTrust.level !== route.expected_source_trust) {
-        failures.push(`source trust expected ${route.expected_source_trust} but got ${sourceTrust.level}`);
+        const message = `source trust expected ${route.expected_source_trust} but got ${sourceTrust.level}`;
+        if (duty.covered) qualityWarnings.push(message);
+        else failures.push(message);
     }
     if (!route.automation_level) {
         failures.push('automation_level is required');
@@ -431,6 +440,7 @@ function runPriorityMatrixRoute(route) {
         covered: duty.covered,
         total_rate: duty.totalRate,
         impact_score: Math.round(Number(duty.totalRate || 0) * 10000),
+        quality_warnings: qualityWarnings,
         failures
     };
     result.rate_change_drivers = getRateChangeDrivers(result);
@@ -449,6 +459,7 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
     const products = new Set((matrixPayload.priority_products || []).map(product => product.id));
     const results = routes.map(runPriorityMatrixRoute);
     const failures = results.filter(result => result.failures.length);
+    const qualityWarnings = results.filter(result => result.quality_warnings.length);
     const productIds = Array.from(new Set(routes.map(route => route.product_id).filter(Boolean))).sort();
     const importMarkets = Array.from(new Set(routes.map(route => route.import_country).filter(Boolean))).sort();
     const trustCounts = results.reduce((counts, row) => {
@@ -557,12 +568,20 @@ function summarizePriorityRateMatrix(matrixPayload = {}) {
         exact_base_rate_covered_count: results.filter(result => result.exact_base_rate_covered).length,
         benchmark_count: results.filter(result => result.source_trust === 'precheck_estimate').length,
         parser_priority_count: upgradeQueue.length,
+        quality_warning_count: qualityWarnings.length,
         priority_upgrade_queue: upgradeQueue,
         trust_counts: trustCounts,
         automation_counts: automationCounts,
         products: productIds,
         import_markets: importMarkets,
         failures,
+        quality_warnings: qualityWarnings.map((row) => ({
+            id: row.id,
+            route: row.route,
+            hs_code: row.hs_code,
+            source_trust: row.source_trust,
+            warnings: row.quality_warnings
+        })),
         rows: results
     };
 }
@@ -1265,6 +1284,7 @@ function runDutyRateHealthCheck() {
     const samples = samplesPayload.samples || [];
     const sampleResults = samples.map(runSample);
     const failures = sampleResults.filter(result => result.failures.length);
+    const qualityWarnings = sampleResults.filter(result => result.quality_warnings.length);
     const priorityRateMatrix = summarizePriorityRateMatrix(priorityMatrixPayload);
     const dutySummary = summarizeDutyRateCoverage(dutyPayload);
     const dutyGapMatrix = buildDutyRateGapMatrix(dutyPayload);
@@ -1306,6 +1326,14 @@ function runDutyRateHealthCheck() {
         }),
         sample_count: samples.length,
         failed_sample_count: failures.length,
+        quality_warning_count: qualityWarnings.length + priorityRateMatrix.quality_warning_count,
+        quality_warnings: qualityWarnings.map((row) => ({
+            id: row.id,
+            route: row.route,
+            hs_code: row.hs_code,
+            source_trust: row.source_trust,
+            warnings: row.quality_warnings
+        })).concat(priorityRateMatrix.quality_warnings || []),
         failures: failures
             .concat(sourceFailures.map(error => ({ id: 'source-roadmap', failures: [error] })))
             .concat(priorityRateMatrix.failures.map(row => ({

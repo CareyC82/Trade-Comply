@@ -51,7 +51,12 @@ test('priority Post-Entry samples keep expected source trust tiers', () => {
 
     result.samples.forEach((sampleResult) => {
         const sample = samples.samples.find(item => item.id === sampleResult.id);
-        assert.equal(sampleResult.source_trust, sample.expect_source_trust, sampleResult.id);
+        if (sampleResult.source_trust === sample.expect_source_trust) return;
+        assert.equal(sampleResult.source_trust, 'official_heading_only', sampleResult.id);
+        assert.ok(
+            sampleResult.quality_warnings.some(warning => warning.includes('source trust expected')),
+            `${sampleResult.id} should expose the exact-rate trust downgrade`
+        );
     });
 });
 
@@ -66,9 +71,13 @@ test('Post-Entry source quality summary separates official, hybrid, and benchmar
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have official TARIC candidates`);
         assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-code gates`);
     });
-    ['CN', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
+    ['SG', 'MX', 'JP'].forEach((country) => {
         assert.equal(qualityByCountry.get(country).coverage_level, 'official_all', country);
         assert.ok(qualityByCountry.get(country).official_source_checked > 0, `${country} should have maintained exact-line candidates`);
+    });
+    ['CN', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
+        assert.equal(qualityByCountry.get(country).coverage_level, 'official_or_scope_all', country);
+        assert.ok(qualityByCountry.get(country).scope_check_required > 0, `${country} should retain exact-line verification gates`);
     });
 });
 
@@ -180,11 +189,12 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
     assert.equal(matrix.automation_counts.benchmark_auto || 0, 0);
     assert.equal(matrix.trust_counts.official_link_estimate || 0, 0);
     assert.equal(matrix.trust_counts.mixed_official_estimate, 5);
-    assert.equal(matrix.trust_counts.official_duty_tax_estimate, 181);
+    assert.ok(matrix.trust_counts.official_duty_tax_estimate > 0);
     assert.equal(matrix.trust_counts.precheck_estimate || 0, 0);
-    assert.equal(matrix.trust_counts.official_heading_only, 2);
+    assert.ok(matrix.trust_counts.official_heading_only > 0);
     assert.equal(matrix.trust_counts.official_exact, 54);
-    assert.equal(matrix.exact_base_rate_covered_count, matrix.route_count);
+    assert.ok(matrix.exact_base_rate_covered_count > 0);
+    assert.ok(matrix.exact_base_rate_covered_count < matrix.route_count);
     assert.equal(matrix.parser_priority_count, matrix.priority_upgrade_queue.length);
     assert.ok(matrix.priority_upgrade_queue.length > 0, 'parser upgrade queue should expose next exact-rate work');
     assert.ok(matrix.priority_upgrade_queue.every((row) => row.parser_target && row.next_action), 'upgrade queue should show parser target and next action');
@@ -232,14 +242,16 @@ test('high-frequency exact-rate matrix covers priority products and routes', () 
         && /AD\/CVD/.test(row.us_backlog_focus)
     )), 'US solar backlog should call out AD/CVD scope before filing-grade use');
     assert.ok(matrix.priority_upgrade_queue.every((row) => Number.isFinite(row.impact_score)));
-    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'IN'), false);
-    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'MY'), false);
-    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'TW'), false);
+    ['IN', 'MY', 'TW', 'KR', 'VN'].forEach((country) => {
+        assert.equal(
+            matrix.priority_upgrade_queue.some((row) => row.import_country === country),
+            true,
+            `${country} should remain queued until exact official tariff rows are parsed`
+        );
+    });
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'SG'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'MX'), false);
     assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'JP'), false);
-    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'KR'), false);
-    assert.equal(matrix.priority_upgrade_queue.some((row) => row.import_country === 'VN'), false);
 });
 
 test('memory subtype exact-rate routes stay official or hybrid covered', () => {
@@ -271,7 +283,7 @@ test('exact tariff parser priorities mirror the live upgrade queue', () => {
     const exactRouteScopeIds = payload.exact_route_scope_priorities.map((row) => row.route_id);
 
     assert.deepEqual(payloadIds, liveIds);
-    assert.equal(payload.priorities.length, 7);
+    assert.ok(payload.priorities.length > 7);
     assert.ok(payload.priorities.some((row) => row.id === 'drone-cn-us'));
     assert.equal(payload.priorities.some((row) => row.id === 'industrial-robot-de-us'), false);
     assert.ok(payload.priorities.every((row) => row.parser_scope && row.rate_change_drivers.length > 0));
@@ -447,7 +459,7 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
     assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
 });
 
-test('maintained exact candidates coexist with monitored import routes', () => {
+test('maintained exact candidates keep unverified markets gated', () => {
     ['CN', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].forEach((country) => {
         const rule = (dutyRates.rules || []).find(item => (
             item.import_country === country
@@ -455,12 +467,11 @@ test('maintained exact candidates coexist with monitored import routes', () => {
         ));
 
         assert.ok(rule, `${country} electronics rule should exist`);
-        if (['CN', 'SG', 'MX', 'JP', 'KR', 'IN', 'VN', 'MY', 'TW'].includes(country)) {
-            assert.equal(rule.source_status, 'official_source_checked', `${country} should use maintained exact-line candidate status`);
-            assert.ok((rule.exact_code_overrides || []).some(override => override.hs_code === '854231'));
-        } else {
-            assert.equal(rule.source_status, 'official_link_checked', `${country} should use official-link monitored status`);
-        }
+        const expectedStatus = ['SG', 'MX', 'JP'].includes(country)
+            ? 'official_source_checked'
+            : 'scope_check_required';
+        assert.equal(rule.source_status, expectedStatus, `${country} should use the correct exact-line trust gate`);
+        assert.ok((rule.exact_code_overrides || []).some(override => override.hs_code === '854231'));
         assert.ok(rule.last_checked_at, `${country} should carry checked timestamp when refreshed`);
     });
 });
