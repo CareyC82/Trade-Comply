@@ -199,8 +199,8 @@ test('duty-rate health check reports source roadmap status', () => {
     assert.deepEqual(result.source_roadmap_summary.missing_roadmap, []);
 });
 
-test('static exact candidates include memory and medical HS lines for automated refresh', () => {
-    ['854231', '854232', '854239', '901890'].forEach((hsCode) => {
+test('static exact candidates include maintained high-tech product HS lines for automated refresh', () => {
+    ['847950', '852580', '852589', '854231', '854232', '854239', '901890', '902750', '950450'].forEach((hsCode) => {
         assert.ok(
             STATIC_EXACT_CODE_CANDIDATES.includes(hsCode),
             `${hsCode} should remain in the maintained static exact-code candidate list`
@@ -684,6 +684,52 @@ test('Korea official lookup JSON rows are parsed into guarded candidates', async
     assert.equal(official.ok, true);
     assert.equal(official.query_attempts.length, 1);
     assert.equal(official.query_attempts[0].row_count, 1);
+});
+
+test('Korea official lookup HTML rows are parsed into guarded candidates', async () => {
+    const official = await fetchKoreaOfficialRows({
+        fetcher: async (url) => ({
+            status_code: 200,
+            body: url.includes('CustomsTariffView.do')
+                ? '<table><tr><th>HS Code</th><th>Description</th><th>Rate</th></tr><tr><td>9027500000</td><td>Laboratory analyzers</td><td>0%</td></tr></table>'
+                : '<h1>KCS Tariff D/B(Inquiry)</h1>'
+        }),
+        queryHsCodes: ['9027500000']
+    });
+
+    assert.equal(official.ok, true);
+    assert.equal(official.rows.length, 1);
+    assert.equal(official.rows[0].hs_code, '9027500000');
+    assert.equal(official.query_attempts[0].row_count, 1);
+});
+
+test('exact candidate updaters scope overrides to each rule product family', () => {
+    const staticRule = {
+        id: 'TEST-CN-GAMING',
+        import_country: 'CN',
+        hs_prefixes: ['950450'],
+        base_rate: 0,
+        additional_rate: 0,
+        add_on_layers: [],
+        source_status: 'indicative'
+    };
+    applyStaticBenchmarkToRule(staticRule, {
+        source: { official_url: 'https://www.customs.gov.cn/' },
+        checkedAt: '2026-07-14T00:00:00.000Z'
+    });
+    assert.deepEqual(staticRule.exact_code_overrides.map(row => row.hs_code), ['950450']);
+
+    const koreaRule = {
+        id: 'TEST-KR-LAB',
+        import_country: 'KR',
+        hs_prefixes: ['9027'],
+        base_rate: 0,
+        additional_rate: 0,
+        add_on_layers: [],
+        source_status: 'indicative'
+    };
+    applyKoreaBenchmarkToRule(koreaRule, '2026-07-14T00:00:00.000Z');
+    assert.deepEqual(koreaRule.exact_code_overrides.map(row => row.hs_code), ['902750']);
 });
 
 test('Korea official-live updater records exact HS query attempts', async () => {

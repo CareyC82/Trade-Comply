@@ -34,16 +34,21 @@ const OFFICIAL_LINK_ESTIMATE_COUNTRIES = new Set(['RU']);
 const STATIC_EXACT_CODE_CANDIDATES = [
     '847150',
     '847130',
+    '847950',
     '850440',
     '850760',
     '851713',
     '851762',
+    '852580',
+    '852589',
     '852852',
     '854143',
     '854231',
     '854232',
     '854239',
-    '901890'
+    '901890',
+    '902750',
+    '950450'
 ];
 const EXACT_CANDIDATE_COUNTRY_META = {
     CN: {
@@ -814,7 +819,13 @@ function applyStaticBenchmarkToRule(rule, { source, checkedAt }) {
 
     if (exactCandidateCountry) {
         refreshExactCandidateLayers(rule, country);
-        const exactOverrides = STATIC_EXACT_CODE_CANDIDATES.map((code) => ({
+        const prefixes = Array.isArray(rule.hs_prefixes)
+            ? rule.hs_prefixes.map(prefix => String(prefix || '').replace(/\D/g, '')).filter(Boolean)
+            : [];
+        const scopedCandidates = prefixes.length
+            ? STATIC_EXACT_CODE_CANDIDATES.filter(code => prefixes.some(prefix => code.startsWith(prefix) || prefix.startsWith(code)))
+            : STATIC_EXACT_CODE_CANDIDATES;
+        const exactOverrides = scopedCandidates.map((code) => ({
             hs_code: code,
             base_rate: 0,
             source_status: 'official_source_checked',

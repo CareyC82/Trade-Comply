@@ -27,16 +27,21 @@ const KR_BENCHMARK = {
 const KR_EXACT_CODE_CANDIDATES = [
     '847150',
     '847130',
+    '847950',
     '850440',
     '850760',
     '851713',
     '851762',
+    '852580',
+    '852589',
     '852852',
     '854143',
     '854231',
     '854232',
     '854239',
-    '901890'
+    '901890',
+    '902750',
+    '950450'
 ];
 
 function readJson(filePath) {
@@ -222,7 +227,13 @@ async function fetchKoreaOfficialRows({
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `customsSeachType=Y&hsCode=${encodeURIComponent(hsCode)}`
                 });
-                const lookupRows = parseKoreaOfficialJsonRows(lookup.body || '');
+                const lookupRows = [
+                    ...parseKoreaOfficialJsonRows(lookup.body || ''),
+                    ...parseKoreaTariffRateRows(lookup.body || '')
+                ].filter((row, index, allRows) => index === allRows.findIndex(candidate => (
+                    candidate.hs_code === row.hs_code
+                    && candidate.parsed_base_rate === row.parsed_base_rate
+                )));
                 queryAttempts.push({
                     hs_code: hsCode,
                     status_code: lookup.status_code,
@@ -385,8 +396,14 @@ function refreshVatLayer(rule) {
     rule.additional_rate = layers.reduce((sum, layer) => sum + Number(layer.rate || 0), 0);
 }
 
-function buildKoreaExactOverrides(checkedAt) {
-    return KR_EXACT_CODE_CANDIDATES.map((code) => ({
+function buildKoreaExactOverrides(checkedAt, hsPrefixes = []) {
+    const prefixes = Array.isArray(hsPrefixes)
+        ? hsPrefixes.map(prefix => String(prefix || '').replace(/\D/g, '')).filter(Boolean)
+        : [];
+    const scopedCandidates = prefixes.length
+        ? KR_EXACT_CODE_CANDIDATES.filter(code => prefixes.some(prefix => code.startsWith(prefix) || prefix.startsWith(code)))
+        : KR_EXACT_CODE_CANDIDATES;
+    return scopedCandidates.map((code) => ({
         hs_code: code,
         base_rate: 0,
         source_status: 'official_source_checked',
@@ -422,7 +439,7 @@ function applyKoreaBenchmarkToRule(rule, checkedAt) {
             rule[field] = value;
         }
     });
-    const exactOverrides = buildKoreaExactOverrides(checkedAt);
+    const exactOverrides = buildKoreaExactOverrides(checkedAt, rule.hs_prefixes);
     if (JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
         changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
         rule.exact_code_overrides = exactOverrides;
