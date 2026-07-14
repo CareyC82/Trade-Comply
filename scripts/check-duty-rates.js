@@ -803,6 +803,7 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
         benchmark_source_checked: 1,
         official_link_checked: 2,
         scope_check_required: 3,
+        official_source_checked: 3,
         indicative: 4
     };
     const countryRank = {
@@ -823,7 +824,22 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
     };
 
     return rules
-        .filter((rule) => rule.source_status && rule.source_status !== 'official_source_checked')
+        .filter((rule) => {
+            if (!rule.source_status) return false;
+            if (rule.source_status !== 'official_source_checked') return true;
+
+            const exactOverrides = Array.isArray(rule.exact_code_overrides) ? rule.exact_code_overrides : [];
+            const scopeText = [rule.source_note, rule.trade_remedy]
+                .filter(Boolean)
+                .join(' ');
+            const explicitlyNeedsExactCode = /(?:verify|confirm|require)[^.]{0,100}\bexact\b[^.]{0,80}\b(?:code|hs|hts|taric|tariff(?:-line)?|subheading)\b/i.test(scopeText)
+                || /\bexact\b[^.]{0,80}\b(?:code|hs|hts|taric|tariff(?:-line)?|subheading)\b[^.]{0,80}\brequired\b/i.test(scopeText);
+
+            // An official source can support the heading-level rate while the
+            // filing-grade tariff line remains unresolved. Keep that separate
+            // scope gap visible until exact-code mappings are attached.
+            return exactOverrides.length === 0 && explicitlyNeedsExactCode;
+        })
         .map((rule) => {
             const importCountry = String(rule.import_country || '').toUpperCase();
             const originCountry = String(rule.origin_country || '*').toUpperCase();
@@ -841,6 +857,9 @@ function buildRuleScopeBacklog(dutyPayload = {}) {
             }
             if (sourceStatus === 'benchmark_source_checked') {
                 drivers.push('Only benchmark coverage exists; exact official parser/source mapping is not attached.');
+            }
+            if (sourceStatus === 'official_source_checked') {
+                drivers.push('Official heading-level evidence exists, but no exact-code mapping is attached yet.');
             }
             if (hasOverrides) {
                 drivers.push('Some exact-code overrides already exist; remaining product scopes still need parser coverage.');

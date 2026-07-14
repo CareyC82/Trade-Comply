@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const {
     PRIORITY_HS_PREFIXES,
+    buildRuleScopeBacklog,
     runDutyRateHealthCheck
 } = require('../scripts/check-duty-rates');
 const {
@@ -324,6 +325,35 @@ test('rule scope backlog avoids broad keyword false positives', () => {
     assert.ok(euCamera);
     assert.equal(euCamera.scope_components.includes('camera_transmission_scope'), true);
     assert.equal(euCamera.scope_components.includes('technology_end_use_scope'), false);
+});
+
+test('official heading evidence stays queued until exact tariff codes are mapped', () => {
+    const rows = buildRuleScopeBacklog({
+        rules: [
+            {
+                id: 'EU-OFFICIAL-HEADING-WITHOUT-EXACT-CODE',
+                import_country: 'EU',
+                origin_country: '*',
+                hs_prefixes: ['8525'],
+                source_status: 'official_source_checked',
+                source_note: 'Official heading checked. Verify exact 10-digit TARIC code before filing.',
+                base_rate: 0,
+                additional_rate: 0.19
+            },
+            {
+                id: 'EU-OFFICIAL-HEADING-WITH-EXACT-CODE',
+                import_country: 'EU',
+                origin_country: '*',
+                hs_prefixes: ['8525'],
+                source_status: 'official_source_checked',
+                source_note: 'Official heading checked. Verify exact 10-digit TARIC code before filing.',
+                exact_code_overrides: [{ hs_code: '8525890000', base_rate: 0 }]
+            }
+        ]
+    });
+
+    assert.equal(rows.some((row) => row.rule_id === 'EU-OFFICIAL-HEADING-WITHOUT-EXACT-CODE'), true);
+    assert.equal(rows.some((row) => row.rule_id === 'EU-OFFICIAL-HEADING-WITH-EXACT-CODE'), false);
 });
 
 test('daily duty-rate sync refreshes exact tariff parser priorities', () => {
