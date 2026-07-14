@@ -1,9 +1,9 @@
 /**
  * Single application entry — loads modules in order, then boots the active page.
- * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity|tariff-watch"></script>
+ * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity|tariff-watch|trade-flow"></script>
  */
 (function () {
-    const BUILD = '20260713-eu-us-taric-automation';
+    const BUILD = '20260714-trade-flow-signals';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -23,6 +23,9 @@
         }
         if (/\/tariff-watch\.html/i.test(path)) {
             return 'tariff-watch';
+        }
+        if (/\/trade-flow\.html/i.test(path)) {
+            return 'trade-flow';
         }
         if (/\/electronics\.html/i.test(path)
             || /\/new-energy\.html/i.test(path)
@@ -149,6 +152,15 @@
         'js/tariff-watch-page.js'
     ];
 
+    const TRADE_FLOW_MODULES = [
+        'js/app-state.js',
+        'js/dom-mount.js',
+        'js/core.js',
+        'lib/country-registry.js',
+        'lib/trade-flow.js',
+        'js/trade-flow-page.js'
+    ];
+
     function withVersion(src) {
         return `${src}?v=${BUILD}`;
     }
@@ -221,6 +233,8 @@
                 modules = OPPORTUNITY_MODULES;
             } else if (app === 'tariff-watch') {
                 modules = TARIFF_WATCH_MODULES;
+            } else if (app === 'trade-flow') {
+                modules = TRADE_FLOW_MODULES;
             } else if (app === 'category') {
                 modules = CATEGORY_MODULES;
             }
@@ -258,6 +272,12 @@
                 if (app === 'tariff-watch') {
                     if (typeof bootstrapTariffWatchPage === 'function') {
                         bootstrapTariffWatchPage();
+                    }
+                    return;
+                }
+                if (app === 'trade-flow') {
+                    if (typeof bootstrapTradeFlowPage === 'function') {
+                        bootstrapTradeFlowPage();
                     }
                     return;
                 }

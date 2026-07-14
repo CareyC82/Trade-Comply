@@ -1,0 +1,49 @@
+name: Monthly Trade Flow Sync
+
+on:
+  schedule:
+    - cron: "32 18 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monthly-trade-flow-sync
+  cancel-in-progress: false
+
+jobs:
+  sync-trade-flow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Sync official monthly trade flow
+        env:
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+        run: npm run sync:trade-flow
+
+      - name: Verify trade-flow output
+        run: node --test test/trade-flow.test.js test/trade-flow-sync.test.js
+
+      - name: Commit official trade-flow snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
+          git add data/trade-flow.json
+          if git diff --staged --quiet; then
+            echo "No trade-flow changes."
+            exit 0
+          fi
+          git commit -m "auto-data: monthly official trade flow [auto-publish]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
+          git push

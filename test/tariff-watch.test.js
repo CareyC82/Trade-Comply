@@ -273,7 +273,7 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
 
     assert.match(readFile('index.html'), /tariff-watch-alert-container/);
     assert.match(readFile('js/render-results.js'), /mountTariffWatchAlert/);
-    assert.match(readFile('js/main.js'), /data-app="index\|hscode\|category\|post-entry\|opportunity\|tariff-watch"/);
+    assert.match(readFile('js/main.js'), /data-app="index\|hscode\|category\|post-entry\|opportunity\|tariff-watch\|trade-flow"/);
     assert.match(readFile('js/tariff-watch-page.js'), /Coverage by market/);
     assert.match(readFile('js/tariff-watch-page.js'), /tariff-watch\.html\?market=/);
     assert.match(readFile('js/tariff-watch-page.js'), /Back to market coverage/);

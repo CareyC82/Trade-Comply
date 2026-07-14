@@ -51,6 +51,8 @@
     "sync:duty-rates:auto:dry-run": "node --use-system-ca scripts/auto-sync-duty-rates.js --dry-run",
     "check:duty-rates": "node scripts/check-duty-rates.js",
     "check:route-coverage": "node scripts/check-route-coverage-matrix.js",
+    "sync:trade-flow": "node --use-system-ca scripts/update-trade-flow.js",
+    "sync:trade-flow:dry-run": "node --use-system-ca scripts/update-trade-flow.js --dry-run",
     "check:post-entry-tax": "node scripts/check-post-entry-tax-coverage.js",
     "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js",
     "pipeline:global": "python3 pipeline/pipeline.py",

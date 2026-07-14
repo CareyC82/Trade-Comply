@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Flow & Demand Signals | TraceWize</title>
+    <link rel="stylesheet" href="css/style.css?v=20260714-trade-flow">
+</head>
+<body class="trade-flow-page-body">
+    <main class="trade-flow-page view-container active">
+        <header class="trade-flow-header">
+            <div class="home-header trade-flow-home-header">
+                <h1 class="home-title trade-flow-page-title">📊 Trade Flow & Demand Signals</h1>
+                <p class="home-subtitle">Track monthly import and export value by high-tech industry and market.</p>
+            </div>
+        </header>
+
+        <div class="disclaimer-bar trade-flow-disclaimer">
+            <span>Official statistical signal, not a sales forecast. Compare value trends first; use quantity only when units are consistent.</span>
+        </div>
+
+        <form id="trade-flow-form" class="trade-flow-form">
+            <label><span>Market</span><select id="trade-flow-market" required></select></label>
+            <label><span>Industry</span><select id="trade-flow-industry" required></select></label>
+            <label><span>Partner</span><select id="trade-flow-partner"></select></label>
+            <button type="submit">View monthly flow</button>
+        </form>
+
+        <div id="trade-flow-result" class="trade-flow-result" aria-live="polite"></div>
+    </main>
+
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code</a>
+        <a class="nav-btn nav-btn-link" href="post-entry.html">🧾 Post-Entry</a>
+        <a class="nav-btn nav-btn-link" href="opportunity.html">🌐 Opportunity</a>
+        <a class="nav-btn nav-btn-link" href="tariff-watch.html">📈 Tariff Watch</a>
+        <span class="nav-btn active" aria-current="page">📊 Trade Flow</span>
+    </nav>
+
+    <script src="js/main.js?v=20260714-trade-flow" data-app="trade-flow"></script>
+</body>
+</html>
