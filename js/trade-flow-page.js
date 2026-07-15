@@ -77,10 +77,12 @@
                 <div class="trade-flow-panel__head"><h2>13-month value trend</h2><div><span class="trade-flow-legend trade-flow-legend--import">Imports</span><span class="trade-flow-legend trade-flow-legend--export">Exports</span></div></div>
                 ${renderChart(model.series)}
             </section>
-            <section class="trade-flow-panel">
-                <h2>Top partner signals</h2>
-                ${model.partners.length ? `<div class="trade-flow-partners">${model.partners.map((row) => `<article><strong>${escapeHtml(row.label)}</strong><span>Imports ${escapeHtml(API.formatCurrency(row.imports))}</span><span>Exports ${escapeHtml(API.formatCurrency(row.exports))}</span></article>`).join('')}</div>` : '<p class="trade-flow-note">Partner-level rows have not been synchronized for this selection.</p>'}
-            </section>
+            ${model.partners.length ? `
+                <section class="trade-flow-panel">
+                    <h2>Top partner signals</h2>
+                    <div class="trade-flow-partners">${model.partners.map((row) => `<article><strong>${escapeHtml(row.label)}</strong><span>Imports ${escapeHtml(API.formatCurrency(row.imports))}</span><span>Exports ${escapeHtml(API.formatCurrency(row.exports))}</span></article>`).join('')}</div>
+                </section>
+            ` : ''}
         `;
     }
 
@@ -92,12 +94,16 @@
     function refreshPartnerOptions(market, industry, partner) {
         if (!partner || !payload) return;
         const selected = partner.value;
-        const partnerCodes = [...new Set((payload.series || [])
-            .filter((row) => row.status === 'official' && row.market === market.value && row.industry_id === industry.value && row.partner && row.partner !== 'WORLD')
-            .map((row) => row.partner))];
-        const rows = partnerCodes.map((code) => ({ value: code, label: API.MARKET_LABELS[code] || code }));
+        const rows = API.availablePartners(payload, market.value, industry.value);
+        const partnerCodes = rows.map((row) => row.value);
+        const field = document.getElementById('trade-flow-partner-field');
+        const form = document.getElementById('trade-flow-form');
         fillSelect(partner, rows, 'All partners');
         if (partnerCodes.includes(selected)) partner.value = selected;
+        const hasPartnerRows = rows.length > 0;
+        partner.disabled = !hasPartnerRows;
+        if (field) field.hidden = !hasPartnerRows;
+        form?.classList.toggle('trade-flow-form--aggregate', !hasPartnerRows);
     }
 
     async function bootstrapTradeFlowPage() {

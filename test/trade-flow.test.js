@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { aggregateSeries, buildTradeFlowModel, percentChange, sourceStatus } = require('../lib/trade-flow');
+const { aggregateSeries, availablePartners, buildTradeFlowModel, percentChange, sourceStatus } = require('../lib/trade-flow');
 
 const ROOT = path.join(__dirname, '..');
 const readFile = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -93,6 +93,26 @@ test('partner filtering never adds WORLD totals to a selected bilateral partner'
     }, { market: 'US', industry: 'memory', partner: 'CN' });
     assert.equal(model.imports, 125);
     assert.equal(model.exports, 30);
+});
+
+test('partner choices only expose synchronized bilateral official rows', () => {
+    const rows = availablePartners({
+        series: [
+            { market: 'US', partner: 'WORLD', industry_id: 'memory', status: 'official' },
+            { market: 'US', partner: 'CN', industry_id: 'memory', status: 'official' },
+            { market: 'US', partner: 'JP', industry_id: 'memory', status: 'estimate' },
+            { market: 'US', partner: 'DE', industry_id: 'computing', status: 'official' }
+        ]
+    }, 'US', 'memory');
+    assert.deepEqual(rows, [{ value: 'CN', label: 'China' }]);
+});
+
+test('aggregate-only data does not create a misleading partner choice', () => {
+    const rows = availablePartners({
+        series: [{ market: 'CN', partner: 'WORLD', industry_id: 'memory', status: 'official' }]
+    }, 'CN', 'memory');
+    assert.deepEqual(rows, []);
+    assert.match(readFile('trade-flow.html'), /trade-flow-partner-field" hidden/);
 });
 
 test('all-partner view prefers official WORLD totals over bilateral row sums', () => {

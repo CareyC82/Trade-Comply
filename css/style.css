@@ -7312,9 +7312,17 @@ button.feedback-link:hover {
     box-shadow: var(--shadow-card);
 }
 
+.trade-flow-form--aggregate {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+}
+
 .trade-flow-form label {
     display: grid;
     gap: 8px;
+}
+
+.trade-flow-form label[hidden] {
+    display: none;
 }
 
 .trade-flow-form label > span {
