@@ -206,6 +206,7 @@ async function syncCensus(payload, { apiKey = process.env.CENSUS_API_KEY, fetchI
     const incoming = [];
     try {
         for (const industry of INDUSTRIES) {
+            if (!industry.hs.length) continue;
             const hsCode = industry.hs[0].slice(0, 4);
             for (const flow of ['import', 'export']) {
                 const url = buildCensusUrl({ flow, hsCode, apiKey, range });

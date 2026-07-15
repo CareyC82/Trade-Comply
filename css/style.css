@@ -7414,9 +7414,24 @@ button.feedback-link:hover {
 }
 
 .trade-flow-source--current { background: #e6f6ec; color: #18733a; }
+.trade-flow-source--delayed,
+.trade-flow-source--historical { background: #fff1dc; color: #8a5700; }
 .trade-flow-source--degraded { background: #fff1dc; color: #8a5700; }
 .trade-flow-source--pending { background: #edf2f7; color: #526777; }
 .trade-flow-source--missing { background: #fdecec; color: #a22828; }
+
+.trade-flow-source-state {
+    display: grid;
+    justify-items: end;
+    gap: 8px;
+    max-width: 390px;
+    text-align: right;
+}
+
+.trade-flow-source-state small {
+    color: #66717c;
+    line-height: 1.4;
+}
 
 .trade-flow-metrics {
     display: grid;
@@ -7506,6 +7521,10 @@ button.feedback-link:hover {
 
 .trade-flow-chart__bar--import { background: #1f4f82; }
 .trade-flow-chart__bar--export { background: #0f766e; }
+.trade-flow-chart__bar--missing {
+    height: 3px;
+    background: repeating-linear-gradient(90deg, #cbd5e1 0 5px, transparent 5px 9px);
+}
 .trade-flow-chart__month small { color: var(--color-text-secondary); text-align: center; }
 
 .trade-flow-partners {

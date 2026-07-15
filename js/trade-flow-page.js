@@ -16,14 +16,18 @@
     }
 
     function renderChart(series) {
-        const max = Math.max(1, ...series.flatMap((row) => [row.imports, row.exports]));
+        const values = series.flatMap((row) => [
+            row.importsAvailable ? row.imports : null,
+            row.exportsAvailable ? row.exports : null
+        ]).filter(Number.isFinite);
+        const max = Math.max(1, ...values);
         return `
             <div class="trade-flow-chart" role="img" aria-label="Monthly import and export trade value trend">
                 ${series.map((row) => `
                     <div class="trade-flow-chart__month">
                         <div class="trade-flow-chart__bars">
-                            <span class="trade-flow-chart__bar trade-flow-chart__bar--import" style="height:${Math.max(3, (row.imports / max) * 100)}%" title="Imports ${escapeHtml(API.formatCurrency(row.imports))}"></span>
-                            <span class="trade-flow-chart__bar trade-flow-chart__bar--export" style="height:${Math.max(3, (row.exports / max) * 100)}%" title="Exports ${escapeHtml(API.formatCurrency(row.exports))}"></span>
+                            ${row.importsAvailable ? `<span class="trade-flow-chart__bar trade-flow-chart__bar--import" style="height:${Math.max(3, (row.imports / max) * 100)}%" title="Imports ${escapeHtml(API.formatCurrency(row.imports))}"></span>` : '<span class="trade-flow-chart__bar trade-flow-chart__bar--missing" title="Imports not published in this source"></span>'}
+                            ${row.exportsAvailable ? `<span class="trade-flow-chart__bar trade-flow-chart__bar--export" style="height:${Math.max(3, (row.exports / max) * 100)}%" title="Exports ${escapeHtml(API.formatCurrency(row.exports))}"></span>` : '<span class="trade-flow-chart__bar trade-flow-chart__bar--missing" title="Exports not published in this source"></span>'}
                         </div>
                         <small>${escapeHtml(row.month.slice(5))}</small>
                     </div>
@@ -45,7 +49,7 @@
                     <span class="trade-flow-source trade-flow-source--${escapeHtml(model.source.tone)}">${escapeHtml(model.source.label)}</span>
                     <h2>No synchronized monthly series yet</h2>
                     <p>${escapeHtml(model.source.detail)}</p>
-                    <small>${escapeHtml(model.marketLabel)} · ${escapeHtml(model.industryLabel)} · HS ${escapeHtml(model.hsScope.join(', '))}</small>
+                    <small>${escapeHtml(model.marketLabel)} · ${escapeHtml(model.industryLabel)} · industry-level monthly signal</small>
                 </section>
             `;
             return;
@@ -55,14 +59,19 @@
                 <div>
                     <span class="trade-flow-kicker">Latest official month · ${escapeHtml(model.latestMonth)}</span>
                     <h2>${escapeHtml(model.industryLabel)} in ${escapeHtml(model.marketLabel)}</h2>
-                    <p>Trade value is the primary comparable signal. Quantity is excluded when official units differ across HS lines.</p>
+                    <p>${model.aggregationLevel === 'industry'
+                        ? `Official industry summary: ${escapeHtml(model.scopeLabel)}. This is not an exact-HS series.`
+                        : 'Official maintained category signal. Trade value is the primary comparable measure.'}</p>
                 </div>
-                <span class="trade-flow-source trade-flow-source--${escapeHtml(model.source.tone)}">${escapeHtml(model.source.label)}</span>
+                <div class="trade-flow-source-state">
+                    <span class="trade-flow-source trade-flow-source--${escapeHtml(model.source.tone)}">${escapeHtml(model.source.label)}</span>
+                    <small>${escapeHtml(model.source.detail)}</small>
+                </div>
             </section>
             <section class="trade-flow-metrics">
-                <article><span>Monthly imports</span><strong>${escapeHtml(API.formatCurrency(model.imports))}</strong><small>MoM ${escapeHtml(formatChange(model.importMoM))} · YoY ${escapeHtml(formatChange(model.importYoY))}</small></article>
-                <article><span>Monthly exports</span><strong>${escapeHtml(API.formatCurrency(model.exports))}</strong><small>MoM ${escapeHtml(formatChange(model.exportMoM))} · YoY ${escapeHtml(formatChange(model.exportYoY))}</small></article>
-                <article><span>Trade balance</span><strong>${escapeHtml(API.formatCurrency(model.balance))}</strong><small>${Number.isFinite(model.importShare) ? `${model.importShare.toFixed(1)}% import share` : 'Share unavailable'}</small></article>
+                <article><span>Monthly imports</span><strong>${model.importsAvailable ? escapeHtml(API.formatCurrency(model.imports)) : 'Not published'}</strong><small>${model.importsAvailable ? `MoM ${escapeHtml(formatChange(model.importMoM))} · YoY ${escapeHtml(formatChange(model.importYoY))}` : 'Not available in this industry bulletin'}</small></article>
+                <article><span>Monthly exports</span><strong>${model.exportsAvailable ? escapeHtml(API.formatCurrency(model.exports)) : 'Not published'}</strong><small>${model.exportsAvailable ? `MoM ${escapeHtml(formatChange(model.exportMoM))} · YoY ${escapeHtml(formatChange(model.exportYoY))}` : 'Not available in this industry bulletin'}</small></article>
+                <article><span>Trade balance</span><strong>${Number.isFinite(model.balance) ? escapeHtml(API.formatCurrency(model.balance)) : 'Not comparable'}</strong><small>${Number.isFinite(model.importShare) ? `${model.importShare.toFixed(1)}% import share` : 'Both directions are required'}</small></article>
             </section>
             <section class="trade-flow-panel">
                 <div class="trade-flow-panel__head"><h2>13-month value trend</h2><div><span class="trade-flow-legend trade-flow-legend--import">Imports</span><span class="trade-flow-legend trade-flow-legend--export">Exports</span></div></div>
@@ -97,9 +106,19 @@
         const partner = document.getElementById('trade-flow-partner');
         const form = document.getElementById('trade-flow-form');
         try {
-            const response = await fetch(`data/trade-flow.json?v=${global.TradeComplyBuild || Date.now()}`, { cache: 'no-store' });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            payload = await response.json();
+            const version = global.TradeComplyBuild || Date.now();
+            const [baseResponse, industryResponse] = await Promise.all([
+                fetch(`data/trade-flow.json?v=${version}`, { cache: 'no-store' }),
+                fetch(`data/china-industry-flow.json?v=${version}`, { cache: 'no-store' })
+            ]);
+            if (!baseResponse.ok) throw new Error(`HTTP ${baseResponse.status}`);
+            const basePayload = await baseResponse.json();
+            const industryPayload = industryResponse.ok ? await industryResponse.json() : { sources: [], series: [] };
+            payload = {
+                ...basePayload,
+                sources: [...(basePayload.sources || []), ...(industryPayload.sources || [])],
+                series: [...(basePayload.series || []), ...(industryPayload.series || [])]
+            };
         } catch (error) {
             payload = { sources: [], series: [] };
         }
