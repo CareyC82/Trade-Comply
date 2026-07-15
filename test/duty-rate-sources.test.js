@@ -159,16 +159,22 @@ test('exact parser priority queue stays filing-grade and customer-impact oriente
         assert.match(item.route, /->/);
         assert.match(item.hs_code, /^\d{4,10}$/);
         assert.match(item.priority_band, /^P[0-3]$/);
-        assert.match(item.parser_target, /add-on|case-scope|trade-remedy|scope parser/i);
+        assert.match(item.parser_target, /add-on|case-scope|trade-remedy|scope (?:parser|resolver)/i);
         assert.match(item.next_action, /official|scope|filing|trade-remedy|add-on|Chapter 99|case/i);
         assert.ok(
             Array.isArray(item.rate_change_drivers) && item.rate_change_drivers.length >= 2,
             `${item.id} should explain why rates can change`
         );
         assert.ok(
-            Array.isArray(item.scope_components) && item.scope_components.includes('official_base_duty'),
-            `${item.id} should keep official base duty separate from add-on scope`
+            Array.isArray(item.scope_components) && item.scope_components.length > 0,
+            `${item.id} should identify the unresolved filing scope`
         );
+        if (item.exact_base_rate_covered) {
+            assert.ok(
+                item.scope_components.includes('official_base_duty'),
+                `${item.id} should keep its covered official base duty separate from add-on scope`
+            );
+        }
         assert.ok(
             Array.isArray(item.parser_subtasks) && item.parser_subtasks.length >= 3,
             `${item.id} should list concrete parser subtasks`

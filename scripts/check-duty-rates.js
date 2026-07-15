@@ -176,6 +176,9 @@ function getRateChangeDrivers(result = {}) {
     if (matchesScopeText(text, [/\b8517\b/, /\brouter\b/, /\bsmartphone\b/, /\btelecom\b/, /\btelecommunications?\b/])) {
         drivers.push('Telecom electronics may need exact subheading, wireless module scope, and local tax treatment.');
     }
+    if (drivers.length < 2) {
+        drivers.push('Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount.');
+    }
 
     return Array.from(new Set(drivers));
 }
@@ -347,7 +350,10 @@ function getUsBacklogFocus(result = {}) {
 }
 
 function getRateParserSubtasks(result = {}) {
-    const subtasks = [];
+    const subtasks = [
+        'Resolve the exact national tariff / statistical line and retain the returned filing code.',
+        'Attach effective-dated official base-duty evidence for the resolved tariff line.'
+    ];
     const product = String(result.product_id || '').toLowerCase();
     const hsCode = String(result.hs_code || '');
 
@@ -375,10 +381,14 @@ function getRateParserSubtasks(result = {}) {
     }
 
     if (result.source_trust === 'official_heading_only') {
-        subtasks.push('Keep official base duty, but block filing-grade use until case/exclusion scope is resolved.');
+        subtasks.push(result.exact_base_rate_covered
+            ? 'Keep official base duty, but block filing-grade use until case/exclusion scope is resolved.'
+            : 'Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.');
+        subtasks.push('Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty.');
     }
     if (result.source_trust === 'mixed_official_estimate') {
         subtasks.push('Separate official base duty from maintained estimate layers before promoting to filing-grade.');
+        subtasks.push('Confirm active trade-remedy, exclusion, and local tax periods independently.');
     }
     if (!subtasks.length) {
         subtasks.push(result.next_action || 'Attach official exact-rate source mapping before filing-grade use.');

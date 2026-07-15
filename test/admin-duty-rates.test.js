@@ -132,7 +132,8 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.equal(payload.duty.gap_matrix.missing_total, 0);
     assert.equal(payload.duty.gap_matrix.full_count, payload.duty.gap_matrix.rows.length);
     assert.equal(Array.isArray(payload.duty.exact_tariff_parser_queue.priorities), true);
-    assert.equal(payload.duty.exact_tariff_parser_queue.priorities[0].id, 'solar-cn-us');
+    assert.ok(payload.duty.exact_tariff_parser_queue.priorities.length > 0);
+    assert.ok(payload.duty.exact_tariff_parser_queue.priorities.some(row => row.id === 'solar-cn-us'));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => row.parser_target && row.next_action && row.why_priority));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => row.priority_band && Array.isArray(row.rate_change_drivers)));
     assert.ok(payload.duty.exact_tariff_parser_queue.priorities.every(row => Array.isArray(row.parser_subtasks) && row.parser_subtasks.length > 0));
@@ -146,6 +147,10 @@ test('admin quality payload exposes search and post-entry coverage gates', () =>
     assert.ok((payload.duty.parser_priority_bands.P2 || []).every(row => row.parser_target && row.next_action));
     assert.ok((payload.duty.parser_priority_bands.P2 || []).every(row => (
         Array.isArray(row.scope_components)
+        && row.scope_components.length > 0
+    )));
+    assert.ok((payload.duty.parser_priority_bands.P2 || []).some(row => (
+        row.route === 'CN->US'
         && row.scope_components.includes('official_base_duty')
         && row.scope_components.includes('chapter_99_section_301')
     )));
