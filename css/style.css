@@ -7441,6 +7441,44 @@ button.feedback-link:hover {
     line-height: 1.4;
 }
 
+.trade-flow-basis {
+    color: var(--color-primary);
+    font-size: 0.82rem;
+}
+
+.trade-flow-evidence {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.trade-flow-evidence__item {
+    display: grid;
+    gap: 7px;
+    padding: 18px;
+    border: 1px solid var(--color-border);
+    border-left: 5px solid #0f766e;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.trade-flow-evidence__item--partial,
+.trade-flow-evidence__item--historical_fallback,
+.trade-flow-evidence__item--primary_missing {
+    border-left-color: #c27a10;
+    background: #fffaf1;
+}
+
+.trade-flow-evidence__item span {
+    color: var(--color-text-secondary);
+    font-size: 0.74rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.trade-flow-evidence__item strong { color: var(--color-primary); }
+.trade-flow-evidence__item small { color: var(--color-text-secondary); line-height: 1.45; }
+
 .trade-flow-metrics {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -7557,6 +7595,7 @@ button.feedback-link:hover {
 @media (max-width: 820px) {
     .trade-flow-form { grid-template-columns: 1fr; }
     .trade-flow-metrics { grid-template-columns: 1fr; }
+    .trade-flow-evidence { grid-template-columns: 1fr; }
     .trade-flow-partners { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .trade-flow-summary { flex-direction: column; }
 }

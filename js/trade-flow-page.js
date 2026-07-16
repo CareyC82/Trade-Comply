@@ -64,9 +64,29 @@
                         : 'Official maintained category signal. Trade value is the primary comparable measure.'}</p>
                 </div>
                 <div class="trade-flow-source-state">
+                    <strong class="trade-flow-basis">${escapeHtml(model.sourceBasis.label)}</strong>
                     <span class="trade-flow-source trade-flow-source--${escapeHtml(model.source.tone)}">${escapeHtml(model.source.label)}</span>
                     <small>${escapeHtml(model.source.detail)}</small>
                 </div>
+            </section>
+            <section class="trade-flow-evidence">
+                <article class="trade-flow-evidence__item trade-flow-evidence__item--${escapeHtml(model.coverage.status)}">
+                    <span>Publication coverage</span>
+                    <strong>${escapeHtml(model.coverage.label)}</strong>
+                    <small>${escapeHtml(model.coverage.detail)}</small>
+                </article>
+                <article class="trade-flow-evidence__item trade-flow-evidence__item--${escapeHtml(model.sourceBasis.role)}">
+                    <span>Source policy</span>
+                    <strong>${escapeHtml(model.sourceBasis.label)}</strong>
+                    <small>${escapeHtml(model.sourceBasis.detail)}</small>
+                </article>
+                ${model.crossCheck ? `
+                    <article class="trade-flow-evidence__item trade-flow-evidence__item--${escapeHtml(model.crossCheck.status)}">
+                        <span>Cross-validation</span>
+                        <strong>${escapeHtml(model.crossCheck.label)}</strong>
+                        <small>${escapeHtml(model.crossCheck.detail)}</small>
+                    </article>
+                ` : ''}
             </section>
             <section class="trade-flow-metrics">
                 <article><span>Monthly imports</span><strong>${model.importsAvailable ? escapeHtml(API.formatCurrency(model.imports)) : 'Not published'}</strong><small>${model.importsAvailable ? `MoM ${escapeHtml(formatChange(model.importMoM))} · YoY ${escapeHtml(formatChange(model.importYoY))}` : 'Not available in this industry bulletin'}</small></article>

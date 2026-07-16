@@ -3,7 +3,7 @@
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity|tariff-watch|trade-flow"></script>
  */
 (function () {
-    const BUILD = '20260714-trade-flow-signals';
+    const BUILD = '20260716-china-source-priority';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();

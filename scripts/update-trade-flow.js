@@ -219,6 +219,11 @@ async function syncCensus(payload, { apiKey = process.env.CENSUS_API_KEY, fetchI
         payload.updated_at = new Date().toISOString();
         if (source) {
             source.status = 'official_current';
+            source.role = 'official_aggregator';
+            source.market_roles = {
+                CN: 'historical_fallback_and_cross_validation',
+                default: 'primary_official_aggregator'
+            };
             source.last_success_at = payload.updated_at;
             delete source.last_error;
         }

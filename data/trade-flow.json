@@ -22,6 +22,11 @@
         "RU"
       ],
       "status": "official_current",
+      "role": "official_aggregator",
+      "market_roles": {
+        "CN": "historical_fallback_and_cross_validation",
+        "default": "primary_official_aggregator"
+      },
       "frequency": "monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "note": "Official monthly merchandise-trade values reported by participating markets and published by the United Nations Statistics Division.",
