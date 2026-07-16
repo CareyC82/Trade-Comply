@@ -7,11 +7,19 @@
       "name": "China Customs major import and export industries",
       "markets": ["CN"],
       "status": "official_current",
+      "role": "primary_market_source",
+      "priority": 100,
+      "covered_industries": ["semiconductor_ai", "computing", "telecom", "healthcare_lab"],
+      "fallback_source_id": "un-comtrade-monthly",
       "frequency": "monthly",
       "aggregation_level": "industry",
       "latest_period": "2026-02",
-      "source_url": "https://english.customs.gov.cn/Statistics/Statistics",
-      "note": "Official GACC major-commodity monthly values. Industry summaries are shown without presenting them as exact HS tariff lines."
+      "synchronized_through": "2026-02",
+      "official_platform_latest_period": "2026-05",
+      "connector_status": "update_required",
+      "source_url": "http://stats.customs.gov.cn/",
+      "backup_source_url": "https://english.customs.gov.cn/Statistics/Statistics",
+      "note": "Primary China-market source. The China Customs online query platform exposes data through 2026-05, while the maintained TraceWize industry summary is synchronized through 2026-02. English GACC tables and UN Comtrade are validation fallbacks, not substitutes for the current China source."
     }
   ],
   "series": [

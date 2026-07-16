@@ -48,6 +48,54 @@ test('China selection prefers current official industry summaries over historica
     assert.equal(model.scopeLabel, 'Integrated circuits');
 });
 
+test('China uses UN Comtrade only as an explicitly labeled historical fallback', () => {
+    const model = buildTradeFlowModel({
+        updated_at: '2026-07-16T00:00:00Z',
+        sources: [
+            { id: 'china-customs-major-industries', markets: ['CN'], status: 'official_current' },
+            { id: 'un-comtrade-monthly', markets: ['CN'], status: 'official_current' }
+        ],
+        series: [
+            { market: 'CN', partner: 'WORLD', industry_id: 'memory', month: '2024-12', imports_value_usd: 100, exports_value_usd: 80, source_id: 'un-comtrade-monthly', status: 'official' }
+        ]
+    }, { market: 'CN', industry: 'memory', referenceDate: '2026-07-16T00:00:00Z' });
+    assert.equal(model.sourceBasis.role, 'historical_fallback');
+    assert.equal(model.sourceBasis.label, 'Historical fallback · UN Comtrade');
+    assert.equal(model.source.label, 'Official historical data');
+    assert.equal(model.crossCheck.status, 'primary_missing');
+});
+
+test('China Customs industry data is not summed with UN exact-HS history', () => {
+    const model = buildTradeFlowModel({
+        updated_at: '2026-07-16T00:00:00Z',
+        sources: [
+            { id: 'china-customs-major-industries', markets: ['CN'], status: 'official_current' },
+            { id: 'un-comtrade-monthly', markets: ['CN'], status: 'official_current' }
+        ],
+        series: [
+            { market: 'CN', partner: 'WORLD', industry_id: 'semiconductor_ai', month: '2026-02', imports_value_usd: null, imports_available: false, exports_value_usd: 20, exports_available: true, aggregation_level: 'industry', source_id: 'china-customs-major-industries', status: 'official' },
+            { market: 'CN', partner: 'WORLD', industry_id: 'semiconductor_ai', month: '2026-02', imports_value_usd: 1000, exports_value_usd: 2000, source_id: 'un-comtrade-monthly', status: 'official' }
+        ]
+    }, { market: 'CN', industry: 'semiconductor_ai', referenceDate: '2026-07-16T00:00:00Z' });
+    assert.equal(model.exports, 20);
+    assert.equal(model.importsAvailable, false);
+    assert.equal(model.sourceBasis.role, 'primary');
+    assert.equal(model.crossCheck.status, 'separate');
+});
+
+test('partial China publication reports the missing direction and last complete month', () => {
+    const model = buildTradeFlowModel({
+        sources: [{ id: 'china-customs-major-industries', markets: ['CN'], status: 'official_current' }],
+        series: [
+            { market: 'CN', partner: 'WORLD', industry_id: 'computing', month: '2025-12', imports_value_usd: 10, exports_value_usd: 20, aggregation_level: 'industry', source_id: 'china-customs-major-industries', status: 'official' },
+            { market: 'CN', partner: 'WORLD', industry_id: 'computing', month: '2026-02', imports_value_usd: null, imports_available: false, exports_value_usd: 30, exports_available: true, aggregation_level: 'industry', source_id: 'china-customs-major-industries', status: 'official' }
+        ]
+    }, { market: 'CN', industry: 'computing' });
+    assert.deepEqual(model.coverage.missingDirections, ['imports']);
+    assert.equal(model.coverage.completeMonth, '2025-12');
+    assert.match(model.coverage.label, /missing imports/);
+});
+
 test('buildTradeFlowModel only uses official rows for the selected market and industry', () => {
     const model = buildTradeFlowModel({
         sources: [{ markets: ['US'], status: 'official_current' }],
@@ -139,6 +187,20 @@ test('sourceStatus distinguishes an active connector from returned exact-HS data
     const status = sourceStatus({ sources: [{ markets: ['CN'], status: 'official_current' }] }, 'CN', false);
     assert.equal(status.label, 'Official connector active');
     assert.match(status.detail, /no monthly rows/i);
+});
+
+test('China Customs platform freshness is separated from TraceWize synchronization freshness', () => {
+    const status = sourceStatus({ sources: [] }, 'CN', true, {
+        latestMonth: '2026-02',
+        sources: [{
+            status: 'official_current',
+            synchronized_through: '2026-02',
+            official_platform_latest_period: '2026-05'
+        }]
+    });
+    assert.equal(status.label, 'TraceWize sync delayed');
+    assert.match(status.detail, /available through 2026-05/);
+    assert.match(status.detail, /synchronized through 2026-02/);
 });
 
 test('trade flow is exposed as a dedicated page and primary workflow link', () => {

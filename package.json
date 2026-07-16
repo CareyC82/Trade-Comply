@@ -53,6 +53,7 @@
     "check:route-coverage": "node scripts/check-route-coverage-matrix.js",
     "sync:trade-flow": "node --use-system-ca scripts/update-trade-flow.js",
     "sync:trade-flow:dry-run": "node --use-system-ca scripts/update-trade-flow.js --dry-run",
+    "import:trade-flow:cn": "node scripts/import-china-customs-flow.js",
     "check:post-entry-tax": "node scripts/check-post-entry-tax-coverage.js",
     "policy:track": "bash scripts/with-node.sh node scripts/run-policy-tracker.js",
     "pipeline:global": "python3 pipeline/pipeline.py",
