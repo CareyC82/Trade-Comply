@@ -1177,7 +1177,37 @@
             `;
         }
 
-        function renderAutomationLaunchStatus(status = {}) {
+        function renderChinaCustomsConnectorStatus(status = null) {
+            if (!status) return '';
+            const supported = Array.isArray(status.supported_industries) ? status.supported_industries : [];
+            const covered = Array.isArray(status.covered_industries) ? status.covered_industries : [];
+            const state = status.connector_status || 'unknown';
+            const stateLabel = {
+                current: 'Current',
+                update_required: 'Sync delayed',
+                source_action_required: 'Connector setup required',
+                failed_last_attempt: 'Last attempt failed'
+            }[state] || state;
+            const stateClass = state === 'current' ? 'auto_updatable' : state === 'failed_last_attempt' ? 'benchmark' : 'official_link_monitor';
+            return `
+                <div class="quality-banner">
+                    <div class="crawl-section-title">
+                        <h3>China Customs industry-flow connector</h3>
+                        <span class="badge ${escapeHtml(stateClass)}">${escapeHtml(stateLabel)}</span>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-card"><strong>${escapeHtml(status.official_platform_latest_period || '—')}</strong><span>Official platform month</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(status.synchronized_through || '—')}</strong><span>TraceWize synchronized</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(`${covered.length}/${supported.length}`)}</strong><span>Industry coverage</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(status.rows_received ?? '—')}</strong><span>Rows in last successful feed</span></div>
+                    </div>
+                    <p class="meta" style="margin:10px 0 0">${escapeHtml(status.reason || 'No connector detail available.')}</p>
+                    ${status.error ? `<div class="empty">Last error: ${escapeHtml(status.error)}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function renderAutomationLaunchStatus(status = {}, chinaCustomsStatus = null) {
             const summary = status.summary || {};
             const healthBoard = status.duty_rate_health_board || {};
             const euProgram = status.eu_us_special_program_health || {};
@@ -1307,6 +1337,7 @@
                 </div>
             ` : '';
             return `
+                ${renderChinaCustomsConnectorStatus(chinaCustomsStatus)}
                 <div class="quality-banner">
                     <h3>Automation Launch Board</h3>
                     <p class="desc">已上线可公开展示的自动化能力；Hybrid / Monitor 不会被包装成完整 filing-grade 自动税率。</p>
@@ -2087,7 +2118,10 @@
             if (!dutyRateStatus) return;
             dutyRateStatus.innerHTML = '<p class="meta">正在加载税率源状态…</p>';
             try {
-                const data = await apiFetch('/api/review/duty-rates');
+                const [data, chinaCustomsStatus] = await Promise.all([
+                    apiFetch('/api/review/duty-rates'),
+                    fetchStaticJson('data/china-customs-sync-status.json').catch(() => null)
+                ]);
                 const summary = data.duty_rate_summary || {};
                 const roadmap = data.source_roadmap_summary || {};
                 const statusCounts = roadmap.status_counts || {};
@@ -2100,7 +2134,7 @@
                 const businessSummary = data.business_summary || {};
                 const automationLaunchStatus = data.automation_launch_status || {};
                 dutyRateStatus.innerHTML = `
-                    ${renderAutomationLaunchStatus(automationLaunchStatus)}
+                    ${renderAutomationLaunchStatus(automationLaunchStatus, chinaCustomsStatus)}
                     ${renderDutyBusinessSummary(businessSummary)}
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">

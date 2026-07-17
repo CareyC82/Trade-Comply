@@ -48,7 +48,37 @@ test('China selection prefers current official industry summaries over historica
     assert.equal(model.scopeLabel, 'Integrated circuits');
 });
 
-test('China uses UN Comtrade only as an explicitly labeled historical fallback', () => {
+test('China memory uses a clearly labeled current China Customs category proxy before UN history', () => {
+    const model = buildTradeFlowModel({
+        updated_at: '2026-07-16T00:00:00Z',
+        sources: [
+            {
+                id: 'china-customs-major-industries',
+                markets: ['CN'],
+                status: 'official_current',
+                synchronized_through: '2026-02',
+                official_platform_latest_period: '2026-05',
+                category_proxies: { memory: 'semiconductor_ai' }
+            },
+            { id: 'un-comtrade-monthly', markets: ['CN'], status: 'official_current' }
+        ],
+        series: [
+            { market: 'CN', partner: 'WORLD', industry_id: 'semiconductor_ai', month: '2026-02', imports_value_usd: null, imports_available: false, exports_value_usd: 200, exports_available: true, aggregation_level: 'industry', scope_label: 'Integrated circuits', source_id: 'china-customs-major-industries', status: 'official' },
+            { market: 'CN', partner: 'WORLD', industry_id: 'memory', month: '2024-12', imports_value_usd: 100, exports_value_usd: 80, source_id: 'un-comtrade-monthly', status: 'official' }
+        ]
+    }, { market: 'CN', industry: 'memory', referenceDate: '2026-07-16T00:00:00Z' });
+    assert.equal(model.latestMonth, '2026-02');
+    assert.equal(model.exports, 200);
+    assert.equal(model.importsAvailable, false);
+    assert.equal(model.sourceBasis.role, 'primary_category_proxy');
+    assert.equal(model.sourceBasis.label, 'Broader category · China Customs');
+    assert.match(model.sourceBasis.detail, /not an exact Memory series/i);
+    assert.match(model.scopeLabel, /broader than Memory components/i);
+    assert.equal(model.source.label, 'TraceWize sync delayed');
+    assert.equal(model.crossCheck.status, 'separate');
+});
+
+test('China uses UN Comtrade as historical fallback when no category proxy is configured', () => {
     const model = buildTradeFlowModel({
         updated_at: '2026-07-16T00:00:00Z',
         sources: [
@@ -56,12 +86,11 @@ test('China uses UN Comtrade only as an explicitly labeled historical fallback',
             { id: 'un-comtrade-monthly', markets: ['CN'], status: 'official_current' }
         ],
         series: [
-            { market: 'CN', partner: 'WORLD', industry_id: 'memory', month: '2024-12', imports_value_usd: 100, exports_value_usd: 80, source_id: 'un-comtrade-monthly', status: 'official' }
+            { market: 'CN', partner: 'WORLD', industry_id: 'gaming', month: '2024-12', imports_value_usd: 100, exports_value_usd: 80, source_id: 'un-comtrade-monthly', status: 'official' }
         ]
-    }, { market: 'CN', industry: 'memory', referenceDate: '2026-07-16T00:00:00Z' });
+    }, { market: 'CN', industry: 'gaming', referenceDate: '2026-07-16T00:00:00Z' });
     assert.equal(model.sourceBasis.role, 'historical_fallback');
     assert.equal(model.sourceBasis.label, 'Historical fallback · UN Comtrade');
-    assert.equal(model.source.label, 'Official historical data');
     assert.equal(model.crossCheck.status, 'primary_missing');
 });
 

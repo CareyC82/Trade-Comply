@@ -31,15 +31,31 @@ jobs:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
         run: npm run sync:trade-flow
 
+      - name: Sync China Customs industry flow
+        id: china_customs_sync
+        continue-on-error: true
+        env:
+          CHINA_CUSTOMS_FLOW_URL: ${{ secrets.CHINA_CUSTOMS_FLOW_URL }}
+          CHINA_CUSTOMS_LATEST_PERIOD: ${{ vars.CHINA_CUSTOMS_LATEST_PERIOD }}
+        run: npm run sync:trade-flow:cn
+
       - name: Verify trade-flow output
-        run: node --test test/trade-flow.test.js test/trade-flow-sync.test.js
+        run: node --test test/trade-flow.test.js test/trade-flow-sync.test.js test/china-customs-flow.test.js
+
+      - name: Upload China Customs connector status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: china-customs-connector-status
+          path: data/china-customs-sync-status.json
+          retention-days: 30
 
       - name: Commit official trade-flow snapshot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
-          git add data/trade-flow.json
+          git add data/trade-flow.json data/china-industry-flow.json data/china-customs-sync-status.json
           if git diff --staged --quiet; then
             echo "No trade-flow changes."
             exit 0
@@ -47,3 +63,9 @@ jobs:
           git commit -m "auto-data: monthly official trade flow [auto-publish]"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
           git push
+
+      - name: Enforce configured China Customs connector health
+        if: steps.china_customs_sync.outcome == 'failure'
+        run: |
+          echo "The configured China Customs connector failed. Last-good data was preserved; inspect the uploaded status artifact."
+          exit 1

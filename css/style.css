@@ -7360,6 +7360,64 @@ button.feedback-link:hover {
     gap: 18px;
 }
 
+.trade-flow-connector {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(420px, 1fr);
+    gap: 20px;
+    padding: 20px 24px;
+    border: 1px solid #f0c97a;
+    border-left: 6px solid #c27a10;
+    border-radius: 8px;
+    background: #fffaf1;
+}
+
+.trade-flow-connector--current {
+    border-color: #9bd8bb;
+    border-left-color: #18733a;
+    background: #f1fbf5;
+}
+
+.trade-flow-connector > div {
+    display: grid;
+    gap: 6px;
+}
+
+.trade-flow-connector span,
+.trade-flow-connector dt {
+    color: var(--color-text-secondary);
+    font-size: 0.74rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.trade-flow-connector strong,
+.trade-flow-connector dd {
+    color: var(--color-primary);
+}
+
+.trade-flow-connector small {
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+}
+
+.trade-flow-connector dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+}
+
+.trade-flow-connector dl div {
+    display: grid;
+    gap: 5px;
+    padding: 12px;
+    border: 1px solid rgba(31, 79, 130, 0.13);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.trade-flow-connector dd { margin: 0; font-weight: 800; }
+
 .trade-flow-empty,
 .trade-flow-summary,
 .trade-flow-panel {
@@ -7598,6 +7656,8 @@ button.feedback-link:hover {
     .trade-flow-evidence { grid-template-columns: 1fr; }
     .trade-flow-partners { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .trade-flow-summary { flex-direction: column; }
+    .trade-flow-connector { grid-template-columns: 1fr; }
+    .trade-flow-connector dl { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 720px) {

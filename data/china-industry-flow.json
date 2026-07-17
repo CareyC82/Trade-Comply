@@ -9,7 +9,22 @@
       "status": "official_current",
       "role": "primary_market_source",
       "priority": 100,
+      "supported_industries": [
+        "semiconductor_ai",
+        "memory",
+        "computing",
+        "telecom",
+        "battery_energy",
+        "solar",
+        "industrial_automation",
+        "healthcare_lab",
+        "gaming"
+      ],
       "covered_industries": ["semiconductor_ai", "computing", "telecom", "healthcare_lab"],
+      "category_proxies": {
+        "memory": "semiconductor_ai"
+      },
+      "category_proxy_note": "Memory components use the broader integrated-circuit and semiconductor-device industry summary until a dedicated China Customs memory category is synchronized.",
       "fallback_source_id": "un-comtrade-monthly",
       "frequency": "monthly",
       "aggregation_level": "industry",

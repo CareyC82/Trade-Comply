@@ -3,6 +3,7 @@
 (function (global) {
     const API = global.TraceWizeTradeFlow;
     let payload = null;
+    let chinaConnectorStatus = null;
 
     function escapeHtml(value) {
         return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -54,7 +55,22 @@
             `;
             return;
         }
+        const connectorPanel = model.market === 'CN' && chinaConnectorStatus ? `
+            <section class="trade-flow-connector trade-flow-connector--${escapeHtml(chinaConnectorStatus.connector_status || 'unknown')}">
+                <div>
+                    <span>China Customs connector</span>
+                    <strong>${escapeHtml(chinaConnectorStatus.ok ? 'Last sync completed' : 'Last-good data retained')}</strong>
+                    <small>${escapeHtml(chinaConnectorStatus.reason || 'Connector status is available for review.')}</small>
+                </div>
+                <dl>
+                    <div><dt>Official platform</dt><dd>${escapeHtml(chinaConnectorStatus.official_platform_latest_period || 'Not declared')}</dd></div>
+                    <div><dt>TraceWize synchronized</dt><dd>${escapeHtml(chinaConnectorStatus.synchronized_through || 'Not synchronized')}</dd></div>
+                    <div><dt>Industry coverage</dt><dd>${escapeHtml((chinaConnectorStatus.covered_industries || []).length)}/${escapeHtml((chinaConnectorStatus.supported_industries || []).length)}</dd></div>
+                </dl>
+            </section>
+        ` : '';
         root.innerHTML = `
+            ${connectorPanel}
             <section class="trade-flow-summary">
                 <div>
                     <span class="trade-flow-kicker">Latest official month · ${escapeHtml(model.latestMonth)}</span>
@@ -133,13 +149,15 @@
         const form = document.getElementById('trade-flow-form');
         try {
             const version = global.TradeComplyBuild || Date.now();
-            const [baseResponse, industryResponse] = await Promise.all([
+            const [baseResponse, industryResponse, connectorResponse] = await Promise.all([
                 fetch(`data/trade-flow.json?v=${version}`, { cache: 'no-store' }),
-                fetch(`data/china-industry-flow.json?v=${version}`, { cache: 'no-store' })
+                fetch(`data/china-industry-flow.json?v=${version}`, { cache: 'no-store' }),
+                fetch(`data/china-customs-sync-status.json?v=${version}`, { cache: 'no-store' })
             ]);
             if (!baseResponse.ok) throw new Error(`HTTP ${baseResponse.status}`);
             const basePayload = await baseResponse.json();
             const industryPayload = industryResponse.ok ? await industryResponse.json() : { sources: [], series: [] };
+            chinaConnectorStatus = connectorResponse.ok ? await connectorResponse.json() : null;
             payload = {
                 ...basePayload,
                 sources: [...(basePayload.sources || []), ...(industryPayload.sources || [])],
@@ -147,6 +165,7 @@
             };
         } catch (error) {
             payload = { sources: [], series: [] };
+            chinaConnectorStatus = null;
         }
         const routeOptions = global.TradeComplyCountryRegistry?.getRouteOptions?.() || [];
         fillSelect(market, routeOptions.filter((row) => row.value !== 'GLOBAL' && row.value !== 'ASEAN'), 'Select market');

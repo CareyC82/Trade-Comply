@@ -143,7 +143,7 @@ test('tariff watch labels unverified exact-code candidates as pre-check only', (
         source_status: 'scope_check_required',
         confidence: 'Pre-check candidate',
         hs_code: '847950'
-    }, '2026-07-14T00:00:00.000Z');
+    }, '2026-07-14T00:00:00.000Z', new Date('2026-07-15T00:00:00.000Z'));
 
     assert.equal(trust.label, 'Pre-check candidate');
     assert.equal(trust.tone, 'candidate');
