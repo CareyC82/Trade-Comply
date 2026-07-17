@@ -13,6 +13,10 @@ on:
         description: "Latest month visible on the official platform (YYYY-MM)"
         required: false
         type: string
+      china_customs_manifest:
+        description: "Optional repository path to a China Customs batch export manifest"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -46,6 +50,7 @@ jobs:
         continue-on-error: true
         env:
           CHINA_CUSTOMS_FLOW_URL: ${{ inputs.china_customs_export_url || secrets.CHINA_CUSTOMS_FLOW_URL }}
+          CHINA_CUSTOMS_FLOW_MANIFEST: ${{ inputs.china_customs_manifest || vars.CHINA_CUSTOMS_FLOW_MANIFEST }}
           CHINA_CUSTOMS_LATEST_PERIOD: ${{ inputs.china_customs_latest_period || vars.CHINA_CUSTOMS_LATEST_PERIOD }}
         run: npm run sync:trade-flow:cn
 
@@ -113,7 +118,7 @@ jobs:
               '### Required official values',
               missingRows || '- None',
               '',
-              'Place official XLSX/XLS/CSV/JSON exports in `data/inbox/china-customs/`, configure `CHINA_CUSTOMS_FLOW_URL`, or run the workflow with an export URL.',
+              'Place official XLSX/XLS/CSV/JSON exports in `data/inbox/china-customs/`, configure `CHINA_CUSTOMS_FLOW_URL`, or run the workflow with a validated batch manifest.',
               '',
               `_Updated automatically by ${context.workflow} run ${context.runNumber}._`
             ].filter(Boolean).join('\n');

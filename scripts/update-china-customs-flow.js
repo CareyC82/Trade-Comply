@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const {
     SOURCE_ID,
     atomicWriteJson,
@@ -24,6 +25,16 @@ const PLAN_PATH = path.join(ROOT, 'data', 'china-customs-sync-plan.json');
 const DEFAULT_INBOX_PATH = path.join(ROOT, 'data', 'inbox', 'china-customs');
 const dryRun = process.argv.includes('--dry-run');
 const inputArg = process.argv.find((arg) => arg.startsWith('--input='));
+const manifestArg = process.argv.find((arg) => arg.startsWith('--manifest='));
+
+function fileEvidence(filePath) {
+    const body = fs.readFileSync(filePath);
+    return {
+        path: path.relative(ROOT, filePath),
+        bytes: body.length,
+        sha256: crypto.createHash('sha256').update(body).digest('hex')
+    };
+}
 
 function parseExportFile(filePath) {
     return parseOfficialFile(filePath, {
@@ -43,11 +54,12 @@ function loadExportDirectory(directoryPath) {
         payload: combineOfficialPayloads(files.map(parseExportFile)),
         mode: 'directory',
         location: directoryPath,
-        files: files.map((filePath) => path.relative(ROOT, filePath))
+        files: files.map((filePath) => path.relative(ROOT, filePath)),
+        evidence: files.map(fileEvidence)
     };
 }
 
-async function fetchOfficialExport(url, timeoutMs = 30000) {
+async function fetchOfficialExport(url, timeoutMs = 30000, values = {}) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -62,19 +74,123 @@ async function fetchOfficialExport(url, timeoutMs = 30000) {
         if (isWorkbook) {
             return parseOfficialWorkbook(body, {
                 official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || undefined,
-                source_url: url
+                source_url: url,
+                ...values
             });
         }
         return parseOfficialExport(body, {
             official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || undefined,
-            source_url: url
+            source_url: url,
+            ...values
         });
     } finally {
         clearTimeout(timer);
     }
 }
 
+function normalizeManifestDirection(value, label = 'direction') {
+    if (value === undefined || value === null || value === '') return undefined;
+    const normalized = String(value).trim().toLowerCase();
+    if (['import', 'imports', '进口'].includes(normalized)) return 'imports';
+    if (['export', 'exports', '出口'].includes(normalized)) return 'exports';
+    throw new Error(`China Customs manifest ${label} must be imports or exports: ${value}`);
+}
+
+function validateManifestCoverage(payload, manifest = {}) {
+    if (Array.isArray(manifest)) return;
+    const requiredMonths = [...new Set(manifest.required_months || [])].map(String).sort();
+    const requiredDirections = [...new Set((manifest.required_directions || [])
+        .map((direction, index) => normalizeManifestDirection(direction, `required_directions[${index}]`)))]
+        .sort();
+    for (const month of requiredMonths) {
+        if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
+            throw new Error(`China Customs manifest required month must use YYYY-MM: ${month}`);
+        }
+    }
+    if (!requiredMonths.length && !requiredDirections.length) return;
+
+    const rowsByMonth = new Map();
+    for (const row of payload.series || []) {
+        if (!rowsByMonth.has(row.month)) rowsByMonth.set(row.month, []);
+        rowsByMonth.get(row.month).push(row);
+    }
+    const targetMonths = requiredMonths.length ? requiredMonths : [...rowsByMonth.keys()].sort();
+    const missing = [];
+    for (const month of targetMonths) {
+        const rows = rowsByMonth.get(month) || [];
+        if (!rows.length) {
+            missing.push(month);
+            continue;
+        }
+        for (const direction of requiredDirections) {
+            const field = direction === 'imports' ? 'imports_value_usd' : 'exports_value_usd';
+            if (!rows.some((row) => row[field] !== null && row[field] !== undefined)) {
+                missing.push(`${month}:${direction}`);
+            }
+        }
+    }
+    if (missing.length) {
+        throw new Error(`China Customs manifest batch is incomplete: ${missing.join(', ')}`);
+    }
+}
+
+async function loadExportManifest(manifestPath) {
+    const absoluteManifestPath = path.resolve(manifestPath);
+    const manifest = JSON.parse(fs.readFileSync(absoluteManifestPath, 'utf8'));
+    const entries = Array.isArray(manifest) ? manifest : manifest.entries;
+    if (!Array.isArray(entries) || !entries.length) throw new Error('China Customs manifest contains no entries');
+    const payloads = [];
+    const evidence = [];
+    const entryKeys = new Set();
+    for (const [index, entry] of entries.entries()) {
+        if (!entry || typeof entry !== 'object') throw new Error(`China Customs manifest entry ${index + 1} must be an object`);
+        const direction = normalizeManifestDirection(entry.direction, `entry ${index + 1} direction`);
+        const entryKey = JSON.stringify([
+            entry.file || null,
+            entry.url || null,
+            entry.month || null,
+            direction || null,
+            entry.industry_id || entry.industry || null,
+            entry.hs_code || null,
+            entry.partner || null
+        ]);
+        if (entryKeys.has(entryKey)) throw new Error(`China Customs manifest entry ${index + 1} duplicates an earlier entry`);
+        entryKeys.add(entryKey);
+        const values = {
+            default_month: entry.month,
+            default_industry: entry.industry_id || entry.industry,
+            default_hs_code: entry.hs_code,
+            default_direction: direction,
+            default_partner: entry.partner,
+            official_platform_latest_period: entry.official_platform_latest_period || manifest.official_platform_latest_period,
+            source_url: entry.source_url || manifest.source_url
+        };
+        if (entry.file) {
+            const filePath = path.resolve(path.dirname(absoluteManifestPath), entry.file);
+            if (!fs.existsSync(filePath)) throw new Error(`China Customs manifest entry ${index + 1} file not found: ${entry.file}`);
+            payloads.push(parseOfficialFile(filePath, values));
+            evidence.push(fileEvidence(filePath));
+        } else if (entry.url) {
+            payloads.push(await fetchOfficialExport(entry.url, 30000, values));
+            evidence.push({ url: entry.url });
+        } else {
+            throw new Error(`China Customs manifest entry ${index + 1} requires file or url`);
+        }
+    }
+    const payload = combineOfficialPayloads(payloads);
+    validateManifestCoverage(payload, manifest);
+    return {
+        payload,
+        mode: 'manifest',
+        location: manifestPath,
+        files: evidence.filter((row) => row.path).map((row) => row.path),
+        evidence
+    };
+}
+
 async function loadIncoming() {
+    const manifestPath = manifestArg?.slice('--manifest='.length) || process.env.CHINA_CUSTOMS_FLOW_MANIFEST;
+    if (manifestPath) return loadExportManifest(manifestPath);
     const inputPath = inputArg?.slice('--input='.length) || process.env.CHINA_CUSTOMS_FLOW_FILE;
     if (inputPath) {
         const absolutePath = path.resolve(inputPath);
@@ -146,6 +262,7 @@ async function main() {
             source_mode: incoming.mode,
             source_location: incoming.location,
             source_files: incoming.files || [],
+            source_evidence: incoming.evidence || [],
             official_platform_latest_period: source.official_platform_latest_period,
             synchronized_through: source.synchronized_through,
             rows_received: incoming.payload.series.length,
@@ -190,4 +307,4 @@ async function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildStatus, fetchOfficialExport, loadExportDirectory, loadIncoming, main, parseExportFile, writePlan };
+module.exports = { buildStatus, fetchOfficialExport, loadExportDirectory, loadExportManifest, loadIncoming, main, normalizeManifestDirection, parseExportFile, validateManifestCoverage, writePlan };

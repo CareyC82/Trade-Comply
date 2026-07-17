@@ -14,12 +14,14 @@ const {
     coverageDiagnostics,
     mergePayload,
     normalizeIndustryId,
+    industryForHsCode,
     normalizeRow,
+    parseOfficialCsv,
     parseOfficialExport,
     parseOfficialFile,
     parseOfficialWorkbook
 } = require('../lib/china-customs-flow');
-const { loadExportDirectory } = require('../scripts/update-china-customs-flow');
+const { loadExportDirectory, loadExportManifest } = require('../scripts/update-china-customs-flow');
 
 function currentPayload() {
     return {
@@ -115,6 +117,33 @@ test('China Customs official CSV accepts normalized and Chinese USD headers', ()
     const next = mergePayload(currentPayload(), payload);
     assert.equal(next.series.some((row) => row.industry_id === 'semiconductor_ai' && row.month === '2026-03'), true);
     assert.equal(next.series.some((row) => row.industry_id === 'healthcare_lab' && row.exports_value_usd === 125), true);
+});
+
+test('China Customs raw commodity-code exports map into maintained industries', () => {
+    const payload = parseOfficialExport([
+        '统计年月,商品编码,商品名称,进出口类型,金额（美元）,平台最新月份',
+        '2026-05,8542320000,存储器,进口,100,2026-05',
+        '2026-05,8471500000,数据处理设备,出口,200,2026-05',
+        '2026-05,8507600000,锂离子蓄电池,进口,300,2026-05'
+    ].join('\n'));
+    assert.equal(industryForHsCode('8542.32'), 'memory');
+    assert.equal(payload.series.find((row) => row.industry_id === 'memory').imports_value_usd, 100);
+    assert.equal(payload.series.find((row) => row.industry_id === 'computing').exports_value_usd, 200);
+    assert.equal(payload.series.find((row) => row.industry_id === 'battery_energy').imports_value_usd, 300);
+});
+
+test('China Customs raw exports deduplicate identical HS value rows and retain evidence', () => {
+    const payload = parseOfficialCsv([
+        '统计月份,进出口类型,商品编码,商品名称,金额（美元）',
+        '2026-05,进口,85423210,动态随机存取存储器,100',
+        '2026-05,进口,85423210,DRAM memory,100',
+        '2026-05,进口,85423290,其他存储器,50'
+    ].join('\n'));
+    assert.equal(payload.series.length, 1);
+    assert.equal(payload.series[0].industry_id, 'memory');
+    assert.equal(payload.series[0].imports_value_usd, 150);
+    assert.deepEqual(payload.series[0].hs_codes, ['85423210', '85423290']);
+    assert.deepEqual(payload.series[0].product_names, ['动态随机存取存储器', '其他存储器']);
 });
 
 test('China Customs native Excel accepts title rows and Chinese long-form trade values', () => {
@@ -246,6 +275,53 @@ test('China Customs inbox loader combines multiple normalized export files', () 
     assert.equal(incoming.mode, 'directory');
     assert.equal(incoming.files.length, 3);
     assert.equal(incoming.payload.series.length, 3);
+});
+
+test('China Customs manifest batches official exports and records file evidence', async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-manifest-'));
+    fs.writeFileSync(path.join(directory, 'imports.csv'), ['金额（美元）', '125'].join('\n'));
+    fs.writeFileSync(path.join(directory, 'exports.csv'), ['金额（美元）', '250'].join('\n'));
+    fs.writeFileSync(path.join(directory, 'manifest.json'), JSON.stringify({
+        official_platform_latest_period: '2026-05',
+        entries: [
+            { file: 'imports.csv', month: '2026-05', hs_code: '854232', direction: 'imports' },
+            { file: 'exports.csv', month: '2026-05', hs_code: '854232', direction: 'exports' }
+        ]
+    }));
+    const incoming = await loadExportManifest(path.join(directory, 'manifest.json'));
+    assert.equal(incoming.mode, 'manifest');
+    assert.equal(incoming.payload.series.length, 1);
+    assert.equal(incoming.payload.series[0].imports_value_usd, 125);
+    assert.equal(incoming.payload.series[0].exports_value_usd, 250);
+    assert.equal(incoming.evidence.length, 2);
+    assert.match(incoming.evidence[0].sha256, /^[a-f0-9]{64}$/);
+});
+
+test('China Customs manifest enforces required months and trade directions', async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-manifest-contract-'));
+    fs.writeFileSync(path.join(directory, 'imports.csv'), ['金额（美元）', '125'].join('\n'));
+    fs.writeFileSync(path.join(directory, 'manifest.json'), JSON.stringify({
+        required_months: ['2026-04', '2026-05'],
+        required_directions: ['imports', 'exports'],
+        entries: [{ file: 'imports.csv', month: '2026-05', hs_code: '854232', direction: 'imports' }]
+    }));
+    await assert.rejects(
+        loadExportManifest(path.join(directory, 'manifest.json')),
+        /batch is incomplete: 2026-04, 2026-05:exports/
+    );
+});
+
+test('China Customs manifest rejects invalid directions and duplicate entries', async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-manifest-invalid-'));
+    fs.writeFileSync(path.join(directory, 'value.csv'), ['金额（美元）', '125'].join('\n'));
+    fs.writeFileSync(path.join(directory, 'invalid.json'), JSON.stringify({
+        entries: [{ file: 'value.csv', month: '2026-05', hs_code: '854232', direction: 'inbound' }]
+    }));
+    await assert.rejects(loadExportManifest(path.join(directory, 'invalid.json')), /must be imports or exports/);
+
+    const duplicate = { file: 'value.csv', month: '2026-05', hs_code: '854232', direction: 'imports' };
+    fs.writeFileSync(path.join(directory, 'duplicate.json'), JSON.stringify({ entries: [duplicate, duplicate] }));
+    await assert.rejects(loadExportManifest(path.join(directory, 'duplicate.json')), /duplicates an earlier entry/);
 });
 
 test('China Customs invalid official export leaves last-good payload unchanged', () => {
