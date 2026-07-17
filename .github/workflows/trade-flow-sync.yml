@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       china_customs_export_url:
-        description: "Optional URL for a normalized China Customs official JSON/CSV export"
+        description: "Optional URL for an official China Customs XLSX/XLS/CSV/JSON export"
         required: false
         type: string
       china_customs_latest_period:
@@ -113,7 +113,7 @@ jobs:
               '### Required official values',
               missingRows || '- None',
               '',
-              'Place normalized official CSV/JSON exports in `data/inbox/china-customs/`, configure `CHINA_CUSTOMS_FLOW_URL`, or run the workflow with an export URL.',
+              'Place official XLSX/XLS/CSV/JSON exports in `data/inbox/china-customs/`, configure `CHINA_CUSTOMS_FLOW_URL`, or run the workflow with an export URL.',
               '',
               `_Updated automatically by ${context.workflow} run ${context.runNumber}._`
             ].filter(Boolean).join('\n');

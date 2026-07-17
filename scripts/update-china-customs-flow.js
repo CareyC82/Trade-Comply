@@ -12,6 +12,8 @@ const {
     mergePayload,
     normalizeIndustryId,
     parseOfficialExport,
+    parseOfficialFile,
+    parseOfficialWorkbook,
     sourceMetadata
 } = require('../lib/china-customs-flow');
 
@@ -24,7 +26,7 @@ const dryRun = process.argv.includes('--dry-run');
 const inputArg = process.argv.find((arg) => arg.startsWith('--input='));
 
 function parseExportFile(filePath) {
-    return parseOfficialExport(fs.readFileSync(filePath, 'utf8'), {
+    return parseOfficialFile(filePath, {
         official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || undefined
     });
 }
@@ -33,7 +35,7 @@ function loadExportDirectory(directoryPath) {
     const absolutePath = path.resolve(directoryPath);
     if (!fs.existsSync(absolutePath)) return null;
     const files = fs.readdirSync(absolutePath)
-        .filter((name) => !name.startsWith('.') && /\.(csv|json)$/i.test(name))
+        .filter((name) => !name.startsWith('.') && /\.(csv|json|xlsx|xls)$/i.test(name))
         .sort()
         .map((name) => path.join(absolutePath, name));
     if (!files.length) return null;
@@ -51,10 +53,18 @@ async function fetchOfficialExport(url, timeoutMs = 30000) {
     try {
         const response = await fetch(url, {
             signal: controller.signal,
-            headers: { accept: 'application/json, text/csv;q=0.9, text/plain;q=0.8', 'user-agent': 'TraceWize-China-Customs-Flow/1.1' }
+            headers: { accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/json;q=0.9, text/csv;q=0.8, text/plain;q=0.7', 'user-agent': 'TraceWize-China-Customs-Flow/1.2' }
         });
         if (!response.ok) throw new Error(`HTTP ${response.status} from configured China Customs adapter`);
-        const body = await response.text();
+        const contentType = response.headers.get('content-type') || '';
+        const isWorkbook = /spreadsheet|excel/i.test(contentType) || /\.xlsx?(?:$|\?)/i.test(url);
+        const body = Buffer.from(await response.arrayBuffer());
+        if (isWorkbook) {
+            return parseOfficialWorkbook(body, {
+                official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || undefined,
+                source_url: url
+            });
+        }
         return parseOfficialExport(body, {
             official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || undefined,
             source_url: url

@@ -107,6 +107,8 @@ Full operator guide (中文 + diagrams): **[docs/DATA_REVIEW.md](docs/DATA_REVIE
 | Service | Command | URL | Purpose |
 |---------|---------|-----|---------|
 | **Site preview** | `npm run dev:preview` or `python3 -m http.server 8000` | http://localhost:8000 | Static site; reads committed prod JSON |
+
+China Customs monthly industry data can be imported directly from official `.xlsx`, `.xls`, `.csv`, or `.json` exports. See [China Customs monthly industry import](docs/china-customs-monthly-import.md) for supported Chinese headers, file naming, and validation rules.
 | **Review admin API** | `npm run restart:admin` | http://127.0.0.1:8787/admin.html | Manual Review Panel (not the public site port) |
 
 Create **`.env.local`** from `.env.example` (`ADMIN_REVIEW_PASSWORD`, `DEEPSEEK_API_KEY`).

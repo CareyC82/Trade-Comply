@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const XLSX = require('xlsx');
 const {
     SOURCE_ID,
     atomicWriteJson,
@@ -14,7 +15,9 @@ const {
     mergePayload,
     normalizeIndustryId,
     normalizeRow,
-    parseOfficialExport
+    parseOfficialExport,
+    parseOfficialFile,
+    parseOfficialWorkbook
 } = require('../lib/china-customs-flow');
 const { loadExportDirectory } = require('../scripts/update-china-customs-flow');
 
@@ -114,11 +117,58 @@ test('China Customs official CSV accepts normalized and Chinese USD headers', ()
     assert.equal(next.series.some((row) => row.industry_id === 'healthcare_lab' && row.exports_value_usd === 125), true);
 });
 
+test('China Customs native Excel accepts title rows and Chinese long-form trade values', () => {
+    const workbook = XLSX.utils.book_new();
+    const sheet = XLSX.utils.aoa_to_sheet([
+        ['中华人民共和国海关总署统计数据'],
+        ['统计年月', '行业类别', '进出口类型', '金额（美元）', '贸易伙伴', '平台最新月份'],
+        ['2026年5月', '半导体', '进口', '1,200.50', '世界', '2026-05'],
+        ['2026年5月', '半导体', '出口', 2500, '世界', '2026-05'],
+        ['2026/05', '存储器', '出口', 700, '美国', '2026-05']
+    ]);
+    XLSX.utils.book_append_sheet(workbook, sheet, '统计结果');
+    const payload = parseOfficialWorkbook(XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }));
+    assert.equal(payload.official_platform_latest_period, '2026-05');
+    assert.equal(payload.series.length, 2);
+    const semiconductor = payload.series.find((row) => row.industry_id === 'semiconductor_ai');
+    assert.equal(semiconductor.imports_value_usd, 1200.5);
+    assert.equal(semiconductor.exports_value_usd, 2500);
+    assert.equal(payload.series.find((row) => row.industry_id === 'memory').partner, '美国');
+});
+
+test('China Customs legacy XLS uses filename metadata when month, industry, and direction are absent', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-xls-'));
+    const file = path.join(directory, '2026-05_memory_import.xls');
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([
+        ['官方导出'],
+        ['金额（美元）'],
+        [345]
+    ]), '进口');
+    fs.writeFileSync(file, XLSX.write(workbook, { type: 'buffer', bookType: 'biff8' }));
+    const payload = parseOfficialFile(file);
+    assert.equal(payload.series[0].month, '2026-05');
+    assert.equal(payload.series[0].industry_id, 'memory');
+    assert.equal(payload.series[0].imports_value_usd, 345);
+});
+
+test('China Customs Excel refuses ambiguous RMB-only columns', () => {
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([
+        ['月份', '行业', '进口金额（人民币）'],
+        ['2026-05', '半导体', 100]
+    ]), '统计');
+    assert.throws(
+        () => parseOfficialWorkbook(XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })),
+        /No usable China Customs worksheet|explicit USD|missing month\/industry metadata/
+    );
+});
+
 test('China Customs CSV refuses ambiguous non-USD value columns', () => {
     assert.throws(() => parseOfficialExport([
         '月份,行业,进口金额,出口金额',
         '2026-05,semiconductor,100,200'
-    ].join('\n')), /must provide imports_value_usd or exports_value_usd/);
+    ].join('\n')), /explicit USD trade-value columns/);
 });
 
 test('China Customs diagnostics expose the real March to May backlog', () => {
@@ -166,6 +216,16 @@ test('China Customs payload combiner retains rows and newest declared platform m
     assert.equal(payload.series.length, 2);
 });
 
+test('China Customs payload combiner preserves import and export values delivered in separate files', () => {
+    const payload = combineOfficialPayloads([
+        { official_platform_latest_period: '2026-05', series: [{ month: '2026-05', industry: 'memory', imports_value_usd: 10 }] },
+        { official_platform_latest_period: '2026-05', series: [{ month: '2026-05', industry: 'memory', exports_value_usd: 20 }] }
+    ]);
+    assert.equal(payload.series.length, 1);
+    assert.equal(payload.series[0].imports_value_usd, 10);
+    assert.equal(payload.series[0].exports_value_usd, 20);
+});
+
 test('China Customs inbox loader combines multiple normalized export files', () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-inbox-'));
     fs.writeFileSync(path.join(directory, 'imports.csv'), [
@@ -176,10 +236,16 @@ test('China Customs inbox loader combines multiple normalized export files', () 
         official_platform_latest_period: '2026-05',
         series: [{ month: '2026-05', industry: 'computing', exports_value_usd: 20 }]
     }));
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([
+        ['统计月份', '行业', '出口金额（美元）', '平台最新月份'],
+        ['2026-05', '光伏', 30, '2026-05']
+    ]), '统计');
+    fs.writeFileSync(path.join(directory, 'solar.xlsx'), XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }));
     const incoming = loadExportDirectory(directory);
     assert.equal(incoming.mode, 'directory');
-    assert.equal(incoming.files.length, 2);
-    assert.equal(incoming.payload.series.length, 2);
+    assert.equal(incoming.files.length, 3);
+    assert.equal(incoming.payload.series.length, 3);
 });
 
 test('China Customs invalid official export leaves last-good payload unchanged', () => {
