@@ -8,12 +8,15 @@ const path = require('node:path');
 const {
     SOURCE_ID,
     atomicWriteJson,
+    buildCoveragePlan,
+    combineOfficialPayloads,
     coverageDiagnostics,
     mergePayload,
     normalizeIndustryId,
     normalizeRow,
     parseOfficialExport
 } = require('../lib/china-customs-flow');
+const { loadExportDirectory } = require('../scripts/update-china-customs-flow');
 
 function currentPayload() {
     return {
@@ -142,6 +145,41 @@ test('China Customs diagnostics only report current when all maintained categori
     assert.deepEqual(diagnostics.missing_industries_at_target, []);
     assert.deepEqual(diagnostics.missing_directions_at_target, []);
     assert.equal(diagnostics.complete, true);
+});
+
+test('China Customs coverage plan lists all nine industries and missing directions', () => {
+    const plan = buildCoveragePlan(currentPayload(), '2026-05');
+    assert.equal(plan.required_industry_count, 9);
+    assert.equal(plan.required_direction_count, 18);
+    assert.equal(plan.missing_direction_count, 18);
+    assert.equal(plan.required_rows.length, 9);
+    assert.equal(plan.required_rows.find((row) => row.industry_id === 'memory').imports_required, true);
+    assert.equal(plan.complete, false);
+});
+
+test('China Customs payload combiner retains rows and newest declared platform month', () => {
+    const payload = combineOfficialPayloads([
+        { official_platform_latest_period: '2026-04', series: [{ month: '2026-04', industry: 'memory', imports_value_usd: 1 }] },
+        { official_platform_latest_period: '2026-05', series: [{ month: '2026-05', industry: 'computing', exports_value_usd: 2 }] }
+    ]);
+    assert.equal(payload.official_platform_latest_period, '2026-05');
+    assert.equal(payload.series.length, 2);
+});
+
+test('China Customs inbox loader combines multiple normalized export files', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-inbox-'));
+    fs.writeFileSync(path.join(directory, 'imports.csv'), [
+        'month,industry,imports_value_usd,official_platform_latest_period',
+        '2026-05,memory components,10,2026-05'
+    ].join('\n'));
+    fs.writeFileSync(path.join(directory, 'exports.json'), JSON.stringify({
+        official_platform_latest_period: '2026-05',
+        series: [{ month: '2026-05', industry: 'computing', exports_value_usd: 20 }]
+    }));
+    const incoming = loadExportDirectory(directory);
+    assert.equal(incoming.mode, 'directory');
+    assert.equal(incoming.files.length, 2);
+    assert.equal(incoming.payload.series.length, 2);
 });
 
 test('China Customs invalid official export leaves last-good payload unchanged', () => {

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_id": "china-customs-major-industries",
-  "attempted_at": "2026-07-17T02:51:48.672Z",
+  "attempted_at": "2026-07-17T05:38:06.469Z",
   "ok": false,
   "data_updated": false,
   "connector_status": "update_required",
@@ -68,5 +68,9 @@
     ],
     "complete": false
   },
-  "reason": "Configure CHINA_CUSTOMS_FLOW_URL or CHINA_CUSTOMS_FLOW_FILE with a normalized official export. Last-good data was preserved."
+  "reason": "Add normalized official exports to data/inbox/china-customs, or configure CHINA_CUSTOMS_FLOW_URL / CHINA_CUSTOMS_FLOW_FILE. Last-good data was preserved.",
+  "coverage_plan": {
+    "path": "data/china-customs-sync-plan.json",
+    "missing_direction_count": 18
+  }
 }

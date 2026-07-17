@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: monthly-trade-flow-sync
@@ -56,15 +57,78 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: china-customs-connector-status
-          path: data/china-customs-sync-status.json
+          path: |
+            data/china-customs-sync-status.json
+            data/china-customs-sync-plan.json
           retention-days: 30
+
+      - name: Publish China Customs coverage summary
+        if: always()
+        run: |
+          node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs = require('node:fs');
+          const status = JSON.parse(fs.readFileSync('data/china-customs-sync-status.json', 'utf8'));
+          const plan = JSON.parse(fs.readFileSync('data/china-customs-sync-plan.json', 'utf8'));
+          console.log('## China Customs monthly industry coverage');
+          console.log(`- Official platform month: ${status.official_platform_latest_period || 'unknown'}`);
+          console.log(`- Synchronized through: ${status.synchronized_through || 'none'}`);
+          console.log(`- Nine-industry coverage: ${plan.completed_industry_count}/${plan.required_industry_count}`);
+          console.log(`- Missing import/export values at target month: ${plan.missing_direction_count}/${plan.required_direction_count}`);
+          console.log(`- Connector: ${status.connector_status} (${status.source_mode})`);
+          if (plan.missing_periods.length) console.log(`- Missing months: ${plan.missing_periods.join(', ')}`);
+          console.log('');
+          console.log(status.reason || '');
+          NODE
+
+      - name: Maintain China Customs coverage issue
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const status = JSON.parse(fs.readFileSync('data/china-customs-sync-status.json', 'utf8'));
+            const plan = JSON.parse(fs.readFileSync('data/china-customs-sync-plan.json', 'utf8'));
+            const title = 'Data automation: China Customs monthly industry coverage';
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+            const existing = issues.find((issue) => issue.title === title);
+            if (plan.complete) {
+              if (existing) await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, state: 'closed' });
+              return;
+            }
+            const missingRows = plan.required_rows
+              .filter((row) => row.status !== 'complete')
+              .map((row) => `- ${row.industry}: ${row.imports_required ? 'imports ' : ''}${row.exports_required ? 'exports' : ''}`.trim())
+              .join('\n');
+            const body = [
+              `Official platform month: **${status.official_platform_latest_period || 'unknown'}**`,
+              `Synchronized through: **${status.synchronized_through || 'none'}**`,
+              `Missing target-month directions: **${plan.missing_direction_count}/${plan.required_direction_count}**`,
+              plan.missing_periods.length ? `Missing months: ${plan.missing_periods.join(', ')}` : '',
+              '',
+              '### Required official values',
+              missingRows || '- None',
+              '',
+              'Place normalized official CSV/JSON exports in `data/inbox/china-customs/`, configure `CHINA_CUSTOMS_FLOW_URL`, or run the workflow with an export URL.',
+              '',
+              `_Updated automatically by ${context.workflow} run ${context.runNumber}._`
+            ].filter(Boolean).join('\n');
+            if (existing) {
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body });
+            }
 
       - name: Commit official trade-flow snapshot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
-          git add data/trade-flow.json data/china-industry-flow.json data/china-customs-sync-status.json
+          git add data/trade-flow.json data/china-industry-flow.json data/china-customs-sync-status.json data/china-customs-sync-plan.json
           if git diff --staged --quiet; then
             echo "No trade-flow changes."
             exit 0
