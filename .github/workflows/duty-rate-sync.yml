@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run duty-rate auto sync
         run: npm run sync:duty-rates:auto
 

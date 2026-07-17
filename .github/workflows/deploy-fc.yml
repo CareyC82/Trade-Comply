@@ -40,6 +40,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Preflight secrets
         env:
           ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}

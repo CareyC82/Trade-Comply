@@ -40,6 +40,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Sync official monthly trade flow
         env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
