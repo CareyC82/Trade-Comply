@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: "32 18 * * 2"
   workflow_dispatch:
+    inputs:
+      china_customs_export_url:
+        description: "Optional URL for a normalized China Customs official JSON/CSV export"
+        required: false
+        type: string
+      china_customs_latest_period:
+        description: "Latest month visible on the official platform (YYYY-MM)"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -35,8 +44,8 @@ jobs:
         id: china_customs_sync
         continue-on-error: true
         env:
-          CHINA_CUSTOMS_FLOW_URL: ${{ secrets.CHINA_CUSTOMS_FLOW_URL }}
-          CHINA_CUSTOMS_LATEST_PERIOD: ${{ vars.CHINA_CUSTOMS_LATEST_PERIOD }}
+          CHINA_CUSTOMS_FLOW_URL: ${{ inputs.china_customs_export_url || secrets.CHINA_CUSTOMS_FLOW_URL }}
+          CHINA_CUSTOMS_LATEST_PERIOD: ${{ inputs.china_customs_latest_period || vars.CHINA_CUSTOMS_LATEST_PERIOD }}
         run: npm run sync:trade-flow:cn
 
       - name: Verify trade-flow output

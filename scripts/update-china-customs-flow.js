@@ -6,8 +6,10 @@ const path = require('node:path');
 const {
     SOURCE_ID,
     atomicWriteJson,
+    coverageDiagnostics,
     mergePayload,
     normalizeIndustryId,
+    parseOfficialExport,
     sourceMetadata
 } = require('../lib/china-customs-flow');
 
@@ -17,16 +19,20 @@ const STATUS_PATH = path.join(ROOT, 'data', 'china-customs-sync-status.json');
 const dryRun = process.argv.includes('--dry-run');
 const inputArg = process.argv.find((arg) => arg.startsWith('--input='));
 
-async function fetchJson(url, timeoutMs = 30000) {
+async function fetchOfficialExport(url, timeoutMs = 30000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
         const response = await fetch(url, {
             signal: controller.signal,
-            headers: { accept: 'application/json', 'user-agent': 'TraceWize-China-Customs-Flow/1.0' }
+            headers: { accept: 'application/json, text/csv;q=0.9, text/plain;q=0.8', 'user-agent': 'TraceWize-China-Customs-Flow/1.1' }
         });
         if (!response.ok) throw new Error(`HTTP ${response.status} from configured China Customs adapter`);
-        return response.json();
+        const body = await response.text();
+        return parseOfficialExport(body, {
+            official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || undefined,
+            source_url: url
+        });
     } finally {
         clearTimeout(timer);
     }
@@ -34,15 +40,22 @@ async function fetchJson(url, timeoutMs = 30000) {
 
 async function loadIncoming() {
     const inputPath = inputArg?.slice('--input='.length) || process.env.CHINA_CUSTOMS_FLOW_FILE;
-    if (inputPath) return { payload: JSON.parse(fs.readFileSync(path.resolve(inputPath), 'utf8')), mode: 'file', location: inputPath };
+    if (inputPath) return {
+        payload: parseOfficialExport(fs.readFileSync(path.resolve(inputPath), 'utf8'), {
+            official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || undefined
+        }),
+        mode: 'file',
+        location: inputPath
+    };
     if (process.env.CHINA_CUSTOMS_FLOW_URL) {
-        return { payload: await fetchJson(process.env.CHINA_CUSTOMS_FLOW_URL), mode: 'url', location: process.env.CHINA_CUSTOMS_FLOW_URL };
+        return { payload: await fetchOfficialExport(process.env.CHINA_CUSTOMS_FLOW_URL), mode: 'url', location: process.env.CHINA_CUSTOMS_FLOW_URL };
     }
     return null;
 }
 
 function buildStatus(current, values = {}) {
     const source = sourceMetadata(current);
+    const diagnostics = coverageDiagnostics(current, process.env.CHINA_CUSTOMS_LATEST_PERIOD || source.official_platform_latest_period || null);
     return {
         schema_version: 1,
         source_id: SOURCE_ID,
@@ -55,6 +68,7 @@ function buildStatus(current, values = {}) {
         synchronized_through: source.synchronized_through || source.latest_period || null,
         supported_industries: source.supported_industries || [],
         covered_industries: source.covered_industries || [],
+        coverage: diagnostics,
         reason: 'Configure CHINA_CUSTOMS_FLOW_URL or CHINA_CUSTOMS_FLOW_FILE with a normalized official export. Last-good data was preserved.',
         ...values
     };
@@ -75,13 +89,14 @@ async function main() {
         }
         const next = mergePayload(current, incoming.payload);
         const source = sourceMetadata(next);
+        const diagnostics = coverageDiagnostics(next, source.official_platform_latest_period);
         const receivedIndustries = [...new Set(incoming.payload.series.map((row) => (
             normalizeIndustryId(row.industry_id || row.industry || row.category)
         )))].sort();
         status = buildStatus(next, {
             ok: true,
             data_updated: true,
-            connector_status: source.connector_status,
+            connector_status: diagnostics.complete ? 'current' : 'partial_coverage',
             source_mode: incoming.mode,
             source_location: incoming.location,
             official_platform_latest_period: source.official_platform_latest_period,
@@ -90,16 +105,17 @@ async function main() {
             industries_received: receivedIndustries,
             supported_industries: source.supported_industries || [],
             covered_industries: source.covered_industries || [],
+            coverage: diagnostics,
             last_success_at: new Date().toISOString(),
-            reason: source.connector_status === 'current'
-                ? 'China Customs industry data is synchronized through the latest declared official platform month.'
-                : 'Official rows were updated, but the normalized feed still trails the declared platform month.'
+            reason: diagnostics.complete
+                ? 'China Customs industry data is synchronized through the latest declared official platform month with all maintained industries and directions.'
+                : `Official rows were imported and last-good history was preserved. Remaining gaps: ${diagnostics.missing_periods.length} month(s), ${diagnostics.missing_industries_at_target.length} industry category/categories, ${diagnostics.missing_directions_at_target.length} trade direction(s).`
         });
         if (!dryRun) {
             atomicWriteJson(DATA_PATH, next);
             atomicWriteJson(STATUS_PATH, status);
         }
-        console.log(`China Customs flow sync: ${source.synchronized_through} (${source.connector_status}).`);
+        console.log(`China Customs flow sync: ${source.synchronized_through} (${status.connector_status}).`);
         return status;
     } catch (error) {
         status = buildStatus(current, {
@@ -117,4 +133,4 @@ async function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildStatus, fetchJson, main };
+module.exports = { buildStatus, fetchOfficialExport, loadIncoming, main };

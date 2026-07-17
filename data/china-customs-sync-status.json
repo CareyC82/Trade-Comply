@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_id": "china-customs-major-industries",
-  "attempted_at": null,
+  "attempted_at": "2026-07-17T02:51:48.672Z",
   "ok": false,
   "data_updated": false,
   "connector_status": "update_required",
@@ -25,5 +25,48 @@
     "telecom",
     "healthcare_lab"
   ],
-  "reason": "China Customs normalized official feed is not configured yet. Last-good data is preserved."
+  "coverage": {
+    "latest_period_in_data": "2026-02",
+    "official_platform_latest_period": "2026-05",
+    "missing_periods": [
+      "2026-03",
+      "2026-04",
+      "2026-05"
+    ],
+    "target_period": "2026-05",
+    "industries_covered_at_target": [],
+    "missing_industries_at_target": [
+      "semiconductor_ai",
+      "memory",
+      "computing",
+      "telecom",
+      "battery_energy",
+      "solar",
+      "industrial_automation",
+      "healthcare_lab",
+      "gaming"
+    ],
+    "missing_directions_at_target": [
+      "battery_energy:exports",
+      "battery_energy:imports",
+      "computing:exports",
+      "computing:imports",
+      "gaming:exports",
+      "gaming:imports",
+      "healthcare_lab:exports",
+      "healthcare_lab:imports",
+      "industrial_automation:exports",
+      "industrial_automation:imports",
+      "memory:exports",
+      "memory:imports",
+      "semiconductor_ai:exports",
+      "semiconductor_ai:imports",
+      "solar:exports",
+      "solar:imports",
+      "telecom:exports",
+      "telecom:imports"
+    ],
+    "complete": false
+  },
+  "reason": "Configure CHINA_CUSTOMS_FLOW_URL or CHINA_CUSTOMS_FLOW_FILE with a normalized official export. Last-good data was preserved."
 }
