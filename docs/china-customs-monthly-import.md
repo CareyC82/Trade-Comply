@@ -5,7 +5,7 @@ TraceWize accepts official China Customs exports from four sources, in this orde
 1. `CHINA_CUSTOMS_FLOW_MANIFEST` or `--manifest=<manifest.json>`
 2. `CHINA_CUSTOMS_FLOW_FILE` or `--input=<file-or-directory>`
 3. `CHINA_CUSTOMS_FLOW_URL`
-4. Excel/CSV/JSON files placed in `data/inbox/china-customs/`
+4. `manifest.json` (preferred) or Excel/CSV/JSON files placed in `data/inbox/china-customs/`
 
 The official statistics portal remains the authority. This adapter does not estimate, invent, or silently convert missing values.
 
@@ -38,11 +38,11 @@ If an export omits month, industry, or direction columns, use a descriptive file
 
 An official export does not need a TraceWize industry column. When it contains a commodity code (`商品编码`, `HS编码`, `海关编码`, or `hs_code`), the importer maps supported HS headings into the nine maintained broad industries and aggregates the official rows. Product names and every contributing HS code are retained as source evidence.
 
-For a batch of China Customs exports, copy and edit `docs/china-customs-export-manifest.example.json`. A manifest entry may supply metadata omitted by the official file:
+For a batch of China Customs exports, place a `manifest.json` beside the exported files in `data/inbox/china-customs/`. The scheduled sync discovers this manifest automatically. File paths in the manifest are relative to the manifest itself:
 
 ```json
 {
-  "file": "../data/inbox/china-customs/2026-05-imports.xls",
+  "file": "2026-05-imports.xls",
   "month": "2026-05",
   "direction": "imports",
   "partner": "WORLD"
@@ -55,16 +55,20 @@ For a multi-month refresh, declare the batch contract at the top level:
 {
   "required_months": ["2026-03", "2026-04", "2026-05"],
   "required_directions": ["imports", "exports"],
+  "required_industries": [
+    "semiconductor_ai", "memory", "computing", "telecom", "battery_storage",
+    "solar", "industrial_automation", "healthcare_lab", "gaming"
+  ],
   "entries": []
 }
 ```
 
-The import is rejected before publication when a required month or direction is missing, a direction is invalid, or an entry is duplicated. The existing last-good data remains in place and the failure is written to the connector status artifact.
+The import is rejected before publication when a required month, industry, or direction is missing, a direction is invalid, or an entry is duplicated. The existing last-good data remains in place and the failure is written to the connector status artifact. A manifest file is never parsed as a data export.
 
 Then run:
 
 ```bash
-node scripts/update-china-customs-flow.js --manifest=docs/china-customs-export-manifest.json
+node scripts/update-china-customs-flow.js --manifest=data/inbox/china-customs/manifest.json
 ```
 
 Each imported local file is recorded with its byte size and SHA-256 digest in `data/china-customs-sync-status.json`. If parsing or validation fails, the last-good monthly series is left unchanged.
@@ -84,6 +88,12 @@ Import one official export:
 
 ```bash
 node scripts/import-china-customs-flow.js ~/Downloads/2026-05_memory_import.xlsx
+```
+
+Import a validated batch directory (the manifest is discovered automatically):
+
+```bash
+node scripts/import-china-customs-flow.js data/inbox/china-customs
 ```
 
 Process every supported file in the inbox:

@@ -23,6 +23,7 @@ const DATA_PATH = path.join(ROOT, 'data', 'china-industry-flow.json');
 const STATUS_PATH = path.join(ROOT, 'data', 'china-customs-sync-status.json');
 const PLAN_PATH = path.join(ROOT, 'data', 'china-customs-sync-plan.json');
 const DEFAULT_INBOX_PATH = path.join(ROOT, 'data', 'inbox', 'china-customs');
+const DEFAULT_MANIFEST_NAMES = ['manifest.json', 'china-customs-manifest.json'];
 const dryRun = process.argv.includes('--dry-run');
 const inputArg = process.argv.find((arg) => arg.startsWith('--input='));
 const manifestArg = process.argv.find((arg) => arg.startsWith('--manifest='));
@@ -42,11 +43,25 @@ function parseExportFile(filePath) {
     });
 }
 
+function isManifestFileName(fileName) {
+    return DEFAULT_MANIFEST_NAMES.includes(String(fileName || '').toLowerCase());
+}
+
+function discoverInboxManifest(directoryPath) {
+    const absolutePath = path.resolve(directoryPath);
+    if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isDirectory()) return null;
+    for (const fileName of DEFAULT_MANIFEST_NAMES) {
+        const manifestPath = path.join(absolutePath, fileName);
+        if (fs.existsSync(manifestPath) && fs.statSync(manifestPath).isFile()) return manifestPath;
+    }
+    return null;
+}
+
 function loadExportDirectory(directoryPath) {
     const absolutePath = path.resolve(directoryPath);
     if (!fs.existsSync(absolutePath)) return null;
     const files = fs.readdirSync(absolutePath)
-        .filter((name) => !name.startsWith('.') && /\.(csv|json|xlsx|xls)$/i.test(name))
+        .filter((name) => !name.startsWith('.') && !isManifestFileName(name) && /\.(csv|json|xlsx|xls)$/i.test(name))
         .sort()
         .map((name) => path.join(absolutePath, name));
     if (!files.length) return null;
@@ -57,6 +72,12 @@ function loadExportDirectory(directoryPath) {
         files: files.map((filePath) => path.relative(ROOT, filePath)),
         evidence: files.map(fileEvidence)
     };
+}
+
+async function loadInbox(directoryPath) {
+    const manifestPath = discoverInboxManifest(directoryPath);
+    if (manifestPath) return loadExportManifest(manifestPath);
+    return loadExportDirectory(directoryPath);
 }
 
 async function fetchOfficialExport(url, timeoutMs = 30000, values = {}) {
@@ -102,12 +123,21 @@ function validateManifestCoverage(payload, manifest = {}) {
     const requiredDirections = [...new Set((manifest.required_directions || [])
         .map((direction, index) => normalizeManifestDirection(direction, `required_directions[${index}]`)))]
         .sort();
+    const requiredIndustries = [...new Set((manifest.required_industries || [])
+        .map((industry, index) => {
+            try {
+                return normalizeIndustryId(industry);
+            } catch (error) {
+                throw new Error(`China Customs manifest required_industries[${index}] is invalid: ${error.message}`);
+            }
+        }))]
+        .sort();
     for (const month of requiredMonths) {
         if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
             throw new Error(`China Customs manifest required month must use YYYY-MM: ${month}`);
         }
     }
-    if (!requiredMonths.length && !requiredDirections.length) return;
+    if (!requiredMonths.length && !requiredDirections.length && !requiredIndustries.length) return;
 
     const rowsByMonth = new Map();
     for (const row of payload.series || []) {
@@ -126,6 +156,19 @@ function validateManifestCoverage(payload, manifest = {}) {
             const field = direction === 'imports' ? 'imports_value_usd' : 'exports_value_usd';
             if (!rows.some((row) => row[field] !== null && row[field] !== undefined)) {
                 missing.push(`${month}:${direction}`);
+            }
+        }
+        for (const industryId of requiredIndustries) {
+            const industryRows = rows.filter((row) => row.industry_id === industryId);
+            if (!industryRows.length) {
+                missing.push(`${month}:${industryId}`);
+                continue;
+            }
+            for (const direction of requiredDirections) {
+                const field = direction === 'imports' ? 'imports_value_usd' : 'exports_value_usd';
+                if (!industryRows.some((row) => row[field] !== null && row[field] !== undefined)) {
+                    missing.push(`${month}:${industryId}:${direction}`);
+                }
             }
         }
     }
@@ -169,7 +212,12 @@ async function loadExportManifest(manifestPath) {
             const filePath = path.resolve(path.dirname(absoluteManifestPath), entry.file);
             if (!fs.existsSync(filePath)) throw new Error(`China Customs manifest entry ${index + 1} file not found: ${entry.file}`);
             payloads.push(parseOfficialFile(filePath, values));
-            evidence.push(fileEvidence(filePath));
+            evidence.push({
+                ...fileEvidence(filePath),
+                source_url: values.source_url || null,
+                month: entry.month || null,
+                direction: direction || null
+            });
         } else if (entry.url) {
             payloads.push(await fetchOfficialExport(entry.url, 30000, values));
             evidence.push({ url: entry.url });
@@ -194,13 +242,13 @@ async function loadIncoming() {
     const inputPath = inputArg?.slice('--input='.length) || process.env.CHINA_CUSTOMS_FLOW_FILE;
     if (inputPath) {
         const absolutePath = path.resolve(inputPath);
-        if (fs.statSync(absolutePath).isDirectory()) return loadExportDirectory(absolutePath);
+        if (fs.statSync(absolutePath).isDirectory()) return loadInbox(absolutePath);
         return { payload: parseExportFile(absolutePath), mode: 'file', location: inputPath, files: [inputPath] };
     }
     if (process.env.CHINA_CUSTOMS_FLOW_URL) {
         return { payload: await fetchOfficialExport(process.env.CHINA_CUSTOMS_FLOW_URL), mode: 'url', location: process.env.CHINA_CUSTOMS_FLOW_URL };
     }
-    return loadExportDirectory(process.env.CHINA_CUSTOMS_FLOW_DIR || DEFAULT_INBOX_PATH);
+    return loadInbox(process.env.CHINA_CUSTOMS_FLOW_DIR || DEFAULT_INBOX_PATH);
 }
 
 function writePlan(payload) {
@@ -307,4 +355,4 @@ async function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildStatus, fetchOfficialExport, loadExportDirectory, loadExportManifest, loadIncoming, main, normalizeManifestDirection, parseExportFile, validateManifestCoverage, writePlan };
+module.exports = { buildStatus, discoverInboxManifest, fetchOfficialExport, isManifestFileName, loadExportDirectory, loadExportManifest, loadInbox, loadIncoming, main, normalizeManifestDirection, parseExportFile, validateManifestCoverage, writePlan };

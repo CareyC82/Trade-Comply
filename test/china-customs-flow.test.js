@@ -21,7 +21,12 @@ const {
     parseOfficialFile,
     parseOfficialWorkbook
 } = require('../lib/china-customs-flow');
-const { loadExportDirectory, loadExportManifest } = require('../scripts/update-china-customs-flow');
+const {
+    discoverInboxManifest,
+    loadExportDirectory,
+    loadExportManifest,
+    loadInbox
+} = require('../scripts/update-china-customs-flow');
 
 function currentPayload() {
     return {
@@ -297,6 +302,44 @@ test('China Customs manifest batches official exports and records file evidence'
     assert.match(incoming.evidence[0].sha256, /^[a-f0-9]{64}$/);
 });
 
+test('China Customs inbox automatically discovers its manifest and excludes it from directory parsing', async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-auto-manifest-'));
+    fs.writeFileSync(path.join(directory, 'imports.csv'), [
+        '统计月份,行业,进口金额（美元）',
+        '2026-05,memory,125'
+    ].join('\n'));
+    fs.writeFileSync(path.join(directory, 'exports.csv'), [
+        '统计月份,行业,出口金额（美元）',
+        '2026-05,memory,250'
+    ].join('\n'));
+    const manifestPath = path.join(directory, 'manifest.json');
+    fs.writeFileSync(manifestPath, JSON.stringify({
+        official_platform_latest_period: '2026-05',
+        source_url: 'http://stats.customs.gov.cn/',
+        required_months: ['2026-05'],
+        required_directions: ['imports', 'exports'],
+        required_industries: ['memory'],
+        entries: [
+            { file: 'imports.csv', month: '2026-05', industry: 'memory', direction: 'imports' },
+            { file: 'exports.csv', month: '2026-05', industry: 'memory', direction: 'exports' }
+        ]
+    }));
+
+    assert.equal(discoverInboxManifest(directory), manifestPath);
+    const incoming = await loadInbox(directory);
+    assert.equal(incoming.mode, 'manifest');
+    assert.equal(incoming.payload.series.length, 1);
+    assert.equal(incoming.payload.series[0].month, '2026-05');
+    assert.equal(incoming.payload.series[0].industry_id, 'memory');
+    assert.equal(incoming.payload.series[0].imports_value_usd, 125);
+    assert.equal(incoming.payload.series[0].exports_value_usd, 250);
+    assert.equal(incoming.evidence[0].source_url, 'http://stats.customs.gov.cn/');
+
+    const directoryOnly = loadExportDirectory(directory);
+    assert.equal(directoryOnly.files.length, 2);
+    assert.ok(directoryOnly.files.every((file) => !file.endsWith('manifest.json')));
+});
+
 test('China Customs manifest enforces required months and trade directions', async () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-manifest-contract-'));
     fs.writeFileSync(path.join(directory, 'imports.csv'), ['金额（美元）', '125'].join('\n'));
@@ -308,6 +351,21 @@ test('China Customs manifest enforces required months and trade directions', asy
     await assert.rejects(
         loadExportManifest(path.join(directory, 'manifest.json')),
         /batch is incomplete: 2026-04, 2026-05:exports/
+    );
+});
+
+test('China Customs manifest enforces required industry coverage', async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-industry-contract-'));
+    fs.writeFileSync(path.join(directory, 'memory.csv'), ['金额（美元）', '125'].join('\n'));
+    fs.writeFileSync(path.join(directory, 'manifest.json'), JSON.stringify({
+        required_months: ['2026-05'],
+        required_directions: ['imports'],
+        required_industries: ['memory', 'computing'],
+        entries: [{ file: 'memory.csv', month: '2026-05', industry: 'memory', direction: 'imports' }]
+    }));
+    await assert.rejects(
+        loadExportManifest(path.join(directory, 'manifest.json')),
+        /batch is incomplete: 2026-05:computing/
     );
 });
 
