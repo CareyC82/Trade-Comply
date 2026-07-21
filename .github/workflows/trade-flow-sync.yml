@@ -5,6 +5,10 @@ on:
     - cron: "32 18 15 * *"
   workflow_dispatch:
     inputs:
+      official_trade_flow_manifest:
+        description: "Optional comma-separated repository paths to complete national official trade-flow manifests"
+        required: false
+        type: string
       china_customs_export_url:
         description: "Optional URL for an official China Customs XLSX/XLS/CSV/JSON export"
         required: false
@@ -48,8 +52,11 @@ jobs:
         run: npm ci
 
       - name: Sync official monthly trade flow
+        id: trade_flow_sync
+        continue-on-error: true
         env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+          OFFICIAL_TRADE_FLOW_MANIFEST: ${{ inputs.official_trade_flow_manifest || vars.OFFICIAL_TRADE_FLOW_MANIFEST }}
         run: npm run sync:trade-flow
 
       - name: Sync China Customs industry flow
@@ -75,6 +82,36 @@ jobs:
             data/china-customs-sync-plan.json
             data/china-customs-pending-batch.json
           retention-days: 30
+
+      - name: Upload official trade-flow sync status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-trade-flow-sync-status
+          path: data/trade-flow-sync-status.json
+          retention-days: 30
+
+      - name: Publish official trade-flow sync summary
+        if: always()
+        run: |
+          node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs = require('node:fs');
+          console.log('## Official monthly trade-flow sync');
+          if (!fs.existsSync('data/trade-flow-sync-status.json')) {
+            console.log('- No sync status was produced. Inspect the sync step logs.');
+            process.exit(0);
+          }
+          const status = JSON.parse(fs.readFileSync('data/trade-flow-sync-status.json', 'utf8'));
+          console.log(`- Result: ${status.ok ? 'complete batches published' : 'one or more connectors rejected; last-good rows retained'}`);
+          console.log(`- Publish policy: ${status.publish_policy}`);
+          for (const [name, connector] of Object.entries(status.connectors || {})) {
+            console.log(`- ${name}: ${connector.ok ? 'OK' : 'needs attention'} · ${connector.row_count || 0} accepted row(s)${connector.skipped ? ' · skipped' : ''}`);
+            if (connector.error) console.log(`  - ${connector.error}`);
+            for (const batch of connector.batches || []) {
+              console.log(`  - ${batch.path}: ${batch.ok ? `${batch.row_count} row(s) accepted` : `rejected · ${batch.error}`}`);
+            }
+          }
+          NODE
 
       - name: Publish China Customs coverage summary
         if: always()
@@ -145,7 +182,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
-          git add data/trade-flow.json data/china-industry-flow.json data/china-customs-sync-status.json data/china-customs-sync-plan.json data/china-customs-pending-batch.json
+          git add data/trade-flow.json data/trade-flow-sync-status.json data/china-industry-flow.json data/china-customs-sync-status.json data/china-customs-sync-plan.json data/china-customs-pending-batch.json
           if git diff --staged --quiet; then
             echo "No trade-flow changes."
             exit 0
@@ -153,6 +190,12 @@ jobs:
           git commit -m "auto-data: monthly official trade flow [auto-publish]"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
           git push
+
+      - name: Enforce official trade-flow sync health
+        if: steps.trade_flow_sync.outcome == 'failure'
+        run: |
+          echo "One or more official trade-flow connectors failed completeness checks. Accepted batches and diagnostics were saved; last-good rows were retained for rejected scopes."
+          exit 1
 
       - name: Enforce configured China Customs connector health
         if: steps.china_customs_sync.outcome == 'failure'
