@@ -4,6 +4,7 @@
     const API = global.TraceWizeTradeFlow;
     let payload = null;
     let chinaConnectorStatus = null;
+    let nationalConnectorStatus = null;
 
     function escapeHtml(value) {
         return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -37,6 +38,49 @@
         `;
     }
 
+    function renderConnectorPanel(model) {
+        if (model.market === 'CN' && chinaConnectorStatus) {
+            return `
+                <section class="trade-flow-connector trade-flow-connector--${escapeHtml(chinaConnectorStatus.connector_status || 'unknown')}">
+                    <div>
+                        <span>China Customs connector</span>
+                        <strong>${escapeHtml(chinaConnectorStatus.ok ? 'Last sync completed' : 'Last-good data retained')}</strong>
+                        <small>${escapeHtml(chinaConnectorStatus.reason || 'Connector status is available for review.')}</small>
+                    </div>
+                    <dl>
+                        <div><dt>Official platform</dt><dd>${escapeHtml(chinaConnectorStatus.official_platform_latest_period || 'Not declared')}</dd></div>
+                        <div><dt>TraceWize synchronized</dt><dd>${escapeHtml(chinaConnectorStatus.synchronized_through || 'Not synchronized')}</dd></div>
+                        <div><dt>Industry coverage</dt><dd>${escapeHtml((chinaConnectorStatus.covered_industries || []).length)}/${escapeHtml((chinaConnectorStatus.supported_industries || []).length)}</dd></div>
+                    </dl>
+                </section>
+            `;
+        }
+        const state = nationalConnectorStatus?.markets?.[model.market];
+        if (!state) return '';
+        const labels = {
+            national_official_current: ['Last sync completed', 'Official national monthly rows are active.'],
+            official_delayed: ['Official data delayed', 'The latest synchronized official month is older than the normal reporting window.'],
+            last_good_degraded: ['Last-good data retained', state.last_error || 'The latest official batch was rejected, so the prior complete snapshot remains active.'],
+            un_comtrade_fallback: ['Historical fallback active', 'No national official series is active; UN Comtrade history is shown separately.'],
+            no_official_series: ['Official series not connected', 'No national official monthly snapshot has been synchronized yet.']
+        };
+        const [title, detail] = labels[state.status] || ['Connector status available', 'Review the latest national connector result.'];
+        return `
+            <section class="trade-flow-connector trade-flow-connector--${escapeHtml(state.status || 'unknown')}">
+                <div>
+                    <span>${escapeHtml(state.connector_name || `${model.marketLabel} official connector`)}</span>
+                    <strong>${escapeHtml(title)}</strong>
+                    <small>${escapeHtml(detail)}</small>
+                </div>
+                <dl>
+                    <div><dt>Latest period</dt><dd>${escapeHtml(state.latest_period || 'Not synchronized')}</dd></div>
+                    <div><dt>Official rows</dt><dd>${escapeHtml(state.official_row_count || 0)}</dd></div>
+                    <div><dt>Fallback rows</dt><dd>${escapeHtml(state.fallback_row_count || 0)}</dd></div>
+                </dl>
+            </section>
+        `;
+    }
+
     function renderModel(model) {
         const root = document.getElementById('trade-flow-result');
         if (!root) return;
@@ -55,20 +99,7 @@
             `;
             return;
         }
-        const connectorPanel = model.market === 'CN' && chinaConnectorStatus ? `
-            <section class="trade-flow-connector trade-flow-connector--${escapeHtml(chinaConnectorStatus.connector_status || 'unknown')}">
-                <div>
-                    <span>China Customs connector</span>
-                    <strong>${escapeHtml(chinaConnectorStatus.ok ? 'Last sync completed' : 'Last-good data retained')}</strong>
-                    <small>${escapeHtml(chinaConnectorStatus.reason || 'Connector status is available for review.')}</small>
-                </div>
-                <dl>
-                    <div><dt>Official platform</dt><dd>${escapeHtml(chinaConnectorStatus.official_platform_latest_period || 'Not declared')}</dd></div>
-                    <div><dt>TraceWize synchronized</dt><dd>${escapeHtml(chinaConnectorStatus.synchronized_through || 'Not synchronized')}</dd></div>
-                    <div><dt>Industry coverage</dt><dd>${escapeHtml((chinaConnectorStatus.covered_industries || []).length)}/${escapeHtml((chinaConnectorStatus.supported_industries || []).length)}</dd></div>
-                </dl>
-            </section>
-        ` : '';
+        const connectorPanel = renderConnectorPanel(model);
         root.innerHTML = `
             ${connectorPanel}
             <section class="trade-flow-summary">
@@ -149,23 +180,27 @@
         const form = document.getElementById('trade-flow-form');
         try {
             const version = global.TradeComplyBuild || Date.now();
-            const [baseResponse, industryResponse, connectorResponse] = await Promise.all([
+            const [baseResponse, industryResponse, connectorResponse, nationalConnectorResponse] = await Promise.all([
                 fetch(`data/trade-flow.json?v=${version}`, { cache: 'no-store' }),
                 fetch(`data/china-industry-flow.json?v=${version}`, { cache: 'no-store' }),
-                fetch(`data/china-customs-sync-status.json?v=${version}`, { cache: 'no-store' })
+                fetch(`data/china-customs-sync-status.json?v=${version}`, { cache: 'no-store' }),
+                fetch(`data/national-trade-flow-sync-status.json?v=${version}`, { cache: 'no-store' })
             ]);
             if (!baseResponse.ok) throw new Error(`HTTP ${baseResponse.status}`);
             const basePayload = await baseResponse.json();
             const industryPayload = industryResponse.ok ? await industryResponse.json() : { sources: [], series: [] };
             chinaConnectorStatus = connectorResponse.ok ? await connectorResponse.json() : null;
+            nationalConnectorStatus = nationalConnectorResponse.ok ? await nationalConnectorResponse.json() : null;
             payload = {
                 ...basePayload,
                 sources: [...(basePayload.sources || []), ...(industryPayload.sources || [])],
-                series: [...(basePayload.series || []), ...(industryPayload.series || [])]
+                series: [...(basePayload.series || []), ...(industryPayload.series || [])],
+                national_connector_status: nationalConnectorStatus
             };
         } catch (error) {
             payload = { sources: [], series: [] };
             chinaConnectorStatus = null;
+            nationalConnectorStatus = null;
         }
         const routeOptions = global.TradeComplyCountryRegistry?.getRouteOptions?.() || [];
         fillSelect(market, routeOptions.filter((row) => row.value !== 'GLOBAL' && row.value !== 'ASEAN'), 'Select market');

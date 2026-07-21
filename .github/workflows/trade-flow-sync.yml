@@ -57,6 +57,9 @@ jobs:
         env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
           OFFICIAL_TRADE_FLOW_MANIFEST: ${{ inputs.official_trade_flow_manifest || vars.OFFICIAL_TRADE_FLOW_MANIFEST }}
+          JP_OFFICIAL_TRADE_FLOW_URL: ${{ secrets.JP_OFFICIAL_TRADE_FLOW_URL || vars.JP_OFFICIAL_TRADE_FLOW_URL }}
+          KR_OFFICIAL_TRADE_FLOW_URL: ${{ secrets.KR_OFFICIAL_TRADE_FLOW_URL || vars.KR_OFFICIAL_TRADE_FLOW_URL }}
+          SG_OFFICIAL_TRADE_FLOW_URL: ${{ secrets.SG_OFFICIAL_TRADE_FLOW_URL || vars.SG_OFFICIAL_TRADE_FLOW_URL }}
         run: npm run sync:trade-flow
 
       - name: Sync China Customs industry flow
@@ -88,7 +91,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: official-trade-flow-sync-status
-          path: data/trade-flow-sync-status.json
+          path: |
+            data/trade-flow-sync-status.json
+            data/national-trade-flow-sync-status.json
           retention-days: 30
 
       - name: Publish official trade-flow sync summary
@@ -109,6 +114,15 @@ jobs:
             if (connector.error) console.log(`  - ${connector.error}`);
             for (const batch of connector.batches || []) {
               console.log(`  - ${batch.path}: ${batch.ok ? `${batch.row_count} row(s) accepted` : `rejected · ${batch.error}`}`);
+            }
+          }
+          if (fs.existsSync('data/national-trade-flow-sync-status.json')) {
+            const national = JSON.parse(fs.readFileSync('data/national-trade-flow-sync-status.json', 'utf8'));
+            console.log('');
+            console.log('### National official connectors');
+            for (const [market, state] of Object.entries(national.markets || {})) {
+              console.log(`- ${market}: ${state.status} · latest ${state.latest_period || 'none'} · ${state.official_row_count || 0} official row(s)`);
+              if (state.last_error) console.log(`  - ${state.last_error}`);
             }
           }
           NODE
@@ -182,7 +196,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
-          git add data/trade-flow.json data/trade-flow-sync-status.json data/china-industry-flow.json data/china-customs-sync-status.json data/china-customs-sync-plan.json data/china-customs-pending-batch.json
+          git add data/trade-flow.json data/trade-flow-sync-status.json data/national-trade-flow-sync-status.json data/china-industry-flow.json data/china-customs-sync-status.json data/china-customs-sync-plan.json data/china-customs-pending-batch.json
           if git diff --staged --quiet; then
             echo "No trade-flow changes."
             exit 0

@@ -13,6 +13,7 @@ const {
     parseComtradeRows,
     syncCensus,
     syncComtrade,
+    syncNationalOfficialConnectors,
     syncOfficialBatches,
     validateOfficialManifest
 } = require('../scripts/update-trade-flow');
@@ -175,4 +176,75 @@ test('national official batches publish complete scopes and reject incomplete sc
     assert.equal(payload.series.some((row) => row.source_id === 'jp-customs-monthly' && row.exports_value_usd === 80), true);
     assert.equal(payload.series.some((row) => row.source_id === 'kr-customs-monthly' && row.exports_value_usd === 30), true);
     fs.rmSync(tempDir, { recursive: true, force: true });
+});
+
+test('national connector publishes a complete Japan official batch', async () => {
+    const payload = { sources: [], series: [] };
+    const connector = {
+        market: 'JP', id: 'jp-customs-monthly', name: 'Japan Customs',
+        official_url: 'https://www.customs.go.jp/', feed_env: 'JP_URL'
+    };
+    const manifest = {
+        complete: true,
+        source: { id: 'jp-customs-monthly', name: 'Japan Customs', source_url: 'https://www.customs.go.jp/' },
+        expected: { markets: ['JP'], months: ['2026-04'], industry_ids: ['memory'], directions: ['import', 'export'] },
+        series: [{ market: 'JP', industry_id: 'memory', month: '2026-04', imports_value_usd: 100, exports_value_usd: 80 }]
+    };
+    const result = await syncNationalOfficialConnectors(payload, {
+        registry: { connectors: [connector] },
+        env: { JP_URL: 'https://feed.test/jp.json' },
+        fetchImpl: async () => ({ ok: true, json: async () => manifest }),
+        referenceDate: new Date('2026-05-15T00:00:00Z')
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.status.markets.JP.status, 'national_official_current');
+    assert.equal(payload.series.some((row) => row.source_id === 'jp-customs-monthly' && row.exports_value_usd === 80), true);
+});
+
+test('national connector retains Korea last-good rows when a new batch is incomplete', async () => {
+    const lastGood = {
+        source_id: 'kr-customs-monthly', market: 'KR', partner: 'WORLD', industry_id: 'memory',
+        hs_code: 'INDUSTRY', month: '2026-04', imports_value_usd: 40, exports_value_usd: 30
+    };
+    const payload = { sources: [{ id: 'kr-customs-monthly', status: 'official_current' }], series: [lastGood] };
+    const connector = {
+        market: 'KR', id: 'kr-customs-monthly', name: 'Korea Customs',
+        official_url: 'https://www.customs.go.kr/', feed_env: 'KR_URL'
+    };
+    const manifest = {
+        complete: true,
+        source: { id: 'kr-customs-monthly', name: 'Korea Customs', source_url: 'https://www.customs.go.kr/' },
+        expected: { markets: ['KR'], months: ['2026-04'], industry_ids: ['memory'], directions: ['import', 'export'] },
+        series: [{ market: 'KR', industry_id: 'memory', month: '2026-04', imports_value_usd: 50 }]
+    };
+    const result = await syncNationalOfficialConnectors(payload, {
+        registry: { connectors: [connector] },
+        env: { KR_URL: 'https://feed.test/kr.json' },
+        fetchImpl: async () => ({ ok: true, json: async () => manifest }),
+        referenceDate: new Date('2026-05-15T00:00:00Z')
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.status.markets.KR.status, 'last_good_degraded');
+    assert.deepEqual(payload.series, [lastGood]);
+});
+
+test('national connector reports Singapore historical fallback without a configured feed', async () => {
+    const fallback = {
+        source_id: 'un-comtrade-monthly', market: 'SG', partner: 'WORLD', industry_id: 'memory',
+        hs_code: '854232', month: '2025-12', imports_value_usd: 10, exports_value_usd: 5
+    };
+    const payload = { sources: [{ id: 'un-comtrade-monthly', status: 'official_current' }], series: [fallback] };
+    const connector = {
+        market: 'SG', id: 'sg-singstat-monthly', name: 'Singapore SingStat',
+        official_url: 'https://www.singstat.gov.sg/', feed_env: 'SG_URL'
+    };
+    const result = await syncNationalOfficialConnectors(payload, {
+        registry: { connectors: [connector] },
+        env: {},
+        referenceDate: new Date('2026-05-15T00:00:00Z')
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.skipped, true);
+    assert.equal(result.status.markets.SG.status, 'un_comtrade_fallback');
+    assert.equal(result.status.markets.SG.fallback_row_count, 1);
 });

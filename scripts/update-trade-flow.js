@@ -8,6 +8,8 @@ const { INDUSTRIES } = require('../lib/trade-flow');
 const ROOT = path.join(__dirname, '..');
 const DATA_PATH = path.join(ROOT, 'data', 'trade-flow.json');
 const STATUS_PATH = path.join(ROOT, 'data', 'trade-flow-sync-status.json');
+const NATIONAL_CONNECTOR_REGISTRY_PATH = path.join(ROOT, 'data', 'national-trade-flow-connectors.json');
+const NATIONAL_CONNECTOR_STATUS_PATH = path.join(ROOT, 'data', 'national-trade-flow-sync-status.json');
 const OFFICIAL_BATCH_DIR = path.join(ROOT, 'data', 'inbox', 'trade-flow');
 const CENSUS_SOURCE_ID = 'us-census-international-trade';
 const COMTRADE_SOURCE_ID = 'un-comtrade-monthly';
@@ -505,22 +507,127 @@ function syncOfficialBatches(payload, { manifestPaths = discoverOfficialBatchPat
     return { ok: allOk, skipped: false, rows: acceptedRows, batches };
 }
 
-async function run({ dryRun = false, apiKey, fetchImpl, manifestPaths } = {}) {
+function monthLag(latestMonth, referenceDate = new Date()) {
+    const match = String(latestMonth || '').match(/^(\d{4})-(\d{2})$/);
+    if (!match) return null;
+    const reference = new Date(referenceDate);
+    return ((reference.getUTCFullYear() - Number(match[1])) * 12) + (reference.getUTCMonth() + 1 - Number(match[2]));
+}
+
+function nationalConnectorState(payload, connector, { error = '', referenceDate = new Date() } = {}) {
+    const officialRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === connector.id);
+    const fallbackRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === COMTRADE_SOURCE_ID);
+    const latestPeriod = officialRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '';
+    const lagMonths = monthLag(latestPeriod, referenceDate);
+    let status = 'no_official_series';
+    if (officialRows.length && error) status = 'last_good_degraded';
+    else if (officialRows.length && Number.isFinite(lagMonths) && lagMonths > 4) status = 'official_delayed';
+    else if (officialRows.length) status = 'national_official_current';
+    else if (fallbackRows.length) status = 'un_comtrade_fallback';
+    return {
+        market: connector.market,
+        connector_id: connector.id,
+        connector_name: connector.name,
+        official_url: connector.official_url,
+        status,
+        latest_period: latestPeriod || fallbackRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '',
+        lag_months: lagMonths,
+        official_row_count: officialRows.length,
+        fallback_row_count: fallbackRows.length,
+        last_error: error || undefined
+    };
+}
+
+async function syncNationalOfficialConnectors(payload, {
+    registry = readJson(NATIONAL_CONNECTOR_REGISTRY_PATH, { connectors: [] }),
+    env = process.env,
+    fetchImpl,
+    referenceDate = new Date()
+} = {}) {
+    const markets = {};
+    const acceptedRows = [];
+    const failures = [];
+    for (const connector of registry.connectors || []) {
+        const feedUrl = String(env[connector.feed_env] || '').trim();
+        let error = '';
+        if (feedUrl) {
+            try {
+                const manifest = await fetchJson(feedUrl, fetchImpl, { retries: 2 });
+                const validated = validateOfficialManifest(manifest);
+                if (validated.source.id !== connector.id) throw new Error(`Source id must be ${connector.id}`);
+                if (validated.expected.markets.length !== 1 || validated.expected.markets[0] !== connector.market) {
+                    throw new Error(`Manifest must contain only market ${connector.market}`);
+                }
+                const existing = Array.isArray(payload.series) ? payload.series : [];
+                const requestedIds = validated.expected.markets.flatMap((market) => (
+                    validated.expected.months.flatMap((month) => validated.expected.industryIds.map((industryId) => `${market}/${industryId}/${month}`))
+                ));
+                const completedIds = validated.rows.map((row) => `${row.market}/${row.industry_id}/${row.month}`);
+                const complete = validateCompleteBatch({
+                    existing,
+                    incoming: validated.rows,
+                    sourceId: connector.id,
+                    requestedIds,
+                    completedIds,
+                    latestMonth: validated.expected.months.slice().sort().at(-1),
+                    scope: validated.scope
+                });
+                if (!complete.ok) throw new Error(complete.reason);
+                payload.series = replaceSourceScope(existing, validated.rows, connector.id, validated.scope);
+                const sourceEntry = (payload.sources || []).find((source) => source.id === connector.id);
+                const nextSource = {
+                    ...(sourceEntry || {}),
+                    id: connector.id,
+                    name: connector.name,
+                    source_url: connector.official_url,
+                    markets: [connector.market],
+                    status: 'official_current',
+                    role: 'national_official_monthly_industry',
+                    latest_period: validated.expected.months.slice().sort().at(-1),
+                    row_count: validated.rows.length,
+                    last_success_at: new Date().toISOString()
+                };
+                if (sourceEntry) Object.assign(sourceEntry, nextSource);
+                else payload.sources = [...(payload.sources || []), nextSource];
+                acceptedRows.push(...validated.rows);
+            } catch (caught) {
+                error = String(caught.message || caught);
+                failures.push({ market: connector.market, connector_id: connector.id, error });
+            }
+        }
+        markets[connector.market] = nationalConnectorState(payload, connector, { error, referenceDate });
+    }
+    const status = {
+        schema_version: '1.0',
+        generated_at: new Date().toISOString(),
+        ok: failures.length === 0,
+        publish_policy: 'complete_batch_only_last_good_retained',
+        markets,
+        failures
+    };
+    payload.national_connector_status = status;
+    if (acceptedRows.length) payload.updated_at = new Date().toISOString();
+    return { ok: status.ok, skipped: acceptedRows.length === 0 && failures.length === 0, rows: acceptedRows, status, failures };
+}
+
+async function run({ dryRun = false, apiKey, fetchImpl, manifestPaths, nationalRegistry, env, referenceDate } = {}) {
     const payload = readJson(DATA_PATH, { schema_version: '1.0', sources: [], series: [] });
     const comtrade = await syncComtrade(payload, { fetchImpl });
     const census = await syncCensus(payload, { apiKey, fetchImpl });
     const officialBatches = syncOfficialBatches(payload, { manifestPaths });
+    const nationalOfficial = await syncNationalOfficialConnectors(payload, { registry: nationalRegistry, env, fetchImpl, referenceDate });
     const result = {
-        ok: comtrade.ok && census.ok && officialBatches.ok,
+        ok: comtrade.ok && census.ok && officialBatches.ok && nationalOfficial.ok,
         skipped: comtrade.skipped && census.skipped,
         reason: census.reason,
-        error: [comtrade.error, census.error, ...officialBatches.batches.filter((batch) => !batch.ok).map((batch) => batch.error)].filter(Boolean).join('; ') || undefined,
-        rows: [...comtrade.rows, ...census.rows, ...officialBatches.rows],
-        connectors: { comtrade, census, official_batches: officialBatches },
+        error: [comtrade.error, census.error, ...officialBatches.batches.filter((batch) => !batch.ok).map((batch) => batch.error), ...nationalOfficial.failures.map((failure) => failure.error)].filter(Boolean).join('; ') || undefined,
+        rows: [...comtrade.rows, ...census.rows, ...officialBatches.rows, ...nationalOfficial.rows],
+        connectors: { comtrade, census, official_batches: officialBatches, national_official: nationalOfficial },
         payload
     };
     if (!dryRun) {
         writeJson(DATA_PATH, payload);
+        writeJson(NATIONAL_CONNECTOR_STATUS_PATH, nationalOfficial.status);
         writeJson(STATUS_PATH, {
             schema_version: '1.0',
             generated_at: new Date().toISOString(),
@@ -529,7 +636,8 @@ async function run({ dryRun = false, apiKey, fetchImpl, manifestPaths } = {}) {
             connectors: {
                 comtrade: { ok: comtrade.ok, skipped: comtrade.skipped, row_count: comtrade.rows.length, error: comtrade.error },
                 census: { ok: census.ok, skipped: census.skipped, row_count: census.rows.length, reason: census.reason, error: census.error },
-                official_batches: { ok: officialBatches.ok, skipped: officialBatches.skipped, row_count: officialBatches.rows.length, batches: officialBatches.batches }
+                official_batches: { ok: officialBatches.ok, skipped: officialBatches.skipped, row_count: officialBatches.rows.length, batches: officialBatches.batches },
+                national_official: { ok: nationalOfficial.ok, skipped: nationalOfficial.skipped, row_count: nationalOfficial.rows.length, markets: nationalOfficial.status.markets, failures: nationalOfficial.failures }
             }
         });
     }
@@ -557,6 +665,7 @@ module.exports = {
     run,
     syncCensus,
     syncComtrade,
+    syncNationalOfficialConnectors,
     syncOfficialBatches,
     validateCompleteBatch,
     validateOfficialManifest
