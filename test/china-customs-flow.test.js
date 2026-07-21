@@ -7,6 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 const XLSX = require('xlsx');
 const {
+    INDUSTRIES,
     SOURCE_ID,
     atomicWriteJson,
     buildCoveragePlan,
@@ -22,10 +23,13 @@ const {
     parseOfficialWorkbook
 } = require('../lib/china-customs-flow');
 const {
+    configuredRequiredPeriods,
     discoverInboxManifest,
+    emptyPendingBatch,
     loadExportDirectory,
     loadExportManifest,
-    loadInbox
+    loadInbox,
+    promotionStatusMetadata
 } = require('../scripts/update-china-customs-flow');
 
 function currentPayload() {
@@ -239,6 +243,76 @@ test('China Customs coverage plan lists all nine industries and missing directio
     assert.equal(plan.required_rows.length, 9);
     assert.equal(plan.required_rows.find((row) => row.industry_id === 'memory').imports_required, true);
     assert.equal(plan.complete, false);
+});
+
+test('China Customs strict diagnostics require every month, industry, and direction', () => {
+    const diagnostics = coverageDiagnostics(currentPayload(), '2026-05', {
+        requiredPeriods: ['2026-03', '2026-04', '2026-05']
+    });
+    assert.equal(INDUSTRIES.length, 9);
+    assert.deepEqual(diagnostics.required_periods, ['2026-03', '2026-04', '2026-05']);
+    assert.equal(diagnostics.required_combination_count, 54);
+    assert.equal(diagnostics.completed_combination_count, 0);
+    assert.equal(diagnostics.missing_combinations.length, 54);
+    assert.deepEqual(diagnostics.missing_combinations[0], {
+        month: '2026-03',
+        industry_id: 'semiconductor_ai',
+        direction: 'imports',
+        key: '2026-03:semiconductor_ai:imports'
+    });
+    assert.equal(diagnostics.batch_complete, false);
+});
+
+test('China Customs strict coverage plan exposes all 27 monthly industry rows', () => {
+    const plan = buildCoveragePlan(currentPayload(), '2026-05', {
+        requiredPeriods: ['2026-03', '2026-04', '2026-05']
+    });
+    assert.equal(plan.required_rows.length, 27);
+    assert.equal(plan.required_direction_count, 54);
+    assert.equal(plan.completed_direction_count, 0);
+    assert.equal(plan.missing_direction_count, 54);
+    assert.equal(plan.required_rows.at(-1).month, '2026-05');
+    assert.equal(plan.required_rows.at(-1).industry_id, 'gaming');
+    assert.equal(plan.complete, false);
+});
+
+test('China Customs required periods default to the unsynchronized month range', () => {
+    const previous = process.env.CHINA_CUSTOMS_REQUIRED_MONTHS;
+    delete process.env.CHINA_CUSTOMS_REQUIRED_MONTHS;
+    try {
+        assert.deepEqual(configuredRequiredPeriods(currentPayload(), '2026-05'), ['2026-03', '2026-04', '2026-05']);
+        process.env.CHINA_CUSTOMS_REQUIRED_MONTHS = '2026-05, 2026-03,2026-05';
+        assert.deepEqual(configuredRequiredPeriods(currentPayload(), '2026-05'), ['2026-03', '2026-05']);
+    } finally {
+        if (previous === undefined) delete process.env.CHINA_CUSTOMS_REQUIRED_MONTHS;
+        else process.env.CHINA_CUSTOMS_REQUIRED_MONTHS = previous;
+    }
+});
+
+test('China Customs pending batch starts inactive and last-good metadata is retained until promotion', () => {
+    assert.deepEqual(emptyPendingBatch(), {
+        schema_version: 1,
+        active: false,
+        updated_at: null,
+        required_periods: [],
+        payload: null,
+        source_evidence: []
+    });
+    const current = currentPayload();
+    const candidate = mergePayload(current, {
+        official_platform_latest_period: '2026-05',
+        series: [{ industry: 'memory', month: '2026-05', imports_value_usd: 3, exports_value_usd: 4 }]
+    });
+    const staged = promotionStatusMetadata(current, candidate, false);
+    assert.equal(staged.synchronized_through, '2026-02');
+    assert.equal(staged.staged_synchronized_through, '2026-05');
+    assert.deepEqual(staged.covered_industries, ['computing']);
+    assert.equal(staged.staged_covered_industries.includes('memory'), true);
+
+    const promoted = promotionStatusMetadata(current, candidate, true);
+    assert.equal(promoted.synchronized_through, '2026-05');
+    assert.equal(promoted.staged_synchronized_through, null);
+    assert.deepEqual(promoted.staged_covered_industries, []);
 });
 
 test('China Customs payload combiner retains rows and newest declared platform month', () => {

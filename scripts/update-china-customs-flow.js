@@ -11,6 +11,8 @@ const {
     combineOfficialPayloads,
     coverageDiagnostics,
     mergePayload,
+    monthRange,
+    nextMonth,
     normalizeIndustryId,
     parseOfficialExport,
     parseOfficialFile,
@@ -22,6 +24,7 @@ const ROOT = path.join(__dirname, '..');
 const DATA_PATH = path.join(ROOT, 'data', 'china-industry-flow.json');
 const STATUS_PATH = path.join(ROOT, 'data', 'china-customs-sync-status.json');
 const PLAN_PATH = path.join(ROOT, 'data', 'china-customs-sync-plan.json');
+const PENDING_PATH = path.join(ROOT, 'data', 'china-customs-pending-batch.json');
 const DEFAULT_INBOX_PATH = path.join(ROOT, 'data', 'inbox', 'china-customs');
 const DEFAULT_MANIFEST_NAMES = ['manifest.json', 'china-customs-manifest.json'];
 const dryRun = process.argv.includes('--dry-run');
@@ -245,22 +248,84 @@ async function loadIncoming() {
         if (fs.statSync(absolutePath).isDirectory()) return loadInbox(absolutePath);
         return { payload: parseExportFile(absolutePath), mode: 'file', location: inputPath, files: [inputPath] };
     }
+    const inbox = await loadInbox(process.env.CHINA_CUSTOMS_FLOW_DIR || DEFAULT_INBOX_PATH);
+    if (inbox) return inbox;
     if (process.env.CHINA_CUSTOMS_FLOW_URL) {
         return { payload: await fetchOfficialExport(process.env.CHINA_CUSTOMS_FLOW_URL), mode: 'url', location: process.env.CHINA_CUSTOMS_FLOW_URL };
     }
-    return loadInbox(process.env.CHINA_CUSTOMS_FLOW_DIR || DEFAULT_INBOX_PATH);
+    return null;
 }
 
-function writePlan(payload) {
+function configuredRequiredPeriods(current, officialPeriod) {
+    const configured = String(process.env.CHINA_CUSTOMS_REQUIRED_MONTHS || '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+    if (configured.length) return [...new Set(configured)].sort();
+    const source = sourceMetadata(current);
+    const synchronizedThrough = source.synchronized_through || source.latest_period || null;
+    if (!synchronizedThrough || !officialPeriod || synchronizedThrough >= officialPeriod) {
+        return officialPeriod ? [officialPeriod] : [];
+    }
+    return monthRange(nextMonth(synchronizedThrough), officialPeriod);
+}
+
+function emptyPendingBatch() {
+    return {
+        schema_version: 1,
+        active: false,
+        updated_at: null,
+        required_periods: [],
+        payload: null,
+        source_evidence: []
+    };
+}
+
+function readPendingBatch() {
+    if (!fs.existsSync(PENDING_PATH)) return emptyPendingBatch();
+    const pending = JSON.parse(fs.readFileSync(PENDING_PATH, 'utf8'));
+    return pending && pending.active && pending.payload ? pending : emptyPendingBatch();
+}
+
+function writePendingBatch(value) {
+    if (!dryRun) atomicWriteJson(PENDING_PATH, value);
+}
+
+function writePlan(payload, requiredPeriods = []) {
     const source = sourceMetadata(payload);
-    const plan = buildCoveragePlan(payload, process.env.CHINA_CUSTOMS_LATEST_PERIOD || source.official_platform_latest_period || null);
+    const plan = buildCoveragePlan(
+        payload,
+        process.env.CHINA_CUSTOMS_LATEST_PERIOD || source.official_platform_latest_period || null,
+        { requiredPeriods }
+    );
     if (!dryRun) atomicWriteJson(PLAN_PATH, plan);
     return plan;
 }
 
+function promotionStatusMetadata(current, candidate, batchComplete) {
+    const currentSource = sourceMetadata(current);
+    const candidateSource = sourceMetadata(candidate);
+    return {
+        synchronized_through: batchComplete
+            ? (candidateSource.synchronized_through || candidateSource.latest_period || null)
+            : (currentSource.synchronized_through || currentSource.latest_period || null),
+        covered_industries: batchComplete
+            ? (candidateSource.covered_industries || [])
+            : (currentSource.covered_industries || []),
+        staged_synchronized_through: batchComplete
+            ? null
+            : (candidateSource.synchronized_through || candidateSource.latest_period || null),
+        staged_covered_industries: batchComplete
+            ? []
+            : (candidateSource.covered_industries || [])
+    };
+}
+
 function buildStatus(current, values = {}) {
     const source = sourceMetadata(current);
-    const diagnostics = coverageDiagnostics(current, process.env.CHINA_CUSTOMS_LATEST_PERIOD || source.official_platform_latest_period || null);
+    const officialPeriod = process.env.CHINA_CUSTOMS_LATEST_PERIOD || source.official_platform_latest_period || null;
+    const requiredPeriods = values.required_periods || configuredRequiredPeriods(current, officialPeriod);
+    const diagnostics = coverageDiagnostics(current, officialPeriod, { requiredPeriods });
     return {
         schema_version: 1,
         source_id: SOURCE_ID,
@@ -271,6 +336,7 @@ function buildStatus(current, values = {}) {
         source_mode: 'not_configured',
         official_platform_latest_period: process.env.CHINA_CUSTOMS_LATEST_PERIOD || source.official_platform_latest_period || null,
         synchronized_through: source.synchronized_through || source.latest_period || null,
+        required_periods: requiredPeriods,
         supported_industries: source.supported_industries || [],
         covered_industries: source.covered_industries || [],
         coverage: diagnostics,
@@ -281,11 +347,32 @@ function buildStatus(current, values = {}) {
 
 async function main() {
     const current = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+    const pending = readPendingBatch();
     let status = buildStatus(current);
     try {
         const incoming = await loadIncoming();
         if (!incoming) {
-            const plan = writePlan(current);
+            const candidate = pending.active ? mergePayload(current, pending.payload) : current;
+            const candidateSource = sourceMetadata(candidate);
+            const officialPeriod = process.env.CHINA_CUSTOMS_LATEST_PERIOD
+                || candidateSource.official_platform_latest_period
+                || sourceMetadata(current).official_platform_latest_period
+                || null;
+            const requiredPeriods = pending.required_periods?.length
+                ? pending.required_periods
+                : configuredRequiredPeriods(current, officialPeriod);
+            const plan = writePlan(candidate, requiredPeriods);
+            status = buildStatus(current, {
+                required_periods: requiredPeriods,
+                connector_status: pending.active ? 'staged_incomplete_batch' : status.connector_status,
+                pending_batch_active: pending.active,
+                pending_batch_path: path.relative(ROOT, PENDING_PATH),
+                pending_rows: pending.payload?.series?.length || 0,
+                pending_missing_combinations: plan.missing_combinations || [],
+                reason: pending.active
+                    ? `An incomplete official batch is staged. Production remains unchanged until all ${plan.required_direction_count} month-industry-direction values are present.`
+                    : status.reason
+            });
             status.coverage_plan = {
                 path: path.relative(ROOT, PLAN_PATH),
                 missing_direction_count: plan.missing_direction_count
@@ -297,42 +384,70 @@ async function main() {
         if (process.env.CHINA_CUSTOMS_LATEST_PERIOD && !incoming.payload.official_platform_latest_period) {
             incoming.payload.official_platform_latest_period = process.env.CHINA_CUSTOMS_LATEST_PERIOD;
         }
-        const next = mergePayload(current, incoming.payload);
+        const accumulatedIncoming = pending.active
+            ? combineOfficialPayloads([pending.payload, incoming.payload])
+            : incoming.payload;
+        const next = mergePayload(current, accumulatedIncoming);
         const source = sourceMetadata(next);
-        const diagnostics = coverageDiagnostics(next, source.official_platform_latest_period);
+        const requiredPeriods = [...new Set([
+            ...(pending.required_periods || []),
+            ...configuredRequiredPeriods(current, source.official_platform_latest_period)
+        ])].sort();
+        const diagnostics = coverageDiagnostics(next, source.official_platform_latest_period, { requiredPeriods });
         const receivedIndustries = [...new Set(incoming.payload.series.map((row) => (
             normalizeIndustryId(row.industry_id || row.industry || row.category)
         )))].sort();
+        const batchComplete = diagnostics.batch_complete;
+        const promotionMetadata = promotionStatusMetadata(current, next, batchComplete);
         status = buildStatus(next, {
             ok: true,
-            data_updated: true,
-            connector_status: diagnostics.complete ? 'current' : 'partial_coverage',
+            data_updated: batchComplete,
+            connector_status: batchComplete ? 'current' : 'staged_incomplete_batch',
             source_mode: incoming.mode,
             source_location: incoming.location,
             source_files: incoming.files || [],
             source_evidence: incoming.evidence || [],
             official_platform_latest_period: source.official_platform_latest_period,
-            synchronized_through: source.synchronized_through,
+            ...promotionMetadata,
             rows_received: incoming.payload.series.length,
             industries_received: receivedIndustries,
             supported_industries: source.supported_industries || [],
-            covered_industries: source.covered_industries || [],
             coverage: diagnostics,
-            last_success_at: new Date().toISOString(),
-            reason: diagnostics.complete
-                ? 'China Customs industry data is synchronized through the latest declared official platform month with all maintained industries and directions.'
-                : `Official rows were imported and last-good history was preserved. Remaining gaps: ${diagnostics.missing_periods.length} month(s), ${diagnostics.missing_industries_at_target.length} industry category/categories, ${diagnostics.missing_directions_at_target.length} trade direction(s).`
+            required_periods: requiredPeriods,
+            pending_batch_active: !batchComplete,
+            pending_batch_path: path.relative(ROOT, PENDING_PATH),
+            pending_rows: batchComplete ? 0 : accumulatedIncoming.series.length,
+            pending_missing_combinations: diagnostics.missing_combinations,
+            last_success_at: batchComplete ? new Date().toISOString() : undefined,
+            reason: batchComplete
+                ? 'China Customs industry data passed the complete month × industry × direction gate and was promoted to production.'
+                : `Official rows were staged, but production was not changed. ${diagnostics.missing_combinations.length} required month-industry-direction value(s) remain missing.`
         });
         if (!dryRun) {
-            atomicWriteJson(DATA_PATH, next);
-            const plan = writePlan(next);
+            if (batchComplete) {
+                atomicWriteJson(DATA_PATH, next);
+                writePendingBatch(emptyPendingBatch());
+            } else {
+                writePendingBatch({
+                    schema_version: 1,
+                    active: true,
+                    updated_at: new Date().toISOString(),
+                    required_periods: requiredPeriods,
+                    payload: accumulatedIncoming,
+                    source_evidence: [
+                        ...(pending.source_evidence || []),
+                        ...(incoming.evidence || [])
+                    ]
+                });
+            }
+            const plan = writePlan(next, requiredPeriods);
             status.coverage_plan = {
                 path: path.relative(ROOT, PLAN_PATH),
                 missing_direction_count: plan.missing_direction_count
             };
             atomicWriteJson(STATUS_PATH, status);
         }
-        console.log(`China Customs flow sync: ${source.synchronized_through} (${status.connector_status}).`);
+        console.log(`China Customs flow sync: ${batchComplete ? 'promoted' : 'staged'} (${status.connector_status}).`);
         return status;
     } catch (error) {
         status = buildStatus(current, {
@@ -341,7 +456,10 @@ async function main() {
             error: error.message,
             reason: 'Configured China Customs sync failed validation or transport. Last-good data was preserved.'
         });
-        const plan = writePlan(current);
+        const requiredPeriods = pending.required_periods?.length
+            ? pending.required_periods
+            : configuredRequiredPeriods(current, status.official_platform_latest_period);
+        const plan = writePlan(current, requiredPeriods);
         status.coverage_plan = {
             path: path.relative(ROOT, PLAN_PATH),
             missing_direction_count: plan.missing_direction_count
@@ -355,4 +473,22 @@ async function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildStatus, discoverInboxManifest, fetchOfficialExport, isManifestFileName, loadExportDirectory, loadExportManifest, loadInbox, loadIncoming, main, normalizeManifestDirection, parseExportFile, validateManifestCoverage, writePlan };
+module.exports = {
+    buildStatus,
+    configuredRequiredPeriods,
+    discoverInboxManifest,
+    emptyPendingBatch,
+    fetchOfficialExport,
+    isManifestFileName,
+    loadExportDirectory,
+    loadExportManifest,
+    loadInbox,
+    loadIncoming,
+    main,
+    normalizeManifestDirection,
+    parseExportFile,
+    promotionStatusMetadata,
+    readPendingBatch,
+    validateManifestCoverage,
+    writePlan
+};

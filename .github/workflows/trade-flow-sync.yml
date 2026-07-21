@@ -2,7 +2,7 @@ name: Monthly Trade Flow Sync
 
 on:
   schedule:
-    - cron: "32 18 * * 2"
+    - cron: "32 18 15 * *"
   workflow_dispatch:
     inputs:
       china_customs_export_url:
@@ -15,6 +15,10 @@ on:
         type: string
       china_customs_manifest:
         description: "Optional repository path to a China Customs batch export manifest"
+        required: false
+        type: string
+      china_customs_required_months:
+        description: "Comma-separated official months that must be complete before promotion"
         required: false
         type: string
 
@@ -55,6 +59,7 @@ jobs:
           CHINA_CUSTOMS_FLOW_URL: ${{ inputs.china_customs_export_url || secrets.CHINA_CUSTOMS_FLOW_URL }}
           CHINA_CUSTOMS_FLOW_MANIFEST: ${{ inputs.china_customs_manifest || vars.CHINA_CUSTOMS_FLOW_MANIFEST }}
           CHINA_CUSTOMS_LATEST_PERIOD: ${{ inputs.china_customs_latest_period || vars.CHINA_CUSTOMS_LATEST_PERIOD }}
+          CHINA_CUSTOMS_REQUIRED_MONTHS: ${{ inputs.china_customs_required_months || vars.CHINA_CUSTOMS_REQUIRED_MONTHS }}
         run: npm run sync:trade-flow:cn
 
       - name: Verify trade-flow output
@@ -68,6 +73,7 @@ jobs:
           path: |
             data/china-customs-sync-status.json
             data/china-customs-sync-plan.json
+            data/china-customs-pending-batch.json
           retention-days: 30
 
       - name: Publish China Customs coverage summary
@@ -80,8 +86,10 @@ jobs:
           console.log('## China Customs monthly industry coverage');
           console.log(`- Official platform month: ${status.official_platform_latest_period || 'unknown'}`);
           console.log(`- Synchronized through: ${status.synchronized_through || 'none'}`);
-          console.log(`- Nine-industry coverage: ${plan.completed_industry_count}/${plan.required_industry_count}`);
-          console.log(`- Missing import/export values at target month: ${plan.missing_direction_count}/${plan.required_direction_count}`);
+          console.log(`- Required months: ${(plan.required_periods || []).join(', ') || 'none'}`);
+          console.log(`- Complete month/industry/direction cells: ${plan.completed_direction_count}/${plan.required_direction_count}`);
+          console.log(`- Missing month/industry/direction cells: ${plan.missing_direction_count}/${plan.required_direction_count}`);
+          console.log(`- Promotion gate: ${plan.complete ? 'complete; production may advance' : 'incomplete; last-good production retained'}`);
           console.log(`- Connector: ${status.connector_status} (${status.source_mode})`);
           if (plan.missing_periods.length) console.log(`- Missing months: ${plan.missing_periods.join(', ')}`);
           console.log('');
@@ -110,12 +118,13 @@ jobs:
             }
             const missingRows = plan.required_rows
               .filter((row) => row.status !== 'complete')
-              .map((row) => `- ${row.industry}: ${row.imports_required ? 'imports ' : ''}${row.exports_required ? 'exports' : ''}`.trim())
+              .map((row) => `- ${row.month} · ${row.industry}: ${row.imports_required ? 'imports ' : ''}${row.exports_required ? 'exports' : ''}`.trim())
               .join('\n');
             const body = [
               `Official platform month: **${status.official_platform_latest_period || 'unknown'}**`,
               `Synchronized through: **${status.synchronized_through || 'none'}**`,
-              `Missing target-month directions: **${plan.missing_direction_count}/${plan.required_direction_count}**`,
+              `Required months: **${(plan.required_periods || []).join(', ') || 'none'}**`,
+              `Missing month/industry/direction cells: **${plan.missing_direction_count}/${plan.required_direction_count}**`,
               plan.missing_periods.length ? `Missing months: ${plan.missing_periods.join(', ')}` : '',
               '',
               '### Required official values',
@@ -136,7 +145,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
-          git add data/trade-flow.json data/china-industry-flow.json data/china-customs-sync-status.json data/china-customs-sync-plan.json
+          git add data/trade-flow.json data/china-industry-flow.json data/china-customs-sync-status.json data/china-customs-sync-plan.json data/china-customs-pending-batch.json
           if git diff --staged --quiet; then
             echo "No trade-flow changes."
             exit 0
