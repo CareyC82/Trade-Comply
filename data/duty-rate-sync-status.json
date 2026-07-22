@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-21T19:47:01.355Z",
-  "started_at": "2026-07-21T19:45:57.136Z",
-  "finished_at": "2026-07-21T19:47:01.355Z",
+  "updated_at": "2026-07-22T19:40:24.254Z",
+  "started_at": "2026-07-22T19:39:24.983Z",
+  "finished_at": "2026-07-22T19:40:24.254Z",
   "status": "ok",
   "ci_diagnostics": {
     "outcome": "completed_with_degraded_sources",
@@ -28,10 +28,10 @@
       {
         "country": "KR",
         "source": "Korea Customs official-live",
-        "category": "parser_no_rows",
-        "label": "Official source reachable, parser found no rate rows",
-        "reason": "official_source_returned_no_rate_rows",
-        "action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.",
+        "category": "network_transport",
+        "label": "Network transport",
+        "reason": "official_fetch_failed",
+        "action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.",
         "recovery_command": "npm run probe:duty-rates:kr",
         "recovery_hint": "Run the official probe before promoting this source."
       }
@@ -168,17 +168,17 @@
   "counts": {
     "sources_checked": 9,
     "sources_auto_applied": 9,
-    "total_changes": 58,
-    "total_rate_changes": 0,
+    "total_changes": 59,
+    "total_rate_changes": 1,
     "exceptions": 0,
     "filing_grade_auto_sources": 1,
     "parser_gap_sources": 13,
     "degraded_sources": 2
   },
   "source_failure_classification": {
-    "real_rate_changes": 0,
+    "real_rate_changes": 1,
     "degraded_probe_counts": {
-      "parser_no_rows": 1,
+      "network_transport": 1,
       "certificate": 1
     },
     "previous_valid_rates_preserved": [
@@ -200,7 +200,7 @@
     "exception_count": 0
   },
   "automation_digest": {
-    "headline": "1 filing-grade source(s) and 13 parser gap(s) tracked by daily duty-rate sync.",
+    "headline": "1 rate change(s) were detected by daily duty-rate sync.",
     "filing_grade_countries": [
       "US"
     ],
@@ -221,10 +221,10 @@
     "official_probe_degraded_reasons": [
       {
         "source": "Korea Customs official-live",
-        "reason": "official_source_returned_no_rate_rows",
-        "detail": "Official source was reachable but no machine-readable tariff rows were parsed.",
-        "category": "parser_no_rows",
-        "action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse."
+        "reason": "official_fetch_failed",
+        "detail": "fetch failed",
+        "category": "network_transport",
+        "action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable."
       },
       {
         "source": "India Customs official-live",
@@ -254,7 +254,7 @@
       "RU"
     ],
     "exception_countries": [],
-    "rate_change_count": 0,
+    "rate_change_count": 1,
     "health_ok": true,
     "priority_queue": [
       {
@@ -1135,9 +1135,9 @@
         "KC/KCC product-approval scope review"
       ],
       "transit_route_priority": false,
-      "degraded_category": "parser_no_rows",
-      "degraded_label": "Official source reachable, parser found no rate rows",
-      "degraded_action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.",
+      "degraded_category": "network_transport",
+      "degraded_label": "Network transport",
+      "degraded_action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.",
       "recovery_command": "npm run probe:duty-rates:kr",
       "recovery_hint": "Run the official probe before promoting this source.",
       "parser_gap_task": {
@@ -1164,9 +1164,9 @@
           "KC/KCC certification or electronics safety scope changes"
         ],
         "transit_route_priority": false,
-        "next_action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse."
+        "next_action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable."
       },
-      "next_upgrade": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse."
+      "next_upgrade": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable."
     },
     {
       "country": "MY",
@@ -1397,8 +1397,8 @@
     {
       "source": "EU-US 2026/1455 official annexes",
       "mode": "official-special-program",
-      "change_count": 0,
-      "rate_change_count": 0
+      "change_count": 1,
+      "rate_change_count": 1
     },
     {
       "source": "EU TARIC official-live",
@@ -1472,8 +1472,8 @@
       "ok": true,
       "applied": true,
       "mode": "official-special-program",
-      "change_count": 0,
-      "rate_change_count": 0,
+      "change_count": 1,
+      "rate_change_count": 1,
       "error_count": 0,
       "countries": [
         "EU",
@@ -1483,7 +1483,7 @@
       "writes_official_machine_rates": true,
       "official_fetch": {
         "ok": true,
-        "checked_at": "2026-07-21T19:46:06.573Z",
+        "checked_at": "2026-07-22T19:39:32.579Z",
         "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1455",
         "row_count": 242,
         "machine_parser_ready": true
@@ -1518,7 +1518,29 @@
         "specific_duty_errors": 0
       },
       "static_official_probes": null,
-      "changes": [],
+      "changes": [
+        {
+          "rule": "EU-US-2026-1455",
+          "change_type": "special_program_quota_change",
+          "affected_order_numbers": [
+            "09.9005",
+            "09.9007",
+            "09.9008",
+            "09.9015",
+            "09.9016",
+            "09.9017"
+          ],
+          "before_after": [
+            "09.9005: 468727257.618 -> 465096501.3 Kilogram",
+            "09.9007: 39699945.9 -> 39584602.9 Kilogram",
+            "09.9008: 340000000 -> 339999184 Kilogram",
+            "09.9015: 49974033.651 -> 49968538.651 Kilogram",
+            "09.9016: 249779137.25 -> 249751659.072 Kilogram",
+            "09.9017: 19899552.582 -> 19740529.106 Kilogram"
+          ],
+          "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/quota_list.jsp"
+        }
+      ],
       "errors": []
     },
     {
@@ -1534,7 +1556,7 @@
       "official_fetch": {
         "checked": true,
         "ok": true,
-        "checked_at": "2026-07-21T19:46:24.026Z",
+        "checked_at": "2026-07-22T19:39:44.529Z",
         "root_folder_id": "64db9d0f-e7c9-4084-afe9-f47e70e53c10",
         "latest_year": {
           "id": "566dd333-1deb-4235-982a-4fdeaf3657c1",
@@ -1575,8 +1597,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1587,8 +1609,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1599,8 +1621,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1611,8 +1633,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1623,8 +1645,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1635,8 +1657,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1647,8 +1669,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1659,8 +1681,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1671,8 +1693,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1683,8 +1705,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1695,8 +1717,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1707,8 +1729,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1719,8 +1741,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1731,8 +1753,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1743,8 +1765,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1755,8 +1777,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1767,8 +1789,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1779,8 +1801,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1791,8 +1813,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1803,8 +1825,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1815,8 +1837,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1827,8 +1849,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1839,8 +1861,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1851,8 +1873,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1863,8 +1885,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1875,8 +1897,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1887,8 +1909,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1899,8 +1921,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1911,8 +1933,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1923,8 +1945,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1935,8 +1957,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1947,8 +1969,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1959,8 +1981,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1971,8 +1993,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1983,8 +2005,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         },
@@ -1995,8 +2017,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:25.694Z",
-              "new_value": "2026-07-21T19:46:34.066Z"
+              "old_value": "2026-07-21T19:46:34.066Z",
+              "new_value": "2026-07-22T19:39:51.030Z"
             }
           ]
         }
@@ -2029,8 +2051,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:27.093Z",
-              "new_value": "2026-07-21T19:46:35.452Z"
+              "old_value": "2026-07-21T19:46:35.452Z",
+              "new_value": "2026-07-22T19:39:52.371Z"
             },
             {
               "field": "exact_code_overrides",
@@ -2044,7 +2066,7 @@
                   "source_hts": "847130 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2055,7 +2077,7 @@
                   "source_hts": "850440 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "850760",
@@ -2066,7 +2088,7 @@
                   "source_hts": "850760 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "851713",
@@ -2077,7 +2099,7 @@
                   "source_hts": "851713 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "851762",
@@ -2088,7 +2110,7 @@
                   "source_hts": "851762 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "852852",
@@ -2099,7 +2121,7 @@
                   "source_hts": "852852 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854143",
@@ -2110,7 +2132,7 @@
                   "source_hts": "854143 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854231",
@@ -2121,7 +2143,7 @@
                   "source_hts": "854231 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854232",
@@ -2132,7 +2154,7 @@
                   "source_hts": "854232 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854239",
@@ -2143,7 +2165,7 @@
                   "source_hts": "854239 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "901890",
@@ -2154,7 +2176,7 @@
                   "source_hts": "901890 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 }
               ],
               "new_value": [
@@ -2167,7 +2189,7 @@
                   "source_hts": "847130 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2178,7 +2200,7 @@
                   "source_hts": "850440 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "850760",
@@ -2189,7 +2211,7 @@
                   "source_hts": "850760 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "851713",
@@ -2200,7 +2222,7 @@
                   "source_hts": "851713 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "851762",
@@ -2211,7 +2233,7 @@
                   "source_hts": "851762 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "852852",
@@ -2222,7 +2244,7 @@
                   "source_hts": "852852 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854143",
@@ -2233,7 +2255,7 @@
                   "source_hts": "854143 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854231",
@@ -2244,7 +2266,7 @@
                   "source_hts": "854231 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854232",
@@ -2255,7 +2277,7 @@
                   "source_hts": "854232 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854239",
@@ -2266,7 +2288,7 @@
                   "source_hts": "854239 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "901890",
@@ -2277,7 +2299,7 @@
                   "source_hts": "901890 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 }
               ]
             }
@@ -2289,8 +2311,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:27.093Z",
-              "new_value": "2026-07-21T19:46:35.452Z"
+              "old_value": "2026-07-21T19:46:35.452Z",
+              "new_value": "2026-07-22T19:39:52.371Z"
             },
             {
               "field": "exact_code_overrides",
@@ -2304,7 +2326,7 @@
                   "source_hts": "847130 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2315,7 +2337,7 @@
                   "source_hts": "850440 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "850760",
@@ -2326,7 +2348,7 @@
                   "source_hts": "850760 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "851713",
@@ -2337,7 +2359,7 @@
                   "source_hts": "851713 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "851762",
@@ -2348,7 +2370,7 @@
                   "source_hts": "851762 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "852852",
@@ -2359,7 +2381,7 @@
                   "source_hts": "852852 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854143",
@@ -2370,7 +2392,7 @@
                   "source_hts": "854143 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854231",
@@ -2381,7 +2403,7 @@
                   "source_hts": "854231 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854232",
@@ -2392,7 +2414,7 @@
                   "source_hts": "854232 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "854239",
@@ -2403,7 +2425,7 @@
                   "source_hts": "854239 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 },
                 {
                   "hs_code": "901890",
@@ -2414,7 +2436,7 @@
                   "source_hts": "901890 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-20T19:54:27.093Z"
+                  "last_checked_at": "2026-07-21T19:46:35.452Z"
                 }
               ],
               "new_value": [
@@ -2427,7 +2449,7 @@
                   "source_hts": "847130 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2438,7 +2460,7 @@
                   "source_hts": "850440 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "850760",
@@ -2449,7 +2471,7 @@
                   "source_hts": "850760 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "851713",
@@ -2460,7 +2482,7 @@
                   "source_hts": "851713 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "851762",
@@ -2471,7 +2493,7 @@
                   "source_hts": "851762 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "852852",
@@ -2482,7 +2504,7 @@
                   "source_hts": "852852 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854143",
@@ -2493,7 +2515,7 @@
                   "source_hts": "854143 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854231",
@@ -2504,7 +2526,7 @@
                   "source_hts": "854231 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854232",
@@ -2515,7 +2537,7 @@
                   "source_hts": "854232 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "854239",
@@ -2526,7 +2548,7 @@
                   "source_hts": "854239 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 },
                 {
                   "hs_code": "901890",
@@ -2537,7 +2559,7 @@
                   "source_hts": "901890 (Singapore Customs exact-line candidate)",
                   "source_rate_text": "Singapore customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-                  "last_checked_at": "2026-07-21T19:46:35.452Z"
+                  "last_checked_at": "2026-07-22T19:39:52.371Z"
                 }
               ]
             }
@@ -2572,8 +2594,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:27.101Z",
-              "new_value": "2026-07-21T19:46:35.460Z"
+              "old_value": "2026-07-21T19:46:35.460Z",
+              "new_value": "2026-07-22T19:39:52.378Z"
             },
             {
               "field": "exact_code_overrides",
@@ -2587,7 +2609,7 @@
                   "source_hts": "847150 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "847130",
@@ -2598,7 +2620,7 @@
                   "source_hts": "847130 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2609,7 +2631,7 @@
                   "source_hts": "850440 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "850760",
@@ -2620,7 +2642,7 @@
                   "source_hts": "850760 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "851713",
@@ -2631,7 +2653,7 @@
                   "source_hts": "851713 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "851762",
@@ -2642,7 +2664,7 @@
                   "source_hts": "851762 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "852852",
@@ -2653,7 +2675,7 @@
                   "source_hts": "852852 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854143",
@@ -2664,7 +2686,7 @@
                   "source_hts": "854143 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854231",
@@ -2675,7 +2697,7 @@
                   "source_hts": "854231 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854232",
@@ -2686,7 +2708,7 @@
                   "source_hts": "854232 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854239",
@@ -2697,7 +2719,7 @@
                   "source_hts": "854239 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 }
               ],
               "new_value": [
@@ -2710,7 +2732,7 @@
                   "source_hts": "847150 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "847130",
@@ -2721,7 +2743,7 @@
                   "source_hts": "847130 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2732,7 +2754,7 @@
                   "source_hts": "850440 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "850760",
@@ -2743,7 +2765,7 @@
                   "source_hts": "850760 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "851713",
@@ -2754,7 +2776,7 @@
                   "source_hts": "851713 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "851762",
@@ -2765,7 +2787,7 @@
                   "source_hts": "851762 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "852852",
@@ -2776,7 +2798,7 @@
                   "source_hts": "852852 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854143",
@@ -2787,7 +2809,7 @@
                   "source_hts": "854143 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854231",
@@ -2798,7 +2820,7 @@
                   "source_hts": "854231 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854232",
@@ -2809,7 +2831,7 @@
                   "source_hts": "854232 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854239",
@@ -2820,7 +2842,7 @@
                   "source_hts": "854239 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 }
               ]
             }
@@ -2832,8 +2854,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:27.101Z",
-              "new_value": "2026-07-21T19:46:35.460Z"
+              "old_value": "2026-07-21T19:46:35.460Z",
+              "new_value": "2026-07-22T19:39:52.378Z"
             },
             {
               "field": "exact_code_overrides",
@@ -2847,7 +2869,7 @@
                   "source_hts": "847150 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "847130",
@@ -2858,7 +2880,7 @@
                   "source_hts": "847130 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2869,7 +2891,7 @@
                   "source_hts": "850440 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "850760",
@@ -2880,7 +2902,7 @@
                   "source_hts": "850760 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "851713",
@@ -2891,7 +2913,7 @@
                   "source_hts": "851713 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "851762",
@@ -2902,7 +2924,7 @@
                   "source_hts": "851762 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "852852",
@@ -2913,7 +2935,7 @@
                   "source_hts": "852852 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854143",
@@ -2924,7 +2946,7 @@
                   "source_hts": "854143 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854231",
@@ -2935,7 +2957,7 @@
                   "source_hts": "854231 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854232",
@@ -2946,7 +2968,7 @@
                   "source_hts": "854232 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 },
                 {
                   "hs_code": "854239",
@@ -2957,7 +2979,7 @@
                   "source_hts": "854239 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-20T19:54:27.101Z"
+                  "last_checked_at": "2026-07-21T19:46:35.460Z"
                 }
               ],
               "new_value": [
@@ -2970,7 +2992,7 @@
                   "source_hts": "847150 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "847130",
@@ -2981,7 +3003,7 @@
                   "source_hts": "847130 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "850440",
@@ -2992,7 +3014,7 @@
                   "source_hts": "850440 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "850760",
@@ -3003,7 +3025,7 @@
                   "source_hts": "850760 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "851713",
@@ -3014,7 +3036,7 @@
                   "source_hts": "851713 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "851762",
@@ -3025,7 +3047,7 @@
                   "source_hts": "851762 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "852852",
@@ -3036,7 +3058,7 @@
                   "source_hts": "852852 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854143",
@@ -3047,7 +3069,7 @@
                   "source_hts": "854143 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854231",
@@ -3058,7 +3080,7 @@
                   "source_hts": "854231 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854232",
@@ -3069,7 +3091,7 @@
                   "source_hts": "854232 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 },
                 {
                   "hs_code": "854239",
@@ -3080,7 +3102,7 @@
                   "source_hts": "854239 (MX maintained TIGIE exact-line candidate)",
                   "source_rate_text": "Mexico TIGIE duty candidate: 0.000%",
                   "source_url": "https://www.snice.gob.mx/",
-                  "last_checked_at": "2026-07-21T19:46:35.460Z"
+                  "last_checked_at": "2026-07-22T19:39:52.378Z"
                 }
               ]
             }
@@ -3154,8 +3176,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:29.454Z",
-              "new_value": "2026-07-21T19:46:38.045Z"
+              "old_value": "2026-07-21T19:46:38.045Z",
+              "new_value": "2026-07-22T19:39:55.842Z"
             }
           ]
         },
@@ -3166,8 +3188,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:29.454Z",
-              "new_value": "2026-07-21T19:46:38.045Z"
+              "old_value": "2026-07-21T19:46:38.045Z",
+              "new_value": "2026-07-22T19:39:55.842Z"
             }
           ]
         }
@@ -3186,109 +3208,23 @@
       "writes_official_machine_rates": false,
       "official_fetch": {
         "ok": false,
-        "status_code": 200,
+        "status_code": null,
         "official_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
         "lookup_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffView.do",
         "row_count": 0,
-        "query_attempts": [
-          {
-            "hs_code": "8471500000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8471300000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8479500000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8504400000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8507600000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8517130000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8517620000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8525800000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8525890000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8528520000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8541430000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8542310000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8542320000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "8542390000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "9018900000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "9027500000",
-            "status_code": 200,
-            "row_count": 0
-          },
-          {
-            "hs_code": "9504500000",
-            "status_code": 200,
-            "row_count": 0
-          }
-        ],
+        "query_attempts": [],
         "exact_query_summary": {
-          "attempted": 17,
+          "attempted": 0,
           "matched": 0,
           "failed": 0
         },
-        "error": ""
+        "error": "fetch failed"
       },
       "official_fetch_degraded": true,
-      "official_fetch_degraded_reason": "official_source_returned_no_rate_rows",
-      "official_fetch_degraded_detail": "Official source was reachable but no machine-readable tariff rows were parsed.",
-      "official_fetch_degraded_category": "parser_no_rows",
-      "official_fetch_degraded_action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.",
+      "official_fetch_degraded_reason": "official_fetch_failed",
+      "official_fetch_degraded_detail": "fetch failed",
+      "official_fetch_degraded_category": "network_transport",
+      "official_fetch_degraded_action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.",
       "readiness": null,
       "special_program": null,
       "static_official_probes": null,
@@ -3300,8 +3236,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:39.976Z",
-              "new_value": "2026-07-21T19:46:43.396Z"
+              "old_value": "2026-07-21T19:46:43.396Z",
+              "new_value": "2026-07-22T19:40:06.363Z"
             },
             {
               "field": "exact_code_overrides",
@@ -3315,7 +3251,7 @@
                   "source_hts": "847150 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "847130",
@@ -3326,7 +3262,7 @@
                   "source_hts": "847130 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "847950",
@@ -3337,7 +3273,7 @@
                   "source_hts": "847950 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "850440",
@@ -3348,7 +3284,7 @@
                   "source_hts": "850440 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "850760",
@@ -3359,7 +3295,7 @@
                   "source_hts": "850760 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "851713",
@@ -3370,7 +3306,7 @@
                   "source_hts": "851713 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "851762",
@@ -3381,7 +3317,7 @@
                   "source_hts": "851762 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "852580",
@@ -3392,7 +3328,7 @@
                   "source_hts": "852580 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "852589",
@@ -3403,7 +3339,7 @@
                   "source_hts": "852589 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "852852",
@@ -3414,7 +3350,7 @@
                   "source_hts": "852852 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "854143",
@@ -3425,7 +3361,7 @@
                   "source_hts": "854143 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "854231",
@@ -3436,7 +3372,7 @@
                   "source_hts": "854231 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "854232",
@@ -3447,7 +3383,7 @@
                   "source_hts": "854232 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "854239",
@@ -3458,7 +3394,7 @@
                   "source_hts": "854239 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "901890",
@@ -3469,7 +3405,7 @@
                   "source_hts": "901890 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 },
                 {
                   "hs_code": "902750",
@@ -3480,7 +3416,7 @@
                   "source_hts": "902750 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 }
               ],
               "new_value": [
@@ -3493,7 +3429,7 @@
                   "source_hts": "847150 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "847130",
@@ -3504,7 +3440,7 @@
                   "source_hts": "847130 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "847950",
@@ -3515,7 +3451,7 @@
                   "source_hts": "847950 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "850440",
@@ -3526,7 +3462,7 @@
                   "source_hts": "850440 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "850760",
@@ -3537,7 +3473,7 @@
                   "source_hts": "850760 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "851713",
@@ -3548,7 +3484,7 @@
                   "source_hts": "851713 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "851762",
@@ -3559,7 +3495,7 @@
                   "source_hts": "851762 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "852580",
@@ -3570,7 +3506,7 @@
                   "source_hts": "852580 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "852589",
@@ -3581,7 +3517,7 @@
                   "source_hts": "852589 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "852852",
@@ -3592,7 +3528,7 @@
                   "source_hts": "852852 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "854143",
@@ -3603,7 +3539,7 @@
                   "source_hts": "854143 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "854231",
@@ -3614,7 +3550,7 @@
                   "source_hts": "854231 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "854232",
@@ -3625,7 +3561,7 @@
                   "source_hts": "854232 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "854239",
@@ -3636,7 +3572,7 @@
                   "source_hts": "854239 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "901890",
@@ -3647,7 +3583,7 @@
                   "source_hts": "901890 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 },
                 {
                   "hs_code": "902750",
@@ -3658,7 +3594,7 @@
                   "source_hts": "902750 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 }
               ]
             }
@@ -3671,8 +3607,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:39.976Z",
-              "new_value": "2026-07-21T19:46:43.396Z"
+              "old_value": "2026-07-21T19:46:43.396Z",
+              "new_value": "2026-07-22T19:40:06.363Z"
             },
             {
               "field": "exact_code_overrides",
@@ -3686,7 +3622,7 @@
                   "source_hts": "950450 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-20T19:54:39.976Z"
+                  "last_checked_at": "2026-07-21T19:46:43.396Z"
                 }
               ],
               "new_value": [
@@ -3699,7 +3635,7 @@
                   "source_hts": "950450 (KR maintained exact-line candidate)",
                   "source_rate_text": "Korea customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.go.kr/english/main.do",
-                  "last_checked_at": "2026-07-21T19:46:43.396Z"
+                  "last_checked_at": "2026-07-22T19:40:06.363Z"
                 }
               ]
             }
@@ -3799,8 +3735,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.444Z",
-              "new_value": "2026-07-21T19:46:48.295Z"
+              "old_value": "2026-07-21T19:46:48.295Z",
+              "new_value": "2026-07-22T19:40:11.700Z"
             },
             {
               "field": "exact_code_overrides",
@@ -3814,7 +3750,7 @@
                   "source_hts": "847150 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "847130",
@@ -3825,7 +3761,7 @@
                   "source_hts": "847130 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "847950",
@@ -3836,7 +3772,7 @@
                   "source_hts": "847950 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "850440",
@@ -3847,7 +3783,7 @@
                   "source_hts": "850440 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "850760",
@@ -3858,7 +3794,7 @@
                   "source_hts": "850760 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "851713",
@@ -3869,7 +3805,7 @@
                   "source_hts": "851713 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "851762",
@@ -3880,7 +3816,7 @@
                   "source_hts": "851762 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "852580",
@@ -3891,7 +3827,7 @@
                   "source_hts": "852580 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "852589",
@@ -3902,7 +3838,7 @@
                   "source_hts": "852589 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "852852",
@@ -3913,7 +3849,7 @@
                   "source_hts": "852852 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "854143",
@@ -3924,7 +3860,7 @@
                   "source_hts": "854143 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "854231",
@@ -3935,7 +3871,7 @@
                   "source_hts": "854231 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "854232",
@@ -3946,7 +3882,7 @@
                   "source_hts": "854232 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "854239",
@@ -3957,7 +3893,7 @@
                   "source_hts": "854239 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "901890",
@@ -3968,7 +3904,7 @@
                   "source_hts": "901890 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 },
                 {
                   "hs_code": "902750",
@@ -3979,7 +3915,7 @@
                   "source_hts": "902750 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 }
               ],
               "new_value": [
@@ -3992,7 +3928,7 @@
                   "source_hts": "847150 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "847130",
@@ -4003,7 +3939,7 @@
                   "source_hts": "847130 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "847950",
@@ -4014,7 +3950,7 @@
                   "source_hts": "847950 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "850440",
@@ -4025,7 +3961,7 @@
                   "source_hts": "850440 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "850760",
@@ -4036,7 +3972,7 @@
                   "source_hts": "850760 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "851713",
@@ -4047,7 +3983,7 @@
                   "source_hts": "851713 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "851762",
@@ -4058,7 +3994,7 @@
                   "source_hts": "851762 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "852580",
@@ -4069,7 +4005,7 @@
                   "source_hts": "852580 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "852589",
@@ -4080,7 +4016,7 @@
                   "source_hts": "852589 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "852852",
@@ -4091,7 +4027,7 @@
                   "source_hts": "852852 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "854143",
@@ -4102,7 +4038,7 @@
                   "source_hts": "854143 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "854231",
@@ -4113,7 +4049,7 @@
                   "source_hts": "854231 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "854232",
@@ -4124,7 +4060,7 @@
                   "source_hts": "854232 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "854239",
@@ -4135,7 +4071,7 @@
                   "source_hts": "854239 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "901890",
@@ -4146,7 +4082,7 @@
                   "source_hts": "901890 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 },
                 {
                   "hs_code": "902750",
@@ -4157,7 +4093,7 @@
                   "source_hts": "902750 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 }
               ]
             }
@@ -4170,8 +4106,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.444Z",
-              "new_value": "2026-07-21T19:46:48.295Z"
+              "old_value": "2026-07-21T19:46:48.295Z",
+              "new_value": "2026-07-22T19:40:11.700Z"
             },
             {
               "field": "exact_code_overrides",
@@ -4185,7 +4121,7 @@
                   "source_hts": "950450 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-20T19:54:44.444Z"
+                  "last_checked_at": "2026-07-21T19:46:48.295Z"
                 }
               ],
               "new_value": [
@@ -4198,7 +4134,7 @@
                   "source_hts": "950450 (IN maintained exact-line candidate)",
                   "source_rate_text": "India BCD candidate: 0.000%",
                   "source_url": "https://www.icegate.gov.in/",
-                  "last_checked_at": "2026-07-21T19:46:48.295Z"
+                  "last_checked_at": "2026-07-22T19:40:11.700Z"
                 }
               ]
             }
@@ -4518,8 +4454,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -4533,7 +4469,7 @@
                   "source_hts": "847150 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "847950",
@@ -4544,7 +4480,7 @@
                   "source_hts": "847950 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850760",
@@ -4555,7 +4491,7 @@
                   "source_hts": "850760 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851713",
@@ -4566,7 +4502,7 @@
                   "source_hts": "851713 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851762",
@@ -4577,7 +4513,7 @@
                   "source_hts": "851762 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852580",
@@ -4588,7 +4524,7 @@
                   "source_hts": "852580 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852589",
@@ -4599,7 +4535,7 @@
                   "source_hts": "852589 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852852",
@@ -4610,7 +4546,7 @@
                   "source_hts": "852852 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854143",
@@ -4621,7 +4557,7 @@
                   "source_hts": "854143 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854231",
@@ -4632,7 +4568,7 @@
                   "source_hts": "854231 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854232",
@@ -4643,7 +4579,7 @@
                   "source_hts": "854232 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854239",
@@ -4654,7 +4590,7 @@
                   "source_hts": "854239 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "901890",
@@ -4665,7 +4601,7 @@
                   "source_hts": "901890 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "902750",
@@ -4676,7 +4612,7 @@
                   "source_hts": "902750 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -4689,7 +4625,7 @@
                   "source_hts": "847150 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "847950",
@@ -4700,7 +4636,7 @@
                   "source_hts": "847950 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850760",
@@ -4711,7 +4647,7 @@
                   "source_hts": "850760 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851713",
@@ -4722,7 +4658,7 @@
                   "source_hts": "851713 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851762",
@@ -4733,7 +4669,7 @@
                   "source_hts": "851762 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852580",
@@ -4744,7 +4680,7 @@
                   "source_hts": "852580 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852589",
@@ -4755,7 +4691,7 @@
                   "source_hts": "852589 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852852",
@@ -4766,7 +4702,7 @@
                   "source_hts": "852852 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854143",
@@ -4777,7 +4713,7 @@
                   "source_hts": "854143 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854231",
@@ -4788,7 +4724,7 @@
                   "source_hts": "854231 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854232",
@@ -4799,7 +4735,7 @@
                   "source_hts": "854232 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854239",
@@ -4810,7 +4746,7 @@
                   "source_hts": "854239 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "901890",
@@ -4821,7 +4757,7 @@
                   "source_hts": "901890 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "902750",
@@ -4832,7 +4768,7 @@
                   "source_hts": "902750 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -4845,8 +4781,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -4860,7 +4796,7 @@
                   "source_hts": "847130 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850440",
@@ -4871,7 +4807,7 @@
                   "source_hts": "850440 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -4884,7 +4820,7 @@
                   "source_hts": "847130 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850440",
@@ -4895,7 +4831,7 @@
                   "source_hts": "850440 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -4908,8 +4844,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -4923,7 +4859,7 @@
                   "source_hts": "847150 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -4936,7 +4872,7 @@
                   "source_hts": "847150 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -4949,8 +4885,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -4964,7 +4900,7 @@
                   "source_hts": "950450 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -4977,7 +4913,7 @@
                   "source_hts": "950450 (CN maintained exact-line candidate)",
                   "source_rate_text": "China MFN duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.cn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -4990,8 +4926,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -5005,7 +4941,7 @@
                   "source_hts": "847150 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "847130",
@@ -5016,7 +4952,7 @@
                   "source_hts": "847130 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "847950",
@@ -5027,7 +4963,7 @@
                   "source_hts": "847950 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850440",
@@ -5038,7 +4974,7 @@
                   "source_hts": "850440 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850760",
@@ -5049,7 +4985,7 @@
                   "source_hts": "850760 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851713",
@@ -5060,7 +4996,7 @@
                   "source_hts": "851713 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851762",
@@ -5071,7 +5007,7 @@
                   "source_hts": "851762 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852580",
@@ -5082,7 +5018,7 @@
                   "source_hts": "852580 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852589",
@@ -5093,7 +5029,7 @@
                   "source_hts": "852589 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852852",
@@ -5104,7 +5040,7 @@
                   "source_hts": "852852 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854143",
@@ -5115,7 +5051,7 @@
                   "source_hts": "854143 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854231",
@@ -5126,7 +5062,7 @@
                   "source_hts": "854231 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854232",
@@ -5137,7 +5073,7 @@
                   "source_hts": "854232 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854239",
@@ -5148,7 +5084,7 @@
                   "source_hts": "854239 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "901890",
@@ -5159,7 +5095,7 @@
                   "source_hts": "901890 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "902750",
@@ -5170,7 +5106,7 @@
                   "source_hts": "902750 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -5183,7 +5119,7 @@
                   "source_hts": "847150 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "847130",
@@ -5194,7 +5130,7 @@
                   "source_hts": "847130 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "847950",
@@ -5205,7 +5141,7 @@
                   "source_hts": "847950 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850440",
@@ -5216,7 +5152,7 @@
                   "source_hts": "850440 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850760",
@@ -5227,7 +5163,7 @@
                   "source_hts": "850760 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851713",
@@ -5238,7 +5174,7 @@
                   "source_hts": "851713 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851762",
@@ -5249,7 +5185,7 @@
                   "source_hts": "851762 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852580",
@@ -5260,7 +5196,7 @@
                   "source_hts": "852580 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852589",
@@ -5271,7 +5207,7 @@
                   "source_hts": "852589 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852852",
@@ -5282,7 +5218,7 @@
                   "source_hts": "852852 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854143",
@@ -5293,7 +5229,7 @@
                   "source_hts": "854143 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854231",
@@ -5304,7 +5240,7 @@
                   "source_hts": "854231 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854232",
@@ -5315,7 +5251,7 @@
                   "source_hts": "854232 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854239",
@@ -5326,7 +5262,7 @@
                   "source_hts": "854239 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "901890",
@@ -5337,7 +5273,7 @@
                   "source_hts": "901890 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "902750",
@@ -5348,7 +5284,7 @@
                   "source_hts": "902750 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -5361,8 +5297,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -5376,7 +5312,7 @@
                   "source_hts": "950450 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -5389,7 +5325,7 @@
                   "source_hts": "950450 (Vietnam Customs exact-line candidate)",
                   "source_rate_text": "Vietnam customs duty candidate: 0.000%",
                   "source_url": "https://www.customs.gov.vn/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -5402,8 +5338,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -5417,7 +5353,7 @@
                   "source_hts": "847150 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "847130",
@@ -5428,7 +5364,7 @@
                   "source_hts": "847130 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "847950",
@@ -5439,7 +5375,7 @@
                   "source_hts": "847950 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850440",
@@ -5450,7 +5386,7 @@
                   "source_hts": "850440 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850760",
@@ -5461,7 +5397,7 @@
                   "source_hts": "850760 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851713",
@@ -5472,7 +5408,7 @@
                   "source_hts": "851713 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851762",
@@ -5483,7 +5419,7 @@
                   "source_hts": "851762 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852580",
@@ -5494,7 +5430,7 @@
                   "source_hts": "852580 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852589",
@@ -5505,7 +5441,7 @@
                   "source_hts": "852589 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852852",
@@ -5516,7 +5452,7 @@
                   "source_hts": "852852 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854143",
@@ -5527,7 +5463,7 @@
                   "source_hts": "854143 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854231",
@@ -5538,7 +5474,7 @@
                   "source_hts": "854231 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854232",
@@ -5549,7 +5485,7 @@
                   "source_hts": "854232 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854239",
@@ -5560,7 +5496,7 @@
                   "source_hts": "854239 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "901890",
@@ -5571,7 +5507,7 @@
                   "source_hts": "901890 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "902750",
@@ -5582,7 +5518,7 @@
                   "source_hts": "902750 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -5595,7 +5531,7 @@
                   "source_hts": "847150 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "847130",
@@ -5606,7 +5542,7 @@
                   "source_hts": "847130 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "847950",
@@ -5617,7 +5553,7 @@
                   "source_hts": "847950 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850440",
@@ -5628,7 +5564,7 @@
                   "source_hts": "850440 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850760",
@@ -5639,7 +5575,7 @@
                   "source_hts": "850760 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851713",
@@ -5650,7 +5586,7 @@
                   "source_hts": "851713 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851762",
@@ -5661,7 +5597,7 @@
                   "source_hts": "851762 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852580",
@@ -5672,7 +5608,7 @@
                   "source_hts": "852580 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852589",
@@ -5683,7 +5619,7 @@
                   "source_hts": "852589 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852852",
@@ -5694,7 +5630,7 @@
                   "source_hts": "852852 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854143",
@@ -5705,7 +5641,7 @@
                   "source_hts": "854143 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854231",
@@ -5716,7 +5652,7 @@
                   "source_hts": "854231 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854232",
@@ -5727,7 +5663,7 @@
                   "source_hts": "854232 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854239",
@@ -5738,7 +5674,7 @@
                   "source_hts": "854239 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "901890",
@@ -5749,7 +5685,7 @@
                   "source_hts": "901890 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "902750",
@@ -5760,7 +5696,7 @@
                   "source_hts": "902750 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -5773,8 +5709,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -5788,7 +5724,7 @@
                   "source_hts": "950450 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -5801,7 +5737,7 @@
                   "source_hts": "950450 (MY maintained exact-line candidate)",
                   "source_rate_text": "Malaysia customs duty candidate: 0.000%",
                   "source_url": "https://mysst.customs.gov.my/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -5814,8 +5750,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -5829,7 +5765,7 @@
                   "source_hts": "847150 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "847130",
@@ -5840,7 +5776,7 @@
                   "source_hts": "847130 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "847950",
@@ -5851,7 +5787,7 @@
                   "source_hts": "847950 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850440",
@@ -5862,7 +5798,7 @@
                   "source_hts": "850440 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "850760",
@@ -5873,7 +5809,7 @@
                   "source_hts": "850760 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851713",
@@ -5884,7 +5820,7 @@
                   "source_hts": "851713 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "851762",
@@ -5895,7 +5831,7 @@
                   "source_hts": "851762 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852580",
@@ -5906,7 +5842,7 @@
                   "source_hts": "852580 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852589",
@@ -5917,7 +5853,7 @@
                   "source_hts": "852589 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "852852",
@@ -5928,7 +5864,7 @@
                   "source_hts": "852852 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854143",
@@ -5939,7 +5875,7 @@
                   "source_hts": "854143 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854231",
@@ -5950,7 +5886,7 @@
                   "source_hts": "854231 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854232",
@@ -5961,7 +5897,7 @@
                   "source_hts": "854232 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "854239",
@@ -5972,7 +5908,7 @@
                   "source_hts": "854239 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "901890",
@@ -5983,7 +5919,7 @@
                   "source_hts": "901890 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 },
                 {
                   "hs_code": "902750",
@@ -5994,7 +5930,7 @@
                   "source_hts": "902750 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -6007,7 +5943,7 @@
                   "source_hts": "847150 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "847130",
@@ -6018,7 +5954,7 @@
                   "source_hts": "847130 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "847950",
@@ -6029,7 +5965,7 @@
                   "source_hts": "847950 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850440",
@@ -6040,7 +5976,7 @@
                   "source_hts": "850440 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "850760",
@@ -6051,7 +5987,7 @@
                   "source_hts": "850760 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851713",
@@ -6062,7 +5998,7 @@
                   "source_hts": "851713 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "851762",
@@ -6073,7 +6009,7 @@
                   "source_hts": "851762 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852580",
@@ -6084,7 +6020,7 @@
                   "source_hts": "852580 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852589",
@@ -6095,7 +6031,7 @@
                   "source_hts": "852589 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "852852",
@@ -6106,7 +6042,7 @@
                   "source_hts": "852852 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854143",
@@ -6117,7 +6053,7 @@
                   "source_hts": "854143 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854231",
@@ -6128,7 +6064,7 @@
                   "source_hts": "854231 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854232",
@@ -6139,7 +6075,7 @@
                   "source_hts": "854232 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "854239",
@@ -6150,7 +6086,7 @@
                   "source_hts": "854239 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "901890",
@@ -6161,7 +6097,7 @@
                   "source_hts": "901890 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 },
                 {
                   "hs_code": "902750",
@@ -6172,7 +6108,7 @@
                   "source_hts": "902750 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -6185,8 +6121,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             },
             {
               "field": "exact_code_overrides",
@@ -6200,7 +6136,7 @@
                   "source_hts": "950450 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-20T19:54:44.453Z"
+                  "last_checked_at": "2026-07-21T19:46:48.304Z"
                 }
               ],
               "new_value": [
@@ -6213,7 +6149,7 @@
                   "source_hts": "950450 (TW maintained exact-line candidate)",
                   "source_rate_text": "Taiwan customs duty candidate: 0.000%",
                   "source_url": "https://web.customs.gov.tw/",
-                  "last_checked_at": "2026-07-21T19:46:48.304Z"
+                  "last_checked_at": "2026-07-22T19:40:11.709Z"
                 }
               ]
             }
@@ -6226,8 +6162,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             }
           ]
         },
@@ -6238,8 +6174,8 @@
           "changes": [
             {
               "field": "last_checked_at",
-              "old_value": "2026-07-20T19:54:44.453Z",
-              "new_value": "2026-07-21T19:46:48.304Z"
+              "old_value": "2026-07-21T19:46:48.304Z",
+              "new_value": "2026-07-22T19:40:11.709Z"
             }
           ]
         }
@@ -6971,32 +6907,32 @@
       "mode": "official-live",
       "change_count": 2,
       "rate_change_count": 0,
-      "degraded_reason": "official_source_returned_no_rate_rows",
-      "degraded_detail": "Official source was reachable but no machine-readable tariff rows were parsed.",
-      "degraded_category": "parser_no_rows",
-      "degraded_label": "Official source reachable, parser found no rate rows",
-      "degraded_action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.",
+      "degraded_reason": "official_fetch_failed",
+      "degraded_detail": "fetch failed",
+      "degraded_category": "network_transport",
+      "degraded_label": "Network transport",
+      "degraded_action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.",
       "recovery_command": "npm run probe:duty-rates:kr",
       "recovery_hint": "Run the official probe before promoting this source.",
       "official_fetch_summary": {
         "ok": false,
         "degraded": true,
-        "degraded_reason": "official_source_returned_no_rate_rows",
-        "degraded_detail": "Official source was reachable but no machine-readable tariff rows were parsed.",
-        "degraded_category": "parser_no_rows",
-        "degraded_action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.",
+        "degraded_reason": "official_fetch_failed",
+        "degraded_detail": "fetch failed",
+        "degraded_category": "network_transport",
+        "degraded_action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.",
         "row_count": 0,
         "latest_schedule_date": "",
         "official_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
         "lookup_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffView.do",
-        "exact_query_attempted": 17,
+        "exact_query_attempted": 0,
         "exact_query_matched": 0,
         "parser_ready": false,
         "status_label": "Official fetch degraded"
       },
       "official_probe_live_status": null,
       "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows.",
-      "run_plan_action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse.",
+      "run_plan_action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable.",
       "official_probe_urls": [],
       "source_use_cases": [
         "Korea import duty and VAT pre-check",
@@ -7038,7 +6974,7 @@
           "KC/KCC certification or electronics safety scope changes"
         ],
         "transit_route_priority": false,
-        "next_action": "Inspect the official response/table selectors, add a source-specific parser fixture, and keep maintained candidates until exact rows parse."
+        "next_action": "Retry with system CA and source-specific headers; keep parser promotion gated until rows are stable."
       }
     },
     {
