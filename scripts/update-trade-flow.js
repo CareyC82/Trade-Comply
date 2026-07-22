@@ -245,6 +245,88 @@ async function fetchJson(url, fetchImpl = global.fetch, { retries = 0 } = {}) {
     throw new Error('Official source retry budget exhausted');
 }
 
+async function fetchText(url, fetchImpl = global.fetch, { retries = 0, headers = {} } = {}) {
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
+        try {
+            const response = await fetchImpl(url, { signal: controller.signal, headers });
+            if (response.ok) return response.text();
+            if (response.status === 429 && attempt < retries) {
+                await new Promise((resolve) => setTimeout(resolve, 5000 * (attempt + 1)));
+                continue;
+            }
+            throw new Error(`HTTP ${response.status}`);
+        } finally {
+            clearTimeout(timeout);
+        }
+    }
+    throw new Error('Official source retry budget exhausted');
+}
+
+const MONTH_NAMES = {
+    jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+    jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+};
+
+const MONTH_NAME_PATTERN = '(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)';
+
+function latestPeriodFromText(value = '') {
+    const periods = [];
+    const text = String(value);
+    for (const match of text.matchAll(/\b(20\d{2})(?:[-/.]?|\s*M\s*)(0?[1-9]|1[0-2])\b/gi)) {
+        periods.push(`${match[1]}-${String(match[2]).padStart(2, '0')}`);
+    }
+    for (const match of text.matchAll(new RegExp(`\\b${MONTH_NAME_PATTERN}\\.?\\s+(20\\d{2})\\b`, 'gi'))) {
+        periods.push(`${match[2]}-${MONTH_NAMES[match[1].slice(0, 3).toLowerCase()]}`);
+    }
+    for (const match of text.matchAll(new RegExp(`\\b(20\\d{2})\\s+${MONTH_NAME_PATTERN}\\.?\\b`, 'gi'))) {
+        periods.push(`${match[1]}-${MONTH_NAMES[match[2].slice(0, 3).toLowerCase()]}`);
+    }
+    return periods.sort().at(-1) || '';
+}
+
+function latestPeriodFromSingStat(payload = {}) {
+    const values = [];
+    (function visit(value) {
+        if (Array.isArray(value)) return value.forEach(visit);
+        if (value && typeof value === 'object') return Object.values(value).forEach(visit);
+        if (typeof value === 'string') values.push(value);
+    }(payload));
+    return latestPeriodFromText(values.join(' '));
+}
+
+async function probeConnectorOfficialLatest(connector, {
+    env = process.env, fetchImpl = global.fetch, referenceDate = new Date()
+} = {}) {
+    const override = String(env[connector.latest_period_env] || '').trim();
+    if (/^20\d{2}-(0[1-9]|1[0-2])$/.test(override)) {
+        return { status: 'environment_override', latest_period: override, checked_at: new Date().toISOString() };
+    }
+    if (!connector.adapter || !connector.latest_probe_url) return { status: 'not_configured', latest_period: '' };
+    if (connector.adapter === 'korea-data-go-kr') {
+        const apiKey = String(env[connector.api_key_env] || '').trim();
+        if (!apiKey) return { status: 'configuration_required', latest_period: '', error: `${connector.api_key_env} is required` };
+        const end = new Date(referenceDate);
+        const start = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() - 3, 1));
+        const yymm = (date) => `${date.getUTCFullYear()}${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+        const url = new URL(connector.latest_probe_url);
+        url.searchParams.set('serviceKey', apiKey);
+        url.searchParams.set('strtYymm', yymm(start));
+        url.searchParams.set('endYymm', yymm(end));
+        url.searchParams.set('pageNo', '1');
+        url.searchParams.set('numOfRows', '100');
+        const text = await fetchText(url.toString(), fetchImpl, { retries: 2, headers: { accept: 'application/xml,text/xml' } });
+        return { status: 'official_probe_ok', latest_period: latestPeriodFromText(text), checked_at: new Date().toISOString() };
+    }
+    if (connector.adapter === 'singstat') {
+        const payload = await fetchJson(connector.latest_probe_url, fetchImpl, { retries: 2 });
+        return { status: 'official_probe_ok', latest_period: latestPeriodFromSingStat(payload), checked_at: new Date().toISOString() };
+    }
+    const text = await fetchText(connector.latest_probe_url, fetchImpl, { retries: 2, headers: { accept: 'text/html' } });
+    return { status: 'official_probe_ok', latest_period: latestPeriodFromText(text), checked_at: new Date().toISOString() };
+}
+
 function mergeSeries(existing, incoming, sourceId) {
     return replaceSourceScope(existing, incoming, sourceId);
 }
@@ -514,15 +596,20 @@ function monthLag(latestMonth, referenceDate = new Date()) {
     return ((reference.getUTCFullYear() - Number(match[1])) * 12) + (reference.getUTCMonth() + 1 - Number(match[2]));
 }
 
-function nationalConnectorState(payload, connector, { error = '', referenceDate = new Date() } = {}) {
+function nationalConnectorState(payload, connector, { error = '', referenceDate = new Date(), probe = {} } = {}) {
     const officialRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === connector.id);
     const fallbackRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === COMTRADE_SOURCE_ID);
-    const latestPeriod = officialRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '';
-    const lagMonths = monthLag(latestPeriod, referenceDate);
+    const synchronizedThrough = officialRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '';
+    const officialLatestPeriod = probe.latest_period || '';
+    const activePeriod = synchronizedThrough || fallbackRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '';
+    const lagMonths = monthLag(synchronizedThrough, referenceDate);
     let status = 'no_official_series';
     if (officialRows.length && error) status = 'last_good_degraded';
+    else if (officialRows.length && officialLatestPeriod && synchronizedThrough < officialLatestPeriod) status = 'official_delayed';
     else if (officialRows.length && Number.isFinite(lagMonths) && lagMonths > 4) status = 'official_delayed';
     else if (officialRows.length) status = 'national_official_current';
+    else if (probe.status === 'configuration_required') status = 'configuration_required';
+    else if (officialLatestPeriod) status = 'official_feed_pending';
     else if (fallbackRows.length) status = 'un_comtrade_fallback';
     return {
         market: connector.market,
@@ -530,10 +617,16 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
         connector_name: connector.name,
         official_url: connector.official_url,
         status,
-        latest_period: latestPeriod || fallbackRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '',
+        latest_period: activePeriod,
+        official_latest_period: officialLatestPeriod,
+        synchronized_through: synchronizedThrough,
+        active_data_tier: officialRows.length ? 'national_official' : (fallbackRows.length ? 'historical_fallback' : 'none'),
         lag_months: lagMonths,
         official_row_count: officialRows.length,
         fallback_row_count: fallbackRows.length,
+        probe_status: probe.status || 'not_run',
+        last_checked_at: probe.checked_at,
+        probe_error: probe.error,
         last_error: error || undefined
     };
 }
@@ -595,7 +688,13 @@ async function syncNationalOfficialConnectors(payload, {
                 failures.push({ market: connector.market, connector_id: connector.id, error });
             }
         }
-        markets[connector.market] = nationalConnectorState(payload, connector, { error, referenceDate });
+        let probe = {};
+        try {
+            probe = await probeConnectorOfficialLatest(connector, { env, fetchImpl, referenceDate });
+        } catch (caught) {
+            probe = { status: 'probe_degraded', latest_period: '', error: String(caught.message || caught), checked_at: new Date().toISOString() };
+        }
+        markets[connector.market] = nationalConnectorState(payload, connector, { error, referenceDate, probe });
     }
     const status = {
         schema_version: '1.0',
@@ -661,6 +760,10 @@ module.exports = {
     monthRange,
     parseCensusRows,
     parseComtradeRows,
+    latestPeriodFromSingStat,
+    latestPeriodFromText,
+    nationalConnectorState,
+    probeConnectorOfficialLatest,
     replaceSourceScope,
     run,
     syncCensus,

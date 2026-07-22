@@ -5,22 +5,33 @@
       "market": "JP",
       "id": "jp-customs-monthly",
       "name": "Japan Customs monthly trade statistics",
-      "official_url": "https://www.customs.go.jp/toukei/info/index_e.htm",
-      "feed_env": "JP_OFFICIAL_TRADE_FLOW_URL"
+      "official_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm",
+      "feed_env": "JP_OFFICIAL_TRADE_FLOW_URL",
+      "latest_period_env": "JP_OFFICIAL_LATEST_PERIOD",
+      "adapter": "japan-customs-release-calendar",
+      "latest_probe_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm"
     },
     {
       "market": "KR",
       "id": "kr-customs-monthly",
       "name": "Korea Customs Service monthly trade statistics",
-      "official_url": "https://www.customs.go.kr/english/main.do",
-      "feed_env": "KR_OFFICIAL_TRADE_FLOW_URL"
+      "official_url": "https://www.data.go.kr/en/data/15102108/openapi.do",
+      "feed_env": "KR_OFFICIAL_TRADE_FLOW_URL",
+      "latest_period_env": "KR_OFFICIAL_LATEST_PERIOD",
+      "api_key_env": "KR_DATA_GO_KR_SERVICE_KEY",
+      "adapter": "korea-data-go-kr",
+      "latest_probe_url": "https://apis.data.go.kr/1220000/Newtrade/getNewtradeList"
     },
     {
       "market": "SG",
       "id": "sg-singstat-monthly",
       "name": "Singapore official monthly merchandise trade statistics",
-      "official_url": "https://www.singstat.gov.sg/",
-      "feed_env": "SG_OFFICIAL_TRADE_FLOW_URL"
+      "official_url": "https://tablebuilder.singstat.gov.sg/table/TR/T010001",
+      "feed_env": "SG_OFFICIAL_TRADE_FLOW_URL",
+      "latest_period_env": "SG_OFFICIAL_LATEST_PERIOD",
+      "adapter": "singstat",
+      "resource_id": "T010001",
+      "latest_probe_url": "https://tablebuilder.singstat.gov.sg/api/table/tabledata/T010001"
     }
   ]
 }

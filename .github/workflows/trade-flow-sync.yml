@@ -60,6 +60,10 @@ jobs:
           JP_OFFICIAL_TRADE_FLOW_URL: ${{ secrets.JP_OFFICIAL_TRADE_FLOW_URL || vars.JP_OFFICIAL_TRADE_FLOW_URL }}
           KR_OFFICIAL_TRADE_FLOW_URL: ${{ secrets.KR_OFFICIAL_TRADE_FLOW_URL || vars.KR_OFFICIAL_TRADE_FLOW_URL }}
           SG_OFFICIAL_TRADE_FLOW_URL: ${{ secrets.SG_OFFICIAL_TRADE_FLOW_URL || vars.SG_OFFICIAL_TRADE_FLOW_URL }}
+          KR_DATA_GO_KR_SERVICE_KEY: ${{ secrets.KR_DATA_GO_KR_SERVICE_KEY }}
+          JP_OFFICIAL_LATEST_PERIOD: ${{ vars.JP_OFFICIAL_LATEST_PERIOD }}
+          KR_OFFICIAL_LATEST_PERIOD: ${{ vars.KR_OFFICIAL_LATEST_PERIOD }}
+          SG_OFFICIAL_LATEST_PERIOD: ${{ vars.SG_OFFICIAL_LATEST_PERIOD }}
         run: npm run sync:trade-flow
 
       - name: Sync China Customs industry flow
@@ -121,7 +125,8 @@ jobs:
             console.log('');
             console.log('### National official connectors');
             for (const [market, state] of Object.entries(national.markets || {})) {
-              console.log(`- ${market}: ${state.status} · latest ${state.latest_period || 'none'} · ${state.official_row_count || 0} official row(s)`);
+              console.log(`- ${market}: ${state.status} · official published ${state.official_latest_period || 'unknown'} · TraceWize synchronized ${state.synchronized_through || 'none'} · tier ${state.active_data_tier || 'none'}`);
+              if (state.probe_error) console.log(`  - Probe: ${state.probe_error}`);
               if (state.last_error) console.log(`  - ${state.last_error}`);
             }
           }

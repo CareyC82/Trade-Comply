@@ -7,16 +7,40 @@ const os = require('node:os');
 const path = require('node:path');
 const {
     buildComtradeUrl,
+    latestPeriodFromSingStat,
+    latestPeriodFromText,
     mergeSeries,
     monthList,
+    nationalConnectorState,
     parseCensusRows,
     parseComtradeRows,
+    probeConnectorOfficialLatest,
     syncCensus,
     syncComtrade,
     syncNationalOfficialConnectors,
     syncOfficialBatches,
     validateOfficialManifest
 } = require('../scripts/update-trade-flow');
+
+test('official month parser accepts customs and statistical month formats', () => {
+    assert.equal(latestPeriodFromText('May 2026; 2026 Apr; 2026M03; 202602'), '2026-05');
+    assert.equal(latestPeriodFromText('<baseYm>202604</baseYm>'), '2026-04');
+    assert.equal(latestPeriodFromText('Released: Sept. 2025'), '2025-09');
+});
+
+test('SingStat month parser finds the newest nested official period', () => {
+    const latest = latestPeriodFromSingStat({ Data: { row: [{ columns: [{ key: '2026 Mar' }, { key: '2026 Apr' }] }] } });
+    assert.equal(latest, '2026-04');
+});
+
+test('official period probe uses environment override without a network request', async () => {
+    const probe = await probeConnectorOfficialLatest({ latest_period_env: 'JP_LATEST' }, {
+        env: { JP_LATEST: '2026-05' },
+        fetchImpl: async () => { throw new Error('network should not be called'); }
+    });
+    assert.equal(probe.status, 'environment_override');
+    assert.equal(probe.latest_period, '2026-05');
+});
 
 test('monthList keeps a thirty-month official reporting window', () => {
     const months = monthList(new Date('2026-07-14T00:00:00Z'));
@@ -247,4 +271,54 @@ test('national connector reports Singapore historical fallback without a configu
     assert.equal(result.skipped, true);
     assert.equal(result.status.markets.SG.status, 'un_comtrade_fallback');
     assert.equal(result.status.markets.SG.fallback_row_count, 1);
+});
+
+test('national connector marks a market delayed when the official release is newer than synchronized data', () => {
+    const connector = { market: 'JP', id: 'jp-customs-monthly', name: 'Japan Customs', official_url: 'https://www.customs.go.jp/' };
+    const state = nationalConnectorState({
+        series: [{
+            source_id: 'jp-customs-monthly', market: 'JP', partner: 'WORLD', industry_id: 'memory',
+            hs_code: 'INDUSTRY', month: '2026-03', imports_value_usd: 40, exports_value_usd: 30
+        }]
+    }, connector, {
+        referenceDate: new Date('2026-06-15T00:00:00Z'),
+        probe: { status: 'official_probe_ok', latest_period: '2026-05', checked_at: '2026-06-15T00:00:00Z' }
+    });
+    assert.equal(state.status, 'official_delayed');
+    assert.equal(state.official_latest_period, '2026-05');
+    assert.equal(state.synchronized_through, '2026-03');
+    assert.equal(state.active_data_tier, 'national_official');
+});
+
+test('Korea connector reports configuration required when the official API key is missing', async () => {
+    const connector = {
+        market: 'KR', id: 'kr-customs-monthly', name: 'Korea Customs',
+        official_url: 'https://www.data.go.kr/en/data/15102108/openapi.do',
+        adapter: 'korea-data-go-kr', latest_probe_url: 'https://apis.data.go.kr/1220000/Newtrade/getNewtradeList',
+        latest_period_env: 'KR_LATEST', api_key_env: 'KR_DATA_GO_KR_SERVICE_KEY', feed_env: 'KR_FEED'
+    };
+    const result = await syncNationalOfficialConnectors({ sources: [], series: [] }, {
+        registry: { connectors: [connector] }, env: {}, referenceDate: new Date('2026-06-15T00:00:00Z')
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.status.markets.KR.status, 'configuration_required');
+    assert.equal(result.status.markets.KR.probe_status, 'configuration_required');
+});
+
+test('Singapore connector reports an official feed pending after a successful official period probe', async () => {
+    const connector = {
+        market: 'SG', id: 'sg-singstat-monthly', name: 'Singapore SingStat',
+        official_url: 'https://tablebuilder.singstat.gov.sg/table/TR/T010001',
+        adapter: 'singstat', latest_probe_url: 'https://tablebuilder.singstat.gov.sg/api/table/tabledata/T010001',
+        latest_period_env: 'SG_LATEST', feed_env: 'SG_FEED'
+    };
+    const result = await syncNationalOfficialConnectors({ sources: [], series: [] }, {
+        registry: { connectors: [connector] }, env: {},
+        fetchImpl: async () => ({ ok: true, json: async () => ({ Data: { row: [{ columns: [{ key: '2026 Apr' }] }] } }) }),
+        referenceDate: new Date('2026-06-15T00:00:00Z')
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.status.markets.SG.status, 'official_feed_pending');
+    assert.equal(result.status.markets.SG.official_latest_period, '2026-04');
+    assert.equal(result.status.markets.SG.synchronized_through, '');
 });

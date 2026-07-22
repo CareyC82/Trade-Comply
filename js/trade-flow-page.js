@@ -61,6 +61,8 @@
             national_official_current: ['Last sync completed', 'Official national monthly rows are active.'],
             official_delayed: ['Official data delayed', 'The latest synchronized official month is older than the normal reporting window.'],
             last_good_degraded: ['Last-good data retained', state.last_error || 'The latest official batch was rejected, so the prior complete snapshot remains active.'],
+            official_feed_pending: ['Official release detected', 'The official source has a newer release, but no complete TraceWize batch is active yet.'],
+            configuration_required: ['Connector configuration required', state.probe_error || 'An official API credential is required before this connector can run.'],
             un_comtrade_fallback: ['Historical fallback active', 'No national official series is active; UN Comtrade history is shown separately.'],
             no_official_series: ['Official series not connected', 'No national official monthly snapshot has been synchronized yet.']
         };
@@ -73,9 +75,9 @@
                     <small>${escapeHtml(detail)}</small>
                 </div>
                 <dl>
-                    <div><dt>Latest period</dt><dd>${escapeHtml(state.latest_period || 'Not synchronized')}</dd></div>
-                    <div><dt>Official rows</dt><dd>${escapeHtml(state.official_row_count || 0)}</dd></div>
-                    <div><dt>Fallback rows</dt><dd>${escapeHtml(state.fallback_row_count || 0)}</dd></div>
+                    <div><dt>Official published</dt><dd>${escapeHtml(state.official_latest_period || 'Not detected')}</dd></div>
+                    <div><dt>TraceWize synchronized</dt><dd>${escapeHtml(state.synchronized_through || 'Not synchronized')}</dd></div>
+                    <div><dt>Active tier</dt><dd>${escapeHtml((state.active_data_tier || 'none').replaceAll('_', ' '))}</dd></div>
                 </dl>
             </section>
         `;
