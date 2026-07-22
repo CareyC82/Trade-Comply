@@ -306,7 +306,14 @@ async function probeConnectorOfficialLatest(connector, {
     if (!connector.adapter || !connector.latest_probe_url) return { status: 'not_configured', latest_period: '' };
     if (connector.adapter === 'korea-data-go-kr') {
         const apiKey = String(env[connector.api_key_env] || '').trim();
-        if (!apiKey) return { status: 'configuration_required', latest_period: '', error: `${connector.api_key_env} is required` };
+        if (!apiKey) {
+            return {
+                status: 'api_key_pending',
+                latest_period: '',
+                checked_at: new Date().toISOString(),
+                note: `${connector.api_key_env} is not configured; UN Comtrade historical fallback remains available.`
+            };
+        }
         const end = new Date(referenceDate);
         const start = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() - 3, 1));
         const yymm = (date) => `${date.getUTCFullYear()}${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
@@ -608,6 +615,7 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
     else if (officialRows.length && officialLatestPeriod && synchronizedThrough < officialLatestPeriod) status = 'official_delayed';
     else if (officialRows.length && Number.isFinite(lagMonths) && lagMonths > 4) status = 'official_delayed';
     else if (officialRows.length) status = 'national_official_current';
+    else if (probe.status === 'api_key_pending') status = 'api_key_pending';
     else if (probe.status === 'configuration_required') status = 'configuration_required';
     else if (officialLatestPeriod) status = 'official_feed_pending';
     else if (fallbackRows.length) status = 'un_comtrade_fallback';
@@ -624,8 +632,12 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
         lag_months: lagMonths,
         official_row_count: officialRows.length,
         fallback_row_count: fallbackRows.length,
+        raw_data_capability: connector.raw_data_capability || '',
+        raw_ingest_status: connector.raw_ingest_status || '',
+        raw_ingest_note: connector.raw_ingest_note || '',
         probe_status: probe.status || 'not_run',
         last_checked_at: probe.checked_at,
+        probe_note: probe.note || '',
         probe_error: probe.error,
         last_error: error || undefined
     };

@@ -1207,7 +1207,60 @@
             `;
         }
 
-        function renderAutomationLaunchStatus(status = {}, chinaCustomsStatus = null) {
+        function renderNationalTradeFlowConnectorStatus(status = null) {
+            const markets = status && status.markets && typeof status.markets === 'object'
+                ? status.markets
+                : {};
+            const rows = ['JP', 'KR', 'SG']
+                .map(code => markets[code])
+                .filter(Boolean);
+            if (!rows.length) return '';
+            const labels = {
+                national_official_current: 'Current',
+                official_delayed: 'Sync delayed',
+                last_good_degraded: 'Last-good retained',
+                official_feed_pending: 'Probe only',
+                api_key_pending: 'API key pending',
+                configuration_required: 'Configuration required',
+                un_comtrade_fallback: 'Historical fallback',
+                no_official_series: 'Not synchronized'
+            };
+            const badgeClasses = {
+                national_official_current: 'auto_updatable',
+                official_delayed: 'official_link_monitor',
+                last_good_degraded: 'benchmark',
+                official_feed_pending: 'official_link_monitor',
+                api_key_pending: 'hybrid_official_candidate',
+                configuration_required: 'benchmark',
+                un_comtrade_fallback: 'hybrid_official_candidate',
+                no_official_series: 'benchmark'
+            };
+            return `
+                <div class="quality-banner">
+                    <div class="crawl-section-title">
+                        <h3>National monthly trade-flow connectors</h3>
+                        <span class="meta">Japan · Korea · Singapore</span>
+                    </div>
+                    <div class="duty-source-grade-grid">
+                        ${rows.map(row => `
+                            <article class="duty-source-grade-card">
+                                <strong>${escapeHtml(row.name || row.market || '—')}</strong>
+                                <div class="grade-line">
+                                    <span class="badge ${escapeHtml(badgeClasses[row.status] || 'benchmark')}">${escapeHtml(labels[row.status] || row.status || 'Unknown')}</span>
+                                    <span class="badge official_reachable">${escapeHtml((row.active_data_tier || 'none').replaceAll('_', ' '))}</span>
+                                </div>
+                                <div class="grade-note">Official published: ${escapeHtml(row.official_latest_period || '—')}</div>
+                                <div class="grade-note">TraceWize synchronized: ${escapeHtml(row.synchronized_through || '—')}</div>
+                                <div class="grade-note">Raw ingest: ${escapeHtml((row.raw_ingest_status || 'not declared').replaceAll('_', ' '))}</div>
+                                <div class="grade-note">${escapeHtml(row.probe_note || row.raw_ingest_note || row.last_error || '')}</div>
+                            </article>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAutomationLaunchStatus(status = {}, chinaCustomsStatus = null, nationalTradeFlowStatus = null) {
             const summary = status.summary || {};
             const healthBoard = status.duty_rate_health_board || {};
             const euProgram = status.eu_us_special_program_health || {};
@@ -1338,6 +1391,7 @@
             ` : '';
             return `
                 ${renderChinaCustomsConnectorStatus(chinaCustomsStatus)}
+                ${renderNationalTradeFlowConnectorStatus(nationalTradeFlowStatus)}
                 <div class="quality-banner">
                     <h3>Automation Launch Board</h3>
                     <p class="desc">已上线可公开展示的自动化能力；Hybrid / Monitor 不会被包装成完整 filing-grade 自动税率。</p>
@@ -2118,9 +2172,10 @@
             if (!dutyRateStatus) return;
             dutyRateStatus.innerHTML = '<p class="meta">正在加载税率源状态…</p>';
             try {
-                const [data, chinaCustomsStatus] = await Promise.all([
+                const [data, chinaCustomsStatus, nationalTradeFlowStatus] = await Promise.all([
                     apiFetch('/api/review/duty-rates'),
-                    fetchStaticJson('data/china-customs-sync-status.json').catch(() => null)
+                    fetchStaticJson('data/china-customs-sync-status.json').catch(() => null),
+                    fetchStaticJson('data/national-trade-flow-sync-status.json').catch(() => null)
                 ]);
                 const summary = data.duty_rate_summary || {};
                 const roadmap = data.source_roadmap_summary || {};
@@ -2134,7 +2189,7 @@
                 const businessSummary = data.business_summary || {};
                 const automationLaunchStatus = data.automation_launch_status || {};
                 dutyRateStatus.innerHTML = `
-                    ${renderAutomationLaunchStatus(automationLaunchStatus, chinaCustomsStatus)}
+                    ${renderAutomationLaunchStatus(automationLaunchStatus, chinaCustomsStatus, nationalTradeFlowStatus)}
                     ${renderDutyBusinessSummary(businessSummary)}
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">

@@ -9,7 +9,10 @@
       "feed_env": "JP_OFFICIAL_TRADE_FLOW_URL",
       "latest_period_env": "JP_OFFICIAL_LATEST_PERIOD",
       "adapter": "japan-customs-release-calendar",
-      "latest_probe_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm"
+      "latest_probe_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm",
+      "raw_data_capability": "release_calendar_only",
+      "raw_ingest_status": "probe_only",
+      "raw_ingest_note": "Japan Customs release calendar is monitored directly; industry rows are activated only from a complete official batch."
     },
     {
       "market": "KR",
@@ -20,7 +23,10 @@
       "latest_period_env": "KR_OFFICIAL_LATEST_PERIOD",
       "api_key_env": "KR_DATA_GO_KR_SERVICE_KEY",
       "adapter": "korea-data-go-kr",
-      "latest_probe_url": "https://apis.data.go.kr/1220000/Newtrade/getNewtradeList"
+      "latest_probe_url": "https://apis.data.go.kr/1220000/Newtrade/getNewtradeList",
+      "raw_data_capability": "credentialed_api",
+      "raw_ingest_status": "api_key_pending",
+      "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available."
     },
     {
       "market": "SG",
@@ -31,7 +37,10 @@
       "latest_period_env": "SG_OFFICIAL_LATEST_PERIOD",
       "adapter": "singstat",
       "resource_id": "T010001",
-      "latest_probe_url": "https://tablebuilder.singstat.gov.sg/api/table/tabledata/T010001"
+      "latest_probe_url": "https://tablebuilder.singstat.gov.sg/api/table/tabledata/T010001",
+      "raw_data_capability": "aggregate_market_table",
+      "raw_ingest_status": "probe_only",
+      "raw_ingest_note": "SingStat T010001 is monitored directly for the latest official month; aggregate merchandise totals are not written into industry series."
     }
   ]
 }

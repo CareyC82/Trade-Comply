@@ -260,7 +260,9 @@ test('national connector reports Singapore historical fallback without a configu
     const payload = { sources: [{ id: 'un-comtrade-monthly', status: 'official_current' }], series: [fallback] };
     const connector = {
         market: 'SG', id: 'sg-singstat-monthly', name: 'Singapore SingStat',
-        official_url: 'https://www.singstat.gov.sg/', feed_env: 'SG_URL'
+        official_url: 'https://www.singstat.gov.sg/', feed_env: 'SG_URL',
+        raw_data_capability: 'aggregate_market_table', raw_ingest_status: 'probe_only',
+        raw_ingest_note: 'Aggregate totals are monitored but not written into industry series.'
     };
     const result = await syncNationalOfficialConnectors(payload, {
         registry: { connectors: [connector] },
@@ -271,6 +273,7 @@ test('national connector reports Singapore historical fallback without a configu
     assert.equal(result.skipped, true);
     assert.equal(result.status.markets.SG.status, 'un_comtrade_fallback');
     assert.equal(result.status.markets.SG.fallback_row_count, 1);
+    assert.equal(result.status.markets.SG.raw_ingest_status, 'probe_only');
 });
 
 test('national connector marks a market delayed when the official release is newer than synchronized data', () => {
@@ -290,19 +293,33 @@ test('national connector marks a market delayed when the official release is new
     assert.equal(state.active_data_tier, 'national_official');
 });
 
-test('Korea connector reports configuration required when the official API key is missing', async () => {
+test('Korea connector keeps historical fallback active when the official API key is missing', async () => {
+    const fallback = {
+        source_id: 'un-comtrade-monthly', market: 'KR', partner: 'WORLD', industry_id: 'memory',
+        hs_code: '854232', month: '2024-12', imports_value_usd: 40, exports_value_usd: 30
+    };
     const connector = {
         market: 'KR', id: 'kr-customs-monthly', name: 'Korea Customs',
         official_url: 'https://www.data.go.kr/en/data/15102108/openapi.do',
         adapter: 'korea-data-go-kr', latest_probe_url: 'https://apis.data.go.kr/1220000/Newtrade/getNewtradeList',
-        latest_period_env: 'KR_LATEST', api_key_env: 'KR_DATA_GO_KR_SERVICE_KEY', feed_env: 'KR_FEED'
+        latest_period_env: 'KR_LATEST', api_key_env: 'KR_DATA_GO_KR_SERVICE_KEY', feed_env: 'KR_FEED',
+        raw_data_capability: 'credentialed_api', raw_ingest_status: 'api_key_pending',
+        raw_ingest_note: 'Official API pending; UN Comtrade history remains available.'
     };
-    const result = await syncNationalOfficialConnectors({ sources: [], series: [] }, {
+    const result = await syncNationalOfficialConnectors({
+        sources: [{ id: 'un-comtrade-monthly', status: 'official_current' }],
+        series: [fallback]
+    }, {
         registry: { connectors: [connector] }, env: {}, referenceDate: new Date('2026-06-15T00:00:00Z')
     });
     assert.equal(result.ok, true);
-    assert.equal(result.status.markets.KR.status, 'configuration_required');
-    assert.equal(result.status.markets.KR.probe_status, 'configuration_required');
+    assert.equal(result.status.markets.KR.status, 'api_key_pending');
+    assert.equal(result.status.markets.KR.probe_status, 'api_key_pending');
+    assert.equal(result.status.markets.KR.active_data_tier, 'historical_fallback');
+    assert.equal(result.status.markets.KR.fallback_row_count, 1);
+    assert.equal(result.status.markets.KR.raw_ingest_status, 'api_key_pending');
+    assert.match(result.status.markets.KR.probe_note, /historical fallback/i);
+    assert.equal(Boolean(result.status.markets.KR.probe_error), false);
 });
 
 test('Singapore connector reports an official feed pending after a successful official period probe', async () => {
@@ -310,7 +327,9 @@ test('Singapore connector reports an official feed pending after a successful of
         market: 'SG', id: 'sg-singstat-monthly', name: 'Singapore SingStat',
         official_url: 'https://tablebuilder.singstat.gov.sg/table/TR/T010001',
         adapter: 'singstat', latest_probe_url: 'https://tablebuilder.singstat.gov.sg/api/table/tabledata/T010001',
-        latest_period_env: 'SG_LATEST', feed_env: 'SG_FEED'
+        latest_period_env: 'SG_LATEST', feed_env: 'SG_FEED',
+        raw_data_capability: 'aggregate_market_table', raw_ingest_status: 'probe_only',
+        raw_ingest_note: 'Aggregate totals are monitored but not written into industry series.'
     };
     const result = await syncNationalOfficialConnectors({ sources: [], series: [] }, {
         registry: { connectors: [connector] }, env: {},
@@ -321,4 +340,5 @@ test('Singapore connector reports an official feed pending after a successful of
     assert.equal(result.status.markets.SG.status, 'official_feed_pending');
     assert.equal(result.status.markets.SG.official_latest_period, '2026-04');
     assert.equal(result.status.markets.SG.synchronized_through, '');
+    assert.equal(result.status.markets.SG.raw_ingest_status, 'probe_only');
 });
