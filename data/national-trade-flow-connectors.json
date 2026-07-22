@@ -8,11 +8,14 @@
       "official_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm",
       "feed_env": "JP_OFFICIAL_TRADE_FLOW_URL",
       "latest_period_env": "JP_OFFICIAL_LATEST_PERIOD",
+      "required_directions": ["import", "export"],
+      "publication_mode": "validated_complete_batch",
+      "industry_feed_format": "complete_official_manifest",
       "adapter": "japan-customs-release-calendar",
       "latest_probe_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm",
       "raw_data_capability": "release_calendar_only",
       "raw_ingest_status": "probe_only",
-      "raw_ingest_note": "Japan Customs release calendar is monitored directly; industry rows are activated only from a complete official batch."
+      "raw_ingest_note": "Japan Customs release calendar monitors the latest official month. Configured industry rows publish only after a complete import-and-export batch passes validation."
     },
     {
       "market": "KR",
@@ -22,6 +25,9 @@
       "feed_env": "KR_OFFICIAL_TRADE_FLOW_URL",
       "latest_period_env": "KR_OFFICIAL_LATEST_PERIOD",
       "api_key_env": "KR_DATA_GO_KR_SERVICE_KEY",
+      "required_directions": ["import", "export"],
+      "publication_mode": "validated_complete_batch",
+      "industry_feed_format": "complete_official_manifest",
       "adapter": "korea-data-go-kr",
       "latest_probe_url": "https://apis.data.go.kr/1220000/Newtrade/getNewtradeList",
       "raw_data_capability": "credentialed_api",
@@ -35,12 +41,15 @@
       "official_url": "https://tablebuilder.singstat.gov.sg/table/TR/T010001",
       "feed_env": "SG_OFFICIAL_TRADE_FLOW_URL",
       "latest_period_env": "SG_OFFICIAL_LATEST_PERIOD",
+      "required_directions": ["import", "export"],
+      "publication_mode": "validated_complete_batch",
+      "industry_feed_format": "complete_official_manifest",
       "adapter": "singstat",
       "resource_id": "T010001",
       "latest_probe_url": "https://tablebuilder.singstat.gov.sg/api/table/tabledata/T010001",
       "raw_data_capability": "aggregate_market_table",
       "raw_ingest_status": "probe_only",
-      "raw_ingest_note": "SingStat T010001 is monitored directly for the latest official month; aggregate merchandise totals are not written into industry series."
+      "raw_ingest_note": "SingStat T010001 monitors the latest official month. Aggregate totals are not treated as industry rows; configured industry data publishes only as a validated complete batch."
     }
   ]
 }

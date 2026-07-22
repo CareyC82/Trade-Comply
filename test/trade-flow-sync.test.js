@@ -222,7 +222,39 @@ test('national connector publishes a complete Japan official batch', async () =>
     });
     assert.equal(result.ok, true);
     assert.equal(result.status.markets.JP.status, 'national_official_current');
+    assert.equal(result.status.markets.JP.publish_ready, true);
+    assert.equal(result.status.markets.JP.feed_configured, true);
+    assert.deepEqual(result.status.markets.JP.directions, ['import', 'export']);
+    assert.deepEqual(result.status.markets.JP.missing_directions, []);
+    assert.deepEqual(payload.sources.find((source) => source.id === 'jp-customs-monthly').directions, ['import', 'export']);
+    assert.equal(payload.sources.find((source) => source.id === 'jp-customs-monthly').complete_batch, true);
     assert.equal(payload.series.some((row) => row.source_id === 'jp-customs-monthly' && row.exports_value_usd === 80), true);
+});
+
+test('national connector publishes a complete Singapore industry batch', async () => {
+    const payload = { sources: [], series: [] };
+    const connector = {
+        market: 'SG', id: 'sg-singstat-monthly', name: 'Singapore SingStat',
+        official_url: 'https://tablebuilder.singstat.gov.sg/table/TR/T010001', feed_env: 'SG_URL',
+        required_directions: ['import', 'export'], publication_mode: 'validated_complete_batch'
+    };
+    const manifest = {
+        complete: true,
+        source: { id: 'sg-singstat-monthly', name: 'Singapore SingStat', source_url: connector.official_url },
+        expected: { markets: ['SG'], months: ['2026-04'], industry_ids: ['semiconductor_ai'], directions: ['import', 'export'] },
+        series: [{ market: 'SG', industry_id: 'semiconductor_ai', month: '2026-04', imports_value_usd: 210, exports_value_usd: 240 }]
+    };
+    const result = await syncNationalOfficialConnectors(payload, {
+        registry: { connectors: [connector] },
+        env: { SG_URL: 'https://feed.test/sg.json' },
+        fetchImpl: async () => ({ ok: true, json: async () => manifest }),
+        referenceDate: new Date('2026-05-15T00:00:00Z')
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.status.markets.SG.status, 'national_official_current');
+    assert.equal(result.status.markets.SG.publish_ready, true);
+    assert.deepEqual(result.status.markets.SG.directions, ['import', 'export']);
+    assert.equal(payload.series.some((row) => row.source_id === 'sg-singstat-monthly' && row.imports_value_usd === 210 && row.exports_value_usd === 240), true);
 });
 
 test('national connector retains Korea last-good rows when a new batch is incomplete', async () => {
@@ -291,6 +323,31 @@ test('national connector marks a market delayed when the official release is new
     assert.equal(state.official_latest_period, '2026-05');
     assert.equal(state.synchronized_through, '2026-03');
     assert.equal(state.active_data_tier, 'national_official');
+    assert.equal(state.official_sync_gap_months, 2);
+    assert.equal(state.data_age_months, 3);
+    assert.match(state.status_reason, /2 month/);
+});
+
+test('national connector gates legacy official data when a required direction is missing', () => {
+    const connector = {
+        market: 'JP', id: 'jp-customs-monthly', name: 'Japan Customs',
+        official_url: 'https://www.customs.go.jp/', required_directions: ['import', 'export']
+    };
+    const state = nationalConnectorState({
+        sources: [{ id: 'jp-customs-monthly', directions: ['import'] }],
+        series: [{
+            source_id: 'jp-customs-monthly', market: 'JP', partner: 'WORLD', industry_id: 'memory',
+            hs_code: 'INDUSTRY', month: '2026-04', imports_value_usd: 40, exports_value_usd: 30
+        }]
+    }, connector, {
+        referenceDate: new Date('2026-05-15T00:00:00Z'),
+        probe: { status: 'official_probe_ok', latest_period: '2026-04' },
+        feedConfigured: true
+    });
+    assert.equal(state.status, 'official_incomplete');
+    assert.deepEqual(state.missing_directions, ['export']);
+    assert.equal(state.publish_ready, false);
+    assert.match(state.status_reason, /export/);
 });
 
 test('Korea connector keeps historical fallback active when the official API key is missing', async () => {
@@ -341,4 +398,6 @@ test('Singapore connector reports an official feed pending after a successful of
     assert.equal(result.status.markets.SG.official_latest_period, '2026-04');
     assert.equal(result.status.markets.SG.synchronized_through, '');
     assert.equal(result.status.markets.SG.raw_ingest_status, 'probe_only');
+    assert.equal(result.status.summary.pending, 1);
+    assert.equal(result.status.markets.SG.publish_ready, false);
 });

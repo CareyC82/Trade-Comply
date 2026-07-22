@@ -1218,6 +1218,7 @@
             const labels = {
                 national_official_current: 'Current',
                 official_delayed: 'Sync delayed',
+                official_incomplete: 'Direction incomplete',
                 last_good_degraded: 'Last-good retained',
                 official_feed_pending: 'Probe only',
                 api_key_pending: 'API key pending',
@@ -1228,6 +1229,7 @@
             const badgeClasses = {
                 national_official_current: 'auto_updatable',
                 official_delayed: 'official_link_monitor',
+                official_incomplete: 'benchmark',
                 last_good_degraded: 'benchmark',
                 official_feed_pending: 'official_link_monitor',
                 api_key_pending: 'hybrid_official_candidate',
@@ -1235,11 +1237,18 @@
                 un_comtrade_fallback: 'hybrid_official_candidate',
                 no_official_series: 'benchmark'
             };
+            const summary = status.summary || {};
             return `
                 <div class="quality-banner">
                     <div class="crawl-section-title">
                         <h3>National monthly trade-flow connectors</h3>
                         <span class="meta">Japan · Korea · Singapore</span>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-card"><strong>${escapeHtml(summary.current ?? 0)}</strong><span>Current official</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(summary.delayed ?? 0)}</strong><span>Sync delayed</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(summary.pending ?? 0)}</strong><span>Feed pending</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(summary.fallback ?? 0)}</strong><span>Fallback active</span></div>
                     </div>
                     <div class="duty-source-grade-grid">
                         ${rows.map(row => `
@@ -1251,8 +1260,11 @@
                                 </div>
                                 <div class="grade-note">Official published: ${escapeHtml(row.official_latest_period || '—')}</div>
                                 <div class="grade-note">TraceWize synchronized: ${escapeHtml(row.synchronized_through || '—')}</div>
+                                <div class="grade-note">Official sync gap: ${escapeHtml(Number.isFinite(row.official_sync_gap_months) ? `${row.official_sync_gap_months} month(s)` : '—')}</div>
+                                <div class="grade-note">Directions: ${escapeHtml((row.directions || []).join(' + ') || 'none')}${row.missing_directions?.length ? ` · missing ${escapeHtml(row.missing_directions.join(', '))}` : ''}</div>
+                                <div class="grade-note">Feed: ${row.feed_configured ? 'configured' : 'not configured'} · Publish: ${row.publish_ready ? 'ready' : 'gated'}</div>
                                 <div class="grade-note">Raw ingest: ${escapeHtml((row.raw_ingest_status || 'not declared').replaceAll('_', ' '))}</div>
-                                <div class="grade-note">${escapeHtml(row.probe_note || row.raw_ingest_note || row.last_error || '')}</div>
+                                <div class="grade-note">${escapeHtml(row.status_reason || row.probe_note || row.raw_ingest_note || row.last_error || '')}</div>
                             </article>
                         `).join('')}
                     </div>

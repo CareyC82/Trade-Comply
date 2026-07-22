@@ -125,7 +125,7 @@ jobs:
             console.log('');
             console.log('### National official connectors');
             for (const [market, state] of Object.entries(national.markets || {})) {
-              console.log(`- ${market}: ${state.status} · official published ${state.official_latest_period || 'unknown'} · TraceWize synchronized ${state.synchronized_through || 'none'} · tier ${state.active_data_tier || 'none'}`);
+              console.log(`- ${market}: ${state.status} · official ${state.official_latest_period || 'unknown'} · synchronized ${state.synchronized_through || 'none'} · gap ${state.official_sync_gap_months ?? 'unknown'} month(s) · directions ${(state.directions || []).join('+') || 'none'} · feed ${state.feed_configured ? 'configured' : 'not configured'} · publish ${state.publish_ready ? 'ready' : 'gated'}`);
               if (state.probe_error) console.log(`  - Probe: ${state.probe_error}`);
               if (state.last_error) console.log(`  - ${state.last_error}`);
             }

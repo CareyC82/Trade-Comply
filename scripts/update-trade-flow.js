@@ -580,6 +580,10 @@ function syncOfficialBatches(payload, { manifestPaths = discoverOfficialBatchPat
                 status: 'official_current',
                 role: 'national_official_monthly_industry',
                 latest_period: validated.expected.months.slice().sort().at(-1),
+                industry_ids: validated.expected.industryIds,
+                directions: validated.expected.directions,
+                complete_batch: true,
+                publication_mode: 'validated_complete_batch',
                 row_count: validated.rows.length,
                 last_success_at: new Date().toISOString()
             };
@@ -603,15 +607,40 @@ function monthLag(latestMonth, referenceDate = new Date()) {
     return ((reference.getUTCFullYear() - Number(match[1])) * 12) + (reference.getUTCMonth() + 1 - Number(match[2]));
 }
 
-function nationalConnectorState(payload, connector, { error = '', referenceDate = new Date(), probe = {} } = {}) {
+function periodDistance(laterPeriod, earlierPeriod) {
+    const later = String(laterPeriod || '').match(/^(\d{4})-(\d{2})$/);
+    const earlier = String(earlierPeriod || '').match(/^(\d{4})-(\d{2})$/);
+    if (!later || !earlier) return null;
+    return Math.max(0, ((Number(later[1]) - Number(earlier[1])) * 12) + Number(later[2]) - Number(earlier[2]));
+}
+
+function nationalConnectorState(payload, connector, { error = '', referenceDate = new Date(), probe = {}, feedConfigured = false } = {}) {
     const officialRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === connector.id);
     const fallbackRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === COMTRADE_SOURCE_ID);
+    const sourceEntry = (payload.sources || []).find((source) => source.id === connector.id) || {};
     const synchronizedThrough = officialRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '';
     const officialLatestPeriod = probe.latest_period || '';
     const activePeriod = synchronizedThrough || fallbackRows.map((row) => row.month).filter(Boolean).sort().at(-1) || '';
     const lagMonths = monthLag(synchronizedThrough, referenceDate);
+    const requiredDirections = Array.isArray(connector.required_directions) && connector.required_directions.length
+        ? connector.required_directions
+        : ['import', 'export'];
+    const inferredDirections = officialRows.length
+        ? [
+            officialRows.every((row) => Object.prototype.hasOwnProperty.call(row, 'imports_value_usd')) ? 'import' : '',
+            officialRows.every((row) => Object.prototype.hasOwnProperty.call(row, 'exports_value_usd')) ? 'export' : ''
+        ].filter(Boolean)
+        : [];
+    const directions = Array.isArray(sourceEntry.directions) && sourceEntry.directions.length
+        ? sourceEntry.directions
+        : inferredDirections;
+    const missingDirections = officialRows.length
+        ? requiredDirections.filter((direction) => !directions.includes(direction))
+        : requiredDirections;
+    const syncGapMonths = periodDistance(officialLatestPeriod, synchronizedThrough);
     let status = 'no_official_series';
     if (officialRows.length && error) status = 'last_good_degraded';
+    else if (officialRows.length && missingDirections.length) status = 'official_incomplete';
     else if (officialRows.length && officialLatestPeriod && synchronizedThrough < officialLatestPeriod) status = 'official_delayed';
     else if (officialRows.length && Number.isFinite(lagMonths) && lagMonths > 4) status = 'official_delayed';
     else if (officialRows.length) status = 'national_official_current';
@@ -619,6 +648,17 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
     else if (probe.status === 'configuration_required') status = 'configuration_required';
     else if (officialLatestPeriod) status = 'official_feed_pending';
     else if (fallbackRows.length) status = 'un_comtrade_fallback';
+    const statusReason = {
+        national_official_current: 'Complete official import and export rows are synchronized to the latest known period.',
+        official_delayed: `The official source is ${syncGapMonths ?? 'an unknown number of'} month(s) ahead of the synchronized industry series.`,
+        official_incomplete: `The retained official batch is missing: ${missingDirections.join(', ')}.`,
+        last_good_degraded: 'The latest batch was rejected; the previous complete official batch remains active.',
+        official_feed_pending: 'The latest official month is known, but no validated industry batch has been published.',
+        api_key_pending: 'The official API credential is not configured; historical fallback remains available.',
+        configuration_required: 'A complete official feed URL or manifest must be configured.',
+        un_comtrade_fallback: 'No national official industry batch is active; historical UN Comtrade data is being used.',
+        no_official_series: 'No national official or historical fallback series is available.'
+    }[status] || '';
     return {
         market: connector.market,
         connector_id: connector.id,
@@ -630,6 +670,15 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
         synchronized_through: synchronizedThrough,
         active_data_tier: officialRows.length ? 'national_official' : (fallbackRows.length ? 'historical_fallback' : 'none'),
         lag_months: lagMonths,
+        data_age_months: lagMonths,
+        official_sync_gap_months: syncGapMonths,
+        required_directions: requiredDirections,
+        directions,
+        missing_directions: missingDirections,
+        feed_configured: feedConfigured,
+        publication_mode: connector.publication_mode || 'validated_complete_batch',
+        publish_ready: Boolean(officialRows.length && !missingDirections.length && !error),
+        status_reason: statusReason,
         official_row_count: officialRows.length,
         fallback_row_count: fallbackRows.length,
         raw_data_capability: connector.raw_data_capability || '',
@@ -689,6 +738,10 @@ async function syncNationalOfficialConnectors(payload, {
                     status: 'official_current',
                     role: 'national_official_monthly_industry',
                     latest_period: validated.expected.months.slice().sort().at(-1),
+                    industry_ids: validated.expected.industryIds,
+                    directions: validated.expected.directions,
+                    complete_batch: true,
+                    publication_mode: connector.publication_mode || 'validated_complete_batch',
                     row_count: validated.rows.length,
                     last_success_at: new Date().toISOString()
                 };
@@ -706,13 +759,23 @@ async function syncNationalOfficialConnectors(payload, {
         } catch (caught) {
             probe = { status: 'probe_degraded', latest_period: '', error: String(caught.message || caught), checked_at: new Date().toISOString() };
         }
-        markets[connector.market] = nationalConnectorState(payload, connector, { error, referenceDate, probe });
+        markets[connector.market] = nationalConnectorState(payload, connector, { error, referenceDate, probe, feedConfigured: Boolean(feedUrl) });
     }
+    const marketStates = Object.values(markets);
     const status = {
         schema_version: '1.0',
         generated_at: new Date().toISOString(),
         ok: failures.length === 0,
         publish_policy: 'complete_batch_only_last_good_retained',
+        summary: {
+            current: marketStates.filter((state) => state.status === 'national_official_current').length,
+            delayed: marketStates.filter((state) => state.status === 'official_delayed').length,
+            incomplete: marketStates.filter((state) => state.status === 'official_incomplete').length,
+            pending: marketStates.filter((state) => ['official_feed_pending', 'configuration_required'].includes(state.status)).length,
+            fallback: marketStates.filter((state) => state.active_data_tier === 'historical_fallback').length,
+            api_key_pending: marketStates.filter((state) => state.status === 'api_key_pending').length,
+            missing_direction_markets: marketStates.filter((state) => state.missing_directions.length && state.official_row_count).map((state) => state.market)
+        },
         markets,
         failures
     };
