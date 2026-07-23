@@ -15,6 +15,7 @@ const {
     parseCensusRows,
     parseComtradeRows,
     probeConnectorOfficialLatest,
+    replaceComtradeRows,
     syncCensus,
     syncComtrade,
     syncNationalOfficialConnectors,
@@ -81,24 +82,48 @@ test('missing Census key leaves prior official series intact', async () => {
     assert.equal(payload.sources[0].status, 'key_required');
 });
 
-test('buildComtradeUrl batches reporters, exact HS codes, and both trade flows', () => {
-    const url = new URL(buildComtradeUrl({ period: '202412', reporters: { CN: 156 }, hsCodes: ['854232'] }));
+test('buildComtradeUrl batches reporters, partners, exact HS codes, and both trade flows', () => {
+    const url = new URL(buildComtradeUrl({
+        period: '202412',
+        reporters: { CN: 156 },
+        partnerCodes: [842],
+        hsCodes: ['854232']
+    }));
     assert.equal(url.searchParams.get('period'), '202412');
     assert.equal(url.searchParams.get('reporterCode'), '156');
+    assert.equal(url.searchParams.get('partnerCode'), '842');
     assert.equal(url.searchParams.get('cmdCode'), '854232');
     assert.equal(url.searchParams.get('flowCode'), 'M,X');
 });
 
 test('parseComtradeRows maps exact memory imports to official monthly rows', () => {
     const rows = parseComtradeRows({ data: [{
-        period: '202412', reporterCode: 156, flowCode: 'M', cmdCode: '854232', primaryValue: 8192854446
+        period: '202412', reporterCode: 156, partnerCode: 842, flowCode: 'M', cmdCode: '854232', primaryValue: 8192854446
     }] });
     const memory = rows.find((row) => row.industry_id === 'memory');
     assert.equal(memory.market, 'CN');
+    assert.equal(memory.partner, 'US');
     assert.equal(memory.month, '2024-12');
     assert.equal(memory.imports_value_usd, 8192854446);
     assert.equal(memory.exports_value_usd, 0);
     assert.equal(memory.status, 'official');
+});
+
+test('replaceComtradeRows refreshes successful partners and preserves failed partner rows', () => {
+    const base = [
+        { source_id: 'un-comtrade-monthly', market: 'CN', partner: 'WORLD', industry_id: 'memory', hs_code: '854232', month: '2024-12', imports_value_usd: 1 },
+        { source_id: 'un-comtrade-monthly', market: 'CN', partner: 'US', industry_id: 'memory', hs_code: '854232', month: '2024-12', imports_value_usd: 2 },
+        { source_id: 'un-comtrade-monthly', market: 'CN', partner: 'JP', industry_id: 'memory', hs_code: '854232', month: '2024-12', imports_value_usd: 3 }
+    ];
+    const result = replaceComtradeRows(
+        base,
+        [{ ...base[0], imports_value_usd: 10 }],
+        [{ partners: ['US'], rows: [{ ...base[1], imports_value_usd: 20 }] }],
+        { markets: ['CN'], months: ['2024-12'] }
+    );
+    assert.equal(result.find((row) => row.partner === 'WORLD').imports_value_usd, 10);
+    assert.equal(result.find((row) => row.partner === 'US').imports_value_usd, 20);
+    assert.equal(result.find((row) => row.partner === 'JP').imports_value_usd, 3);
 });
 
 test('syncComtrade replaces its own rows and marks official source current', async () => {
@@ -112,7 +137,7 @@ test('syncComtrade replaces its own rows and marks official source current', asy
             period: '202412', reporterCode: 156, flowCode: 'X', cmdCode: '854232', primaryValue: 100
         }] })
     });
-    const result = await syncComtrade(payload, { fetchImpl, periods: ['202412'], concurrency: 1 });
+    const result = await syncComtrade(payload, { fetchImpl, periods: ['202412'], concurrency: 1, includePartners: false });
     assert.equal(result.ok, true);
     assert.equal(payload.sources[0].status, 'official_current');
     assert.equal(payload.series.some((row) => row.source_id === 'other-source'), true);
@@ -134,7 +159,7 @@ test('syncComtrade rejects a partial month batch and retains last-good rows', as
             period: '202412', reporterCode: 156, flowCode: 'M', cmdCode: '854232', primaryValue: 200
         }] : [] })
     });
-    const result = await syncComtrade(payload, { fetchImpl, periods: ['202412', '202501'], concurrency: 1 });
+    const result = await syncComtrade(payload, { fetchImpl, periods: ['202412', '202501'], concurrency: 1, includePartners: false });
     assert.equal(result.ok, false);
     assert.match(result.error, /Incomplete official batch/);
     assert.deepEqual(payload.series, [lastGood]);
@@ -155,7 +180,7 @@ test('syncComtrade replaces requested months but preserves older official histor
             period: '202412', reporterCode: 156, flowCode: 'X', cmdCode: '854232', primaryValue: 100
         }] })
     });
-    const result = await syncComtrade(payload, { fetchImpl, periods: ['202412'], concurrency: 1 });
+    const result = await syncComtrade(payload, { fetchImpl, periods: ['202412'], concurrency: 1, includePartners: false });
     assert.equal(result.ok, true);
     assert.equal(payload.series.some((row) => row.month === '2023-12' && row.imports_value_usd === 50), true);
     assert.equal(payload.series.some((row) => row.month === '2024-12' && row.exports_value_usd === 100), true);
@@ -352,6 +377,42 @@ test('national connector gates legacy official data when a required direction is
     assert.equal(state.publish_ready, false);
     assert.ok(state.publication_blockers.includes('missing_export_direction'));
     assert.match(state.status_reason, /export/);
+});
+
+test('national connector blocks publication when required partner and industry coverage is incomplete', () => {
+    const connector = {
+        market: 'JP',
+        id: 'jp-customs-monthly',
+        name: 'Japan Customs',
+        required_directions: ['import', 'export'],
+        required_partners: ['CN', 'US'],
+        required_industries: ['memory', 'semiconductor_ai'],
+        enforce_partner_coverage: true,
+        enforce_industry_coverage: true
+    };
+    const state = nationalConnectorState({
+        sources: [{ id: 'jp-customs-monthly', directions: ['import', 'export'] }],
+        series: [{
+            source_id: 'jp-customs-monthly',
+            market: 'JP',
+            partner: 'CN',
+            industry_id: 'memory',
+            hs_code: 'INDUSTRY',
+            month: '2026-04',
+            imports_value_usd: 40,
+            exports_value_usd: 30
+        }]
+    }, connector, {
+        referenceDate: new Date('2026-05-15T00:00:00Z'),
+        probe: { status: 'official_probe_ok', latest_period: '2026-04' },
+        feedConfigured: true
+    });
+    assert.equal(state.status, 'official_incomplete');
+    assert.deepEqual(state.missing_partners, ['US']);
+    assert.deepEqual(state.missing_industries, ['semiconductor_ai']);
+    assert.equal(state.publish_ready, false);
+    assert.ok(state.publication_blockers.includes('missing_partner_US'));
+    assert.ok(state.publication_blockers.includes('missing_industry_semiconductor_ai'));
 });
 
 test('Korea connector keeps historical fallback active when the official API key is missing', async () => {

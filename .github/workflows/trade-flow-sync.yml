@@ -116,6 +116,9 @@ jobs:
           for (const [name, connector] of Object.entries(status.connectors || {})) {
             console.log(`- ${name}: ${connector.ok ? 'OK' : 'needs attention'} · ${connector.row_count || 0} accepted row(s)${connector.skipped ? ' · skipped' : ''}`);
             if (connector.error) console.log(`  - ${connector.error}`);
+            if (name === 'comtrade') {
+              console.log(`  - Partner coverage: ${connector.partner_row_count || 0} row(s) · markets ${(connector.partner_markets || []).join(', ') || 'none'} · sync error(s) ${(connector.partner_sync_errors || []).length}`);
+            }
             for (const batch of connector.batches || []) {
               console.log(`  - ${batch.path}: ${batch.ok ? `${batch.row_count} row(s) accepted` : `rejected · ${batch.error}`}`);
             }
@@ -125,9 +128,12 @@ jobs:
             console.log('');
             console.log('### National official connectors');
             for (const [market, state] of Object.entries(national.markets || {})) {
-              console.log(`- ${market}: ${state.status} · official ${state.official_latest_period || 'unknown'} · synchronized ${state.synchronized_through || 'none'} · gap ${state.official_sync_gap_months ?? 'unknown'} month(s) · directions ${(state.directions || []).join('+') || 'none'} · feed ${state.feed_configured ? 'configured' : 'not configured'} · publish ${state.publish_ready ? 'ready' : 'gated'}`);
+              console.log(`- ${market}: ${state.status} · official ${state.official_latest_period || 'unknown'} · synchronized ${state.synchronized_through || 'none'} · gap ${state.official_sync_gap_months ?? 'unknown'} month(s) · directions ${(state.directions || []).join('+') || 'none'} · partners ${state.partner_count || 0}/${(state.required_partners || []).length || 0} · industries ${state.industry_count || 0}/${(state.required_industries || []).length || 0} · feed ${state.feed_configured ? 'configured' : 'not configured'} · publish ${state.publish_ready ? 'ready' : 'gated'}`);
               if (state.probe_error) console.log(`  - Probe: ${state.probe_error}`);
               if (state.last_error) console.log(`  - ${state.last_error}`);
+              if ((state.missing_partners || []).length) console.log(`  - Missing partners: ${state.missing_partners.join(', ')}`);
+              if ((state.missing_industries || []).length) console.log(`  - Missing industries: ${state.missing_industries.join(', ')}`);
+              if ((state.publication_blockers || []).length) console.log(`  - Publication blockers: ${state.publication_blockers.join(', ')}`);
             }
           }
           NODE

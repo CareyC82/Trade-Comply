@@ -1218,7 +1218,7 @@
             const labels = {
                 national_official_current: 'Current',
                 official_delayed: 'Sync delayed',
-                official_incomplete: 'Direction incomplete',
+                official_incomplete: 'Coverage incomplete',
                 last_good_degraded: 'Last-good retained',
                 official_feed_pending: 'Probe only',
                 api_key_pending: 'API key pending',
@@ -1257,6 +1257,8 @@
                             ${gatedRows.map(row => `${escapeHtml(row.market || '—')}: ${[
                                 row.missing_periods?.length ? `missing month(s) ${row.missing_periods.join(', ')}` : '',
                                 row.missing_directions?.length ? `missing direction(s) ${row.missing_directions.join(', ')}` : '',
+                                row.missing_partners?.length ? `missing partner(s) ${row.missing_partners.join(', ')}` : '',
+                                row.missing_industries?.length ? `missing industry(s) ${row.missing_industries.join(', ')}` : '',
                                 row.publication_blockers?.length ? `gate ${row.publication_blockers.join(', ')}` : ''
                             ].filter(Boolean).join(' · ')}`).join('<br>')}
                         </div>
@@ -1274,6 +1276,8 @@
                                 <div class="grade-note">Official sync gap: ${escapeHtml(Number.isFinite(row.official_sync_gap_months) ? `${row.official_sync_gap_months} month(s)` : '—')}</div>
                                 <div class="grade-note">Missing official months: ${escapeHtml((row.missing_periods || []).join(', ') || 'none')}</div>
                                 <div class="grade-note">Directions: ${escapeHtml((row.directions || []).join(' + ') || 'none')}${row.missing_directions?.length ? ` · missing ${escapeHtml(row.missing_directions.join(', '))}` : ''}</div>
+                                <div class="grade-note">Partners: ${escapeHtml(String((row.partners || []).length))}/${escapeHtml(String((row.required_partners || []).length))}${row.missing_partners?.length ? ` · missing ${escapeHtml(row.missing_partners.join(', '))}` : ''}</div>
+                                <div class="grade-note">Industries: ${escapeHtml(String((row.industries || []).length))}/${escapeHtml(String((row.required_industries || []).length))}${row.missing_industries?.length ? ` · missing ${escapeHtml(row.missing_industries.join(', '))}` : ''}</div>
                                 <div class="grade-note">Feed: ${row.feed_configured ? 'configured' : 'not configured'} · Publish: ${row.publish_ready ? 'ready' : 'gated'}</div>
                                 <div class="grade-note">Gate reason: ${escapeHtml((row.publication_blockers || []).join(', ') || 'none')}</div>
                                 <div class="grade-note">Raw ingest: ${escapeHtml((row.raw_ingest_status || 'not declared').replaceAll('_', ' '))}</div>

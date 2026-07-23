@@ -35,6 +35,14 @@ const REPORTER_MARKETS = Object.fromEntries(
     Object.entries(COMTRADE_REPORTERS).map(([market, code]) => [String(code), market])
 );
 
+const COMTRADE_PARTNER_PRIORITY = {
+    CN: ['US', 'JP', 'KR', 'SG', 'DE'],
+    US: ['CN', 'JP', 'KR', 'MX', 'DE'],
+    EU: ['US', 'CN', 'JP', 'KR', 'SG'],
+    JP: ['CN', 'US', 'KR', 'SG', 'DE'],
+    SG: ['CN', 'US', 'MY', 'JP', 'KR']
+};
+
 const HS_INDUSTRIES = INDUSTRIES.reduce((result, industry) => {
     industry.hs.forEach((hsCode) => {
         if (!result[hsCode]) result[hsCode] = [];
@@ -92,6 +100,32 @@ function replaceSourceScope(existing, incoming, sourceId, scope = {}) {
         row.source_id !== sourceId || !rowMatchesScope(row, scope)
     ));
     return aggregateSeries([...retained, ...incoming]);
+}
+
+function replaceComtradeRows(existing, aggregateRows, partnerBatches, scope = {}) {
+    const aggregateRetained = existing.filter((row) => (
+        row.source_id !== COMTRADE_SOURCE_ID
+        || row.partner !== 'WORLD'
+        || !rowMatchesScope(row, scope)
+    ));
+    let merged = aggregateSeries([...aggregateRetained, ...aggregateRows]);
+
+    partnerBatches.forEach(({ market, month, partners = [], rows = [] }) => {
+        const batchMarket = market || rows[0]?.market;
+        const batchMonth = month || rows[0]?.month;
+        const partnerSet = new Set(
+            (partners.length ? partners : rows.map((row) => row.partner)).filter(Boolean)
+        );
+        if (!batchMarket || !batchMonth || !partnerSet.size) return;
+        const retained = merged.filter((row) => (
+            row.source_id !== COMTRADE_SOURCE_ID
+            || row.market !== batchMarket
+            || row.month !== batchMonth
+            || !partnerSet.has(row.partner)
+        ));
+        merged = aggregateSeries([...retained, ...rows]);
+    });
+    return merged;
 }
 
 function validateCompleteBatch({
@@ -180,26 +214,33 @@ function buildCensusUrl({ flow, hsCode, apiKey, range }) {
     return `https://api.census.gov/data/timeseries/intltrade/${dataset}?${params.toString()}`;
 }
 
-function buildComtradeUrl({ period, reporters = COMTRADE_REPORTERS, hsCodes = Object.keys(HS_INDUSTRIES) } = {}) {
+function buildComtradeUrl({
+    period,
+    reporters = COMTRADE_REPORTERS,
+    hsCodes = Object.keys(HS_INDUSTRIES),
+    partnerCodes = [0],
+    maxRecords = 500
+} = {}) {
     const params = new URLSearchParams({
         period,
         reporterCode: Object.values(reporters).join(','),
         cmdCode: hsCodes.join(','),
         flowCode: 'M,X',
-        partnerCode: '0',
+        partnerCode: partnerCodes.join(','),
         partner2Code: '0',
         customsCode: 'C00',
         motCode: '0',
-        maxRecords: '500'
+        maxRecords: String(maxRecords)
     });
     return `${COMTRADE_ENDPOINT}?${params.toString()}`;
 }
 
-function parseComtradeRows(response, { sourceId = COMTRADE_SOURCE_ID } = {}) {
+function parseComtradeRows(response, { sourceId = COMTRADE_SOURCE_ID, defaultPartner = 'WORLD' } = {}) {
     const rows = Array.isArray(response?.data) ? response.data : [];
     const fetchedAt = new Date().toISOString();
     return rows.flatMap((row) => {
         const market = REPORTER_MARKETS[String(row.reporterCode)];
+        const partner = REPORTER_MARKETS[String(row.partnerCode)] || defaultPartner;
         const hsCode = String(row.cmdCode || '');
         const industries = HS_INDUSTRIES[hsCode] || [];
         const period = String(row.period || '');
@@ -208,7 +249,7 @@ function parseComtradeRows(response, { sourceId = COMTRADE_SOURCE_ID } = {}) {
         const month = `${period.slice(0, 4)}-${period.slice(4)}`;
         return industries.map((industryId) => ({
             market,
-            partner: 'WORLD',
+            partner,
             industry_id: industryId,
             hs_code: hsCode,
             month,
@@ -422,7 +463,8 @@ async function mapWithConcurrency(items, concurrency, task) {
 async function syncComtrade(payload, {
     fetchImpl = global.fetch,
     periods = monthList(),
-    concurrency = 1
+    concurrency = 1,
+    includePartners = true
 } = {}) {
     const sources = Array.isArray(payload.sources) ? payload.sources : [];
     const source = sources.find((row) => row.id === COMTRADE_SOURCE_ID);
@@ -435,6 +477,48 @@ async function syncComtrade(payload, {
         const completedIds = responses.filter((response) => response.rows.length).map((response) => response.period);
         const existing = Array.isArray(payload.series) ? payload.series : [];
         const months = periods.map((period) => `${period.slice(0, 4)}-${period.slice(4)}`);
+        const partnerRequests = includePartners
+            ? periods.flatMap((period) => Object.entries(COMTRADE_PARTNER_PRIORITY).map(([market, partners]) => ({
+                period,
+                month: `${period.slice(0, 4)}-${period.slice(4)}`,
+                market,
+                partners
+            })))
+            : [];
+        const partnerResults = await mapWithConcurrency(partnerRequests, concurrency, async (request) => {
+            try {
+                const response = await fetchJson(buildComtradeUrl({
+                    period: request.period,
+                    reporters: { [request.market]: COMTRADE_REPORTERS[request.market] },
+                    partnerCodes: request.partners.map((partner) => COMTRADE_REPORTERS[partner]),
+                    maxRecords: 500
+                }), fetchImpl, { retries: 3 });
+                const rows = parseComtradeRows(response, { defaultPartner: '' })
+                    .filter((row) => row.market === request.market && request.partners.includes(row.partner));
+                return {
+                    ...request,
+                    ok: rows.length > 0,
+                    rows,
+                    error: rows.length ? '' : 'No usable partner rows'
+                };
+            } catch (error) {
+                return {
+                    ...request,
+                    ok: false,
+                    rows: [],
+                    error: String(error.message || error)
+                };
+            }
+        });
+        const successfulPartnerBatches = partnerResults.filter((result) => result.ok);
+        const partnerRows = successfulPartnerBatches.flatMap((result) => result.rows);
+        const partnerFailures = partnerResults
+            .filter((result) => !result.ok)
+            .map((result) => ({
+                market: result.market,
+                period: result.period,
+                error: result.error
+            }));
         const validation = validateCompleteBatch({
             existing,
             incoming,
@@ -445,7 +529,7 @@ async function syncComtrade(payload, {
             scope: { months, markets: Object.keys(COMTRADE_REPORTERS), industryIds: INDUSTRIES.map((industry) => industry.id) }
         });
         if (!validation.ok) throw new Error(validation.reason);
-        payload.series = replaceSourceScope(existing, incoming, COMTRADE_SOURCE_ID, {
+        payload.series = replaceComtradeRows(existing, incoming, successfulPartnerBatches, {
             months,
             markets: Object.keys(COMTRADE_REPORTERS),
             industryIds: INDUSTRIES.map((industry) => industry.id)
@@ -456,9 +540,18 @@ async function syncComtrade(payload, {
             source.last_success_at = payload.updated_at;
             source.latest_period = incoming.map((row) => row.month).sort().at(-1);
             source.row_count = incoming.length;
+            source.partner_row_count = partnerRows.length;
+            source.partner_markets = [...new Set(partnerRows.map((row) => row.market))].sort();
+            source.partner_sync_errors = partnerFailures;
+            if (partnerRows.length) source.partner_last_success_at = payload.updated_at;
             delete source.last_error;
         }
-        return { ok: true, skipped: false, rows: incoming };
+        return {
+            ok: true,
+            skipped: false,
+            rows: [...incoming, ...partnerRows],
+            partnerFailures
+        };
     } catch (error) {
         if (source) {
             source.status = Array.isArray(payload.series) && payload.series.some((row) => row.source_id === COMTRADE_SOURCE_ID)
@@ -658,16 +751,37 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
     const missingDirections = officialRows.length
         ? requiredDirections.filter((direction) => !directions.includes(direction))
         : requiredDirections;
+    const requiredPartners = Array.isArray(connector.required_partners) ? connector.required_partners : [];
+    const requiredIndustries = Array.isArray(connector.required_industries) ? connector.required_industries : [];
+    const partners = [...new Set(officialRows
+        .map((row) => String(row.partner || '').trim().toUpperCase())
+        .filter((partner) => partner && !['WORLD', 'ALL'].includes(partner)))].sort();
+    const industries = [...new Set(officialRows.map((row) => row.industry_id).filter(Boolean))].sort();
+    const missingPartners = requiredPartners.filter((partner) => !partners.includes(partner));
+    const missingIndustries = requiredIndustries.filter((industryId) => !industries.includes(industryId));
+    const enforcePartnerCoverage = connector.enforce_partner_coverage === true;
+    const enforceIndustryCoverage = connector.enforce_industry_coverage === true;
     const syncGapMonths = periodDistance(officialLatestPeriod, synchronizedThrough);
     const missingPeriods = missingMonthlyPeriods(synchronizedThrough, officialLatestPeriod);
     const publicationBlockers = [];
     if (!officialRows.length) publicationBlockers.push('no_validated_official_rows');
     if (missingPeriods.length) publicationBlockers.push('official_period_gap');
     missingDirections.forEach((direction) => publicationBlockers.push(`missing_${direction}_direction`));
+    if (enforcePartnerCoverage) {
+        missingPartners.forEach((partner) => publicationBlockers.push(`missing_partner_${partner}`));
+    }
+    if (enforceIndustryCoverage) {
+        missingIndustries.forEach((industryId) => publicationBlockers.push(`missing_industry_${industryId}`));
+    }
     if (error) publicationBlockers.push('latest_batch_failed');
+    const retainedCoverageGaps = [
+        ...missingDirections.map((direction) => `${direction} direction`),
+        ...(enforcePartnerCoverage ? missingPartners.map((partner) => `partner ${partner}`) : []),
+        ...(enforceIndustryCoverage ? missingIndustries.map((industryId) => `industry ${industryId}`) : [])
+    ];
     let status = 'no_official_series';
     if (officialRows.length && error) status = 'last_good_degraded';
-    else if (officialRows.length && missingDirections.length) status = 'official_incomplete';
+    else if (officialRows.length && retainedCoverageGaps.length) status = 'official_incomplete';
     else if (officialRows.length && officialLatestPeriod && synchronizedThrough < officialLatestPeriod) status = 'official_delayed';
     else if (officialRows.length && Number.isFinite(lagMonths) && lagMonths > 4) status = 'official_delayed';
     else if (officialRows.length) status = 'national_official_current';
@@ -678,7 +792,7 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
     const statusReason = {
         national_official_current: 'Complete official import and export rows are synchronized to the latest known period.',
         official_delayed: `The official source is ${syncGapMonths ?? 'an unknown number of'} month(s) ahead of the synchronized industry series.`,
-        official_incomplete: `The retained official batch is missing: ${missingDirections.join(', ')}.`,
+        official_incomplete: `The retained official batch is missing: ${retainedCoverageGaps.join(', ')}.`,
         last_good_degraded: 'The latest batch was rejected; the previous complete official batch remains active.',
         official_feed_pending: 'The latest official month is known, but no validated industry batch has been published.',
         api_key_pending: 'The official API credential is not configured; historical fallback remains available.',
@@ -702,6 +816,14 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
         required_directions: requiredDirections,
         directions,
         missing_directions: missingDirections,
+        required_partners: requiredPartners,
+        partners,
+        missing_partners: missingPartners,
+        enforce_partner_coverage: enforcePartnerCoverage,
+        required_industries: requiredIndustries,
+        industries,
+        missing_industries: missingIndustries,
+        enforce_industry_coverage: enforceIndustryCoverage,
         missing_periods: missingPeriods,
         feed_configured: feedConfigured,
         publication_mode: connector.publication_mode || 'validated_complete_batch',
@@ -756,7 +878,6 @@ async function syncNationalOfficialConnectors(payload, {
                     scope: validated.scope
                 });
                 if (!complete.ok) throw new Error(complete.reason);
-                payload.series = replaceSourceScope(existing, validated.rows, connector.id, validated.scope);
                 const sourceEntry = (payload.sources || []).find((source) => source.id === connector.id);
                 const nextSource = {
                     ...(sourceEntry || {}),
@@ -774,8 +895,26 @@ async function syncNationalOfficialConnectors(payload, {
                     row_count: validated.rows.length,
                     last_success_at: new Date().toISOString()
                 };
-                if (sourceEntry) Object.assign(sourceEntry, nextSource);
-                else payload.sources = [...(payload.sources || []), nextSource];
+                const candidateSeries = replaceSourceScope(existing, validated.rows, connector.id, validated.scope);
+                const candidateSources = sourceEntry
+                    ? (payload.sources || []).map((source) => source.id === connector.id ? nextSource : source)
+                    : [...(payload.sources || []), nextSource];
+                const candidatePayload = { ...payload, series: candidateSeries, sources: candidateSources };
+                const candidateLatestPeriod = validated.expected.months.slice().sort().at(-1);
+                const candidateState = nationalConnectorState(candidatePayload, connector, {
+                    referenceDate,
+                    feedConfigured: true,
+                    probe: {
+                        status: 'candidate_manifest',
+                        latest_period: candidateLatestPeriod,
+                        checked_at: new Date().toISOString()
+                    }
+                });
+                if (candidateState.publication_blockers.length) {
+                    throw new Error(`Publication gate blocked candidate batch: ${candidateState.publication_blockers.join(', ')}`);
+                }
+                payload.series = candidateSeries;
+                payload.sources = candidateSources;
                 acceptedRows.push(...validated.rows);
             } catch (caught) {
                 error = String(caught.message || caught);
@@ -807,10 +946,14 @@ async function syncNationalOfficialConnectors(payload, {
             publication_gated: marketStates.filter((state) => !state.publish_ready).length,
             missing_direction_markets: marketStates.filter((state) => state.missing_directions.length).map((state) => state.market),
             missing_period_markets: marketStates.filter((state) => state.missing_periods.length).map((state) => state.market),
+            missing_partner_markets: marketStates.filter((state) => state.missing_partners.length).map((state) => state.market),
+            missing_industry_markets: marketStates.filter((state) => state.missing_industries.length).map((state) => state.market),
             publication_gates: marketStates.filter((state) => !state.publish_ready).map((state) => ({
                 market: state.market,
                 missing_periods: state.missing_periods,
                 missing_directions: state.missing_directions,
+                missing_partners: state.missing_partners,
+                missing_industries: state.missing_industries,
                 blockers: state.publication_blockers
             }))
         },
@@ -837,6 +980,7 @@ async function run({ dryRun = false, apiKey, fetchImpl, manifestPaths, nationalR
         connectors: { comtrade, census, official_batches: officialBatches, national_official: nationalOfficial },
         payload
     };
+    const comtradeSource = (payload.sources || []).find((source) => source.id === COMTRADE_SOURCE_ID);
     if (!dryRun) {
         writeJson(DATA_PATH, payload);
         writeJson(NATIONAL_CONNECTOR_STATUS_PATH, nationalOfficial.status);
@@ -846,7 +990,15 @@ async function run({ dryRun = false, apiKey, fetchImpl, manifestPaths, nationalR
             ok: result.ok,
             publish_policy: 'complete_batch_only_last_good_retained',
             connectors: {
-                comtrade: { ok: comtrade.ok, skipped: comtrade.skipped, row_count: comtrade.rows.length, error: comtrade.error },
+                comtrade: {
+                    ok: comtrade.ok,
+                    skipped: comtrade.skipped,
+                    row_count: comtrade.rows.length,
+                    partner_row_count: comtradeSource?.partner_row_count || 0,
+                    partner_markets: comtradeSource?.partner_markets || [],
+                    partner_sync_errors: comtradeSource?.partner_sync_errors || [],
+                    error: comtrade.error
+                },
                 census: { ok: census.ok, skipped: census.skipped, row_count: census.rows.length, reason: census.reason, error: census.error },
                 official_batches: { ok: officialBatches.ok, skipped: officialBatches.skipped, row_count: officialBatches.rows.length, batches: officialBatches.batches },
                 national_official: { ok: nationalOfficial.ok, skipped: nationalOfficial.skipped, row_count: nationalOfficial.rows.length, markets: nationalOfficial.status.markets, failures: nationalOfficial.failures }
@@ -877,6 +1029,7 @@ module.exports = {
     latestPeriodFromText,
     nationalConnectorState,
     probeConnectorOfficialLatest,
+    replaceComtradeRows,
     replaceSourceScope,
     run,
     syncCensus,
