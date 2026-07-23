@@ -1238,6 +1238,7 @@
                 no_official_series: 'benchmark'
             };
             const summary = status.summary || {};
+            const gatedRows = rows.filter(row => !row.publish_ready);
             return `
                 <div class="quality-banner">
                     <div class="crawl-section-title">
@@ -1248,8 +1249,18 @@
                         <div class="summary-card"><strong>${escapeHtml(summary.current ?? 0)}</strong><span>Current official</span></div>
                         <div class="summary-card"><strong>${escapeHtml(summary.delayed ?? 0)}</strong><span>Sync delayed</span></div>
                         <div class="summary-card"><strong>${escapeHtml(summary.pending ?? 0)}</strong><span>Feed pending</span></div>
-                        <div class="summary-card"><strong>${escapeHtml(summary.fallback ?? 0)}</strong><span>Fallback active</span></div>
+                        <div class="summary-card"><strong>${escapeHtml(summary.publication_gated ?? gatedRows.length)}</strong><span>Publication gated</span></div>
                     </div>
+                    ${gatedRows.length ? `
+                        <div class="empty" style="text-align:left">
+                            <strong>Publication blockers</strong><br>
+                            ${gatedRows.map(row => `${escapeHtml(row.market || '—')}: ${[
+                                row.missing_periods?.length ? `missing month(s) ${row.missing_periods.join(', ')}` : '',
+                                row.missing_directions?.length ? `missing direction(s) ${row.missing_directions.join(', ')}` : '',
+                                row.publication_blockers?.length ? `gate ${row.publication_blockers.join(', ')}` : ''
+                            ].filter(Boolean).join(' · ')}`).join('<br>')}
+                        </div>
+                    ` : ''}
                     <div class="duty-source-grade-grid">
                         ${rows.map(row => `
                             <article class="duty-source-grade-card">
@@ -1261,8 +1272,10 @@
                                 <div class="grade-note">Official published: ${escapeHtml(row.official_latest_period || '—')}</div>
                                 <div class="grade-note">TraceWize synchronized: ${escapeHtml(row.synchronized_through || '—')}</div>
                                 <div class="grade-note">Official sync gap: ${escapeHtml(Number.isFinite(row.official_sync_gap_months) ? `${row.official_sync_gap_months} month(s)` : '—')}</div>
+                                <div class="grade-note">Missing official months: ${escapeHtml((row.missing_periods || []).join(', ') || 'none')}</div>
                                 <div class="grade-note">Directions: ${escapeHtml((row.directions || []).join(' + ') || 'none')}${row.missing_directions?.length ? ` · missing ${escapeHtml(row.missing_directions.join(', '))}` : ''}</div>
                                 <div class="grade-note">Feed: ${row.feed_configured ? 'configured' : 'not configured'} · Publish: ${row.publish_ready ? 'ready' : 'gated'}</div>
+                                <div class="grade-note">Gate reason: ${escapeHtml((row.publication_blockers || []).join(', ') || 'none')}</div>
                                 <div class="grade-note">Raw ingest: ${escapeHtml((row.raw_ingest_status || 'not declared').replaceAll('_', ' '))}</div>
                                 <div class="grade-note">${escapeHtml(row.status_reason || row.probe_note || row.raw_ingest_note || row.last_error || '')}</div>
                             </article>

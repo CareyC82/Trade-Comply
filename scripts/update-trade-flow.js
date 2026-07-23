@@ -614,6 +614,27 @@ function periodDistance(laterPeriod, earlierPeriod) {
     return Math.max(0, ((Number(later[1]) - Number(earlier[1])) * 12) + Number(later[2]) - Number(earlier[2]));
 }
 
+function missingMonthlyPeriods(synchronizedThrough, officialLatestPeriod) {
+    const synchronized = String(synchronizedThrough || '').match(/^(\d{4})-(\d{2})$/);
+    const official = String(officialLatestPeriod || '').match(/^(\d{4})-(\d{2})$/);
+    if (!official) return [];
+    if (!synchronized) return [officialLatestPeriod];
+    let year = Number(synchronized[1]);
+    let month = Number(synchronized[2]);
+    const endYear = Number(official[1]);
+    const endMonth = Number(official[2]);
+    const periods = [];
+    while (year < endYear || (year === endYear && month < endMonth)) {
+        month += 1;
+        if (month > 12) {
+            year += 1;
+            month = 1;
+        }
+        periods.push(`${year}-${String(month).padStart(2, '0')}`);
+    }
+    return periods;
+}
+
 function nationalConnectorState(payload, connector, { error = '', referenceDate = new Date(), probe = {}, feedConfigured = false } = {}) {
     const officialRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === connector.id);
     const fallbackRows = (payload.series || []).filter((row) => row.market === connector.market && row.source_id === COMTRADE_SOURCE_ID);
@@ -638,6 +659,12 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
         ? requiredDirections.filter((direction) => !directions.includes(direction))
         : requiredDirections;
     const syncGapMonths = periodDistance(officialLatestPeriod, synchronizedThrough);
+    const missingPeriods = missingMonthlyPeriods(synchronizedThrough, officialLatestPeriod);
+    const publicationBlockers = [];
+    if (!officialRows.length) publicationBlockers.push('no_validated_official_rows');
+    if (missingPeriods.length) publicationBlockers.push('official_period_gap');
+    missingDirections.forEach((direction) => publicationBlockers.push(`missing_${direction}_direction`));
+    if (error) publicationBlockers.push('latest_batch_failed');
     let status = 'no_official_series';
     if (officialRows.length && error) status = 'last_good_degraded';
     else if (officialRows.length && missingDirections.length) status = 'official_incomplete';
@@ -675,9 +702,11 @@ function nationalConnectorState(payload, connector, { error = '', referenceDate 
         required_directions: requiredDirections,
         directions,
         missing_directions: missingDirections,
+        missing_periods: missingPeriods,
         feed_configured: feedConfigured,
         publication_mode: connector.publication_mode || 'validated_complete_batch',
-        publish_ready: Boolean(officialRows.length && !missingDirections.length && !error),
+        publish_ready: publicationBlockers.length === 0,
+        publication_blockers: publicationBlockers,
         status_reason: statusReason,
         official_row_count: officialRows.length,
         fallback_row_count: fallbackRows.length,
@@ -774,7 +803,16 @@ async function syncNationalOfficialConnectors(payload, {
             pending: marketStates.filter((state) => ['official_feed_pending', 'configuration_required'].includes(state.status)).length,
             fallback: marketStates.filter((state) => state.active_data_tier === 'historical_fallback').length,
             api_key_pending: marketStates.filter((state) => state.status === 'api_key_pending').length,
-            missing_direction_markets: marketStates.filter((state) => state.missing_directions.length && state.official_row_count).map((state) => state.market)
+            publish_ready: marketStates.filter((state) => state.publish_ready).length,
+            publication_gated: marketStates.filter((state) => !state.publish_ready).length,
+            missing_direction_markets: marketStates.filter((state) => state.missing_directions.length).map((state) => state.market),
+            missing_period_markets: marketStates.filter((state) => state.missing_periods.length).map((state) => state.market),
+            publication_gates: marketStates.filter((state) => !state.publish_ready).map((state) => ({
+                market: state.market,
+                missing_periods: state.missing_periods,
+                missing_directions: state.missing_directions,
+                blockers: state.publication_blockers
+            }))
         },
         markets,
         failures

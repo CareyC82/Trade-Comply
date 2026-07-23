@@ -325,6 +325,9 @@ test('national connector marks a market delayed when the official release is new
     assert.equal(state.active_data_tier, 'national_official');
     assert.equal(state.official_sync_gap_months, 2);
     assert.equal(state.data_age_months, 3);
+    assert.equal(state.publish_ready, false);
+    assert.deepEqual(state.missing_periods, ['2026-04', '2026-05']);
+    assert.ok(state.publication_blockers.includes('official_period_gap'));
     assert.match(state.status_reason, /2 month/);
 });
 
@@ -347,6 +350,7 @@ test('national connector gates legacy official data when a required direction is
     assert.equal(state.status, 'official_incomplete');
     assert.deepEqual(state.missing_directions, ['export']);
     assert.equal(state.publish_ready, false);
+    assert.ok(state.publication_blockers.includes('missing_export_direction'));
     assert.match(state.status_reason, /export/);
 });
 
