@@ -122,6 +122,13 @@ function searchSemiconductorProducts(query) {
         trimmedQuery
     );
     AppState.productIntelligence = intelligence.profile || null;
+    globalThis.TradeComplySearchGap?.recordSearchGap({
+        query: trimmedQuery,
+        tags: results.tags,
+        cases: results.cases,
+        selections,
+        view: 'semiconductor'
+    });
     renderResults(trimmedQuery || t('semiconductorProducts'), results.tags, results.cases, selections);
 }
 

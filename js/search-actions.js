@@ -37,6 +37,13 @@ function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
         caseCount: results.cases.length
     });
     AppState.productIntelligence = intelligence.profile || null;
+    globalThis.TradeComplySearchGap?.recordSearchGap({
+        query: trimmedQuery,
+        tags: results.tags,
+        cases: results.cases,
+        selections,
+        view: origin
+    });
 
     renderResults(displayQuery, results.tags, results.cases, selections);
 }

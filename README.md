@@ -185,6 +185,11 @@ See [docs/ENGINEERING.md](docs/ENGINEERING.md).
 npm test
 ```
 
+Weekly unmet-search gaps are automatically aggregated into
+`data/unmet-search-backlog.json`. Exact national tariff feeds for EU, China,
+Singapore, and Mexico are promoted only after exact-code, source, date, and
+complete-batch validation.
+
 ---
 
 ## Data Files

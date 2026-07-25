@@ -266,6 +266,7 @@ function summarizeFeedbackRecords(records, { since, until, topNoResult, topInSco
     let withRegulationText = 0;
     let noResultCount = 0;
     let inScopeGapCount = 0;
+    let weakMatchCount = 0;
     let outOfScopeCount = 0;
 
     for (const record of records) {
@@ -290,6 +291,9 @@ function summarizeFeedbackRecords(records, { since, until, topNoResult, topInSco
             (record.selected_precheck_attributes || []).forEach(attribute => {
                 incrementCounter(noMatchPrecheckCounts, attribute);
             });
+        }
+        if (record.trust_status === 'weak_match') {
+            weakMatchCount += 1;
         }
         if (record.trust_status === 'out_of_scope') {
             outOfScopeCount += 1;
@@ -320,6 +324,7 @@ function summarizeFeedbackRecords(records, { since, until, topNoResult, topInSco
             records: records.length,
             no_result: noResultCount,
             in_scope_no_rules: inScopeGapCount,
+            weak_match: weakMatchCount,
             out_of_scope: outOfScopeCount,
             with_email: withEmail,
             with_regulation_text: withRegulationText
@@ -346,6 +351,15 @@ function summarizeFeedbackRecords(records, { since, until, topNoResult, topInSco
             latest_submitted_at: item.latest_submitted_at,
             sample_regulation_needed: item.sample_regulation_needed,
             views: Array.from(item.views).sort()
+        })),
+        top_weak_match_queries: buildQueryGroups(
+            records,
+            record => record.trust_status === 'weak_match'
+        ).slice(0, topInScopeGap).map(item => ({
+            product_query: item.query,
+            count: item.count,
+            latest_submitted_at: item.latest_submitted_at,
+            views: Array.from(item.views).sort()
         }))
     };
 }
@@ -360,6 +374,7 @@ function formatTextReport(summary) {
     lines.push(`  Records: ${summary.totals.records}`);
     lines.push(`  No-result submissions: ${summary.totals.no_result}`);
     lines.push(`  In-scope / no rules (no_match): ${summary.totals.in_scope_no_rules}`);
+    lines.push(`  Weak matches: ${summary.totals.weak_match}`);
     lines.push(`  Out of scope: ${summary.totals.out_of_scope}`);
     lines.push(`  With regulation text: ${summary.totals.with_regulation_text}`);
     lines.push(`  With email: ${summary.totals.with_email}`);

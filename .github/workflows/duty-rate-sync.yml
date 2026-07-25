@@ -33,6 +33,14 @@ jobs:
       - name: Run duty-rate auto sync
         run: npm run sync:duty-rates:auto
 
+      - name: Sync official exact tariff lines
+        env:
+          EU_TARIC_EXACT_LINES_URL: ${{ secrets.EU_TARIC_EXACT_LINES_URL || vars.EU_TARIC_EXACT_LINES_URL }}
+          CN_CUSTOMS_EXACT_TARIFF_URL: ${{ secrets.CN_CUSTOMS_EXACT_TARIFF_URL || vars.CN_CUSTOMS_EXACT_TARIFF_URL }}
+          SG_AHTN_EXACT_TARIFF_URL: ${{ secrets.SG_AHTN_EXACT_TARIFF_URL || vars.SG_AHTN_EXACT_TARIFF_URL }}
+          MX_TIGIE_NICO_EXACT_TARIFF_URL: ${{ secrets.MX_TIGIE_NICO_EXACT_TARIFF_URL || vars.MX_TIGIE_NICO_EXACT_TARIFF_URL }}
+        run: npm run sync:duty-rates:exact
+
       - name: Refresh automation launch status
         run: npm run build:automation-launch-status
 

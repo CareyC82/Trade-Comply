@@ -78,6 +78,7 @@
         'js/render-prepare.js',
         'js/render-mount.js',
         'js/ai-query-bindings.js',
+        'js/unmet-search.js',
         'js/search-actions.js',
         'js/render-results.js',
         'js/tariff-watch-page.js',

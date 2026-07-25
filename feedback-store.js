@@ -78,6 +78,7 @@ function validateFeedbackPayload(body) {
     const view = truncateText(body?.view, 40) || 'unknown';
     const riskLevel = truncateText(body?.risk_level, 40) || 'unknown';
     const trustStatus = truncateText(body?.trust_status, 40) || 'unknown';
+    const eventType = body?.event_type === 'search_gap' ? 'search_gap' : 'user_feedback';
 
     if (errors.length > 0) {
         return { ok: false, errors };
@@ -86,6 +87,7 @@ function validateFeedbackPayload(body) {
     const record = {
         feedback_id: createFeedbackId(),
         submitted_at: new Date().toISOString(),
+        event_type: eventType,
         product_query: productQuery,
         regulation_needed: regulationNeeded,
         email: email || null,
@@ -102,6 +104,9 @@ function validateFeedbackPayload(body) {
         risk_level: riskLevel,
         trust_status: trustStatus,
         selected_precheck_attributes: normalizeStringList(body?.selected_precheck_attributes),
+        route_origin: truncateText(body?.route_origin, 12) || null,
+        route_destination: truncateText(body?.route_destination, 12) || null,
+        compliance_focus: truncateText(body?.compliance_focus, 20) || null,
         page_url: truncateText(body?.page_url, 500) || null,
         user_agent: truncateText(body?.user_agent, 300) || null
     };

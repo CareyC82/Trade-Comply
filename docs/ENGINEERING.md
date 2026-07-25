@@ -52,3 +52,29 @@ The adapter maps maintained 6-digit HS codes into the nine product industries. A
 is published only when both directions, every configured partner, every configured industry, and
 the latest official month pass the complete-batch gate. Failed or partial snapshots never replace
 the previous accepted national series.
+
+## Filing-grade exact tariff feeds
+
+The daily duty-rate workflow can ingest official exact-line JSON feeds for:
+
+- `EU_TARIC_EXACT_LINES_URL` — EU/DE/NL TARIC third-country duty lines.
+- `CN_CUSTOMS_EXACT_TARIFF_URL` — China Customs MFN tariff lines.
+- `SG_AHTN_EXACT_TARIFF_URL` — Singapore AHTN/TradeNet tariff lines.
+- `MX_TIGIE_NICO_EXACT_TARIFF_URL` — Mexico TIGIE/NICO tariff lines.
+
+Each response must declare `complete: true`, identify an official HTTPS source, and provide 8- or
+10-digit rows with a base-duty field and optional effective dates. Heading-only rows, conflicting
+rates, invalid dates, and incomplete snapshots are rejected. Exact overrides apply only when the
+entered national tariff code matches the official line; broad HS prefixes remain pre-screening
+signals. VAT/GST, preferences, trade remedies, licensing, and product controls stay separate.
+
+## Weekly unmet-search expansion loop
+
+Searches with zero matched rules or only one weak rule are recorded as `search_gap` events through
+the existing feedback endpoint. The browser deduplicates identical route/query gaps per session.
+Every Sunday, `unmet-search-weekly.yml` summarizes the last seven days from OSS and updates
+`data/unmet-search-backlog.json`.
+
+No-match searches receive a higher priority weight than weak matches. The generated queue preserves
+manual review status and lists the required research sequence: product attributes, official HS
+mapping, keyword/HS enrichment, and official-source verification before a rule is published.

@@ -1,0 +1,41 @@
+name: Weekly Unmet Search Backlog
+
+on:
+  schedule:
+    - cron: "25 18 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-backlog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build seven-day search gap summary
+        env:
+          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
+          OSS_REGION: ${{ vars.OSS_REGION || 'cn-shenzhen' }}
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          OSS_FEEDBACK_PREFIX: ${{ vars.OSS_FEEDBACK_PREFIX || 'feedback' }}
+        run: node scripts/summarize-feedback.js --days 7 --output reports/unmet-search-weekly.json
+      - name: Build prioritized research backlog
+        run: npm run build:unmet-search-backlog
+      - name: Verify tests
+        run: npm test
+      - name: Commit weekly backlog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/unmet-search-weekly.json data/unmet-search-backlog.json
+          if git diff --staged --quiet; then exit 0; fi
+          git commit -m "auto-data: weekly unmet search backlog [auto-publish]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
+          git push
