@@ -319,8 +319,8 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
                 country,
                 target_markets: targetMarkets,
                 env_name: envName,
-                configured: ['EU', 'CN'].includes(country) || Boolean(String(process.env[envName] || '').trim()),
-                connector_type: ['EU', 'CN'].includes(country) ? 'direct_official' : 'normalized_feed',
+                configured: ['EU', 'CN', 'SG', 'MX'].includes(country) || Boolean(String(process.env[envName] || '').trim()),
+                connector_type: ['EU', 'CN', 'SG', 'MX'].includes(country) ? 'direct_official' : 'normalized_feed',
                 status: result.ok === false ? 'failed'
                     : result.skipped ? 'not_configured'
                         : result.ok ? 'current'

@@ -182,7 +182,7 @@ test('tariff watch keeps gaming device HS coverage across maintained markets', (
 
     maintainedMarkets.forEach((marketKey) => {
         assert.ok(
-            tariffRows.some((row) => row.marketKey === marketKey && row.hsScope === '950450'),
+            tariffRows.some((row) => row.marketKey === marketKey && row.hsScope.startsWith('950450')),
             `${marketKey} should cover gaming HS 950450`
         );
     });

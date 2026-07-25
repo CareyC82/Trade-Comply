@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install official PDF parser
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
       - name: Run duty-rate auto sync
         run: npm run sync:duty-rates:auto
 
@@ -37,9 +40,6 @@ jobs:
         run: npm run update:duty-rates:eu:official
 
       - name: Sync official exact tariff lines
-        env:
-          SG_AHTN_EXACT_TARIFF_URL: ${{ secrets.SG_AHTN_EXACT_TARIFF_URL || vars.SG_AHTN_EXACT_TARIFF_URL }}
-          MX_TIGIE_NICO_EXACT_TARIFF_URL: ${{ secrets.MX_TIGIE_NICO_EXACT_TARIFF_URL || vars.MX_TIGIE_NICO_EXACT_TARIFF_URL }}
         run: npm run sync:duty-rates:exact
 
       - name: Refresh automation launch status

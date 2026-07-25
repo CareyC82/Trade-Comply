@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-24",
-  "generated_at": "2026-07-24T19:43:40.532Z",
+  "version": "2026-07-25",
+  "generated_at": "2026-07-25T08:48:42.430Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -3790,39 +3790,6 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
-      "id": "rule-EU-GLOBAL-8517-TELECOM-IMPORT-OFFICIAL",
-      "rule_id": "EU-GLOBAL-8517-TELECOM-IMPORT-OFFICIAL",
-      "route": "*->EU",
-      "product_id": "EU import telecom / network equipment signal",
-      "import_country": "EU",
-      "origin_country": "*",
-      "hs_code": "8517",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "EU exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 1900,
-      "why_priority": "*->EU 8517 remains a rule-level exact-rate gap: EU import telecom / network equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
       "id": "rule-EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "rule_id": "EU-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "route": "*->EU",
@@ -3830,15 +3797,16 @@
       "import_country": "EU",
       "origin_country": "*",
       "hs_code": "8525",
-      "source_status": "official_source_checked",
+      "source_status": "scope_check_required",
       "source_trust": "official_heading_only",
       "parser_target": "EU exact tariff-line scope resolver",
       "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
       "priority_band": "P2",
       "impact_score": 1900,
-      "why_priority": "*->EU 8525 remains a rule-level exact-rate gap: EU import camera / transmission equipment signal is official_source_checked.",
+      "why_priority": "*->EU 8525 remains a rule-level exact-rate gap: EU import camera / transmission equipment signal is scope_check_required.",
       "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -3850,7 +3818,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -3884,38 +3852,6 @@
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
         "Backfill remaining exact-code overrides that are still missing parser coverage."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-EU-GLOBAL-850760-BATTERY-IMPORT-OFFICIAL",
-      "rule_id": "EU-GLOBAL-850760-BATTERY-IMPORT-OFFICIAL",
-      "route": "*->EU",
-      "product_id": "EU import lithium-ion battery equipment signal",
-      "import_country": "EU",
-      "origin_country": "*",
-      "hs_code": "850760",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "EU exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 2170,
-      "why_priority": "*->EU 850760 remains a rule-level exact-rate gap: EU import lithium-ion battery equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "battery_chemistry_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -3968,6 +3904,7 @@
       "why_priority": "*->EU 8543 remains a rule-level exact-rate gap: EU import other electrical machines signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -3978,39 +3915,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-EU-CN-850440-EVCHARGER-INDICATIVE",
-      "rule_id": "EU-CN-850440-EVCHARGER-INDICATIVE",
-      "route": "*->EU",
-      "product_id": "EU import EV charger / converter signal",
-      "import_country": "EU",
-      "origin_country": "*",
-      "hs_code": "850440",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "EU exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 1900,
-      "why_priority": "*->EU 850440 remains a rule-level exact-rate gap: EU import EV charger / converter signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "power_conversion_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4064,6 +3969,7 @@
       "why_priority": "*->EU 8479 / 9018 / 9027 remains a rule-level exact-rate gap: EU import automation / medical / lab equipment heading signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -4075,74 +3981,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-EU-GLOBAL-8541-SOLAR-IMPORT-OFFICIAL",
-      "rule_id": "EU-GLOBAL-8541-SOLAR-IMPORT-OFFICIAL",
-      "route": "*->EU",
-      "product_id": "EU import photovoltaic / semiconductor device equipment signal",
-      "import_country": "EU",
-      "origin_country": "*",
-      "hs_code": "8541",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "EU exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 1900,
-      "why_priority": "*->EU 8541 remains a rule-level exact-rate gap: EU import photovoltaic / semiconductor device equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "ad_cvd_scope",
-        "origin_route_evidence",
-        "technology_end_use_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-DE-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
-      "rule_id": "DE-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
-      "route": "*->DE",
-      "product_id": "Germany import telecom / network equipment signal",
-      "import_country": "DE",
-      "origin_country": "*",
-      "hs_code": "8517",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "DE exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 1900,
-      "why_priority": "*->DE 8517 remains a rule-level exact-rate gap: Germany import telecom / network equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4154,15 +3993,16 @@
       "import_country": "DE",
       "origin_country": "*",
       "hs_code": "8525",
-      "source_status": "official_source_checked",
+      "source_status": "scope_check_required",
       "source_trust": "official_heading_only",
       "parser_target": "DE exact tariff-line scope resolver",
       "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
       "priority_band": "P2",
       "impact_score": 1900,
-      "why_priority": "*->DE 8525 remains a rule-level exact-rate gap: Germany import camera / transmission equipment signal is official_source_checked.",
+      "why_priority": "*->DE 8525 remains a rule-level exact-rate gap: Germany import camera / transmission equipment signal is scope_check_required.",
       "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -4174,7 +4014,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4208,38 +4048,6 @@
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
         "Backfill remaining exact-code overrides that are still missing parser coverage."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
-      "rule_id": "DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
-      "route": "*->DE",
-      "product_id": "Germany import lithium-ion battery equipment signal",
-      "import_country": "DE",
-      "origin_country": "*",
-      "hs_code": "850760",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "DE exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 2170,
-      "why_priority": "*->DE 850760 remains a rule-level exact-rate gap: Germany import lithium-ion battery equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "battery_chemistry_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4292,6 +4100,7 @@
       "why_priority": "*->DE 8543 remains a rule-level exact-rate gap: Germany import other electrical machines signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -4302,7 +4111,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4323,6 +4132,7 @@
       "why_priority": "*->DE 8479 / 9018 / 9027 remains a rule-level exact-rate gap: Germany import automation / medical / lab equipment heading signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -4334,73 +4144,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-DE-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
-      "rule_id": "DE-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
-      "route": "*->DE",
-      "product_id": "Germany import power conversion / charger equipment signal",
-      "import_country": "DE",
-      "origin_country": "*",
-      "hs_code": "850440",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "DE exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 1900,
-      "why_priority": "*->DE 850440 remains a rule-level exact-rate gap: Germany import power conversion / charger equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "power_conversion_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-DE-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
-      "rule_id": "DE-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
-      "route": "*->DE",
-      "product_id": "Germany import photovoltaic / semiconductor device equipment signal",
-      "import_country": "DE",
-      "origin_country": "*",
-      "hs_code": "8541",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "DE exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 1900,
-      "why_priority": "*->DE 8541 remains a rule-level exact-rate gap: Germany import photovoltaic / semiconductor device equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "ad_cvd_scope",
-        "origin_route_evidence",
-        "technology_end_use_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4438,39 +4182,6 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
-      "id": "rule-NL-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
-      "rule_id": "NL-GLOBAL-8517-TELECOM-IMPORT-INDICATIVE",
-      "route": "*->NL",
-      "product_id": "Netherlands import telecom / network equipment signal",
-      "import_country": "NL",
-      "origin_country": "*",
-      "hs_code": "8517",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "NL exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 2100,
-      "why_priority": "*->NL 8517 remains a rule-level exact-rate gap: Netherlands import telecom / network equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
       "id": "rule-NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "rule_id": "NL-GLOBAL-8525-CAMERA-IMPORT-SCOPE",
       "route": "*->NL",
@@ -4478,15 +4189,16 @@
       "import_country": "NL",
       "origin_country": "*",
       "hs_code": "8525",
-      "source_status": "official_source_checked",
+      "source_status": "scope_check_required",
       "source_trust": "official_heading_only",
       "parser_target": "NL exact tariff-line scope resolver",
       "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
       "priority_band": "P2",
       "impact_score": 2100,
-      "why_priority": "*->NL 8525 remains a rule-level exact-rate gap: Netherlands import camera / transmission equipment signal is official_source_checked.",
+      "why_priority": "*->NL 8525 remains a rule-level exact-rate gap: Netherlands import camera / transmission equipment signal is scope_check_required.",
       "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -4498,7 +4210,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4532,38 +4244,6 @@
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
         "Backfill remaining exact-code overrides that are still missing parser coverage."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
-      "rule_id": "NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
-      "route": "*->NL",
-      "product_id": "Netherlands import lithium-ion battery equipment signal",
-      "import_country": "NL",
-      "origin_country": "*",
-      "hs_code": "850760",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "NL exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 2370,
-      "why_priority": "*->NL 850760 remains a rule-level exact-rate gap: Netherlands import lithium-ion battery equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "battery_chemistry_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4616,6 +4296,7 @@
       "why_priority": "*->NL 8543 remains a rule-level exact-rate gap: Netherlands import other electrical machines signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -4626,7 +4307,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4647,6 +4328,7 @@
       "why_priority": "*->NL 8479 / 9018 / 9027 remains a rule-level exact-rate gap: Netherlands import automation / medical / lab equipment heading signal is scope_check_required.",
       "rate_change_drivers": [
         "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
         "TARIC exact 10-digit goods-code scope can change the final duty rate."
       ],
       "scope_components": [
@@ -4658,73 +4340,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-NL-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
-      "rule_id": "NL-GLOBAL-850440-POWER-CONVERSION-IMPORT-INDICATIVE",
-      "route": "*->NL",
-      "product_id": "Netherlands import power conversion / charger equipment signal",
-      "import_country": "NL",
-      "origin_country": "*",
-      "hs_code": "850440",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "NL exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 2100,
-      "why_priority": "*->NL 850440 remains a rule-level exact-rate gap: Netherlands import power conversion / charger equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "power_conversion_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-NL-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
-      "rule_id": "NL-GLOBAL-8541-SOLAR-IMPORT-INDICATIVE",
-      "route": "*->NL",
-      "product_id": "Netherlands import photovoltaic / semiconductor device equipment signal",
-      "import_country": "NL",
-      "origin_country": "*",
-      "hs_code": "8541",
-      "source_status": "official_source_checked",
-      "source_trust": "official_heading_only",
-      "parser_target": "NL exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 2100,
-      "why_priority": "*->NL 8541 remains a rule-level exact-rate gap: Netherlands import photovoltaic / semiconductor device equipment signal is official_source_checked.",
-      "rate_change_drivers": [
-        "Official heading-level evidence exists, but no exact-code mapping is attached yet.",
-        "TARIC exact 10-digit goods-code scope can change the final duty rate."
-      ],
-      "scope_components": [
-        "ad_cvd_scope",
-        "origin_route_evidence",
-        "technology_end_use_scope",
-        "taric_exact_code_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },

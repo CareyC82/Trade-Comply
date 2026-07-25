@@ -102,14 +102,10 @@ test('P1 markets keep exact-rate trust gaps visible until parser promotion is co
         assert.equal(exactBacklogMarkets.has(country), true, `${country} should expose exact-rate scope backlog rows`);
     });
 
-    const singapore = backlogByCountry.get('SG');
-    assert.ok(singapore, 'SG should stay visible in the P1 source connector backlog');
-    assert.equal(singapore.maintenance_priority, 'P1');
-    assert.equal(singapore.rate_automation_stage, 'maintained_exact_map');
-    assert.equal(singapore.workstream, 'machine-readable source connector');
-    assert.equal(singapore.parser_gap, true);
-    assert.match(singapore.public_claim, /Maintained exact candidates; not fully machine-parsed/);
-    assert.match(singapore.next_action, /machine-readable SG tariff parser|official API/i);
+    ['SG', 'MX'].forEach((country) => {
+        assert.equal(backlogByCountry.has(country), false, `${country} should leave the parser backlog after official sync`);
+        assert.equal(exactBacklogMarkets.has(country), false, `${country} should have filing-grade exact rows`);
+    });
 });
 
 test('priority Post-Entry samples cover common global electronics routes', () => {

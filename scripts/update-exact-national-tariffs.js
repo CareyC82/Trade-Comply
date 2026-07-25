@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const {
     parseExactTariffRows,
@@ -23,6 +24,50 @@ async function fetchOfficialPayload(url, fetchImpl = global.fetch) {
     return response.json();
 }
 
+async function fetchSingaporeOfficialPayload({ dutyPayload, fetchImpl, checkedAt }) {
+    const {
+        SG_STCCED_PDF_URL,
+        SG_DUTIABLE_GOODS_URL,
+        extractPdfText,
+        buildSingaporeExactPayload
+    } = require('../lib/singapore-stcced');
+    const [pdfResponse, scopeResponse] = await Promise.all([
+        fetchImpl(SG_STCCED_PDF_URL),
+        fetchImpl(SG_DUTIABLE_GOODS_URL, { headers: { accept: 'text/html' } })
+    ]);
+    if (!pdfResponse.ok) throw new Error(`HTTP ${pdfResponse.status} for Singapore STCCED PDF`);
+    if (!scopeResponse.ok) throw new Error(`HTTP ${scopeResponse.status} for Singapore dutiable-goods scope`);
+    const tempPath = path.join(os.tmpdir(), `tracewize-stcced-${process.pid}-${Date.now()}.pdf`);
+    try {
+        fs.writeFileSync(tempPath, Buffer.from(await pdfResponse.arrayBuffer()));
+        const text = await extractPdfText(tempPath);
+        const prefixes = [...new Set((dutyPayload.rules || [])
+            .filter((rule) => rule.import_country === 'SG')
+            .flatMap((rule) => rule.hs_prefixes || []))].sort();
+        return buildSingaporeExactPayload({
+            text,
+            dutiableHtml: await scopeResponse.text(),
+            prefixes,
+            checkedAt
+        });
+    } finally {
+        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+    }
+}
+
+async function fetchMexicoOfficialPayload({ dutyPayload, fetchImpl, checkedAt }) {
+    const {
+        MX_TIGIE_NICO_URL,
+        parseMexicoTigieWorkbook
+    } = require('../lib/mexico-tigie-nico');
+    const response = await fetchImpl(MX_TIGIE_NICO_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status} for Mexico TIGIE/NICO workbook`);
+    const prefixes = [...new Set((dutyPayload.rules || [])
+        .filter((rule) => rule.import_country === 'MX')
+        .flatMap((rule) => rule.hs_prefixes || []))].sort();
+    return parseMexicoTigieWorkbook(Buffer.from(await response.arrayBuffer()), { prefixes, checkedAt });
+}
+
 async function syncExactNationalTariffs({
     dutyPayload = JSON.parse(fs.readFileSync(DUTY_RATES_PATH, 'utf8')),
     env = process.env,
@@ -35,7 +80,7 @@ async function syncExactNationalTariffs({
     for (const country of countries) {
         const envName = FEEDS[country];
         const url = String(env[envName] || '').trim();
-        const directOfficial = country === 'CN';
+        const directOfficial = ['CN', 'SG', 'MX'].includes(country);
         if (!url && !directOfficial) {
             results.push({ country, ok: true, skipped: true, reason: `${envName} is not configured` });
             continue;
@@ -44,6 +89,10 @@ async function syncExactNationalTariffs({
             let raw;
             if (url) {
                 raw = await fetchOfficialPayload(url, fetchImpl);
+            } else if (country === 'SG') {
+                raw = await fetchSingaporeOfficialPayload({ dutyPayload, fetchImpl, checkedAt });
+            } else if (country === 'MX') {
+                raw = await fetchMexicoOfficialPayload({ dutyPayload, fetchImpl, checkedAt });
             } else {
                 const { buildChinaCustomsExactPayload } = require('../lib/china-customs-tariff');
                 const prefixes = [...new Set((dutyPayload.rules || [])
@@ -83,4 +132,10 @@ if (require.main === module) {
     });
 }
 
-module.exports = { FEEDS, fetchOfficialPayload, syncExactNationalTariffs };
+module.exports = {
+    FEEDS,
+    fetchOfficialPayload,
+    fetchSingaporeOfficialPayload,
+    fetchMexicoOfficialPayload,
+    syncExactNationalTariffs
+};

@@ -59,10 +59,11 @@ The daily duty-rate workflow downloads and parses the latest official EU TARIC
 `Duties Import 01-99.xlsx` workbook directly from the European Commission CIRCABC database.
 It also queries the public China Customs tariff service directly for every maintained
 China HS prefix and requires complete pagination before publishing. Normalized official
-exact-line JSON feeds remain available for:
-
-- `SG_AHTN_EXACT_TARIFF_URL` — Singapore AHTN/TradeNet tariff lines.
-- `MX_TIGIE_NICO_EXACT_TARIFF_URL` — Mexico TIGIE/NICO tariff lines.
+Singapore lines are extracted from the official STCCED PDF and published as non-dutiable
+only when the separate Singapore Customs dutiable-goods page confirms all four dutiable
+classes. Mexico lines are downloaded from the official SNICE `Fracciones Arancelarias`
+workbook: 8-digit TIGIE import rates are joined to the workbook's 2-digit NICO rows and
+published as filing-grade 10-digit codes.
 
 Each response must declare `complete: true`, identify an official HTTPS source, and provide 8- or
 10-digit rows with a base-duty field and optional effective dates. Heading-only rows, conflicting

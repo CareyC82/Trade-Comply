@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-24T19:43:40.371Z",
+  "updated_at": "2026-07-25T08:48:42.349Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -23,19 +23,21 @@
       "do_not_market": 0
     },
     "duty_rate_modes": {
-      "live_auto": 1,
-      "live_hybrid": 12,
+      "live_auto": 3,
+      "live_hybrid": 10,
       "live_monitor": 1
     },
     "duty_rate_automation_stages": {
-      "official_machine_sync": 1,
-      "maintained_exact_map": 6,
+      "official_machine_sync": 3,
+      "maintained_exact_map": 4,
       "official_hybrid_parser": 3,
       "official_probe_candidate": 3,
       "official_link_monitor": 1
     },
     "duty_rate_launch_levels": {
       "official_exact": [
+        "MX",
+        "SG",
         "US"
       ],
       "hybrid_official": [
@@ -48,9 +50,7 @@
       ],
       "maintained_benchmark": [
         "CN",
-        "MX",
         "MY",
-        "SG",
         "TW",
         "VN"
       ],
@@ -64,16 +64,16 @@
         "IN",
         "JP",
         "KR",
-        "MX",
         "MY",
         "NL",
-        "SG",
         "TW",
         "VN",
         "RU"
       ]
     },
     "public_launch_countries": [
+      "MX",
+      "SG",
       "US",
       "CN",
       "DE",
@@ -81,15 +81,15 @@
       "IN",
       "JP",
       "KR",
-      "MX",
       "MY",
       "NL",
-      "SG",
       "TW",
       "VN",
       "RU"
     ],
     "filing_grade_auto_countries": [
+      "MX",
+      "SG",
       "US"
     ],
     "parser_gap_countries": [
@@ -99,10 +99,8 @@
       "IN",
       "JP",
       "KR",
-      "MX",
       "MY",
       "NL",
-      "SG",
       "TW",
       "VN",
       "RU"
@@ -110,14 +108,16 @@
     "weekly_route_priority_count": 5
   },
   "duty_rate_health_board": {
-    "headline": "1 official exact market(s), 6 hybrid official market(s), 6 maintained exact-map market(s).",
+    "headline": "3 official exact market(s), 6 hybrid official market(s), 4 maintained exact-map market(s).",
     "next_action": "Next route parser priority: DE Tablet computer (8471300000).",
     "cards": [
       {
         "key": "official_exact",
         "label": "Official exact",
-        "count": 1,
+        "count": 3,
         "countries": [
+          "MX",
+          "SG",
           "US"
         ],
         "note": "Machine-readable source can feed maintained HS-rate checks."
@@ -139,12 +139,10 @@
       {
         "key": "maintained_exact_map",
         "label": "Maintained exact-map",
-        "count": 6,
+        "count": 4,
         "countries": [
           "CN",
-          "MX",
           "MY",
-          "SG",
           "TW",
           "VN"
         ],
@@ -155,14 +153,14 @@
         "label": "P0/P1 source priorities",
         "count": 8,
         "countries": [
+          "MX",
+          "SG",
           "US",
           "CN",
           "DE",
           "EU",
           "JP",
-          "MX",
-          "NL",
-          "SG"
+          "NL"
         ],
         "note": "Highest-value markets to keep fresh first."
       },
@@ -171,8 +169,8 @@
         "label": "Transit route priority",
         "count": 3,
         "countries": [
-          "MY",
           "SG",
+          "MY",
           "VN"
         ],
         "note": "Used by two-leg opportunity comparisons."
@@ -180,7 +178,7 @@
       {
         "key": "parser_gap",
         "label": "Parser gaps",
-        "count": 13,
+        "count": 11,
         "countries": [
           "CN",
           "DE",
@@ -188,10 +186,8 @@
           "IN",
           "JP",
           "KR",
-          "MX",
           "MY",
           "NL",
-          "SG",
           "TW",
           "VN",
           "RU"
@@ -777,6 +773,84 @@
   ],
   "duty_rates": [
     {
+      "country": "MX",
+      "name": "Mexico tariff / VAT",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_xlsx_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:mx",
+      "probe_command": "",
+      "official_url": "https://www.snice.gob.mx/",
+      "official_probe_urls": [],
+      "source_use_cases": [
+        "Mexico import duty and VAT pre-check",
+        "USMCA or alternate-route pricing comparison",
+        "NOM certification and preferential-origin evidence review"
+      ],
+      "parser_subtasks": [
+        "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
+        "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
+        "Flag routes where USMCA or other origin-transformation evidence is required before cost comparison."
+      ],
+      "rate_change_drivers": [
+        "TIGIE/NICO tariff schedule changes",
+        "VAT or customs-fee layer updates",
+        "NOM and preferential-origin evidence changes"
+      ],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced 10-digit TIGIE/NICO IGI lines plus 16% VAT and NOM/origin review reminders.",
+      "next_action": "Monitor SNICE workbook revisions and keep VAT, NOM, and preferential-origin checks refreshed.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
+      "country": "SG",
+      "name": "Singapore Customs duties and GST",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_pdf_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:sg",
+      "probe_command": "",
+      "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
+      "official_probe_urls": [],
+      "source_use_cases": [
+        "Singapore import duty and GST pre-check",
+        "two-leg transit comparison",
+        "origin transformation and re-export evidence review"
+      ],
+      "parser_subtasks": [
+        "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
+        "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
+        "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
+      ],
+      "rate_change_drivers": [
+        "Singapore Customs dutiable-goods or tariff schedule updates",
+        "GST rate or relief updates",
+        "Strategic Goods Control, IMDA, or controlled-goods scope changes"
+      ],
+      "transit_route_priority": true,
+      "current_scope": "Official machine-synced 8-digit STCCED/AHTN base-duty lines plus 9% GST value treatment reminder.",
+      "next_action": "Monitor STCCED revisions and keep GST, controlled-goods, and relief checks separately refreshed.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
       "country": "US",
       "name": "United States HTS / USITC",
       "source_status": "auto_updatable",
@@ -1038,45 +1112,6 @@
       "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
     },
     {
-      "country": "MX",
-      "name": "Mexico tariff / VAT",
-      "source_status": "hybrid_official_candidate",
-      "machine_readable": "local_exact_map",
-      "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:mx",
-      "probe_command": "",
-      "official_url": "https://www.snice.gob.mx/",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Mexico import duty and VAT pre-check",
-        "USMCA or alternate-route pricing comparison",
-        "NOM certification and preferential-origin evidence review"
-      ],
-      "parser_subtasks": [
-        "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
-        "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
-        "Flag routes where USMCA or other origin-transformation evidence is required before cost comparison."
-      ],
-      "rate_change_drivers": [
-        "TIGIE/NICO tariff schedule changes",
-        "VAT or customs-fee layer updates",
-        "NOM and preferential-origin evidence changes"
-      ],
-      "transit_route_priority": false,
-      "current_scope": "Maintained Mexico exact-line IGI/base-duty candidates plus 16% VAT and NOM/origin review reminders.",
-      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed.",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "parser_gap": true,
-      "next_upgrade": "Connect a machine-readable MX tariff parser or official API.",
-      "launch_mode": "live_hybrid",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live hybrid",
-      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
       "country": "MY",
       "name": "Malaysia Customs SST / duty",
       "source_status": "hybrid_official_candidate",
@@ -1150,45 +1185,6 @@
       "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
       "parser_gap": true,
       "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
-      "launch_mode": "live_hybrid",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live hybrid",
-      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
-      "country": "SG",
-      "name": "Singapore Customs duties and GST",
-      "source_status": "hybrid_official_candidate",
-      "machine_readable": "local_exact_map",
-      "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:sg",
-      "probe_command": "",
-      "official_url": "https://www.customs.gov.sg/businesses/valuation-duties-taxes-fees/duties-and-dutiable-goods/",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Singapore import duty and GST pre-check",
-        "two-leg transit comparison",
-        "origin transformation and re-export evidence review"
-      ],
-      "parser_subtasks": [
-        "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
-        "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
-        "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
-      ],
-      "rate_change_drivers": [
-        "Singapore Customs dutiable-goods or tariff schedule updates",
-        "GST rate or relief updates",
-        "Strategic Goods Control, IMDA, or controlled-goods scope changes"
-      ],
-      "transit_route_priority": true,
-      "current_scope": "Maintained Singapore exact-line base-duty candidates plus 9% GST value treatment reminder.",
-      "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed.",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "parser_gap": true,
-      "next_upgrade": "Connect a machine-readable SG tariff parser or official API.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -1685,112 +1681,6 @@
       },
       "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
       "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
-    },
-    {
-      "country": "MX",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:mx",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Mexico import duty and VAT pre-check",
-        "USMCA or alternate-route pricing comparison",
-        "NOM certification and preferential-origin evidence review"
-      ],
-      "parser_subtasks": [
-        "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
-        "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
-        "Flag routes where USMCA or other origin-transformation evidence is required before cost comparison."
-      ],
-      "rate_change_drivers": [
-        "TIGIE/NICO tariff schedule changes",
-        "VAT or customs-fee layer updates",
-        "NOM and preferential-origin evidence changes"
-      ],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "MX",
-        "priority": "P1",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "Mexico import duty and VAT pre-check",
-          "USMCA or alternate-route pricing comparison",
-          "NOM certification and preferential-origin evidence review"
-        ],
-        "parser_subtasks": [
-          "Parse TIGIE/NICO exact tariff rows for high-tech HS lines and keep NICO subheading scope explicit.",
-          "Separate IGI duty, VAT, NOM certification, and preferential-origin treatment before promoting filing-grade results.",
-          "Flag routes where USMCA or other origin-transformation evidence is required before cost comparison."
-        ],
-        "rate_change_drivers": [
-          "TIGIE/NICO tariff schedule changes",
-          "VAT or customs-fee layer updates",
-          "NOM and preferential-origin evidence changes"
-        ],
-        "transit_route_priority": false,
-        "next_action": "Connect a machine-readable MX tariff parser or official API."
-      },
-      "next_upgrade": "Connect a machine-readable MX tariff parser or official API.",
-      "next_action": "Replace local exact map with a machine-readable TIGIE/NICO parser when available; keep VAT, NOM, and preferential-origin checks refreshed."
-    },
-    {
-      "country": "SG",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:sg",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Singapore import duty and GST pre-check",
-        "two-leg transit comparison",
-        "origin transformation and re-export evidence review"
-      ],
-      "parser_subtasks": [
-        "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
-        "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
-        "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
-      ],
-      "rate_change_drivers": [
-        "Singapore Customs dutiable-goods or tariff schedule updates",
-        "GST rate or relief updates",
-        "Strategic Goods Control, IMDA, or controlled-goods scope changes"
-      ],
-      "transit_route_priority": true,
-      "parser_gap_task": {
-        "country": "SG",
-        "priority": "P1",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "Singapore import duty and GST pre-check",
-          "two-leg transit comparison",
-          "origin transformation and re-export evidence review"
-        ],
-        "parser_subtasks": [
-          "Parse exact Singapore HS/AHTN rows for maintained high-tech product lines before promoting filing-grade duty output.",
-          "Keep GST, import relief, strategic-goods, telecom, and controlled-goods checks outside the base-duty parser.",
-          "Require origin transformation and re-export evidence before treating Singapore as a cost-saving transit route."
-        ],
-        "rate_change_drivers": [
-          "Singapore Customs dutiable-goods or tariff schedule updates",
-          "GST rate or relief updates",
-          "Strategic Goods Control, IMDA, or controlled-goods scope changes"
-        ],
-        "transit_route_priority": true,
-        "next_action": "Connect a machine-readable SG tariff parser or official API."
-      },
-      "next_upgrade": "Connect a machine-readable SG tariff parser or official API.",
-      "next_action": "Replace local exact map with machine-readable TradeNet/AHTN parser when available; keep GST separately refreshed."
     },
     {
       "country": "MY",

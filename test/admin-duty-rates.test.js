@@ -128,11 +128,8 @@ test('admin duty-rate payload exposes source roadmap status', () => {
         && row.rate_automation_stage === 'official_probe_candidate'
         && row.workstream === 'official probe promotion'
     )));
-    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
-        row.country === 'SG'
-        && row.rate_automation_stage === 'maintained_exact_map'
-        && row.workstream === 'machine-readable source connector'
-    )));
+    assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'SG'), false);
+    assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'MX'), false);
     assert.ok(payload.source_roadmap_summary.next_source_priorities.some(row => (
         row.country === 'US'
         && row.maintenance_priority === 'P0'

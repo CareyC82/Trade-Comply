@@ -97,8 +97,8 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.ok(roadmap.hybrid_official_candidate.includes('EU'));
     assert.ok(roadmap.hybrid_official_candidate.includes('DE'));
     assert.ok(roadmap.hybrid_official_candidate.includes('NL'));
-    assert.ok(roadmap.hybrid_official_candidate.includes('SG'));
-    assert.ok(roadmap.hybrid_official_candidate.includes('MX'));
+    assert.equal(dutyRateSources.sources.find((source) => source.country === 'SG').source_status, 'official_machine_synced');
+    assert.equal(dutyRateSources.sources.find((source) => source.country === 'MX').source_status, 'official_machine_synced');
     assert.ok(roadmap.hybrid_official_candidate.includes('VN'));
     assert.ok(roadmap.hybrid_official_candidate.includes('MY'));
     assert.ok(roadmap.hybrid_official_candidate.includes('TW'));
@@ -299,13 +299,13 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
     assert.equal(sg.ok, true);
     assert.equal(sg.writes_rates, true);
     assert.equal(sg.writes_official_machine_rates, true);
-    assert.equal(sg.source_status, 'hybrid_official_candidate');
+    assert.equal(sg.source_status, 'official_machine_synced');
     assert.ok(sg.maintained_hs_prefixes.includes('8517'));
 
     assert.equal(mx.ok, true);
     assert.equal(mx.writes_rates, true);
     assert.equal(mx.writes_official_machine_rates, true);
-    assert.equal(mx.source_status, 'hybrid_official_candidate');
+    assert.equal(mx.source_status, 'official_machine_synced');
     assert.ok(mx.maintained_hs_prefixes.includes('847130'));
 
     assert.equal(jp.ok, true);

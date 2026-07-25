@@ -21,7 +21,7 @@ function readJson(filePath, fallback = {}) {
 }
 
 function sourceMode(sourceStatus) {
-    if (sourceStatus === 'auto_updatable') {
+    if (sourceStatus === 'auto_updatable' || sourceStatus === 'official_machine_synced') {
         return {
             launch_mode: 'live_auto',
             public_launch: true,
@@ -63,7 +63,10 @@ function dutyAutomationStage(source = {}) {
     const updateCommand = source.update_command || '';
     const country = source.country || '';
 
-    if (sourceStatus === 'auto_updatable' && machineReadable === true) {
+    if (
+        (sourceStatus === 'auto_updatable' && machineReadable === true)
+        || sourceStatus === 'official_machine_synced'
+    ) {
         return {
             rate_automation_stage: 'official_machine_sync',
             automation_claim: 'Official machine-readable tariff sync',
