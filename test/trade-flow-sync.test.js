@@ -7,6 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 const {
     buildComtradeUrl,
+    buildNationalRawManifest,
     latestPeriodFromSingStat,
     latestPeriodFromText,
     mergeSeries,
@@ -22,6 +23,83 @@ const {
     syncOfficialBatches,
     validateOfficialManifest
 } = require('../scripts/update-trade-flow');
+
+test('Japan commodity-country rows map HS codes, partners, both flows, and JPY values', () => {
+    const connector = {
+        market: 'JP',
+        id: 'jp-customs-monthly',
+        name: 'Japan Customs',
+        official_url: 'https://www.customs.go.jp/toukei/info/tsdl_e.htm',
+        required_directions: ['import', 'export'],
+        required_partners: ['CN'],
+        enforce_partner_coverage: true
+    };
+    const manifest = buildNationalRawManifest(connector, {
+        complete: true,
+        value_scale: 1000,
+        exchange_rates: { '2026-04': 150 },
+        rows: [
+            { statistical_code: '854232000', country_code: '156', period: '202604', flow: 'import', trade_value: 1500 },
+            { statistical_code: '854232000', country_code: '156', period: '202604', flow: 'export', trade_value: 750 }
+        ]
+    });
+    assert.equal(manifest.complete, true);
+    assert.deepEqual(manifest.expected.months, ['2026-04']);
+    assert.ok(manifest.expected.industry_ids.includes('memory'));
+    const memory = manifest.series.find((row) => row.industry_id === 'memory');
+    assert.equal(memory.partner, 'CN');
+    assert.equal(memory.imports_value_usd, 10000);
+    assert.equal(memory.exports_value_usd, 5000);
+});
+
+test('Singapore AHTN rows publish through the native raw-feed adapter', async () => {
+    const payload = { sources: [], series: [] };
+    const connector = {
+        market: 'SG',
+        id: 'sg-singstat-monthly',
+        name: 'Singapore SingStat',
+        official_url: 'https://tablebuilder.singstat.gov.sg/table/TR/T010001',
+        raw_feed_env: 'SG_RAW_URL',
+        required_directions: ['import', 'export'],
+        required_partners: ['CN'],
+        required_industries: ['solar'],
+        enforce_partner_coverage: true,
+        enforce_industry_coverage: true
+    };
+    const raw = {
+        complete: true,
+        local_currency_per_usd: 1.25,
+        rows: [
+            { ahtn_code: '85414300', partner_country: 'China', month: '2026-04', direction: 'imports', value_local: 125 },
+            { ahtn_code: '85414300', partner_country: 'China', month: '2026-04', direction: 'exports', value_local: 250 }
+        ]
+    };
+    const result = await syncNationalOfficialConnectors(payload, {
+        registry: { connectors: [connector] },
+        env: { SG_RAW_URL: 'https://feed.test/sg-commodity.json' },
+        fetchImpl: async () => ({ ok: true, json: async () => raw }),
+        referenceDate: new Date('2026-05-15T00:00:00Z')
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.status.markets.SG.status, 'national_official_current');
+    assert.equal(result.status.markets.SG.publish_ready, true);
+    const solar = payload.series.find((row) => row.source_id === 'sg-singstat-monthly' && row.industry_id === 'solar');
+    assert.equal(solar.imports_value_usd, 100);
+    assert.equal(solar.exports_value_usd, 200);
+});
+
+test('native national raw feeds reject local-currency rows without conversion evidence', () => {
+    assert.throws(() => buildNationalRawManifest({
+        market: 'JP',
+        id: 'jp-customs-monthly',
+        name: 'Japan Customs',
+        official_url: 'https://www.customs.go.jp/',
+        required_directions: ['import']
+    }, {
+        complete: true,
+        rows: [{ hs_code: '854232', partner: 'US', month: '2026-04', flow: 'import', value_local: 100 }]
+    }), /local_currency_per_usd/);
+});
 
 test('official month parser accepts customs and statistical month formats', () => {
     assert.equal(latestPeriodFromText('May 2026; 2026 Apr; 2026M03; 202602'), '2026-05');

@@ -263,6 +263,139 @@ function parseComtradeRows(response, { sourceId = COMTRADE_SOURCE_ID, defaultPar
     });
 }
 
+const NATIONAL_PARTNER_ALIASES = {
+    '156': 'CN', CHINA: 'CN',
+    '276': 'DE', GERMANY: 'DE',
+    '392': 'JP', JAPAN: 'JP',
+    '410': 'KR', KOREA: 'KR', 'SOUTH KOREA': 'KR', 'REPUBLIC OF KOREA': 'KR',
+    '458': 'MY', MALAYSIA: 'MY',
+    '702': 'SG', SINGAPORE: 'SG',
+    '842': 'US', USA: 'US', 'UNITED STATES': 'US', 'UNITED STATES OF AMERICA': 'US'
+};
+
+function firstPresent(row, fields) {
+    for (const field of fields) {
+        if (row[field] !== undefined && row[field] !== null && String(row[field]).trim() !== '') return row[field];
+    }
+    return undefined;
+}
+
+function normalizeNationalPartner(value) {
+    const normalized = String(value || 'WORLD').trim().toUpperCase();
+    if (['WORLD', 'ALL', 'TOTAL'].includes(normalized)) return 'WORLD';
+    return NATIONAL_PARTNER_ALIASES[normalized] || normalized;
+}
+
+function normalizeNationalMonth(value) {
+    const text = String(value || '').trim();
+    const compact = text.match(/^(20\d{2})[-/.]?(0[1-9]|1[0-2])$/);
+    if (compact) return `${compact[1]}-${compact[2]}`;
+    return latestPeriodFromText(text);
+}
+
+function nationalValueUsd(row, month, payload = {}) {
+    const direct = Number(firstPresent(row, ['value_usd', 'trade_value_usd', 'usd_value']));
+    if (Number.isFinite(direct) && direct >= 0) return direct;
+    const local = Number(firstPresent(row, ['value_local', 'trade_value', 'value', 'amount']));
+    const scale = Number(firstPresent(row, ['value_scale', 'scale']) ?? payload.value_scale ?? 1);
+    const rate = Number(
+        firstPresent(row, ['local_currency_per_usd', 'exchange_rate'])
+        ?? payload.exchange_rates?.[month]
+        ?? payload.local_currency_per_usd
+    );
+    if (!Number.isFinite(local) || local < 0) throw new Error(`Invalid national trade value for ${month}`);
+    if (!Number.isFinite(scale) || scale <= 0) throw new Error(`Invalid national trade value scale for ${month}`);
+    if (!Number.isFinite(rate) || rate <= 0) {
+        throw new Error(`Missing local_currency_per_usd conversion for ${month}; local-currency values cannot be published as USD`);
+    }
+    return (local * scale) / rate;
+}
+
+function buildNationalRawManifest(connector, payload = {}) {
+    const rawRows = Array.isArray(payload.rows) ? payload.rows
+        : Array.isArray(payload.data) ? payload.data
+            : Array.isArray(payload.series) ? payload.series : [];
+    if (!rawRows.length) throw new Error(`Official ${connector.market} raw feed returned no commodity rows`);
+    const requiredPartners = new Set(connector.required_partners || []);
+    const aggregate = new Map();
+    const directionCoverage = new Map();
+    rawRows.forEach((raw) => {
+        const hsCode = String(firstPresent(raw, [
+            'hs_code', 'commodity_code', 'commodity', 'ahtn_code', 'statistical_code', '品目番号', '統計品目番号'
+        ]) || '').replace(/\D/g, '').slice(0, 6);
+        const industryIds = HS_INDUSTRIES[hsCode] || [];
+        if (!industryIds.length) return;
+        const month = normalizeNationalMonth(firstPresent(raw, ['month', 'period', 'time', 'year_month', '年月']));
+        if (!month) throw new Error(`Invalid official ${connector.market} row month`);
+        const partner = normalizeNationalPartner(firstPresent(raw, [
+            'partner', 'partner_country', 'country', 'market', 'country_code', '国符号', '国名'
+        ]));
+        if (requiredPartners.size && partner !== 'WORLD' && !requiredPartners.has(partner)) return;
+        const flowValue = String(firstPresent(raw, ['flow', 'direction', 'trade_flow', '輸出入']) || '').toLowerCase();
+        const flow = /^(m|import|imports|輸入)$/.test(flowValue) ? 'import'
+            : /^(x|e|export|exports|輸出)$/.test(flowValue) ? 'export' : '';
+        if (!flow) throw new Error(`Invalid official ${connector.market} trade flow: ${flowValue || 'missing'}`);
+        const valueUsd = nationalValueUsd(raw, month, payload);
+        industryIds.forEach((industryId) => {
+            const coverageKey = `${industryId}|${month}`;
+            if (!directionCoverage.has(coverageKey)) directionCoverage.set(coverageKey, new Set());
+            directionCoverage.get(coverageKey).add(flow);
+            const key = `${partner}|${industryId}|${hsCode}|${month}`;
+            const current = aggregate.get(key) || {
+                market: connector.market,
+                partner,
+                industry_id: industryId,
+                hs_code: hsCode,
+                month,
+                imports_value_usd: 0,
+                exports_value_usd: 0
+            };
+            current[flow === 'import' ? 'imports_value_usd' : 'exports_value_usd'] += valueUsd;
+            aggregate.set(key, current);
+        });
+    });
+    const series = [...aggregate.values()];
+    if (!series.length) throw new Error(`Official ${connector.market} raw feed had no maintained HS commodity rows`);
+    const months = [...new Set(series.map((row) => row.month))].sort();
+    const industryIds = [...new Set(series.map((row) => row.industry_id))].sort();
+    const requiredDirections = connector.required_directions || ['import', 'export'];
+    const missingDirections = [];
+    months.forEach((month) => industryIds.forEach((industryId) => {
+        const seen = directionCoverage.get(`${industryId}|${month}`) || new Set();
+        requiredDirections.forEach((direction) => {
+            if (!seen.has(direction)) missingDirections.push(`${industryId}/${month}:${direction}`);
+        });
+    }));
+    if (missingDirections.length) {
+        throw new Error(`Official ${connector.market} raw feed is incomplete: ${missingDirections.slice(0, 5).join(', ')}`);
+    }
+    const observedPartners = new Set(series.map((row) => row.partner));
+    const missingPartners = [...requiredPartners].filter((partner) => !observedPartners.has(partner));
+    if (connector.enforce_partner_coverage === true && missingPartners.length) {
+        throw new Error(`Official ${connector.market} raw feed is missing partner coverage: ${missingPartners.join(', ')}`);
+    }
+    const requiredIndustries = connector.required_industries || [];
+    const missingIndustries = requiredIndustries.filter((industryId) => !industryIds.includes(industryId));
+    if (connector.enforce_industry_coverage === true && missingIndustries.length) {
+        throw new Error(`Official ${connector.market} raw feed is missing industry coverage: ${missingIndustries.join(', ')}`);
+    }
+    return {
+        complete: payload.complete === true,
+        source: {
+            id: connector.id,
+            name: connector.name,
+            source_url: connector.official_url
+        },
+        expected: {
+            markets: [connector.market],
+            months,
+            industry_ids: industryIds,
+            directions: requiredDirections
+        },
+        series
+    };
+}
+
 async function fetchJson(url, fetchImpl = global.fetch, { retries = 0 } = {}) {
     for (let attempt = 0; attempt <= retries; attempt += 1) {
         const controller = new AbortController();
@@ -854,10 +987,12 @@ async function syncNationalOfficialConnectors(payload, {
     const failures = [];
     for (const connector of registry.connectors || []) {
         const feedUrl = String(env[connector.feed_env] || '').trim();
+        const rawFeedUrl = String(env[connector.raw_feed_env] || '').trim();
         let error = '';
-        if (feedUrl) {
+        if (feedUrl || rawFeedUrl) {
             try {
-                const manifest = await fetchJson(feedUrl, fetchImpl, { retries: 2 });
+                const downloaded = await fetchJson(rawFeedUrl || feedUrl, fetchImpl, { retries: 2 });
+                const manifest = rawFeedUrl ? buildNationalRawManifest(connector, downloaded) : downloaded;
                 const validated = validateOfficialManifest(manifest);
                 if (validated.source.id !== connector.id) throw new Error(`Source id must be ${connector.id}`);
                 if (validated.expected.markets.length !== 1 || validated.expected.markets[0] !== connector.market) {
@@ -927,7 +1062,12 @@ async function syncNationalOfficialConnectors(payload, {
         } catch (caught) {
             probe = { status: 'probe_degraded', latest_period: '', error: String(caught.message || caught), checked_at: new Date().toISOString() };
         }
-        markets[connector.market] = nationalConnectorState(payload, connector, { error, referenceDate, probe, feedConfigured: Boolean(feedUrl) });
+        markets[connector.market] = nationalConnectorState(payload, connector, {
+            error,
+            referenceDate,
+            probe,
+            feedConfigured: Boolean(feedUrl || rawFeedUrl)
+        });
     }
     const marketStates = Object.values(markets);
     const status = {
@@ -1019,6 +1159,7 @@ module.exports = {
     COMTRADE_REPORTERS,
     buildCensusUrl,
     buildComtradeUrl,
+    buildNationalRawManifest,
     mapWithConcurrency,
     mergeSeries,
     monthList,

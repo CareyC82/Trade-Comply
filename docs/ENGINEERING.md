@@ -35,3 +35,20 @@ ADMIN_REVIEW_PASSWORD=secret node scripts/admin-server.js
 ```
 
 Each Approve will attempt `git push` + dispatch. Most operators prefer manual `npm run publish:reviewed` after reviewing all items.
+
+## Japan and Singapore national trade-flow feeds
+
+The monthly trade-flow job accepts official commodity-level JSON feeds directly:
+
+- `JP_OFFICIAL_COMMODITY_FLOW_URL` — Japan Customs commodity-by-country rows.
+- `SG_OFFICIAL_COMMODITY_FLOW_URL` — SingStat T010001 AHTN commodity-by-market rows.
+
+The response must declare `complete: true` and contain `rows`. Each row needs a commodity code
+(`hs_code`, `statistical_code`, or `ahtn_code`), partner, month, flow (`import`/`export`), and value.
+Use `value_usd`, or provide `value_local` together with `local_currency_per_usd` (globally, per row,
+or in `exchange_rates[YYYY-MM]`). `value_scale` supports official tables expressed in thousands.
+
+The adapter maps maintained 6-digit HS codes into the nine product industries. A candidate snapshot
+is published only when both directions, every configured partner, every configured industry, and
+the latest official month pass the complete-batch gate. Failed or partial snapshots never replace
+the previous accepted national series.
