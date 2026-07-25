@@ -21,6 +21,8 @@
     "update:duty-rates:us": "node scripts/update-us-duty-rates.js",
     "update:duty-rates:us:dry-run": "node scripts/update-us-duty-rates.js --dry-run",
     "update:duty-rates:eu": "node scripts/update-eu-duty-rates.js",
+    "update:duty-rates:eu:official": "node --use-system-ca scripts/update-eu-duty-rates.js --official-live",
+    "update:duty-rates:eu:official:dry-run": "node --use-system-ca scripts/update-eu-duty-rates.js --official-live --dry-run",
     "update:duty-rates:eu-us-special": "node --use-system-ca scripts/update-eu-us-special-program.js",
     "update:duty-rates:eu-us-special:dry-run": "node --use-system-ca scripts/update-eu-us-special-program.js --dry-run",
     "update:duty-rates:eu:dry-run": "node scripts/update-eu-duty-rates.js --dry-run",

@@ -22,6 +22,7 @@ const {
     selectEuThirdCountryDutyRate,
     buildEuOfficialRateCandidate,
     buildEuOfficialCandidateForRule,
+    buildEuExactOverridesForRule,
     applyOfficialCandidateToRule,
     updateEuRules,
     probeEuTaricOfficialSource,
@@ -843,6 +844,27 @@ test('EU TARIC parser extracts third-country duty rates from worksheet XML', () 
     assert.equal(summary.ok, true);
     assert.equal(summary.exact_single_rate, true);
     assert.deepEqual(summary.unique_base_rates, [0.027]);
+});
+
+test('EU TARIC exact overrides retain only unambiguous 10-digit third-country duty rows', () => {
+    const rows = [
+        { goods_code: '8542310000', duty: '0 %', origin_code: '1011', measure_type_code: '103', measure_type: 'Third country duty' },
+        { goods_code: '8542320000', duty: '2.5 %', origin_code: '1011', measure_type_code: '103', measure_type: 'Third country duty' },
+        { goods_code: '8542320000', duty: '4 %', origin_code: '1011', measure_type_code: '103', measure_type: 'Third country duty' },
+        { goods_code: '8542390000', duty: 'Free', origin_code: '1011', measure_type_code: '103', measure_type: 'Third country duty' },
+        { goods_code: '8542410000', duty: '1 %', origin_code: '1000', measure_type_code: '103', measure_type: 'Third country duty' }
+    ];
+    const overrides = buildEuExactOverridesForRule(
+        {
+            hs_prefixes: ['8542'],
+            exact_code_overrides: [{ hs_code: '8542', confidence: 'Pre-check candidate' }]
+        },
+        rows,
+        '2026-07-25T00:00:00.000Z'
+    );
+    assert.deepEqual(overrides.map((row) => row.hs_code), ['8542', '8542310000']);
+    assert.equal(overrides[1].base_rate, 0);
+    assert.equal(overrides[1].confidence, 'Official exact tariff line');
 });
 
 test('EU TARIC selector only promotes a single ERGA OMNES third-country duty rate', () => {

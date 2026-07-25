@@ -35,12 +35,22 @@ async function syncExactNationalTariffs({
     for (const country of countries) {
         const envName = FEEDS[country];
         const url = String(env[envName] || '').trim();
-        if (!url) {
+        const directOfficial = country === 'CN';
+        if (!url && !directOfficial) {
             results.push({ country, ok: true, skipped: true, reason: `${envName} is not configured` });
             continue;
         }
         try {
-            const raw = await fetchOfficialPayload(url, fetchImpl);
+            let raw;
+            if (url) {
+                raw = await fetchOfficialPayload(url, fetchImpl);
+            } else {
+                const { buildChinaCustomsExactPayload } = require('../lib/china-customs-tariff');
+                const prefixes = [...new Set((dutyPayload.rules || [])
+                    .filter((rule) => rule.import_country === 'CN')
+                    .flatMap((rule) => rule.hs_prefixes || []))].sort();
+                raw = await buildChinaCustomsExactPayload(prefixes, { fetchImpl });
+            }
             const rows = parseExactTariffRows(raw, { country, checkedAt });
             const changedRules = applyExactTariffRows(dutyPayload, country, rows);
             results.push({ country, ok: true, skipped: false, row_count: rows.length, changed_rules: changedRules });

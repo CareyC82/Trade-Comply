@@ -83,6 +83,30 @@ test('official national sync applies exact rows only to matching market rules', 
     assert.deepEqual(dutyPayload.rules[1].exact_code_overrides, []);
 });
 
+test('official exact sync preserves shorter maintained search candidates', () => {
+    const payload = {
+        rules: [{
+            id: 'CN-RULE',
+            import_country: 'CN',
+            hs_prefixes: ['8542'],
+            exact_code_overrides: [{
+                hs_code: '854231',
+                base_rate: 0,
+                confidence: 'Official source checked'
+            }]
+        }]
+    };
+    applyExactTariffRows(payload, 'CN', [{
+        hs_code: '8542311100',
+        base_rate: 0,
+        confidence: 'Official exact tariff line'
+    }]);
+    assert.deepEqual(
+        payload.rules[0].exact_code_overrides.map((row) => row.hs_code),
+        ['854231', '8542311100']
+    );
+});
+
 test('applies exact rows without promoting unrelated prefixes', () => {
     const payload = { rules: [{ id: 'cn-computing', import_country: 'CN', hs_prefixes: ['8471'] }] };
     const changed = applyExactTariffRows(payload, 'CN', [{

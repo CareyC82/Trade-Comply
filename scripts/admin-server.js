@@ -297,11 +297,19 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
     };
     const sync = dutyPayload.last_exact_national_tariff_sync || {};
     const results = new Map((sync.results || []).map((row) => [row.country, row]));
+    const euSync = dutyPayload.last_eu_taric_benchmark_sync || {};
     return {
-        checked_at: sync.checked_at || dutyPayload.last_exact_national_tariff_sync_at || null,
-        ok: sync.ok ?? null,
+        checked_at: sync.checked_at || euSync.official_fetch?.checked_at || dutyPayload.last_exact_national_tariff_sync_at || null,
+        ok: [euSync.ok, sync.ok].filter((value) => value !== undefined).every((value) => value !== false),
         markets: Object.entries(feedEnv).map(([country, envName]) => {
-            const result = results.get(country) || {};
+            const result = country === 'EU' && Object.keys(euSync).length
+                ? {
+                    ok: euSync.ok && euSync.official_fetch?.ok,
+                    row_count: euSync.official_candidate_rows || 0,
+                    changed_rules: (euSync.changes || []).map((row) => row.rule),
+                    error: euSync.errors?.[0]?.error || euSync.official_fetch_degraded_detail || ''
+                }
+                : results.get(country) || {};
             const targetMarkets = country === 'EU' ? ['EU', 'DE', 'NL'] : [country];
             const officialExactRows = (dutyPayload.rules || [])
                 .filter((rule) => targetMarkets.includes(rule.import_country))
@@ -311,7 +319,8 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
                 country,
                 target_markets: targetMarkets,
                 env_name: envName,
-                configured: Boolean(String(process.env[envName] || '').trim()),
+                configured: ['EU', 'CN'].includes(country) || Boolean(String(process.env[envName] || '').trim()),
+                connector_type: ['EU', 'CN'].includes(country) ? 'direct_official' : 'normalized_feed',
                 status: result.ok === false ? 'failed'
                     : result.skipped ? 'not_configured'
                         : result.ok ? 'current'
@@ -320,7 +329,7 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
                 changed_rule_count: (result.changed_rules || []).length,
                 changed_rules: result.changed_rules || [],
                 error: result.error || '',
-                last_checked_at: sync.checked_at || null
+                last_checked_at: country === 'EU' ? euSync.official_fetch?.checked_at || null : sync.checked_at || null
             };
         })
     };

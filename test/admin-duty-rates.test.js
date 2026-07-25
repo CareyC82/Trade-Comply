@@ -41,6 +41,8 @@ test('admin exact tariff feed status covers the four P1 connector groups without
     assert.equal(payload.markets[0].row_count, 12);
     assert.equal(payload.markets[0].changed_rule_count, 1);
     assert.ok(payload.markets.every((row) => !Object.hasOwn(row, 'url')));
+    assert.equal(payload.markets[0].connector_type, 'direct_official');
+    assert.equal(payload.markets[1].connector_type, 'direct_official');
 });
 
 test('admin unmet-search payload has an honest empty Top 10 state', () => {

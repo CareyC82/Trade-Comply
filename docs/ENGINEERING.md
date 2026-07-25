@@ -55,10 +55,12 @@ the previous accepted national series.
 
 ## Filing-grade exact tariff feeds
 
-The daily duty-rate workflow can ingest official exact-line JSON feeds for:
+The daily duty-rate workflow downloads and parses the latest official EU TARIC
+`Duties Import 01-99.xlsx` workbook directly from the European Commission CIRCABC database.
+It also queries the public China Customs tariff service directly for every maintained
+China HS prefix and requires complete pagination before publishing. Normalized official
+exact-line JSON feeds remain available for:
 
-- `EU_TARIC_EXACT_LINES_URL` — EU/DE/NL TARIC third-country duty lines.
-- `CN_CUSTOMS_EXACT_TARIFF_URL` — China Customs MFN tariff lines.
 - `SG_AHTN_EXACT_TARIFF_URL` — Singapore AHTN/TradeNet tariff lines.
 - `MX_TIGIE_NICO_EXACT_TARIFF_URL` — Mexico TIGIE/NICO tariff lines.
 

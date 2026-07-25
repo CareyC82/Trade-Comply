@@ -11,7 +11,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const https = require('https');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawn } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
@@ -487,6 +487,65 @@ function parseTaricWorkbookRows(workbookPath, { prefixes = [] } = {}) {
     return parseTaricSheetRows(sheetXml, { prefixes });
 }
 
+function parseTaricRowXml(rowXml, prefixes = []) {
+    const wanted = prefixes.map(prefix => String(prefix || ''));
+    const values = {};
+    const cellRegex = /<c\b[^>]*r="([A-Z]+)\d+"[^>]*(?:>([\s\S]*?)<\/c>|\/>)/g;
+    let cellMatch;
+    while ((cellMatch = cellRegex.exec(rowXml))) {
+        const textMatch = String(cellMatch[2] || '').match(/<t[^>]*>([\s\S]*?)<\/t>/);
+        values[cellMatch[1]] = decodeXmlText(textMatch ? textMatch[1] : '').trim();
+    }
+    const goodsCode = values.A || '';
+    if (wanted.length && !wanted.some(prefix => goodsCode.startsWith(prefix))) return null;
+    return {
+        goods_code: goodsCode,
+        additional_code: values.B || '',
+        order_number: values.C || '',
+        start_date: values.D || '',
+        end_date: values.E || '',
+        reduction_indicator: values.F || '',
+        origin: values.G || '',
+        measure_type: values.H || '',
+        legal_base: values.I || '',
+        duty: values.J || '',
+        origin_code: values.K || '',
+        measure_type_code: values.L || ''
+    };
+}
+
+function parseTaricWorkbookRowsStreaming(workbookPath, { prefixes = [] } = {}) {
+    return new Promise((resolve, reject) => {
+        const child = spawn('unzip', ['-p', workbookPath, 'xl/worksheets/sheet1.xml']);
+        const rows = [];
+        let buffer = '';
+        let stderr = '';
+        child.stdout.setEncoding('utf8');
+        child.stderr.setEncoding('utf8');
+        child.stdout.on('data', (chunk) => {
+            buffer += chunk;
+            let end;
+            while ((end = buffer.indexOf('</row>')) >= 0) {
+                const start = buffer.lastIndexOf('<row', end);
+                if (start >= 0) {
+                    const row = parseTaricRowXml(buffer.slice(start, end + 6), prefixes);
+                    if (row) rows.push(row);
+                }
+                buffer = buffer.slice(end + 6);
+            }
+        });
+        child.stderr.on('data', chunk => { stderr += chunk; });
+        child.on('error', reject);
+        child.on('close', (code) => {
+            if (code !== 0) {
+                reject(new Error(`Could not stream TARIC workbook: ${stderr.trim() || `unzip exited ${code}`}`));
+                return;
+            }
+            resolve(rows);
+        });
+    });
+}
+
 function refreshVatLayer(rule, benchmark) {
     if (typeof benchmark.vat_rate !== 'number') {
         return;
@@ -572,6 +631,52 @@ function buildEuOfficialCandidateForRule(rule, taricRows = []) {
         source_rate_text: successful[0].source_rate_text,
         source_note: 'Official TARIC ERGA OMNES third-country-duty candidate selected because each maintained HS prefix produced one unambiguous rate. Verify exact 10-digit TARIC code, origin preference, and member-state VAT before filing.'
     };
+}
+
+function buildEuExactOverridesForRule(rule, taricRows = [], checkedAt = new Date().toISOString()) {
+    const prefixes = (rule.hs_prefixes || []).map(String);
+    const grouped = new Map();
+    taricRows.filter((row) => (
+        prefixes.some((prefix) => String(row.goods_code || '').startsWith(prefix))
+        && row.origin_code === '1011'
+        && row.measure_type_code === '103'
+        && /third country duty/i.test(row.measure_type || '')
+    )).forEach((row) => {
+        const hsCode = normalizeTaricGoodsCode(row.goods_code);
+        const baseRate = parseTaricPercentDuty(row.duty);
+        if (hsCode.length !== 10 || baseRate === null) return;
+        const rates = grouped.get(hsCode) || new Set();
+        rates.add(baseRate);
+        grouped.set(hsCode, rates);
+    });
+    const maintainedCandidates = (rule.exact_code_overrides || []).filter((row) => (
+        String(row.confidence || '').toLowerCase() !== 'official exact tariff line'
+    ));
+    const officialExact = [...grouped.entries()]
+        .filter(([, rates]) => rates.size === 1)
+        .map(([hsCode, rates]) => {
+            const baseRate = [...rates][0];
+            return {
+                hs_code: hsCode,
+                base_rate: baseRate,
+                measure_type: 'third_country_duty',
+                origin_scope: 'ERGA_OMNES',
+                effective_from: null,
+                effective_to: null,
+                source_status: 'official_source_checked',
+                confidence: 'Official exact tariff line',
+                source_url: EU_TARIC_CONSULTATION_URL,
+                source_name: 'European Commission TARIC',
+                source_hts: `${hsCode} (EU TARIC official exact tariff line)`,
+                source_rate_text: `${(baseRate * 100).toFixed(3)}% third-country duty`,
+                source_note: 'Official 10-digit TARIC ERGA OMNES third-country duty. VAT, preferences, trade remedies, quotas, licensing, and product controls remain separate layers.',
+                last_checked_at: checkedAt
+            };
+        })
+        .sort((a, b) => a.hs_code.localeCompare(b.hs_code));
+    const merged = new Map(maintainedCandidates.map((row) => [normalizeTaricGoodsCode(row.hs_code), row]));
+    officialExact.forEach((row) => merged.set(row.hs_code, row));
+    return [...merged.values()];
 }
 
 function applyOfficialCandidateToRule(rule, candidate, checkedAt) {
@@ -681,12 +786,26 @@ function updateEuRules({ dryRun = false, taricRows = null, taricWorkbookPath = '
         if (!benchmark) continue;
         try {
             const officialCandidate = buildEuOfficialCandidateForRule(rule, parsedTaricRows);
+            const preserveScopeGate = Boolean(parsedTaricRows.length && (
+                rule.source_status === 'scope_check_required' || /-SCOPE(?:-|$)/.test(rule.id || '')
+            ));
             const shouldApplyScopeCheck = Boolean(parsedTaricRows.length && officialCandidate && !officialCandidate.ok && (rule.hs_prefixes || []).length === 1);
-            const ruleChanges = officialCandidate?.ok
+            const ruleChanges = officialCandidate?.ok && !preserveScopeGate
                 ? applyOfficialCandidateToRule(rule, officialCandidate, checkedAt)
-                : shouldApplyScopeCheck
+                : shouldApplyScopeCheck || preserveScopeGate
                     ? applyTaricScopeCheckToRule(rule, officialCandidate, benchmark, checkedAt)
                     : applyBenchmarkToRule(rule, benchmark, checkedAt);
+            if (parsedTaricRows.length) {
+                const exactOverrides = buildEuExactOverridesForRule(rule, parsedTaricRows, checkedAt);
+                if (JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
+                    ruleChanges.push({
+                        field: 'exact_code_overrides',
+                        old_count: (rule.exact_code_overrides || []).length,
+                        new_count: exactOverrides.length
+                    });
+                    rule.exact_code_overrides = exactOverrides;
+                }
+            }
             if (officialCandidate) {
                 candidateOutcomes.push(officialCandidate);
             }
@@ -749,7 +868,9 @@ async function updateEuRulesFromOfficialSource({
             throw new Error('Official TARIC workbook download returned no binary content.');
         }
         fs.writeFileSync(tempPath, workbook);
-        const result = updateEuRules({ dryRun, taricWorkbookPath: tempPath });
+        const prefixes = Array.from(new Set(getEuDutyRules().flatMap(rule => rule.hs_prefixes || []))).sort();
+        const taricRows = await parseTaricWorkbookRowsStreaming(tempPath, { prefixes });
+        const result = updateEuRules({ dryRun, taricRows });
         return {
             ...result,
             official_fetch: {
@@ -785,11 +906,14 @@ async function main() {
     const probeOnly = process.argv.includes('--probe');
     const probeLive = process.argv.includes('--probe-live');
     const probeFull = process.argv.includes('--probe-full');
+    const officialLive = process.argv.includes('--official-live');
     const taricWorkbookIndex = process.argv.indexOf('--taric-workbook');
     const taricWorkbookPath = taricWorkbookIndex >= 0 ? process.argv[taricWorkbookIndex + 1] : '';
     const result = probeOnly || probeLive
         ? await probeEuTaricReadiness({ live: probeLive, inspectFullDatabase: probeFull })
-        : updateEuRules({ dryRun, taricWorkbookPath });
+        : officialLive
+            ? await updateEuRulesFromOfficialSource({ dryRun })
+            : updateEuRules({ dryRun, taricWorkbookPath });
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.ok ? 0 : 1);
 }
@@ -818,7 +942,9 @@ module.exports = {
     selectEuThirdCountryDutyRate,
     buildEuOfficialRateCandidate,
     parseTaricWorkbookRows,
+    parseTaricWorkbookRowsStreaming,
     buildEuOfficialCandidateForRule,
+    buildEuExactOverridesForRule,
     applyOfficialCandidateToRule,
     applyTaricScopeCheckToRule,
     formatCandidateScopeRateText,
