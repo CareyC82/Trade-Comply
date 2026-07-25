@@ -59,7 +59,12 @@ function buildBacklog(summary = {}, existing = { items: [] }) {
             gap_types: [...item.gap_types].sort(),
             views: [...item.views].sort(),
             status: old?.status || 'research_pending',
-            owner_note: old?.owner_note || ''
+            owner_note: old?.owner_note || '',
+            product_attributes: old?.product_attributes || [],
+            confirmed_hs_codes: old?.confirmed_hs_codes || [],
+            official_sources: old?.official_sources || [],
+            countries: old?.countries || [],
+            directions: old?.directions || []
         };
     }).sort((a, b) => b.priority_score - a.priority_score || b.count - a.count);
     return {

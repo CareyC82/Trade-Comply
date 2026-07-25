@@ -459,6 +459,16 @@
             <div class="panel">
                 <div class="crawl-section-title">
                     <div>
+                        <h2 style="margin:0 0 4px">Unmet Search Workbench</h2>
+                        <p class="meta" style="margin:0">真实零匹配/弱匹配 Top 10；补齐产品属性、HS、官方来源、国家和方向后才可进入 rule-ready。</p>
+                    </div>
+                    <button type="button" class="btn-ghost" id="btn-refresh-unmet-searches">刷新搜索缺口</button>
+                </div>
+                <div id="unmet-search-status">加载中…</div>
+            </div>
+            <div class="panel">
+                <div class="crawl-section-title">
+                    <div>
                         <h2 style="margin:0 0 4px">Quality Gate</h2>
                         <p class="meta" style="margin:0">自动检查搜索结果是否错国家/错方向/产品不相关，以及 Post-Entry 高频 HS 税率覆盖缺口。</p>
                     </div>
@@ -498,6 +508,7 @@
         const pendingList = document.getElementById('pending-list');
         const crawlSummary = document.getElementById('crawl-summary');
         const dutyRateStatus = document.getElementById('duty-rate-status');
+        const unmetSearchStatus = document.getElementById('unmet-search-status');
         const qualityStatus = document.getElementById('quality-status');
         const coverageMatrixView = document.getElementById('coverage-matrix-view');
         const coverageSummary = document.getElementById('coverage-summary');
@@ -633,6 +644,106 @@
             const date = new Date(value);
             if (Number.isNaN(date.getTime())) return value;
             return date.toLocaleString('zh-CN');
+        }
+
+        function renderExactTariffFeeds(feedStatus = {}) {
+            const markets = Array.isArray(feedStatus.markets) ? feedStatus.markets : [];
+            return `
+                <div class="crawl-section-title"><h3>Official exact tariff feeds</h3><span class="meta">${markets.filter(row => row.status === 'current').length}/${markets.length} current</span></div>
+                <div class="coverage-table-wrap">
+                    <table class="coverage-table">
+                        <thead><tr><th>Feed</th><th>Targets</th><th>Configured</th><th>Status</th><th>Rows</th><th>Changed rules</th><th>Last check / error</th></tr></thead>
+                        <tbody>${markets.map((row) => `
+                            <tr>
+                                <td><strong>${escapeHtml(row.country)}</strong><br><span class="meta">${escapeHtml(row.env_name)}</span></td>
+                                <td>${escapeHtml((row.target_markets || []).join(', '))}</td>
+                                <td><span class="badge ${row.configured ? 'auto_updatable' : 'benchmark'}">${row.configured ? 'YES' : 'NO'}</span></td>
+                                <td><span class="badge ${row.status === 'current' ? 'auto_updatable' : row.status === 'failed' ? 'benchmark' : 'official_link'}">${escapeHtml(row.status)}</span></td>
+                                <td>${row.row_count || 0}</td>
+                                <td>${row.changed_rule_count || 0}</td>
+                                <td><span class="meta">${escapeHtml(row.error || formatDateTime(row.last_checked_at))}</span></td>
+                            </tr>
+                        `).join('') || '<tr><td colspan="7">No exact tariff feed status.</td></tr>'}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function listValue(item, field) {
+            return escapeHtml((item[field] || []).join(', '));
+        }
+
+        function renderUnmetSearchItem(item, index) {
+            const gate = item.quality_gate || { ok: false, missing: [] };
+            const statuses = ['research_pending', 'source_research', 'rule_ready', 'published'];
+            return `
+                <article class="item unmet-search-item" data-gap-id="${escapeHtml(item.id)}">
+                    <div class="item-header">
+                        <span class="badge ${gate.ok ? 'auto_updatable' : 'benchmark'}">#${index + 1} · score ${item.priority_score || 0}</span>
+                        <span class="meta">${escapeHtml((item.gap_types || []).join(' + '))} · ${item.count || 0} search(es)</span>
+                    </div>
+                    <h3>${escapeHtml(item.product_query || item.normalized_query)}</h3>
+                    <p class="meta">Views: ${escapeHtml((item.views || []).join(', ') || '—')} · Latest: ${escapeHtml(formatDateTime(item.latest_submitted_at))}</p>
+                    <div class="coverage-table-wrap">
+                        <table class="coverage-table"><tbody>
+                            <tr><th>Product attributes</th><td><input data-gap-field="product_attributes" value="${listValue(item, 'product_attributes')}" placeholder="wireless, lithium battery"></td></tr>
+                            <tr><th>Confirmed HS</th><td><input data-gap-field="confirmed_hs_codes" value="${listValue(item, 'confirmed_hs_codes')}" placeholder="85177900"></td></tr>
+                            <tr><th>Official sources</th><td><input data-gap-field="official_sources" value="${listValue(item, 'official_sources')}" placeholder="https://official.example/..."></td></tr>
+                            <tr><th>Countries</th><td><input data-gap-field="countries" value="${listValue(item, 'countries')}" placeholder="US, EU"></td></tr>
+                            <tr><th>Directions</th><td><input data-gap-field="directions" value="${listValue(item, 'directions')}" placeholder="import, export"></td></tr>
+                            <tr><th>Owner note</th><td><input data-gap-field="owner_note" value="${escapeHtml(item.owner_note || '')}" placeholder="Research note"></td></tr>
+                        </tbody></table>
+                    </div>
+                    <div class="actions">
+                        <select data-gap-field="status">${statuses.map((status) => `<option value="${status}" ${item.status === status ? 'selected' : ''}>${status}</option>`).join('')}</select>
+                        <button type="button" class="btn-primary" data-action="save-search-gap">保存</button>
+                        <span class="meta">${gate.ok ? '✅ Rule-ready gate passed' : `Missing: ${escapeHtml((gate.missing || []).join(', '))}`}</span>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderUnmetSearchWorkbench(data = {}) {
+            const summary = data.summary || {};
+            const top = Array.isArray(data.top_10) ? data.top_10 : [];
+            return `
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${summary.total || 0}</strong><span>Total gaps</span></div>
+                    <div class="summary-card"><strong>${summary.research_pending || 0}</strong><span>Research pending</span></div>
+                    <div class="summary-card"><strong>${summary.source_research || 0}</strong><span>Source research</span></div>
+                    <div class="summary-card"><strong>${summary.gate_ready || 0}</strong><span>Gate ready</span></div>
+                    <div class="summary-card"><strong>${summary.published || 0}</strong><span>Published</span></div>
+                </div>
+                <p class="meta">Generated: ${escapeHtml(formatDateTime(data.generated_at))} · Only real captured searches are shown.</p>
+                ${top.length ? top.map(renderUnmetSearchItem).join('') : '<div class="empty">尚无真实搜索缺口。每周任务运行后会在这里显示 Top 10；不会生成模拟用户数据。</div>'}
+            `;
+        }
+
+        async function loadUnmetSearches() {
+            if (!unmetSearchStatus) return;
+            unmetSearchStatus.innerHTML = '<p class="meta">正在加载真实搜索缺口…</p>';
+            try {
+                const data = await apiFetch('/api/review/unmet-searches');
+                unmetSearchStatus.innerHTML = renderUnmetSearchWorkbench(data);
+            } catch (err) {
+                unmetSearchStatus.innerHTML = `<div class="empty">搜索缺口加载失败：${escapeHtml(err.message)}</div>`;
+            }
+        }
+
+        async function saveUnmetSearchItem(article) {
+            const id = article.dataset.gapId;
+            const patch = {};
+            article.querySelectorAll('[data-gap-field]').forEach((input) => {
+                const field = input.dataset.gapField;
+                patch[field] = field === 'status' || field === 'owner_note'
+                    ? input.value
+                    : input.value.split(',').map((value) => value.trim()).filter(Boolean);
+            });
+            await apiFetch('/api/review/unmet-searches', {
+                method: 'POST',
+                body: JSON.stringify({ id, patch })
+            });
+            await loadUnmetSearches();
         }
 
         async function fetchStaticJson(path) {
@@ -2219,6 +2330,7 @@
                 const automationLaunchStatus = data.automation_launch_status || {};
                 dutyRateStatus.innerHTML = `
                     ${renderAutomationLaunchStatus(automationLaunchStatus, chinaCustomsStatus, nationalTradeFlowStatus)}
+                    ${renderExactTariffFeeds(data.exact_tariff_feeds || {})}
                     ${renderDutyBusinessSummary(businessSummary)}
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">
@@ -2346,6 +2458,7 @@
             reviewPanel.classList.remove('hidden');
             loadCrawlSummary();
             loadDutyRateStatus();
+            loadUnmetSearches();
             loadQualityStatus();
             loadCoverageMatrixView();
             if (!skipInitialLoad) {
@@ -2469,12 +2582,26 @@
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
         document.getElementById('btn-refresh-duty-rates').addEventListener('click', loadDutyRateStatus);
+        document.getElementById('btn-refresh-unmet-searches').addEventListener('click', loadUnmetSearches);
         document.getElementById('btn-refresh-quality').addEventListener('click', loadQualityStatus);
         document.getElementById('btn-refresh-coverage').addEventListener('click', loadCoverageMatrixView);
         document.getElementById('btn-save-coverage').addEventListener('click', saveCoverageMatrix);
         document.getElementById('btn-test-crawl').addEventListener('click', runTestCrawl);
         document.getElementById('btn-publish-sync').addEventListener('click', publishSync);
         document.getElementById('btn-logout').addEventListener('click', showLogin);
+        unmetSearchStatus.addEventListener('click', async (event) => {
+            const button = event.target.closest('[data-action="save-search-gap"]');
+            if (!button) return;
+            button.disabled = true;
+            try {
+                await saveUnmetSearchItem(button.closest('.unmet-search-item'));
+                statusBar.textContent = '搜索缺口已保存；满足全部门禁后才可进入 rule-ready。';
+            } catch (err) {
+                alert(`保存失败：${err.message}`);
+            } finally {
+                button.disabled = false;
+            }
+        });
 
         if (getCurrentAdminOrigin()) {
             apiBaseInput.value = getCurrentAdminOrigin();
@@ -2493,6 +2620,7 @@
                 statusBar.textContent = `Connected · build ${health.build || 'unknown'} · engine ${health.engine || '—'}`;
                 showReview(true);
                 await loadPending();
+                await Promise.all([loadDutyRateStatus(), loadUnmetSearches(), loadQualityStatus()]);
             } catch (err) {
                 setToken('');
                 showLogin();

@@ -5,7 +5,9 @@ const path = require('node:path');
 
 const {
     buildDutyRateStatusPayload,
-    buildQualityStatusPayload
+    buildExactTariffFeedStatus,
+    buildQualityStatusPayload,
+    buildUnmetSearchBacklogPayload
 } = require('../scripts/admin-server');
 
 test('admin page includes duty-rate automation health queue', () => {
@@ -18,6 +20,35 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Fix:/);
     assert.match(html, /Priority:/);
     assert.match(html, /<strong>Run:<\/strong>/);
+    assert.match(html, /Official exact tariff feeds/);
+    assert.match(html, /Unmet Search Workbench/);
+    assert.match(html, /Only real captured searches are shown/);
+});
+
+test('admin exact tariff feed status covers the four P1 connector groups without exposing URLs', () => {
+    const payload = buildExactTariffFeedStatus({
+        rules: [],
+        last_exact_national_tariff_sync: {
+            checked_at: '2026-07-25T00:00:00.000Z',
+            ok: true,
+            results: [{ country: 'EU', ok: true, row_count: 12, changed_rules: ['rule-1'] }]
+        }
+    });
+
+    assert.deepEqual(payload.markets.map((row) => row.country), ['EU', 'CN', 'SG', 'MX']);
+    assert.deepEqual(payload.markets[0].target_markets, ['EU', 'DE', 'NL']);
+    assert.equal(payload.markets[0].status, 'current');
+    assert.equal(payload.markets[0].row_count, 12);
+    assert.equal(payload.markets[0].changed_rule_count, 1);
+    assert.ok(payload.markets.every((row) => !Object.hasOwn(row, 'url')));
+});
+
+test('admin unmet-search payload has an honest empty Top 10 state', () => {
+    const payload = buildUnmetSearchBacklogPayload();
+
+    assert.equal(payload.summary.total, payload.items.length);
+    assert.deepEqual(payload.top_10, payload.items.slice(0, 10));
+    assert.ok(payload.top_10.length <= 10);
 });
 
 test('admin duty-rate payload exposes source roadmap status', () => {

@@ -38,7 +38,7 @@ const { loadLocalEnvFiles } = require('../lib/load-local-env');
 let envFiles = loadLocalEnvFiles(ROOT);
 
 const PORT = Number(process.env.ADMIN_REVIEW_PORT || 8787);
-const ADMIN_BUILD_ID = '20260603-global-compliance-crawler-v1';
+const ADMIN_BUILD_ID = '20260725-admin-data-workbench-v1';
 const LOG_PREFIX = '[GLOBAL-CRAWL]';
 const COVERAGE_MATRIX_PATH = path.join(ROOT, 'data', 'coverage-matrix.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
@@ -46,6 +46,7 @@ const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json')
 const DUTY_RATE_SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const AUTOMATION_LAUNCH_STATUS_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
 const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
+const UNMET_SEARCH_BACKLOG_PATH = path.join(ROOT, 'data', 'unmet-search-backlog.json');
 const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
@@ -282,7 +283,46 @@ function buildDutyRateStatusPayload() {
         },
         duty_rate_sync_status: syncStatus,
         automation_launch_status: automationLaunchStatus,
-        sources: Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : []
+        sources: Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : [],
+        exact_tariff_feeds: buildExactTariffFeedStatus(dutyPayload)
+    };
+}
+
+function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, { rules: [] })) {
+    const feedEnv = {
+        EU: 'EU_TARIC_EXACT_LINES_URL',
+        CN: 'CN_CUSTOMS_EXACT_TARIFF_URL',
+        SG: 'SG_AHTN_EXACT_TARIFF_URL',
+        MX: 'MX_TIGIE_NICO_EXACT_TARIFF_URL'
+    };
+    const sync = dutyPayload.last_exact_national_tariff_sync || {};
+    const results = new Map((sync.results || []).map((row) => [row.country, row]));
+    return {
+        checked_at: sync.checked_at || dutyPayload.last_exact_national_tariff_sync_at || null,
+        ok: sync.ok ?? null,
+        markets: Object.entries(feedEnv).map(([country, envName]) => {
+            const result = results.get(country) || {};
+            const targetMarkets = country === 'EU' ? ['EU', 'DE', 'NL'] : [country];
+            const officialExactRows = (dutyPayload.rules || [])
+                .filter((rule) => targetMarkets.includes(rule.import_country))
+                .flatMap((rule) => rule.exact_code_overrides || [])
+                .filter((row) => String(row.confidence || '').toLowerCase().includes('official exact tariff line'));
+            return {
+                country,
+                target_markets: targetMarkets,
+                env_name: envName,
+                configured: Boolean(String(process.env[envName] || '').trim()),
+                status: result.ok === false ? 'failed'
+                    : result.skipped ? 'not_configured'
+                        : result.ok ? 'current'
+                            : 'not_run',
+                row_count: result.row_count || officialExactRows.length,
+                changed_rule_count: (result.changed_rules || []).length,
+                changed_rules: result.changed_rules || [],
+                error: result.error || '',
+                last_checked_at: sync.checked_at || null
+            };
+        })
     };
 }
 
@@ -297,6 +337,41 @@ function buildQualityStatusPayload() {
 
 async function handleQualityStatus(req, res) {
     sendJson(res, 200, buildQualityStatusPayload());
+}
+
+function buildUnmetSearchBacklogPayload() {
+    const { enrichBacklog } = require('../lib/unmet-search-admin');
+    return enrichBacklog(readJsonFile(UNMET_SEARCH_BACKLOG_PATH, {
+        schema_version: '1.0',
+        generated_at: null,
+        items: []
+    }));
+}
+
+async function handleUnmetSearchBacklog(req, res) {
+    const {
+        updateBacklogItem,
+        writeBacklogAtomic
+    } = require('../lib/unmet-search-admin');
+    if (req.method === 'GET') {
+        sendJson(res, 200, buildUnmetSearchBacklogPayload());
+        return;
+    }
+    if (req.method !== 'POST') {
+        sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+        return;
+    }
+    try {
+        const body = await readBody(req);
+        const id = String(body.id || '').trim();
+        if (!id) throw new Error('id is required');
+        const current = readJsonFile(UNMET_SEARCH_BACKLOG_PATH, { schema_version: '1.0', items: [] });
+        const updated = updateBacklogItem(current, id, body.patch || {});
+        writeBacklogAtomic(UNMET_SEARCH_BACKLOG_PATH, updated);
+        sendJson(res, 200, { ok: true, item: updated.items.find((item) => item.id === id), payload: updated });
+    } catch (error) {
+        sendJson(res, 400, { ok: false, error: error.message });
+    }
 }
 
 function getAllowedCoverageCodes() {
@@ -478,6 +553,11 @@ async function handleApi(req, res) {
             return;
         }
 
+        if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/api/review/unmet-searches') {
+            await handleUnmetSearchBacklog(req, res);
+            return;
+        }
+
         if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/api/review/coverage-matrix') {
             await handleCoverageMatrix(req, res);
             return;
@@ -561,7 +641,9 @@ if (require.main === module) {
 
 module.exports = {
     buildDutyRateStatusPayload,
+    buildExactTariffFeedStatus,
     buildQualityStatusPayload,
+    buildUnmetSearchBacklogPayload,
     createAdminServer,
     startAdminServer
 };
