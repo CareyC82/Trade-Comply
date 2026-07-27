@@ -61,6 +61,7 @@ const {
     KR_EXACT_CODE_CANDIDATES,
     KR_TARIFF_DB_URL,
     KR_TARIFF_LOOKUP_URL,
+    KR_UNIPASS_TARIFF_URL,
     parseKoreaAdValoremRate,
     parseKoreaOfficialJsonRows,
     parseKoreaTariffRateRows,
@@ -73,6 +74,7 @@ const {
     STATIC_EXACT_CODE_CANDIDATES,
     applyStaticBenchmarkToRule,
     applyIndiaOfficialCandidateToRule,
+    buildOfficialArtifactEvidence,
     buildOfficialCandidateForRule,
     buildIndiaOfficialCandidateForRule,
     fetchIndiaOfficialRows,
@@ -80,6 +82,7 @@ const {
     getOfficialProbeUrls,
     parseGenericTariffRows,
     parseIndiaTariffRows,
+    parseIndiaOfficialJsonRows,
     parseMalaysiaTariffRows,
     parseTaiwanTariffRows,
     parseVietnamTariffRows,
@@ -731,6 +734,25 @@ test('Korea official lookup HTML rows are parsed into guarded candidates', async
     assert.equal(official.rows.length, 1);
     assert.equal(official.rows[0].hs_code, '9027500000');
     assert.equal(official.query_attempts[0].row_count, 1);
+});
+
+test('Korea official fetch falls back from KCS to UNI-PASS and records source attempts', async () => {
+    const official = await fetchKoreaOfficialRows({
+        sourceUrls: [KR_TARIFF_DB_URL, KR_UNIPASS_TARIFF_URL],
+        queryHsCodes: [],
+        fetcher: async (url) => {
+            if (url === KR_TARIFF_DB_URL) throw new Error('KCS transport blocked');
+            return {
+                status_code: 200,
+                body: '<table><tr><td>8517620000</td><td>Data transmission apparatus</td><td>0%</td></tr></table>'
+            };
+        }
+    });
+    assert.equal(official.ok, true);
+    assert.equal(official.official_url, KR_UNIPASS_TARIFF_URL);
+    assert.equal(official.row_count, 1);
+    assert.equal(official.source_attempts.length, 2);
+    assert.match(official.source_attempts[0].error, /blocked/);
 });
 
 test('exact candidate updaters scope overrides to each rule product family', () => {
@@ -1503,6 +1525,23 @@ test('India official live probe can parse tariff rows from injected official sou
     assert.equal(readiness.official_probe.parsed_rate_rows, 1);
 });
 
+test('India CIP JSON parser splits HSN BCD SWS and IGST layers', () => {
+    const rows = parseIndiaOfficialJsonRows({
+        data: [{
+            hsnCode: '85423100',
+            description: 'Processors and controllers',
+            bcdRate: '0%',
+            swsRate: '10%',
+            igstRate: '18%'
+        }]
+    });
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].hs_code, '85423100');
+    assert.equal(rows[0].bcd_rate, 0);
+    assert.equal(rows[0].sws_rate, 0.1);
+    assert.equal(rows[0].igst_rate, 0.18);
+});
+
 test('India official probe tries candidate sources before falling back to maintained exact map', async () => {
     const source = {
         official_url: 'https://example.invalid/primary',
@@ -1631,4 +1670,25 @@ test('ASEAN and Taiwan official candidates promote only unambiguous prefix rates
     ], 'MY');
     assert.equal(mixed.ok, false);
     assert.equal(mixed.source_status, 'scope_check_required');
+});
+
+test('official tariff artifact evidence hashes complete source bodies and blocks partial promotion', () => {
+    const complete = buildOfficialArtifactEvidence({
+        country: 'MY',
+        url: 'https://ezhs.customs.gov.my/',
+        body: '8517620000,0%',
+        statusCode: 200,
+        retrievedAt: '2026-07-27T00:00:00.000Z'
+    });
+    const partial = buildOfficialArtifactEvidence({
+        country: 'MY',
+        url: 'https://ezhs.customs.gov.my/',
+        body: '8517620000,0%',
+        statusCode: 206,
+        partial: true,
+        retrievedAt: '2026-07-27T00:00:00.000Z'
+    });
+    assert.equal(complete.sha256.length, 64);
+    assert.equal(complete.filing_grade_eligible, true);
+    assert.equal(partial.filing_grade_eligible, false);
 });

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-27T06:41:13.300Z",
+  "updated_at": "2026-07-27T09:14:11.210Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -29,8 +29,7 @@
     },
     "duty_rate_automation_stages": {
       "official_machine_sync": 8,
-      "official_probe_candidate": 2,
-      "maintained_exact_map": 3,
+      "official_probe_candidate": 5,
       "official_link_monitor": 1
     },
     "duty_rate_launch_levels": {
@@ -46,13 +45,12 @@
       ],
       "hybrid_official": [
         "IN",
-        "KR"
-      ],
-      "maintained_benchmark": [
+        "KR",
         "MY",
         "TW",
         "VN"
       ],
+      "maintained_benchmark": [],
       "monitor_only": [
         "RU"
       ],
@@ -102,8 +100,8 @@
     "weekly_route_priority_count": 5
   },
   "duty_rate_health_board": {
-    "headline": "8 official exact market(s), 2 hybrid official market(s), 3 maintained exact-map market(s).",
-    "next_action": "Next route parser priority: IN Tablet computer (847130).",
+    "headline": "8 official exact market(s), 5 hybrid official market(s), 0 maintained exact-map market(s).",
+    "next_action": "Next route parser priority: MY Tablet computer (847130).",
     "cards": [
       {
         "key": "official_exact",
@@ -124,22 +122,21 @@
       {
         "key": "hybrid_official",
         "label": "Hybrid official",
-        "count": 2,
+        "count": 5,
         "countries": [
           "IN",
-          "KR"
+          "KR",
+          "MY",
+          "TW",
+          "VN"
         ],
         "note": "Official-linked coverage is live, but exact tariff-line parser gates stay visible."
       },
       {
         "key": "maintained_exact_map",
         "label": "Maintained exact-map",
-        "count": 3,
-        "countries": [
-          "MY",
-          "TW",
-          "VN"
-        ],
+        "count": 0,
+        "countries": [],
         "note": "Exact candidates are maintained from source roadmap until official parsers are promoted."
       },
       {
@@ -1068,7 +1065,8 @@
       "probe_command": "npm run probe:duty-rates:in",
       "official_url": "https://www.icegate.gov.in/",
       "official_probe_urls": [
-        "https://www.icegate.gov.in/"
+        "https://www.icegate.gov.in/",
+        "https://foservices.icegate.gov.in/cip/cip#/"
       ],
       "source_use_cases": [
         "India import duty, SWS, and IGST pre-check",
@@ -1108,7 +1106,10 @@
       "update_command": "npm run update:duty-rates:kr:official",
       "probe_command": "npm run probe:duty-rates:kr",
       "official_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
-      "official_probe_urls": [],
+      "official_probe_urls": [
+        "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
+        "https://tunipass.customs.go.kr/clip/hsinfosrch/openULS0201002Q.do"
+      ],
       "source_use_cases": [
         "Korea import duty and VAT pre-check",
         "semiconductor and electronics route pricing",
@@ -1142,12 +1143,13 @@
       "country": "MY",
       "name": "Malaysia Customs SST / duty",
       "source_status": "hybrid_official_candidate",
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "npm run update:duty-rates:static -- --countries=MY",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY --official-live",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
-      "official_url": "https://mysst.customs.gov.my/",
+      "official_url": "https://ezhs.customs.gov.my/",
       "official_probe_urls": [
+        "https://ezhs.customs.gov.my/",
         "https://mysst.customs.gov.my/",
         "https://tariff.customs.gov.my/"
       ],
@@ -1169,11 +1171,11 @@
       "transit_route_priority": true,
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
       "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed.",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
       "parser_gap": true,
-      "next_upgrade": "Connect a machine-readable MY tariff parser or official API.",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -1184,12 +1186,16 @@
       "country": "TW",
       "name": "Taiwan Customs tariff / business tax",
       "source_status": "hybrid_official_candidate",
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "npm run update:duty-rates:static -- --countries=TW",
-      "probe_command": "",
-      "official_url": "https://web.customs.gov.tw/",
-      "official_probe_urls": [],
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=TW --official-live",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=TW --probe-live",
+      "official_url": "https://portal.sw.nat.gov.tw/APGQ/GC453?request_locale=zh_TW",
+      "official_probe_urls": [
+        "https://portal.sw.nat.gov.tw/APGQ/GC453?request_locale=zh_TW",
+        "https://portal.sw.nat.gov.tw/APGQ/GC413?PPLTitle=true&request_locale=zh_TW",
+        "https://portal.sw.nat.gov.tw/APGQO/GC411"
+      ],
       "source_use_cases": [
         "Taiwan import duty and business-tax pre-check",
         "electronics component route pricing",
@@ -1208,11 +1214,11 @@
       "transit_route_priority": false,
       "current_scope": "Maintained Taiwan exact-line base-duty candidates plus 5% business-tax and product-scope review reminders.",
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed.",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
       "parser_gap": true,
-      "next_upgrade": "Connect a machine-readable TW tariff parser or official API.",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -1223,9 +1229,9 @@
       "country": "VN",
       "name": "Vietnam Customs tariff / VAT",
       "source_status": "hybrid_official_candidate",
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "npm run update:duty-rates:static -- --countries=VN",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=VN --official-live",
       "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
       "official_url": "https://www.customs.gov.vn/",
       "official_probe_urls": [
@@ -1250,11 +1256,11 @@
       "transit_route_priority": true,
       "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed.",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
       "parser_gap": true,
-      "next_upgrade": "Connect a machine-readable VN tariff parser or official API.",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -1311,7 +1317,8 @@
       "update_command": "npm run update:duty-rates:in:official",
       "probe_command": "npm run probe:duty-rates:in",
       "official_probe_urls": [
-        "https://www.icegate.gov.in/"
+        "https://www.icegate.gov.in/",
+        "https://foservices.icegate.gov.in/cip/cip#/"
       ],
       "source_use_cases": [
         "India import duty, SWS, and IGST pre-check",
@@ -1336,7 +1343,8 @@
         "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
         "probe_command": "npm run probe:duty-rates:in",
         "official_probe_urls": [
-          "https://www.icegate.gov.in/"
+          "https://www.icegate.gov.in/",
+          "https://foservices.icegate.gov.in/cip/cip#/"
         ],
         "source_use_cases": [
           "India import duty, SWS, and IGST pre-check",
@@ -1367,7 +1375,10 @@
       "public_claim": "Official-linked candidate coverage with parser caveat",
       "update_command": "npm run update:duty-rates:kr:official",
       "probe_command": "npm run probe:duty-rates:kr",
-      "official_probe_urls": [],
+      "official_probe_urls": [
+        "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
+        "https://tunipass.customs.go.kr/clip/hsinfosrch/openULS0201002Q.do"
+      ],
       "source_use_cases": [
         "Korea import duty and VAT pre-check",
         "semiconductor and electronics route pricing",
@@ -1390,7 +1401,10 @@
         "stage": "official_probe_candidate",
         "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
         "probe_command": "npm run probe:duty-rates:kr",
-        "official_probe_urls": [],
+        "official_probe_urls": [
+          "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
+          "https://tunipass.customs.go.kr/clip/hsinfosrch/openULS0201002Q.do"
+        ],
         "source_use_cases": [
           "Korea import duty and VAT pre-check",
           "semiconductor and electronics route pricing",
@@ -1415,12 +1429,13 @@
     {
       "country": "MY",
       "maintenance_priority": "P2",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:static -- --countries=MY",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY --official-live",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
+        "https://ezhs.customs.gov.my/",
         "https://mysst.customs.gov.my/",
         "https://tariff.customs.gov.my/"
       ],
@@ -1443,10 +1458,11 @@
       "parser_gap_task": {
         "country": "MY",
         "priority": "P2",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
         "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
         "official_probe_urls": [
+          "https://ezhs.customs.gov.my/",
           "https://mysst.customs.gov.my/",
           "https://tariff.customs.gov.my/"
         ],
@@ -1466,20 +1482,24 @@
           "SIRIM/MCMC/ST product-approval or origin-evidence changes"
         ],
         "transit_route_priority": true,
-        "next_action": "Connect a machine-readable MY tariff parser or official API."
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
       },
-      "next_upgrade": "Connect a machine-readable MY tariff parser or official API.",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
     },
     {
       "country": "TW",
       "maintenance_priority": "P2",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:static -- --countries=TW",
-      "probe_command": "",
-      "official_probe_urls": [],
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=TW --official-live",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=TW --probe-live",
+      "official_probe_urls": [
+        "https://portal.sw.nat.gov.tw/APGQ/GC453?request_locale=zh_TW",
+        "https://portal.sw.nat.gov.tw/APGQ/GC413?PPLTitle=true&request_locale=zh_TW",
+        "https://portal.sw.nat.gov.tw/APGQO/GC411"
+      ],
       "source_use_cases": [
         "Taiwan import duty and business-tax pre-check",
         "electronics component route pricing",
@@ -1499,10 +1519,14 @@
       "parser_gap_task": {
         "country": "TW",
         "priority": "P2",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
-        "probe_command": "",
-        "official_probe_urls": [],
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
+        "probe_command": "npm run probe:duty-rates:static -- --countries=TW --probe-live",
+        "official_probe_urls": [
+          "https://portal.sw.nat.gov.tw/APGQ/GC453?request_locale=zh_TW",
+          "https://portal.sw.nat.gov.tw/APGQ/GC413?PPLTitle=true&request_locale=zh_TW",
+          "https://portal.sw.nat.gov.tw/APGQO/GC411"
+        ],
         "source_use_cases": [
           "Taiwan import duty and business-tax pre-check",
           "electronics component route pricing",
@@ -1519,18 +1543,18 @@
           "BSMI/NCC product-scope or origin-preference updates"
         ],
         "transit_route_priority": false,
-        "next_action": "Connect a machine-readable TW tariff parser or official API."
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
       },
-      "next_upgrade": "Connect a machine-readable TW tariff parser or official API.",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed."
     },
     {
       "country": "VN",
       "maintenance_priority": "P2",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:static -- --countries=VN",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=VN --official-live",
       "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
       "official_probe_urls": [
         "https://www.customs.gov.vn/",
@@ -1555,8 +1579,8 @@
       "parser_gap_task": {
         "country": "VN",
         "priority": "P2",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
         "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
         "official_probe_urls": [
           "https://www.customs.gov.vn/",
@@ -1578,9 +1602,9 @@
           "ICT approval, energy-efficiency, battery safety, or origin evidence changes"
         ],
         "transit_route_priority": true,
-        "next_action": "Connect a machine-readable VN tariff parser or official API."
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
       },
-      "next_upgrade": "Connect a machine-readable VN tariff parser or official API.",
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
     },
     {
@@ -1640,10 +1664,10 @@
   "weekly_route_priorities": [
     {
       "rank": 1,
-      "id": "tablet-global-in",
-      "rank_score": 240,
-      "country": "IN",
-      "route": "* -> IN",
+      "id": "tablet-cn-my",
+      "rank_score": 232,
+      "country": "MY",
+      "route": "CN -> MY",
       "product_id": "tablet",
       "product_label": "Tablet computer",
       "hs_code": "847130",
@@ -1652,20 +1676,22 @@
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
-      "transit_route_priority": false,
-      "probe_command": "npm run probe:duty-rates:in",
+      "transit_route_priority": true,
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.icegate.gov.in/"
+        "https://ezhs.customs.gov.my/",
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
       ],
-      "why_priority": "IN Tablet computer is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "why_priority": "MY Tablet computer is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 2,
-      "id": "smartphone-global-in",
-      "rank_score": 241,
-      "country": "IN",
-      "route": "* -> IN",
+      "id": "smartphone-cn-my",
+      "rank_score": 233,
+      "country": "MY",
+      "route": "CN -> MY",
       "product_id": "smartphone",
       "product_label": "Smartphone / 5G cellular",
       "hs_code": "851713",
@@ -1674,20 +1700,22 @@
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
-      "transit_route_priority": false,
-      "probe_command": "npm run probe:duty-rates:in",
+      "transit_route_priority": true,
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.icegate.gov.in/"
+        "https://ezhs.customs.gov.my/",
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
       ],
-      "why_priority": "IN Smartphone / 5G cellular is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "why_priority": "MY Smartphone / 5G cellular is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 3,
-      "id": "router-global-in",
-      "rank_score": 242,
-      "country": "IN",
-      "route": "* -> IN",
+      "id": "router-global-my",
+      "rank_score": 234,
+      "country": "MY",
+      "route": "* -> MY",
       "product_id": "router",
       "product_label": "Wireless router / network equipment",
       "hs_code": "851762",
@@ -1696,20 +1724,22 @@
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
-      "transit_route_priority": false,
-      "probe_command": "npm run probe:duty-rates:in",
+      "transit_route_priority": true,
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.icegate.gov.in/"
+        "https://ezhs.customs.gov.my/",
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
       ],
-      "why_priority": "IN Wireless router / network equipment is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "why_priority": "MY Wireless router / network equipment is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 4,
-      "id": "ev-charger-global-in",
-      "rank_score": 243,
-      "country": "IN",
-      "route": "* -> IN",
+      "id": "ev-charger-global-my",
+      "rank_score": 235,
+      "country": "MY",
+      "route": "* -> MY",
       "product_id": "ev_charger",
       "product_label": "EV charger / power converter",
       "hs_code": "850440",
@@ -1718,20 +1748,22 @@
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
-      "transit_route_priority": false,
-      "probe_command": "npm run probe:duty-rates:in",
+      "transit_route_priority": true,
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.icegate.gov.in/"
+        "https://ezhs.customs.gov.my/",
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
       ],
-      "why_priority": "IN EV charger / power converter is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "why_priority": "MY EV charger / power converter is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 5,
-      "id": "battery-global-in",
-      "rank_score": 244,
-      "country": "IN",
-      "route": "* -> IN",
+      "id": "battery-global-my",
+      "rank_score": 236,
+      "country": "MY",
+      "route": "* -> MY",
       "product_id": "battery",
       "product_label": "Lithium battery / ESS",
       "hs_code": "850760",
@@ -1740,12 +1772,14 @@
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
-      "transit_route_priority": false,
-      "probe_command": "npm run probe:duty-rates:in",
+      "transit_route_priority": true,
+      "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.icegate.gov.in/"
+        "https://ezhs.customs.gov.my/",
+        "https://mysst.customs.gov.my/",
+        "https://tariff.customs.gov.my/"
       ],
-      "why_priority": "IN Lithium battery / ESS is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "why_priority": "MY Lithium battery / ESS is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     }
   ]

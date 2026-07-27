@@ -5,6 +5,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { execFile } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
@@ -231,6 +232,27 @@ function parsePercent(value = '') {
     return match ? Number(match[1]) / 100 : null;
 }
 
+function buildOfficialArtifactEvidence({
+    country = '',
+    url = '',
+    body = '',
+    statusCode = null,
+    partial = false,
+    retrievedAt = new Date().toISOString()
+} = {}) {
+    const buffer = Buffer.from(String(body || ''), 'utf8');
+    return {
+        country: String(country || '').toUpperCase(),
+        source_url: url,
+        retrieved_at: retrievedAt,
+        status_code: statusCode,
+        byte_length: buffer.length,
+        sha256: crypto.createHash('sha256').update(buffer).digest('hex'),
+        partial: Boolean(partial),
+        filing_grade_eligible: !partial && statusCode >= 200 && statusCode < 300 && buffer.length > 0
+    };
+}
+
 function parseIndiaTariffRows(html = '') {
     const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
     const tableRows = rowMatches.map((rowHtml) => {
@@ -285,6 +307,54 @@ function parseIndiaTariffRows(html = '') {
             };
         })
         .filter(Boolean);
+}
+
+function parseIndiaOfficialJsonRows(value = '') {
+    let payload;
+    try {
+        payload = typeof value === 'string' ? JSON.parse(value) : value;
+    } catch (_error) {
+        return [];
+    }
+    const candidateArrays = [
+        payload,
+        payload?.data,
+        payload?.response,
+        payload?.result,
+        payload?.items,
+        payload?.list,
+        payload?.data?.items,
+        payload?.response?.items,
+        payload?.result?.items
+    ].filter(Array.isArray);
+    const sourceRows = candidateArrays.find(rows => rows.length) || [];
+    return sourceRows.map((row) => {
+        const hsCode = String(
+            row.hsn
+            || row.hsnCode
+            || row.hsCode
+            || row.cth
+            || row.tariffItem
+            || row.tariff_item
+            || ''
+        ).replace(/\D/g, '');
+        const bcdText = String(row.bcd || row.bcdRate || row.basicCustomsDuty || row.basic_duty || '');
+        const swsText = String(row.sws || row.swsRate || row.socialWelfareSurcharge || '');
+        const igstText = String(row.igst || row.igstRate || row.integratedTax || '');
+        const bcdRate = parsePercent(bcdText);
+        if (!/^\d{6,10}$/.test(hsCode) || bcdRate === null) return null;
+        return {
+            hs_code: hsCode,
+            hs_prefix: hsCode.slice(0, 6),
+            item_name: String(row.description || row.goodsDescription || row.itemName || ''),
+            bcd_rate_text: bcdText,
+            sws_rate_text: swsText,
+            igst_rate_text: igstText,
+            bcd_rate: bcdRate,
+            sws_rate: parsePercent(swsText),
+            igst_rate: parsePercent(igstText)
+        };
+    }).filter(Boolean);
 }
 
 function normalizeGenericRateText(value = '') {
@@ -576,7 +646,15 @@ async function fetchIndiaOfficialRows({
     for (const url of urls) {
         try {
             const response = await fetcher(url, { timeoutMs: INDIA_REQUEST_TIMEOUT_MS });
-            const rows = parseIndiaTariffRows(response.body || '');
+            const rows = [
+                ...parseIndiaOfficialJsonRows(response.body || ''),
+                ...parseIndiaTariffRows(response.body || '')
+            ].filter((row, index, allRows) => index === allRows.findIndex(candidate => (
+                candidate.hs_code === row.hs_code
+                && candidate.bcd_rate === row.bcd_rate
+                && candidate.sws_rate === row.sws_rate
+                && candidate.igst_rate === row.igst_rate
+            )));
             const acceptableStatus = response.status_code >= 200 && response.status_code < 400;
             const attempt = {
                 ok: acceptableStatus && rows.length > 0,
@@ -654,13 +732,21 @@ async function fetchCountryOfficialRows({
             const rows = parseOfficialTariffRows(code, response.body || '');
             const safeRows = rows.filter(row => row.exact_rate_safe);
             const acceptableStatus = response.status_code >= 200 && response.status_code < 400;
+            const artifact = buildOfficialArtifactEvidence({
+                country: code,
+                url,
+                body: response.body || '',
+                statusCode: response.status_code,
+                partial: response.partial
+            });
             const attempt = {
-                ok: acceptableStatus && safeRows.length > 0,
+                ok: acceptableStatus && artifact.filing_grade_eligible && safeRows.length > 0,
                 status_code: response.status_code,
                 official_url: url,
                 rows: safeRows,
                 row_count: safeRows.length,
                 parsed_row_count: rows.length,
+                artifact,
                 partial: Boolean(response.partial),
                 error: response.error || ''
             };
@@ -669,6 +755,7 @@ async function fetchCountryOfficialRows({
                 status_code: response.status_code,
                 row_count: safeRows.length,
                 parsed_row_count: rows.length,
+                artifact,
                 partial: Boolean(response.partial),
                 error: response.error || ''
             });
@@ -1285,7 +1372,8 @@ async function updateCountriesFromOfficialSources({ countries, dryRun = false, f
         parsed_row_count: official.parsed_row_count,
         partial: official.partial,
         error: official.error || '',
-        attempts: official.attempts || []
+        attempts: official.attempts || [],
+        artifact: official.artifact || null
     }]));
     result.writes_official_machine_rates = Object.keys(officialTariffRows).length > 0;
     result.official_fetch_degraded_countries = targetCountries.filter(country => !officialTariffRows[country]);
@@ -1392,6 +1480,7 @@ module.exports = {
     buildOfficialCandidateForRule,
     buildOfficialRateCandidate,
     buildIndiaOfficialCandidateForRule,
+    buildOfficialArtifactEvidence,
     buildIndiaOfficialRateCandidate,
     fetchIndiaOfficialRows,
     fetchCountryOfficialRows,
@@ -1402,6 +1491,7 @@ module.exports = {
     getMaintainedPrefixes,
     parseGenericTariffRows,
     parseIndiaTariffRows,
+    parseIndiaOfficialJsonRows,
     parseMalaysiaTariffRows,
     parseOfficialTariffRows,
     parseTaiwanTariffRows,

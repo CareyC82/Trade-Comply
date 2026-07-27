@@ -23,15 +23,13 @@ jobs:
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID || secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
           OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET || secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
-        run: |
-          missing=()
-          if [ -z "$OSS_BUCKET" ]; then missing+=("OSS_BUCKET"); fi
-          if [ -z "$OSS_ACCESS_KEY_ID" ]; then missing+=("OSS_ACCESS_KEY_ID or ALIBABA_CLOUD_ACCESS_KEY_ID"); fi
-          if [ -z "$OSS_ACCESS_KEY_SECRET" ]; then missing+=("OSS_ACCESS_KEY_SECRET or ALIBABA_CLOUD_ACCESS_KEY_SECRET"); fi
-          if [ "${#missing[@]}" -gt 0 ]; then
-            echo "::error title=OSS feedback storage is not configured::Missing GitHub secrets: ${missing[*]}"
-            exit 1
-          fi
+        run: npm run check:unmet-search:production
+      - name: Upload production readiness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unmet-search-production-readiness
+          path: reports/unmet-search-production-readiness.json
       - name: Build seven-day search gap summary
         env:
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}

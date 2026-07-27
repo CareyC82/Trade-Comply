@@ -205,6 +205,10 @@
       "authority": "Korea Customs Service",
       "official_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
       "official_lookup_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffView.do",
+      "official_probe_urls": [
+        "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
+        "https://tunipass.customs.go.kr/clip/hsinfosrch/openULS0201002Q.do"
+      ],
       "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
@@ -305,12 +309,12 @@
         "https://www.customs.gov.vn/",
         "https://www.customs.gov.vn/index.jsp?pageId=2281"
       ],
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
       "status_reason": "Vietnam maintained high-tech HS lines use exact-line base-duty candidates while the updater probes official Vietnam Customs pages for parser readiness; VAT and preferential-origin scope remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
-      "update_command": "npm run update:duty-rates:static -- --countries=VN",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=VN --official-live",
       "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Vietnam exact-line base-duty candidates plus VAT/preferential-origin review for electronics.",
@@ -330,6 +334,7 @@
         "ICT approval, energy-efficiency, battery safety, or origin evidence changes"
       ],
       "transit_route_priority": true,
+      "artifact_evidence_required": true,
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
     },
     {
@@ -342,12 +347,12 @@
         "https://mysst.customs.gov.my/",
         "https://tariff.customs.gov.my/"
       ],
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
       "status_reason": "Malaysia maintained high-tech HS lines use exact-line duty candidates while the updater probes Royal Malaysian Customs/SST pages for parser readiness; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
-      "update_command": "npm run update:duty-rates:static -- --countries=MY",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY --official-live",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
@@ -367,6 +372,7 @@
         "SIRIM/MCMC/ST product-approval or origin-evidence changes"
       ],
       "transit_route_priority": true,
+      "artifact_evidence_required": true,
       "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
     },
     {
@@ -379,12 +385,13 @@
         "https://portal.sw.nat.gov.tw/APGQ/GC413?PPLTitle=true&request_locale=zh_TW",
         "https://portal.sw.nat.gov.tw/APGQO/GC411"
       ],
-      "machine_readable": "local_exact_map",
+      "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
       "status_reason": "Taiwan maintained high-tech HS lines use exact-line duty candidates while business tax, inspection, telecom approval, and tariff-line scope remain separate checks.",
       "updater_script": "scripts/update-static-duty-rates.js",
-      "update_command": "npm run update:duty-rates:static -- --countries=TW",
+      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=TW --official-live",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=TW --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Taiwan exact-line base-duty candidates plus 5% business-tax and product-scope review reminders.",
       "source_use_cases": [
@@ -402,6 +409,7 @@
         "Business tax or import tax treatment changes",
         "BSMI/NCC product-scope or origin-preference updates"
       ],
+      "artifact_evidence_required": true,
       "next_action": "Replace local exact map with machine-readable Taiwan Customs tariff parser when available; keep business tax and product inspection checks refreshed."
     },
     {

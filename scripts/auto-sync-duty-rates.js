@@ -18,6 +18,7 @@ const { updateKoreaRules, updateKoreaRulesFromOfficialSource } = require('./upda
 const {
     DEFAULT_COUNTRIES: STATIC_BENCHMARK_COUNTRIES,
     updateIndiaRulesFromOfficialSource,
+    updateCountriesFromOfficialSources,
     probeStaticBenchmarkReadinessLive,
     updateStaticBenchmarkRules
 } = require('./update-static-duty-rates');
@@ -28,7 +29,8 @@ const ROOT = path.join(__dirname, '..');
 const SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const MATERIAL_RATE_CHANGE_THRESHOLD = 0.03;
-const STATIC_OFFICIAL_LIVE_PROBE_COUNTRIES = ['CN', 'VN', 'MY'];
+const STATIC_OFFICIAL_LIVE_PROBE_COUNTRIES = ['CN', 'VN', 'MY', 'TW'];
+const STATIC_OFFICIAL_UPDATE_COUNTRIES = ['VN', 'MY', 'TW'];
 
 function writeJson(filePath, payload) {
     fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`);
@@ -881,14 +883,60 @@ async function runAutoDutyRateSync({
     }));
 
     const staticCountries = STATIC_BENCHMARK_COUNTRIES.filter(country => country !== 'IN');
-    const staticResult = updateStaticBenchmarkRules({
-        countries: staticCountries,
+    const officialStaticCountries = staticCountries.filter(country => STATIC_OFFICIAL_UPDATE_COUNTRIES.includes(country));
+    const benchmarkStaticCountries = staticCountries.filter(country => !STATIC_OFFICIAL_UPDATE_COUNTRIES.includes(country));
+    const officialStaticResult = await updateCountriesFromOfficialSources({
+        countries: officialStaticCountries,
+        dryRun,
+        ...(staticOfficialFetcher ? { fetcher: staticOfficialFetcher } : {})
+    });
+    const benchmarkStaticResult = updateStaticBenchmarkRules({
+        countries: benchmarkStaticCountries,
         dryRun
     });
+    const staticResult = {
+        ok: officialStaticResult.ok !== false && benchmarkStaticResult.ok !== false,
+        dry_run: dryRun,
+        countries: staticCountries,
+        writes_official_machine_rates: Boolean(officialStaticResult.writes_official_machine_rates),
+        changes: [
+            ...(officialStaticResult.changes || []),
+            ...(benchmarkStaticResult.changes || [])
+        ],
+        errors: [
+            ...(officialStaticResult.errors || []),
+            ...(benchmarkStaticResult.errors || [])
+        ],
+        readiness: {
+            ...(officialStaticResult.readiness || {}),
+            ...(benchmarkStaticResult.readiness || {})
+        },
+        official_fetches: officialStaticResult.official_fetches || {},
+        official_fetch_degraded_countries: officialStaticResult.official_fetch_degraded_countries || []
+    };
     const staticProbeCountries = staticCountries.filter(country => STATIC_OFFICIAL_LIVE_PROBE_COUNTRIES.includes(country));
     const staticOfficialProbes = {};
     if (!skipStaticOfficialProbe) {
         await Promise.all(staticProbeCountries.map(async (country) => {
+            const fetched = staticResult.official_fetches?.[country];
+            if (fetched) {
+                staticOfficialProbes[country] = {
+                    checked: true,
+                    ok: fetched.ok,
+                    official_url: fetched.official_url || '',
+                    parsed_rate_rows: Number(fetched.parsed_row_count || fetched.row_count || 0),
+                    safe_rate_rows: Number(fetched.row_count || 0),
+                    weak_rate_rows: Math.max(0, Number(fetched.parsed_row_count || 0) - Number(fetched.row_count || 0)),
+                    exact_rate_safe: Boolean(fetched.ok && fetched.row_count),
+                    machine_parser_ready: Boolean(fetched.ok && fetched.row_count),
+                    parser_note: fetched.ok
+                        ? `${country} official artifact passed hash, completeness, and exact-row guards.`
+                        : `${country} official artifact did not pass exact-row promotion guards.`,
+                    artifact: fetched.artifact || null,
+                    error: fetched.error || ''
+                };
+                return;
+            }
             const readiness = await probeStaticBenchmarkReadinessLive(country, {
                 ...(staticOfficialFetcher ? { fetcher: staticOfficialFetcher } : {})
             }).catch(error => ({

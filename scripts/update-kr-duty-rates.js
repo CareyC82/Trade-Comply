@@ -14,6 +14,7 @@ const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const KR_CUSTOMS_URL = 'https://www.customs.go.kr/english/main.do';
 const KR_TARIFF_DB_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037';
 const KR_TARIFF_LOOKUP_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffView.do';
+const KR_UNIPASS_TARIFF_URL = 'https://tunipass.customs.go.kr/clip/hsinfosrch/openULS0201002Q.do';
 const REQUEST_TIMEOUT_MS = 15000;
 
 const KR_BENCHMARK = {
@@ -213,11 +214,54 @@ function normalizeKoreaHs10(value = '') {
 async function fetchKoreaOfficialRows({
     fetcher = fetchText,
     url = KR_TARIFF_DB_URL,
+    sourceUrls = [url, KR_UNIPASS_TARIFF_URL],
     lookupUrl = KR_TARIFF_LOOKUP_URL,
     queryHsCodes = KR_EXACT_CODE_CANDIDATES.map(normalizeKoreaHs10)
 } = {}) {
-    const response = await fetcher(url);
-    let rows = parseKoreaTariffRateRows(response.body || '');
+    const sourceAttempts = [];
+    let response = null;
+    let selectedUrl = url;
+    let rows = [];
+    for (const sourceUrl of Array.from(new Set(sourceUrls.filter(Boolean)))) {
+        try {
+            const candidateResponse = await fetcher(sourceUrl);
+            const candidateRows = [
+                ...parseKoreaOfficialJsonRows(candidateResponse.body || ''),
+                ...parseKoreaTariffRateRows(candidateResponse.body || '')
+            ];
+            sourceAttempts.push({
+                official_url: sourceUrl,
+                status_code: candidateResponse.status_code,
+                row_count: candidateRows.length
+            });
+            if (!response || candidateRows.length > rows.length) {
+                response = candidateResponse;
+                selectedUrl = sourceUrl;
+                rows = candidateRows;
+            }
+            if (candidateRows.length) break;
+        } catch (error) {
+            sourceAttempts.push({
+                official_url: sourceUrl,
+                status_code: null,
+                row_count: 0,
+                error: error.message
+            });
+        }
+    }
+    if (!response) {
+        return {
+            ok: false,
+            status_code: null,
+            official_url: url,
+            lookup_url: lookupUrl,
+            source_attempts: sourceAttempts,
+            query_attempts: [],
+            rows: [],
+            row_count: 0,
+            error: sourceAttempts.map(attempt => attempt.error).filter(Boolean).join('; ') || 'All Korea official source attempts failed.'
+        };
+    }
     const queryAttempts = [];
     if (!rows.length && Array.isArray(queryHsCodes) && queryHsCodes.length) {
         for (const hsCode of queryHsCodes.map(normalizeKoreaHs10).filter(Boolean)) {
@@ -253,8 +297,9 @@ async function fetchKoreaOfficialRows({
     return {
         ok: response.status_code >= 200 && response.status_code < 400 && rows.length > 0,
         status_code: response.status_code,
-        official_url: url,
+        official_url: selectedUrl,
         lookup_url: lookupUrl,
+        source_attempts: sourceAttempts,
         query_attempts: queryAttempts,
         rows,
         row_count: rows.length
@@ -580,6 +625,7 @@ async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fe
         official_url: official.official_url,
         lookup_url: official.lookup_url || KR_TARIFF_LOOKUP_URL,
         row_count: official.row_count,
+        source_attempts: official.source_attempts || [],
         query_attempts: official.query_attempts || [],
         exact_query_summary: {
             attempted: (official.query_attempts || []).length,
@@ -625,6 +671,7 @@ module.exports = {
     KR_CUSTOMS_URL,
     KR_TARIFF_DB_URL,
     KR_TARIFF_LOOKUP_URL,
+    KR_UNIPASS_TARIFF_URL,
     KR_EXACT_CODE_CANDIDATES,
     parseKoreaTariffDbHtml,
     parseKoreaAdValoremRate,

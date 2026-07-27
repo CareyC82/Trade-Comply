@@ -14,6 +14,7 @@
     "check:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js && bash scripts/with-node.sh node scripts/build-catalog.js --check",
     "summarize:feedback": "bash scripts/with-node.sh node scripts/summarize-feedback.js",
     "build:unmet-search-backlog": "node scripts/build-unmet-search-backlog.js",
+    "check:unmet-search:production": "node scripts/check-unmet-search-production-readiness.js",
     "parse:announcement": "bash scripts/with-node.sh node scripts/auto-parse-announcement.js",
     "fetch:policy-news": "bash scripts/with-node.sh node scripts/fetch-policy-news.js",
     "fetch:global": "node scripts/fetch-global-sources.js",
