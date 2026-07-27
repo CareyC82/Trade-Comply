@@ -73,12 +73,16 @@ const {
     STATIC_EXACT_CODE_CANDIDATES,
     applyStaticBenchmarkToRule,
     applyIndiaOfficialCandidateToRule,
+    buildOfficialCandidateForRule,
     buildIndiaOfficialCandidateForRule,
     fetchIndiaOfficialRows,
     fetchStaticOfficialProbe,
     getOfficialProbeUrls,
     parseGenericTariffRows,
     parseIndiaTariffRows,
+    parseMalaysiaTariffRows,
+    parseTaiwanTariffRows,
+    parseVietnamTariffRows,
     probeIndiaReadiness,
     probeStaticBenchmarkReadiness,
     probeStaticBenchmarkReadinessLive
@@ -1573,4 +1577,58 @@ test('India official candidate keeps mixed tariff rows exact-line gated', () => 
 
     assert.equal(candidate.ok, false);
     assert.equal(candidate.source_status, 'scope_check_required');
+});
+
+test('Malaysia JKDM parser composes split AHTN columns into exact 10-digit rows', () => {
+    const html = `
+        <table>
+            <tr><th>HEADER</th><th>SUB</th><th>ITEM</th><th>UNIT</th><th>DESCRIPTION</th><th>IMPORT RATE</th></tr>
+            <tr><td>8517</td><td>62</td><td>0000</td><td>u</td><td>Machines for reception conversion and transmission</td><td>0%</td></tr>
+            <tr><td>8504</td><td>40</td><td>9000</td><td>u</td><td>Other static converters</td><td>5%</td></tr>
+        </table>
+    `;
+    const rows = parseMalaysiaTariffRows(html);
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].hs_code, '8517620000');
+    assert.equal(rows[0].base_rate, 0);
+    assert.equal(rows[0].exact_rate_safe, true);
+});
+
+test('Vietnam parser recognizes ordinary or MFN tariff text rows', () => {
+    const rows = parseVietnamTariffRows(`
+        85176200 Thiết bị thu, chuyển đổi và truyền dữ liệu Thuế suất ưu đãi: 0%
+        85044090 Bộ biến đổi tĩnh MFN: 5%
+    `);
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].hs_code, '85176200');
+    assert.equal(rows[0].base_rate, 0);
+    assert.equal(rows[1].base_rate, 0.05);
+});
+
+test('Taiwan parser accepts downloadable delimited CCC tariff rows', () => {
+    const rows = parseTaiwanTariffRows([
+        '"85176200000","Data transmission apparatus","0%"',
+        '"85044090009","Other static converters","5%"'
+    ].join('\n'));
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].hs_code, '85176200000');
+    assert.equal(rows[0].base_rate, 0);
+    assert.equal(rows[1].base_rate, 0.05);
+});
+
+test('ASEAN and Taiwan official candidates promote only unambiguous prefix rates', () => {
+    const rule = { id: 'TEST-MY', import_country: 'MY', hs_prefixes: ['851762'] };
+    const candidate = buildOfficialCandidateForRule(rule, [
+        { hs_code: '8517620000', base_rate: 0, exact_rate_safe: true },
+        { hs_code: '8517629000', base_rate: 0, exact_rate_safe: true }
+    ], 'MY');
+    assert.equal(candidate.ok, true);
+    assert.equal(candidate.base_rate, 0);
+
+    const mixed = buildOfficialCandidateForRule(rule, [
+        { hs_code: '8517620000', base_rate: 0, exact_rate_safe: true },
+        { hs_code: '8517629000', base_rate: 0.05, exact_rate_safe: true }
+    ], 'MY');
+    assert.equal(mixed.ok, false);
+    assert.equal(mixed.source_status, 'scope_check_required');
 });

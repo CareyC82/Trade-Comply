@@ -13,6 +13,7 @@ const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DEFAULT_COUNTRIES = ['CN', 'VN', 'MY', 'TW', 'RU', 'IN'];
 const REQUEST_TIMEOUT_MS = 15000;
 const INDIA_REQUEST_TIMEOUT_MS = 30000;
+const ASEAN_TW_REQUEST_TIMEOUT_MS = 90000;
 const OFFICIAL_PROBE_MARKERS = {
     CN: [/customs/i, /tariff/i, /海关|税则|关税/],
     VN: [/customs/i, /tariff/i, /vietnam/i, /hải quan|biểu thuế|thuế nhập khẩu/i],
@@ -135,10 +136,8 @@ function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
                 body: await response.text()
             }))
             .catch((error) => {
-                if (error?.cause?.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
-                    return fetchTextWithCurl(url, { timeoutMs });
-                }
-                throw error;
+                // Includes UNABLE_TO_VERIFY_LEAF_SIGNATURE, DNS, reset, and timeout failures.
+                return fetchTextWithCurl(url, { timeoutMs, fetch_error: error?.message || '' });
             })
             .finally(() => clearTimeout(timer));
     }
@@ -349,6 +348,95 @@ function parseGenericTariffRows(html = '') {
     });
 }
 
+function parseMalaysiaTariffRows(html = '') {
+    const rows = [];
+    const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    rowMatches.forEach((rowHtml) => {
+        const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
+        const headerIndex = cells.findIndex(cell => /^\d{4}$/.test(cell));
+        if (headerIndex < 0) return;
+        const header = cells[headerIndex];
+        const sub = cells[headerIndex + 1] || '';
+        const item = cells[headerIndex + 2] || '';
+        if (!/^\d{2}$/.test(sub) || !/^\d{4}$/.test(item)) return;
+        const hsCode = `${header}${sub}${item}`;
+        const description = cells[headerIndex + 4] || cells[headerIndex + 3] || '';
+        const rateCell = cells.slice(headerIndex + 5).find(cell => /^(free|nil|exempt|\d+(?:\.\d+)?\s*%)$/i.test(cell)) || '';
+        const row = buildGenericTariffRow({
+            hsCode,
+            text: `${hsCode} ${description} ${rateCell}`,
+            rateText: rateCell
+        });
+        if (row) rows.push(row);
+    });
+    return rows;
+}
+
+function parseVietnamTariffRows(html = '') {
+    const rows = parseGenericTariffRows(html);
+    if (rows.length) return rows;
+    return stripHtml(html)
+        .split(/(?=\b\d{8,10}\b)/)
+        .map((line) => {
+            const hsCode = line.match(/\b\d{8,10}\b/)?.[0] || '';
+            const rateText = line.match(/(?:MFN|ordinary|thuế suất(?: ưu đãi)?|NK ưu đãi)[:\s-]*(free|nil|exempt|\d+(?:\.\d+)?\s*%)/i)?.[1] || '';
+            return buildGenericTariffRow({ hsCode, text: line, rateText });
+        })
+        .filter(Boolean);
+}
+
+function parseTaiwanTariffRows(body = '') {
+    const htmlRows = parseGenericTariffRows(body);
+    if (htmlRows.length) return htmlRows;
+
+    const rows = [];
+    String(body).split(/\r?\n/).forEach((line) => {
+        const delimited = line.split(/\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim());
+        const hsCell = delimited.find(cell => /^\d{8,11}$/.test(cell)) || '';
+        const rateCell = delimited.find(cell => /^(free|nil|exempt|\d+(?:\.\d+)?\s*%)$/i.test(cell)) || '';
+        if (hsCell && rateCell) {
+            const row = buildGenericTariffRow({
+                hsCode: hsCell,
+                text: delimited.join(' '),
+                rateText: rateCell
+            });
+            if (row) rows.push(row);
+            return;
+        }
+
+        const fixedMatch = line.match(/^\d{8}\d{8}(\d{11})(.{10})(.{10})(.{10})/);
+        if (!fixedMatch) return;
+        const hsCode = fixedMatch[1];
+        const rawRates = fixedMatch.slice(2).map(value => value.trim()).filter(Boolean);
+        const numericRate = rawRates
+            .map(value => Number(value))
+            .find(value => Number.isFinite(value));
+        if (!Number.isFinite(numericRate)) return;
+        const rateText = `${numericRate / 100000}%`;
+        const row = buildGenericTariffRow({
+            hsCode,
+            text: `${hsCode} Taiwan Customs fixed-width tariff ${rateText}`,
+            rateText
+        });
+        if (row) rows.push(row);
+    });
+    return rows;
+}
+
+function parseOfficialTariffRows(country, body = '') {
+    const code = String(country || '').toUpperCase();
+    if (code === 'MY') {
+        const rows = parseMalaysiaTariffRows(body);
+        return rows.length ? rows : parseGenericTariffRows(body);
+    }
+    if (code === 'VN') return parseVietnamTariffRows(body);
+    if (code === 'TW') {
+        const rows = parseTaiwanTariffRows(body);
+        return rows.length ? rows : parseGenericTariffRows(body);
+    }
+    return parseGenericTariffRows(body);
+}
+
 function summarizeGenericTariffParserRows(rows = []) {
     const safeRows = rows.filter(row => row.exact_rate_safe);
     return {
@@ -398,7 +486,7 @@ async function fetchStaticOfficialProbe({
             const response = await fetcher(url, { timeoutMs });
             const ok = response.status_code >= 200 && response.status_code < 400;
             const markers = detectOfficialProbeMarkers(code, response.body || '');
-            const rows = parseGenericTariffRows(response.body || '');
+            const rows = parseOfficialTariffRows(code, response.body || '');
             const parserSummary = summarizeGenericTariffParserRows(rows);
             const attempt = {
                 ok,
@@ -548,6 +636,143 @@ async function fetchIndiaOfficialRows({
     return {
         ...selected,
         attempts
+    };
+}
+
+async function fetchCountryOfficialRows({
+    country,
+    fetcher = fetchText,
+    source = getSource(String(country || '').toUpperCase())
+} = {}) {
+    const code = String(country || source?.country || '').toUpperCase();
+    const urls = getOfficialProbeUrls(source, source?.official_url || '');
+    const attempts = [];
+    let best = null;
+    for (const url of urls) {
+        try {
+            const response = await fetcher(url, { timeoutMs: ASEAN_TW_REQUEST_TIMEOUT_MS });
+            const rows = parseOfficialTariffRows(code, response.body || '');
+            const safeRows = rows.filter(row => row.exact_rate_safe);
+            const acceptableStatus = response.status_code >= 200 && response.status_code < 400;
+            const attempt = {
+                ok: acceptableStatus && safeRows.length > 0,
+                status_code: response.status_code,
+                official_url: url,
+                rows: safeRows,
+                row_count: safeRows.length,
+                parsed_row_count: rows.length,
+                partial: Boolean(response.partial),
+                error: response.error || ''
+            };
+            attempts.push({
+                official_url: url,
+                status_code: response.status_code,
+                row_count: safeRows.length,
+                parsed_row_count: rows.length,
+                partial: Boolean(response.partial),
+                error: response.error || ''
+            });
+            if (attempt.ok) return { ...attempt, attempts };
+            if (!best || attempt.row_count > best.row_count || (!best.status_code && attempt.status_code)) best = attempt;
+        } catch (error) {
+            const attempt = {
+                ok: false,
+                status_code: null,
+                official_url: url,
+                rows: [],
+                row_count: 0,
+                parsed_row_count: 0,
+                partial: false,
+                error: error.message
+            };
+            attempts.push(attempt);
+            if (!best) best = attempt;
+        }
+    }
+    return {
+        ...(best || {
+            ok: false,
+            status_code: null,
+            official_url: source?.official_url || '',
+            rows: [],
+            row_count: 0,
+            parsed_row_count: 0,
+            partial: false,
+            error: 'No official probe URL configured.'
+        }),
+        attempts
+    };
+}
+
+function buildOfficialRateCandidate(rows = [], hsPrefix = '', country = '') {
+    const prefix = String(hsPrefix || '').replace(/\D/g, '');
+    const matched = rows.filter(row => String(row.hs_code || row.hs_prefix || '').replace(/\D/g, '').startsWith(prefix));
+    const rates = Array.from(new Set(matched
+        .map(row => row.base_rate)
+        .filter(Number.isFinite)
+        .map(rate => Number(rate.toFixed(6)))))
+        .sort((a, b) => a - b);
+    if (!matched.length) {
+        return {
+            ok: false,
+            source_status: 'official_link_checked',
+            status: 'no_matching_rows',
+            hs_prefix: prefix,
+            matched_rows: 0
+        };
+    }
+    if (rates.length === 1) {
+        return {
+            ok: true,
+            source_status: 'official_source_checked',
+            status: 'official_source_candidate',
+            hs_prefix: prefix,
+            matched_rows: matched.length,
+            base_rate: rates[0]
+        };
+    }
+    return {
+        ok: false,
+        source_status: 'scope_check_required',
+        status: 'multiple_rates_need_exact_hs',
+        hs_prefix: prefix,
+        matched_rows: matched.length,
+        unique_base_rates: rates,
+        reason: `${prefix} has multiple ${country} official rates; exact tariff line is required.`
+    };
+}
+
+function buildOfficialCandidateForRule(rule, rows = [], country = rule?.import_country || '') {
+    const prefixes = Array.isArray(rule.hs_prefixes) ? rule.hs_prefixes : [];
+    const candidates = prefixes.map(prefix => buildOfficialRateCandidate(rows, prefix, country));
+    const okCandidates = candidates.filter(candidate => candidate.ok);
+    const uniqueRates = Array.from(new Set(okCandidates.map(candidate => candidate.base_rate)));
+    if (prefixes.length && okCandidates.length === prefixes.length && uniqueRates.length === 1) {
+        return {
+            ok: true,
+            source_status: 'official_source_checked',
+            status: 'official_source_candidate',
+            candidates,
+            base_rate: uniqueRates[0],
+            source_hts: `${prefixes.join(', ')} (${country} official tariff rows)`,
+            source_rate_text: `${country} official base-duty candidate: ${(uniqueRates[0] * 100).toFixed(3)}%`
+        };
+    }
+    if (candidates.some(candidate => candidate.source_status === 'scope_check_required') || uniqueRates.length > 1) {
+        return {
+            ok: false,
+            source_status: 'scope_check_required',
+            status: 'exact_hs_required',
+            candidates,
+            reason: `${rule.id || 'rule'} needs an exact ${country} tariff line before official duty can be used.`
+        };
+    }
+    return {
+        ok: false,
+        source_status: 'official_link_checked',
+        status: 'no_matching_rows',
+        candidates,
+        reason: `${rule.id || 'rule'} has no matched ${country} official tariff rows.`
     };
 }
 
@@ -904,7 +1129,58 @@ function applyIndiaOfficialCandidateToRule(rule, candidate, { source, checkedAt 
     return changes;
 }
 
-function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = false, indiaTariffRows = null } = {}) {
+function applyOfficialCandidateToRule(rule, candidate, { source, checkedAt }) {
+    if (!candidate.ok) {
+        const changes = applyStaticBenchmarkToRule(rule, { source, checkedAt });
+        const exactRequired = candidate.source_status === 'scope_check_required';
+        const updates = {
+            source_status: exactRequired ? 'scope_check_required' : 'official_link_checked',
+            confidence: exactRequired ? 'Scope check required' : 'Official link monitored',
+            source_note: exactRequired
+                ? `${rule.import_country} official rows contain mixed rates; exact tariff classification is required before filing.`
+                : COUNTRY_NOTES[rule.import_country],
+            source_rate_text: exactRequired
+                ? `Exact ${rule.import_country} tariff line required before using an official base-duty rate.`
+                : rule.source_rate_text
+        };
+        Object.entries(updates).forEach(([field, value]) => {
+            if (rule[field] !== value) {
+                changes.push({ field, old_value: rule[field], new_value: value });
+                rule[field] = value;
+            }
+        });
+        return changes;
+    }
+
+    const changes = [];
+    if (Number(rule.base_rate) !== Number(candidate.base_rate)) {
+        changes.push({ field: 'base_rate', old_value: rule.base_rate, new_value: candidate.base_rate });
+        rule.base_rate = candidate.base_rate;
+    }
+    const updates = {
+        source_status: 'official_source_checked',
+        confidence: 'Official source checked',
+        source_note: `${rule.import_country} official tariff rows produced one unambiguous base-duty rate for every maintained prefix. Tax, preference, licensing, and product-approval layers remain separate filing checks.`,
+        source_hts: candidate.source_hts,
+        source_rate_text: candidate.source_rate_text,
+        source_url: source?.official_url || rule.source_url || '',
+        last_checked_at: checkedAt
+    };
+    Object.entries(updates).forEach(([field, value]) => {
+        if (rule[field] !== value) {
+            changes.push({ field, old_value: rule[field], new_value: value });
+            rule[field] = value;
+        }
+    });
+    return changes;
+}
+
+function updateStaticBenchmarkRules({
+    countries = DEFAULT_COUNTRIES,
+    dryRun = false,
+    indiaTariffRows = null,
+    officialTariffRows = {}
+} = {}) {
     const targetCountries = normalizeCountries(countries);
     const sourcesPayload = readJson(SOURCES_PATH);
     const payload = readJson(DUTY_RATES_PATH);
@@ -930,9 +1206,12 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
 
         rules.forEach((rule) => {
             try {
+                const countryRows = officialTariffRows[country];
                 const candidate = country === 'IN' && Array.isArray(indiaTariffRows)
                     ? buildIndiaOfficialCandidateForRule(rule, indiaTariffRows)
-                    : null;
+                    : Array.isArray(countryRows)
+                        ? buildOfficialCandidateForRule(rule, countryRows, country)
+                        : null;
                 if (candidate) {
                     officialCandidateOutcomes.push({
                         rule: rule.id,
@@ -943,7 +1222,9 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
                     });
                 }
                 const ruleChanges = candidate
-                    ? applyIndiaOfficialCandidateToRule(rule, candidate, { source, checkedAt })
+                    ? country === 'IN'
+                        ? applyIndiaOfficialCandidateToRule(rule, candidate, { source, checkedAt })
+                        : applyOfficialCandidateToRule(rule, candidate, { source, checkedAt })
                     : applyStaticBenchmarkToRule(rule, { source, checkedAt });
                 if (ruleChanges.length) {
                     changes.push({
@@ -965,12 +1246,12 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
         ok: errors.length === 0,
         dry_run: dryRun,
         countries: targetCountries,
-        writes_official_machine_rates: Boolean(indiaTariffRows),
+        writes_official_machine_rates: Boolean(indiaTariffRows) || Object.values(officialTariffRows).some(Array.isArray),
         changes,
         errors,
         readiness
     };
-    if (indiaTariffRows) {
+    if (indiaTariffRows || Object.values(officialTariffRows).some(Array.isArray)) {
         payload.last_static_benchmark_sync.official_candidate_outcomes = officialCandidateOutcomes;
     }
 
@@ -979,6 +1260,36 @@ function updateStaticBenchmarkRules({ countries = DEFAULT_COUNTRIES, dryRun = fa
     }
 
     return payload.last_static_benchmark_sync;
+}
+
+async function updateCountriesFromOfficialSources({ countries, dryRun = false, fetcher = fetchText } = {}) {
+    const targetCountries = normalizeCountries(countries).filter(country => country !== 'IN');
+    const fetches = await Promise.all(targetCountries.map(async (country) => [
+        country,
+        await fetchCountryOfficialRows({ country, fetcher })
+    ]));
+    const officialTariffRows = {};
+    fetches.forEach(([country, result]) => {
+        if (result.ok && result.rows.length) officialTariffRows[country] = result.rows;
+    });
+    const result = updateStaticBenchmarkRules({
+        countries: targetCountries,
+        dryRun,
+        officialTariffRows
+    });
+    result.official_fetches = Object.fromEntries(fetches.map(([country, official]) => [country, {
+        ok: official.ok,
+        status_code: official.status_code,
+        official_url: official.official_url,
+        row_count: official.row_count,
+        parsed_row_count: official.parsed_row_count,
+        partial: official.partial,
+        error: official.error || '',
+        attempts: official.attempts || []
+    }]));
+    result.writes_official_machine_rates = Object.keys(officialTariffRows).length > 0;
+    result.official_fetch_degraded_countries = targetCountries.filter(country => !officialTariffRows[country]);
+    return result;
 }
 
 async function updateIndiaRulesFromOfficialSource({ dryRun = false, fetcher = fetchText } = {}) {
@@ -1049,8 +1360,10 @@ function main() {
             ? Promise.all(countries.map(country => String(country).toUpperCase() === 'IN'
                 ? probeIndiaReadiness({ live: true })
                 : probeStaticBenchmarkReadinessLive(country)))
-            : officialLive && countries.includes('IN')
+            : officialLive && countries.length === 1 && countries[0].toUpperCase() === 'IN'
                 ? updateIndiaRulesFromOfficialSource({ dryRun })
+                : officialLive
+                    ? updateCountriesFromOfficialSources({ countries, dryRun })
                 : probeOnly
                     ? countries.map(country => probeStaticBenchmarkReadiness(country))
                     : updateStaticBenchmarkRules({ countries, dryRun })
@@ -1075,9 +1388,13 @@ module.exports = {
     EXACT_CANDIDATE_COUNTRY_META,
     applyStaticBenchmarkToRule,
     applyIndiaOfficialCandidateToRule,
+    applyOfficialCandidateToRule,
+    buildOfficialCandidateForRule,
+    buildOfficialRateCandidate,
     buildIndiaOfficialCandidateForRule,
     buildIndiaOfficialRateCandidate,
     fetchIndiaOfficialRows,
+    fetchCountryOfficialRows,
     fetchStaticOfficialProbe,
     fetchText,
     fetchTextWithCurl,
@@ -1085,10 +1402,15 @@ module.exports = {
     getMaintainedPrefixes,
     parseGenericTariffRows,
     parseIndiaTariffRows,
+    parseMalaysiaTariffRows,
+    parseOfficialTariffRows,
+    parseTaiwanTariffRows,
+    parseVietnamTariffRows,
     parsePercent,
     probeIndiaReadiness,
     probeStaticBenchmarkReadiness,
     probeStaticBenchmarkReadinessLive,
     updateIndiaRulesFromOfficialSource,
+    updateCountriesFromOfficialSources,
     updateStaticBenchmarkRules
 };

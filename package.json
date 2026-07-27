@@ -49,6 +49,8 @@
     "update:duty-rates:in:official": "node --use-system-ca scripts/update-static-duty-rates.js --countries=IN --official-live",
     "update:duty-rates:in:official:dry-run": "node --use-system-ca scripts/update-static-duty-rates.js --countries=IN --official-live --dry-run",
     "probe:duty-rates:in": "node --use-system-ca scripts/update-static-duty-rates.js --countries=IN --probe-live",
+    "update:duty-rates:asean-tw:official": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY,VN,TW --official-live",
+    "update:duty-rates:asean-tw:official:dry-run": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY,VN,TW --official-live --dry-run",
     "probe:duty-rates:static": "node scripts/update-static-duty-rates.js --probe",
     "sync:duty-rates:auto": "node --use-system-ca scripts/auto-sync-duty-rates.js",
     "sync:duty-rates:auto:dry-run": "node --use-system-ca scripts/auto-sync-duty-rates.js --dry-run",
