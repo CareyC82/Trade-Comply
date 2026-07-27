@@ -677,7 +677,7 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.equal(payload.source_run_plan.find(row => row.country === 'IN').degraded_reason, 'official_fetch_failed');
     assert.equal(payload.source_run_plan.find(row => row.country === 'KR').degraded_category, 'network_transport');
     assert.match(payload.source_run_plan.find(row => row.country === 'KR').degraded_action, /Retry/);
-    assert.ok(payload.automation_digest.official_probe_countries.includes('JP'));
+    assert.equal(payload.automation_digest.official_probe_countries.includes('JP'), false);
     assert.ok(payload.automation_digest.official_probe_countries.includes('KR'));
     assert.ok(payload.automation_digest.official_probe_countries.includes('IN'));
     assert.ok(payload.automation_digest.official_probe_degraded_sources.includes('Japan Customs official-live'));

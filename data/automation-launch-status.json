@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-26T19:25:43.119Z",
+  "updated_at": "2026-07-27T06:41:13.300Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -23,33 +23,32 @@
       "do_not_market": 0
     },
     "duty_rate_modes": {
-      "live_auto": 3,
-      "live_hybrid": 10,
+      "live_auto": 8,
+      "live_hybrid": 5,
       "live_monitor": 1
     },
     "duty_rate_automation_stages": {
-      "official_machine_sync": 3,
-      "maintained_exact_map": 4,
-      "official_hybrid_parser": 3,
-      "official_probe_candidate": 3,
+      "official_machine_sync": 8,
+      "official_probe_candidate": 2,
+      "maintained_exact_map": 3,
       "official_link_monitor": 1
     },
     "duty_rate_launch_levels": {
       "official_exact": [
+        "CN",
+        "DE",
+        "EU",
+        "JP",
         "MX",
+        "NL",
         "SG",
         "US"
       ],
       "hybrid_official": [
-        "DE",
-        "EU",
         "IN",
-        "JP",
-        "KR",
-        "NL"
+        "KR"
       ],
       "maintained_benchmark": [
-        "CN",
         "MY",
         "TW",
         "VN"
@@ -58,49 +57,44 @@
         "RU"
       ],
       "parser_gap": [
-        "CN",
-        "DE",
-        "EU",
         "IN",
-        "JP",
         "KR",
         "MY",
-        "NL",
         "TW",
         "VN",
         "RU"
       ]
     },
     "public_launch_countries": [
-      "MX",
-      "SG",
-      "US",
       "CN",
       "DE",
       "EU",
-      "IN",
       "JP",
+      "MX",
+      "NL",
+      "SG",
+      "US",
+      "IN",
       "KR",
       "MY",
-      "NL",
       "TW",
       "VN",
       "RU"
     ],
     "filing_grade_auto_countries": [
+      "CN",
+      "DE",
+      "EU",
+      "JP",
       "MX",
+      "NL",
       "SG",
       "US"
     ],
     "parser_gap_countries": [
-      "CN",
-      "DE",
-      "EU",
       "IN",
-      "JP",
       "KR",
       "MY",
-      "NL",
       "TW",
       "VN",
       "RU"
@@ -108,15 +102,20 @@
     "weekly_route_priority_count": 5
   },
   "duty_rate_health_board": {
-    "headline": "3 official exact market(s), 6 hybrid official market(s), 4 maintained exact-map market(s).",
-    "next_action": "Next route parser priority: DE Tablet computer (8471300000).",
+    "headline": "8 official exact market(s), 2 hybrid official market(s), 3 maintained exact-map market(s).",
+    "next_action": "Next route parser priority: IN Tablet computer (847130).",
     "cards": [
       {
         "key": "official_exact",
         "label": "Official exact",
-        "count": 3,
+        "count": 8,
         "countries": [
+          "CN",
+          "DE",
+          "EU",
+          "JP",
           "MX",
+          "NL",
           "SG",
           "US"
         ],
@@ -125,23 +124,18 @@
       {
         "key": "hybrid_official",
         "label": "Hybrid official",
-        "count": 6,
+        "count": 2,
         "countries": [
-          "DE",
-          "EU",
           "IN",
-          "JP",
-          "KR",
-          "NL"
+          "KR"
         ],
         "note": "Official-linked coverage is live, but exact tariff-line parser gates stay visible."
       },
       {
         "key": "maintained_exact_map",
         "label": "Maintained exact-map",
-        "count": 4,
+        "count": 3,
         "countries": [
-          "CN",
           "MY",
           "TW",
           "VN"
@@ -153,14 +147,14 @@
         "label": "P0/P1 source priorities",
         "count": 8,
         "countries": [
-          "MX",
-          "SG",
-          "US",
           "CN",
           "DE",
           "EU",
           "JP",
-          "NL"
+          "MX",
+          "NL",
+          "SG",
+          "US"
         ],
         "note": "Highest-value markets to keep fresh first."
       },
@@ -178,16 +172,11 @@
       {
         "key": "parser_gap",
         "label": "Parser gaps",
-        "count": 11,
+        "count": 6,
         "countries": [
-          "CN",
-          "DE",
-          "EU",
           "IN",
-          "JP",
           "KR",
           "MY",
-          "NL",
           "TW",
           "VN",
           "RU"
@@ -773,6 +762,160 @@
   ],
   "duty_rates": [
     {
+      "country": "CN",
+      "name": "China import tariff / VAT",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_api_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run sync:duty-rates:exact",
+      "probe_command": "",
+      "official_url": "https://www.customs.gov.cn/",
+      "official_probe_urls": [],
+      "source_use_cases": [
+        "China import duty and VAT pre-check",
+        "direct and alternate-route landed duty/tax comparison",
+        "CCC/SRRC/licensing and preferential-origin evidence review"
+      ],
+      "parser_subtasks": [
+        "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
+        "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
+        "Block promotion when one HS prefix maps to multiple tax rates or product-control notes."
+      ],
+      "rate_change_drivers": [
+        "MFN duty, preferential-origin duty, or import VAT changes",
+        "Retaliatory tariff or trade-remedy changes",
+        "CCC, SRRC, dual-use, or other product-control overlays"
+      ],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced 10-digit China Customs MFN duty lines plus 13% import VAT and product-control review reminders.",
+      "next_action": "Monitor China Customs API schema and pagination; keep VAT, preferential-origin, trade-remedy, and product-control checks separately refreshed.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
+      "country": "DE",
+      "name": "Germany import VAT with EU TARIC duty",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_xlsx_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "",
+      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "official_probe_urls": [],
+      "source_use_cases": [
+        "Germany import VAT plus EU TARIC duty pre-check",
+        "EU-bound direct and transit route pricing"
+      ],
+      "parser_subtasks": [
+        "Resolve exact TARIC code against EU duty rows before applying Germany-specific VAT as a separate tax layer.",
+        "Preserve Germany VAT treatment separately from EU customs duty so Post-Entry math does not overstate base duty certainty.",
+        "Flag ambiguous EU TARIC prefixes as exact-code required instead of promoting them to filing-grade rates."
+      ],
+      "rate_change_drivers": [
+        "EU TARIC duty measure changes",
+        "Germany VAT updates",
+        "EU trade-remedy or suspension changes affecting Germany entries"
+      ],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced EU TARIC exact duty with safe 8-digit aggregation and Germany VAT shown separately.",
+      "next_action": "Monitor TARIC and German VAT changes while keeping non-base-duty measures separate.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
+      "country": "EU",
+      "name": "EU TARIC",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_xlsx_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "npm run probe:duty-rates:eu",
+      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "official_probe_urls": [],
+      "source_use_cases": [
+        "EU import duty pre-check",
+        "EU-bound direct and transit route pricing"
+      ],
+      "parser_subtasks": [
+        "Accept exact 8/10-digit TARIC code input and normalize spaces, dots, and national suffixes before lookup.",
+        "Map ERGA OMNES third-country duty rows to official base duty only when one active measure applies for the entry date.",
+        "Keep VAT, anti-dumping, countervailing, quota, and suspension layers outside the base-duty parser until separately sourced."
+      ],
+      "rate_change_drivers": [
+        "EU TARIC duty measure changes",
+        "Suspensions, quotas, anti-dumping, or countervailing duty updates",
+        "Member-state VAT updates"
+      ],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced 10-digit TARIC base-duty rows with safe 8-digit aggregation; member-state VAT and non-base-duty measures remain separate.",
+      "next_action": "Monitor TARIC workbook schema and effective dates; keep VAT, trade remedies, quotas, suspensions, and preferences separately sourced.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
+      "country": "JP",
+      "name": "Japan Customs tariff",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_html_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:jp:official",
+      "probe_command": "npm run probe:duty-rates:jp",
+      "official_url": "https://www.customs.go.jp/english/tariff/",
+      "official_probe_urls": [],
+      "source_use_cases": [
+        "Japan import duty and consumption-tax pre-check",
+        "electronics and semiconductor route pricing",
+        "statistical-code scope and temporary tariff measure review"
+      ],
+      "parser_subtasks": [
+        "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
+        "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
+        "Gate promotion when one HS prefix maps to multiple statistical-code rates or product-scope notes."
+      ],
+      "rate_change_drivers": [
+        "Japan Customs tariff schedule revisions",
+        "Consumption tax layer changes",
+        "Statistical-code scope changes"
+      ],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced 9-digit Japan statistical-code base-duty rows plus a separate 10% consumption-tax layer.",
+      "next_action": "Monitor chapter-page schema and schedule revisions; keep mixed-rate gates, consumption tax, preferences, and product approvals separate.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
       "country": "MX",
       "name": "Mexico tariff / VAT",
       "source_status": "official_machine_synced",
@@ -800,6 +943,44 @@
       "transit_route_priority": false,
       "current_scope": "Official machine-synced 10-digit TIGIE/NICO IGI lines plus 16% VAT and NOM/origin review reminders.",
       "next_action": "Monitor SNICE workbook revisions and keep VAT, NOM, and preferential-origin checks refreshed.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
+      "country": "NL",
+      "name": "Netherlands import VAT with EU TARIC duty",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_xlsx_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:eu",
+      "probe_command": "",
+      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
+      "official_probe_urls": [],
+      "source_use_cases": [
+        "Netherlands import VAT plus EU TARIC duty pre-check",
+        "EU-bound direct and transit route pricing"
+      ],
+      "parser_subtasks": [
+        "Resolve exact TARIC code against EU duty rows before applying Netherlands-specific VAT as a separate tax layer.",
+        "Keep Dutch VAT and import VAT accounting separate from EU base-duty parser output.",
+        "Flag ambiguous EU TARIC prefixes as exact-code required before using the route in pricing comparison."
+      ],
+      "rate_change_drivers": [
+        "EU TARIC duty measure changes",
+        "Netherlands VAT updates",
+        "EU trade-remedy or suspension changes affecting Netherlands entries"
+      ],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced EU TARIC exact duty with safe 8-digit aggregation and Dutch VAT shown separately.",
+      "next_action": "Monitor TARIC and Dutch VAT changes while keeping non-base-duty measures separate.",
       "rate_automation_stage": "official_machine_sync",
       "automation_claim": "Official machine-readable tariff sync",
       "public_claim": "Filing-grade auto for maintained HS prefixes",
@@ -878,121 +1059,6 @@
       "note": "Official machine-readable source is connected to daily sync."
     },
     {
-      "country": "CN",
-      "name": "China import tariff / VAT",
-      "source_status": "hybrid_official_candidate",
-      "machine_readable": "local_exact_map",
-      "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:static -- --countries=CN",
-      "probe_command": "",
-      "official_url": "https://www.customs.gov.cn/",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "China import duty and VAT pre-check",
-        "direct and alternate-route landed duty/tax comparison",
-        "CCC/SRRC/licensing and preferential-origin evidence review"
-      ],
-      "parser_subtasks": [
-        "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
-        "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
-        "Block promotion when one HS prefix maps to multiple tax rates or product-control notes."
-      ],
-      "rate_change_drivers": [
-        "MFN duty, preferential-origin duty, or import VAT changes",
-        "Retaliatory tariff or trade-remedy changes",
-        "CCC, SRRC, dual-use, or other product-control overlays"
-      ],
-      "transit_route_priority": false,
-      "current_scope": "Maintained China exact-line MFN duty candidates plus 13% import VAT and product-control review reminders.",
-      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed.",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "parser_gap": true,
-      "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
-      "launch_mode": "live_hybrid",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live hybrid",
-      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
-      "country": "DE",
-      "name": "Germany import VAT with EU TARIC duty",
-      "source_status": "hybrid_official_candidate",
-      "machine_readable": "partial",
-      "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:eu",
-      "probe_command": "",
-      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Germany import VAT plus EU TARIC duty pre-check",
-        "EU-bound direct and transit route pricing"
-      ],
-      "parser_subtasks": [
-        "Resolve exact TARIC code against EU duty rows before applying Germany-specific VAT as a separate tax layer.",
-        "Preserve Germany VAT treatment separately from EU customs duty so Post-Entry math does not overstate base duty certainty.",
-        "Flag ambiguous EU TARIC prefixes as exact-code required instead of promoting them to filing-grade rates."
-      ],
-      "rate_change_drivers": [
-        "EU TARIC duty measure changes",
-        "Germany VAT updates",
-        "EU trade-remedy or suspension changes affecting Germany entries"
-      ],
-      "transit_route_priority": false,
-      "current_scope": "Hybrid Germany coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Germany VAT benchmark separately.",
-      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
-      "rate_automation_stage": "official_hybrid_parser",
-      "automation_claim": "Official parser candidate with exact-code gates",
-      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
-      "parser_gap": true,
-      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
-      "launch_mode": "live_hybrid",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live hybrid",
-      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
-      "country": "EU",
-      "name": "EU TARIC",
-      "source_status": "hybrid_official_candidate",
-      "machine_readable": "partial",
-      "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:eu",
-      "probe_command": "npm run probe:duty-rates:eu",
-      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "EU import duty pre-check",
-        "EU-bound direct and transit route pricing"
-      ],
-      "parser_subtasks": [
-        "Accept exact 8/10-digit TARIC code input and normalize spaces, dots, and national suffixes before lookup.",
-        "Map ERGA OMNES third-country duty rows to official base duty only when one active measure applies for the entry date.",
-        "Keep VAT, anti-dumping, countervailing, quota, and suspension layers outside the base-duty parser until separately sourced."
-      ],
-      "rate_change_drivers": [
-        "EU TARIC duty measure changes",
-        "Suspensions, quotas, anti-dumping, or countervailing duty updates",
-        "Member-state VAT updates"
-      ],
-      "transit_route_priority": false,
-      "current_scope": "Hybrid EU coverage: official TARIC candidate duty for unambiguous HS prefixes, scope-check status for ambiguous prefixes, and benchmark member-state VAT shown separately.",
-      "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated.",
-      "rate_automation_stage": "official_hybrid_parser",
-      "automation_claim": "Official parser candidate with exact-code gates",
-      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
-      "parser_gap": true,
-      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
-      "launch_mode": "live_hybrid",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live hybrid",
-      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
       "country": "IN",
       "name": "India Customs Tariff / ICEGATE CIP",
       "source_status": "hybrid_official_candidate",
@@ -1022,45 +1088,6 @@
       "transit_route_priority": false,
       "current_scope": "Official-live probe candidate plus maintained exact-line BCD fallback; SWS/IGST and product-control review reminders stay separate.",
       "next_action": "Promote ICEGATE/CIP parser output only where one unambiguous BCD/SWS/IGST row is found; keep exemption, IGST, BIS/QCO, WPC, and product-control checks refreshed.",
-      "rate_automation_stage": "official_probe_candidate",
-      "automation_claim": "Official source probe wired; parser promotion still gated",
-      "public_claim": "Official-linked candidate coverage with parser caveat",
-      "parser_gap": true,
-      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
-      "launch_mode": "live_hybrid",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live hybrid",
-      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
-      "country": "JP",
-      "name": "Japan Customs tariff",
-      "source_status": "hybrid_official_candidate",
-      "machine_readable": "candidate",
-      "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:jp:official",
-      "probe_command": "npm run probe:duty-rates:jp",
-      "official_url": "https://www.customs.go.jp/english/tariff/",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Japan import duty and consumption-tax pre-check",
-        "electronics and semiconductor route pricing",
-        "statistical-code scope and temporary tariff measure review"
-      ],
-      "parser_subtasks": [
-        "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
-        "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
-        "Gate promotion when one HS prefix maps to multiple statistical-code rates or product-scope notes."
-      ],
-      "rate_change_drivers": [
-        "Japan Customs tariff schedule revisions",
-        "Consumption tax layer changes",
-        "Statistical-code scope changes"
-      ],
-      "transit_route_priority": false,
-      "current_scope": "Maintained Japan exact-line base-duty candidates plus 10% consumption-tax value treatment reminder.",
-      "next_action": "Keep Japan Customs chapter parser running daily; preserve statistical-code gates for mixed-rate prefixes and consumption-tax separation.",
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
@@ -1147,44 +1174,6 @@
       "public_claim": "Maintained exact candidates; not fully machine-parsed",
       "parser_gap": true,
       "next_upgrade": "Connect a machine-readable MY tariff parser or official API.",
-      "launch_mode": "live_hybrid",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live hybrid",
-      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
-      "country": "NL",
-      "name": "Netherlands import VAT with EU TARIC duty",
-      "source_status": "hybrid_official_candidate",
-      "machine_readable": "partial",
-      "maintenance_priority": "P1",
-      "update_command": "npm run update:duty-rates:eu",
-      "probe_command": "",
-      "official_url": "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff_en",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Netherlands import VAT plus EU TARIC duty pre-check",
-        "EU-bound direct and transit route pricing"
-      ],
-      "parser_subtasks": [
-        "Resolve exact TARIC code against EU duty rows before applying Netherlands-specific VAT as a separate tax layer.",
-        "Keep Dutch VAT and import VAT accounting separate from EU base-duty parser output.",
-        "Flag ambiguous EU TARIC prefixes as exact-code required before using the route in pricing comparison."
-      ],
-      "rate_change_drivers": [
-        "EU TARIC duty measure changes",
-        "Netherlands VAT updates",
-        "EU trade-remedy or suspension changes affecting Netherlands entries"
-      ],
-      "transit_route_priority": false,
-      "current_scope": "Hybrid Netherlands coverage: official TARIC candidate duty where unambiguous, TARIC scope-check where exact code is needed, and Netherlands VAT benchmark separately.",
-      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate.",
-      "rate_automation_stage": "official_hybrid_parser",
-      "automation_claim": "Official parser candidate with exact-code gates",
-      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
-      "parser_gap": true,
-      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
       "launch_mode": "live_hybrid",
       "public_launch": true,
       "filing_grade_auto": false,
@@ -1314,212 +1303,6 @@
   ],
   "duty_rate_priority_queue": [
     {
-      "country": "DE",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
-      "automation_claim": "Official parser candidate with exact-code gates",
-      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
-      "update_command": "npm run update:duty-rates:eu",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Germany import VAT plus EU TARIC duty pre-check",
-        "EU-bound direct and transit route pricing"
-      ],
-      "parser_subtasks": [
-        "Resolve exact TARIC code against EU duty rows before applying Germany-specific VAT as a separate tax layer.",
-        "Preserve Germany VAT treatment separately from EU customs duty so Post-Entry math does not overstate base duty certainty.",
-        "Flag ambiguous EU TARIC prefixes as exact-code required instead of promoting them to filing-grade rates."
-      ],
-      "rate_change_drivers": [
-        "EU TARIC duty measure changes",
-        "Germany VAT updates",
-        "EU trade-remedy or suspension changes affecting Germany entries"
-      ],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "DE",
-        "priority": "P1",
-        "stage": "official_hybrid_parser",
-        "task": "Promote exact HS parser only after official tariff rows and rate fields are stable.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "Germany import VAT plus EU TARIC duty pre-check",
-          "EU-bound direct and transit route pricing"
-        ],
-        "parser_subtasks": [
-          "Resolve exact TARIC code against EU duty rows before applying Germany-specific VAT as a separate tax layer.",
-          "Preserve Germany VAT treatment separately from EU customs duty so Post-Entry math does not overstate base duty certainty.",
-          "Flag ambiguous EU TARIC prefixes as exact-code required instead of promoting them to filing-grade rates."
-        ],
-        "rate_change_drivers": [
-          "EU TARIC duty measure changes",
-          "Germany VAT updates",
-          "EU trade-remedy or suspension changes affecting Germany entries"
-        ],
-        "transit_route_priority": false,
-        "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
-      },
-      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
-      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
-    },
-    {
-      "country": "EU",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
-      "automation_claim": "Official parser candidate with exact-code gates",
-      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
-      "update_command": "npm run update:duty-rates:eu",
-      "probe_command": "npm run probe:duty-rates:eu",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "EU import duty pre-check",
-        "EU-bound direct and transit route pricing"
-      ],
-      "parser_subtasks": [
-        "Accept exact 8/10-digit TARIC code input and normalize spaces, dots, and national suffixes before lookup.",
-        "Map ERGA OMNES third-country duty rows to official base duty only when one active measure applies for the entry date.",
-        "Keep VAT, anti-dumping, countervailing, quota, and suspension layers outside the base-duty parser until separately sourced."
-      ],
-      "rate_change_drivers": [
-        "EU TARIC duty measure changes",
-        "Suspensions, quotas, anti-dumping, or countervailing duty updates",
-        "Member-state VAT updates"
-      ],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "EU",
-        "priority": "P1",
-        "stage": "official_hybrid_parser",
-        "task": "Promote exact HS parser only after official tariff rows and rate fields are stable.",
-        "probe_command": "npm run probe:duty-rates:eu",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "EU import duty pre-check",
-          "EU-bound direct and transit route pricing"
-        ],
-        "parser_subtasks": [
-          "Accept exact 8/10-digit TARIC code input and normalize spaces, dots, and national suffixes before lookup.",
-          "Map ERGA OMNES third-country duty rows to official base duty only when one active measure applies for the entry date.",
-          "Keep VAT, anti-dumping, countervailing, quota, and suspension layers outside the base-duty parser until separately sourced."
-        ],
-        "rate_change_drivers": [
-          "EU TARIC duty measure changes",
-          "Suspensions, quotas, anti-dumping, or countervailing duty updates",
-          "Member-state VAT updates"
-        ],
-        "transit_route_priority": false,
-        "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
-      },
-      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
-      "next_action": "Continue TARIC workbook sync; promote only prefixes with one unambiguous ERGA OMNES third-country-duty rate and keep ambiguous prefixes exact-code gated."
-    },
-    {
-      "country": "NL",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
-      "automation_claim": "Official parser candidate with exact-code gates",
-      "public_claim": "Hybrid official coverage; exact tariff-line scope stays gated",
-      "update_command": "npm run update:duty-rates:eu",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Netherlands import VAT plus EU TARIC duty pre-check",
-        "EU-bound direct and transit route pricing"
-      ],
-      "parser_subtasks": [
-        "Resolve exact TARIC code against EU duty rows before applying Netherlands-specific VAT as a separate tax layer.",
-        "Keep Dutch VAT and import VAT accounting separate from EU base-duty parser output.",
-        "Flag ambiguous EU TARIC prefixes as exact-code required before using the route in pricing comparison."
-      ],
-      "rate_change_drivers": [
-        "EU TARIC duty measure changes",
-        "Netherlands VAT updates",
-        "EU trade-remedy or suspension changes affecting Netherlands entries"
-      ],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "NL",
-        "priority": "P1",
-        "stage": "official_hybrid_parser",
-        "task": "Promote exact HS parser only after official tariff rows and rate fields are stable.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "Netherlands import VAT plus EU TARIC duty pre-check",
-          "EU-bound direct and transit route pricing"
-        ],
-        "parser_subtasks": [
-          "Resolve exact TARIC code against EU duty rows before applying Netherlands-specific VAT as a separate tax layer.",
-          "Keep Dutch VAT and import VAT accounting separate from EU base-duty parser output.",
-          "Flag ambiguous EU TARIC prefixes as exact-code required before using the route in pricing comparison."
-        ],
-        "rate_change_drivers": [
-          "EU TARIC duty measure changes",
-          "Netherlands VAT updates",
-          "EU trade-remedy or suspension changes affecting Netherlands entries"
-        ],
-        "transit_route_priority": false,
-        "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
-      },
-      "next_upgrade": "Add exact tariff-code input and promote only unambiguous official rows.",
-      "next_action": "Keep using EU TARIC updater; next upgrade is exact TARIC-code input so ambiguous prefixes can resolve to one official rate."
-    },
-    {
-      "country": "JP",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_probe_candidate",
-      "automation_claim": "Official source probe wired; parser promotion still gated",
-      "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "npm run update:duty-rates:jp:official",
-      "probe_command": "npm run probe:duty-rates:jp",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Japan import duty and consumption-tax pre-check",
-        "electronics and semiconductor route pricing",
-        "statistical-code scope and temporary tariff measure review"
-      ],
-      "parser_subtasks": [
-        "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
-        "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
-        "Gate promotion when one HS prefix maps to multiple statistical-code rates or product-scope notes."
-      ],
-      "rate_change_drivers": [
-        "Japan Customs tariff schedule revisions",
-        "Consumption tax layer changes",
-        "Statistical-code scope changes"
-      ],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "JP",
-        "priority": "P1",
-        "stage": "official_probe_candidate",
-        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
-        "probe_command": "npm run probe:duty-rates:jp",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "Japan import duty and consumption-tax pre-check",
-          "electronics and semiconductor route pricing",
-          "statistical-code scope and temporary tariff measure review"
-        ],
-        "parser_subtasks": [
-          "Parse Japan Customs tariff schedule rows by exact statistical code for high-tech HS lines.",
-          "Keep customs duty, consumption tax, and any temporary tariff measure as separate rate layers.",
-          "Gate promotion when one HS prefix maps to multiple statistical-code rates or product-scope notes."
-        ],
-        "rate_change_drivers": [
-          "Japan Customs tariff schedule revisions",
-          "Consumption tax layer changes",
-          "Statistical-code scope changes"
-        ],
-        "transit_route_priority": false,
-        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
-      },
-      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
-      "next_action": "Keep Japan Customs chapter parser running daily; preserve statistical-code gates for mixed-rate prefixes and consumption-tax separation."
-    },
-    {
       "country": "IN",
       "maintenance_priority": "P2",
       "rate_automation_stage": "official_probe_candidate",
@@ -1628,59 +1411,6 @@
       },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Replace local exact map with KCS 10-digit parser output where unambiguous; keep exact-HS gates for mixed-rate rows."
-    },
-    {
-      "country": "CN",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "maintained_exact_map",
-      "automation_claim": "Maintained exact-line map refreshed by source roadmap",
-      "public_claim": "Maintained exact candidates; not fully machine-parsed",
-      "update_command": "npm run update:duty-rates:static -- --countries=CN",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "China import duty and VAT pre-check",
-        "direct and alternate-route landed duty/tax comparison",
-        "CCC/SRRC/licensing and preferential-origin evidence review"
-      ],
-      "parser_subtasks": [
-        "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
-        "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
-        "Block promotion when one HS prefix maps to multiple tax rates or product-control notes."
-      ],
-      "rate_change_drivers": [
-        "MFN duty, preferential-origin duty, or import VAT changes",
-        "Retaliatory tariff or trade-remedy changes",
-        "CCC, SRRC, dual-use, or other product-control overlays"
-      ],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "CN",
-        "priority": "P1",
-        "stage": "maintained_exact_map",
-        "task": "Find machine-readable official tariff rows and promote parser only where exact HS rates are unambiguous.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "China import duty and VAT pre-check",
-          "direct and alternate-route landed duty/tax comparison",
-          "CCC/SRRC/licensing and preferential-origin evidence review"
-        ],
-        "parser_subtasks": [
-          "Map exact 8/10-digit China Customs tariff rows for priority high-tech HS lines such as 854231, 847150, 850760, and 9018.",
-          "Separate MFN duty, preferential-origin duty, import VAT, consumption tax, and license/control flags before filing-grade promotion.",
-          "Block promotion when one HS prefix maps to multiple tax rates or product-control notes."
-        ],
-        "rate_change_drivers": [
-          "MFN duty, preferential-origin duty, or import VAT changes",
-          "Retaliatory tariff or trade-remedy changes",
-          "CCC, SRRC, dual-use, or other product-control overlays"
-        ],
-        "transit_route_priority": false,
-        "next_action": "Connect a machine-readable CN tariff parser or official API."
-      },
-      "next_upgrade": "Connect a machine-readable CN tariff parser or official API.",
-      "next_action": "Replace local exact map with machine-readable China Customs tariff parser output when available; keep VAT and product-control checks refreshed."
     },
     {
       "country": "MY",
@@ -1910,103 +1640,113 @@
   "weekly_route_priorities": [
     {
       "rank": 1,
-      "id": "tablet-cn-de-exact",
-      "rank_score": 120,
-      "country": "DE",
-      "route": "CN -> DE",
+      "id": "tablet-global-in",
+      "rank_score": 240,
+      "country": "IN",
+      "route": "* -> IN",
       "product_id": "tablet",
       "product_label": "Tablet computer",
-      "hs_code": "8471300000",
+      "hs_code": "847130",
       "expected_source_trust": "official_duty_tax_estimate",
       "automation_level": "hybrid_official",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
       "transit_route_priority": false,
-      "probe_command": "",
-      "official_probe_urls": [],
-      "why_priority": "DE Tablet computer is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
-      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      "probe_command": "npm run probe:duty-rates:in",
+      "official_probe_urls": [
+        "https://www.icegate.gov.in/"
+      ],
+      "why_priority": "IN Tablet computer is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 2,
-      "id": "smartphone-us-de",
-      "rank_score": 121,
-      "country": "DE",
-      "route": "US -> DE",
+      "id": "smartphone-global-in",
+      "rank_score": 241,
+      "country": "IN",
+      "route": "* -> IN",
       "product_id": "smartphone",
       "product_label": "Smartphone / 5G cellular",
       "hs_code": "851713",
       "expected_source_trust": "official_duty_tax_estimate",
       "automation_level": "hybrid_official",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
       "transit_route_priority": false,
-      "probe_command": "",
-      "official_probe_urls": [],
-      "why_priority": "DE Smartphone / 5G cellular is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
-      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      "probe_command": "npm run probe:duty-rates:in",
+      "official_probe_urls": [
+        "https://www.icegate.gov.in/"
+      ],
+      "why_priority": "IN Smartphone / 5G cellular is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 3,
-      "id": "router-sg-eu",
-      "rank_score": 122,
-      "country": "EU",
-      "route": "SG -> EU",
+      "id": "router-global-in",
+      "rank_score": 242,
+      "country": "IN",
+      "route": "* -> IN",
       "product_id": "router",
       "product_label": "Wireless router / network equipment",
       "hs_code": "851762",
       "expected_source_trust": "official_duty_tax_estimate",
       "automation_level": "hybrid_official",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
       "transit_route_priority": false,
-      "probe_command": "npm run probe:duty-rates:eu",
-      "official_probe_urls": [],
-      "why_priority": "EU Wireless router / network equipment is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
-      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      "probe_command": "npm run probe:duty-rates:in",
+      "official_probe_urls": [
+        "https://www.icegate.gov.in/"
+      ],
+      "why_priority": "IN Wireless router / network equipment is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 4,
-      "id": "ev-charger-us-de-exact",
-      "rank_score": 123,
-      "country": "DE",
-      "route": "US -> DE",
+      "id": "ev-charger-global-in",
+      "rank_score": 243,
+      "country": "IN",
+      "route": "* -> IN",
       "product_id": "ev_charger",
       "product_label": "EV charger / power converter",
-      "hs_code": "8504409990",
+      "hs_code": "850440",
       "expected_source_trust": "official_duty_tax_estimate",
       "automation_level": "hybrid_official",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
       "transit_route_priority": false,
-      "probe_command": "",
-      "official_probe_urls": [],
-      "why_priority": "DE EV charger / power converter is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
-      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      "probe_command": "npm run probe:duty-rates:in",
+      "official_probe_urls": [
+        "https://www.icegate.gov.in/"
+      ],
+      "why_priority": "IN EV charger / power converter is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     },
     {
       "rank": 5,
-      "id": "battery-cn-de-exact",
-      "rank_score": 124,
-      "country": "DE",
-      "route": "CN -> DE",
+      "id": "battery-global-in",
+      "rank_score": 244,
+      "country": "IN",
+      "route": "* -> IN",
       "product_id": "battery",
       "product_label": "Lithium battery / ESS",
-      "hs_code": "8507600015",
+      "hs_code": "850760",
       "expected_source_trust": "official_duty_tax_estimate",
       "automation_level": "hybrid_official",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_hybrid_parser",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
       "parser_gap": true,
       "transit_route_priority": false,
-      "probe_command": "",
-      "official_probe_urls": [],
-      "why_priority": "DE Lithium battery / ESS is blocked by official_hybrid_parser; promote exact tariff-row parsing or official source mapping before filing-grade use.",
-      "next_action": "Add exact tariff-code input and promote only unambiguous official rows."
+      "probe_command": "npm run probe:duty-rates:in",
+      "official_probe_urls": [
+        "https://www.icegate.gov.in/"
+      ],
+      "why_priority": "IN Lithium battery / ESS is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
+      "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
     }
   ]
 }

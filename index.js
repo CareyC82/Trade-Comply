@@ -4,7 +4,7 @@ const path = require('path');
 require('./js/catalog.js');
 
 const { buildScopeCatalog, queryMatchesScope } = globalThis.Catalog;
-const { handleFeedbackRequest } = require('./feedback-store');
+const { handleFeedbackRequest, getFeedbackStorageStatus } = require('./feedback-store');
 const { handleComplianceFeedbackRequest } = require('./supabase-feedback');
 const {
     extractComplianceFeedbackPayload,
@@ -1162,7 +1162,8 @@ exports.handler = async (rawEvent) => {
                 body: JSON.stringify({
                     ok: true,
                     build: FC_BUILD_ID,
-                    features
+                    features,
+                    feedback_storage: getFeedbackStorageStatus()
                 })
             };
         }

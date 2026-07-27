@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { buildBacklog, classifyCandidate } = require('../scripts/build-unmet-search-backlog');
-const { validateFeedbackPayload } = require('../feedback-store');
+const { validateFeedbackPayload, getFeedbackStorageStatus } = require('../feedback-store');
 
 test('automatic search-gap records preserve route and quality context', () => {
     const result = validateFeedbackPayload({
@@ -20,6 +20,24 @@ test('automatic search-gap records preserve route and quality context', () => {
     assert.equal(result.record.event_type, 'search_gap');
     assert.equal(result.record.route_origin, 'CN');
     assert.equal(result.record.route_destination, 'EU');
+});
+
+test('feedback storage health reports missing OSS configuration without exposing values', () => {
+    const previous = {
+        bucket: process.env.OSS_BUCKET,
+        id: process.env.OSS_ACCESS_KEY_ID,
+        secret: process.env.OSS_ACCESS_KEY_SECRET
+    };
+    delete process.env.OSS_BUCKET;
+    delete process.env.OSS_ACCESS_KEY_ID;
+    delete process.env.OSS_ACCESS_KEY_SECRET;
+    const status = getFeedbackStorageStatus();
+    assert.equal(status.configured, false);
+    assert.equal(status.storage, 'log');
+    assert.deepEqual(status.missing, ['OSS_BUCKET', 'OSS_ACCESS_KEY_ID', 'OSS_ACCESS_KEY_SECRET']);
+    if (previous.bucket !== undefined) process.env.OSS_BUCKET = previous.bucket;
+    if (previous.id !== undefined) process.env.OSS_ACCESS_KEY_ID = previous.id;
+    if (previous.secret !== undefined) process.env.OSS_ACCESS_KEY_SECRET = previous.secret;
 });
 
 test('weekly backlog prioritizes repeated no-match searches over weak matches', () => {

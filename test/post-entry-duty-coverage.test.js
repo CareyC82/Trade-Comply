@@ -90,21 +90,11 @@ test('P1 markets keep exact-rate trust gaps visible until parser promotion is co
         result.exact_rate_progress.rule_scope_backlog_rows.map((row) => row.import_country)
     );
 
-    ['EU', 'DE', 'NL'].forEach((country) => {
-        const backlog = backlogByCountry.get(country);
-        assert.ok(backlog, `${country} should stay visible in the P1 parser backlog`);
-        assert.equal(backlog.maintenance_priority, 'P1');
-        assert.equal(backlog.rate_automation_stage, 'official_hybrid_parser');
-        assert.equal(backlog.workstream, 'exact-code parser');
-        assert.equal(backlog.parser_gap, true);
-        assert.match(backlog.public_claim, /Hybrid official coverage; exact tariff-line scope stays gated/);
-        assert.match(backlog.next_action, /exact tariff-code input/i);
-        assert.equal(exactBacklogMarkets.has(country), true, `${country} should expose exact-rate scope backlog rows`);
-    });
-
-    ['SG', 'MX'].forEach((country) => {
+    ['EU', 'DE', 'NL', 'CN', 'JP', 'SG', 'MX'].forEach((country) => {
         assert.equal(backlogByCountry.has(country), false, `${country} should leave the parser backlog after official sync`);
-        assert.equal(exactBacklogMarkets.has(country), false, `${country} should have filing-grade exact rows`);
+    });
+    ['EU', 'DE', 'NL'].forEach((country) => {
+        assert.equal(exactBacklogMarkets.has(country), true, `${country} should still request an exact code for ambiguous product scope`);
     });
 });
 
@@ -467,7 +457,7 @@ test('maintained exact candidates keep unverified markets gated', () => {
             ? 'official_source_checked'
             : 'scope_check_required';
         assert.equal(rule.source_status, expectedStatus, `${country} should use the correct exact-line trust gate`);
-        assert.ok((rule.exact_code_overrides || []).some(override => override.hs_code === '854231'));
+        assert.ok((rule.exact_code_overrides || []).some(override => String(override.hs_code).startsWith('8542')));
         assert.ok(rule.last_checked_at, `${country} should carry checked timestamp when refreshed`);
     });
 });

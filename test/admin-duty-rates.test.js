@@ -108,8 +108,8 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(payload.action_details.some(item => item.type === 'exact_rate_backlog' && item.details?.why_priority));
     assert.equal(payload.sources.some(source => source.country === 'US' && source.source_status === 'auto_updatable'), true);
     assert.equal(payload.source_roadmap_summary.auto_updatable.includes('US'), true);
-    assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('EU'), true);
-    assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('JP'), true);
+    assert.equal(payload.sources.some(source => source.country === 'EU' && source.source_status === 'official_machine_synced'), true);
+    assert.equal(payload.sources.some(source => source.country === 'JP' && source.source_status === 'official_machine_synced'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('KR'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('IN'), true);
     assert.equal(payload.source_roadmap_summary.hybrid_official_candidate.includes('MY'), true);
@@ -117,12 +117,8 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(Array.isArray(payload.source_roadmap_summary.next_source_priorities));
     assert.ok(Array.isArray(payload.source_roadmap_summary.automation_backlog));
     assert.ok(payload.source_roadmap_summary.automation_backlog_summary.parser_gap_count > 0);
-    assert.deepEqual(payload.source_roadmap_summary.automation_backlog.slice(0, 3).map(row => row.country), ['CN', 'DE', 'EU']);
-    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
-        row.country === 'EU'
-        && row.rate_automation_stage === 'official_hybrid_parser'
-        && row.workstream === 'exact-code parser'
-    )));
+    assert.deepEqual(payload.source_roadmap_summary.automation_backlog.slice(0, 3).map(row => row.country), ['IN', 'KR', 'MY']);
+    assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'EU'), false);
     assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
         row.country === 'IN'
         && row.rate_automation_stage === 'official_probe_candidate'
@@ -130,16 +126,17 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     )));
     assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'SG'), false);
     assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'MX'), false);
+    assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'JP'), false);
     assert.ok(payload.source_roadmap_summary.next_source_priorities.some(row => (
         row.country === 'US'
         && row.maintenance_priority === 'P0'
         && /USITC/.test(row.next_action)
     )));
-    assert.ok(payload.source_roadmap_summary.next_source_priorities.some(row => (
+    assert.equal(payload.sources.some(row => (
         row.country === 'JP'
         && row.maintenance_priority === 'P1'
-        && /Japan Customs/.test(row.next_action)
-    )));
+        && row.source_status === 'official_machine_synced'
+    )), true);
     assert.ok(payload.source_roadmap_summary.maintenance_priority_groups.P1.some(row => row.country === 'SG'));
     assert.ok(payload.source_roadmap_summary.maintenance_priority_groups.P1.some(row => row.country === 'MX'));
     assert.ok(payload.source_roadmap_summary.maintenance_priority_groups.P1.some(row => row.country === 'CN'));

@@ -194,7 +194,8 @@ function japanRowCandidateCodes(row = {}) {
     const statisticalDigits = normalizeHsCode(row.statistical_code || '');
     return Array.from(new Set([
         hsDigits,
-        statisticalDigits ? `${hsDigits}${statisticalDigits}` : ''
+        statisticalDigits ? `${hsDigits}${statisticalDigits.padStart(3, '0')}` : '',
+        !statisticalDigits && hsDigits.length === 6 ? `${hsDigits}000` : ''
     ].filter(Boolean)));
 }
 
@@ -276,7 +277,9 @@ function buildJapanOfficialRateCandidate(chapterRows = [], prefix = '') {
 }
 
 function buildJapanOfficialCandidateForRule(rule = {}, chapterRows = []) {
-    const exactCodes = Array.isArray(rule.exact_statistical_codes) ? rule.exact_statistical_codes : [];
+    const exactCodes = (Array.isArray(rule.required_exact_statistical_codes) ? rule.required_exact_statistical_codes : [])
+        .map(normalizeHsCode)
+        .filter(code => code.length >= 9);
     if (exactCodes.length) {
         const candidates = exactCodes.map(code => buildJapanOfficialExactRateCandidate(chapterRows, code));
         const matched = candidates.filter(candidate => candidate.rate_row_count > 0);
@@ -365,6 +368,38 @@ function buildJapanOfficialCandidateForRule(rule = {}, chapterRows = []) {
         reason: 'All matched Japan tariff prefixes share one official general duty rate.',
         prefix_candidates: candidates
     };
+}
+
+function buildJapanOfficialExactOverrides(rule = {}, chapterRows = [], checkedAt = new Date().toISOString()) {
+    const prefixes = (rule.hs_prefixes || []).map(normalizeHsCode).filter(Boolean);
+    const grouped = new Map();
+    for (const row of chapterRows) {
+        const rate = row.parsed_base_rate;
+        if (!Number.isFinite(rate)) continue;
+        for (const code of japanRowCandidateCodes(row)) {
+            if (code.length < 9 || !prefixes.some(prefix => code.startsWith(prefix))) continue;
+            const rates = grouped.get(code) || new Set();
+            rates.add(rate);
+            grouped.set(code, rates);
+        }
+    }
+    return [...grouped.entries()]
+        .filter(([, rates]) => rates.size === 1)
+        .map(([code, rates]) => {
+            const baseRate = [...rates][0];
+            return {
+                hs_code: code,
+                base_rate: baseRate,
+                source_status: 'official_source_checked',
+                confidence: 'Official exact tariff line',
+                source_note: 'Official Japan Customs statistical-line general duty. Consumption tax, preferences, product approvals, and other controls remain separate layers.',
+                source_hts: `${code} (Japan Customs official statistical line)`,
+                source_rate_text: `Japan Customs general duty: ${(baseRate * 100).toFixed(3)}%`,
+                source_url: JP_CUSTOMS_URL,
+                last_checked_at: checkedAt
+            };
+        })
+        .sort((left, right) => left.hs_code.localeCompare(right.hs_code));
 }
 
 async function probeJapanOfficialSource({ fetcher = fetchText, maintainedPrefixes = [] } = {}) {
@@ -494,7 +529,7 @@ async function probeJapanReadiness({ live = false, fetcher = fetchText } = {}) {
         maintained_rule_count: rules.length,
         maintained_hs_prefixes: prefixes,
         writes_rates: true,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: true,
         official_probe: officialProbe,
         next_action: source?.next_action || 'Add Japan source roadmap before updating.',
         status_reason: source?.status_reason || ''
@@ -553,18 +588,10 @@ function applyJapanBenchmarkToRule(rule, checkedAt) {
         changes.push({ field: 'exact_code_overrides', old_value: rule.exact_code_overrides || [], new_value: exactOverrides });
         rule.exact_code_overrides = exactOverrides;
     }
-    if (JSON.stringify(rule.exact_statistical_codes || []) !== JSON.stringify(JP_EXACT_STATISTICAL_CODE_CANDIDATES)) {
-        changes.push({
-            field: 'exact_statistical_codes',
-            old_value: rule.exact_statistical_codes || [],
-            new_value: JP_EXACT_STATISTICAL_CODE_CANDIDATES
-        });
-        rule.exact_statistical_codes = JP_EXACT_STATISTICAL_CODE_CANDIDATES;
-    }
     return changes;
 }
 
-function applyJapanOfficialCandidateToRule(rule, candidate, checkedAt) {
+function applyJapanOfficialCandidateToRule(rule, candidate, checkedAt, chapterRows = []) {
     const changes = [];
     refreshConsumptionTaxLayer(rule);
     if (!candidate || !candidate.source_status) {
@@ -604,6 +631,26 @@ function applyJapanOfficialCandidateToRule(rule, candidate, checkedAt) {
             rule[field] = value;
         }
     });
+    if (chapterRows.length) {
+        const exactOverrides = buildJapanOfficialExactOverrides(rule, chapterRows, checkedAt);
+        if (exactOverrides.length && JSON.stringify(rule.exact_code_overrides || []) !== JSON.stringify(exactOverrides)) {
+            changes.push({
+                field: 'exact_code_overrides',
+                old_value: rule.exact_code_overrides || [],
+                new_value: exactOverrides
+            });
+            rule.exact_code_overrides = exactOverrides;
+        }
+        const statisticalCodes = exactOverrides.map(row => row.hs_code);
+        if (statisticalCodes.length && JSON.stringify(rule.exact_statistical_codes || []) !== JSON.stringify(statisticalCodes)) {
+            changes.push({
+                field: 'exact_statistical_codes',
+                old_value: rule.exact_statistical_codes || [],
+                new_value: statisticalCodes
+            });
+            rule.exact_statistical_codes = statisticalCodes;
+        }
+    }
     return changes;
 }
 
@@ -624,7 +671,7 @@ function updateJapanRules({ dryRun = false, officialChapterRows = null } = {}) {
                 officialCandidateOutcomes.push(candidate);
             }
             const ruleChanges = candidate
-                ? applyJapanOfficialCandidateToRule(rule, candidate, checkedAt)
+                ? applyJapanOfficialCandidateToRule(rule, candidate, checkedAt, officialChapterRows)
                 : applyJapanBenchmarkToRule(rule, checkedAt);
             if (ruleChanges.length) {
                 changes.push({
@@ -687,10 +734,26 @@ async function updateJapanRulesFromOfficialSource({ dryRun = false, fetcher = fe
             : official.status_code && official.status_code >= 400
                 ? 'official_http_error'
                 : 'official_source_returned_no_rate_rows';
-    const result = updateJapanRules({
-        dryRun,
-        officialChapterRows: official.rows.length ? official.rows : null
-    });
+    let result;
+    if (official.ok && official.rows.length) {
+        result = updateJapanRules({ dryRun, officialChapterRows: official.rows });
+    } else {
+        const checkedAt = new Date().toISOString();
+        result = {
+            ok: true,
+            dry_run: dryRun,
+            writes_official_machine_rates: false,
+            official_candidate_outcomes: [],
+            changes: [],
+            errors: [],
+            preserved_last_good: true
+        };
+        if (!dryRun) {
+            payload.last_jp_customs_benchmark_sync_at = checkedAt;
+            payload.last_jp_customs_benchmark_sync = result;
+            writeJson(DUTY_RATES_PATH, payload);
+        }
+    }
     result.official_fetch = {
         ok: official.ok,
         status_code: official.status_code,
@@ -709,6 +772,12 @@ async function updateJapanRulesFromOfficialSource({ dryRun = false, fetcher = fe
             : 'Official source was reachable but no machine-readable Japan tariff rows were parsed.'
     );
     result.writes_official_machine_rates = official.ok;
+    if (!dryRun) {
+        const persisted = readJson(DUTY_RATES_PATH);
+        persisted.last_jp_customs_benchmark_sync_at = new Date().toISOString();
+        persisted.last_jp_customs_benchmark_sync = result;
+        writeJson(DUTY_RATES_PATH, persisted);
+    }
     return result;
 }
 
@@ -746,6 +815,7 @@ module.exports = {
     buildJapanOfficialExactRateCandidate,
     buildJapanOfficialRateCandidate,
     buildJapanOfficialCandidateForRule,
+    buildJapanOfficialExactOverrides,
     fetchJapanOfficialRows,
     probeJapanOfficialSource,
     probeJapanReadiness,

@@ -324,7 +324,7 @@ async function probeEuTaricReadiness({ live = false, inspectFullDatabase = false
         maintained_rule_count: rules.length,
         maintained_hs_prefixes: prefixes,
         writes_rates: true,
-        writes_official_machine_rates: false,
+        writes_official_machine_rates: true,
         official_probe: officialProbe,
         next_action: source?.next_action || 'Add EU source roadmap before updating.',
         status_reason: source?.status_reason || ''

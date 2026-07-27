@@ -41,6 +41,7 @@ const {
     applyJapanBenchmarkToRule,
     applyJapanOfficialCandidateToRule,
     buildJapanOfficialCandidateForRule,
+    buildJapanOfficialExactOverrides,
     buildJapanOfficialExactRateCandidate,
     buildJapanOfficialRateCandidate,
     JP_EXACT_STATISTICAL_CODE_CANDIDATES,
@@ -94,21 +95,23 @@ test('duty-rate source roadmap covers every maintained duty-rate country', () =>
     assert.equal(roadmap.missing_coverage.length, 0);
     assert.equal(roadmap.missing_roadmap.length, 0);
     assert.ok(roadmap.auto_updatable.includes('US'));
-    assert.ok(roadmap.hybrid_official_candidate.includes('EU'));
-    assert.ok(roadmap.hybrid_official_candidate.includes('DE'));
-    assert.ok(roadmap.hybrid_official_candidate.includes('NL'));
+    ['EU', 'DE', 'NL', 'JP'].forEach((country) => {
+        assert.equal(dutyRateSources.sources.find((source) => source.country === country).source_status, 'official_machine_synced');
+    });
     assert.equal(dutyRateSources.sources.find((source) => source.country === 'SG').source_status, 'official_machine_synced');
     assert.equal(dutyRateSources.sources.find((source) => source.country === 'MX').source_status, 'official_machine_synced');
+    assert.equal(dutyRateSources.sources.find((source) => source.country === 'CN').source_status, 'official_machine_synced');
     assert.ok(roadmap.hybrid_official_candidate.includes('VN'));
     assert.ok(roadmap.hybrid_official_candidate.includes('MY'));
     assert.ok(roadmap.hybrid_official_candidate.includes('TW'));
-    assert.ok(roadmap.hybrid_official_candidate.includes('JP'));
     assert.ok(roadmap.hybrid_official_candidate.includes('KR'));
     assert.ok(roadmap.hybrid_official_candidate.includes('IN'));
     STATIC_BENCHMARK_COUNTRIES.forEach((country) => {
         if (country === 'IN') {
             assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
-        } else if (['CN', 'VN', 'MY', 'TW'].includes(country)) {
+        } else if (country === 'CN') {
+            assert.equal(dutyRateSources.sources.find((source) => source.country === country).source_status, 'official_machine_synced');
+        } else if (['VN', 'MY', 'TW'].includes(country)) {
             assert.ok(roadmap.hybrid_official_candidate.includes(country), `${country} should be hybrid official candidate`);
         } else if (country === 'RU') {
             assert.ok(roadmap.official_link_only.includes(country), `${country} should be official-link monitored`);
@@ -290,8 +293,8 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
 
     assert.equal(eu.ok, true);
     assert.equal(eu.writes_rates, true);
-    assert.equal(eu.writes_official_machine_rates, false);
-    assert.equal(eu.source_status, 'hybrid_official_candidate');
+    assert.equal(eu.writes_official_machine_rates, true);
+    assert.equal(eu.source_status, 'official_machine_synced');
     assert.ok(eu.maintained_hs_prefixes.includes('850440'));
     assert.equal(eu.official_probe.checked, false);
     assert.equal(eu.official_probe.machine_parser_ready, false);
@@ -310,8 +313,8 @@ test('EU hybrid source and benchmark updater probes are wired by market', async 
 
     assert.equal(jp.ok, true);
     assert.equal(jp.writes_rates, true);
-    assert.equal(jp.writes_official_machine_rates, false);
-    assert.equal(jp.source_status, 'hybrid_official_candidate');
+    assert.equal(jp.writes_official_machine_rates, true);
+    assert.equal(jp.source_status, 'official_machine_synced');
     assert.ok(jp.maintained_hs_prefixes.includes('8542'));
     assert.equal(jp.official_probe.checked, false);
     assert.equal(jp.official_probe.machine_parser_ready, false);
@@ -331,7 +334,9 @@ test('static official-link benchmark updater covers China Vietnam Malaysia Taiwa
         assert.equal(readiness.ok, true, `${country} static benchmark readiness should be OK`);
         if (country === 'IN') {
             assert.equal(readiness.source_status, 'hybrid_official_candidate');
-        } else if (['CN', 'VN', 'MY', 'TW'].includes(country)) {
+        } else if (country === 'CN') {
+            assert.equal(readiness.source_status, 'official_machine_synced');
+        } else if (['VN', 'MY', 'TW'].includes(country)) {
             assert.equal(readiness.source_status, 'hybrid_official_candidate');
         } else if (country === 'RU') {
             assert.equal(readiness.source_status, 'official_link');
@@ -500,7 +505,7 @@ test('Japan Customs live probe parses dated tariff schedule and chapter candidat
     assert.equal(readiness.official_probe.ok, true);
     assert.equal(readiness.official_probe.chapter_links.some(link => link.chapter === '85'), true);
     assert.equal(readiness.official_probe.prefix_candidates.some(item => item.hs_prefix === '8542' && item.status === 'official_source_candidate'), true);
-    assert.equal(readiness.writes_official_machine_rates, false);
+    assert.equal(readiness.writes_official_machine_rates, true);
 });
 
 test('Japan official parser promotes supplied exact statistical code only when unambiguous', () => {
@@ -532,7 +537,7 @@ test('Japan official parser promotes supplied exact statistical code only when u
     const candidate = buildJapanOfficialCandidateForRule({
         id: 'TEST-JP-EXACT',
         hs_prefixes: ['8542'],
-        exact_statistical_codes: ['854231000']
+        required_exact_statistical_codes: ['854231000']
     }, rows);
 
     assert.equal(candidate.ok, true);
@@ -564,7 +569,7 @@ test('Japan official parser gates conflicting supplied exact statistical codes',
     const candidate = buildJapanOfficialCandidateForRule({
         id: 'TEST-JP-CONFLICT',
         hs_prefixes: ['8542'],
-        exact_statistical_codes: ['854231000', '854231900']
+        required_exact_statistical_codes: ['854231000', '854231900']
     }, rows);
 
     assert.equal(candidate.ok, false);
@@ -621,7 +626,21 @@ test('Japan official-live updater verifies exact statistical code candidates fro
     assert.ok(outcome);
     assert.equal(outcome.ok, true);
     assert.equal(outcome.source_status, 'official_source_checked');
-    assert.equal(outcome.exact_code_candidates.length, JP_EXACT_STATISTICAL_CODE_CANDIDATES.length);
+    assert.ok(outcome.prefix_candidates.length > 0);
+});
+
+test('Japan official-live failure preserves the last-good tariff rules', async () => {
+    const result = await updateJapanRulesFromOfficialSource({
+        dryRun: true,
+        fetcher: async () => {
+            throw new Error('simulated upstream outage');
+        }
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.preserved_last_good, true);
+    assert.equal(result.changes.length, 0);
+    assert.equal(result.official_fetch_degraded, true);
+    assert.equal(result.official_fetch_degraded_reason, 'official_fetch_failed');
 });
 
 test('Korea Customs live probe detects tariff DB lookup without upgrading rate trust', async () => {
@@ -795,7 +814,7 @@ test('EU TARIC official probe parses consultation metadata without upgrading rat
         })
     });
     assert.equal(readiness.ok, true);
-    assert.equal(readiness.writes_official_machine_rates, false);
+    assert.equal(readiness.writes_official_machine_rates, true);
     assert.equal(readiness.official_probe.ok, true);
 });
 
@@ -1205,7 +1224,7 @@ test('Japan updater keeps exact candidates separate from consumption tax layer',
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854231'));
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854232'));
     assert.ok(rule.exact_code_overrides.some(override => override.hs_code === '854239'));
-    assert.deepEqual(rule.exact_statistical_codes, JP_EXACT_STATISTICAL_CODE_CANDIDATES);
+    assert.equal(rule.exact_statistical_codes, undefined);
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
 });
@@ -1242,12 +1261,40 @@ test('Japan updater can promote unambiguous official candidates while preserving
     assert.equal(candidate.ok, true);
     assert.equal(candidate.source_status, 'official_source_checked');
 
-    const changes = applyJapanOfficialCandidateToRule(rule, candidate, '2026-06-16T00:00:00.000Z');
+    const changes = applyJapanOfficialCandidateToRule(rule, candidate, '2026-06-16T00:00:00.000Z', rows);
     assert.ok(changes.some(change => change.field === 'base_rate'));
     assert.equal(rule.base_rate, 0);
     assert.equal(rule.source_status, 'official_source_checked');
     assert.equal(rule.add_on_layers[0].rate, 0.1);
     assert.equal(rule.additional_rate, 0.1);
+});
+
+test('Japan official parser publishes unambiguous 9-digit statistical rows', () => {
+    const rule = { id: 'TEST-JP-EXACT-ROWS', hs_prefixes: ['8542'] };
+    const rows = [
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            statistical_code: '000',
+            parsed_base_rate: 0
+        },
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            statistical_code: '900',
+            parsed_base_rate: 0.039
+        },
+        {
+            hs_heading: '8542.31',
+            hs_digits: '854231',
+            statistical_code: '900',
+            parsed_base_rate: 0.05
+        }
+    ];
+    const overrides = buildJapanOfficialExactOverrides(rule, rows, '2026-07-27T00:00:00.000Z');
+    assert.deepEqual(overrides.map(row => row.hs_code), ['854231000']);
+    assert.equal(overrides[0].base_rate, 0);
+    assert.equal(overrides[0].confidence, 'Official exact tariff line');
 });
 
 test('Japan official candidate keeps mixed-rate prefixes exact-code gated', () => {

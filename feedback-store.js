@@ -124,6 +124,19 @@ function getOssConfig() {
     };
 }
 
+function getFeedbackStorageStatus() {
+    const config = getOssConfig();
+    const missing = [];
+    if (!config.bucket) missing.push('OSS_BUCKET');
+    if (!config.accessKeyId) missing.push('OSS_ACCESS_KEY_ID');
+    if (!config.accessKeySecret) missing.push('OSS_ACCESS_KEY_SECRET');
+    return {
+        configured: missing.length === 0,
+        storage: missing.length === 0 ? 'oss' : 'log',
+        missing
+    };
+}
+
 function buildOssObjectKey(prefix, feedbackId, submittedAt) {
     const date = new Date(submittedAt);
     const yyyy = date.getUTCFullYear();
@@ -394,6 +407,7 @@ module.exports = {
     handleFeedbackRequest,
     storeFeedbackRecord,
     getOssConfig,
+    getFeedbackStorageStatus,
     listFeedbackObjectKeys,
     downloadFeedbackObject,
     parseFeedbackRecord,

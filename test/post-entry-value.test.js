@@ -8,6 +8,8 @@ const {
     calculateDutyImpact,
     normalizeIncoterm,
     loadDutyRules,
+    findDutyRule,
+    setDutyRulesForTest,
     buildReviewChecklist,
     buildValuationMethod,
     buildComplianceMeaning,
@@ -380,6 +382,49 @@ test('uses exact TARIC override when a precise EU code is entered', () => {
     assert.ok(exactDuty.sourceBreakdown.some(source => source.component === 'base_duty' && source.status === 'official_source_checked'));
     assert.equal(exactDuty.baseRate, 0);
     assert.equal(classifyRateSourceTrust(exactDuty.sourceBreakdown).level, 'official_duty_tax_estimate');
+});
+
+test('uses an 8-digit TARIC input only when all matching 10-digit lines share one rate', () => {
+    setDutyRulesForTest([{
+        id: 'EU-TEST-8-DIGIT',
+        import_country: 'EU',
+        origin_country: '*',
+        hs_prefixes: ['847130'],
+        base_rate: 0.14,
+        source_status: 'scope_check_required',
+        exact_code_overrides: [
+            { hs_code: '8471300000', base_rate: 0, confidence: 'Official exact tariff line' },
+            { hs_code: '8471300090', base_rate: 0, confidence: 'Official exact tariff line' }
+        ]
+    }]);
+    const resolved = findDutyRule({
+        importCountryCode: 'EU',
+        originCountryCode: 'CN',
+        hsCode: '84713000'
+    });
+    assert.equal(resolved.baseRate, 0);
+    assert.match(resolved.sourceHts, /all matched 10-digit TARIC lines share one rate/);
+
+    setDutyRulesForTest([{
+        id: 'EU-TEST-8-DIGIT-MIXED',
+        import_country: 'EU',
+        origin_country: '*',
+        hs_prefixes: ['852852'],
+        base_rate: 0.14,
+        source_status: 'scope_check_required',
+        exact_code_overrides: [
+            { hs_code: '8528521000', base_rate: 0, confidence: 'Official exact tariff line' },
+            { hs_code: '8528529000', base_rate: 0.14, confidence: 'Official exact tariff line' }
+        ]
+    }]);
+    const gated = findDutyRule({
+        importCountryCode: 'EU',
+        originCountryCode: 'CN',
+        hsCode: '85285200'
+    });
+    assert.equal(gated.baseRate, 0.14);
+    assert.equal(gated.sourceStatus, 'scope_check_required');
+    setDutyRulesForTest(null);
 });
 
 test('splits US duty source rows into general duty, Section 301, and scope flags', () => {

@@ -77,6 +77,10 @@ Searches with zero matched rules or only one weak rule are recorded as `search_g
 the existing feedback endpoint. The browser deduplicates identical route/query gaps per session.
 Every Sunday, `unmet-search-weekly.yml` summarizes the last seven days from OSS and updates
 `data/unmet-search-backlog.json`.
+The workflow accepts either dedicated `OSS_ACCESS_KEY_*` secrets or the deployment
+`ALIBABA_CLOUD_ACCESS_KEY_*` aliases, and fails at an explicit configuration preflight
+when the bucket or credentials are missing. `?health=feedback` reports only whether
+feedback persistence is configured (`oss` versus log fallback), never secret values.
 
 No-match searches receive a higher priority weight than weak matches. The generated queue preserves
 manual review status and lists the required research sequence: product attributes, official HS
