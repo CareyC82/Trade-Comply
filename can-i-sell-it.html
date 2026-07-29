@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Can I Sell It? | TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260729-consumer-check">
+    <link rel="stylesheet" href="css/style.css?v=20260729-consumer-economics">
 </head>
 <body class="sell-check-page-body">
     <main class="sell-check-page view-container active">
@@ -27,6 +27,9 @@
                     <button type="button" data-example="Bluetooth smart watch with a rechargeable lithium battery, GPS, heart-rate and sleep tracking. No medical claims.">Smart watch</button>
                     <button type="button" data-example="Smart ring with Bluetooth, rechargeable lithium battery, sleep and heart-rate tracking. No medical claims.">Smart ring</button>
                     <button type="button" data-example="Children's 4G GPS smart watch with eSIM, camera, microphone and rechargeable lithium battery.">Kids GPS watch</button>
+                    <button type="button" data-example="Bluetooth fitness band with rechargeable battery, display, step, sleep and heart-rate tracking. No medical claims.">Fitness band</button>
+                    <button type="button" data-example="Bluetooth noise-cancelling earbuds with microphones, charging case and rechargeable lithium batteries.">Earbuds</button>
+                    <button type="button" data-example="Smart glasses with Bluetooth, Wi-Fi, projected display, camera, microphone and rechargeable lithium battery.">Smart glasses</button>
                 </div>
                 <div class="sell-check-grid">
                     <label class="sell-check-field"><span>Made in</span><select id="sell-origin"><option value="CN">China</option><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="OTHER">Other</option></select></label>
@@ -41,10 +44,28 @@
         <section id="sell-follow-up" class="sell-check-card" hidden>
             <div class="sell-check-section-head"><span>2</span><div><h2>Confirm the product facts</h2><p>These answers change the legal and shipping path. “Not sure” remains a visible gap.</p></div></div>
             <form id="sell-follow-up-form">
+                <label class="sell-check-field sell-check-product-type" for="sell-product-type"><span>Detected product type — change if needed</span><select id="sell-product-type" name="productType"></select></label>
                 <div id="sell-follow-up-questions" class="sell-question-grid"></div>
                 <fieldset class="sell-documents">
                     <legend>Documents already supplied for this exact model</legend>
                     <div id="sell-document-options"></div>
+                </fieldset>
+                <fieldset class="sell-costs">
+                    <legend>Purchase and selling economics</legend>
+                    <p>Enter your own platform fee and tax assumptions. Blank duty uses the maintained candidate tariff signal when available.</p>
+                    <div class="sell-cost-grid">
+                        <label class="sell-check-field"><span>Currency</span><select name="currency"><option>USD</option><option>EUR</option><option>JPY</option><option>SGD</option><option>CNY</option></select></label>
+                        <label class="sell-check-field"><span>Quantity</span><input name="quantity" type="number" min="1" step="1" value="100"></label>
+                        <label class="sell-check-field"><span>Purchase price / unit</span><input name="purchaseUnit" type="number" min="0" step="0.01" placeholder="18.00"></label>
+                        <label class="sell-check-field"><span>Expected sale price / unit</span><input name="saleUnit" type="number" min="0" step="0.01" placeholder="49.00"></label>
+                        <label class="sell-check-field"><span>Freight total</span><input name="freightTotal" type="number" min="0" step="0.01" placeholder="250"></label>
+                        <label class="sell-check-field"><span>Insurance total</span><input name="insuranceTotal" type="number" min="0" step="0.01" placeholder="0"></label>
+                        <label class="sell-check-field"><span>Other import costs total</span><input name="otherImportTotal" type="number" min="0" step="0.01" placeholder="100"></label>
+                        <label class="sell-check-field"><span>Duty rate % (optional)</span><input name="dutyRate" type="number" min="0" step="0.01" placeholder="auto candidate"></label>
+                        <label class="sell-check-field"><span>Import tax / VAT %</span><input name="importTaxRate" type="number" min="0" step="0.01" placeholder="0"></label>
+                        <label class="sell-check-field"><span>Platform fee %</span><input name="platformFeeRate" type="number" min="0" step="0.01" placeholder="enter your current fee"></label>
+                        <label class="sell-check-field"><span>Ads, fulfillment and other / unit</span><input name="otherSellingUnit" type="number" min="0" step="0.01" placeholder="5.00"></label>
+                    </div>
                 </fieldset>
                 <button class="sell-check-primary" type="submit">Build My Assessment</button>
             </form>
@@ -64,6 +85,6 @@
         <span id="nav-can-i-sell-it" class="nav-btn active" aria-current="page">🛍️ Can I Sell It?</span>
     </nav>
 
-    <script src="js/main.js?v=20260729-consumer-check" data-app="can-i-sell-it"></script>
+    <script src="js/main.js?v=20260729-consumer-economics" data-app="can-i-sell-it"></script>
 </body>
 </html>

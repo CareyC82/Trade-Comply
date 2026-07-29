@@ -167,6 +167,7 @@
     ];
 
     const CAN_I_SELL_IT_MODULES = [
+        'lib/wearable-product-models.js',
         'lib/can-i-sell-it.js',
         'js/can-i-sell-it-page.js'
     ];

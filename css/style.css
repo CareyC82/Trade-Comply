@@ -3832,7 +3832,8 @@ a.hub-core-card--link {
 .sell-check-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
 .sell-check-field { display: grid; gap: 7px; color: #344a60; font-size: .83rem; font-weight: 800; }
 .sell-check-field textarea,
-.sell-check-field select {
+.sell-check-field select,
+.sell-check-field input {
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #c9d6e4;
@@ -3843,6 +3844,7 @@ a.hub-core-card--link {
 }
 .sell-check-field textarea { min-height: 125px; padding: 14px; resize: vertical; line-height: 1.55; font-weight: 500; }
 .sell-check-field select { min-height: 46px; padding: 0 12px; font-weight: 600; }
+.sell-check-field input { min-height: 46px; padding: 0 12px; font-weight: 600; }
 .sell-check-examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .sell-check-examples button { border: 1px solid #b9cde6; border-radius: 999px; background: #f3f7fd; color: #21568d; padding: 7px 11px; cursor: pointer; font-weight: 700; }
 .sell-check-primary { margin-top: 22px; border: 0; border-radius: 10px; background: #1763bd; color: #fff; padding: 13px 21px; font-weight: 900; cursor: pointer; }
@@ -3855,6 +3857,11 @@ a.hub-core-card--link {
 .sell-documents legend { padding: 0 6px; color: #264661; font-weight: 900; }
 .sell-documents > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .sell-documents label { color: #55687b; font-size: .88rem; }
+.sell-check-product-type { max-width: 430px; margin-bottom: 18px; }
+.sell-costs { margin: 22px 0 0; padding: 18px; border: 1px solid #dbe5ef; border-radius: 10px; }
+.sell-costs legend { padding: 0 6px; color: #264661; font-weight: 900; }
+.sell-costs > p, .sell-panel-note { color: #6e7e8d; font-size: .84rem; line-height: 1.5; }
+.sell-cost-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 
 .sell-verdict { display: flex; justify-content: space-between; gap: 25px; align-items: center; padding: 26px; border-left: 7px solid #c47b09; }
 .sell-verdict--warning { border-left-color: #b43c3c; background: #fffafa; }
@@ -3874,6 +3881,19 @@ a.hub-core-card--link {
 .sell-requirement > span { color: #6a7d8e; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
 .sell-requirement h3 { margin: 7px 0; color: #234867; font-size: 1rem; }
 .sell-requirement p { margin: 0; color: #68798a; font-size: .86rem; line-height: 1.5; }
+.sell-source-list { display: grid; gap: 7px; margin-top: 13px; }
+.sell-source-list a { display: grid; gap: 3px; padding: 9px; border-radius: 7px; background: #f1f6fb; color: #23598b; text-decoration: none; }
+.sell-source-list a strong { font-size: .76rem; }
+.sell-source-list a span { color: #667b8e; font-size: .68rem; line-height: 1.35; }
+.sell-procurement { margin-top: 14px; padding: 24px; border-radius: 14px; background: #173c64; color: #fff; }
+.sell-procurement > span { color: #bcd5ed; font-size: .72rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.sell-procurement h2 { margin: 7px 0; }
+.sell-procurement p { margin: 0; color: #dbe8f4; line-height: 1.5; }
+.sell-economics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sell-economics-grid article { display: grid; gap: 6px; padding: 15px; border-radius: 9px; background: #f5f8fb; }
+.sell-economics-grid span { color: #718090; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
+.sell-economics-grid strong { color: #173c64; font-size: 1.05rem; }
+.sell-economics-grid small { color: #788795; }
 .sell-gap-list { display: grid; gap: 8px; padding: 0; list-style: none; }
 .sell-gap-list li { display: flex; justify-content: space-between; gap: 18px; padding: 11px 13px; border-radius: 8px; background: #f5f8fb; }
 .sell-gap-list strong { color: #294b69; }
@@ -3885,8 +3905,8 @@ a.hub-core-card--link {
     .sell-check-page { width: min(100% - 20px, 1120px); padding-top: 12px; }
     .sell-check-hero { padding: 28px 22px; border-radius: 16px; }
     .sell-check-card, .sell-result-panel { padding: 20px; }
-    .sell-check-grid, .sell-question-grid, .sell-documents > div,
-    .sell-readiness-grid, .sell-requirement-grid { grid-template-columns: 1fr; }
+    .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid,
+    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid { grid-template-columns: 1fr; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-gap-list span { text-align: left; }
 }
