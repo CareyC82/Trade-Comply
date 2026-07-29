@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can I Sell It? | TraceWize</title>
+    <link rel="stylesheet" href="css/style.css?v=20260729-consumer-check">
+</head>
+<body class="sell-check-page-body">
+    <main class="sell-check-page view-container active">
+        <header class="sell-check-hero">
+            <span class="sell-check-eyebrow">For independent online sellers</span>
+            <h1>Can I Sell It?</h1>
+            <p>Describe a smart wearable. Get a practical pre-check for market access, supplier documents, small-parcel shipping, and listing readiness.</p>
+            <div class="sell-check-scope"><strong>Deep coverage:</strong> United States and European Union · <strong>Basic screening:</strong> Japan and Singapore</div>
+            <div class="sell-check-scope"><strong>Included:</strong> Market Access · Supplier Documents · Small Parcel Check · Platform Readiness</div>
+        </header>
+
+        <form id="sell-check-form" class="sell-check-form" novalidate>
+            <section class="sell-check-card">
+                <div class="sell-check-section-head"><span>1</span><div><h2>Tell us what you want to sell</h2><p>Include connectivity, battery, health features, and listing claims if known.</p></div></div>
+                <label class="sell-check-field sell-check-field--wide" for="sell-description">
+                    <span>Product description</span>
+                    <textarea id="sell-description" required placeholder="e.g. Smart ring with Bluetooth, rechargeable lithium battery, sleep and heart-rate tracking. No medical claims."></textarea>
+                </label>
+                <div class="sell-check-examples" aria-label="Product examples">
+                    <button type="button" data-example="Bluetooth smart watch with a rechargeable lithium battery, GPS, heart-rate and sleep tracking. No medical claims.">Smart watch</button>
+                    <button type="button" data-example="Smart ring with Bluetooth, rechargeable lithium battery, sleep and heart-rate tracking. No medical claims.">Smart ring</button>
+                    <button type="button" data-example="Children's 4G GPS smart watch with eSIM, camera, microphone and rechargeable lithium battery.">Kids GPS watch</button>
+                </div>
+                <div class="sell-check-grid">
+                    <label class="sell-check-field"><span>Made in</span><select id="sell-origin"><option value="CN">China</option><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="OTHER">Other</option></select></label>
+                    <label class="sell-check-field"><span>Target market</span><select id="sell-market"><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option></select></label>
+                    <label class="sell-check-field"><span>Sales channel</span><select id="sell-platform"><option>Amazon</option><option>TikTok Shop</option><option>Shopify / own store</option><option>Other marketplace</option></select></label>
+                </div>
+                <button class="sell-check-primary" type="submit">Check My Product</button>
+                <div id="sell-check-error" class="post-entry-error" hidden role="alert"></div>
+            </section>
+        </form>
+
+        <section id="sell-follow-up" class="sell-check-card" hidden>
+            <div class="sell-check-section-head"><span>2</span><div><h2>Confirm the product facts</h2><p>These answers change the legal and shipping path. “Not sure” remains a visible gap.</p></div></div>
+            <form id="sell-follow-up-form">
+                <div id="sell-follow-up-questions" class="sell-question-grid"></div>
+                <fieldset class="sell-documents">
+                    <legend>Documents already supplied for this exact model</legend>
+                    <div id="sell-document-options"></div>
+                </fieldset>
+                <button class="sell-check-primary" type="submit">Build My Assessment</button>
+            </form>
+        </section>
+
+        <section id="sell-result" class="sell-check-result" hidden aria-live="polite"></section>
+    </main>
+
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a id="nav-home" class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a id="nav-incoterm" class="nav-btn nav-btn-link" href="index.html#incoterm">📦 Incoterm</a>
+        <a id="nav-hscode" class="nav-btn nav-btn-link" href="hscode.html">🔍 HS Code</a>
+        <a id="nav-post-entry" class="nav-btn nav-btn-link" href="post-entry.html">🧾 Post-Entry</a>
+        <a id="nav-opportunity" class="nav-btn nav-btn-link" href="opportunity.html">🌐 Opportunity</a>
+        <a id="nav-tariff-watch" class="nav-btn nav-btn-link" href="tariff-watch.html">📈 Tariff Watch</a>
+        <a id="nav-trade-flow" class="nav-btn nav-btn-link" href="trade-flow.html">📊 Trade Flow</a>
+        <span id="nav-can-i-sell-it" class="nav-btn active" aria-current="page">🛍️ Can I Sell It?</span>
+    </nav>
+
+    <script src="js/main.js?v=20260729-consumer-check" data-app="can-i-sell-it"></script>
+</body>
+</html>

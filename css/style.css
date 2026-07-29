@@ -3771,6 +3771,126 @@ a.hub-core-card--link {
     }
 }
 
+/* Consumer smart-wearable market-entry pre-check */
+.sell-check-page-body {
+    background: #f4f7fb;
+    padding-bottom: 96px;
+}
+
+.sell-check-page {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 42px 0 72px;
+}
+
+.sell-check-hero {
+    padding: 42px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #123a66 0%, #1f5faf 68%, #2b6ed3 100%);
+    color: #fff;
+    box-shadow: 0 18px 45px rgba(18, 58, 102, 0.2);
+}
+
+.sell-check-eyebrow {
+    display: inline-flex;
+    padding: 7px 12px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    font-size: .76rem;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.sell-check-hero h1 { margin: 15px 0 10px; font-size: clamp(2.2rem, 6vw, 4rem); }
+.sell-check-hero p { max-width: 760px; margin: 0; font-size: 1.08rem; line-height: 1.65; color: #e6effc; }
+.sell-check-scope { margin-top: 22px; color: #d6e7ff; font-size: .86rem; }
+.sell-check-scope strong { color: #fff; }
+
+.sell-check-form,
+.sell-check-card,
+.sell-check-result { margin-top: 24px; }
+
+.sell-check-card,
+.sell-result-panel,
+.sell-verdict,
+.sell-readiness-grid article {
+    border: 1px solid #dfe7f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(29, 55, 82, .07);
+}
+
+.sell-check-card,
+.sell-result-panel { padding: 28px; }
+.sell-check-section-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 22px; }
+.sell-check-section-head > span { display: grid; place-items: center; flex: 0 0 34px; height: 34px; border-radius: 50%; background: #e8f1ff; color: #1558a6; font-weight: 900; }
+.sell-check-section-head h2 { margin: 2px 0 5px; color: #173c64; font-size: 1.2rem; }
+.sell-check-section-head p { margin: 0; color: #67788a; }
+
+.sell-check-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+.sell-check-field { display: grid; gap: 7px; color: #344a60; font-size: .83rem; font-weight: 800; }
+.sell-check-field textarea,
+.sell-check-field select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #c9d6e4;
+    border-radius: 10px;
+    background: #fff;
+    color: #172b40;
+    font: inherit;
+}
+.sell-check-field textarea { min-height: 125px; padding: 14px; resize: vertical; line-height: 1.55; font-weight: 500; }
+.sell-check-field select { min-height: 46px; padding: 0 12px; font-weight: 600; }
+.sell-check-examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.sell-check-examples button { border: 1px solid #b9cde6; border-radius: 999px; background: #f3f7fd; color: #21568d; padding: 7px 11px; cursor: pointer; font-weight: 700; }
+.sell-check-primary { margin-top: 22px; border: 0; border-radius: 10px; background: #1763bd; color: #fff; padding: 13px 21px; font-weight: 900; cursor: pointer; }
+
+.sell-question-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.sell-question { margin: 0; padding: 14px; border: 1px solid #dbe5ef; border-radius: 10px; }
+.sell-question legend { padding: 0 5px; color: #264661; font-weight: 800; }
+.sell-question label { display: inline-flex; align-items: center; gap: 4px; margin: 7px 12px 0 0; color: #55687b; font-size: .86rem; }
+.sell-documents { margin: 22px 0 0; padding: 18px; border: 1px solid #dbe5ef; border-radius: 10px; }
+.sell-documents legend { padding: 0 6px; color: #264661; font-weight: 900; }
+.sell-documents > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.sell-documents label { color: #55687b; font-size: .88rem; }
+
+.sell-verdict { display: flex; justify-content: space-between; gap: 25px; align-items: center; padding: 26px; border-left: 7px solid #c47b09; }
+.sell-verdict--warning { border-left-color: #b43c3c; background: #fffafa; }
+.sell-verdict span { color: #6c7d8c; font-size: .75rem; font-weight: 900; text-transform: uppercase; }
+.sell-verdict h2 { margin: 5px 0 0; color: #173c64; }
+.sell-verdict p { max-width: 430px; margin: 0; color: #657486; font-size: .83rem; line-height: 1.5; }
+.sell-readiness-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+.sell-readiness-grid article { display: grid; gap: 8px; padding: 19px; }
+.sell-readiness-grid span { color: #6e7e8d; font-size: .73rem; font-weight: 900; text-transform: uppercase; }
+.sell-readiness-grid strong { color: #173c64; line-height: 1.35; }
+.sell-readiness-grid small { color: #6e7e8d; line-height: 1.45; }
+.sell-result-panel { margin-top: 14px; }
+.sell-result-panel h2 { margin: 0 0 18px; color: #173c64; font-size: 1.15rem; }
+.sell-requirement-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.sell-requirement { padding: 18px; border: 1px solid #dce6f0; border-left: 4px solid #2c6dac; border-radius: 9px; }
+.sell-requirement--high { border-left-color: #b43c3c; background: #fffafa; }
+.sell-requirement > span { color: #6a7d8e; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
+.sell-requirement h3 { margin: 7px 0; color: #234867; font-size: 1rem; }
+.sell-requirement p { margin: 0; color: #68798a; font-size: .86rem; line-height: 1.5; }
+.sell-gap-list { display: grid; gap: 8px; padding: 0; list-style: none; }
+.sell-gap-list li { display: flex; justify-content: space-between; gap: 18px; padding: 11px 13px; border-radius: 8px; background: #f5f8fb; }
+.sell-gap-list strong { color: #294b69; }
+.sell-gap-list span { color: #718090; font-size: .82rem; text-align: right; }
+.sell-action-list { margin: 0; padding-left: 22px; color: #4e6375; line-height: 1.8; }
+.sell-trust-note { margin-top: 14px; padding: 16px 18px; border-radius: 10px; background: #fff5dd; color: #6f5623; font-size: .86rem; line-height: 1.55; }
+
+@media (max-width: 760px) {
+    .sell-check-page { width: min(100% - 20px, 1120px); padding-top: 12px; }
+    .sell-check-hero { padding: 28px 22px; border-radius: 16px; }
+    .sell-check-card, .sell-result-panel { padding: 20px; }
+    .sell-check-grid, .sell-question-grid, .sell-documents > div,
+    .sell-readiness-grid, .sell-requirement-grid { grid-template-columns: 1fr; }
+    .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
+    .sell-gap-list span { text-align: left; }
+}
+
 /* Case Library Button */
 .case-library-btn {
     display: block;

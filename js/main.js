@@ -1,6 +1,7 @@
 /**
  * Single application entry — loads modules in order, then boots the active page.
  * HTML pages only need: <script src="js/main.js" data-app="index|hscode|category|post-entry|opportunity|tariff-watch|trade-flow"></script>
+ * The consumer pre-check uses the same entry with data-app="can-i-sell-it".
  */
 (function () {
     const BUILD = '20260716-china-source-priority';
@@ -26,6 +27,9 @@
         }
         if (/\/trade-flow\.html/i.test(path)) {
             return 'trade-flow';
+        }
+        if (/\/can-i-sell-it\.html/i.test(path)) {
+            return 'can-i-sell-it';
         }
         if (/\/electronics\.html/i.test(path)
             || /\/new-energy\.html/i.test(path)
@@ -162,6 +166,11 @@
         'js/trade-flow-page.js'
     ];
 
+    const CAN_I_SELL_IT_MODULES = [
+        'lib/can-i-sell-it.js',
+        'js/can-i-sell-it-page.js'
+    ];
+
     function withVersion(src) {
         return `${src}?v=${BUILD}`;
     }
@@ -236,6 +245,8 @@
                 modules = TARIFF_WATCH_MODULES;
             } else if (app === 'trade-flow') {
                 modules = TRADE_FLOW_MODULES;
+            } else if (app === 'can-i-sell-it') {
+                modules = CAN_I_SELL_IT_MODULES;
             } else if (app === 'category') {
                 modules = CATEGORY_MODULES;
             }
@@ -279,6 +290,12 @@
                 if (app === 'trade-flow') {
                     if (typeof bootstrapTradeFlowPage === 'function') {
                         bootstrapTradeFlowPage();
+                    }
+                    return;
+                }
+                if (app === 'can-i-sell-it') {
+                    if (typeof bootstrapCanISellItPage === 'function') {
+                        bootstrapCanISellItPage();
                     }
                     return;
                 }
