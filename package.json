@@ -71,6 +71,7 @@
     "pipeline:publish": "node scripts/auto-publish-pipeline.js",
     "dev:preview": "python3 -m http.server 8000",
     "dev:admin": "node scripts/admin-server.js",
+    "dev:consumer": "node scripts/consumer-server.js",
     "restart:admin": "bash scripts/restart-admin-server.sh",
     "test:crawl": "node -e \"require('./lib/global-compliance-crawler').runGlobalCrawlTest({ dataDir: './data', persist: true, label: 'cli-test-crawl' }).then(r => { console.log(JSON.stringify({ ok: r.ok, changed: r.changed, errors: r.errors, telemetry: r.telemetry }, null, 2)); process.exit(r.ok ? 0 : 1); })\"",
     "publish:reviewed": "node scripts/publish-reviewed-data.js",

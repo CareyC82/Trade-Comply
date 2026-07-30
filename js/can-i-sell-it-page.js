@@ -15,10 +15,17 @@ function bootstrapCanISellItPage() {
     const historyList = document.getElementById('sell-history-list');
     const historyEmpty = document.getElementById('sell-history-empty');
     const models = globalThis.TradeComplyWearableModels;
-    const HISTORY_KEY = 'tracewize-can-i-sell-it-history-v1';
+    const accountForm = document.getElementById('sell-account-form');
+    const accountSignedOut = document.getElementById('sell-account-signed-out');
+    const accountSignedIn = document.getElementById('sell-account-signed-in');
+    const accountEmail = document.getElementById('sell-account-email');
+    const accountMessage = document.getElementById('sell-account-message');
     let currentInput = null;
     let dutyRates = null;
     let latestAssessment = null;
+    let currentUser = null;
+    let history = [];
+    let uploadedFiles = [];
 
     const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -74,30 +81,45 @@ function bootstrapCanISellItPage() {
             </a>`).join('')}</div>`;
     }
 
-    function readHistory() {
-        try {
-            const parsed = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            return Array.isArray(parsed) ? parsed : [];
-        } catch {
-            return [];
-        }
+    async function api(path, options = {}) {
+        const response = await fetch(`/api/consumer${path}`, {
+            credentials: 'same-origin',
+            ...options,
+            headers: options.body ? { 'Content-Type': 'application/json', ...(options.headers || {}) } : options.headers
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || `Request failed (${response.status})`);
+        return payload;
     }
 
-    function saveHistory(record) {
-        const history = readHistory().filter((item) => item.id !== record.id);
-        history.unshift(record);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
+    async function refreshSession() {
+        try {
+            currentUser = (await api('/session')).user;
+        } catch { currentUser = null; }
+        accountSignedOut.hidden = Boolean(currentUser);
+        accountSignedIn.hidden = !currentUser;
+        accountEmail.textContent = currentUser?.email || '';
+        await loadHistory();
+    }
+
+    async function loadHistory() {
+        history = currentUser ? (await api('/assessments')).assessments : [];
         renderHistory();
     }
 
     function renderHistory() {
-        const history = readHistory();
         historyEmpty.hidden = history.length > 0;
         historyList.innerHTML = history.map((item) => `
             <article>
                 <div><strong>${escapeHtml(item.productLabel)}</strong><span>${escapeHtml(item.market)} · ${escapeHtml(item.platform)} · ${escapeHtml(item.createdAt)}</span></div>
                 <div><button type="button" data-history-open="${escapeHtml(item.id)}">Open</button><button type="button" data-history-delete="${escapeHtml(item.id)}">Delete</button></div>
             </article>`).join('');
+        if (!currentUser) {
+            historyEmpty.hidden = false;
+            historyEmpty.textContent = 'Sign in to see your private assessment history.';
+        } else {
+            historyEmpty.textContent = 'No saved assessments yet.';
+        }
     }
 
     function printAssessment() {
@@ -163,28 +185,29 @@ function bootstrapCanISellItPage() {
         latestAssessment = assessment;
         result.hidden = false;
         document.getElementById('sell-save-assessment')?.addEventListener('click', () => {
-            saveHistory({
-                id: `${Date.now()}`,
-                createdAt: new Date().toLocaleString(),
+            if (!currentUser) {
+                accountMessage.textContent = 'Sign in before saving an assessment.';
+                return;
+            }
+            api('/assessments', { method: 'POST', body: JSON.stringify({
                 productLabel: assessment.product.label,
                 market: currentInput.market,
                 platform: currentInput.platform,
                 input: { ...currentInput, dutyRates: undefined },
                 assessment
-            });
+            }) }).then(loadHistory).catch((failure) => { accountMessage.textContent = failure.message; });
         });
         document.getElementById('sell-print-assessment')?.addEventListener('click', printAssessment);
         document.querySelectorAll('[data-assistant-prompt]').forEach((button) => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', async () => {
                 const prompt = button.dataset.assistantPrompt;
-                const answer = prompt.includes('missing')
-                    ? (assessment.documentGaps.length ? assessment.documentGaps.slice(0, 8).map((gap) => gap.document).join('; ') : 'No missing document was identified from the selected evidence.')
-                    : prompt.includes('purchase order')
-                        ? assessment.contractConditions.join(' ')
-                        : prompt.includes('landed-cost')
-                            ? (assessment.economics ? assessment.economics.caveat : 'Enter purchase and selling figures first.')
-                            : `${assessment.procurement.reason} Resolve unknown product facts, exact-model evidence and final tariff classification before ordering.`;
-                document.getElementById('sell-assistant-answer').textContent = answer;
+                const target = document.getElementById('sell-assistant-answer');
+                if (!currentUser) { target.textContent = 'Sign in to use the AI Assistant.'; return; }
+                target.textContent = 'Reviewing this assessment…';
+                try {
+                    const response = await api('/assistant', { method: 'POST', body: JSON.stringify({ question: prompt, assessment }) });
+                    target.textContent = response.answer;
+                } catch (failure) { target.textContent = failure.message; }
             });
         });
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -223,7 +246,7 @@ function bootstrapCanISellItPage() {
         followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
-    followUpForm.addEventListener('submit', (event) => {
+    followUpForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const data = new FormData(followUpForm);
         const attributes = { productType: data.get('productType') };
@@ -231,7 +254,27 @@ function bootstrapCanISellItPage() {
             .forEach((key) => { attributes[key] = data.get(key) || 'unknown'; });
         const costKeys = ['currency', 'quantity', 'purchaseUnit', 'saleUnit', 'freightTotal', 'insuranceTotal', 'otherImportTotal', 'dutyRate', 'importTaxRate', 'platformFeeRate', 'otherSellingUnit'];
         const costs = Object.fromEntries(costKeys.map((key) => [key, data.get(key)]));
-        const files = Array.from(evidenceFiles.files || []).map((file) => ({ name: file.name, type: file.type, size: file.size }));
+        uploadedFiles = [];
+        const sourceFiles = Array.from(evidenceFiles.files || []);
+        if (sourceFiles.length && !currentUser) {
+            accountMessage.textContent = 'Sign in to upload and parse supplier evidence. The assessment can continue without the files.';
+        } else if (sourceFiles.length) {
+            evidencePreview.innerHTML = '<span>Securely uploading and parsing files…</span>';
+            for (const file of sourceFiles) {
+                try {
+                    const dataUrl = await new Promise((resolve, reject) => {
+                        const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file);
+                    });
+                    const saved = await api('/files', { method: 'POST', body: JSON.stringify({ name: file.name, type: file.type, data: dataUrl, expectedModel: data.get('requiredModel') }) });
+                    const parsed = await api(`/files/${encodeURIComponent(saved.file.id)}/parse`, { method: 'POST', body: '{}' });
+                    uploadedFiles.push({ name: file.name, type: file.type, size: file.size, status: parsed.file.status, note: parsed.file.parsing?.modelMatch === false ? 'Extracted model does not match your ordered model.' : `Parsed with ${parsed.file.parsing?.engine || 'document parser'}.` });
+                } catch (failure) {
+                    uploadedFiles.push({ name: file.name, type: file.type, size: file.size, status: 'verification_failed', note: failure.message });
+                }
+            }
+            evidencePreview.innerHTML = uploadedFiles.map((file) => `<span>${escapeHtml(file.name)} · ${escapeHtml(file.status.replaceAll('_', ' '))} · ${escapeHtml(file.note)}</span>`).join('');
+        }
+        const files = uploadedFiles.length ? uploadedFiles : sourceFiles.map((file) => ({ name: file.name, type: file.type, size: file.size }));
         renderAssessment(engine.assess({
             ...currentInput,
             attributes,
@@ -265,14 +308,14 @@ function bootstrapCanISellItPage() {
             : '';
     });
 
-    historyList.addEventListener('click', (event) => {
+    historyList.addEventListener('click', async (event) => {
         const openId = event.target.closest('[data-history-open]')?.dataset.historyOpen;
         const deleteId = event.target.closest('[data-history-delete]')?.dataset.historyDelete;
         if (deleteId) {
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(readHistory().filter((item) => item.id !== deleteId)));
-            renderHistory();
+            await api(`/assessments/${encodeURIComponent(deleteId)}`, { method: 'DELETE' });
+            await loadHistory();
         } else if (openId) {
-            const record = readHistory().find((item) => item.id === openId);
+            const record = history.find((item) => item.id === openId);
             if (record) {
                 currentInput = record.input;
                 latestAssessment = record.assessment;
@@ -281,5 +324,27 @@ function bootstrapCanISellItPage() {
         }
     });
 
-    renderHistory();
+    accountForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = new FormData(accountForm);
+        const action = event.submitter?.value === 'register' ? 'register' : 'login';
+        accountMessage.textContent = action === 'register' ? 'Creating your private workspace…' : 'Signing in…';
+        try {
+            await api(`/${action}`, { method: 'POST', body: JSON.stringify({ email: data.get('email'), password: data.get('password') }) });
+            accountForm.reset(); accountMessage.textContent = 'Your private workspace is ready.';
+            await refreshSession();
+        } catch (failure) { accountMessage.textContent = failure.message; }
+    });
+    document.getElementById('sell-account-logout').addEventListener('click', async () => {
+        await api('/logout', { method: 'POST' }); accountMessage.textContent = 'Signed out.'; await refreshSession();
+    });
+    document.getElementById('sell-delete-account').addEventListener('click', async () => {
+        if (!confirm('Permanently delete your account, assessments, and uploaded evidence files?')) return;
+        await api('/account', { method: 'DELETE' }); accountMessage.textContent = 'Your account and private data were deleted.'; await refreshSession();
+    });
+
+    refreshSession().catch(() => {
+        accountMessage.textContent = 'Private workspace server is unavailable. Start it with npm run dev:consumer.';
+        renderHistory();
+    });
 }

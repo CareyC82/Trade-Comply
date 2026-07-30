@@ -16,6 +16,23 @@
             <div class="sell-check-scope"><strong>Included:</strong> Market Access · Supplier Documents · Small Parcel Check · Platform Readiness</div>
         </header>
 
+        <section class="sell-check-card sell-account-card">
+            <div class="sell-check-section-head"><span>☁</span><div><h2>Your private workspace</h2><p>Sign in to save assessments, securely upload supplier evidence, and use the AI Assistant.</p></div></div>
+            <div id="sell-account-signed-out">
+                <form id="sell-account-form" class="sell-account-form">
+                    <label class="sell-check-field"><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+                    <label class="sell-check-field"><span>Password</span><input name="password" type="password" minlength="10" autocomplete="current-password" required></label>
+                    <button class="sell-check-primary" name="action" value="login" type="submit">Sign in</button>
+                    <button class="sell-check-secondary" name="action" value="register" type="submit">Create account</button>
+                </form>
+            </div>
+            <div id="sell-account-signed-in" hidden>
+                <div class="sell-account-status"><span>Signed in as <strong id="sell-account-email"></strong></span><button id="sell-account-logout" type="button">Sign out</button></div>
+                <details class="sell-privacy-controls"><summary>Privacy and data controls</summary><p>Evidence files are encrypted at rest and automatically expire after 30 days. You can delete individual files, assessments, or your entire account.</p><button id="sell-delete-account" type="button">Delete my account and data</button></details>
+            </div>
+            <div id="sell-account-message" class="sell-panel-note" role="status"></div>
+        </section>
+
         <form id="sell-check-form" class="sell-check-form" novalidate>
             <section class="sell-check-card">
                 <div class="sell-check-section-head"><span>1</span><div><h2>Tell us what you want to sell</h2><p>Include connectivity, battery, health features, and listing claims if known.</p></div></div>
@@ -57,7 +74,7 @@
                 </fieldset>
                 <fieldset class="sell-evidence-upload">
                     <legend>Supplier evidence files</legend>
-                    <p>Files are checked for type and model consistency. A filename alone never proves authenticity or compliance.</p>
+                    <p>Signed-in files are privately uploaded, malware-screened, then parsed with PDF text extraction or OCR. A filename alone never proves authenticity or compliance.</p>
                     <div class="sell-cost-grid">
                         <label class="sell-check-field"><span>Your ordered model</span><input name="requiredModel" type="text" placeholder="e.g. TW-RING-01"></label>
                         <label class="sell-check-field"><span>Model stated by supplier</span><input name="supplierModel" type="text" placeholder="e.g. TW-RING-01"></label>
@@ -89,7 +106,7 @@
 
         <section id="sell-result" class="sell-check-result" hidden aria-live="polite"></section>
         <section class="sell-check-card sell-history-card">
-            <div class="sell-check-section-head"><span>↺</span><div><h2>Saved assessments</h2><p>Saved in this browser. Reopen an assessment or print it to PDF.</p></div></div>
+            <div class="sell-check-section-head"><span>↺</span><div><h2>Saved assessments</h2><p>Signed-in assessments are saved to your private server workspace. Reopen or delete them here.</p></div></div>
             <div id="sell-history-empty" class="sell-panel-note">No saved assessments yet.</div>
             <div id="sell-history-list" class="sell-history-list"></div>
         </section>

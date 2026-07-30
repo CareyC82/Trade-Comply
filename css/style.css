@@ -3919,6 +3919,13 @@ a.hub-core-card--link {
 .sell-history-list article > div { display: flex; gap: 8px; }
 .sell-history-list article > div:first-child { flex-direction: column; }
 .sell-history-list span { color: #708090; font-size: .78rem; }
+.sell-account-form { display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 12px; align-items: end; }
+.sell-account-form .sell-check-primary, .sell-account-form .sell-check-secondary { margin: 0; min-height: 46px; }
+.sell-check-secondary, .sell-account-status button, .sell-privacy-controls button { border: 1px solid #b9cde6; border-radius: 9px; background: #fff; color: #21568d; padding: 11px 14px; cursor: pointer; font-weight: 800; }
+.sell-account-status { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+.sell-privacy-controls { margin-top: 14px; color: #50657a; }
+.sell-privacy-controls summary { cursor: pointer; font-weight: 800; color: #244e75; }
+.sell-privacy-controls button { color: #9c2f2f; border-color: #e6bcbc; }
 
 @media print {
     .bottom-nav, .sell-check-hero, .sell-check-form, #sell-follow-up,
@@ -3938,6 +3945,7 @@ a.hub-core-card--link {
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-gap-list span { text-align: left; }
     .sell-history-list article { align-items: flex-start; flex-direction: column; }
+    .sell-account-form { grid-template-columns: 1fr; }
 }
 
 /* Case Library Button */

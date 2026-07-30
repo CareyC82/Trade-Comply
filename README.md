@@ -14,6 +14,23 @@ It cites official regulatory sources where available and is designed for prelimi
 
 ---
 
+## Consumer workspace (local)
+
+The `Can I Sell It?` flow now has an optional private server workspace:
+
+```bash
+cp .env.example .env.local
+npm run dev:consumer
+```
+
+Open `http://127.0.0.1:8790/can-i-sell-it.html`. Before production, set independent
+`CONSUMER_SESSION_SECRET` and `CONSUMER_FILE_ENCRYPTION_KEY` values plus the
+server-only `OPENAI_API_KEY`. Install `pdftotext` for PDF extraction and
+`tesseract` for image OCR. Uploaded evidence is encrypted at rest, user-scoped,
+and removed after the configured retention period (30 days by default).
+
+---
+
 ## What It Does
 
 Enter a product name, HS Code, or risk feature such as `drone`, `Bluetooth`, `lithium battery`, `AI chip`, or `8525.89`. The app returns relevant compliance signals grouped by category.
