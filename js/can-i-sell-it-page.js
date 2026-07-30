@@ -12,8 +12,11 @@ function bootstrapCanISellItPage() {
     const productTypeSelect = document.getElementById('sell-product-type');
     const evidenceFiles = document.getElementById('sell-evidence-files');
     const evidencePreview = document.getElementById('sell-evidence-preview');
+    const advancedTools = document.getElementById('sell-advanced-tools');
+    const advancedForm = document.getElementById('sell-advanced-form');
     const historyList = document.getElementById('sell-history-list');
     const historyEmpty = document.getElementById('sell-history-empty');
+    const historyCard = document.querySelector('.sell-history-card');
     const models = globalThis.TradeComplyWearableModels;
     const accountForm = document.getElementById('sell-account-form');
     const accountSignedOut = document.getElementById('sell-account-signed-out');
@@ -23,6 +26,8 @@ function bootstrapCanISellItPage() {
     let currentInput = null;
     let dutyRates = null;
     let latestAssessment = null;
+    let currentProfile = null;
+    let currentAttributes = null;
     let currentUser = null;
     let history = [];
     let uploadedFiles = [];
@@ -48,12 +53,28 @@ function bootstrapCanISellItPage() {
         , mainsPowered: 'AC mains powered'
     };
 
+    function quickQuestionKeys(profile, productType = profile.productType) {
+        const material = engine.materialQuestionKeys(productType);
+        const priorities = productType === 'gan_charger'
+            ? ['mainsPowered', 'wirelessCharging']
+            : productType === 'kids_gps_watch' || productType === 'kids_electronics'
+                ? ['childUse', 'cellular', 'cameraMic', 'battery']
+                : profile.healthMonitoring === true
+                    ? ['medicalClaim', 'battery', 'cellular', 'childUse']
+                    : ['battery', 'cellular', 'bluetooth', 'wifi', 'medicalClaim'];
+        const unknown = priorities.filter((key) => material.includes(key) && profile[key] === 'unknown');
+        return (unknown.length ? unknown : material.filter((key) => profile[key] === 'unknown')).slice(0, 2);
+    }
+
     function renderQuestions(profile, productType = profile.productType) {
-        questions.innerHTML = engine.materialQuestionKeys(productType).map((key) => `
+        const keys = quickQuestionKeys(profile, productType);
+        questions.innerHTML = keys.map((key) => `
             <fieldset class="sell-question">
                 <legend>${escapeHtml(attributeLabels[key])}</legend>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : profile[key] === 'unknown' && value === 'unknown' ? 'checked' : ''}> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`).join('');
+        questions.hidden = keys.length === 0;
+        return keys;
     }
 
     function renderDocumentOptions(market, profile) {
@@ -99,6 +120,7 @@ function bootstrapCanISellItPage() {
         accountSignedOut.hidden = Boolean(currentUser);
         accountSignedIn.hidden = !currentUser;
         accountEmail.textContent = currentUser?.email || '';
+        historyCard.hidden = !currentUser;
         await loadHistory();
     }
 
@@ -180,13 +202,15 @@ function bootstrapCanISellItPage() {
             <section class="sell-result-panel"><h2>Put these conditions in the purchase order</h2><ol class="sell-action-list">${assessment.contractConditions.map((condition) => `<li>${escapeHtml(condition)}</li>`).join('')}</ol></section>
             <section class="sell-result-panel"><h2>What to do next</h2><ol class="sell-action-list">${assessment.nextActions.map((action) => `<li>${escapeHtml(action)}</li>`).join('')}</ol></section>
             <section class="sell-result-panel sell-assistant-result"><h2>Ask the assessment assistant</h2><p>${escapeHtml(assessment.assistant.summary)}</p><div>${assessment.assistant.answerPrompts.map((prompt) => `<button type="button" data-assistant-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join('')}</div><p id="sell-assistant-answer" class="sell-panel-note"></p></section>
-            <div class="sell-result-actions"><button type="button" id="sell-save-assessment">Save assessment</button><button type="button" id="sell-print-assessment">Print / Save PDF</button></div>
+            <div class="sell-result-actions"><button type="button" id="sell-save-assessment">Save this result (optional)</button><button type="button" id="sell-print-assessment">Print / Save PDF</button></div>
             <div class="sell-trust-note"><strong>How to use this:</strong> do not place a purchase order solely from this result. Final duty requires exact HS classification; certifications must match the exact model, radio module, battery, and listing claims.</div>`;
         latestAssessment = assessment;
         result.hidden = false;
+        advancedTools.hidden = false;
         document.getElementById('sell-save-assessment')?.addEventListener('click', () => {
             if (!currentUser) {
-                accountMessage.textContent = 'Sign in before saving an assessment.';
+                accountMessage.textContent = 'Sign in here only if you want to save this result.';
+                advancedTools.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 return;
             }
             api('/assessments', { method: 'POST', body: JSON.stringify({
@@ -236,22 +260,49 @@ function bootstrapCanISellItPage() {
             dutyRates
         };
         const profile = engine.extractProfile(description);
+        currentProfile = profile;
         productTypeSelect.innerHTML = models.listProducts().map((product) => `<option value="${escapeHtml(product.id)}" ${product.id === profile.productType ? 'selected' : ''}>${escapeHtml(product.label)}</option>`).join('');
-        renderQuestions(profile, profile.productType);
-        const missing = engine.getFollowUpQuestions(profile);
-        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Assessment assistant</strong><p>${missing.length ? `I found ${escapeHtml(models.getProduct(profile.productType).label)}. Please confirm ${missing.length} material facts below; I will not guess them.` : 'I found enough product attributes to continue. Please verify them below.'}</p>`;
+        const quickKeys = renderQuestions(profile, profile.productType);
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Quick pre-check</strong><p>${quickKeys.length ? `I identified ${escapeHtml(models.getProduct(profile.productType).label)}. Only ${quickKeys.length} answer${quickKeys.length === 1 ? '' : 's'} could materially change this result.` : `I identified ${escapeHtml(models.getProduct(profile.productType).label)} and can build the quick result without more questions.`}</p>`;
         renderDocumentOptions(currentInput.market, profile);
-        followUp.hidden = false;
         result.hidden = true;
-        followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        advancedTools.hidden = true;
+        if (quickKeys.length === 0) {
+            currentAttributes = resolvedAttributes(new FormData(followUpForm));
+            followUp.hidden = true;
+            renderAssessment(engine.assess({ ...currentInput, attributes: currentAttributes, documents: [], supplierEvidence: { files: [] } }));
+        } else {
+            followUp.hidden = false;
+            followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     });
 
-    followUpForm.addEventListener('submit', async (event) => {
+    function resolvedAttributes(data) {
+        const productType = data.get('productType') || currentProfile.productType;
+        const attributes = { productType };
+        engine.materialQuestionKeys(productType).forEach((key) => {
+            const answer = data.get(key);
+            const inferred = currentProfile[key];
+            attributes[key] = answer || (inferred === true ? 'yes' : inferred === false ? 'no' : 'unknown');
+        });
+        return attributes;
+    }
+
+    followUpForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = new FormData(followUpForm);
-        const attributes = { productType: data.get('productType') };
-        engine.materialQuestionKeys(attributes.productType)
-            .forEach((key) => { attributes[key] = data.get(key) || 'unknown'; });
+        currentAttributes = resolvedAttributes(data);
+        renderAssessment(engine.assess({
+            ...currentInput,
+            attributes: currentAttributes,
+            documents: [],
+            supplierEvidence: { files: [] }
+        }));
+    });
+
+    advancedForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = new FormData(advancedForm);
         const costKeys = ['currency', 'quantity', 'purchaseUnit', 'saleUnit', 'freightTotal', 'insuranceTotal', 'otherImportTotal', 'dutyRate', 'importTaxRate', 'platformFeeRate', 'otherSellingUnit'];
         const costs = Object.fromEntries(costKeys.map((key) => [key, data.get(key)]));
         uploadedFiles = [];
@@ -277,7 +328,7 @@ function bootstrapCanISellItPage() {
         const files = uploadedFiles.length ? uploadedFiles : sourceFiles.map((file) => ({ name: file.name, type: file.type, size: file.size }));
         renderAssessment(engine.assess({
             ...currentInput,
-            attributes,
+            attributes: currentAttributes,
             documents: data.getAll('documents'),
             costs,
             supplierEvidence: {
@@ -292,6 +343,7 @@ function bootstrapCanISellItPage() {
     productTypeSelect.addEventListener('change', () => {
         const profile = engine.extractProfile(document.getElementById('sell-description').value);
         profile.productType = productTypeSelect.value;
+        currentProfile = profile;
         renderQuestions(profile, productTypeSelect.value);
         renderDocumentOptions(currentInput.market, profile);
     });

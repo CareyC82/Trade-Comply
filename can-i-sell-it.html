@@ -4,40 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Can I Sell It? | TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260730-consumer-phase2">
+    <link rel="stylesheet" href="css/style.css?v=20260730-consumer-lightweight-v1">
 </head>
 <body class="sell-check-page-body">
     <main class="sell-check-page view-container active">
         <header class="sell-check-hero">
             <span class="sell-check-eyebrow">For independent online sellers</span>
             <h1>Can I Sell It?</h1>
-            <p>Describe a consumer electronic product. Get a conversational pre-check for market access, supplier documents, small-parcel shipping, platform readiness, and procurement economics.</p>
+            <p>Tell us what you want to sell. Get the main compliance, shipping, and platform risks before you buy inventory.</p>
             <div class="sell-check-scope"><strong>Deep coverage:</strong> United States · European Union · Japan · Singapore</div>
-            <div class="sell-check-scope"><strong>Included:</strong> Market Access · Supplier Documents · Small Parcel Check · Platform Readiness</div>
+            <div class="sell-check-scope"><strong>No account required:</strong> market access · Small Parcel Check · platform readiness.</div>
         </header>
-
-        <section class="sell-check-card sell-account-card">
-            <div class="sell-check-section-head"><span>☁</span><div><h2>Your private workspace</h2><p>Sign in to save assessments, securely upload supplier evidence, and use the AI Assistant.</p></div></div>
-            <div id="sell-account-signed-out">
-                <form id="sell-account-form" class="sell-account-form">
-                    <label class="sell-check-field"><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
-                    <label class="sell-check-field"><span>Password</span><input name="password" type="password" minlength="10" autocomplete="current-password" required></label>
-                    <button class="sell-check-primary" name="action" value="login" type="submit">Sign in</button>
-                    <button class="sell-check-secondary" name="action" value="register" type="submit">Create account</button>
-                </form>
-            </div>
-            <div id="sell-account-signed-in" hidden>
-                <div class="sell-account-status"><span>Signed in as <strong id="sell-account-email"></strong></span><button id="sell-account-logout" type="button">Sign out</button></div>
-                <details class="sell-privacy-controls"><summary>Privacy and data controls</summary><p>Evidence files are encrypted at rest and automatically expire after 30 days. You can delete individual files, assessments, or your entire account.</p><button id="sell-delete-account" type="button">Delete my account and data</button></details>
-            </div>
-            <div id="sell-account-message" class="sell-panel-note" role="status"></div>
-        </section>
 
         <form id="sell-check-form" class="sell-check-form" novalidate>
             <section class="sell-check-card">
-                <div class="sell-check-section-head"><span>1</span><div><h2>Tell us what you want to sell</h2><p>Include connectivity, battery, health features, and listing claims if known.</p></div></div>
+                <div class="sell-check-section-head"><span>1</span><div><h2>What do you want to sell?</h2><p>A product name and one sentence is enough. Add battery or wireless details only if you know them.</p></div></div>
                 <label class="sell-check-field sell-check-field--wide" for="sell-description">
-                    <span>Product description</span>
+                    <span>Product name or short description</span>
                     <textarea id="sell-description" required placeholder="e.g. Smart ring with Bluetooth, rechargeable lithium battery, sleep and heart-rate tracking. No medical claims."></textarea>
                 </label>
                 <div class="sell-check-examples" aria-label="Product examples">
@@ -57,55 +40,80 @@
                     <label class="sell-check-field"><span>Target market</span><select id="sell-market"><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option></select></label>
                     <label class="sell-check-field"><span>Sales channel</span><select id="sell-platform"><option>Amazon</option><option>TikTok Shop</option><option>Shopify / own store</option><option>Other marketplace</option></select></label>
                 </div>
-                <button class="sell-check-primary" type="submit">Check My Product</button>
+                <button class="sell-check-primary" type="submit">Can I Sell It?</button>
                 <div id="sell-check-error" class="post-entry-error" hidden role="alert"></div>
             </section>
         </form>
 
         <section id="sell-follow-up" class="sell-check-card" hidden>
-            <div class="sell-check-section-head"><span>2</span><div><h2>Confirm the product facts</h2><p>These answers change the legal and shipping path. “Not sure” remains a visible gap.</p></div></div>
+            <div class="sell-check-section-head"><span>2</span><div><h2>One quick check</h2><p>We only ask facts that could materially change the answer. “Not sure” is fine.</p></div></div>
             <form id="sell-follow-up-form">
                 <label class="sell-check-field sell-check-product-type" for="sell-product-type"><span>Detected product type — change if needed</span><select id="sell-product-type" name="productType"></select></label>
                 <div id="sell-follow-up-questions" class="sell-question-grid"></div>
                 <div id="sell-assistant-follow-up" class="sell-assistant-panel" aria-live="polite"></div>
-                <fieldset class="sell-documents">
-                    <legend>Documents already supplied for this exact model</legend>
-                    <div id="sell-document-options"></div>
-                </fieldset>
-                <fieldset class="sell-evidence-upload">
-                    <legend>Supplier evidence files</legend>
-                    <p>Signed-in files are privately uploaded, malware-screened, then parsed with PDF text extraction or OCR. A filename alone never proves authenticity or compliance.</p>
-                    <div class="sell-cost-grid">
-                        <label class="sell-check-field"><span>Your ordered model</span><input name="requiredModel" type="text" placeholder="e.g. TW-RING-01"></label>
-                        <label class="sell-check-field"><span>Model stated by supplier</span><input name="supplierModel" type="text" placeholder="e.g. TW-RING-01"></label>
-                        <label class="sell-check-field"><span>Upload certificates or reports</span><input id="sell-evidence-files" name="evidenceFiles" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple></label>
-                    </div>
-                    <label class="sell-check-field sell-check-field--wide"><span>Optional text copied from documents</span><textarea name="documentText" placeholder="Paste model number, manufacturer, report date and standards if the PDF/image cannot be read automatically."></textarea></label>
-                    <div id="sell-evidence-preview" class="sell-evidence-preview"></div>
-                </fieldset>
-                <fieldset class="sell-costs">
-                    <legend>Purchase and selling economics</legend>
-                    <p>Enter your own platform fee and tax assumptions. Blank duty uses the maintained candidate tariff signal when available.</p>
-                    <div class="sell-cost-grid">
-                        <label class="sell-check-field"><span>Currency</span><select name="currency"><option>USD</option><option>EUR</option><option>JPY</option><option>SGD</option><option>CNY</option></select></label>
-                        <label class="sell-check-field"><span>Quantity</span><input name="quantity" type="number" min="1" step="1" value="100"></label>
-                        <label class="sell-check-field"><span>Purchase price / unit</span><input name="purchaseUnit" type="number" min="0" step="0.01" placeholder="18.00"></label>
-                        <label class="sell-check-field"><span>Expected sale price / unit</span><input name="saleUnit" type="number" min="0" step="0.01" placeholder="49.00"></label>
-                        <label class="sell-check-field"><span>Freight total</span><input name="freightTotal" type="number" min="0" step="0.01" placeholder="250"></label>
-                        <label class="sell-check-field"><span>Insurance total</span><input name="insuranceTotal" type="number" min="0" step="0.01" placeholder="0"></label>
-                        <label class="sell-check-field"><span>Other import costs total</span><input name="otherImportTotal" type="number" min="0" step="0.01" placeholder="100"></label>
-                        <label class="sell-check-field"><span>Duty rate % (optional)</span><input name="dutyRate" type="number" min="0" step="0.01" placeholder="auto candidate"></label>
-                        <label class="sell-check-field"><span>Import tax / VAT %</span><input name="importTaxRate" type="number" min="0" step="0.01" placeholder="0"></label>
-                        <label class="sell-check-field"><span>Platform fee %</span><input name="platformFeeRate" type="number" min="0" step="0.01" placeholder="enter your current fee"></label>
-                        <label class="sell-check-field"><span>Ads, fulfillment and other / unit</span><input name="otherSellingUnit" type="number" min="0" step="0.01" placeholder="5.00"></label>
-                    </div>
-                </fieldset>
-                <button class="sell-check-primary" type="submit">Build My Assessment</button>
+                <button class="sell-check-primary" type="submit">Show My Result</button>
             </form>
         </section>
 
         <section id="sell-result" class="sell-check-result" hidden aria-live="polite"></section>
-        <section class="sell-check-card sell-history-card">
+
+        <section id="sell-advanced-tools" class="sell-check-card sell-advanced-card" hidden>
+            <div class="sell-check-section-head"><span>+</span><div><h2>Optional deeper checks</h2><p>Your quick result is complete. Use these only if you want to verify a supplier, estimate margins, or save the assessment.</p></div></div>
+            <form id="sell-advanced-form">
+                <details class="sell-advanced-option">
+                    <summary><strong>Verify supplier documents</strong><span>Upload exact-model reports and certificates</span></summary>
+                    <fieldset class="sell-documents"><legend>Documents already supplied</legend><div id="sell-document-options"></div></fieldset>
+                    <fieldset class="sell-evidence-upload">
+                        <div class="sell-cost-grid">
+                            <label class="sell-check-field"><span>Your ordered model</span><input name="requiredModel" type="text" placeholder="e.g. TW-RING-01"></label>
+                            <label class="sell-check-field"><span>Model stated by supplier</span><input name="supplierModel" type="text" placeholder="e.g. TW-RING-01"></label>
+                            <label class="sell-check-field"><span>Certificates or reports</span><input id="sell-evidence-files" name="evidenceFiles" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple></label>
+                        </div>
+                        <label class="sell-check-field sell-check-field--wide"><span>Optional text copied from documents</span><textarea name="documentText" placeholder="Paste model number, manufacturer, report date or standards."></textarea></label>
+                        <div id="sell-evidence-preview" class="sell-evidence-preview"></div>
+                    </fieldset>
+                </details>
+                <details class="sell-advanced-option">
+                    <summary><strong>Estimate landed cost and margin</strong><span>Commercial figures stay optional</span></summary>
+                    <fieldset class="sell-costs">
+                        <div class="sell-cost-grid">
+                            <label class="sell-check-field"><span>Currency</span><select name="currency"><option>USD</option><option>EUR</option><option>JPY</option><option>SGD</option><option>CNY</option></select></label>
+                            <label class="sell-check-field"><span>Quantity</span><input name="quantity" type="number" min="1" step="1" value="100"></label>
+                            <label class="sell-check-field"><span>Purchase price / unit</span><input name="purchaseUnit" type="number" min="0" step="0.01"></label>
+                            <label class="sell-check-field"><span>Expected sale price / unit</span><input name="saleUnit" type="number" min="0" step="0.01"></label>
+                            <label class="sell-check-field"><span>Freight total</span><input name="freightTotal" type="number" min="0" step="0.01"></label>
+                            <label class="sell-check-field"><span>Other import costs</span><input name="otherImportTotal" type="number" min="0" step="0.01"></label>
+                            <label class="sell-check-field"><span>Duty rate % (optional)</span><input name="dutyRate" type="number" min="0" step="0.01"></label>
+                            <label class="sell-check-field"><span>Import tax / VAT %</span><input name="importTaxRate" type="number" min="0" step="0.01"></label>
+                            <label class="sell-check-field"><span>Platform fee %</span><input name="platformFeeRate" type="number" min="0" step="0.01"></label>
+                            <label class="sell-check-field"><span>Other selling cost / unit</span><input name="otherSellingUnit" type="number" min="0" step="0.01"></label>
+                        </div>
+                    </fieldset>
+                </details>
+                <button class="sell-check-secondary sell-advanced-update" type="submit">Update result with optional details</button>
+            </form>
+
+            <details class="sell-advanced-option">
+                <summary><strong>Save this assessment</strong><span>Create an account only when you need a private workspace</span></summary>
+                <section class="sell-account-card">
+                    <div id="sell-account-signed-out">
+                        <form id="sell-account-form" class="sell-account-form">
+                            <label class="sell-check-field"><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+                            <label class="sell-check-field"><span>Password</span><input name="password" type="password" minlength="10" autocomplete="current-password" required></label>
+                            <button class="sell-check-primary" name="action" value="login" type="submit">Sign in</button>
+                            <button class="sell-check-secondary" name="action" value="register" type="submit">Create account</button>
+                        </form>
+                    </div>
+                    <div id="sell-account-signed-in" hidden>
+                        <div class="sell-account-status"><span>Signed in as <strong id="sell-account-email"></strong></span><button id="sell-account-logout" type="button">Sign out</button></div>
+                        <details class="sell-privacy-controls"><summary>Privacy and data controls</summary><p>Evidence files expire after 30 days. You can delete your account and stored data.</p><button id="sell-delete-account" type="button">Delete my account and data</button></details>
+                    </div>
+                    <div id="sell-account-message" class="sell-panel-note" role="status"></div>
+                </section>
+            </details>
+        </section>
+
+        <section class="sell-check-card sell-history-card" hidden>
             <div class="sell-check-section-head"><span>↺</span><div><h2>Saved assessments</h2><p>Signed-in assessments are saved to your private server workspace. Reopen or delete them here.</p></div></div>
             <div id="sell-history-empty" class="sell-panel-note">No saved assessments yet.</div>
             <div id="sell-history-list" class="sell-history-list"></div>
@@ -123,6 +131,6 @@
         <span id="nav-can-i-sell-it" class="nav-btn active" aria-current="page">🛍️ Can I Sell It?</span>
     </nav>
 
-    <script src="js/main.js?v=20260730-consumer-phase2" data-app="can-i-sell-it"></script>
+    <script src="js/main.js?v=20260730-consumer-lightweight-v1" data-app="can-i-sell-it"></script>
 </body>
 </html>

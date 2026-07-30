@@ -3926,6 +3926,13 @@ a.hub-core-card--link {
 .sell-privacy-controls { margin-top: 14px; color: #50657a; }
 .sell-privacy-controls summary { cursor: pointer; font-weight: 800; color: #244e75; }
 .sell-privacy-controls button { color: #9c2f2f; border-color: #e6bcbc; }
+.sell-advanced-card { margin-top: 22px; }
+.sell-advanced-option { margin-top: 12px; border: 1px solid #d5e1ee; border-radius: 11px; background: #fbfdff; overflow: hidden; }
+.sell-advanced-option > summary { display: flex; flex-direction: column; gap: 3px; padding: 16px 18px; cursor: pointer; color: #244e75; }
+.sell-advanced-option > summary span { color: #708090; font-size: .83rem; font-weight: 500; }
+.sell-advanced-option[open] > summary { border-bottom: 1px solid #e2eaf2; background: #f5f9fd; }
+.sell-advanced-option > fieldset, .sell-advanced-option > .sell-account-card, .sell-advanced-option > form, .sell-advanced-option > div { margin: 16px; }
+.sell-advanced-update { margin-top: 14px; }
 
 @media print {
     .bottom-nav, .sell-check-hero, .sell-check-form, #sell-follow-up,
