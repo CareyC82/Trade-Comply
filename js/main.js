@@ -4,7 +4,7 @@
  * The consumer pre-check uses the same entry with data-app="can-i-sell-it".
  */
 (function () {
-    const BUILD = '20260716-china-source-priority';
+    const BUILD = '20260730-consumer-phase2';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();

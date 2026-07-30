@@ -10,9 +10,15 @@ function bootstrapCanISellItPage() {
     const result = document.getElementById('sell-result');
     const error = document.getElementById('sell-check-error');
     const productTypeSelect = document.getElementById('sell-product-type');
+    const evidenceFiles = document.getElementById('sell-evidence-files');
+    const evidencePreview = document.getElementById('sell-evidence-preview');
+    const historyList = document.getElementById('sell-history-list');
+    const historyEmpty = document.getElementById('sell-history-empty');
     const models = globalThis.TradeComplyWearableModels;
+    const HISTORY_KEY = 'tracewize-can-i-sell-it-history-v1';
     let currentInput = null;
     let dutyRates = null;
+    let latestAssessment = null;
 
     const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -32,6 +38,7 @@ function bootstrapCanISellItPage() {
         medicalClaim: 'Medical claim', childUse: 'Designed for children', cameraMic: 'Camera / microphone',
         gps: 'GPS / location tracking', display: 'Screen / projected display',
         wirelessCharging: 'Wireless charging', noiseCancellation: 'Active noise cancellation'
+        , mainsPowered: 'AC mains powered'
     };
 
     function renderQuestions(profile, productType = profile.productType) {
@@ -67,6 +74,39 @@ function bootstrapCanISellItPage() {
             </a>`).join('')}</div>`;
     }
 
+    function readHistory() {
+        try {
+            const parsed = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function saveHistory(record) {
+        const history = readHistory().filter((item) => item.id !== record.id);
+        history.unshift(record);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const history = readHistory();
+        historyEmpty.hidden = history.length > 0;
+        historyList.innerHTML = history.map((item) => `
+            <article>
+                <div><strong>${escapeHtml(item.productLabel)}</strong><span>${escapeHtml(item.market)} · ${escapeHtml(item.platform)} · ${escapeHtml(item.createdAt)}</span></div>
+                <div><button type="button" data-history-open="${escapeHtml(item.id)}">Open</button><button type="button" data-history-delete="${escapeHtml(item.id)}">Delete</button></div>
+            </article>`).join('');
+    }
+
+    function printAssessment() {
+        if (!latestAssessment) return;
+        document.body.classList.add('sell-print-mode');
+        window.print();
+        setTimeout(() => document.body.classList.remove('sell-print-mode'), 500);
+    }
+
     function renderAssessment(assessment) {
         const requirementCards = assessment.requirements.map((item) => `
             <article class="sell-requirement ${item.severity === 'high' ? 'sell-requirement--high' : ''}">
@@ -80,6 +120,12 @@ function bootstrapCanISellItPage() {
             ? assessment.tariffOptions.map((row) => `<li><strong>HS ${escapeHtml(row.hsCode)}</strong><span>${row.rate === null ? 'Rate not covered' : `${(row.rate * 100).toFixed(2)}% candidate signal`} · ${escapeHtml(row.exact ? 'exact-line source match' : row.sourceStatus)}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
+        const evidenceRows = assessment.supplierEvidence.length
+            ? assessment.supplierEvidence.map((item) => `<li><strong>${escapeHtml(item.kind)} — ${escapeHtml(item.name)}</strong><span>${escapeHtml(item.status.replaceAll('_', ' '))}: ${escapeHtml(item.note)}</span></li>`).join('')
+            : '<li><strong>No supplier files uploaded</strong><span>Upload the exact-model reports before committing inventory.</span></li>';
+        const platformCards = assessment.platformRules.length
+            ? assessment.platformRules.map((rule) => `<article class="sell-requirement"><span>Platform rule</span><h3>${escapeHtml(rule.title)}</h3><p>${escapeHtml(rule.action)}</p>${renderSources({ sources: [rule.source] })}</article>`).join('')
+            : '<p class="sell-panel-note">No maintained platform-specific rule is available for this channel. Legal market-access checks still apply.</p>';
         const economicsPanel = economics ? `
             <section class="sell-result-panel"><h2>Landed cost and margin estimate</h2>
                 <div class="sell-economics-grid">
@@ -107,10 +153,40 @@ function bootstrapCanISellItPage() {
             <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
             <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-grid">${requirementCards}</div></section>
             <section class="sell-result-panel"><h2>Supplier document gaps</h2><ul class="sell-gap-list">${gaps}</ul></section>
+            <section class="sell-result-panel"><h2>Uploaded supplier evidence</h2><ul class="sell-gap-list">${evidenceRows}</ul></section>
+            <section class="sell-result-panel"><h2>${escapeHtml(currentInput.platform)} listing readiness</h2><div class="sell-requirement-grid">${platformCards}</div></section>
             <section class="sell-result-panel"><h2>Put these conditions in the purchase order</h2><ol class="sell-action-list">${assessment.contractConditions.map((condition) => `<li>${escapeHtml(condition)}</li>`).join('')}</ol></section>
             <section class="sell-result-panel"><h2>What to do next</h2><ol class="sell-action-list">${assessment.nextActions.map((action) => `<li>${escapeHtml(action)}</li>`).join('')}</ol></section>
+            <section class="sell-result-panel sell-assistant-result"><h2>Ask the assessment assistant</h2><p>${escapeHtml(assessment.assistant.summary)}</p><div>${assessment.assistant.answerPrompts.map((prompt) => `<button type="button" data-assistant-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join('')}</div><p id="sell-assistant-answer" class="sell-panel-note"></p></section>
+            <div class="sell-result-actions"><button type="button" id="sell-save-assessment">Save assessment</button><button type="button" id="sell-print-assessment">Print / Save PDF</button></div>
             <div class="sell-trust-note"><strong>How to use this:</strong> do not place a purchase order solely from this result. Final duty requires exact HS classification; certifications must match the exact model, radio module, battery, and listing claims.</div>`;
+        latestAssessment = assessment;
         result.hidden = false;
+        document.getElementById('sell-save-assessment')?.addEventListener('click', () => {
+            saveHistory({
+                id: `${Date.now()}`,
+                createdAt: new Date().toLocaleString(),
+                productLabel: assessment.product.label,
+                market: currentInput.market,
+                platform: currentInput.platform,
+                input: { ...currentInput, dutyRates: undefined },
+                assessment
+            });
+        });
+        document.getElementById('sell-print-assessment')?.addEventListener('click', printAssessment);
+        document.querySelectorAll('[data-assistant-prompt]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const prompt = button.dataset.assistantPrompt;
+                const answer = prompt.includes('missing')
+                    ? (assessment.documentGaps.length ? assessment.documentGaps.slice(0, 8).map((gap) => gap.document).join('; ') : 'No missing document was identified from the selected evidence.')
+                    : prompt.includes('purchase order')
+                        ? assessment.contractConditions.join(' ')
+                        : prompt.includes('landed-cost')
+                            ? (assessment.economics ? assessment.economics.caveat : 'Enter purchase and selling figures first.')
+                            : `${assessment.procurement.reason} Resolve unknown product facts, exact-model evidence and final tariff classification before ordering.`;
+                document.getElementById('sell-assistant-answer').textContent = answer;
+            });
+        });
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -139,6 +215,8 @@ function bootstrapCanISellItPage() {
         const profile = engine.extractProfile(description);
         productTypeSelect.innerHTML = models.listProducts().map((product) => `<option value="${escapeHtml(product.id)}" ${product.id === profile.productType ? 'selected' : ''}>${escapeHtml(product.label)}</option>`).join('');
         renderQuestions(profile, profile.productType);
+        const missing = engine.getFollowUpQuestions(profile);
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Assessment assistant</strong><p>${missing.length ? `I found ${escapeHtml(models.getProduct(profile.productType).label)}. Please confirm ${missing.length} material facts below; I will not guess them.` : 'I found enough product attributes to continue. Please verify them below.'}</p>`;
         renderDocumentOptions(currentInput.market, profile);
         followUp.hidden = false;
         result.hidden = true;
@@ -153,11 +231,18 @@ function bootstrapCanISellItPage() {
             .forEach((key) => { attributes[key] = data.get(key) || 'unknown'; });
         const costKeys = ['currency', 'quantity', 'purchaseUnit', 'saleUnit', 'freightTotal', 'insuranceTotal', 'otherImportTotal', 'dutyRate', 'importTaxRate', 'platformFeeRate', 'otherSellingUnit'];
         const costs = Object.fromEntries(costKeys.map((key) => [key, data.get(key)]));
+        const files = Array.from(evidenceFiles.files || []).map((file) => ({ name: file.name, type: file.type, size: file.size }));
         renderAssessment(engine.assess({
             ...currentInput,
             attributes,
             documents: data.getAll('documents'),
-            costs
+            costs,
+            supplierEvidence: {
+                files,
+                requiredModel: data.get('requiredModel'),
+                supplierModel: data.get('supplierModel'),
+                documentText: data.get('documentText')
+            }
         }));
     });
 
@@ -172,4 +257,29 @@ function bootstrapCanISellItPage() {
         .then((response) => response.ok ? response.json() : null)
         .then((payload) => { dutyRates = payload; })
         .catch(() => { dutyRates = null; });
+
+    evidenceFiles.addEventListener('change', () => {
+        const files = Array.from(evidenceFiles.files || []);
+        evidencePreview.innerHTML = files.length
+            ? files.map((file) => `<span>${escapeHtml(file.name)} · ${(file.size / 1024).toFixed(1)} KB · pending verification</span>`).join('')
+            : '';
+    });
+
+    historyList.addEventListener('click', (event) => {
+        const openId = event.target.closest('[data-history-open]')?.dataset.historyOpen;
+        const deleteId = event.target.closest('[data-history-delete]')?.dataset.historyDelete;
+        if (deleteId) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(readHistory().filter((item) => item.id !== deleteId)));
+            renderHistory();
+        } else if (openId) {
+            const record = readHistory().find((item) => item.id === openId);
+            if (record) {
+                currentInput = record.input;
+                latestAssessment = record.assessment;
+                renderAssessment(record.assessment);
+            }
+        }
+    });
+
+    renderHistory();
 }

@@ -3857,6 +3857,14 @@ a.hub-core-card--link {
 .sell-documents legend { padding: 0 6px; color: #264661; font-weight: 900; }
 .sell-documents > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .sell-documents label { color: #55687b; font-size: .88rem; }
+.sell-evidence-upload { margin: 22px 0 0; padding: 18px; border: 1px solid #dbe5ef; border-radius: 10px; }
+.sell-evidence-upload legend { padding: 0 6px; color: #264661; font-weight: 900; }
+.sell-evidence-upload > p { color: #6e7e8d; font-size: .84rem; }
+.sell-evidence-upload textarea { min-height: 85px; }
+.sell-evidence-preview { display: grid; gap: 6px; margin-top: 10px; }
+.sell-evidence-preview span { padding: 8px 10px; border-radius: 7px; background: #f5f8fb; color: #607487; font-size: .78rem; }
+.sell-assistant-panel { margin: 18px 0; padding: 16px; border: 1px solid #bdd5ef; border-radius: 10px; background: #eef6ff; color: #244e75; }
+.sell-assistant-panel p { margin: 5px 0 0; line-height: 1.5; }
 .sell-check-product-type { max-width: 430px; margin-bottom: 18px; }
 .sell-costs { margin: 22px 0 0; padding: 18px; border: 1px solid #dbe5ef; border-radius: 10px; }
 .sell-costs legend { padding: 0 6px; color: #264661; font-weight: 900; }
@@ -3900,6 +3908,26 @@ a.hub-core-card--link {
 .sell-gap-list span { color: #718090; font-size: .82rem; text-align: right; }
 .sell-action-list { margin: 0; padding-left: 22px; color: #4e6375; line-height: 1.8; }
 .sell-trust-note { margin-top: 14px; padding: 16px 18px; border-radius: 10px; background: #fff5dd; color: #6f5623; font-size: .86rem; line-height: 1.55; }
+.sell-assistant-result > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.sell-assistant-result button,
+.sell-result-actions button,
+.sell-history-list button { border: 1px solid #b9cde6; border-radius: 8px; background: #f3f7fd; color: #21568d; padding: 9px 12px; cursor: pointer; font-weight: 800; }
+.sell-result-actions { display: flex; gap: 10px; margin-top: 14px; }
+.sell-result-actions button { background: #1763bd; color: #fff; }
+.sell-history-list { display: grid; gap: 9px; }
+.sell-history-list article { display: flex; justify-content: space-between; gap: 18px; align-items: center; padding: 13px; border-radius: 9px; background: #f5f8fb; }
+.sell-history-list article > div { display: flex; gap: 8px; }
+.sell-history-list article > div:first-child { flex-direction: column; }
+.sell-history-list span { color: #708090; font-size: .78rem; }
+
+@media print {
+    .bottom-nav, .sell-check-hero, .sell-check-form, #sell-follow-up,
+    .sell-history-card, .sell-result-actions, .sell-assistant-result { display: none !important; }
+    .sell-check-page-body { background: #fff; padding: 0; }
+    .sell-check-page { width: 100%; padding: 0; }
+    #sell-result { display: block !important; margin: 0; }
+    .sell-result-panel, .sell-verdict, .sell-procurement { break-inside: avoid; box-shadow: none; }
+}
 
 @media (max-width: 760px) {
     .sell-check-page { width: min(100% - 20px, 1120px); padding-top: 12px; }
@@ -3909,6 +3937,7 @@ a.hub-core-card--link {
     .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid { grid-template-columns: 1fr; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-gap-list span { text-align: left; }
+    .sell-history-list article { align-items: flex-start; flex-direction: column; }
 }
 
 /* Case Library Button */

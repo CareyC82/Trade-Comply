@@ -78,7 +78,65 @@ test('distinguishes all six supported wearable product models', () => {
     Object.entries(samples).forEach(([expected, description]) => {
         assert.equal(engine.extractProfile(description).productType, expected);
     });
-    assert.equal(models.listProducts().filter((item) => item.id !== 'wearable_other').length, 6);
+    assert.equal(models.listProducts().filter((item) => item.id !== 'wearable_other').length, 10);
+});
+
+test('detects the four adjacent consumer-electronics categories', () => {
+    assert.equal(engine.detectProductType('65W GaN wall charger'), 'charger');
+    assert.equal(engine.detectProductType('10000mAh power bank portable charger'), 'power_bank');
+    assert.equal(engine.detectProductType('rechargeable LED facial beauty device'), 'beauty_device');
+    assert.equal(engine.detectProductType("children's electronic camera"), 'kids_electronics');
+});
+
+test('Japan and Singapore screens attach local official requirements', () => {
+    const japan = engine.assess({
+        description: 'Bluetooth 65W wall charger with AC input and no battery',
+        market: 'JP', origin: 'CN', platform: 'Amazon',
+        attributes: { productType: 'charger', bluetooth: 'yes', wifi: 'no', mainsPowered: 'yes' },
+        documents: []
+    });
+    const singapore = engine.assess({
+        description: 'Bluetooth smart watch with lithium battery and no medical claims',
+        market: 'SG', origin: 'CN', platform: 'TikTok Shop',
+        attributes: {
+            bluetooth: 'yes', wifi: 'no', cellular: 'no', battery: 'yes',
+            healthMonitoring: 'no', medicalClaim: 'no', childUse: 'no', cameraMic: 'no'
+        },
+        documents: []
+    });
+    assert.equal(japan.coverage, 'deep');
+    assert.ok(japan.requirements.some((item) => item.id === 'jp_radio' && item.sources[0].authority.includes('Japan')));
+    assert.ok(japan.requirements.some((item) => item.id === 'jp_pse'));
+    assert.equal(singapore.coverage, 'deep');
+    assert.ok(singapore.requirements.some((item) => item.id === 'sg_imda' && item.sources[0].url.includes('imda.gov.sg')));
+});
+
+test('supplier evidence remains unverified unless model text matches and flags mismatches', () => {
+    const matched = engine.analyzeSupplierEvidence({
+        files: [{ name: 'FCC-report.pdf', type: 'application/pdf', size: 1200 }],
+        requiredModel: 'TW-01',
+        supplierModel: 'TW-01'
+    });
+    const mismatch = engine.analyzeSupplierEvidence({
+        files: [{ name: 'UN38.3.pdf', type: 'application/pdf', size: 1200 }],
+        requiredModel: 'TW-01',
+        supplierModel: 'TW-02'
+    });
+    assert.equal(matched[0].status, 'model_matched');
+    assert.match(matched[0].note, /authenticity.*verification/);
+    assert.equal(mismatch[0].status, 'suspected_mismatch');
+});
+
+test('platform rules are separated from legal market-access requirements', () => {
+    const result = engine.assess({
+        description: 'Bluetooth earbuds with lithium battery',
+        market: 'US', origin: 'CN', platform: 'TikTok Shop',
+        attributes: { productType: 'earbuds', bluetooth: 'yes', wifi: 'no', battery: 'yes', cameraMic: 'yes', wirelessCharging: 'no', noiseCancellation: 'no' },
+        documents: []
+    });
+    assert.ok(result.platformRules.some((rule) => rule.id === 'tiktok-electronics'));
+    assert.ok(result.platformRules.some((rule) => rule.id === 'tiktok-battery'));
+    assert.ok(result.requirements.some((rule) => rule.id === 'fcc'));
 });
 
 test('official evidence is attached to applicable US and EU requirements', () => {
