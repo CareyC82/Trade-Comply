@@ -51,7 +51,7 @@ test('bottom-navigation tools share one primary title scale', () => {
     ].forEach((className) => {
         assert.ok(css.includes(`.${className}`), `${className} should be covered by the shared title rule`);
     });
-    assert.match(css, /Final cascade:[\s\S]*font-size:\s*1\.48rem/);
+    assert.match(css, /Final cascade:[\s\S]*font-size:\s*clamp\(1\.5rem,\s*2\.4vw,\s*1\.75rem\)/);
 });
 
 test('category pages keep product feedback and result handoff available', () => {
