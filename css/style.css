@@ -3773,61 +3773,71 @@ a.hub-core-card--link {
 
 /* Consumer smart-wearable market-entry pre-check */
 .sell-check-page-body {
-    background: #f4f7fb;
-    padding-bottom: 96px;
+    background: var(--color-bg-secondary);
 }
 
 .sell-check-page {
-    width: min(1120px, calc(100% - 32px));
+    display: block;
+    width: 100%;
+    max-width: 980px;
     margin: 0 auto;
-    padding: 42px 0 72px;
+    padding: 0 16px 96px;
 }
 
 .sell-check-hero {
-    padding: 42px;
-    border-radius: 22px;
-    background: linear-gradient(135deg, #123a66 0%, #1f5faf 68%, #2b6ed3 100%);
-    color: #fff;
-    box-shadow: 0 18px 45px rgba(18, 58, 102, 0.2);
+    padding: 36px 0 14px;
+    color: var(--color-text);
+    text-align: center;
 }
 
 .sell-check-eyebrow {
     display: inline-flex;
-    padding: 7px 12px;
-    border: 1px solid rgba(255,255,255,.35);
+    padding: 5px 10px;
+    border: 1px solid rgba(232, 168, 23, .28);
     border-radius: 999px;
-    background: rgba(255,255,255,.12);
-    font-size: .76rem;
-    font-weight: 900;
-    letter-spacing: .05em;
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .04em;
     text-transform: uppercase;
 }
 
-.sell-check-hero h1 { margin: 15px 0 10px; font-size: clamp(2.2rem, 6vw, 4rem); }
-.sell-check-hero p { max-width: 760px; margin: 0; font-size: 1.08rem; line-height: 1.65; color: #e6effc; }
-.sell-check-scope { margin-top: 22px; color: #d6e7ff; font-size: .86rem; }
-.sell-check-scope strong { color: #fff; }
+.sell-check-hero h1 { margin: 0 0 5px; color: var(--color-primary); font-size: 1.62rem; line-height: 1.18; }
+.sell-check-hero p { max-width: 680px; margin: 0 auto; color: var(--color-text-secondary); font-size: .95rem; line-height: 1.55; }
+.sell-check-scope-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px 16px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--color-warning-bg);
+}
+.sell-check-scope { color: var(--color-warning-text); font-size: .79rem; line-height: 1.45; }
+.sell-check-scope strong { color: var(--color-warning-text); }
 
 .sell-check-form,
 .sell-check-card,
-.sell-check-result { margin-top: 24px; }
+.sell-check-result { margin-top: 16px; }
 
 .sell-check-card,
 .sell-result-panel,
 .sell-verdict,
 .sell-readiness-grid article {
-    border: 1px solid #dfe7f0;
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 8px 24px rgba(29, 55, 82, .07);
+    border: 1px solid rgba(26, 58, 92, 0.08);
+    border-radius: 14px;
+    background: var(--color-bg);
+    box-shadow: 0 2px 12px var(--color-card-shadow);
 }
 
 .sell-check-card,
-.sell-result-panel { padding: 28px; }
-.sell-check-section-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 22px; }
-.sell-check-section-head > span { display: grid; place-items: center; flex: 0 0 34px; height: 34px; border-radius: 50%; background: #e8f1ff; color: #1558a6; font-weight: 900; }
-.sell-check-section-head h2 { margin: 2px 0 5px; color: #173c64; font-size: 1.2rem; }
-.sell-check-section-head p { margin: 0; color: #67788a; }
+.sell-result-panel { padding: 18px; }
+.sell-check-section-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
+.sell-check-section-head > span { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border-radius: 9px; background: var(--color-warning-bg); color: var(--color-warning-text); font-weight: 900; }
+.sell-check-section-head h2 { margin: 1px 0 3px; color: var(--color-primary); font-size: 1.05rem; }
+.sell-check-section-head p { margin: 0; color: var(--color-text-secondary); font-size: .85rem; }
 
 .sell-check-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
 .sell-check-field { display: grid; gap: 7px; color: #344a60; font-size: .83rem; font-weight: 800; }
@@ -3836,7 +3846,7 @@ a.hub-core-card--link {
 .sell-check-field input {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #c9d6e4;
+    border: 2px solid var(--color-border);
     border-radius: 10px;
     background: #fff;
     color: #172b40;
@@ -3845,9 +3855,16 @@ a.hub-core-card--link {
 .sell-check-field textarea { min-height: 125px; padding: 14px; resize: vertical; line-height: 1.55; font-weight: 500; }
 .sell-check-field select { min-height: 46px; padding: 0 12px; font-weight: 600; }
 .sell-check-field input { min-height: 46px; padding: 0 12px; font-weight: 600; }
+.sell-check-field textarea:focus,
+.sell-check-field select:focus,
+.sell-check-field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 58, 92, .12);
+}
 .sell-check-examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.sell-check-examples button { border: 1px solid #b9cde6; border-radius: 999px; background: #f3f7fd; color: #21568d; padding: 7px 11px; cursor: pointer; font-weight: 700; }
-.sell-check-primary { margin-top: 22px; border: 0; border-radius: 10px; background: #1763bd; color: #fff; padding: 13px 21px; font-weight: 900; cursor: pointer; }
+.sell-check-examples button { border: 1px solid var(--color-border); border-radius: 999px; background: #f8fafc; color: var(--color-primary); padding: 7px 11px; cursor: pointer; font-weight: 700; }
+.sell-check-primary { width: 100%; min-height: 50px; margin-top: 18px; border: 0; border-radius: 12px; background: var(--color-primary); color: #fff; padding: 13px 21px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 20px rgba(26, 58, 92, .16); }
 
 .sell-question-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .sell-question { margin: 0; padding: 14px; border: 1px solid #dbe5ef; border-radius: 10px; }
@@ -3944,9 +3961,11 @@ a.hub-core-card--link {
 }
 
 @media (max-width: 760px) {
-    .sell-check-page { width: min(100% - 20px, 1120px); padding-top: 12px; }
-    .sell-check-hero { padding: 28px 22px; border-radius: 16px; }
-    .sell-check-card, .sell-result-panel { padding: 20px; }
+    .sell-check-page { width: 100%; padding: 0 10px 88px; }
+    .sell-check-hero { padding: 22px 4px 10px; }
+    .sell-check-hero h1 { font-size: 1.48rem; }
+    .sell-check-scope-row { display: grid; gap: 5px; text-align: left; }
+    .sell-check-card, .sell-result-panel { padding: 16px; }
     .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid,
     .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid { grid-template-columns: 1fr; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
@@ -7853,4 +7872,18 @@ button.feedback-link:hover {
         align-items: flex-start;
         flex-direction: column;
     }
+}
+
+/* Final cascade: keep every bottom-navigation tool title on one scale. */
+#incoterm-view .incoterm-page-title,
+.hscode-page-title,
+.post-entry-page-title,
+.opportunity-page-title,
+.tariff-watch-page-title,
+.trade-flow-page-title,
+.sell-check-hero h1.sell-check-page-title {
+    margin-bottom: 4px;
+    font-size: 1.48rem;
+    line-height: 1.18;
+    white-space: normal;
 }

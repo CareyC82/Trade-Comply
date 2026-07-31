@@ -38,6 +38,22 @@ test('primary user pages expose the shared bottom workflow navigation', () => {
     });
 });
 
+test('bottom-navigation tools share one primary title scale', () => {
+    const css = readFile('css/style.css');
+    [
+        'incoterm-page-title',
+        'hscode-page-title',
+        'post-entry-page-title',
+        'opportunity-page-title',
+        'tariff-watch-page-title',
+        'trade-flow-page-title',
+        'sell-check-page-title'
+    ].forEach((className) => {
+        assert.ok(css.includes(`.${className}`), `${className} should be covered by the shared title rule`);
+    });
+    assert.match(css, /Final cascade:[\s\S]*font-size:\s*1\.48rem/);
+});
+
 test('category pages keep product feedback and result handoff available', () => {
     [
         'electronics.html',
