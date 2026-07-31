@@ -66,6 +66,48 @@ test('consumer page is reachable from the primary navigation and declares the de
     });
 });
 
+test('quick questions do not preselect Not sure', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.doesNotMatch(script, /profile\[key\]\s*===\s*['"]unknown['"][\s\S]{0,80}checked/);
+});
+
+test('quick assessment only blocks on questions actually shown to the user', () => {
+    const common = {
+        description: 'Bluetooth smart watch with heart-rate tracking',
+        market: 'US',
+        platform: 'Amazon',
+        assessmentMode: 'quick',
+        blockingQuestionKeys: ['childUse']
+    };
+    const adult = engine.assess({
+        ...common,
+        attributes: { productType: 'smart_watch', childUse: 'no' }
+    });
+    const child = engine.assess({
+        ...common,
+        attributes: { productType: 'smart_watch', childUse: 'yes' }
+    });
+
+    assert.notEqual(adult.verdict, 'information_missing');
+    assert.equal(child.verdict, 'high_risk');
+    assert.notEqual(adult.procurement.label, child.procurement.label);
+    assert.ok(adult.deferredQuestions.length > 0);
+});
+
+test('quick battery answer changes the small-parcel result', () => {
+    const common = {
+        description: 'Portable consumer electronic accessory',
+        market: 'US',
+        platform: 'Amazon',
+        assessmentMode: 'quick',
+        blockingQuestionKeys: ['battery']
+    };
+    const battery = engine.assess({ ...common, attributes: { productType: 'general_electronics', battery: 'yes' } });
+    const noBattery = engine.assess({ ...common, attributes: { productType: 'general_electronics', battery: 'no' } });
+
+    assert.notEqual(battery.shipping, noBattery.shipping);
+});
+
 test('distinguishes all six supported wearable product models', () => {
     const samples = {
         smart_watch: 'Bluetooth smart watch',

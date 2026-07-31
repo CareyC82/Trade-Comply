@@ -28,6 +28,7 @@ function bootstrapCanISellItPage() {
     let latestAssessment = null;
     let currentProfile = null;
     let currentAttributes = null;
+    let currentQuickKeys = [];
     let currentUser = null;
     let history = [];
     let uploadedFiles = [];
@@ -62,16 +63,22 @@ function bootstrapCanISellItPage() {
                 : profile.healthMonitoring === true
                     ? ['medicalClaim', 'battery', 'cellular', 'childUse']
                     : ['battery', 'cellular', 'bluetooth', 'wifi', 'medicalClaim'];
-        const unknown = priorities.filter((key) => material.includes(key) && profile[key] === 'unknown');
-        return (unknown.length ? unknown : material.filter((key) => profile[key] === 'unknown')).slice(0, 2);
+        const changesMaintainedResult = (key) => {
+            if (key === 'cellular') return profile.bluetooth !== true && profile.wifi !== true;
+            return ['battery', 'medicalClaim', 'childUse', 'cameraMic', 'mainsPowered', 'bluetooth', 'wifi'].includes(key);
+        };
+        return priorities
+            .filter((key) => material.includes(key) && profile[key] === 'unknown' && changesMaintainedResult(key))
+            .slice(0, 2);
     }
 
     function renderQuestions(profile, productType = profile.productType) {
         const keys = quickQuestionKeys(profile, productType);
+        currentQuickKeys = keys;
         questions.innerHTML = keys.map((key) => `
             <fieldset class="sell-question">
                 <legend>${escapeHtml(attributeLabels[key])}</legend>
-                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : profile[key] === 'unknown' && value === 'unknown' ? 'checked' : ''}> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
+                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`).join('');
         questions.hidden = keys.length === 0;
         return keys;
@@ -270,7 +277,14 @@ function bootstrapCanISellItPage() {
         if (quickKeys.length === 0) {
             currentAttributes = resolvedAttributes(new FormData(followUpForm));
             followUp.hidden = true;
-            renderAssessment(engine.assess({ ...currentInput, attributes: currentAttributes, documents: [], supplierEvidence: { files: [] } }));
+            renderAssessment(engine.assess({
+                ...currentInput,
+                attributes: currentAttributes,
+                documents: [],
+                supplierEvidence: { files: [] },
+                assessmentMode: 'quick',
+                blockingQuestionKeys: currentQuickKeys
+            }));
         } else {
             followUp.hidden = false;
             followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -296,7 +310,9 @@ function bootstrapCanISellItPage() {
             ...currentInput,
             attributes: currentAttributes,
             documents: [],
-            supplierEvidence: { files: [] }
+            supplierEvidence: { files: [] },
+            assessmentMode: 'quick',
+            blockingQuestionKeys: currentQuickKeys
         }));
     });
 
@@ -336,7 +352,9 @@ function bootstrapCanISellItPage() {
                 requiredModel: data.get('requiredModel'),
                 supplierModel: data.get('supplierModel'),
                 documentText: data.get('documentText')
-            }
+            },
+            assessmentMode: 'quick',
+            blockingQuestionKeys: currentQuickKeys
         }));
     });
 
