@@ -30,6 +30,8 @@ function bootstrapCanISellItPage() {
     let currentAttributes = null;
     let currentQuickKeys = [];
     let currentEvidenceQuestions = [];
+    let currentEvidenceAnswers = {};
+    let currentConfirmedDocuments = [];
     let currentUser = null;
     let history = [];
     let uploadedFiles = [];
@@ -230,6 +232,16 @@ function bootstrapCanISellItPage() {
                 </div><p class="sell-panel-note">${escapeHtml(economics.caveat)}</p>
             </section>` : '<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">Add purchase price and expected selling price to calculate the commercial result.</p></section>';
         const conclusion = assessment.consumerConclusion;
+        const commercial = assessment.commercialConclusion;
+        const commercialPanel = commercial.code === 'not_calculated' ? '' : `
+            <section class="sell-commercial-answer sell-commercial-answer--${escapeHtml(commercial.code)}">
+                <div><span>Commercial viability</span><strong>${escapeHtml(commercial.answer)}</strong><h2>${escapeHtml(commercial.label)}</h2><p>${escapeHtml(commercial.reason)}</p></div>
+                ${assessment.economics ? `<div class="sell-commercial-metrics">
+                    <article><span>Landed cost / unit</span><strong>${money(assessment.economics.landedUnit, assessment.economics.currency)}</strong></article>
+                    <article><span>Contribution / unit</span><strong>${money(assessment.economics.profitUnit, assessment.economics.currency)}</strong></article>
+                    <article><span>Break-even price</span><strong>${money(assessment.economics.breakEvenPrice, assessment.economics.currency)}</strong></article>
+                </div>` : ''}
+            </section>`;
         result.innerHTML = `
             <section class="sell-final-answer sell-final-answer--${escapeHtml(conclusion.code)}">
                 <span>Can I sell it?</span>
@@ -242,6 +254,7 @@ function bootstrapCanISellItPage() {
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
                 <article><span>Shipping</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
+            ${commercialPanel}
             <details class="sell-result-details"><summary>View technical basis and document checklist</summary>
                 ${economicsPanel}
                 <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
@@ -364,11 +377,13 @@ function bootstrapCanISellItPage() {
         event.preventDefault();
         const data = new FormData(followUpForm);
         currentAttributes = resolvedAttributes(data);
+        currentEvidenceAnswers = resolvedEvidence(data);
+        currentConfirmedDocuments = confirmedDocuments(data);
         renderAssessment(engine.assess({
             ...currentInput,
             attributes: currentAttributes,
-            documents: confirmedDocuments(data),
-            evidenceAnswers: resolvedEvidence(data),
+            documents: currentConfirmedDocuments,
+            evidenceAnswers: currentEvidenceAnswers,
             supplierEvidence: { files: [] },
             assessmentMode: 'quick',
             blockingQuestionKeys: currentQuickKeys
@@ -404,7 +419,8 @@ function bootstrapCanISellItPage() {
         renderAssessment(engine.assess({
             ...currentInput,
             attributes: currentAttributes,
-            documents: data.getAll('documents'),
+            documents: Array.from(new Set([...currentConfirmedDocuments, ...data.getAll('documents')])),
+            evidenceAnswers: currentEvidenceAnswers,
             costs,
             supplierEvidence: {
                 files,

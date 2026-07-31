@@ -184,6 +184,24 @@ test('consumer conclusion is driven by exact-model evidence answers', () => {
     assert.match(missing.consumerConclusion.reason, /FCC ID/);
 });
 
+test('commercial conclusion distinguishes profitable, low-margin and loss-making products', () => {
+    const assessCosts = (saleUnit) => engine.assess({
+        description: 'Simple electronic accessory without battery',
+        market: 'US',
+        platform: 'Amazon',
+        attributes: { productType: 'wearable_other', battery: 'no', bluetooth: 'no', wifi: 'no', cellular: 'no' },
+        costs: {
+            currency: 'USD', quantity: 100, purchaseUnit: 10, saleUnit,
+            freightTotal: 100, otherImportTotal: 0, dutyRate: 0,
+            importTaxRate: 0, platformFeeRate: 10, otherSellingUnit: 1
+        }
+    });
+
+    assert.equal(assessCosts(25).commercialConclusion.code, 'profitable');
+    assert.equal(assessCosts(14).commercialConclusion.code, 'low_margin');
+    assert.equal(assessCosts(12).commercialConclusion.code, 'loss_making');
+});
+
 test('distinguishes all six supported wearable product models', () => {
     const samples = {
         smart_watch: 'Bluetooth smart watch',

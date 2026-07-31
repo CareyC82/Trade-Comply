@@ -3932,6 +3932,19 @@ a.hub-core-card--link {
 .sell-result-details { margin-top: 14px; border: 1px solid #dce5ed; border-radius: 12px; background: #fff; }
 .sell-result-details > summary { padding: 14px 16px; color: #264661; font-weight: 800; cursor: pointer; }
 .sell-result-details > .sell-result-panel { margin: 0 14px 14px; box-shadow: none; }
+.sell-commercial-answer { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; margin-top: 12px; padding: 18px 20px; border: 1px solid #d7e2eb; border-left: 7px solid #bd7b08; border-radius: 14px; background: #fff; }
+.sell-commercial-answer > div:first-child { display: grid; align-content: center; gap: 4px; }
+.sell-commercial-answer span { color: #71808e; font-size: .7rem; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+.sell-commercial-answer > div > strong { color: #986100; font-size: .8rem; }
+.sell-commercial-answer h2 { margin: 0; color: #173c64; font-size: 1.15rem; line-height: 1.3; }
+.sell-commercial-answer p { margin: 0; color: #607182; font-size: .82rem; line-height: 1.45; }
+.sell-commercial-answer--profitable { border-left-color: #27845a; background: #f7fcf9; }
+.sell-commercial-answer--profitable > div > strong { color: #19714b; }
+.sell-commercial-answer--loss_making { border-left-color: #b43c3c; background: #fffafa; }
+.sell-commercial-answer--loss_making > div > strong { color: #a42f2f; }
+.sell-commercial-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.sell-commercial-metrics article { display: grid; align-content: center; gap: 4px; padding: 11px; border-radius: 9px; background: rgba(235, 242, 248, .72); }
+.sell-commercial-metrics strong { color: #173c64; font-size: .88rem; line-height: 1.3; }
 .sell-economics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .sell-economics-grid article { display: grid; gap: 6px; padding: 15px; border-radius: 9px; background: #f5f8fb; }
 .sell-economics-grid span { color: #718090; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
@@ -3985,7 +3998,8 @@ a.hub-core-card--link {
     .sell-check-scope-row { display: grid; gap: 5px; text-align: left; }
     .sell-check-card, .sell-result-panel { padding: 16px; }
     .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid,
-    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary { grid-template-columns: 1fr; }
+    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary,
+    .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-gap-list span { text-align: left; }
     .sell-history-list article { align-items: flex-start; flex-direction: column; }
