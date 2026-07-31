@@ -191,12 +191,12 @@ function bootstrapCanISellItPage() {
             </section>` : '<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">Add purchase price and expected selling price to calculate the commercial result.</p></section>';
         result.innerHTML = `
             <div class="sell-verdict ${verdictClass(assessment.verdict)}">
-                <div><span>${assessment.coverage === 'deep' ? 'Deep market screen' : 'Basic market screen'}</span><h2>${escapeHtml(assessment.verdictLabel)}</h2></div>
+                <div><span>${assessment.coverage === 'deep' ? 'Deep market screen' : 'Basic market screen'}</span><h2>${escapeHtml(assessment.verdictLabel)}</h2><p>${escapeHtml(assessment.verdictDetail || '')}</p></div>
                 <p>${escapeHtml(assessment.disclaimer)}</p>
             </div>
             <section class="sell-procurement"><span>Procurement decision</span><h2>${escapeHtml(assessment.procurement.label)}</h2><p>${escapeHtml(assessment.procurement.reason)}</p></section>
             <div class="sell-readiness-grid">
-                <article><span>Market access</span><strong>${assessment.requirements.some((item) => item.severity === 'high') ? 'Specialist review' : 'Conditional'}</strong></article>
+                <article><span>Market access</span><strong>${escapeHtml(assessment.marketDecision.label)}</strong><small>${escapeHtml(assessment.marketDecision.detail)}</small></article>
                 <article><span>Small Parcel Check</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
                 <article><span>Platform readiness</span><strong>Evidence required</strong><small>${escapeHtml(assessment.platform)}</small></article>
             </div>

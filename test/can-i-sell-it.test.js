@@ -108,6 +108,39 @@ test('quick battery answer changes the small-parcel result', () => {
     assert.notEqual(battery.shipping, noBattery.shipping);
 });
 
+test('different electronics produce product-specific market and procurement decisions', () => {
+    const common = {
+        market: 'US',
+        platform: 'Amazon',
+        assessmentMode: 'quick',
+        blockingQuestionKeys: []
+    };
+    const wireless = engine.assess({
+        ...common,
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        attributes: { productType: 'smart_watch', bluetooth: 'yes', battery: 'yes', medicalClaim: 'no', childUse: 'no' }
+    });
+    const batteryOnly = engine.assess({
+        ...common,
+        description: 'Power bank with rechargeable lithium battery',
+        attributes: { productType: 'power_bank', bluetooth: 'no', wifi: 'no', cellular: 'no', battery: 'yes' }
+    });
+    const passive = engine.assess({
+        ...common,
+        description: 'Consumer electronic accessory without battery or wireless connection',
+        attributes: { productType: 'wearable_other', bluetooth: 'no', wifi: 'no', cellular: 'no', battery: 'no' }
+    });
+
+    assert.equal(wireless.marketDecision.code, 'radio_approval');
+    assert.equal(batteryOnly.marketDecision.code, 'battery_controls');
+    assert.equal(passive.marketDecision.code, 'classification_review');
+    assert.notEqual(wireless.verdictLabel, batteryOnly.verdictLabel);
+    assert.notEqual(batteryOnly.verdictLabel, passive.verdictLabel);
+    assert.match(wireless.procurement.label, /FCC/i);
+    assert.match(batteryOnly.procurement.label, /Lithium-battery transport/i);
+    assert.match(passive.procurement.label, /customs classification/i);
+});
+
 test('distinguishes all six supported wearable product models', () => {
     const samples = {
         smart_watch: 'Bluetooth smart watch',

@@ -4,7 +4,7 @@
  * The consumer pre-check uses the same entry with data-app="can-i-sell-it".
  */
 (function () {
-    const BUILD = '20260731-consumer-quick-verdict-v1';
+    const BUILD = '20260731-product-specific-verdict-v1';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
