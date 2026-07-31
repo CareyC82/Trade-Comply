@@ -3914,6 +3914,24 @@ a.hub-core-card--link {
 .sell-procurement > span { color: #bcd5ed; font-size: .72rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
 .sell-procurement h2 { margin: 5px 0; font-size: 1.3rem; line-height: 1.3; }
 .sell-procurement p { margin: 0; color: #dbe8f4; font-size: .88rem; line-height: 1.5; }
+.sell-final-answer { display: grid; gap: 6px; padding: 22px 24px; border: 1px solid #c9d9e8; border-left: 7px solid #bd7b08; border-radius: 14px; background: #fff; }
+.sell-final-answer > span { color: #6b7c8c; font-size: .75rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.sell-final-answer > strong { color: #9a6200; font-size: .82rem; letter-spacing: .05em; }
+.sell-final-answer h2 { margin: 0; color: #173c64; font-size: 1.35rem; line-height: 1.3; }
+.sell-final-answer p { margin: 0; color: #5f7183; font-size: .88rem; line-height: 1.5; }
+.sell-final-answer--yes_precheck { border-left-color: #27845a; background: #f7fcf9; }
+.sell-final-answer--yes_precheck > strong { color: #19714b; }
+.sell-final-answer--not_yet,
+.sell-final-answer--specialist_review { border-left-color: #b43c3c; background: #fffafa; }
+.sell-final-answer--not_yet > strong,
+.sell-final-answer--specialist_review > strong { color: #a42f2f; }
+.sell-answer-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.sell-answer-summary article { display: grid; gap: 5px; padding: 13px 15px; border: 1px solid #dce5ed; border-radius: 10px; background: #fff; }
+.sell-answer-summary span { color: #71808e; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
+.sell-answer-summary strong { color: #173c64; font-size: .88rem; line-height: 1.35; }
+.sell-result-details { margin-top: 14px; border: 1px solid #dce5ed; border-radius: 12px; background: #fff; }
+.sell-result-details > summary { padding: 14px 16px; color: #264661; font-weight: 800; cursor: pointer; }
+.sell-result-details > .sell-result-panel { margin: 0 14px 14px; box-shadow: none; }
 .sell-economics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .sell-economics-grid article { display: grid; gap: 6px; padding: 15px; border-radius: 9px; background: #f5f8fb; }
 .sell-economics-grid span { color: #718090; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
@@ -3967,7 +3985,7 @@ a.hub-core-card--link {
     .sell-check-scope-row { display: grid; gap: 5px; text-align: left; }
     .sell-check-card, .sell-result-panel { padding: 16px; }
     .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid,
-    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid { grid-template-columns: 1fr; }
+    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary { grid-template-columns: 1fr; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-gap-list span { text-align: left; }
     .sell-history-list article { align-items: flex-start; flex-direction: column; }

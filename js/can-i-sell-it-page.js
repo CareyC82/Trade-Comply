@@ -29,6 +29,7 @@ function bootstrapCanISellItPage() {
     let currentProfile = null;
     let currentAttributes = null;
     let currentQuickKeys = [];
+    let currentEvidenceQuestions = [];
     let currentUser = null;
     let history = [];
     let uploadedFiles = [];
@@ -54,6 +55,31 @@ function bootstrapCanISellItPage() {
         , mainsPowered: 'AC mains powered'
     };
 
+    const evidenceQuestionMap = {
+        fcc: [
+            { key: 'fccGrant', label: 'Valid FCC ID / Grant for this exact model', docs: ['FCC ID / grant'] },
+            { key: 'rfExposure', label: 'RF exposure / SAR evidence for this exact model', docs: ['RF exposure / SAR evidence'] }
+        ],
+        red: [
+            { key: 'redEvidence', label: 'EU RED test reports and Declaration of Conformity for this exact model', docs: ['EU Declaration of Conformity', 'RED test reports'] }
+        ],
+        jp_radio: [
+            { key: 'jpRadioEvidence', label: 'Japan radio certificate for this exact model', docs: ['Japan radio certificate'] }
+        ],
+        sg_imda: [
+            { key: 'sgImdaEvidence', label: 'Singapore IMDA registration / SDoC for this exact model', docs: ['IMDA registration / SDoC'] }
+        ],
+        battery: [
+            { key: 'batteryTransport', label: 'UN38.3 test summary matching the battery and exact model', docs: ['UN38.3 test summary'] }
+        ],
+        jp_pse: [
+            { key: 'jpPseEvidence', label: 'Applicable Japan PSE evidence for this exact model', docs: ['PSE scope rationale', 'Conformity/test evidence'] }
+        ],
+        sg_safety: [
+            { key: 'sgSafetyEvidence', label: 'Applicable Singapore SAFETY Mark evidence for this exact model', docs: ['CPSR registration', 'SAFETY Mark artwork'] }
+        ]
+    };
+
     function quickQuestionKeys(profile, productType = profile.productType) {
         const material = engine.materialQuestionKeys(productType);
         const priorities = productType === 'gan_charger'
@@ -72,16 +98,30 @@ function bootstrapCanISellItPage() {
             .slice(0, 2);
     }
 
+    function evidenceQuestionsFor(market, profile) {
+        const preliminary = engine.assess({ ...currentInput, market, attributes: profile, documents: [] });
+        return preliminary.requirements
+            .flatMap((item) => evidenceQuestionMap[item.id] || [])
+            .slice(0, 4);
+    }
+
     function renderQuestions(profile, productType = profile.productType) {
         const keys = quickQuestionKeys(profile, productType);
         currentQuickKeys = keys;
-        questions.innerHTML = keys.map((key) => `
+        currentEvidenceQuestions = evidenceQuestionsFor(currentInput.market, { ...profile, productType });
+        const productQuestions = keys.map((key) => `
             <fieldset class="sell-question">
                 <legend>${escapeHtml(attributeLabels[key])}</legend>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
-            </fieldset>`).join('');
-        questions.hidden = keys.length === 0;
-        return keys;
+            </fieldset>`);
+        const evidenceQuestions = currentEvidenceQuestions.map((item) => `
+            <fieldset class="sell-question sell-question--evidence">
+                <legend>${escapeHtml(item.label)}</legend>
+                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" required> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
+            </fieldset>`);
+        questions.innerHTML = [...productQuestions, ...evidenceQuestions].join('');
+        questions.hidden = keys.length + currentEvidenceQuestions.length === 0;
+        return { productKeys: keys, evidenceQuestions: currentEvidenceQuestions };
     }
 
     function renderDocumentOptions(market, profile) {
@@ -189,26 +229,30 @@ function bootstrapCanISellItPage() {
                     <article><span>Break-even sale price</span><strong>${money(economics.breakEvenPrice, economics.currency)}</strong></article>
                 </div><p class="sell-panel-note">${escapeHtml(economics.caveat)}</p>
             </section>` : '<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">Add purchase price and expected selling price to calculate the commercial result.</p></section>';
+        const conclusion = assessment.consumerConclusion;
         result.innerHTML = `
-            <div class="sell-verdict ${verdictClass(assessment.verdict)}">
-                <div><span>${assessment.coverage === 'deep' ? 'Deep market screen' : 'Basic market screen'}</span><h2>${escapeHtml(assessment.verdictLabel)}</h2><p>${escapeHtml(assessment.verdictDetail || '')}</p></div>
-                <p>${escapeHtml(assessment.disclaimer)}</p>
+            <section class="sell-final-answer sell-final-answer--${escapeHtml(conclusion.code)}">
+                <span>Can I sell it?</span>
+                <strong>${escapeHtml(conclusion.answer)}</strong>
+                <h2>${escapeHtml(conclusion.label)}</h2>
+                <p>${escapeHtml(conclusion.reason)}</p>
+            </section>
+            <div class="sell-answer-summary">
+                <article><span>Market</span><strong>${escapeHtml(currentInput.market)}</strong></article>
+                <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
+                <article><span>Shipping</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
-            <section class="sell-procurement"><span>Procurement decision</span><h2>${escapeHtml(assessment.procurement.label)}</h2><p>${escapeHtml(assessment.procurement.reason)}</p></section>
-            <div class="sell-readiness-grid">
-                <article><span>Market access</span><strong>${escapeHtml(assessment.marketDecision.label)}</strong><small>${escapeHtml(assessment.marketDecision.detail)}</small></article>
-                <article><span>Small Parcel Check</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
-                <article><span>Platform readiness</span><strong>Evidence required</strong><small>${escapeHtml(assessment.platform)}</small></article>
-            </div>
-            ${economicsPanel}
-            <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
-            <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-grid">${requirementCards}</div></section>
-            <section class="sell-result-panel"><h2>Supplier document gaps</h2><ul class="sell-gap-list">${gaps}</ul></section>
-            <section class="sell-result-panel"><h2>Uploaded supplier evidence</h2><ul class="sell-gap-list">${evidenceRows}</ul></section>
-            <section class="sell-result-panel"><h2>${escapeHtml(currentInput.platform)} listing readiness</h2><div class="sell-requirement-grid">${platformCards}</div></section>
-            <section class="sell-result-panel"><h2>Put these conditions in the purchase order</h2><ol class="sell-action-list">${assessment.contractConditions.map((condition) => `<li>${escapeHtml(condition)}</li>`).join('')}</ol></section>
-            <section class="sell-result-panel"><h2>What to do next</h2><ol class="sell-action-list">${assessment.nextActions.map((action) => `<li>${escapeHtml(action)}</li>`).join('')}</ol></section>
-            <section class="sell-result-panel sell-assistant-result"><h2>Ask the assessment assistant</h2><p>${escapeHtml(assessment.assistant.summary)}</p><div>${assessment.assistant.answerPrompts.map((prompt) => `<button type="button" data-assistant-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join('')}</div><p id="sell-assistant-answer" class="sell-panel-note"></p></section>
+            <details class="sell-result-details"><summary>View technical basis and document checklist</summary>
+                ${economicsPanel}
+                <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
+                <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-grid">${requirementCards}</div></section>
+                <section class="sell-result-panel"><h2>Supplier document gaps</h2><ul class="sell-gap-list">${gaps}</ul></section>
+                <section class="sell-result-panel"><h2>Uploaded supplier evidence</h2><ul class="sell-gap-list">${evidenceRows}</ul></section>
+                <section class="sell-result-panel"><h2>${escapeHtml(currentInput.platform)} listing readiness</h2><div class="sell-requirement-grid">${platformCards}</div></section>
+                <section class="sell-result-panel"><h2>Put these conditions in the purchase order</h2><ol class="sell-action-list">${assessment.contractConditions.map((condition) => `<li>${escapeHtml(condition)}</li>`).join('')}</ol></section>
+                <section class="sell-result-panel"><h2>What to do next</h2><ol class="sell-action-list">${assessment.nextActions.map((action) => `<li>${escapeHtml(action)}</li>`).join('')}</ol></section>
+                <section class="sell-result-panel sell-assistant-result"><h2>Ask the assessment assistant</h2><p>${escapeHtml(assessment.assistant.summary)}</p><div>${assessment.assistant.answerPrompts.map((prompt) => `<button type="button" data-assistant-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join('')}</div><p id="sell-assistant-answer" class="sell-panel-note"></p></section>
+            </details>
             <div class="sell-result-actions"><button type="button" id="sell-save-assessment">Save this result (optional)</button><button type="button" id="sell-print-assessment">Print / Save PDF</button></div>
             <div class="sell-trust-note"><strong>How to use this:</strong> do not place a purchase order solely from this result. Final duty requires exact HS classification; certifications must match the exact model, radio module, battery, and listing claims.</div>`;
         latestAssessment = assessment;
@@ -269,12 +313,13 @@ function bootstrapCanISellItPage() {
         const profile = engine.extractProfile(description);
         currentProfile = profile;
         productTypeSelect.innerHTML = models.listProducts().map((product) => `<option value="${escapeHtml(product.id)}" ${product.id === profile.productType ? 'selected' : ''}>${escapeHtml(product.label)}</option>`).join('');
-        const quickKeys = renderQuestions(profile, profile.productType);
-        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Quick pre-check</strong><p>${quickKeys.length ? `I identified ${escapeHtml(models.getProduct(profile.productType).label)}. Only ${quickKeys.length} answer${quickKeys.length === 1 ? '' : 's'} could materially change this result.` : `I identified ${escapeHtml(models.getProduct(profile.productType).label)} and can build the quick result without more questions.`}</p>`;
+        const quick = renderQuestions(profile, profile.productType);
+        const totalQuestions = quick.productKeys.length + quick.evidenceQuestions.length;
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Evidence check</strong><p>I identified ${escapeHtml(models.getProduct(profile.productType).label)}. Answer these ${totalQuestions} product and supplier-evidence questions to receive a clear result.</p>`;
         renderDocumentOptions(currentInput.market, profile);
         result.hidden = true;
         advancedTools.hidden = true;
-        if (quickKeys.length === 0) {
+        if (totalQuestions === 0) {
             currentAttributes = resolvedAttributes(new FormData(followUpForm));
             followUp.hidden = true;
             renderAssessment(engine.assess({
@@ -302,6 +347,19 @@ function bootstrapCanISellItPage() {
         return attributes;
     }
 
+    function resolvedEvidence(data) {
+        return Object.fromEntries(currentEvidenceQuestions.map((item) => [
+            item.key,
+            { label: item.label, value: data.get(`evidence:${item.key}`) || 'unknown' }
+        ]));
+    }
+
+    function confirmedDocuments(data) {
+        return currentEvidenceQuestions
+            .filter((item) => data.get(`evidence:${item.key}`) === 'yes')
+            .flatMap((item) => item.docs);
+    }
+
     followUpForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = new FormData(followUpForm);
@@ -309,7 +367,8 @@ function bootstrapCanISellItPage() {
         renderAssessment(engine.assess({
             ...currentInput,
             attributes: currentAttributes,
-            documents: [],
+            documents: confirmedDocuments(data),
+            evidenceAnswers: resolvedEvidence(data),
             supplierEvidence: { files: [] },
             assessmentMode: 'quick',
             blockingQuestionKeys: currentQuickKeys

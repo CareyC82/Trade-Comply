@@ -141,6 +141,49 @@ test('different electronics produce product-specific market and procurement deci
     assert.match(passive.procurement.label, /customs classification/i);
 });
 
+test('consumer conclusion is driven by exact-model evidence answers', () => {
+    const common = {
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        market: 'US',
+        platform: 'Amazon',
+        assessmentMode: 'quick',
+        blockingQuestionKeys: [],
+        attributes: {
+            productType: 'smart_watch', bluetooth: 'yes', battery: 'yes',
+            medicalClaim: 'no', childUse: 'no'
+        }
+    };
+    const verified = engine.assess({
+        ...common,
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'yes' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        }
+    });
+    const missing = engine.assess({
+        ...common,
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'no' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        }
+    });
+    const unknown = engine.assess({
+        ...common,
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'unknown' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        }
+    });
+
+    assert.equal(verified.consumerConclusion.code, 'yes_precheck');
+    assert.equal(missing.consumerConclusion.code, 'not_yet');
+    assert.equal(unknown.consumerConclusion.code, 'unable_to_confirm');
+    assert.match(missing.consumerConclusion.reason, /FCC ID/);
+});
+
 test('distinguishes all six supported wearable product models', () => {
     const samples = {
         smart_watch: 'Bluetooth smart watch',
