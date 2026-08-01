@@ -184,6 +184,29 @@ test('consumer conclusion is driven by exact-model evidence answers', () => {
     assert.match(missing.consumerConclusion.reason, /FCC ID/);
 });
 
+test('child-directed answer explains why specialist review overrides positive evidence answers', () => {
+    const result = engine.assess({
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        market: 'US',
+        platform: 'Amazon',
+        assessmentMode: 'quick',
+        blockingQuestionKeys: [],
+        attributes: {
+            productType: 'smart_watch', bluetooth: 'yes', battery: 'yes',
+            medicalClaim: 'no', childUse: 'yes'
+        },
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'yes' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        }
+    });
+
+    assert.equal(result.consumerConclusion.code, 'specialist_review');
+    assert.match(result.consumerConclusion.label, /Children’s product/);
+    assert.match(result.consumerConclusion.reason, /Designed for children.*Yes/);
+});
+
 test('commercial conclusion distinguishes profitable, low-margin and loss-making products', () => {
     const assessCosts = (saleUnit) => engine.assess({
         description: 'Simple electronic accessory without battery',

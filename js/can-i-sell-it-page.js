@@ -112,13 +112,15 @@ function bootstrapCanISellItPage() {
         currentQuickKeys = keys;
         currentEvidenceQuestions = evidenceQuestionsFor(currentInput.market, { ...profile, productType });
         const productQuestions = keys.map((key) => `
-            <fieldset class="sell-question">
+            <fieldset class="sell-question sell-question--fact">
                 <legend>${escapeHtml(attributeLabels[key])}</legend>
-                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
+                <small>Product fact — Yes may add requirements; it does not mean “pass”.</small>
+                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${key === 'childUse' && value === 'yes' ? 'Yes — children’s product' : key === 'childUse' && value === 'no' ? 'No — general audience' : value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`);
         const evidenceQuestions = currentEvidenceQuestions.map((item) => `
             <fieldset class="sell-question sell-question--evidence">
                 <legend>${escapeHtml(item.label)}</legend>
+                <small>Supplier evidence — Yes means you have verified the exact-model document.</small>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" required> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`);
         questions.innerHTML = [...productQuestions, ...evidenceQuestions].join('');
@@ -328,7 +330,7 @@ function bootstrapCanISellItPage() {
         productTypeSelect.innerHTML = models.listProducts().map((product) => `<option value="${escapeHtml(product.id)}" ${product.id === profile.productType ? 'selected' : ''}>${escapeHtml(product.label)}</option>`).join('');
         const quick = renderQuestions(profile, profile.productType);
         const totalQuestions = quick.productKeys.length + quick.evidenceQuestions.length;
-        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Evidence check</strong><p>I identified ${escapeHtml(models.getProduct(profile.productType).label)}. Answer these ${totalQuestions} product and supplier-evidence questions to receive a clear result.</p>`;
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Evidence check</strong><p>I identified ${escapeHtml(models.getProduct(profile.productType).label)}. Answer these ${totalQuestions} questions accurately. Product-fact answers can add requirements; only evidence answers indicate whether a document is available.</p>`;
         renderDocumentOptions(currentInput.market, profile);
         result.hidden = true;
         advancedTools.hidden = true;
