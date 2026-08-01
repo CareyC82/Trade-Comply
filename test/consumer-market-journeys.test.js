@@ -81,3 +81,41 @@ test('medical-claim beauty devices are specialist-gated in every deep market', (
         assert.equal(result.consumerConclusion.code, 'specialist_review', market);
     });
 });
+
+test('multiple Not sure evidence answers produce an unable-to-confirm result with named gaps', () => {
+    const result = engine.assess({
+        description: 'Bluetooth earbuds with rechargeable lithium battery',
+        market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { productType: 'earbuds', bluetooth: 'yes', battery: 'yes' },
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'unknown' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'unknown' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        }
+    });
+    assert.equal(result.consumerConclusion.code, 'unable_to_confirm');
+    assert.match(result.consumerConclusion.reason, /FCC ID.*RF exposure/);
+});
+
+test('a parsed model mismatch blocks otherwise positive supplier claims', () => {
+    const result = engine.assess({
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { productType: 'smart_watch', bluetooth: 'yes', battery: 'yes', medicalClaim: 'no', childUse: 'no' },
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'yes' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        },
+        supplierEvidence: {
+            requiredModel: 'SW-100',
+            files: [{
+                name: 'FCC-report.pdf', type: 'application/pdf', status: 'model_mismatch',
+                parsing: { model: 'SW-200', modelMatch: false, documentKind: 'FCC', missingFields: [] }
+            }]
+        }
+    });
+    assert.equal(result.consumerConclusion.code, 'not_yet');
+    assert.equal(result.procurement.code, 'change_supplier');
+    assert.ok(result.decisionTrace.some((step) => /1 mismatched/.test(step)));
+});

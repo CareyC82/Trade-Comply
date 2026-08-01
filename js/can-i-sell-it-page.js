@@ -6,6 +6,9 @@ function bootstrapCanISellItPage() {
     const followUp = document.getElementById('sell-follow-up');
     const followUpForm = document.getElementById('sell-follow-up-form');
     const questions = document.getElementById('sell-follow-up-questions');
+    const followUpTitle = document.getElementById('sell-follow-up-title');
+    const followUpCopy = document.getElementById('sell-follow-up-copy');
+    const followUpSubmit = document.getElementById('sell-follow-up-submit');
     const documentOptions = document.getElementById('sell-document-options');
     const result = document.getElementById('sell-result');
     const error = document.getElementById('sell-check-error');
@@ -32,6 +35,7 @@ function bootstrapCanISellItPage() {
     let currentEvidenceQuestions = [];
     let currentEvidenceAnswers = {};
     let currentConfirmedDocuments = [];
+    let questionStage = 'facts';
     let currentUser = null;
     let history = [];
     let uploadedFiles = [];
@@ -75,34 +79,41 @@ function bootstrapCanISellItPage() {
             .slice(0, 2);
     }
 
-    function evidenceQuestionsFor(market, profile) {
-        const projected = { ...profile };
-        quickQuestionKeys(profile, profile.productType).forEach((key) => {
-            if (['bluetooth', 'wifi', 'cellular', 'battery', 'mainsPowered'].includes(key)) projected[key] = true;
-        });
-        const requirements = engine.marketRequirements(market, projected);
-        return engine.evidenceQuestionsForRequirements(requirements).slice(0, 5);
-    }
-
-    function renderQuestions(profile, productType = profile.productType) {
+    function renderFactQuestions(profile, productType = profile.productType) {
         const keys = quickQuestionKeys(profile, productType);
         currentQuickKeys = keys;
-        currentEvidenceQuestions = evidenceQuestionsFor(currentInput.market, { ...profile, productType });
-        const productQuestions = keys.map((key) => `
+        questionStage = 'facts';
+        followUpTitle.textContent = 'Confirm product facts';
+        followUpCopy.textContent = 'First confirm the facts that determine which rules apply. “Not sure” is fine.';
+        followUpSubmit.textContent = 'Continue to evidence';
+        questions.innerHTML = keys.map((key) => `
             <fieldset class="sell-question sell-question--fact">
                 <legend>${escapeHtml(attributeLabels[key])}</legend>
                 <small>Product fact — Yes may add requirements; it does not mean “pass”.</small>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${key === 'childUse' && value === 'yes' ? 'Yes — children’s product' : key === 'childUse' && value === 'no' ? 'No — general audience' : value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
-            </fieldset>`);
-        const evidenceQuestions = currentEvidenceQuestions.map((item) => `
+            </fieldset>`).join('');
+        questions.hidden = keys.length === 0;
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Product facts</strong><p>${keys.length ? `Answer ${keys.length} product question${keys.length === 1 ? '' : 's'}. These answers determine which market evidence checks appear next.` : 'No additional product facts are needed for this description.'}</p>`;
+        return keys;
+    }
+
+    function renderEvidenceQuestions(profile) {
+        currentEvidenceQuestions = engine.evidenceQuestionsForRequirements(
+            engine.marketRequirements(currentInput.market, profile)
+        ).slice(0, 5);
+        questionStage = 'evidence';
+        followUpTitle.textContent = 'Confirm supplier evidence';
+        followUpCopy.textContent = 'Only evidence that applies to the confirmed product is shown. Answer based on the exact model.';
+        followUpSubmit.textContent = 'Show My Result';
+        questions.innerHTML = currentEvidenceQuestions.map((item) => `
             <fieldset class="sell-question sell-question--evidence">
                 <legend>${escapeHtml(item.label)}</legend>
                 <small>Supplier claim — Yes means the supplier says this exact-model document is available; upload it for a model-match check.</small>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" required> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
-            </fieldset>`);
-        questions.innerHTML = [...productQuestions, ...evidenceQuestions].join('');
-        questions.hidden = keys.length + currentEvidenceQuestions.length === 0;
-        return { productKeys: keys, evidenceQuestions: currentEvidenceQuestions };
+            </fieldset>`).join('');
+        questions.hidden = currentEvidenceQuestions.length === 0;
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Applicable evidence</strong><p>${currentEvidenceQuestions.length ? `${currentEvidenceQuestions.length} exact-model evidence check${currentEvidenceQuestions.length === 1 ? '' : 's'} apply after reviewing your product facts.` : 'No product-specific approval evidence question applies; the result will retain classification and general-product caveats.'}</p>`;
+        return currentEvidenceQuestions;
     }
 
     function renderDocumentOptions(market, profile) {
@@ -233,6 +244,7 @@ function bootstrapCanISellItPage() {
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
                 <article><span>Shipping</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
+            <section class="sell-decision-trace"><span>Why this result</span><ol>${assessment.decisionTrace.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></section>
             ${commercialPanel}
             <details class="sell-result-details"><summary>View technical basis and document checklist</summary>
                 ${economicsPanel}
@@ -305,23 +317,16 @@ function bootstrapCanISellItPage() {
         const profile = engine.extractProfile(description);
         currentProfile = profile;
         productTypeSelect.innerHTML = models.listProducts().map((product) => `<option value="${escapeHtml(product.id)}" ${product.id === profile.productType ? 'selected' : ''}>${escapeHtml(product.label)}</option>`).join('');
-        const quick = renderQuestions(profile, profile.productType);
-        const totalQuestions = quick.productKeys.length + quick.evidenceQuestions.length;
-        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Evidence check</strong><p>I identified ${escapeHtml(models.getProduct(profile.productType).label)}. Answer these ${totalQuestions} questions accurately. Product-fact answers can add requirements; only evidence answers indicate whether a document is available.</p>`;
+        const factKeys = renderFactQuestions(profile, profile.productType);
         renderDocumentOptions(currentInput.market, profile);
         result.hidden = true;
         advancedTools.hidden = true;
-        if (totalQuestions === 0) {
+        if (factKeys.length === 0) {
             currentAttributes = resolvedAttributes(new FormData(followUpForm));
-            followUp.hidden = true;
-            renderAssessment(engine.assess({
-                ...currentInput,
-                attributes: currentAttributes,
-                documents: [],
-                supplierEvidence: { files: [] },
-                assessmentMode: 'quick',
-                blockingQuestionKeys: currentQuickKeys
-            }));
+            const resolvedProfile = engine.assess({ ...currentInput, attributes: currentAttributes, assessmentMode: 'quick', blockingQuestionKeys: [] }).profile;
+            renderEvidenceQuestions(resolvedProfile);
+            followUp.hidden = false;
+            followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
             followUp.hidden = false;
             followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -355,7 +360,19 @@ function bootstrapCanISellItPage() {
     followUpForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = new FormData(followUpForm);
-        currentAttributes = resolvedAttributes(data);
+        if (questionStage === 'facts') {
+            currentAttributes = resolvedAttributes(data);
+            const resolvedProfile = engine.assess({
+                ...currentInput,
+                attributes: currentAttributes,
+                assessmentMode: 'quick',
+                blockingQuestionKeys: currentQuickKeys
+            }).profile;
+            renderEvidenceQuestions(resolvedProfile);
+            renderDocumentOptions(currentInput.market, resolvedProfile);
+            followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
         currentEvidenceAnswers = resolvedEvidence(data);
         currentConfirmedDocuments = confirmedDocuments(data);
         renderAssessment(engine.assess({
@@ -387,7 +404,17 @@ function bootstrapCanISellItPage() {
                     });
                     const saved = await api('/files', { method: 'POST', body: JSON.stringify({ name: file.name, type: file.type, data: dataUrl, expectedModel: data.get('requiredModel') }) });
                     const parsed = await api(`/files/${encodeURIComponent(saved.file.id)}/parse`, { method: 'POST', body: '{}' });
-                    uploadedFiles.push({ name: file.name, type: file.type, size: file.size, status: parsed.file.status, note: parsed.file.parsing?.modelMatch === false ? 'Extracted model does not match your ordered model.' : `Parsed with ${parsed.file.parsing?.engine || 'document parser'}.` });
+                    uploadedFiles.push({
+                        name: file.name, type: file.type, size: file.size, status: parsed.file.status,
+                        parsing: parsed.file.parsing,
+                        note: parsed.file.parsing?.modelMatch === false
+                            ? 'Extracted model does not match your ordered model.'
+                            : `Parsed with ${parsed.file.parsing?.engine || 'document parser'}; extracted ${[
+                                parsed.file.parsing?.model && 'model', parsed.file.parsing?.manufacturer && 'manufacturer',
+                                parsed.file.parsing?.reportNumber && 'report number', parsed.file.parsing?.reportDate && 'date',
+                                parsed.file.parsing?.standards?.length && 'standards'
+                            ].filter(Boolean).join(', ') || 'no key fields'}.${parsed.file.parsing?.missingFields?.length ? ` Missing: ${parsed.file.parsing.missingFields.join(', ')}.` : ''}`
+                    });
                 } catch (failure) {
                     uploadedFiles.push({ name: file.name, type: file.type, size: file.size, status: 'verification_failed', note: failure.message });
                 }
@@ -416,7 +443,7 @@ function bootstrapCanISellItPage() {
         const profile = engine.extractProfile(document.getElementById('sell-description').value);
         profile.productType = productTypeSelect.value;
         currentProfile = profile;
-        renderQuestions(profile, productTypeSelect.value);
+        renderFactQuestions(profile, productTypeSelect.value);
         renderDocumentOptions(currentInput.market, profile);
     });
 

@@ -42,10 +42,22 @@ test('active PDF content is rejected', () => {
 });
 
 test('document extraction reports exact-model mismatches', () => {
-    const parsed = extractFields('Model No: SG-RING-02\nManufacturer: Example Labs\nReport No: REP-42\nStandard IEC 62368-1', 'SG-RING-01');
+    const parsed = extractFields('Model No: SG-RING-02\nManufacturer: Example Labs\nReport No: REP-42\nReport Date: 2026-07-12\nFCC ID: ABC-SGRING02\nBattery Model: BAT-02\nStandard IEC 62368-1', 'SG-RING-01');
     assert.equal(parsed.model, 'SG-RING-02');
     assert.equal(parsed.modelMatch, false);
     assert.match(parsed.standards.join(' '), /IEC 62368-1/);
+    assert.equal(parsed.fccId, 'ABC-SGRING02');
+    assert.equal(parsed.batteryModel, 'BAT-02');
+    assert.equal(parsed.documentKind, 'FCC');
+    assert.deepEqual(parsed.missingFields, []);
+});
+
+test('document extraction exposes incomplete reports instead of treating parse success as verification', () => {
+    const parsed = extractFields('Model: TW-01\nUN38.3 test summary', 'TW-01');
+    assert.equal(parsed.modelMatch, true);
+    assert.equal(parsed.documentKind, 'UN38.3');
+    assert.ok(parsed.missingFields.includes('manufacturer'));
+    assert.ok(parsed.missingFields.includes('report/issue date'));
 });
 
 test('health makes missing production secrets explicit', () => {

@@ -71,6 +71,14 @@ test('quick questions do not preselect Not sure', () => {
     assert.doesNotMatch(script, /profile\[key\]\s*===\s*['"]unknown['"][\s\S]{0,80}checked/);
 });
 
+test('consumer page separates product facts from applicable evidence questions', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /questionStage\s*=\s*['"]facts['"]/);
+    assert.match(script, /renderFactQuestions/);
+    assert.match(script, /renderEvidenceQuestions\(resolvedProfile\)/);
+    assert.match(script, /Only evidence that applies to the confirmed product is shown/);
+});
+
 test('quick assessment only blocks on questions actually shown to the user', () => {
     const common = {
         description: 'Bluetooth smart watch with heart-rate tracking',
@@ -106,6 +114,18 @@ test('quick battery answer changes the small-parcel result', () => {
     const noBattery = engine.assess({ ...common, attributes: { productType: 'general_electronics', battery: 'no' } });
 
     assert.notEqual(battery.shipping, noBattery.shipping);
+});
+
+test('confirmed no-wireless and no-battery facts remove FCC and UN38.3 evidence questions', () => {
+    const profile = {
+        productType: 'smart_glasses', bluetooth: false, wifi: false, cellular: false,
+        battery: false, medicalClaim: false, childUse: false, cameraMic: false
+    };
+    const requirements = engine.marketRequirements('US', profile);
+    const evidence = engine.evidenceQuestionsForRequirements(requirements);
+    assert.ok(!requirements.some((item) => item.id === 'fcc'));
+    assert.ok(!requirements.some((item) => item.id === 'battery'));
+    assert.ok(!evidence.some((item) => ['fccGrant', 'rfExposure', 'batteryTransport'].includes(item.key)));
 });
 
 test('different electronics produce product-specific market and procurement decisions', () => {
@@ -201,8 +221,8 @@ test('uploaded exact-model files can upgrade a supplier claim to document-match 
         supplierEvidence: {
             requiredModel: 'SW-100', supplierModel: 'SW-100',
             files: [
-                { name: 'SW-100-FCC-report.pdf', type: 'application/pdf' },
-                { name: 'SW-100-UN38.3.pdf', type: 'application/pdf' }
+                { name: 'SW-100-FCC-report.pdf', type: 'application/pdf', status: 'parsed', parsing: { model: 'SW-100', modelMatch: true, documentKind: 'FCC', missingFields: [] } },
+                { name: 'SW-100-UN38.3.pdf', type: 'application/pdf', status: 'parsed', parsing: { model: 'SW-100', modelMatch: true, documentKind: 'UN38.3', missingFields: [] } }
             ]
         }
     });
@@ -270,6 +290,23 @@ test('commercial conclusion distinguishes profitable, low-margin and loss-making
     assert.equal(assessCosts(12).commercialConclusion.code, 'loss_making');
 });
 
+test('decision trace explains facts, evidence claims and final conclusion', () => {
+    const result = engine.assess({
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { productType: 'smart_watch', bluetooth: 'yes', battery: 'yes', medicalClaim: 'no', childUse: 'no' },
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'yes' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3', value: 'unknown' }
+        }
+    });
+    assert.ok(result.decisionTrace.some((step) => /Bluetooth.*FCC/.test(step)));
+    assert.ok(result.decisionTrace.some((step) => /UN38\.3/.test(step)));
+    assert.ok(result.decisionTrace.some((step) => /2 Yes.*1 Not sure/.test(step)));
+    assert.match(result.decisionTrace.at(-1), /UNABLE TO CONFIRM/);
+});
+
 test('distinguishes all six supported wearable product models', () => {
     const samples = {
         smart_watch: 'Bluetooth smart watch',
@@ -317,7 +354,7 @@ test('Japan and Singapore screens attach local official requirements', () => {
 
 test('supplier evidence remains unverified unless model text matches and flags mismatches', () => {
     const matched = engine.analyzeSupplierEvidence({
-        files: [{ name: 'FCC-report.pdf', type: 'application/pdf', size: 1200 }],
+        files: [{ name: 'FCC-report.pdf', type: 'application/pdf', size: 1200, status: 'parsed', parsing: { model: 'TW-01', modelMatch: true, documentKind: 'FCC', missingFields: ['report/issue date'] } }],
         requiredModel: 'TW-01',
         supplierModel: 'TW-01'
     });
@@ -327,7 +364,7 @@ test('supplier evidence remains unverified unless model text matches and flags m
         supplierModel: 'TW-02'
     });
     assert.equal(matched[0].status, 'model_matched');
-    assert.match(matched[0].note, /authenticity.*verification/);
+    assert.match(matched[0].note, /Missing extracted fields.*Authenticity/);
     assert.equal(mismatch[0].status, 'suspected_mismatch');
 });
 
