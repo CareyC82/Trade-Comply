@@ -178,10 +178,55 @@ test('consumer conclusion is driven by exact-model evidence answers', () => {
         }
     });
 
-    assert.equal(verified.consumerConclusion.code, 'yes_precheck');
+    assert.equal(verified.consumerConclusion.code, 'provisionally_ready');
+    assert.match(verified.consumerConclusion.reason, /answers only/i);
     assert.equal(missing.consumerConclusion.code, 'not_yet');
     assert.equal(unknown.consumerConclusion.code, 'unable_to_confirm');
     assert.match(missing.consumerConclusion.reason, /FCC ID/);
+});
+
+test('uploaded exact-model files can upgrade a supplier claim to document-match checked', () => {
+    const result = engine.assess({
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: {
+            productType: 'smart_watch', bluetooth: 'yes', battery: 'yes',
+            medicalClaim: 'no', childUse: 'no'
+        },
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'yes' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        },
+        supplierEvidence: {
+            requiredModel: 'SW-100', supplierModel: 'SW-100',
+            files: [
+                { name: 'SW-100-FCC-report.pdf', type: 'application/pdf' },
+                { name: 'SW-100-UN38.3.pdf', type: 'application/pdf' }
+            ]
+        }
+    });
+
+    assert.equal(result.consumerConclusion.code, 'evidence_checked');
+    assert.match(result.consumerConclusion.reason, /model-reference check/i);
+});
+
+test('assessment matrix covers ten products across all four deep markets', () => {
+    const matrix = engine.buildAssessmentMatrix();
+    assert.equal(matrix.length, 40);
+    assert.deepEqual(new Set(matrix.map((item) => item.market)), new Set(['US', 'EU', 'JP', 'SG']));
+    assert.equal(new Set(matrix.map((item) => item.productType)).size, 10);
+
+    const smartWatch = Object.fromEntries(matrix
+        .filter((item) => item.productType === 'smart_watch')
+        .map((item) => [item.market, item.evidenceQuestions.map((question) => question.key)]));
+    assert.ok(smartWatch.US.includes('fccGrant'));
+    assert.ok(smartWatch.EU.includes('redEvidence'));
+    assert.ok(smartWatch.EU.includes('rohsEvidence'));
+    assert.ok(smartWatch.EU.includes('euResponsiblePerson'));
+    assert.ok(smartWatch.JP.includes('jpRadioEvidence'));
+    assert.ok(smartWatch.SG.includes('sgImdaEvidence'));
+    Object.values(smartWatch).forEach((questions) => assert.ok(questions.includes('batteryTransport')));
 });
 
 test('child-directed answer explains why specialist review overrides positive evidence answers', () => {

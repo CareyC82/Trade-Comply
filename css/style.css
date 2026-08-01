@@ -3922,8 +3922,12 @@ a.hub-core-card--link {
 .sell-final-answer > strong { color: #9a6200; font-size: .82rem; letter-spacing: .05em; }
 .sell-final-answer h2 { margin: 0; color: #173c64; font-size: 1.35rem; line-height: 1.3; }
 .sell-final-answer p { margin: 0; color: #5f7183; font-size: .88rem; line-height: 1.5; }
-.sell-final-answer--yes_precheck { border-left-color: #27845a; background: #f7fcf9; }
-.sell-final-answer--yes_precheck > strong { color: #19714b; }
+.sell-final-answer--yes_precheck,
+.sell-final-answer--evidence_checked,
+.sell-final-answer--basic_ready { border-left-color: #27845a; background: #f7fcf9; }
+.sell-final-answer--yes_precheck > strong,
+.sell-final-answer--evidence_checked > strong,
+.sell-final-answer--basic_ready > strong { color: #19714b; }
 .sell-final-answer--not_yet,
 .sell-final-answer--specialist_review { border-left-color: #b43c3c; background: #fffafa; }
 .sell-final-answer--not_yet > strong,

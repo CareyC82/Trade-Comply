@@ -57,34 +57,9 @@ function bootstrapCanISellItPage() {
         , mainsPowered: 'AC mains powered'
     };
 
-    const evidenceQuestionMap = {
-        fcc: [
-            { key: 'fccGrant', label: 'Valid FCC ID / Grant for this exact model', docs: ['FCC ID / grant'] },
-            { key: 'rfExposure', label: 'RF exposure / SAR evidence for this exact model', docs: ['RF exposure / SAR evidence'] }
-        ],
-        red: [
-            { key: 'redEvidence', label: 'EU RED test reports and Declaration of Conformity for this exact model', docs: ['EU Declaration of Conformity', 'RED test reports'] }
-        ],
-        jp_radio: [
-            { key: 'jpRadioEvidence', label: 'Japan radio certificate for this exact model', docs: ['Japan radio certificate'] }
-        ],
-        sg_imda: [
-            { key: 'sgImdaEvidence', label: 'Singapore IMDA registration / SDoC for this exact model', docs: ['IMDA registration / SDoC'] }
-        ],
-        battery: [
-            { key: 'batteryTransport', label: 'UN38.3 test summary matching the battery and exact model', docs: ['UN38.3 test summary'] }
-        ],
-        jp_pse: [
-            { key: 'jpPseEvidence', label: 'Applicable Japan PSE evidence for this exact model', docs: ['PSE scope rationale', 'Conformity/test evidence'] }
-        ],
-        sg_safety: [
-            { key: 'sgSafetyEvidence', label: 'Applicable Singapore SAFETY Mark evidence for this exact model', docs: ['CPSR registration', 'SAFETY Mark artwork'] }
-        ]
-    };
-
     function quickQuestionKeys(profile, productType = profile.productType) {
         const material = engine.materialQuestionKeys(productType);
-        const priorities = productType === 'gan_charger'
+        const priorities = productType === 'charger'
             ? ['mainsPowered', 'wirelessCharging']
             : productType === 'kids_gps_watch' || productType === 'kids_electronics'
                 ? ['childUse', 'cellular', 'cameraMic', 'battery']
@@ -101,10 +76,12 @@ function bootstrapCanISellItPage() {
     }
 
     function evidenceQuestionsFor(market, profile) {
-        const preliminary = engine.assess({ ...currentInput, market, attributes: profile, documents: [] });
-        return preliminary.requirements
-            .flatMap((item) => evidenceQuestionMap[item.id] || [])
-            .slice(0, 4);
+        const projected = { ...profile };
+        quickQuestionKeys(profile, profile.productType).forEach((key) => {
+            if (['bluetooth', 'wifi', 'cellular', 'battery', 'mainsPowered'].includes(key)) projected[key] = true;
+        });
+        const requirements = engine.marketRequirements(market, projected);
+        return engine.evidenceQuestionsForRequirements(requirements).slice(0, 5);
     }
 
     function renderQuestions(profile, productType = profile.productType) {
@@ -120,7 +97,7 @@ function bootstrapCanISellItPage() {
         const evidenceQuestions = currentEvidenceQuestions.map((item) => `
             <fieldset class="sell-question sell-question--evidence">
                 <legend>${escapeHtml(item.label)}</legend>
-                <small>Supplier evidence — Yes means you have verified the exact-model document.</small>
+                <small>Supplier claim — Yes means the supplier says this exact-model document is available; upload it for a model-match check.</small>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" required> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`);
         questions.innerHTML = [...productQuestions, ...evidenceQuestions].join('');
