@@ -75,8 +75,10 @@ signals. VAT/GST, preferences, trade remedies, licensing, and product controls s
 
 Searches with zero matched rules or only one weak rule are recorded as `search_gap` events through
 the existing feedback endpoint. The browser deduplicates identical route/query gaps per session.
-Every Sunday, `unmet-search-weekly.yml` summarizes the last seven days from OSS and updates
-`data/unmet-search-backlog.json`.
+`unmet-search-weekly.yml` summarizes the last seven days from OSS and updates
+`data/unmet-search-backlog.json`. Its scheduled trigger is currently paused while OSS is not
+enabled; the workflow remains available for manual runs and the weekly schedule should be restored
+after persistent feedback storage is configured.
 The workflow accepts either dedicated `OSS_ACCESS_KEY_*` secrets or the deployment
 `ALIBABA_CLOUD_ACCESS_KEY_*` aliases, and fails at an explicit configuration preflight
 when the bucket or credentials are missing. `?health=feedback` reports only whether

@@ -1,8 +1,8 @@
 name: Weekly Unmet Search Backlog
 
 on:
-  schedule:
-    - cron: "25 18 * * 0"
+  # Keep this manual-only until persistent OSS feedback storage is enabled.
+  # Restore the weekly schedule after OSS_BUCKET and credentials are configured.
   workflow_dispatch:
 
 permissions:
