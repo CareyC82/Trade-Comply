@@ -223,6 +223,7 @@ function bootstrapCanISellItPage() {
             </section>` : '<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">Add purchase price and expected selling price to calculate the commercial result.</p></section>';
         const conclusion = assessment.consumerConclusion;
         const commercial = assessment.commercialConclusion;
+        const platformDecision = assessment.platformDecision;
         const commercialPanel = commercial.code === 'not_calculated' ? '' : `
             <section class="sell-commercial-answer sell-commercial-answer--${escapeHtml(commercial.code)}">
                 <div><span>Commercial viability</span><strong>${escapeHtml(commercial.answer)}</strong><h2>${escapeHtml(commercial.label)}</h2><p>${escapeHtml(commercial.reason)}</p></div>
@@ -232,6 +233,13 @@ function bootstrapCanISellItPage() {
                     <article><span>Break-even price</span><strong>${money(assessment.economics.breakEvenPrice, assessment.economics.currency)}</strong></article>
                 </div>` : ''}
             </section>`;
+        const platformPanel = `
+            <section class="sell-platform-answer sell-platform-answer--${escapeHtml(platformDecision.code)}">
+                <span>Can I list it on ${escapeHtml(currentInput.platform)}?</span>
+                <strong>${escapeHtml(platformDecision.answer)}</strong>
+                <h2>${escapeHtml(platformDecision.label)}</h2>
+                <p>${escapeHtml(platformDecision.reason)}</p>
+            </section>`;
         result.innerHTML = `
             <section class="sell-final-answer sell-final-answer--${escapeHtml(conclusion.code)}">
                 <span>Can I sell it?</span>
@@ -239,9 +247,11 @@ function bootstrapCanISellItPage() {
                 <h2>${escapeHtml(conclusion.label)}</h2>
                 <p>${escapeHtml(conclusion.reason)}</p>
             </section>
+            ${platformPanel}
             <div class="sell-answer-summary">
                 <article><span>Market</span><strong>${escapeHtml(currentInput.market)}</strong></article>
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
+                <article><span>Sales channel</span><strong>${escapeHtml(currentInput.platform)}</strong></article>
                 <article><span>Shipping</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
             <section class="sell-decision-trace"><span>Why this result</span><ol>${assessment.decisionTrace.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></section>
