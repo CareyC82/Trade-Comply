@@ -98,9 +98,14 @@ function bootstrapCanISellItPage() {
     }
 
     function renderEvidenceQuestions(profile) {
-        currentEvidenceQuestions = engine.evidenceQuestionsForRequirements(
+        const platformQuestions = engine.platformEvidenceQuestions(currentInput.platform, profile);
+        const marketQuestions = engine.evidenceQuestionsForRequirements(
             engine.marketRequirements(currentInput.market, profile)
-        ).slice(0, 5);
+        );
+        currentEvidenceQuestions = [
+            ...platformQuestions,
+            ...marketQuestions.slice(0, Math.max(0, 5 - platformQuestions.length))
+        ];
         questionStage = 'evidence';
         followUpTitle.textContent = 'Confirm supplier evidence';
         followUpCopy.textContent = 'Only evidence that applies to the confirmed product is shown. Answer based on the exact model.';
@@ -108,11 +113,13 @@ function bootstrapCanISellItPage() {
         questions.innerHTML = currentEvidenceQuestions.map((item) => `
             <fieldset class="sell-question sell-question--evidence">
                 <legend>${escapeHtml(item.label)}</legend>
-                <small>Supplier claim — Yes means the supplier says this exact-model document is available; upload it for a model-match check.</small>
+                <small>${item.scope === 'platform'
+                    ? 'Platform status — Yes means this exact product or listing received the stated platform approval.'
+                    : 'Supplier claim — Yes means the supplier says this exact-model document is available; upload it for a model-match check.'}</small>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" required> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`).join('');
         questions.hidden = currentEvidenceQuestions.length === 0;
-        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Applicable evidence</strong><p>${currentEvidenceQuestions.length ? `${currentEvidenceQuestions.length} exact-model evidence check${currentEvidenceQuestions.length === 1 ? '' : 's'} apply after reviewing your product facts.` : 'No product-specific approval evidence question applies; the result will retain classification and general-product caveats.'}</p>`;
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Applicable evidence</strong><p>${currentEvidenceQuestions.length ? `${currentEvidenceQuestions.length} market and platform evidence check${currentEvidenceQuestions.length === 1 ? '' : 's'} apply after reviewing your product facts.` : 'No product-specific approval evidence question applies; the result will retain classification and general-product caveats.'}</p>`;
         return currentEvidenceQuestions;
     }
 

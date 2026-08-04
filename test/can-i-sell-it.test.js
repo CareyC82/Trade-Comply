@@ -392,14 +392,41 @@ test('sales channels produce distinct visible listing decisions', () => {
     const ownStore = engine.assess({ ...common, platform: 'Shopify / own store' });
     const other = engine.assess({ ...common, platform: 'Other marketplace' });
 
-    assert.equal(amazon.platformDecision.code, 'amazon_review');
+    assert.equal(amazon.platformDecision.code, 'evidence_needed');
     assert.match(amazon.platformDecision.reason, /dangerous-goods/i);
-    assert.equal(tiktok.platformDecision.code, 'tiktok_qualification');
-    assert.match(tiktok.platformDecision.reason, /battery declaration/i);
-    assert.equal(ownStore.platformDecision.code, 'merchant_responsible');
+    assert.equal(tiktok.platformDecision.code, 'evidence_needed');
+    assert.match(tiktok.platformDecision.reason, /battery-declaration/i);
+    assert.equal(ownStore.platformDecision.code, 'ready');
     assert.match(ownStore.platformDecision.reason, /legal market access/i);
-    assert.equal(other.platformDecision.code, 'policy_check');
-    assert.equal(new Set([amazon, tiktok, ownStore, other].map((item) => item.platformDecision.label)).size, 4);
+    assert.equal(other.platformDecision.code, 'policy_unknown');
+});
+
+test('platform evidence answers produce ready, evidence-needed and not-ready states', () => {
+    const common = {
+        description: 'Bluetooth earbuds with lithium battery',
+        market: 'US', origin: 'CN', platform: 'Amazon',
+        attributes: { productType: 'earbuds', bluetooth: 'yes', wifi: 'no', battery: 'yes' },
+        documents: []
+    };
+    const questions = engine.platformEvidenceQuestions('Amazon', engine.assess(common).profile);
+    assert.deepEqual(questions.map((item) => item.key), ['amazonListingApproval', 'amazonDangerousGoods']);
+
+    const ready = engine.assess({
+        ...common,
+        evidenceAnswers: { amazonListingApproval: 'yes', amazonDangerousGoods: 'yes' }
+    });
+    const blocked = engine.assess({
+        ...common,
+        evidenceAnswers: { amazonListingApproval: 'no', amazonDangerousGoods: 'yes' }
+    });
+    const uncertain = engine.assess({
+        ...common,
+        evidenceAnswers: { amazonListingApproval: 'yes', amazonDangerousGoods: 'unknown' }
+    });
+
+    assert.equal(ready.platformDecision.answer, 'READY TO LIST');
+    assert.equal(blocked.platformDecision.answer, 'NOT READY TO LIST');
+    assert.equal(uncertain.platformDecision.answer, 'MORE EVIDENCE NEEDED');
 });
 
 test('official evidence is attached to applicable US and EU requirements', () => {
