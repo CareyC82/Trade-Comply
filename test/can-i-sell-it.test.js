@@ -79,6 +79,15 @@ test('consumer page separates product facts from applicable evidence questions',
     assert.match(script, /Only evidence that applies to the confirmed product is shown/);
 });
 
+test('result page exposes three core answers and direct sales-channel comparison', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /Can I legally sell it\?/);
+    assert.match(script, /Can I list it on this channel\?/);
+    assert.match(script, /Should I purchase it now\?/);
+    assert.match(script, /id="sell-result-platform"/);
+    assert.match(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\}/);
+});
+
 test('quick assessment only blocks on questions actually shown to the user', () => {
     const common = {
         description: 'Bluetooth smart watch with heart-rate tracking',
@@ -392,13 +401,14 @@ test('sales channels produce distinct visible listing decisions', () => {
     const ownStore = engine.assess({ ...common, platform: 'Shopify / own store' });
     const other = engine.assess({ ...common, platform: 'Other marketplace' });
 
-    assert.equal(amazon.platformDecision.code, 'evidence_needed');
-    assert.match(amazon.platformDecision.reason, /dangerous-goods/i);
-    assert.equal(tiktok.platformDecision.code, 'evidence_needed');
-    assert.match(tiktok.platformDecision.reason, /battery-declaration/i);
-    assert.equal(ownStore.platformDecision.code, 'ready');
-    assert.match(ownStore.platformDecision.reason, /legal market access/i);
-    assert.equal(other.platformDecision.code, 'policy_unknown');
+    assert.equal(amazon.platformGateDecision.code, 'evidence_needed');
+    assert.match(amazon.platformGateDecision.reason, /dangerous-goods/i);
+    assert.equal(tiktok.platformGateDecision.code, 'evidence_needed');
+    assert.match(tiktok.platformGateDecision.reason, /battery-declaration/i);
+    assert.equal(ownStore.platformGateDecision.code, 'ready');
+    assert.match(ownStore.platformGateDecision.reason, /legal market access/i);
+    assert.equal(other.platformGateDecision.code, 'policy_unknown');
+    assert.ok([amazon, tiktok, ownStore, other].every((item) => item.platformDecision.code === 'not_ready'));
 });
 
 test('platform evidence answers produce ready, evidence-needed and not-ready states', () => {
@@ -406,22 +416,31 @@ test('platform evidence answers produce ready, evidence-needed and not-ready sta
         description: 'Bluetooth earbuds with lithium battery',
         market: 'US', origin: 'CN', platform: 'Amazon',
         attributes: { productType: 'earbuds', bluetooth: 'yes', wifi: 'no', battery: 'yes' },
-        documents: []
+        documents: [], assessmentMode: 'quick', blockingQuestionKeys: []
     };
     const questions = engine.platformEvidenceQuestions('Amazon', engine.assess(common).profile);
     assert.deepEqual(questions.map((item) => item.key), ['amazonListingApproval', 'amazonDangerousGoods']);
 
     const ready = engine.assess({
         ...common,
-        evidenceAnswers: { amazonListingApproval: 'yes', amazonDangerousGoods: 'yes' }
+        evidenceAnswers: {
+            fccGrant: 'yes', rfExposure: 'yes', batteryTransport: 'yes',
+            amazonListingApproval: 'yes', amazonDangerousGoods: 'yes'
+        }
     });
     const blocked = engine.assess({
         ...common,
-        evidenceAnswers: { amazonListingApproval: 'no', amazonDangerousGoods: 'yes' }
+        evidenceAnswers: {
+            fccGrant: 'yes', rfExposure: 'yes', batteryTransport: 'yes',
+            amazonListingApproval: 'no', amazonDangerousGoods: 'yes'
+        }
     });
     const uncertain = engine.assess({
         ...common,
-        evidenceAnswers: { amazonListingApproval: 'yes', amazonDangerousGoods: 'unknown' }
+        evidenceAnswers: {
+            fccGrant: 'yes', rfExposure: 'yes', batteryTransport: 'yes',
+            amazonListingApproval: 'yes', amazonDangerousGoods: 'unknown'
+        }
     });
 
     assert.equal(ready.platformDecision.answer, 'READY TO LIST');
@@ -488,6 +507,6 @@ test('uses maintained candidate duty evidence but preserves classification warni
     assert.ok(result.tariffOptions.some((row) => row.hsCode === '8517.13' && row.rate !== null));
     assert.match(result.product.hsNote, /Classification depends/);
     assert.ok(result.economics);
-    assert.equal(result.procurement.code, 'conditional_buy');
+    assert.equal(result.procurement.code, 'market_not_ready');
     assert.ok(result.contractConditions.some((line) => /exact ordered model/.test(line)));
 });

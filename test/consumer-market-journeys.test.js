@@ -119,3 +119,48 @@ test('a parsed model mismatch blocks otherwise positive supplier claims', () => 
     assert.equal(result.procurement.code, 'change_supplier');
     assert.ok(result.decisionTrace.some((step) => /1 mismatched/.test(step)));
 });
+
+test('consumer product, market and channel matrix never reports a ready platform when market access is blocked', () => {
+    const products = [
+        { description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.', attributes: { productType: 'smart_watch', bluetooth: 'yes', battery: 'yes', medicalClaim: 'no', childUse: 'no' } },
+        { description: 'Bluetooth earbuds with rechargeable lithium battery', attributes: { productType: 'earbuds', bluetooth: 'yes', wifi: 'no', battery: 'yes' } },
+        { description: '65W GaN wall charger with AC input and no battery', attributes: { productType: 'charger', mainsPowered: 'yes', battery: 'no', bluetooth: 'no', wifi: 'no' } },
+        { description: '10000mAh lithium-ion power bank', attributes: { productType: 'power_bank', battery: 'yes', bluetooth: 'no', wifi: 'no' } },
+        { description: 'Children’s Wi-Fi electronic camera with a rechargeable battery', attributes: { productType: 'kids_electronics', childUse: 'yes', wifi: 'yes', battery: 'yes', cameraMic: 'yes' } },
+        { description: 'Rechargeable facial beauty device with no medical claims', attributes: { productType: 'beauty_device', battery: 'yes', medicalClaim: 'no', childUse: 'no' } }
+    ];
+    const markets = ['US', 'EU', 'JP', 'SG'];
+    const platforms = ['Amazon', 'TikTok Shop', 'Shopify / own store', 'Other marketplace'];
+    let checked = 0;
+
+    products.forEach((product) => markets.forEach((market) => platforms.forEach((platform) => {
+        const preliminary = engine.assess({
+            ...product, market, platform, assessmentMode: 'quick', blockingQuestionKeys: []
+        });
+        const questions = [
+            ...engine.evidenceQuestionsForRequirements(preliminary.requirements),
+            ...engine.platformEvidenceQuestions(platform, preliminary.profile)
+        ];
+        const evidenceAnswers = Object.fromEntries(questions.map((question) => [
+            question.key, { label: question.label, value: 'yes' }
+        ]));
+        const result = engine.assess({
+            ...product, market, platform, evidenceAnswers,
+            assessmentMode: 'quick', blockingQuestionKeys: []
+        });
+        const marketReady = ['basic_ready', 'provisionally_ready', 'evidence_checked'].includes(result.consumerConclusion.code);
+        if (!marketReady) {
+            assert.equal(result.platformDecision.code, 'not_ready', `${product.attributes.productType}/${market}/${platform}`);
+            assert.notEqual(result.procurement.code, 'ready_for_po_review', `${product.attributes.productType}/${market}/${platform}`);
+        }
+        if (marketReady && ['Amazon', 'TikTok Shop', 'Shopify / own store'].includes(platform)) {
+            assert.equal(result.platformDecision.code, 'ready', `${product.attributes.productType}/${market}/${platform}`);
+        }
+        if (marketReady && platform === 'Other marketplace') {
+            assert.equal(result.platformDecision.code, 'policy_unknown', `${product.attributes.productType}/${market}/${platform}`);
+        }
+        checked += 1;
+    })));
+
+    assert.equal(checked, 96);
+});

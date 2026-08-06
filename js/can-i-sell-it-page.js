@@ -29,6 +29,7 @@ function bootstrapCanISellItPage() {
     let currentInput = null;
     let dutyRates = null;
     let latestAssessment = null;
+    let latestAssessmentInput = null;
     let currentProfile = null;
     let currentAttributes = null;
     let currentQuickKeys = [];
@@ -231,6 +232,7 @@ function bootstrapCanISellItPage() {
         const conclusion = assessment.consumerConclusion;
         const commercial = assessment.commercialConclusion;
         const platformDecision = assessment.platformDecision;
+        const procurement = assessment.procurement;
         const commercialPanel = commercial.code === 'not_calculated' ? '' : `
             <section class="sell-commercial-answer sell-commercial-answer--${escapeHtml(commercial.code)}">
                 <div><span>Commercial viability</span><strong>${escapeHtml(commercial.answer)}</strong><h2>${escapeHtml(commercial.label)}</h2><p>${escapeHtml(commercial.reason)}</p></div>
@@ -240,21 +242,30 @@ function bootstrapCanISellItPage() {
                     <article><span>Break-even price</span><strong>${money(assessment.economics.breakEvenPrice, assessment.economics.currency)}</strong></article>
                 </div>` : ''}
             </section>`;
-        const platformPanel = `
-            <section class="sell-platform-answer sell-platform-answer--${escapeHtml(platformDecision.code)}">
-                <span>Can I list it on ${escapeHtml(currentInput.platform)}?</span>
-                <strong>${escapeHtml(platformDecision.answer)}</strong>
-                <h2>${escapeHtml(platformDecision.label)}</h2>
-                <p>${escapeHtml(platformDecision.reason)}</p>
-            </section>`;
+        const platformOptions = ['Amazon', 'TikTok Shop', 'Shopify / own store', 'Other marketplace']
+            .map((platform) => `<option ${platform === currentInput.platform ? 'selected' : ''}>${escapeHtml(platform)}</option>`).join('');
         result.innerHTML = `
-            <section class="sell-final-answer sell-final-answer--${escapeHtml(conclusion.code)}">
-                <span>Can I sell it?</span>
-                <strong>${escapeHtml(conclusion.answer)}</strong>
-                <h2>${escapeHtml(conclusion.label)}</h2>
-                <p>${escapeHtml(conclusion.reason)}</p>
+            <section class="sell-core-decisions" aria-label="Core assessment answers">
+                <article class="sell-core-decision sell-core-decision--${escapeHtml(conclusion.code)}">
+                    <span>Can I legally sell it?</span>
+                    <strong>${escapeHtml(conclusion.answer)}</strong>
+                    <h2>${escapeHtml(conclusion.label)}</h2>
+                    <p>${escapeHtml(conclusion.reason)}</p>
+                </article>
+                <article class="sell-core-decision sell-core-decision--${escapeHtml(platformDecision.code)}">
+                    <label for="sell-result-platform">Can I list it on this channel?</label>
+                    <select id="sell-result-platform" aria-label="Compare sales channel">${platformOptions}</select>
+                    <strong>${escapeHtml(platformDecision.answer)}</strong>
+                    <h2>${escapeHtml(platformDecision.label)}</h2>
+                    <p>${escapeHtml(platformDecision.reason)}</p>
+                </article>
+                <article class="sell-core-decision sell-core-decision--procurement sell-core-decision--${escapeHtml(procurement.code)}">
+                    <span>Should I purchase it now?</span>
+                    <strong>${escapeHtml(procurement.answer)}</strong>
+                    <h2>${escapeHtml(procurement.label)}</h2>
+                    <p>${escapeHtml(procurement.reason)}</p>
+                </article>
             </section>
-            ${platformPanel}
             <div class="sell-answer-summary">
                 <article><span>Market</span><strong>${escapeHtml(currentInput.market)}</strong></article>
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
@@ -294,6 +305,15 @@ function bootstrapCanISellItPage() {
             }) }).then(loadHistory).catch((failure) => { accountMessage.textContent = failure.message; });
         });
         document.getElementById('sell-print-assessment')?.addEventListener('click', printAssessment);
+        document.getElementById('sell-result-platform')?.addEventListener('change', (event) => {
+            if (!latestAssessmentInput) return;
+            const platform = event.target.value;
+            currentInput = { ...currentInput, platform };
+            const entryPlatform = document.getElementById('sell-platform');
+            if (entryPlatform) entryPlatform.value = platform;
+            latestAssessmentInput = { ...latestAssessmentInput, platform };
+            renderAssessment(engine.assess(latestAssessmentInput));
+        });
         document.querySelectorAll('[data-assistant-prompt]').forEach((button) => {
             button.addEventListener('click', async () => {
                 const prompt = button.dataset.assistantPrompt;
@@ -392,7 +412,7 @@ function bootstrapCanISellItPage() {
         }
         currentEvidenceAnswers = resolvedEvidence(data);
         currentConfirmedDocuments = confirmedDocuments(data);
-        renderAssessment(engine.assess({
+        latestAssessmentInput = {
             ...currentInput,
             attributes: currentAttributes,
             documents: currentConfirmedDocuments,
@@ -400,7 +420,8 @@ function bootstrapCanISellItPage() {
             supplierEvidence: { files: [] },
             assessmentMode: 'quick',
             blockingQuestionKeys: currentQuickKeys
-        }));
+        };
+        renderAssessment(engine.assess(latestAssessmentInput));
     });
 
     advancedForm.addEventListener('submit', async (event) => {
@@ -439,7 +460,7 @@ function bootstrapCanISellItPage() {
             evidencePreview.innerHTML = uploadedFiles.map((file) => `<span>${escapeHtml(file.name)} · ${escapeHtml(file.status.replaceAll('_', ' '))} · ${escapeHtml(file.note)}</span>`).join('');
         }
         const files = uploadedFiles.length ? uploadedFiles : sourceFiles.map((file) => ({ name: file.name, type: file.type, size: file.size }));
-        renderAssessment(engine.assess({
+        latestAssessmentInput = {
             ...currentInput,
             attributes: currentAttributes,
             documents: Array.from(new Set([...currentConfirmedDocuments, ...data.getAll('documents')])),
@@ -453,7 +474,8 @@ function bootstrapCanISellItPage() {
             },
             assessmentMode: 'quick',
             blockingQuestionKeys: currentQuickKeys
-        }));
+        };
+        renderAssessment(engine.assess(latestAssessmentInput));
     });
 
     productTypeSelect.addEventListener('change', () => {
@@ -487,6 +509,14 @@ function bootstrapCanISellItPage() {
             if (record) {
                 currentInput = record.input;
                 latestAssessment = record.assessment;
+                latestAssessmentInput = {
+                    ...record.input,
+                    attributes: record.assessment.profile,
+                    documents: record.assessment.requirements
+                        .filter((item) => !record.assessment.documentGaps.some((gap) => gap.requirementId === item.id))
+                        .map((item) => item.id),
+                    evidenceAnswers: {}
+                };
                 renderAssessment(record.assessment);
             }
         }

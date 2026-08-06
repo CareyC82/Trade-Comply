@@ -3943,6 +3943,42 @@ a.hub-core-card--link {
 .sell-platform-answer--not_ready > strong { color: #a42f2f; }
 .sell-platform-answer--policy_unknown { border-left-color: #697786; background: #f8fafb; }
 .sell-platform-answer--policy_unknown > strong { color: #536272; }
+.sell-core-decisions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sell-core-decision { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 18px 19px; border: 1px solid #d7e2eb; border-top: 6px solid #bd7b08; border-radius: 14px; background: #fff; }
+.sell-core-decision > span,
+.sell-core-decision > label { color: #6b7c8c; font-size: .7rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.sell-core-decision > strong { color: #986100; font-size: .78rem; letter-spacing: .03em; }
+.sell-core-decision h2 { margin: 0; color: #173c64; font-size: 1.08rem; line-height: 1.3; }
+.sell-core-decision p { margin: 0; color: #607182; font-size: .8rem; line-height: 1.45; }
+.sell-core-decision select { width: 100%; margin: 1px 0 3px; padding: 8px 10px; border: 1px solid #cbd8e4; border-radius: 8px; background: #fff; color: #173c64; font: inherit; font-size: .82rem; font-weight: 750; }
+.sell-core-decision--basic_ready,
+.sell-core-decision--provisionally_ready,
+.sell-core-decision--evidence_checked,
+.sell-core-decision--ready,
+.sell-core-decision--ready_for_po_review { border-top-color: #27845a; background: #f7fcf9; }
+.sell-core-decision--basic_ready > strong,
+.sell-core-decision--provisionally_ready > strong,
+.sell-core-decision--evidence_checked > strong,
+.sell-core-decision--ready > strong,
+.sell-core-decision--ready_for_po_review > strong { color: #19714b; }
+.sell-core-decision--not_yet,
+.sell-core-decision--specialist_review,
+.sell-core-decision--not_ready,
+.sell-core-decision--change_supplier,
+.sell-core-decision--do_not_buy_yet,
+.sell-core-decision--market_not_ready,
+.sell-core-decision--platform_not_ready,
+.sell-core-decision--not_recommended { border-top-color: #b43c3c; background: #fffafa; }
+.sell-core-decision--not_yet > strong,
+.sell-core-decision--specialist_review > strong,
+.sell-core-decision--not_ready > strong,
+.sell-core-decision--change_supplier > strong,
+.sell-core-decision--do_not_buy_yet > strong,
+.sell-core-decision--market_not_ready > strong,
+.sell-core-decision--platform_not_ready > strong,
+.sell-core-decision--not_recommended > strong { color: #a42f2f; }
+.sell-core-decision--policy_unknown { border-top-color: #697786; background: #f8fafb; }
+.sell-core-decision--policy_unknown > strong { color: #536272; }
 .sell-answer-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
 .sell-answer-summary article { display: grid; gap: 5px; padding: 13px 15px; border: 1px solid #dce5ed; border-radius: 10px; background: #fff; }
 .sell-answer-summary span { color: #71808e; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
@@ -4020,7 +4056,7 @@ a.hub-core-card--link {
     .sell-check-scope-row { display: grid; gap: 5px; text-align: left; }
     .sell-check-card, .sell-result-panel { padding: 16px; }
     .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid,
-    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary,
+    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-core-decisions,
     .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-gap-list span { text-align: left; }
