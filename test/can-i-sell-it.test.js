@@ -88,6 +88,15 @@ test('result page exposes three core answers and direct sales-channel comparison
     assert.match(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\}/);
 });
 
+test('result page exposes a copyable supplier evidence request', () => {
+    const page = fs.readFileSync(path.join(__dirname, '..', 'can-i-sell-it.html'), 'utf8');
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(page, /Supplier \/ manufacturer legal name/);
+    assert.match(script, /sell-copy-supplier-request/);
+    assert.match(script, /supplierRequest\.message/);
+    assert.match(script, /navigator\.clipboard\.writeText/);
+});
+
 test('quick assessment only blocks on questions actually shown to the user', () => {
     const common = {
         description: 'Bluetooth smart watch with heart-rate tracking',
@@ -230,8 +239,8 @@ test('uploaded exact-model files can upgrade a supplier claim to document-match 
         supplierEvidence: {
             requiredModel: 'SW-100', supplierModel: 'SW-100',
             files: [
-                { name: 'SW-100-FCC-report.pdf', type: 'application/pdf', status: 'parsed', parsing: { model: 'SW-100', modelMatch: true, documentKind: 'FCC', missingFields: [] } },
-                { name: 'SW-100-UN38.3.pdf', type: 'application/pdf', status: 'parsed', parsing: { model: 'SW-100', modelMatch: true, documentKind: 'UN38.3', missingFields: [] } }
+                { name: 'SW-100-FCC-report.pdf', type: 'application/pdf', status: 'parsed', parsing: { model: 'SW-100', manufacturer: 'Example Electronics', reportNumber: 'FCC-100', reportDate: '2026-06-01', standards: ['FCC Part 15'], modelMatch: true, documentKind: 'FCC', missingFields: [] } },
+                { name: 'SW-100-UN38.3.pdf', type: 'application/pdf', status: 'parsed', parsing: { model: 'SW-100', manufacturer: 'Example Electronics', reportNumber: 'UN-100', reportDate: '2026-06-01', standards: ['UN38.3'], modelMatch: true, documentKind: 'UN38.3', missingFields: [] } }
             ]
         }
     });
@@ -372,9 +381,48 @@ test('supplier evidence remains unverified unless model text matches and flags m
         requiredModel: 'TW-01',
         supplierModel: 'TW-02'
     });
-    assert.equal(matched[0].status, 'model_matched');
-    assert.match(matched[0].note, /Missing extracted fields.*Authenticity/);
+    assert.equal(matched[0].status, 'incomplete_verification');
+    assert.match(matched[0].note, /missing report\/issue date/i);
     assert.equal(mismatch[0].status, 'suspected_mismatch');
+});
+
+test('supplier request names missing and failed exact-model evidence', () => {
+    const result = engine.assess({
+        description: 'Bluetooth earbuds with rechargeable lithium battery.',
+        market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { productType: 'earbuds', bluetooth: 'yes', battery: 'yes', childUse: 'no' },
+        evidenceAnswers: {
+            amazonListingApproval: { value: 'yes' }, amazonDangerousGoods: { value: 'yes' },
+            fccGrant: { value: 'yes' }, rfExposure: { value: 'yes' }, batteryTransport: { value: 'yes' }
+        },
+        supplierEvidence: {
+            requiredModel: 'EB-10', supplierName: 'Example Electronics',
+            files: [{
+                name: 'fcc.pdf', type: 'application/pdf', status: 'parsed',
+                parsing: { model: 'EB-10', manufacturer: 'Different Factory', reportNumber: 'R-1', reportDate: '2026-01-01', standards: ['FCC Part 15'], documentKind: 'FCC', modelMatch: true, missingFields: [] }
+            }]
+        }
+    });
+    assert.equal(result.supplierEvidence[0].status, 'verification_failed');
+    assert.match(result.supplierEvidence[0].note, /holder does not match/i);
+    assert.equal(result.consumerConclusion.code, 'not_yet');
+    assert.equal(result.procurement.code, 'market_not_ready');
+    assert.ok(result.supplierRequest.items.some((item) => /FCC/.test(item.document)));
+    assert.ok(result.supplierRequest.items.some((item) => /UN38/.test(item.document)));
+    assert.match(result.supplierRequest.message, /EB-10/);
+});
+
+test('supplier request is complete only when all reviewable files pass', () => {
+    const requirements = engine.marketRequirements('US', { productType: 'earbuds', bluetooth: true, wifi: false, cellular: false, battery: true });
+    const evidenceAnswers = Object.fromEntries(engine.evidenceQuestionsForRequirements(requirements).map((question) => [question.key, { value: 'yes' }]));
+    const files = ['FCC', 'UN38.3'].map((documentKind) => ({
+        name: `${documentKind}.pdf`, type: 'application/pdf', status: 'parsed',
+        parsing: { model: 'EB-10', manufacturer: 'Example Electronics', reportNumber: `R-${documentKind}`, reportDate: '2026-01-01', standards: ['Applicable standard'], documentKind, modelMatch: true, missingFields: [] }
+    }));
+    const checked = engine.analyzeSupplierEvidence({ files, requiredModel: 'EB-10', supplierName: 'Example Electronics', market: 'US' });
+    const request = engine.buildSupplierRequest({ requirements, evidenceAnswers, supplierEvidence: checked, requiredModel: 'EB-10', market: 'US', platform: 'Shopify / own store', profile: { battery: true } });
+    assert.equal(request.complete, true);
+    assert.equal(request.items.length, 0);
 });
 
 test('platform rules are separated from legal market-access requirements', () => {

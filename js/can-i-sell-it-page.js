@@ -212,8 +212,12 @@ function bootstrapCanISellItPage() {
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length
-            ? assessment.supplierEvidence.map((item) => `<li><strong>${escapeHtml(item.kind)} — ${escapeHtml(item.name)}</strong><span>${escapeHtml(item.status.replaceAll('_', ' '))}: ${escapeHtml(item.note)}</span></li>`).join('')
+            ? assessment.supplierEvidence.map((item) => `<li><strong>${escapeHtml(item.kind)} — ${escapeHtml(item.name)}</strong><span>${escapeHtml(item.status.replaceAll('_', ' '))}: ${escapeHtml(item.note)}</span>${item.extracted?.model ? `<small>Model: ${escapeHtml(item.extracted.model)}${item.extracted.manufacturer ? ` · Holder: ${escapeHtml(item.extracted.manufacturer)}` : ''}${item.extracted.reportDate ? ` · Date: ${escapeHtml(item.extracted.reportDate)}` : ''}</small>` : ''}</li>`).join('')
             : '<li><strong>No supplier files uploaded</strong><span>Upload the exact-model reports before committing inventory.</span></li>';
+        const supplierRequest = assessment.supplierRequest;
+        const supplierRequestItems = supplierRequest.items.length
+            ? `<ul>${supplierRequest.items.map((item) => `<li><strong>${escapeHtml(item.document)}</strong><span>${escapeHtml(item.reason)}</span></li>`).join('')}</ul>`
+            : '<p>All applicable uploaded evidence passed the automated reference and completeness checks.</p>';
         const platformCards = assessment.platformRules.length
             ? assessment.platformRules.map((rule) => `<article class="sell-requirement"><span>Platform rule</span><h3>${escapeHtml(rule.title)}</h3><p>${escapeHtml(rule.action)}</p>${renderSources({ sources: [rule.source] })}</article>`).join('')
             : '<p class="sell-panel-note">No maintained platform-specific rule is available for this channel. Legal market-access checks still apply.</p>';
@@ -273,6 +277,12 @@ function bootstrapCanISellItPage() {
                 <article><span>Shipping</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
             <section class="sell-decision-trace"><span>Why this result</span><ol>${assessment.decisionTrace.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></section>
+            <section class="sell-supplier-request ${supplierRequest.complete ? 'sell-supplier-request--complete' : ''}">
+                <div><span>Supplier follow-up</span><h2>${supplierRequest.complete ? 'No document follow-up identified' : `${supplierRequest.items.length} document request${supplierRequest.items.length === 1 ? '' : 's'} ready to send`}</h2><p>${supplierRequest.complete ? 'Keep the files with the exact-model purchase record.' : 'Generated from the actual unanswered, missing, incomplete, mismatched, or expired evidence.'}</p></div>
+                ${supplierRequestItems}
+                <button type="button" id="sell-copy-supplier-request">${supplierRequest.complete ? 'Copy confirmation request' : 'Copy supplier request'}</button>
+                <p id="sell-copy-status" class="sell-copy-status" aria-live="polite"></p>
+            </section>
             ${commercialPanel}
             <details class="sell-result-details"><summary>View technical basis and document checklist</summary>
                 ${economicsPanel}
@@ -305,6 +315,19 @@ function bootstrapCanISellItPage() {
             }) }).then(loadHistory).catch((failure) => { accountMessage.textContent = failure.message; });
         });
         document.getElementById('sell-print-assessment')?.addEventListener('click', printAssessment);
+        document.getElementById('sell-copy-supplier-request')?.addEventListener('click', async () => {
+            const status = document.getElementById('sell-copy-status');
+            const text = `${supplierRequest.subject}\n\n${supplierRequest.message}`;
+            try {
+                await navigator.clipboard.writeText(text);
+                status.textContent = 'Copied. You can paste this into email or supplier chat.';
+            } catch {
+                const textarea = document.createElement('textarea');
+                textarea.value = text; document.body.appendChild(textarea); textarea.select();
+                document.execCommand('copy'); textarea.remove();
+                status.textContent = 'Copied. You can paste this into email or supplier chat.';
+            }
+        });
         document.getElementById('sell-result-platform')?.addEventListener('change', (event) => {
             if (!latestAssessmentInput) return;
             const platform = event.target.value;
@@ -470,6 +493,7 @@ function bootstrapCanISellItPage() {
                 files,
                 requiredModel: data.get('requiredModel'),
                 supplierModel: data.get('supplierModel'),
+                supplierName: data.get('supplierName'),
                 documentText: data.get('documentText')
             },
             assessmentMode: 'quick',

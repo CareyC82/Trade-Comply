@@ -3987,6 +3987,17 @@ a.hub-core-card--link {
 .sell-decision-trace > span { color: #657789; font-size: .72rem; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
 .sell-decision-trace ol { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 19px; }
 .sell-decision-trace li { color: #40566b; font-size: .8rem; line-height: 1.45; }
+.sell-supplier-request { display: grid; gap: 12px; margin-top: 14px; padding: 18px 20px; border: 1px solid #e2c884; border-left: 6px solid #bd7b08; border-radius: 12px; background: #fffaf0; }
+.sell-supplier-request--complete { border-color: #abd8c2; border-left-color: #27845a; background: #f6fcf8; }
+.sell-supplier-request > div > span { color: #84671f; font-size: .7rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.sell-supplier-request h2 { margin: 4px 0; color: #173c64; font-size: 1.08rem; }
+.sell-supplier-request p { margin: 0; color: #667789; font-size: .82rem; line-height: 1.45; }
+.sell-supplier-request ul { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.sell-supplier-request li { display: grid; grid-template-columns: minmax(150px, .7fr) 1.3fr; gap: 12px; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,.8); }
+.sell-supplier-request li strong { color: #294b69; font-size: .82rem; }
+.sell-supplier-request li span { color: #6d7c8a; font-size: .78rem; line-height: 1.4; }
+.sell-supplier-request button { justify-self: start; border: 0; border-radius: 8px; background: #173c64; color: #fff; padding: 10px 15px; font-weight: 800; cursor: pointer; }
+.sell-copy-status { min-height: 1.2em; color: #24704e !important; }
 .sell-result-details { margin-top: 14px; border: 1px solid #dce5ed; border-radius: 12px; background: #fff; }
 .sell-result-details > summary { padding: 14px 16px; color: #264661; font-weight: 800; cursor: pointer; }
 .sell-result-details > .sell-result-panel { margin: 0 14px 14px; box-shadow: none; }
@@ -4012,6 +4023,7 @@ a.hub-core-card--link {
 .sell-gap-list li { display: flex; justify-content: space-between; gap: 18px; padding: 11px 13px; border-radius: 8px; background: #f5f8fb; }
 .sell-gap-list strong { color: #294b69; }
 .sell-gap-list span { color: #718090; font-size: .82rem; text-align: right; }
+.sell-gap-list small { display: block; color: #81909d; font-size: .72rem; }
 .sell-action-list { margin: 0; padding-left: 22px; color: #4e6375; line-height: 1.8; }
 .sell-trust-note { margin-top: 14px; padding: 16px 18px; border-radius: 10px; background: #fff5dd; color: #6f5623; font-size: .86rem; line-height: 1.55; }
 .sell-assistant-result > div { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -4059,6 +4071,7 @@ a.hub-core-card--link {
     .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-core-decisions,
     .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
+    .sell-supplier-request li { grid-template-columns: 1fr; }
     .sell-gap-list span { text-align: left; }
     .sell-history-list article { align-items: flex-start; flex-direction: column; }
     .sell-account-form { grid-template-columns: 1fr; }

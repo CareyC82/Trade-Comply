@@ -60,6 +60,11 @@ test('document extraction exposes incomplete reports instead of treating parse s
     assert.ok(parsed.missingFields.includes('report/issue date'));
 });
 
+test('document extraction captures an explicit expiry date', () => {
+    const parsed = extractFields('Model: TW-01\nManufacturer: Example Labs\nReport No: R-9\nIssue Date: 2025-01-01\nValid until: 2027-01-01\nStandard: FCC Part 15', 'TW-01');
+    assert.equal(parsed.expiryDate, '2027-01-01');
+});
+
 test('health makes missing production secrets explicit', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-consumer-test-'));
     const app = new ConsumerService({ root });
