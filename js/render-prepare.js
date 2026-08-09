@@ -164,7 +164,7 @@ function prepareEmptyResultsViewModel(query, precheckSelections) {
 function prepareComplianceCardViewModel(tag, context) {
     const { selectedCountry, direction } = context;
     const countryMeta = typeof buildTagCountryDisplayMeta === 'function'
-        ? buildTagCountryDisplayMeta(tag, selectedCountry, direction)
+        ? buildTagCountryDisplayMeta(tag, selectedCountry, direction, context.routeContext)
         : { badgeCode: 'CN', badgeClass: 'cn', scopeLine: '', isExact: false, isBaseline: true, matchRibbon: '' };
 
     const tagTypeRaw = tag.tag_type || 'Unknown';

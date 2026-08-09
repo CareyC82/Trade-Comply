@@ -128,7 +128,8 @@ function auditSample(sample) {
     const coverage = country.analyzeCountryCoverage(
         results.tags,
         routeContext.country,
-        routeContext.direction
+        routeContext.direction,
+        routeContext
     );
     const productTerms = getProductRelevanceTerms(intelligence.originalQuery);
     const offRouteTags = results.tags.filter((tag) => !country.countryMatchesSelection(tag, routeContext.country, routeContext));

@@ -6,7 +6,7 @@ function getCountryRenderApi() {
     return globalThis.TradeComplyCountry || null;
 }
 
-function buildTagCountryDisplayMeta(tag, selectedCountry, direction) {
+function buildTagCountryDisplayMeta(tag, selectedCountry, direction, routeContext = null) {
     const api = getCountryRenderApi();
     const safeDirection = direction === 'import' ? 'import' : 'export';
 
@@ -23,11 +23,13 @@ function buildTagCountryDisplayMeta(tag, selectedCountry, direction) {
 
     const badgeCode = api.getTagCountryBadgeCode(tag, safeDirection);
     const badgeClass = String(badgeCode || 'cn').toLowerCase();
-    const isExact = api.isExactCountryMatch(tag, selectedCountry);
+    const isExact = api.isExactCountryMatch(tag, selectedCountry, routeContext || {});
     const isBaseline = api.isChinaBaselineRule(tag);
-    const selectedLabel = api.getCountryLabel(selectedCountry);
-    const scopeLine = api.getTagCountryBadgeTitle(tag, safeDirection);
-    const roleLabel = api.getCounterpartyRoleLabel(safeDirection);
+    const focus = routeContext?.focus || tag.route_focus || tag.compliance_focus || '';
+    const targetCountry = focus === 'export' ? routeContext?.from : focus === 'import' ? routeContext?.to : selectedCountry;
+    const selectedLabel = api.getCountryLabel(targetCountry || selectedCountry);
+    const scopeLine = api.getTagCountryBadgeTitle(tag, safeDirection, routeContext || {});
+    const roleLabel = focus === 'export' ? 'origin' : focus === 'import' ? 'destination' : api.getCounterpartyRoleLabel(safeDirection);
 
     let matchRibbon = '';
     if (isExact) {
@@ -61,7 +63,7 @@ function renderCountryContextBanner(tags, selectedCountry, direction, routeConte
         return;
     }
 
-    const coverage = api.analyzeCountryCoverage(tags, selectedCountry, direction);
+    const coverage = api.analyzeCountryCoverage(tags, selectedCountry, direction, routeContext || {});
     const message = api.buildCountryContextMessage(coverage);
     const indicator = typeof api.buildCoverageIndicator === 'function'
         ? api.buildCoverageIndicator(coverage, routeContext)

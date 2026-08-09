@@ -8,6 +8,7 @@ const {
     filterTagsForSelectedCountry,
     countryPriorityScore,
     getTagCountryBadgeCode,
+    getTagCountryBadgeTitle,
     analyzeCountryCoverage,
     buildCountryContextMessage,
     buildCoverageIndicator
@@ -32,20 +33,20 @@ describe('trade-country', () => {
 
     it('filters out non-selected countries but keeps China baseline on China routes', () => {
         const tags = [
-            { tag_id: 'CL-KR-001', country: 'KR' },
-            { tag_id: 'CL-JP-001', country: 'JP' },
-            { tag_id: 'CL-TW-001', country: 'TW' },
-            { tag_id: 'CL-GLOBAL-001', country: 'GLOBAL' }
+            { tag_id: 'CL-KR-001', country: 'KR', route_focus: 'import', jurisdiction_role: 'origin' },
+            { tag_id: 'CL-JP-001', country: 'JP', route_focus: 'import' },
+            { tag_id: 'CL-TW-001', country: 'TW', route_focus: 'import' },
+            { tag_id: 'CL-GLOBAL-001', country: 'GLOBAL', route_focus: 'import' }
         ];
-        const filtered = filterTagsForSelectedCountry(tags, 'KR', { from: 'US', to: 'CN', focus: 'import' });
+        const filtered = filterTagsForSelectedCountry(tags, 'KR', { from: 'KR', to: 'CN', focus: 'import' });
         assert.deepEqual(filtered.map((t) => t.tag_id), ['CL-KR-001', 'CL-GLOBAL-001']);
         assert.equal(countryMatchesSelection({ country: 'JP' }, 'KR'), false);
     });
 
     it('does not show China baseline on non-China global routes', () => {
         const tags = [
-            { tag_id: 'CL-DE-001', country: 'DE' },
-            { tag_id: 'CL-GLOBAL-001', country: 'GLOBAL' }
+            { tag_id: 'CL-DE-001', country: 'DE', route_focus: 'export' },
+            { tag_id: 'CL-GLOBAL-001', country: 'GLOBAL', route_focus: 'export' }
         ];
         const filtered = filterTagsForSelectedCountry(tags, 'DE', { from: 'DE', to: 'US', focus: 'export' });
         assert.deepEqual(filtered.map((t) => t.tag_id), ['CL-DE-001']);
@@ -69,6 +70,12 @@ describe('trade-country', () => {
     it('maps GLOBAL rules to CN badge for export baseline', () => {
         const tag = { country: 'GLOBAL', short_name: 'Test' };
         assert.equal(getTagCountryBadgeCode(tag, 'export'), 'CN');
+    });
+
+    it('labels origin, destination, and transit jurisdictions from route semantics', () => {
+        assert.match(getTagCountryBadgeTitle({ country: 'US', route_focus: 'export' }, 'export', { from: 'US', to: 'CN', focus: 'export' }), /Origin \/ exporting jurisdiction/);
+        assert.match(getTagCountryBadgeTitle({ country: 'US', route_focus: 'import' }, 'export', { from: 'CN', to: 'US', focus: 'import' }), /Destination \/ importing jurisdiction/);
+        assert.match(getTagCountryBadgeTitle({ country: 'SG', route_focus: 'export', jurisdiction_role: 'transit' }, 'export', { from: 'US', to: 'SG', focus: 'export' }), /Transit \/ re-export jurisdiction/);
     });
 
     it('builds fallback context when only baseline rules', () => {

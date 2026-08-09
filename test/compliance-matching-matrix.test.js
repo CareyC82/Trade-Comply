@@ -57,9 +57,9 @@ function effectiveCountry(tag) {
     return country.normalizeCountryCode(tag.country || 'GLOBAL');
 }
 
-function assertNoWrongMarketRules(result, selectedCountry, direction, query) {
+function assertNoWrongMarketRules(result, selectedCountry, direction, query, route = null) {
     const selected = country.normalizeCountryCode(selectedCountry);
-    const wrong = result.tags.filter((tag) => {
+    const wrong = route ? result.tags.filter((tag) => !country.countryMatchesSelection(tag, selected, route)) : result.tags.filter((tag) => {
         const code = effectiveCountry(tag);
         return code !== selected && code !== 'GLOBAL';
     });
@@ -141,14 +141,14 @@ describe('compliance matching matrix', () => {
                 const importResult = runSearch(product, 'export', market, 'import', importRoute);
                 assert.ok(importResult.tags.length > 0, `expected import focus matches for ${product} into ${market}`);
                 assertHasSelectedMarketRule(importResult, market, 'import focus', product);
-                assertNoWrongMarketRules(importResult, market, 'import focus', product);
+                assertNoWrongMarketRules(importResult, market, 'import focus', product, { ...importRoute, focus: 'import' });
                 assertNoOppositeRouteFocus(importResult, 'import', `import ${importRoute.from}->${importRoute.to} ${product}`);
 
                 const exportRoute = { from: market, to: market === 'US' ? 'CN' : 'US' };
                 const exportResult = runSearch(product, 'export', market, 'export', exportRoute);
                 assert.ok(exportResult.tags.length > 0, `expected export focus matches for ${product} from ${market}`);
                 assertHasSelectedMarketRule(exportResult, market, 'export focus', product);
-                assertNoWrongMarketRules(exportResult, market, 'export focus', product);
+                assertNoWrongMarketRules(exportResult, market, 'export focus', product, { ...exportRoute, focus: 'export' });
                 assertNoOppositeRouteFocus(exportResult, 'export', `export ${exportRoute.from}->${exportRoute.to} ${product}`);
             }
         }
@@ -392,6 +392,34 @@ describe('compliance matching matrix', () => {
             false,
             'Mexico NOM import rule should not appear for origin export focus'
         );
+    });
+
+    it('keeps China-origin export focus on China for every maintained destination', () => {
+        const forbiddenByDestination = {
+            US: ['CL-USORIGEXP-001', 'CL-USCOMPEXP-001', 'CL-USMARKET-001', 'CL-USMARKET-002'],
+            EU: ['CL-EUORIGEXP-001', 'CL-EUCOMPEXP-001', 'CL-EUMARKET-001', 'CL-EUMARKET-002'],
+            JP: ['CL-JPORIGEXP-001', 'CL-JPCOMPEXP-001'],
+            SG: ['CL-SGCOMPEXP-001']
+        };
+        for (const [destination, forbidden] of Object.entries(forbiddenByDestination)) {
+            const result = runSearch('tablet computer wifi', 'export', 'CN', 'export', { from: 'CN', to: destination });
+            assert.ok(result.tags.length > 0, `expected China export rules for CN->${destination}`);
+            assert.ok(result.tags.every((tag) => {
+                const role = tag.jurisdiction_role || 'origin';
+                const expected = role === 'destination' || role === 'transit' ? destination : 'CN';
+                return effectiveCountry(tag) === expected || effectiveCountry(tag) === 'GLOBAL';
+            }), `CN->${destination} export focus should use the correct route endpoint`);
+            forbidden.forEach((id) => assert.equal(ids(result).includes(id), false, `${id} must not appear for CN->${destination} origin export focus`));
+        }
+    });
+
+    it('separates China export rules from United States destination-import rules', () => {
+        const exportSide = runSearch('tablet computer wifi', 'export', 'CN', 'export', { from: 'CN', to: 'US' });
+        const importSide = runSearch('tablet computer wifi', 'export', 'US', 'import', { from: 'CN', to: 'US' });
+        assert.ok(ids(exportSide).includes('CL-CNCOMPEXP-001'));
+        assert.equal(ids(exportSide).includes('CL-USORIGEXP-001'), false);
+        assert.ok(ids(importSide).includes('CL-USMARKET-001'));
+        assert.equal(ids(importSide).includes('CL-CNCOMPEXP-001'), false);
     });
 
     it('keeps Japan origin-export baseline out of Japan destination-import smartphone checks', () => {

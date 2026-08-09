@@ -50,10 +50,7 @@ function summarizeRouteProduct({ market, focus, product }) {
     setupSearchState(route);
     const result = search(product);
     const selectedRules = result.tags.filter((tag) => country.getEffectiveTagCountry(tag) === selected);
-    const offRouteRules = result.tags.filter((tag) => {
-        const effective = country.getEffectiveTagCountry(tag);
-        return effective !== selected && effective !== 'GLOBAL';
-    });
+    const offRouteRules = result.tags.filter((tag) => !country.countryMatchesSelection(tag, selected, route));
     const focusMismatchRules = result.tags.filter((tag) => {
         const focusValue = tagFocus(tag);
         return focusValue && focusValue !== focus;

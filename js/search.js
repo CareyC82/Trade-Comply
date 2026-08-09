@@ -415,9 +415,12 @@ function search(query) {
     const caseDirectionsForRoute = currentFocus
         ? Array.from(new Set([currentFocus, currentDirection]))
         : [currentDirection];
+    const allowedTagDirections = currentFocus
+        ? new Set([currentDirection, currentFocus, 'both'])
+        : new Set([currentDirection, 'both']);
     matchedTags = matchedTags.filter(tag => {
         const tagDirection = tag.direction || 'both';
-        return tagDirection === 'both' || tagDirection === currentDirection;
+        return allowedTagDirections.has(tagDirection);
     });
 
     if (currentFocus) {
