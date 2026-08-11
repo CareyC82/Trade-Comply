@@ -92,10 +92,35 @@ function parseTableGrid(tableHtml) {
 
 function extractAnnexHtml(html, annex, nextAnnex = '') {
     const body = String(html || '');
-    const start = body.indexOf(`id="anx_${annex}"`);
+    const markerPatterns = (value) => [
+        new RegExp(`\\bid\\s*=\\s*["']anx[_-]?${value}["']`, 'i'),
+        new RegExp(`\\b(?:id|name)\\s*=\\s*["']annex[_-]?${value}["']`, 'i'),
+        new RegExp(`<h[1-6][^>]*>\\s*(?:<[^>]+>\\s*)*ANNEX\\s+${value}\\b`, 'i'),
+        new RegExp(`<p[^>]*>\\s*(?:<[^>]+>\\s*)*ANNEX\\s+${value}\\b`, 'i')
+    ];
+    const findMarker = (value, offset = 0) => {
+        const section = body.slice(offset);
+        const indexes = markerPatterns(value)
+            .map((pattern) => section.search(pattern))
+            .filter((index) => index >= 0);
+        return indexes.length ? offset + Math.min(...indexes) : -1;
+    };
+    const start = findMarker(annex);
     if (start < 0) throw new Error(`Annex ${annex} container not found.`);
-    const end = nextAnnex ? body.indexOf(`id="anx_${nextAnnex}"`, start) : body.length;
+    const end = nextAnnex ? findMarker(nextAnnex, start + 1) : body.length;
     return body.slice(start, end > start ? end : body.length);
+}
+
+function hasReusableAnnexSnapshot(program = {}) {
+    const counts = program.annex_counts || {};
+    const annexes = program.annexes || {};
+    return Number(counts.annex_i) >= 100
+        && Number(counts.annex_ii) >= 10
+        && Number(counts.annex_iii) >= 50
+        && asArray(annexes.I?.entries).length === Number(counts.annex_i)
+        && asArray(annexes.II?.entries).length === Number(counts.annex_ii)
+        && asArray(annexes.III?.entries).length === Number(counts.annex_iii)
+        && Boolean(program.annex_content_hash);
 }
 
 function extractTables(sectionHtml) {
@@ -441,19 +466,40 @@ async function updateEuUsSpecialProgram({
         const payload = readDutyRates();
         const program = asArray(payload.special_programs).find((row) => row.id === PROGRAM_ID);
         if (!program) throw new Error(`${PROGRAM_ID} is missing from duty-rates.json.`);
-        const parsed = reuseExistingAnnex
-            ? {
+        let annexFallbackError = '';
+        let parsed;
+        if (reuseExistingAnnex) {
+            parsed = {
                 annexes: program.annexes,
                 content_hash: program.annex_content_hash,
                 counts: program.annex_counts
+            };
+        } else {
+            try {
+                parsed = parseRegulationHtml(html || await fetcher(OFFICIAL_URL));
+            } catch (error) {
+                if (!hasReusableAnnexSnapshot(program)) throw error;
+                annexFallbackError = error.message;
+                parsed = {
+                    annexes: program.annexes,
+                    content_hash: program.annex_content_hash,
+                    counts: program.annex_counts
+                };
             }
-            : parseRegulationHtml(html || await fetcher(OFFICIAL_URL));
+        }
         if (!parsed.annexes || !parsed.content_hash || !parsed.counts) {
             throw new Error('The stored official Annex snapshot is incomplete and cannot be reused.');
         }
-        const procedureHash = reuseExistingAnnex
-            ? program.origin_procedure_content_hash
-            : hashOfficialText(originProcedureHtml || await (originProcedureFetcher || fetcher)(ORIGIN_PROCEDURE_URL));
+        let procedureFallbackError = '';
+        let procedureHash = program.origin_procedure_content_hash || '';
+        if (!reuseExistingAnnex) {
+            try {
+                procedureHash = hashOfficialText(originProcedureHtml || await (originProcedureFetcher || fetcher)(ORIGIN_PROCEDURE_URL));
+            } catch (error) {
+                if (!procedureHash) throw error;
+                procedureFallbackError = error.message;
+            }
+        }
         const oldHash = program.annex_content_hash || '';
         const oldCounts = program.annex_counts || null;
         const oldProcedureHash = program.origin_procedure_content_hash || '';
@@ -487,9 +533,13 @@ async function updateEuUsSpecialProgram({
             annexes: parsed.annexes,
             annex_content_hash: parsed.content_hash,
             annex_source_url: OFFICIAL_URL,
-            annex_last_checked_at: reuseExistingAnnex ? program.annex_last_checked_at : checkedAt,
+            annex_last_checked_at: reuseExistingAnnex || annexFallbackError ? program.annex_last_checked_at : checkedAt,
+            annex_last_attempt_at: checkedAt,
+            annex_last_attempt_error: annexFallbackError,
             origin_procedure_content_hash: procedureHash,
-            origin_procedure_last_checked_at: reuseExistingAnnex ? program.origin_procedure_last_checked_at : checkedAt,
+            origin_procedure_last_checked_at: reuseExistingAnnex || procedureFallbackError ? program.origin_procedure_last_checked_at : checkedAt,
+            origin_procedure_last_attempt_at: checkedAt,
+            origin_procedure_last_attempt_error: procedureFallbackError,
             quota_status: {
                 source_url: QUOTA_URL,
                 checked_at: checkedAt,
@@ -566,12 +616,21 @@ async function updateEuUsSpecialProgram({
                 specific_duty_auto_rows: specificDutyStatus.simple_auto_rows || 0,
                 specific_duty_errors: asArray(specificDutyStatus.errors).length
             },
+            official_fetch_degraded: Boolean(annexFallbackError || procedureFallbackError),
+            official_fetch_degraded_reason: annexFallbackError ? 'annex_parser_last_good_fallback' : procedureFallbackError ? 'origin_procedure_last_good_fallback' : '',
+            official_fetch_degraded_detail: annexFallbackError || procedureFallbackError,
+            official_fetch_degraded_category: annexFallbackError || procedureFallbackError ? 'parser_structure_changed' : '',
+            official_fetch_degraded_action: annexFallbackError || procedureFallbackError
+                ? 'Inspect the current EUR-Lex response and update the parser fixture; last-good official rows remain active.'
+                : '',
             official_fetch: {
-                ok: true,
+                ok: !annexFallbackError && !procedureFallbackError,
                 checked_at: checkedAt,
                 official_url: OFFICIAL_URL,
                 row_count: parsed.counts.annex_i + parsed.counts.annex_ii + parsed.counts.annex_iii,
-                machine_parser_ready: true
+                machine_parser_ready: true,
+                reused_last_good: Boolean(annexFallbackError || procedureFallbackError),
+                error: annexFallbackError || procedureFallbackError
             }
         };
     } catch (error) {
@@ -625,6 +684,8 @@ module.exports = {
     decodeHtml,
     normalizeCnCode,
     parseTableGrid,
+    extractAnnexHtml,
+    hasReusableAnnexSnapshot,
     parseAnnexI,
     parseAnnexII,
     parseAnnexIII,

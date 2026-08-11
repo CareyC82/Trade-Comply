@@ -23,6 +23,25 @@ function matchByHSCode(hsCode, tags) {
     });
 }
 
+function getHsCodeMatchTier(hsCode, tag) {
+    const input = String(hsCode || '').replace(/\D/g, '');
+    const codes = (tag?.related_hs_codes || []).map((code) => String(code || '').replace(/\D/g, '')).filter(Boolean);
+    if (!input || !codes.length) return 0;
+    if (codes.some((code) => code === input)) return 3;
+    if (input.length >= 6 && codes.some((code) => code.length >= 6 && code.slice(0, 6) === input.slice(0, 6))) return 2;
+    if (input.length >= 4 && codes.some((code) => code.length >= 4 && code.slice(0, 4) === input.slice(0, 4))) return 1;
+    return 0;
+}
+
+function selectBestHsCodeTier(hsCode, tags) {
+    const ranked = (tags || []).map((tag) => ({ tag, tier: getHsCodeMatchTier(hsCode, tag) })).filter((row) => row.tier > 0);
+    const bestTier = ranked.reduce((best, row) => Math.max(best, row.tier), 0);
+    return {
+        tags: ranked.filter((row) => row.tier === bestTier).map((row) => row.tag),
+        level: bestTier === 3 ? 'exact' : bestTier === 2 ? 'hs6' : bestTier === 1 ? 'hs4' : 'none'
+    };
+}
+
 /**
  * Match tags by product name keywords
  */
@@ -392,15 +411,15 @@ function dedupeTagsByPolicySignal(tags) {
 /**
  * Search logic core
  */
-function search(query) {
+function search(query, options = {}) {
     const tags = AppState.data.tags || [];
     const cases = AppState.data.cases || [];
     let matchedTags = [];
     
+    const inputType = query && query.trim() ? detectInputType(query) : '';
     if (!query || !query.trim()) {
         matchedTags = [...tags];
     } else {
-        const inputType = detectInputType(query);
         if (inputType === 'hs_code') {
             matchedTags = matchByHSCode(query, tags);
         } else {
@@ -441,6 +460,13 @@ function search(query) {
     }
 
     matchedTags = matchedTags.filter((tag) => tagMatchesExplicitRoute(tag, routeContext));
+
+    let matchMeta = { method: inputType === 'hs_code' ? 'hs_code' : 'product_description', level: inputType === 'hs_code' ? 'none' : 'keyword' };
+    if (inputType === 'hs_code') {
+        const tiered = selectBestHsCodeTier(query, matchedTags);
+        matchedTags = tiered.tags;
+        matchMeta = { method: 'hs_code', level: tiered.level, hsCode: String(query || '').replace(/\D/g, '') };
+    }
 
     if (
         countryApi?.normalizeCountryCode?.(selectedCountry) === 'ASEAN'
@@ -532,7 +558,28 @@ function search(query) {
         }
     }
 
-    return { tags: matchedTags, cases: matchedCases };
+    if (
+        inputType === 'hs_code'
+        && matchedTags.length === 0
+        && !options.disableHsContextFallback
+    ) {
+        const hsContext = typeof AppState !== 'undefined' ? AppState.hsContext : null;
+        const fallbackQuery = String(hsContext?.productDescription || hsContext?.officialName || '').trim();
+        if (fallbackQuery) {
+            const fallback = search(fallbackQuery, { disableHsContextFallback: true });
+            return {
+                ...fallback,
+                matchMeta: {
+                    method: 'product_description_fallback',
+                    level: 'description',
+                    hsCode: String(query || '').replace(/\D/g, ''),
+                    fallbackQuery
+                }
+            };
+        }
+    }
+
+    return { tags: matchedTags, cases: matchedCases, matchMeta };
 }
 
 function getPrecheckSelections(panelId = 'precheck-panel') {
@@ -630,7 +677,8 @@ function searchWithPrecheck(query, selections, searchFn = search, relevanceQuery
     const sortedTags = sortTagsForDisplay(filtered.tags, selectedCountry, routeContext, relevanceAnchor);
     return {
         ...filtered,
-        tags: dedupeTagsByPolicySignal(sortedTags)
+        tags: dedupeTagsByPolicySignal(sortedTags),
+        matchMeta: baseResults.matchMeta || precheckResults.matchMeta || null
     };
 }
 
@@ -638,6 +686,8 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         detectInputType,
         matchByHSCode,
+        getHsCodeMatchTier,
+        selectBestHsCodeTier,
         matchByProductName,
         search,
         getPrecheckSelections,

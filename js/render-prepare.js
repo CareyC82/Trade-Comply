@@ -110,8 +110,17 @@ function prepareCountryContext(selectedCountry, direction) {
     return { selectedCountryLabel, roleLabel };
 }
 
-function prepareResultSummaryViewModel(query, tagCount, context) {
+function prepareResultSummaryViewModel(query, tagCount, context, matchMeta = null) {
     const route = context.routeContext;
+    const levelLabels = {
+        exact: 'Exact HS code match',
+        hs6: 'Matched at HS-6 subheading level',
+        hs4: 'Matched at HS-4 heading level',
+        description: 'No route rule matched the HS code; matched using the classified product description'
+    };
+    const matchNoteHtml = matchMeta?.level && levelLabels[matchMeta.level]
+        ? escapeHtml(`${levelLabels[matchMeta.level]}${matchMeta.hsCode ? ` (${matchMeta.hsCode})` : ''}. Verify the final national tariff line before filing.`)
+        : '';
     if (route?.fromLabel && route?.toLabel) {
         const isExportFocus = route.focus === 'export';
         return {
@@ -124,7 +133,8 @@ function prepareResultSummaryViewModel(query, tagCount, context) {
             tagCount,
             regulationsForHtml: escapeHtml(t('regulationsFor')),
             queryHtml: escapeHtml(query),
-            roleFocusHtml: escapeHtml(isExportFocus ? 'origin export focus' : 'destination import focus')
+            roleFocusHtml: escapeHtml(isExportFocus ? 'origin export focus' : 'destination import focus'),
+            matchNoteHtml
         };
     }
     const directionText = context.direction === 'export' ? t('exportTitle') : t('importTitle');
@@ -135,7 +145,8 @@ function prepareResultSummaryViewModel(query, tagCount, context) {
         tagCount,
         regulationsForHtml: escapeHtml(t('regulationsFor')),
         queryHtml: escapeHtml(query),
-        roleFocusHtml: escapeHtml(t('resultRoleFocus', { role: context.roleLabel }))
+        roleFocusHtml: escapeHtml(t('resultRoleFocus', { role: context.roleLabel })),
+        matchNoteHtml
     };
 }
 
@@ -319,7 +330,7 @@ function prepareCasesGroupViewModel(cases) {
 /**
  * Full results screen view model (filtering and mapping only).
  */
-function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
+function prepareResultsViewModel(query, tags, cases, precheckSelections = [], matchMeta = null) {
     const direction = AppState.currentDirection || 'export';
     const selectedCountry = AppState.currentCountry || 'US';
     cases = resolveCasesForMatchedTags(tags, cases, query);
@@ -353,7 +364,7 @@ function prepareResultsViewModel(query, tags, cases, precheckSelections = []) {
         direction,
         selectedCountry,
         renderContext,
-        resultSummary: prepareResultSummaryViewModel(query, tags.length, { direction, routeContext, ...countryContext }),
+        resultSummary: prepareResultSummaryViewModel(query, tags.length, { direction, routeContext, ...countryContext }, matchMeta),
         aiQuerySection: prepareAiQuerySectionViewModel(tags.length),
         showAiAssistant: !browseAll || precheckSelections.length > 0,
         showPolicyCorrection,

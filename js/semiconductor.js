@@ -129,7 +129,7 @@ function searchSemiconductorProducts(query) {
         selections,
         view: 'semiconductor'
     });
-    renderResults(trimmedQuery || t('semiconductorProducts'), results.tags, results.cases, selections);
+    renderResults(trimmedQuery || t('semiconductorProducts'), results.tags, results.cases, selections, results.matchMeta);
 }
 
 function renderSemiQuickActions() {

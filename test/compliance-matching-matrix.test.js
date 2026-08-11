@@ -5,7 +5,7 @@ const tags = require('../data/tags.json');
 const cases = require('../data/cases.json');
 const country = require('../lib/trade-country');
 const matchedResults = require('../lib/matched-results');
-const { search, searchWithPrecheck } = require('../js/search');
+const { search, searchWithPrecheck, selectBestHsCodeTier } = require('../js/search');
 
 const PRODUCTS = [
     'gpu ai accelerator chip',
@@ -27,6 +27,14 @@ const PRODUCTS = [
 const ROUTE_COUNTRIES = ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'IN', 'TW', 'RU', 'ASEAN'];
 const EXPORT_MARKETS = ROUTE_COUNTRIES;
 const IMPORT_ORIGINS = ['US', 'TW', 'JP', 'KR', 'GLOBAL'];
+const CORE_ROUTE_MARKETS = ['US', 'EU', 'JP', 'SG', 'MX'];
+const CORE_ROUTE_PRODUCTS = [
+    'tablet computer with wifi and lithium battery',
+    'wireless router with encryption',
+    'lithium ion battery pack',
+    'smart watch with bluetooth and lithium battery',
+    'IP security camera with wifi'
+];
 
 function setupSearch(direction, selectedCountry, route = {}) {
     globalThis.AppState = {
@@ -61,6 +69,11 @@ function assertNoWrongMarketRules(result, selectedCountry, direction, query, rou
     const selected = country.normalizeCountryCode(selectedCountry);
     const wrong = route ? result.tags.filter((tag) => !country.countryMatchesSelection(tag, selected, route)) : result.tags.filter((tag) => {
         const code = effectiveCountry(tag);
+        const isChinaOriginExportRule = direction === 'export'
+            && code === 'CN'
+            && (tag.route_focus || tag.compliance_focus) === 'export'
+            && tag.jurisdiction_role === 'origin';
+        if (isChinaOriginExportRule) return false;
         return code !== selected && code !== 'GLOBAL';
     });
     assert.deepEqual(
@@ -112,6 +125,48 @@ function assertNoOppositeRouteFocus(result, expectedFocus, label) {
 }
 
 describe('compliance matching matrix', () => {
+    it('keeps real China electronics journeys separated across five core destination markets', () => {
+        for (const market of CORE_ROUTE_MARKETS) {
+            for (const product of CORE_ROUTE_PRODUCTS) {
+                const exportRoute = { from: 'CN', to: market, focus: 'export' };
+                const exportResult = runSearch(product, 'export', 'CN', 'export', exportRoute);
+                assert.ok(exportResult.tags.length > 0, `expected China export rules for ${product} to ${market}`);
+                assertNoWrongMarketRules(exportResult, 'CN', 'export', product, exportRoute);
+                assertNoOppositeRouteFocus(exportResult, 'export', `CN->${market} ${product}`);
+
+                const importRoute = { from: 'CN', to: market, focus: 'import' };
+                const importResult = runSearch(product, 'export', market, 'import', importRoute);
+                assert.ok(importResult.tags.length > 0, `expected ${market} import rules for ${product}`);
+                assertHasSelectedMarketRule(importResult, market, 'import', product);
+                assertNoWrongMarketRules(importResult, market, 'import', product, importRoute);
+                assertNoOppositeRouteFocus(importResult, 'import', `CN->${market} ${product}`);
+            }
+        }
+    });
+
+    it('selects the narrowest available HS tier and reports HS-6/HS-4 fallback explicitly', () => {
+        const sampleTags = [
+            { tag_id: 'EXACT', related_hs_codes: ['847130'] },
+            { tag_id: 'HS6', related_hs_codes: ['84713090'] },
+            { tag_id: 'HS4', related_hs_codes: ['8471'] }
+        ];
+        assert.equal(selectBestHsCodeTier('847130', sampleTags).level, 'exact');
+        assert.deepEqual(selectBestHsCodeTier('847130', sampleTags.slice(1)).tags.map((tag) => tag.tag_id), ['HS6']);
+        assert.equal(selectBestHsCodeTier('847130', sampleTags.slice(2)).level, 'hs4');
+    });
+
+    it('falls back from an unmatched HS code to the classified product description', () => {
+        setupSearch('export', 'US', { from: 'CN', to: 'US', focus: 'import' });
+        globalThis.AppState.hsContext = {
+            officialName: 'Tablet computer',
+            productDescription: 'tablet computer with wifi and lithium battery'
+        };
+        const result = search('999999');
+        assert.ok(result.tags.length > 0);
+        assert.equal(result.matchMeta.method, 'product_description_fallback');
+        assert.equal(result.matchMeta.hsCode, '999999');
+    });
+
     for (const market of EXPORT_MARKETS) {
         it(`keeps export-from-China matches focused on ${market}`, () => {
             for (const product of PRODUCTS) {

@@ -17,10 +17,11 @@ function templateAiQuerySection(vm) {
 }
 
 function templateResultSummary(vm) {
+    const matchNote = vm.matchNoteHtml ? `<small class="result-summary-match-note">${vm.matchNoteHtml}</small>` : '';
     if (vm.routeLineHtml) {
-        return `${vm.routeLineHtml}: ${vm.foundRegulationsHtml} <span id="result-count">${vm.tagCount}</span> ${vm.regulationsForHtml} '<span id="search-term">${vm.queryHtml}</span>' <span class="result-summary-role">(${vm.roleFocusHtml})</span>`;
+        return `${vm.routeLineHtml}: ${vm.foundRegulationsHtml} <span id="result-count">${vm.tagCount}</span> ${vm.regulationsForHtml} '<span id="search-term">${vm.queryHtml}</span>' <span class="result-summary-role">(${vm.roleFocusHtml})</span>${matchNote}`;
     }
-    return `${vm.directionTextHtml} <span class="result-summary-arrow" aria-hidden="true">→</span> <span class="result-summary-country">${vm.countryLabelHtml}</span>: ${vm.foundRegulationsHtml} <span id="result-count">${vm.tagCount}</span> ${vm.regulationsForHtml} '<span id="search-term">${vm.queryHtml}</span>' <span class="result-summary-role">(${vm.roleFocusHtml})</span>`;
+    return `${vm.directionTextHtml} <span class="result-summary-arrow" aria-hidden="true">→</span> <span class="result-summary-country">${vm.countryLabelHtml}</span>: ${vm.foundRegulationsHtml} <span id="result-count">${vm.tagCount}</span> ${vm.regulationsForHtml} '<span id="search-term">${vm.queryHtml}</span>' <span class="result-summary-role">(${vm.roleFocusHtml})</span>${matchNote}`;
 }
 
 function templateEmptyResultsMessage(vm) {

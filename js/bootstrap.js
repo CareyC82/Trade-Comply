@@ -154,7 +154,12 @@ async function bootstrapTradeComplyIndex() {
             clearUnselectedComplianceFocus();
         }
 
-        if (inboundHsContext && (inboundHsContext.chinaCode || inboundHsContext.counterpartyCode)) {
+        if (inboundHsContext && (
+            inboundHsContext.chinaCode
+            || inboundHsContext.counterpartyCode
+            || inboundHsContext.officialName
+            || inboundHsContext.productDescription
+        )) {
             AppState.hsContext = inboundHsContext;
         }
 

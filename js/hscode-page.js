@@ -129,7 +129,8 @@ function bindDirectionToggle() {
 
 function buildComplianceUrl(hscode) {
     const digits = String(hscode || '').replace(/\D/g, '');
-    const search = lastHs6 || (digits.length >= 6 ? digits.slice(0, 6) : digits);
+    const hsSearch = lastHs6 || (digits.length >= 6 ? digits.slice(0, 6) : digits);
+    const search = lastProductDescription || lastClassification?.official_name || hsSearch;
     const params = new URLSearchParams();
     params.set('search', search);
     params.set('direction', getSelectedDirection());
@@ -137,6 +138,7 @@ function buildComplianceUrl(hscode) {
     params.set('from', selectedFromCountry || 'CN');
     params.set('to', selectedToCountry || 'US');
     params.set('focus', selectedComplianceFocus || 'import');
+    if (hsSearch) params.set('hs', hsSearch);
     if (lastClassification) {
         const china = lastClassification.china_code || lastClassification.hscode || '';
         const cp = lastClassification.counterparty_code || '';

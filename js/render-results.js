@@ -3,11 +3,11 @@
  */
 'use strict';
 
-function renderResults(query, tags, cases, precheckSelections = []) {
+function renderResults(query, tags, cases, precheckSelections = [], matchMeta = null) {
     showView('result');
     removeAiBox();
 
-    const viewModel = prepareResultsViewModel(query, tags, cases, precheckSelections);
+    const viewModel = prepareResultsViewModel(query, tags, cases, precheckSelections, matchMeta);
     tags = viewModel.tags;
     cases = viewModel.cases;
 

@@ -27,7 +27,8 @@ function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
             profile: null
         };
     const selections = intelligence.selections || manualSelections;
-    const searchQuery = intelligence.expandedQuery || trimmedQuery;
+    const isHsCodeQuery = typeof detectInputType === 'function' && detectInputType(trimmedQuery) === 'hs_code';
+    const searchQuery = isHsCodeQuery ? trimmedQuery : (intelligence.expandedQuery || trimmedQuery);
     const results = searchWithPrecheck(searchQuery, selections, search, trimmedQuery);
     const displayQuery = trimmedQuery || fallbackLabel || t('allProducts');
 
@@ -45,7 +46,7 @@ function runProductSearch({ query, origin, precheckPanelId, fallbackLabel }) {
         view: origin
     });
 
-    renderResults(displayQuery, results.tags, results.cases, selections);
+    renderResults(displayQuery, results.tags, results.cases, selections, results.matchMeta);
 }
 
 function searchProducts(query) {

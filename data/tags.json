@@ -1,5 +1,49 @@
 [
   {
+    "tag_id": "CL-CNHIGHTECHEXP-001",
+    "country": "CN",
+    "category": "EXPORT_DECLARATION",
+    "category_label": "China High-Tech Export Baseline",
+    "tag_type": "CHECK_REQUIRED",
+    "short_name": "[CN High-Tech Export Baseline]",
+    "short_description": "Confirm China export classification and declaration evidence for electronic and clean-tech products before shipment.",
+    "description": "Electronic, wireless, battery, solar, and imaging products exported from China require an accurate commodity description and HS code, consistent declaration data, origin and transaction evidence, and any applicable export-control or inspection documents. Destination-market approvals remain a separate import-side check.",
+    "content_en": "Before exporting high-tech products from China, confirm the declared HS code, model and function, transaction and origin evidence, and any applicable export-control or inspection documents. Check destination-market approvals separately.",
+    "content_zh": "中国高科技产品出口前，应核对申报HS编码、型号功能、成交与原产地证据，以及适用的出口管制或检验文件；目的国准入要求应在进口侧另行核查。",
+    "source_citation": "General Administration of Customs of China",
+    "source_url": "https://www.customs.gov.cn/",
+    "effective_date": "2026-01-01",
+    "status": "ACTIVE",
+    "direction": "export",
+    "route_focus": "export",
+    "jurisdiction_role": "origin",
+    "risk_level": "Medium",
+    "related_hs_codes": ["8471", "8504", "8507", "8517", "8525", "8528", "8541"],
+    "related_keywords": [
+      "tablet computer", "wireless router", "network router", "lithium battery", "battery pack",
+      "solar photovoltaic", "solar module", "ip security camera", "network camera", "consumer electronics",
+      "electronic product", "wireless product", "clean tech"
+    ],
+    "related_cases": [],
+    "display_order": 46,
+    "checklist": [
+      {
+        "id": "China export declaration::Confirm classification and model description",
+        "phase": "China export declaration",
+        "task": "Confirm classification and model description",
+        "desc": "Align the HS code, product name, model, function, value, and transaction documents before export filing.",
+        "source": "official-source"
+      },
+      {
+        "id": "China export evidence::Check controlled or inspected goods scope",
+        "phase": "China export evidence",
+        "task": "Check controlled or inspected goods scope",
+        "desc": "Confirm whether export-control, inspection, battery, radio, or other product-specific documents apply to the exact model.",
+        "source": "official-source"
+      }
+    ]
+  },
+  {
     "tag_id": "CL-BATT-001",
     "category": "OTHER",
     "category_label": "Other Requirements",

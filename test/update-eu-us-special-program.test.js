@@ -2,15 +2,61 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const {
+    extractAnnexHtml,
+    parseAnnexI,
+    parseAnnexII,
+    parseAnnexIII,
+    hasReusableAnnexSnapshot,
     parseQuotaStatusHtml,
     quotaLookupUrl,
     diffAnnexes,
     classifyQuotaAvailability,
     attachQuotaAlerts,
     parseSimpleSpecificDuty,
-    buildSpecificDutyStatus
+    buildSpecificDutyStatus,
+    updateEuUsSpecialProgram
 } = require('../scripts/update-eu-us-special-program');
+
+test('parses EUR-Lex annex variants without relying on one double-quoted id', () => {
+    const html = fs.readFileSync(path.join(__dirname, 'fixtures', 'eu-us-1455-annex-variant.html'), 'utf8');
+    assert.match(extractAnnexHtml(html, 'I', 'II'), /Electrical machinery/);
+    assert.equal(parseAnnexI(html)[0].normalized_code, '85');
+    assert.equal(parseAnnexII(html)[0].normalized_code, '0702');
+    assert.equal(parseAnnexIII(html)[0].order_number, '09.9001');
+});
+
+test('accepts only complete last-good annex snapshots', () => {
+    const entries = (count) => Array.from({ length: count }, (_, index) => ({ cn_code: String(index) }));
+    const complete = {
+        annex_content_hash: 'verified-hash',
+        annex_counts: { annex_i: 100, annex_ii: 10, annex_iii: 50 },
+        annexes: {
+            I: { entries: entries(100) },
+            II: { entries: entries(10) },
+            III: { entries: entries(50) }
+        }
+    };
+    assert.equal(hasReusableAnnexSnapshot(complete), true);
+    assert.equal(hasReusableAnnexSnapshot({ ...complete, annex_content_hash: '' }), false);
+    assert.equal(hasReusableAnnexSnapshot({ ...complete, annexes: { ...complete.annexes, III: { entries: entries(49) } } }), false);
+});
+
+test('keeps the last-good official annex active when EUR-Lex markup is temporarily unparseable', async () => {
+    const result = await updateEuUsSpecialProgram({
+        dryRun: true,
+        fetcher: async () => '<html><body>Temporary EUR-Lex shell</body></html>',
+        skipQuotaStatus: true,
+        skipSpecificDutyStatus: true
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.errors.length, 0);
+    assert.equal(result.official_fetch_degraded, true);
+    assert.equal(result.official_fetch.reused_last_good, true);
+    assert.match(result.official_fetch_degraded_detail, /Annex I container not found/);
+});
 
 test('parses official EU QUOTA balance rows by order number', () => {
     const html = `

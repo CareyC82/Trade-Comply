@@ -163,5 +163,5 @@ function renderCategories() {
 function searchFromCategory(query, hsCode) {
     document.getElementById('search-input').value = query;
     const result = search(query);
-    renderResults(query, result.tags, result.cases);
+    renderResults(query, result.tags, result.cases, [], result.matchMeta);
 }
