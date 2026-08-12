@@ -316,37 +316,41 @@ function parseIndiaOfficialJsonRows(value = '') {
     } catch (_error) {
         return [];
     }
-    const candidateArrays = [
-        payload,
-        payload?.data,
-        payload?.response,
-        payload?.result,
-        payload?.items,
-        payload?.list,
-        payload?.data?.items,
-        payload?.response?.items,
-        payload?.result?.items
-    ].filter(Array.isArray);
-    const sourceRows = candidateArrays.find(rows => rows.length) || [];
+    const candidateArrays = [];
+    const visited = new Set();
+    function collectArrays(node, depth = 0) {
+        if (!node || typeof node !== 'object' || depth > 6 || visited.has(node)) return;
+        visited.add(node);
+        if (Array.isArray(node)) {
+            if (node.some(item => item && typeof item === 'object')) candidateArrays.push(node);
+            node.forEach(item => collectArrays(item, depth + 1));
+            return;
+        }
+        Object.values(node).forEach(item => collectArrays(item, depth + 1));
+    }
+    collectArrays(payload);
+    const sourceRows = candidateArrays.flat();
     return sourceRows.map((row) => {
         const hsCode = String(
             row.hsn
             || row.hsnCode
+            || row.hsnCd
             || row.hsCode
+            || row.hsCd
             || row.cth
             || row.tariffItem
             || row.tariff_item
             || ''
         ).replace(/\D/g, '');
-        const bcdText = String(row.bcd || row.bcdRate || row.basicCustomsDuty || row.basic_duty || '');
-        const swsText = String(row.sws || row.swsRate || row.socialWelfareSurcharge || '');
-        const igstText = String(row.igst || row.igstRate || row.integratedTax || '');
+        const bcdText = String(row.bcd || row.bcdRate || row.bcd_rate || row.basicCustomsDuty || row.basic_duty || '');
+        const swsText = String(row.sws || row.swsRate || row.sws_rate || row.socialWelfareSurcharge || '');
+        const igstText = String(row.igst || row.igstRate || row.igst_rate || row.integratedTax || '');
         const bcdRate = parsePercent(bcdText);
         if (!/^\d{6,10}$/.test(hsCode) || bcdRate === null) return null;
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: String(row.description || row.goodsDescription || row.itemName || ''),
+            item_name: String(row.description || row.goodsDescription || row.itemName || row.itemDescription || ''),
             bcd_rate_text: bcdText,
             sws_rate_text: swsText,
             igst_rate_text: igstText,
@@ -1423,6 +1427,8 @@ async function updateIndiaRulesFromOfficialSource({ dryRun = false, fetcher = fe
             ? `HTTP ${official.status_code}`
             : 'Official source was reachable but no machine-readable tariff rows were parsed.'
     );
+    result.preserved_last_good = !official.ok;
+    result.fallback_mode = official.ok ? '' : 'maintained_exact_candidates';
     result.writes_official_machine_rates = official.ok;
     return result;
 }

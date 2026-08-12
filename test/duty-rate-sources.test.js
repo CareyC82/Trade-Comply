@@ -1442,6 +1442,28 @@ test('Korea official candidate keeps mixed rows exact-HS gated', () => {
     assert.equal(candidate.source_status, 'scope_check_required');
 });
 
+test('Korea Customs fixture parses nested official response fields', () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'korea-customs-tariff-response.json'), 'utf8');
+    const rows = parseKoreaOfficialJsonRows(fixture);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(
+        rows.map(row => [row.hs_code, row.parsed_base_rate]),
+        [['8542310000', 0], ['8528521000', 0.08]]
+    );
+});
+
+test('Korea official failure explicitly preserves maintained last-good candidates', async () => {
+    const result = await updateKoreaRulesFromOfficialSource({
+        dryRun: true,
+        fetcher: async () => { throw new Error('fetch failed'); }
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.official_fetch_degraded, true);
+    assert.equal(result.preserved_last_good, true);
+    assert.equal(result.fallback_mode, 'maintained_exact_candidates');
+    assert.equal(result.writes_official_machine_rates, false);
+});
+
 test('India official candidate can parse BCD SWS and IGST rows', () => {
     const html = `
         <table>
@@ -1540,6 +1562,28 @@ test('India CIP JSON parser splits HSN BCD SWS and IGST layers', () => {
     assert.equal(rows[0].bcd_rate, 0);
     assert.equal(rows[0].sws_rate, 0.1);
     assert.equal(rows[0].igst_rate, 0.18);
+});
+
+test('India CIP fixture parses nested official response fields', () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'india-cip-tariff-response.json'), 'utf8');
+    const rows = parseIndiaOfficialJsonRows(fixture);
+    assert.equal(rows.length, 1);
+    assert.deepEqual(
+        [rows[0].hs_code, rows[0].bcd_rate, rows[0].sws_rate, rows[0].igst_rate],
+        ['85423100', 0, 0.1, 0.18]
+    );
+});
+
+test('India official failure explicitly preserves maintained last-good candidates', async () => {
+    const result = await require('../scripts/update-static-duty-rates').updateIndiaRulesFromOfficialSource({
+        dryRun: true,
+        fetcher: async () => { throw new Error('fetch failed'); }
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.official_fetch_degraded, true);
+    assert.equal(result.preserved_last_good, true);
+    assert.equal(result.fallback_mode, 'maintained_exact_candidates');
+    assert.equal(result.writes_official_machine_rates, false);
 });
 
 test('India official probe tries candidate sources before falling back to maintained exact map', async () => {

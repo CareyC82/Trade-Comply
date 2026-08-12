@@ -7,6 +7,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
@@ -80,6 +81,7 @@ function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS, method = 'GET', header
                 status_code: response.status,
                 body: await response.text()
             }))
+            .catch(() => fetchTextWithCurl(url, { timeoutMs, method, headers, body }))
             .finally(() => clearTimeout(timer));
     }
     return new Promise((resolve, reject) => {
@@ -105,6 +107,27 @@ function fetchText(url, { timeoutMs = REQUEST_TIMEOUT_MS, method = 'GET', header
             request.destroy(new Error(`Request timed out after ${timeoutMs}ms`));
         });
         request.on('error', reject);
+    });
+}
+
+function fetchTextWithCurl(url, { timeoutMs = REQUEST_TIMEOUT_MS, method = 'GET', headers = {}, body = null } = {}) {
+    const args = [
+        '--location', '--silent', '--show-error', '--compressed',
+        '--max-time', String(Math.max(1, Math.ceil(timeoutMs / 1000))),
+        '--user-agent', 'Mozilla/5.0 TraceWize duty-rate updater (+https://tracewize.com)'
+    ];
+    Object.entries(headers).forEach(([name, value]) => args.push('--header', `${name}: ${value}`));
+    if (method !== 'GET') args.push('--request', method);
+    if (body !== null && body !== undefined) args.push('--data', String(body));
+    args.push('--write-out', '\n__TRACEWIZE_HTTP_STATUS__:%{http_code}', url);
+    return new Promise((resolve, reject) => {
+        execFile('curl', args, { maxBuffer: 10 * 1024 * 1024 }, (error, stdout, stderr) => {
+            if (error) return reject(new Error(stderr || error.message));
+            const marker = '\n__TRACEWIZE_HTTP_STATUS__:';
+            const index = stdout.lastIndexOf(marker);
+            if (index < 0) return reject(new Error('curl response did not include HTTP status marker.'));
+            resolve({ status_code: Number(stdout.slice(index + marker.length).trim()), body: stdout.slice(0, index) });
+        });
     });
 }
 
@@ -170,16 +193,29 @@ function parseKoreaOfficialJsonRows(value = '') {
     } catch (_error) {
         return [];
     }
-    const rows = Array.isArray(payload) ? payload : Array.isArray(payload?.list) ? payload.list : [];
+    const arrays = [];
+    const visited = new Set();
+    function collectArrays(node, depth = 0) {
+        if (!node || typeof node !== 'object' || depth > 6 || visited.has(node)) return;
+        visited.add(node);
+        if (Array.isArray(node)) {
+            if (node.some(item => item && typeof item === 'object')) arrays.push(node);
+            node.forEach(item => collectArrays(item, depth + 1));
+            return;
+        }
+        Object.values(node).forEach(item => collectArrays(item, depth + 1));
+    }
+    collectArrays(payload);
+    const rows = arrays.flat();
     return rows.map((row) => {
-        const hsCode = String(row.hsCode || row.hs_code || '').replace(/\D/g, '');
-        const rateText = row.taxRate || row.tax_rate || row.base_rate || '';
+        const hsCode = String(row.hsCode || row.hs_code || row.hsCd || row.hscode || '').replace(/\D/g, '');
+        const rateText = row.taxRate || row.tax_rate || row.base_rate || row.rate || row.aplDtyRt || '';
         const parsedRate = parseKoreaAdValoremRate(rateText);
         if (!hsCode || parsedRate === null) return null;
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: row.goodsName || row.goods_name || '',
+            item_name: row.goodsName || row.goods_name || row.itemName || row.prnm || '',
             base_rate_text: String(rateText),
             parsed_base_rate: parsedRate
         };
@@ -641,6 +677,8 @@ async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fe
             ? `HTTP ${official.status_code}`
             : 'Official source was reachable but no machine-readable tariff rows were parsed.'
     );
+    result.preserved_last_good = !official.ok;
+    result.fallback_mode = official.ok ? '' : 'maintained_exact_candidates';
     result.writes_official_machine_rates = official.ok;
     return result;
 }
@@ -674,6 +712,7 @@ module.exports = {
     KR_UNIPASS_TARIFF_URL,
     KR_EXACT_CODE_CANDIDATES,
     parseKoreaTariffDbHtml,
+    fetchTextWithCurl,
     parseKoreaAdValoremRate,
     parseKoreaTariffRateRows,
     parseKoreaOfficialJsonRows,
