@@ -3979,16 +3979,19 @@ a.hub-core-card--link {
 .sell-core-decision p { margin: 0; color: #607182; font-size: .8rem; line-height: 1.45; }
 .sell-core-decision select { width: 100%; margin: 1px 0 3px; padding: 8px 10px; border: 1px solid #cbd8e4; border-radius: 8px; background: #fff; color: #173c64; font: inherit; font-size: .82rem; font-weight: 750; }
 .sell-core-decision--basic_ready,
+.sell-core-decision--likely_eligible,
 .sell-core-decision--provisionally_ready,
 .sell-core-decision--evidence_checked,
 .sell-core-decision--ready,
 .sell-core-decision--ready_for_po_review { border-top-color: #27845a; background: #f7fcf9; }
 .sell-core-decision--basic_ready > strong,
+.sell-core-decision--likely_eligible > strong,
 .sell-core-decision--provisionally_ready > strong,
 .sell-core-decision--evidence_checked > strong,
 .sell-core-decision--ready > strong,
 .sell-core-decision--ready_for_po_review > strong { color: #19714b; }
 .sell-core-decision--not_yet,
+.sell-core-decision--high_risk,
 .sell-core-decision--specialist_review,
 .sell-core-decision--not_ready,
 .sell-core-decision--change_supplier,
@@ -3997,6 +4000,7 @@ a.hub-core-card--link {
 .sell-core-decision--platform_not_ready,
 .sell-core-decision--not_recommended { border-top-color: #b43c3c; background: #fffafa; }
 .sell-core-decision--not_yet > strong,
+.sell-core-decision--high_risk > strong,
 .sell-core-decision--specialist_review > strong,
 .sell-core-decision--not_ready > strong,
 .sell-core-decision--change_supplier > strong,
@@ -4006,6 +4010,11 @@ a.hub-core-card--link {
 .sell-core-decision--not_recommended > strong { color: #a42f2f; }
 .sell-core-decision--policy_unknown { border-top-color: #697786; background: #f8fafb; }
 .sell-core-decision--policy_unknown > strong { color: #536272; }
+.sell-core-decision--not_enough_information { border-top-color: #697786; background: #f8fafb; }
+.sell-core-decision--conditional { border-top-color: #bd7b08; background: #fffaf0; }
+.sell-coverage-warning { margin-top: 12px; padding: 14px 16px; border: 1px solid #d7c69f; border-left: 6px solid #bd7b08; border-radius: 10px; background: #fffaf0; }
+.sell-coverage-warning strong { color: #7a5711; }
+.sell-coverage-warning p { margin: 5px 0 0; color: #6c6250; font-size: .84rem; line-height: 1.5; }
 .sell-answer-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
 .sell-answer-summary article { display: grid; gap: 5px; padding: 13px 15px; border: 1px solid #dce5ed; border-radius: 10px; background: #fff; }
 .sell-answer-summary span { color: #71808e; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
@@ -4025,6 +4034,12 @@ a.hub-core-card--link {
 .sell-supplier-request li span { color: #6d7c8a; font-size: .78rem; line-height: 1.4; }
 .sell-supplier-request button { justify-self: start; border: 0; border-radius: 8px; background: #173c64; color: #fff; padding: 10px 15px; font-weight: 800; cursor: pointer; }
 .sell-copy-status { min-height: 1.2em; color: #24704e !important; }
+.sell-review-cta { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; align-items: center; margin-top: 14px; padding: 18px 20px; border-radius: 12px; background: #173c64; color: #fff; }
+.sell-review-cta span { color: #bcd5ed; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
+.sell-review-cta h2 { margin: 4px 0; font-size: 1.08rem; }
+.sell-review-cta p { margin: 0; color: #dbe8f4; font-size: .8rem; line-height: 1.45; }
+.sell-review-cta button { grid-column: 2; grid-row: 1; align-self: center; border: 0; border-radius: 8px; background: #fff; color: #173c64; padding: 10px 14px; font-weight: 850; cursor: pointer; }
+#sell-review-status { grid-column: 1 / -1; min-height: 1em; }
 .sell-result-details { margin-top: 14px; border: 1px solid #dce5ed; border-radius: 12px; background: #fff; }
 .sell-result-details > summary { padding: 14px 16px; color: #264661; font-weight: 800; cursor: pointer; }
 .sell-result-details > .sell-result-panel { margin: 0 14px 14px; box-shadow: none; }
@@ -4097,6 +4112,8 @@ a.hub-core-card--link {
     .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid,
     .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-core-decisions,
     .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }
+    .sell-review-cta { grid-template-columns: 1fr; }
+    .sell-review-cta button { grid-column: 1; grid-row: auto; justify-self: stretch; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-supplier-request li { grid-template-columns: 1fr; }
     .sell-gap-list span { text-align: left; }

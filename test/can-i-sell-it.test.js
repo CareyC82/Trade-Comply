@@ -71,21 +71,48 @@ test('quick questions do not preselect Not sure', () => {
     assert.doesNotMatch(script, /profile\[key\]\s*===\s*['"]unknown['"][\s\S]{0,80}checked/);
 });
 
-test('consumer page separates product facts from applicable evidence questions', () => {
+test('consumer page shows preliminary value before optional supplier evidence', () => {
+    const page = fs.readFileSync(path.join(__dirname, '..', 'can-i-sell-it.html'), 'utf8');
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
-    assert.match(script, /questionStage\s*=\s*['"]facts['"]/);
+    assert.match(page, /Initial coverage/);
+    assert.match(page, /consumer electronics, smart devices, wireless and battery products/i);
     assert.match(script, /renderFactQuestions/);
-    assert.match(script, /renderEvidenceQuestions\(resolvedProfile\)/);
-    assert.match(script, /Only evidence that applies to the confirmed product is shown/);
+    assert.match(script, /renderEvidenceQuestions\(preliminary\.profile\)/);
+    assert.match(script, /renderAssessment\(preliminary\)/);
+    assert.match(page, /Improve accuracy/);
 });
 
-test('result page exposes three core answers and direct sales-channel comparison', () => {
+test('result page uses preliminary seller language and direct sales-channel comparison', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
-    assert.match(script, /Can I legally sell it\?/);
+    assert.match(script, /Preliminary market-access result/);
+    assert.doesNotMatch(script, /Can I legally sell it\?/);
     assert.match(script, /Can I list it on this channel\?/);
-    assert.match(script, /Should I purchase it now\?/);
+    assert.match(script, /What should I verify before paying\?/);
     assert.match(script, /id="sell-result-platform"/);
     assert.match(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\}/);
+});
+
+test('seller conclusion uses four bounded result states and warns outside initial coverage', () => {
+    const unsupported = engine.assess({
+        description: 'cotton summer dress', market: 'US', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    const child = engine.assess({
+        description: 'children smart watch with GPS and battery', market: 'US', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: [], attributes: { childUse: 'yes' }
+    });
+    assert.equal(unsupported.coverageStatus.supported, false);
+    assert.equal(unsupported.sellerConclusion.code, 'not_enough_information');
+    assert.equal(child.sellerConclusion.code, 'high_risk');
+    assert.match(unsupported.disclaimer, /not customs or legal advice/i);
+});
+
+test('complimentary review CTA copies only a non-confidential local summary', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /Request a complimentary review/);
+    assert.match(script, /Nothing is uploaded or sent automatically/);
+    assert.match(script, /intentionally excludes supplier identity, pricing and uploaded files/);
+    assert.doesNotMatch(script, /api\(['"]\/review/);
 });
 
 test('result page exposes a copyable supplier evidence request', () => {

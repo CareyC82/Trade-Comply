@@ -10,6 +10,7 @@ function bootstrapCanISellItPage() {
     const followUpCopy = document.getElementById('sell-follow-up-copy');
     const followUpSubmit = document.getElementById('sell-follow-up-submit');
     const documentOptions = document.getElementById('sell-document-options');
+    const improveQuestions = document.getElementById('sell-improve-questions');
     const result = document.getElementById('sell-result');
     const error = document.getElementById('sell-check-error');
     const productTypeSelect = document.getElementById('sell-product-type');
@@ -36,7 +37,6 @@ function bootstrapCanISellItPage() {
     let currentEvidenceQuestions = [];
     let currentEvidenceAnswers = {};
     let currentConfirmedDocuments = [];
-    let questionStage = 'facts';
     let currentUser = null;
     let history = [];
     let uploadedFiles = [];
@@ -83,10 +83,9 @@ function bootstrapCanISellItPage() {
     function renderFactQuestions(profile, productType = profile.productType) {
         const keys = quickQuestionKeys(profile, productType);
         currentQuickKeys = keys;
-        questionStage = 'facts';
-        followUpTitle.textContent = 'Confirm product facts';
-        followUpCopy.textContent = 'First confirm the facts that determine which rules apply. “Not sure” is fine.';
-        followUpSubmit.textContent = 'Continue to evidence';
+        followUpTitle.textContent = 'Improve your preliminary result';
+        followUpCopy.textContent = 'Answer up to two product facts that could materially change the result. “Not sure” is fine.';
+        followUpSubmit.textContent = 'Update preliminary result';
         questions.innerHTML = keys.map((key) => `
             <fieldset class="sell-question sell-question--fact">
                 <legend>${escapeHtml(attributeLabels[key])}</legend>
@@ -94,7 +93,7 @@ function bootstrapCanISellItPage() {
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${key === 'childUse' && value === 'yes' ? 'Yes — children’s product' : key === 'childUse' && value === 'no' ? 'No — general audience' : value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`).join('');
         questions.hidden = keys.length === 0;
-        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Product facts</strong><p>${keys.length ? `Answer ${keys.length} product question${keys.length === 1 ? '' : 's'}. These answers determine which market evidence checks appear next.` : 'No additional product facts are needed for this description.'}</p>`;
+        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Optional accuracy check</strong><p>${keys.length ? `These ${keys.length} answer${keys.length === 1 ? '' : 's'} may change the preliminary result.` : 'No additional product facts are needed for this description.'}</p>`;
         return keys;
     }
 
@@ -107,20 +106,15 @@ function bootstrapCanISellItPage() {
             ...platformQuestions,
             ...marketQuestions.slice(0, Math.max(0, 5 - platformQuestions.length))
         ];
-        questionStage = 'evidence';
-        followUpTitle.textContent = 'Confirm supplier evidence';
-        followUpCopy.textContent = 'Only evidence that applies to the confirmed product is shown. Answer based on the exact model.';
-        followUpSubmit.textContent = 'Show My Result';
-        questions.innerHTML = currentEvidenceQuestions.map((item) => `
+        improveQuestions.innerHTML = currentEvidenceQuestions.map((item) => `
             <fieldset class="sell-question sell-question--evidence">
                 <legend>${escapeHtml(item.label)}</legend>
                 <small>${item.scope === 'platform'
                     ? 'Platform status — Yes means this exact product or listing received the stated platform approval.'
                     : 'Supplier claim — Yes means the supplier says this exact-model document is available; upload it for a model-match check.'}</small>
-                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" required> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
+                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}"> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`).join('');
-        questions.hidden = currentEvidenceQuestions.length === 0;
-        document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Applicable evidence</strong><p>${currentEvidenceQuestions.length ? `${currentEvidenceQuestions.length} market and platform evidence check${currentEvidenceQuestions.length === 1 ? '' : 's'} apply after reviewing your product facts.` : 'No product-specific approval evidence question applies; the result will retain classification and general-product caveats.'}</p>`;
+        improveQuestions.parentElement.hidden = currentEvidenceQuestions.length === 0;
         return currentEvidenceQuestions;
     }
 
@@ -234,6 +228,7 @@ function bootstrapCanISellItPage() {
                 </div><p class="sell-panel-note">${escapeHtml(economics.caveat)}</p>
             </section>` : '<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">Add purchase price and expected selling price to calculate the commercial result.</p></section>';
         const conclusion = assessment.consumerConclusion;
+        const sellerConclusion = assessment.sellerConclusion;
         const commercial = assessment.commercialConclusion;
         const platformDecision = assessment.platformDecision;
         const procurement = assessment.procurement;
@@ -250,11 +245,10 @@ function bootstrapCanISellItPage() {
             .map((platform) => `<option ${platform === currentInput.platform ? 'selected' : ''}>${escapeHtml(platform)}</option>`).join('');
         result.innerHTML = `
             <section class="sell-core-decisions" aria-label="Core assessment answers">
-                <article class="sell-core-decision sell-core-decision--${escapeHtml(conclusion.code)}">
-                    <span>Can I legally sell it?</span>
-                    <strong>${escapeHtml(conclusion.answer)}</strong>
-                    <h2>${escapeHtml(conclusion.label)}</h2>
-                    <p>${escapeHtml(conclusion.reason)}</p>
+                <article class="sell-core-decision sell-core-decision--${escapeHtml(sellerConclusion.code)}">
+                    <span>Preliminary market-access result</span>
+                    <h2>${escapeHtml(sellerConclusion.label)}</h2>
+                    <p>${escapeHtml(sellerConclusion.reason)}</p>
                 </article>
                 <article class="sell-core-decision sell-core-decision--${escapeHtml(platformDecision.code)}">
                     <label for="sell-result-platform">Can I list it on this channel?</label>
@@ -264,27 +258,29 @@ function bootstrapCanISellItPage() {
                     <p>${escapeHtml(platformDecision.reason)}</p>
                 </article>
                 <article class="sell-core-decision sell-core-decision--procurement sell-core-decision--${escapeHtml(procurement.code)}">
-                    <span>Should I purchase it now?</span>
+                    <span>What should I verify before paying?</span>
                     <strong>${escapeHtml(procurement.answer)}</strong>
                     <h2>${escapeHtml(procurement.label)}</h2>
                     <p>${escapeHtml(procurement.reason)}</p>
                 </article>
             </section>
+            ${assessment.coverageStatus.supported ? '' : `<section class="sell-coverage-warning"><strong>${escapeHtml(assessment.coverageStatus.label)}</strong><p>${escapeHtml(assessment.coverageStatus.detail)}</p></section>`}
             <div class="sell-answer-summary">
                 <article><span>Market</span><strong>${escapeHtml(currentInput.market)}</strong></article>
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
                 <article><span>Sales channel</span><strong>${escapeHtml(currentInput.platform)}</strong></article>
-                <article><span>Shipping</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
+                <article><span>Can the battery be shipped?</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
             <section class="sell-decision-trace"><span>Why this result</span><ol>${assessment.decisionTrace.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></section>
             <section class="sell-supplier-request ${supplierRequest.complete ? 'sell-supplier-request--complete' : ''}">
-                <div><span>Supplier follow-up</span><h2>${supplierRequest.complete ? 'No document follow-up identified' : `${supplierRequest.items.length} document request${supplierRequest.items.length === 1 ? '' : 's'} ready to send`}</h2><p>${supplierRequest.complete ? 'Keep the files with the exact-model purchase record.' : 'Generated from the actual unanswered, missing, incomplete, mismatched, or expired evidence.'}</p></div>
+                <div><span>What documents should I ask the supplier for?</span><h2>${supplierRequest.complete ? 'No document follow-up identified' : `${supplierRequest.items.length} document request${supplierRequest.items.length === 1 ? '' : 's'} ready to send`}</h2><p>${supplierRequest.complete ? 'Keep the files with the exact-model purchase record.' : 'Use Improve accuracy below when the supplier replies.'}</p></div>
                 ${supplierRequestItems}
                 <button type="button" id="sell-copy-supplier-request">${supplierRequest.complete ? 'Copy confirmation request' : 'Copy supplier request'}</button>
                 <p id="sell-copy-status" class="sell-copy-status" aria-live="polite"></p>
             </section>
             ${commercialPanel}
-            <details class="sell-result-details"><summary>View technical basis and document checklist</summary>
+            <section class="sell-review-cta"><div><span>Need a second look?</span><h2>Request a complimentary review</h2><p>Copy a non-confidential product and trade-route summary. Nothing is uploaded or sent automatically.</p></div><button type="button" id="sell-copy-review-request">Copy review request</button><p id="sell-review-status" aria-live="polite"></p></section>
+            <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
                 ${economicsPanel}
                 <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
                 <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-grid">${requirementCards}</div></section>
@@ -296,7 +292,7 @@ function bootstrapCanISellItPage() {
                 <section class="sell-result-panel sell-assistant-result"><h2>Ask the assessment assistant</h2><p>${escapeHtml(assessment.assistant.summary)}</p><div>${assessment.assistant.answerPrompts.map((prompt) => `<button type="button" data-assistant-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join('')}</div><p id="sell-assistant-answer" class="sell-panel-note"></p></section>
             </details>
             <div class="sell-result-actions"><button type="button" id="sell-save-assessment">Save this result (optional)</button><button type="button" id="sell-print-assessment">Print / Save PDF</button></div>
-            <div class="sell-trust-note"><strong>How to use this:</strong> do not place a purchase order solely from this result. Final duty requires exact HS classification; certifications must match the exact model, radio module, battery, and listing claims.</div>`;
+            <div class="sell-trust-note"><strong>Preliminary screening only:</strong> this is not customs or legal advice. Do not place a purchase order solely from this result. Final duty requires exact HS classification; certifications must match the exact model, radio module, battery, and listing claims.</div>`;
         latestAssessment = assessment;
         result.hidden = false;
         advancedTools.hidden = false;
@@ -326,6 +322,16 @@ function bootstrapCanISellItPage() {
                 textarea.value = text; document.body.appendChild(textarea); textarea.select();
                 document.execCommand('copy'); textarea.remove();
                 status.textContent = 'Copied. You can paste this into email or supplier chat.';
+            }
+        });
+        document.getElementById('sell-copy-review-request')?.addEventListener('click', async () => {
+            const text = `Complimentary review request\n\nProduct: ${currentInput.description}\nMade in: ${currentInput.origin}\nTarget market: ${currentInput.market}\nSales channel: ${currentInput.platform}\nPreliminary result: ${sellerConclusion.label}\n\nThis summary intentionally excludes supplier identity, pricing and uploaded files.`;
+            const status = document.getElementById('sell-review-status');
+            try {
+                await navigator.clipboard.writeText(text);
+                status.textContent = 'Copied. Review it before sending through your preferred contact channel.';
+            } catch {
+                status.textContent = 'Copy is unavailable in this browser. No information was sent.';
             }
         });
         document.getElementById('sell-result-platform')?.addEventListener('change', (event) => {
@@ -379,18 +385,20 @@ function bootstrapCanISellItPage() {
         productTypeSelect.innerHTML = models.listProducts().map((product) => `<option value="${escapeHtml(product.id)}" ${product.id === profile.productType ? 'selected' : ''}>${escapeHtml(product.label)}</option>`).join('');
         const factKeys = renderFactQuestions(profile, profile.productType);
         renderDocumentOptions(currentInput.market, profile);
-        result.hidden = true;
-        advancedTools.hidden = true;
-        if (factKeys.length === 0) {
-            currentAttributes = resolvedAttributes(new FormData(followUpForm));
-            const resolvedProfile = engine.assess({ ...currentInput, attributes: currentAttributes, assessmentMode: 'quick', blockingQuestionKeys: [] }).profile;
-            renderEvidenceQuestions(resolvedProfile);
-            followUp.hidden = false;
-            followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-            followUp.hidden = false;
-            followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        currentAttributes = resolvedAttributes(new FormData(followUpForm));
+        latestAssessmentInput = {
+            ...currentInput,
+            attributes: currentAttributes,
+            documents: [],
+            evidenceAnswers: {},
+            supplierEvidence: { files: [] },
+            assessmentMode: 'quick',
+            blockingQuestionKeys: factKeys
+        };
+        const preliminary = engine.assess(latestAssessmentInput);
+        renderEvidenceQuestions(preliminary.profile);
+        renderAssessment(preliminary);
+        followUp.hidden = factKeys.length === 0;
     });
 
     function resolvedAttributes(data) {
@@ -420,36 +428,27 @@ function bootstrapCanISellItPage() {
     followUpForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = new FormData(followUpForm);
-        if (questionStage === 'facts') {
-            currentAttributes = resolvedAttributes(data);
-            const resolvedProfile = engine.assess({
-                ...currentInput,
-                attributes: currentAttributes,
-                assessmentMode: 'quick',
-                blockingQuestionKeys: currentQuickKeys
-            }).profile;
-            renderEvidenceQuestions(resolvedProfile);
-            renderDocumentOptions(currentInput.market, resolvedProfile);
-            followUp.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-        }
-        currentEvidenceAnswers = resolvedEvidence(data);
-        currentConfirmedDocuments = confirmedDocuments(data);
+        currentAttributes = resolvedAttributes(data);
         latestAssessmentInput = {
             ...currentInput,
             attributes: currentAttributes,
-            documents: currentConfirmedDocuments,
-            evidenceAnswers: currentEvidenceAnswers,
+            documents: [],
+            evidenceAnswers: {},
             supplierEvidence: { files: [] },
             assessmentMode: 'quick',
             blockingQuestionKeys: currentQuickKeys
         };
-        renderAssessment(engine.assess(latestAssessmentInput));
+        const assessment = engine.assess(latestAssessmentInput);
+        renderEvidenceQuestions(assessment.profile);
+        renderDocumentOptions(currentInput.market, assessment.profile);
+        renderAssessment(assessment);
     });
 
     advancedForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const data = new FormData(advancedForm);
+        currentEvidenceAnswers = resolvedEvidence(data);
+        currentConfirmedDocuments = confirmedDocuments(data);
         const costKeys = ['currency', 'quantity', 'purchaseUnit', 'saleUnit', 'freightTotal', 'insuranceTotal', 'otherImportTotal', 'dutyRate', 'importTaxRate', 'platformFeeRate', 'otherSellingUnit'];
         const costs = Object.fromEntries(costKeys.map((key) => [key, data.get(key)]));
         uploadedFiles = [];

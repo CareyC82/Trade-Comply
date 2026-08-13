@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Can I Sell It? | TraceWize</title>
-    <link rel="stylesheet" href="css/style.css?v=20260806-evidence-check-v1">
+    <link rel="stylesheet" href="css/style.css?v=20260813-seller-flow-v1">
 </head>
 <body class="sell-check-page-body">
     <main class="sell-check-page view-container active">
         <header class="sell-check-hero">
+            <span class="sell-check-eyebrow">Initial coverage</span>
             <h1 class="home-title sell-check-page-title">🛍️ Can I Sell It?</h1>
-            <p>Tell us what you want to sell. Get the main compliance, shipping, and platform risks before you buy inventory.</p>
+            <p>Does your product appear sellable? Get a preliminary market-access, shipping, and channel result before you buy inventory.</p>
             <div class="sell-check-scope-row">
-                <div class="sell-check-scope"><strong>No account required.</strong> Deep coverage: United States · European Union · Japan · Singapore · Market access · Small Parcel Check · Platform readiness.</div>
+                <div class="sell-check-scope"><strong>Best for consumer electronics, smart devices, wireless and battery products.</strong> Deep markets: United States · European Union · Japan · Singapore. Unsupported products receive a coverage warning instead of a confident answer.</div>
+                <div class="sell-check-scope"><strong>No account required.</strong> Small Parcel Check, supplier files and commercial figures stay optional.</div>
             </div>
         </header>
 
@@ -40,7 +42,7 @@
                     <label class="sell-check-field"><span>Target market</span><select id="sell-market"><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option></select></label>
                     <label class="sell-check-field"><span>Sales channel</span><select id="sell-platform"><option>Amazon</option><option>TikTok Shop</option><option>Shopify / own store</option><option>Other marketplace</option></select></label>
                 </div>
-                <button class="sell-check-primary" type="submit">Can I Sell It?</button>
+                <button class="sell-check-primary" type="submit">Show preliminary result</button>
                 <div id="sell-check-error" class="post-entry-error" hidden role="alert"></div>
             </section>
         </form>
@@ -51,7 +53,7 @@
                 <label class="sell-check-field sell-check-product-type" for="sell-product-type"><span>Detected product type — change if needed</span><select id="sell-product-type" name="productType"></select></label>
                 <div id="sell-follow-up-questions" class="sell-question-grid"></div>
                 <div id="sell-assistant-follow-up" class="sell-assistant-panel" aria-live="polite"></div>
-                <button id="sell-follow-up-submit" class="sell-check-primary" type="submit">Continue to evidence</button>
+                <button id="sell-follow-up-submit" class="sell-check-primary" type="submit">Update preliminary result</button>
             </form>
         </section>
 
@@ -61,7 +63,8 @@
             <div class="sell-check-section-head"><span>+</span><div><h2>Optional deeper checks</h2><p>Your quick result is complete. Use these only if you want to verify a supplier, estimate margins, or save the assessment.</p></div></div>
             <form id="sell-advanced-form">
                 <details class="sell-advanced-option">
-                    <summary><strong>Verify supplier documents</strong><span>Upload exact-model reports and certificates</span></summary>
+                    <summary><strong>Improve accuracy</strong><span>Confirm supplier claims or upload exact-model reports</span></summary>
+                    <fieldset class="sell-documents"><legend>Supplier evidence claims (optional)</legend><div id="sell-improve-questions" class="sell-question-grid"></div></fieldset>
                     <fieldset class="sell-documents"><legend>Documents already supplied</legend><div id="sell-document-options"></div></fieldset>
                     <fieldset class="sell-evidence-upload">
                         <div class="sell-cost-grid">
@@ -132,6 +135,6 @@
         <span id="nav-can-i-sell-it" class="nav-btn active" aria-current="page">🛍️ Can I Sell It?</span>
     </nav>
 
-    <script src="js/main.js?v=20260806-evidence-check-v1" data-app="can-i-sell-it"></script>
+    <script src="js/main.js?v=20260813-seller-flow-v1" data-app="can-i-sell-it"></script>
 </body>
 </html>
