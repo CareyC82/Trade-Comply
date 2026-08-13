@@ -4038,7 +4038,10 @@ a.hub-core-card--link {
 .sell-review-cta span { color: #bcd5ed; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
 .sell-review-cta h2 { margin: 4px 0; font-size: 1.08rem; }
 .sell-review-cta p { margin: 0; color: #dbe8f4; font-size: .8rem; line-height: 1.45; }
-.sell-review-cta button { grid-column: 2; grid-row: 1; align-self: center; border: 0; border-radius: 8px; background: #fff; color: #173c64; padding: 10px 14px; font-weight: 850; cursor: pointer; }
+.sell-review-cta p a { color: #fff; overflow-wrap: anywhere; }
+.sell-review-actions { grid-column: 2; grid-row: 1; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.sell-review-actions button, .sell-review-actions a { border: 1px solid #fff; border-radius: 8px; background: #fff; color: #173c64; padding: 10px 14px; font: inherit; font-weight: 850; line-height: 1.2; text-align: center; text-decoration: none; cursor: pointer; }
+.sell-review-actions a { background: transparent; color: #fff; }
 #sell-review-status { grid-column: 1 / -1; min-height: 1em; }
 .sell-result-details { margin-top: 14px; border: 1px solid #dce5ed; border-radius: 12px; background: #fff; }
 .sell-result-details > summary { padding: 14px 16px; color: #264661; font-weight: 800; cursor: pointer; }
@@ -4113,7 +4116,8 @@ a.hub-core-card--link {
     .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-core-decisions,
     .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }
     .sell-review-cta { grid-template-columns: 1fr; }
-    .sell-review-cta button { grid-column: 1; grid-row: auto; justify-self: stretch; }
+    .sell-review-actions { grid-column: 1; grid-row: auto; display: grid; grid-template-columns: 1fr; }
+    .sell-review-actions button, .sell-review-actions a { width: 100%; box-sizing: border-box; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-supplier-request li { grid-template-columns: 1fr; }
     .sell-gap-list span { text-align: left; }

@@ -279,7 +279,7 @@ function bootstrapCanISellItPage() {
                 <p id="sell-copy-status" class="sell-copy-status" aria-live="polite"></p>
             </section>
             ${commercialPanel}
-            <section class="sell-review-cta"><div><span>Need a second look?</span><h2>Request a complimentary review</h2><p>Copy a non-confidential product and trade-route summary. Nothing is uploaded or sent automatically.</p></div><button type="button" id="sell-copy-review-request">Copy review request</button><p id="sell-review-status" aria-live="polite"></p></section>
+            <section class="sell-review-cta"><div><span>Need a second look?</span><h2>Request a complimentary review</h2><p>Prepare a non-confidential summary, then review and send it yourself in your email app. Nothing is uploaded or sent automatically. If the email draft does not open, copy the request and email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><p id="sell-review-status" aria-live="polite"></p></section>
             <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
                 ${economicsPanel}
                 <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
@@ -324,14 +324,18 @@ function bootstrapCanISellItPage() {
                 status.textContent = 'Copied. You can paste this into email or supplier chat.';
             }
         });
+        const reviewText = `Complimentary review request\n\nProduct: ${currentInput.description}\nMade in: ${currentInput.origin}\nTarget market: ${currentInput.market}\nSales channel: ${currentInput.platform}\nPreliminary result: ${sellerConclusion.label}\n\nThis summary intentionally excludes supplier identity, pricing and uploaded files.`;
+        const reviewEmail = 'carey@tracewize.com';
+        const reviewSubject = `Complimentary product review: ${assessment.product.label}`;
+        const reviewEmailLink = document.getElementById('sell-open-review-email');
+        if (reviewEmailLink) reviewEmailLink.href = `mailto:${reviewEmail}?subject=${encodeURIComponent(reviewSubject)}&body=${encodeURIComponent(reviewText)}`;
         document.getElementById('sell-copy-review-request')?.addEventListener('click', async () => {
-            const text = `Complimentary review request\n\nProduct: ${currentInput.description}\nMade in: ${currentInput.origin}\nTarget market: ${currentInput.market}\nSales channel: ${currentInput.platform}\nPreliminary result: ${sellerConclusion.label}\n\nThis summary intentionally excludes supplier identity, pricing and uploaded files.`;
             const status = document.getElementById('sell-review-status');
             try {
-                await navigator.clipboard.writeText(text);
-                status.textContent = 'Copied. Review it before sending through your preferred contact channel.';
+                await navigator.clipboard.writeText(reviewText);
+                status.textContent = `Copied. Review it, then send it yourself to ${reviewEmail}.`;
             } catch {
-                status.textContent = 'Copy is unavailable in this browser. No information was sent.';
+                status.textContent = `Copy is unavailable in this browser. No information was sent; email ${reviewEmail} manually.`;
             }
         });
         document.getElementById('sell-result-platform')?.addEventListener('change', (event) => {

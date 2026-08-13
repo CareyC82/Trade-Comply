@@ -112,7 +112,27 @@ test('complimentary review CTA copies only a non-confidential local summary', ()
     assert.match(script, /Request a complimentary review/);
     assert.match(script, /Nothing is uploaded or sent automatically/);
     assert.match(script, /intentionally excludes supplier identity, pricing and uploaded files/);
+    assert.match(script, /carey@tracewize\.com/);
+    assert.match(script, /mailto:/);
+    assert.match(script, /subject=\$\{encodeURIComponent\(reviewSubject\)\}/);
+    assert.match(script, /body=\$\{encodeURIComponent\(reviewText\)\}/);
+    assert.match(script, /review and send it yourself in your email app/i);
     assert.doesNotMatch(script, /api\(['"]\/review/);
+});
+
+test('known wireless and battery requirements lead the preliminary result before unanswered facts', () => {
+    const result = engine.assess({
+        description: 'Smart watch with Bluetooth, rechargeable lithium battery, heart-rate tracking and no medical claims.',
+        market: 'US',
+        platform: 'Amazon',
+        assessmentMode: 'quick',
+        blockingQuestionKeys: ['childUse', 'cellular']
+    });
+    assert.equal(result.sellerConclusion.code, 'conditional');
+    assert.match(result.sellerConclusion.reason, /FCC authorization and RF-exposure evidence/);
+    assert.match(result.sellerConclusion.reason, /UN38\.3 and carrier battery-shipping evidence/);
+    assert.ok(result.unanswered.some((item) => item.key === 'childUse'));
+    assert.doesNotMatch(result.sellerConclusion.reason, /^Is it designed for children\??$/i);
 });
 
 test('result page exposes a copyable supplier evidence request', () => {
