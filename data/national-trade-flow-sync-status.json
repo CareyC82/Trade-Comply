@@ -1,8 +1,466 @@
 {
   "schema_version": "1.0",
-  "generated_at": "",
+  "generated_at": "2026-08-15T19:03:13.637Z",
   "ok": true,
   "publish_policy": "complete_batch_only_last_good_retained",
-  "markets": {},
+  "summary": {
+    "current": 0,
+    "delayed": 0,
+    "incomplete": 0,
+    "pending": 1,
+    "fallback": 3,
+    "api_key_pending": 1,
+    "publish_ready": 0,
+    "publication_gated": 3,
+    "missing_direction_markets": [
+      "JP",
+      "KR",
+      "SG"
+    ],
+    "missing_period_markets": [
+      "JP"
+    ],
+    "missing_partner_markets": [
+      "JP",
+      "KR",
+      "SG"
+    ],
+    "missing_industry_markets": [
+      "JP",
+      "KR",
+      "SG"
+    ],
+    "publication_gates": [
+      {
+        "market": "JP",
+        "missing_periods": [
+          "2099-08"
+        ],
+        "missing_directions": [
+          "import",
+          "export"
+        ],
+        "missing_partners": [
+          "CN",
+          "US",
+          "KR",
+          "SG",
+          "DE"
+        ],
+        "missing_industries": [
+          "battery_energy",
+          "computing",
+          "gaming",
+          "healthcare_lab",
+          "industrial_automation",
+          "memory",
+          "semiconductor_ai",
+          "solar",
+          "telecom"
+        ],
+        "blockers": [
+          "no_validated_official_rows",
+          "official_period_gap",
+          "missing_import_direction",
+          "missing_export_direction",
+          "missing_partner_CN",
+          "missing_partner_US",
+          "missing_partner_KR",
+          "missing_partner_SG",
+          "missing_partner_DE",
+          "missing_industry_battery_energy",
+          "missing_industry_computing",
+          "missing_industry_gaming",
+          "missing_industry_healthcare_lab",
+          "missing_industry_industrial_automation",
+          "missing_industry_memory",
+          "missing_industry_semiconductor_ai",
+          "missing_industry_solar",
+          "missing_industry_telecom"
+        ]
+      },
+      {
+        "market": "KR",
+        "missing_periods": [],
+        "missing_directions": [
+          "import",
+          "export"
+        ],
+        "missing_partners": [
+          "CN",
+          "US",
+          "JP",
+          "SG",
+          "DE"
+        ],
+        "missing_industries": [
+          "battery_energy",
+          "computing",
+          "gaming",
+          "healthcare_lab",
+          "industrial_automation",
+          "memory",
+          "semiconductor_ai",
+          "solar",
+          "telecom"
+        ],
+        "blockers": [
+          "no_validated_official_rows",
+          "missing_import_direction",
+          "missing_export_direction",
+          "missing_partner_CN",
+          "missing_partner_US",
+          "missing_partner_JP",
+          "missing_partner_SG",
+          "missing_partner_DE",
+          "missing_industry_battery_energy",
+          "missing_industry_computing",
+          "missing_industry_gaming",
+          "missing_industry_healthcare_lab",
+          "missing_industry_industrial_automation",
+          "missing_industry_memory",
+          "missing_industry_semiconductor_ai",
+          "missing_industry_solar",
+          "missing_industry_telecom"
+        ]
+      },
+      {
+        "market": "SG",
+        "missing_periods": [],
+        "missing_directions": [
+          "import",
+          "export"
+        ],
+        "missing_partners": [
+          "CN",
+          "US",
+          "MY",
+          "JP",
+          "KR"
+        ],
+        "missing_industries": [
+          "battery_energy",
+          "computing",
+          "gaming",
+          "healthcare_lab",
+          "industrial_automation",
+          "memory",
+          "semiconductor_ai",
+          "solar",
+          "telecom"
+        ],
+        "blockers": [
+          "no_validated_official_rows",
+          "missing_import_direction",
+          "missing_export_direction",
+          "missing_partner_CN",
+          "missing_partner_US",
+          "missing_partner_MY",
+          "missing_partner_JP",
+          "missing_partner_KR",
+          "missing_industry_battery_energy",
+          "missing_industry_computing",
+          "missing_industry_gaming",
+          "missing_industry_healthcare_lab",
+          "missing_industry_industrial_automation",
+          "missing_industry_memory",
+          "missing_industry_semiconductor_ai",
+          "missing_industry_solar",
+          "missing_industry_telecom"
+        ]
+      }
+    ]
+  },
+  "markets": {
+    "JP": {
+      "market": "JP",
+      "connector_id": "jp-customs-monthly",
+      "connector_name": "Japan Customs monthly trade statistics",
+      "official_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm",
+      "status": "official_feed_pending",
+      "latest_period": "2026-05",
+      "official_latest_period": "2099-08",
+      "synchronized_through": "",
+      "active_data_tier": "historical_fallback",
+      "lag_months": null,
+      "data_age_months": null,
+      "official_sync_gap_months": null,
+      "required_directions": [
+        "import",
+        "export"
+      ],
+      "directions": [],
+      "missing_directions": [
+        "import",
+        "export"
+      ],
+      "required_partners": [
+        "CN",
+        "US",
+        "KR",
+        "SG",
+        "DE"
+      ],
+      "partners": [],
+      "missing_partners": [
+        "CN",
+        "US",
+        "KR",
+        "SG",
+        "DE"
+      ],
+      "enforce_partner_coverage": true,
+      "required_industries": [
+        "battery_energy",
+        "computing",
+        "gaming",
+        "healthcare_lab",
+        "industrial_automation",
+        "memory",
+        "semiconductor_ai",
+        "solar",
+        "telecom"
+      ],
+      "industries": [],
+      "missing_industries": [
+        "battery_energy",
+        "computing",
+        "gaming",
+        "healthcare_lab",
+        "industrial_automation",
+        "memory",
+        "semiconductor_ai",
+        "solar",
+        "telecom"
+      ],
+      "enforce_industry_coverage": true,
+      "missing_periods": [
+        "2099-08"
+      ],
+      "feed_configured": false,
+      "publication_mode": "validated_complete_batch",
+      "publish_ready": false,
+      "publication_blockers": [
+        "no_validated_official_rows",
+        "official_period_gap",
+        "missing_import_direction",
+        "missing_export_direction",
+        "missing_partner_CN",
+        "missing_partner_US",
+        "missing_partner_KR",
+        "missing_partner_SG",
+        "missing_partner_DE",
+        "missing_industry_battery_energy",
+        "missing_industry_computing",
+        "missing_industry_gaming",
+        "missing_industry_healthcare_lab",
+        "missing_industry_industrial_automation",
+        "missing_industry_memory",
+        "missing_industry_semiconductor_ai",
+        "missing_industry_solar",
+        "missing_industry_telecom"
+      ],
+      "status_reason": "The latest official month is known, but no validated industry batch has been published.",
+      "official_row_count": 0,
+      "fallback_row_count": 3115,
+      "raw_data_capability": "commodity_country_feed",
+      "raw_ingest_status": "production_ready",
+      "raw_ingest_note": "Japan Customs 6/9-digit commodity-country rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly JPY-to-USD conversion evidence.",
+      "probe_status": "official_probe_ok",
+      "last_checked_at": "2026-08-15T19:03:12.835Z",
+      "probe_note": ""
+    },
+    "KR": {
+      "market": "KR",
+      "connector_id": "kr-customs-monthly",
+      "connector_name": "Korea Customs Service monthly trade statistics",
+      "official_url": "https://www.data.go.kr/en/data/15102108/openapi.do",
+      "status": "api_key_pending",
+      "latest_period": "2025-12",
+      "official_latest_period": "",
+      "synchronized_through": "",
+      "active_data_tier": "historical_fallback",
+      "lag_months": null,
+      "data_age_months": null,
+      "official_sync_gap_months": null,
+      "required_directions": [
+        "import",
+        "export"
+      ],
+      "directions": [],
+      "missing_directions": [
+        "import",
+        "export"
+      ],
+      "required_partners": [
+        "CN",
+        "US",
+        "JP",
+        "SG",
+        "DE"
+      ],
+      "partners": [],
+      "missing_partners": [
+        "CN",
+        "US",
+        "JP",
+        "SG",
+        "DE"
+      ],
+      "enforce_partner_coverage": true,
+      "required_industries": [
+        "battery_energy",
+        "computing",
+        "gaming",
+        "healthcare_lab",
+        "industrial_automation",
+        "memory",
+        "semiconductor_ai",
+        "solar",
+        "telecom"
+      ],
+      "industries": [],
+      "missing_industries": [
+        "battery_energy",
+        "computing",
+        "gaming",
+        "healthcare_lab",
+        "industrial_automation",
+        "memory",
+        "semiconductor_ai",
+        "solar",
+        "telecom"
+      ],
+      "enforce_industry_coverage": true,
+      "missing_periods": [],
+      "feed_configured": false,
+      "publication_mode": "validated_complete_batch",
+      "publish_ready": false,
+      "publication_blockers": [
+        "no_validated_official_rows",
+        "missing_import_direction",
+        "missing_export_direction",
+        "missing_partner_CN",
+        "missing_partner_US",
+        "missing_partner_JP",
+        "missing_partner_SG",
+        "missing_partner_DE",
+        "missing_industry_battery_energy",
+        "missing_industry_computing",
+        "missing_industry_gaming",
+        "missing_industry_healthcare_lab",
+        "missing_industry_industrial_automation",
+        "missing_industry_memory",
+        "missing_industry_semiconductor_ai",
+        "missing_industry_solar",
+        "missing_industry_telecom"
+      ],
+      "status_reason": "The official API credential is not configured; historical fallback remains available.",
+      "official_row_count": 0,
+      "fallback_row_count": 450,
+      "raw_data_capability": "credentialed_api",
+      "raw_ingest_status": "api_key_pending",
+      "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available.",
+      "probe_status": "api_key_pending",
+      "last_checked_at": "2026-08-15T19:03:12.838Z",
+      "probe_note": "KR_DATA_GO_KR_SERVICE_KEY is not configured; UN Comtrade historical fallback remains available."
+    },
+    "SG": {
+      "market": "SG",
+      "connector_id": "sg-singstat-monthly",
+      "connector_name": "Singapore official monthly merchandise trade statistics",
+      "official_url": "https://tablebuilder.singstat.gov.sg/table/TR/T010001",
+      "status": "un_comtrade_fallback",
+      "latest_period": "2025-12",
+      "official_latest_period": "",
+      "synchronized_through": "",
+      "active_data_tier": "historical_fallback",
+      "lag_months": null,
+      "data_age_months": null,
+      "official_sync_gap_months": null,
+      "required_directions": [
+        "import",
+        "export"
+      ],
+      "directions": [],
+      "missing_directions": [
+        "import",
+        "export"
+      ],
+      "required_partners": [
+        "CN",
+        "US",
+        "MY",
+        "JP",
+        "KR"
+      ],
+      "partners": [],
+      "missing_partners": [
+        "CN",
+        "US",
+        "MY",
+        "JP",
+        "KR"
+      ],
+      "enforce_partner_coverage": true,
+      "required_industries": [
+        "battery_energy",
+        "computing",
+        "gaming",
+        "healthcare_lab",
+        "industrial_automation",
+        "memory",
+        "semiconductor_ai",
+        "solar",
+        "telecom"
+      ],
+      "industries": [],
+      "missing_industries": [
+        "battery_energy",
+        "computing",
+        "gaming",
+        "healthcare_lab",
+        "industrial_automation",
+        "memory",
+        "semiconductor_ai",
+        "solar",
+        "telecom"
+      ],
+      "enforce_industry_coverage": true,
+      "missing_periods": [],
+      "feed_configured": false,
+      "publication_mode": "validated_complete_batch",
+      "publish_ready": false,
+      "publication_blockers": [
+        "no_validated_official_rows",
+        "missing_import_direction",
+        "missing_export_direction",
+        "missing_partner_CN",
+        "missing_partner_US",
+        "missing_partner_MY",
+        "missing_partner_JP",
+        "missing_partner_KR",
+        "missing_industry_battery_energy",
+        "missing_industry_computing",
+        "missing_industry_gaming",
+        "missing_industry_healthcare_lab",
+        "missing_industry_industrial_automation",
+        "missing_industry_memory",
+        "missing_industry_semiconductor_ai",
+        "missing_industry_solar",
+        "missing_industry_telecom"
+      ],
+      "status_reason": "No national official industry batch is active; historical UN Comtrade data is being used.",
+      "official_row_count": 0,
+      "fallback_row_count": 2598,
+      "raw_data_capability": "ahtn_commodity_market_feed",
+      "raw_ingest_status": "production_ready",
+      "raw_ingest_note": "SingStat T010001 AHTN commodity-market rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly SGD-to-USD conversion evidence.",
+      "probe_status": "probe_degraded",
+      "last_checked_at": "2026-08-15T19:03:13.635Z",
+      "probe_note": "",
+      "probe_error": "HTTP 400"
+    }
+  },
   "failures": []
 }
