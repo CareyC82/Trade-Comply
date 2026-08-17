@@ -549,6 +549,15 @@ test('sales channels produce distinct visible listing decisions', () => {
     assert.match(ownStore.platformGateDecision.reason, /legal market access/i);
     assert.equal(other.platformGateDecision.code, 'policy_unknown');
     assert.ok([amazon, tiktok, ownStore, other].every((item) => item.platformDecision.code === 'not_ready'));
+    assert.match(amazon.platformDecision.label, /Amazon category, ASIN and dangerous-goods/i);
+    assert.match(amazon.platformDecision.reason, /dangerous-goods/i);
+    assert.match(tiktok.platformDecision.label, /TikTok Shop electronics qualification and battery declaration/i);
+    assert.match(tiktok.platformDecision.reason, /battery-declaration/i);
+    assert.match(ownStore.platformDecision.label, /No marketplace approval gate/i);
+    assert.match(ownStore.platformDecision.reason, /responsible for legal market access/i);
+    assert.match(other.platformDecision.label, /Confirm this marketplace’s policy/i);
+    assert.match(other.platformDecision.reason, /marketplace is not identified/i);
+    assert.equal(new Set([amazon, tiktok, ownStore, other].map((item) => item.platformDecision.label)).size, 4);
 });
 
 test('platform evidence answers produce ready, evidence-needed and not-ready states', () => {
