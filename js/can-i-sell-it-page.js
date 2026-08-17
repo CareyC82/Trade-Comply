@@ -143,6 +143,34 @@ function bootstrapCanISellItPage() {
             </a>`).join('')}</div>`;
     }
 
+    function platformChecklistItems(assessment) {
+        const items = assessment.platformRules.map((rule) => rule.action);
+        if (items.length) return items;
+        return ['Identify the marketplace and confirm its category restrictions, document requests and approval process before listing.'];
+    }
+
+    function renderPlatformCards(assessment) {
+        return assessment.platformRules.length
+            ? assessment.platformRules.map((rule) => `<article class="sell-requirement"><span>Platform rule</span><h3>${escapeHtml(rule.title)}</h3><p>${escapeHtml(rule.action)}</p>${renderSources({ sources: [rule.source] })}</article>`).join('')
+            : '<p class="sell-panel-note">No maintained platform-specific rule is available for this channel. Legal market-access checks still apply.</p>';
+    }
+
+    function updateChannelView(assessment) {
+        const card = document.getElementById('sell-channel-decision');
+        if (!card) return;
+        card.className = `sell-core-decision sell-core-decision--${assessment.platformDecision.code} sell-channel-updated`;
+        document.getElementById('sell-channel-gate-answer').textContent = assessment.platformGateDecision.answer;
+        document.getElementById('sell-channel-gate-label').textContent = assessment.platformGateDecision.label;
+        document.getElementById('sell-channel-gate-reason').textContent = assessment.platformGateDecision.reason;
+        document.getElementById('sell-channel-overall-answer').textContent = assessment.platformDecision.answer;
+        document.getElementById('sell-channel-overall-label').textContent = assessment.platformDecision.label;
+        document.getElementById('sell-channel-checklist').innerHTML = platformChecklistItems(assessment).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+        document.getElementById('sell-summary-platform').textContent = currentInput.platform;
+        document.getElementById('sell-platform-details-title').textContent = `${currentInput.platform} listing readiness`;
+        document.getElementById('sell-platform-details-cards').innerHTML = renderPlatformCards(assessment);
+        setTimeout(() => card.classList.remove('sell-channel-updated'), 900);
+    }
+
     async function api(path, options = {}) {
         const response = await fetch(`/api/consumer${path}`, {
             credentials: 'same-origin',
@@ -212,9 +240,7 @@ function bootstrapCanISellItPage() {
         const supplierRequestItems = supplierRequest.items.length
             ? `<ul>${supplierRequest.items.map((item) => `<li><strong>${escapeHtml(item.document)}</strong><span>${escapeHtml(item.reason)}</span></li>`).join('')}</ul>`
             : '<p>All applicable uploaded evidence passed the automated reference and completeness checks.</p>';
-        const platformCards = assessment.platformRules.length
-            ? assessment.platformRules.map((rule) => `<article class="sell-requirement"><span>Platform rule</span><h3>${escapeHtml(rule.title)}</h3><p>${escapeHtml(rule.action)}</p>${renderSources({ sources: [rule.source] })}</article>`).join('')
-            : '<p class="sell-panel-note">No maintained platform-specific rule is available for this channel. Legal market-access checks still apply.</p>';
+        const platformCards = renderPlatformCards(assessment);
         const economicsPanel = economics ? `
             <section class="sell-result-panel"><h2>Landed cost and margin estimate</h2>
                 <div class="sell-economics-grid">
@@ -250,12 +276,12 @@ function bootstrapCanISellItPage() {
                     <h2>${escapeHtml(sellerConclusion.label)}</h2>
                     <p>${escapeHtml(sellerConclusion.reason)}</p>
                 </article>
-                <article class="sell-core-decision sell-core-decision--${escapeHtml(platformDecision.code)}">
+                <article id="sell-channel-decision" class="sell-core-decision sell-core-decision--${escapeHtml(platformDecision.code)}">
                     <label for="sell-result-platform">Can I list it on this channel?</label>
                     <select id="sell-result-platform" aria-label="Compare sales channel">${platformOptions}</select>
-                    <strong>${escapeHtml(platformDecision.answer)}</strong>
-                    <h2>${escapeHtml(platformDecision.label)}</h2>
-                    <p>${escapeHtml(platformDecision.reason)}</p>
+                    <div class="sell-channel-layer"><span>Platform check</span><strong id="sell-channel-gate-answer">${escapeHtml(assessment.platformGateDecision.answer)}</strong><h2 id="sell-channel-gate-label">${escapeHtml(assessment.platformGateDecision.label)}</h2><p id="sell-channel-gate-reason">${escapeHtml(assessment.platformGateDecision.reason)}</p></div>
+                    <div class="sell-channel-layer sell-channel-layer--overall"><span>Overall listing status</span><strong id="sell-channel-overall-answer">${escapeHtml(platformDecision.answer)}</strong><p id="sell-channel-overall-label">${escapeHtml(platformDecision.label)}</p></div>
+                    <div class="sell-channel-tasks"><span>Channel-specific next steps</span><ul id="sell-channel-checklist">${platformChecklistItems(assessment).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>
                 </article>
                 <article class="sell-core-decision sell-core-decision--procurement sell-core-decision--${escapeHtml(procurement.code)}">
                     <span>What should I verify before paying?</span>
@@ -268,7 +294,7 @@ function bootstrapCanISellItPage() {
             <div class="sell-answer-summary">
                 <article><span>Market</span><strong>${escapeHtml(currentInput.market)}</strong></article>
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
-                <article><span>Sales channel</span><strong>${escapeHtml(currentInput.platform)}</strong></article>
+                <article><span>Sales channel</span><strong id="sell-summary-platform">${escapeHtml(currentInput.platform)}</strong></article>
                 <article><span>Can the battery be shipped?</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
             <section class="sell-decision-trace"><span>Why this result</span><ol>${assessment.decisionTrace.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></section>
@@ -286,7 +312,7 @@ function bootstrapCanISellItPage() {
                 <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-grid">${requirementCards}</div></section>
                 <section class="sell-result-panel"><h2>Supplier document gaps</h2><ul class="sell-gap-list">${gaps}</ul></section>
                 <section class="sell-result-panel"><h2>Uploaded supplier evidence</h2><ul class="sell-gap-list">${evidenceRows}</ul></section>
-                <section class="sell-result-panel"><h2>${escapeHtml(currentInput.platform)} listing readiness</h2><div class="sell-requirement-grid">${platformCards}</div></section>
+                <section class="sell-result-panel"><h2 id="sell-platform-details-title">${escapeHtml(currentInput.platform)} listing readiness</h2><div id="sell-platform-details-cards" class="sell-requirement-grid">${platformCards}</div></section>
                 <section class="sell-result-panel"><h2>Put these conditions in the purchase order</h2><ol class="sell-action-list">${assessment.contractConditions.map((condition) => `<li>${escapeHtml(condition)}</li>`).join('')}</ol></section>
                 <section class="sell-result-panel"><h2>What to do next</h2><ol class="sell-action-list">${assessment.nextActions.map((action) => `<li>${escapeHtml(action)}</li>`).join('')}</ol></section>
                 <section class="sell-result-panel sell-assistant-result"><h2>Ask the assessment assistant</h2><p>${escapeHtml(assessment.assistant.summary)}</p><div>${assessment.assistant.answerPrompts.map((prompt) => `<button type="button" data-assistant-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join('')}</div><p id="sell-assistant-answer" class="sell-panel-note"></p></section>
@@ -347,7 +373,10 @@ function bootstrapCanISellItPage() {
             const entryPlatform = document.getElementById('sell-platform');
             if (entryPlatform) entryPlatform.value = platform;
             latestAssessmentInput = { ...latestAssessmentInput, platform };
-            renderAssessment(engine.assess(latestAssessmentInput));
+            const nextAssessment = engine.assess(latestAssessmentInput);
+            latestAssessment = nextAssessment;
+            renderEvidenceQuestions(nextAssessment.profile);
+            updateChannelView(nextAssessment);
         });
         document.querySelectorAll('[data-assistant-prompt]').forEach((button) => {
             button.addEventListener('click', async () => {

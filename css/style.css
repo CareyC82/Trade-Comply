@@ -3978,6 +3978,16 @@ a.hub-core-card--link {
 .sell-core-decision h2 { margin: 0; color: #173c64; font-size: 1.08rem; line-height: 1.3; }
 .sell-core-decision p { margin: 0; color: #607182; font-size: .8rem; line-height: 1.45; }
 .sell-core-decision select { width: 100%; margin: 1px 0 3px; padding: 8px 10px; border: 1px solid #cbd8e4; border-radius: 8px; background: #fff; color: #173c64; font: inherit; font-size: .82rem; font-weight: 750; }
+.sell-channel-layer { display: grid; gap: 4px; padding-top: 7px; border-top: 1px solid #e3e9ef; }
+.sell-channel-layer > span, .sell-channel-tasks > span { color: #6b7c8c; font-size: .66rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.sell-channel-layer > strong { color: #986100; font-size: .78rem; letter-spacing: .03em; }
+.sell-channel-layer--overall { margin-top: 3px; }
+.sell-channel-layer--overall > strong { color: #a42f2f; }
+.sell-channel-tasks { display: grid; gap: 4px; margin-top: 3px; padding-top: 7px; border-top: 1px solid #e3e9ef; }
+.sell-channel-tasks ul { display: grid; gap: 4px; margin: 0; padding-left: 17px; }
+.sell-channel-tasks li { color: #4e6478; font-size: .75rem; line-height: 1.4; }
+.sell-channel-updated { animation: sell-channel-update .85s ease-out; }
+@keyframes sell-channel-update { 0% { box-shadow: 0 0 0 4px rgba(37, 99, 235, .3); transform: translateY(-2px); } 100% { box-shadow: none; transform: none; } }
 .sell-core-decision--basic_ready,
 .sell-core-decision--likely_eligible,
 .sell-core-decision--provisionally_ready,

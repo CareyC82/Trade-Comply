@@ -90,6 +90,11 @@ test('result page uses preliminary seller language and direct sales-channel comp
     assert.match(script, /What should I verify before paying\?/);
     assert.match(script, /id="sell-result-platform"/);
     assert.match(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\}/);
+    assert.match(script, /Platform check/);
+    assert.match(script, /Overall listing status/);
+    assert.match(script, /Channel-specific next steps/);
+    assert.match(script, /updateChannelView\(nextAssessment\)/);
+    assert.doesNotMatch(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\};\s*renderAssessment/s);
 });
 
 test('seller conclusion uses four bounded result states and warns outside initial coverage', () => {
