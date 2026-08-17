@@ -112,7 +112,7 @@ function bootstrapCanISellItPage() {
                 <small>${item.scope === 'platform'
                     ? 'Platform status — Yes means this exact product or listing received the stated platform approval.'
                     : 'Supplier claim — Yes means the supplier says this exact-model document is available; upload it for a model-match check.'}</small>
-                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}"> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
+                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" ${currentEvidenceAnswers[item.key]?.value === value ? 'checked' : ''}> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`).join('');
         improveQuestions.parentElement.hidden = currentEvidenceQuestions.length === 0;
         return currentEvidenceQuestions;
@@ -149,13 +149,54 @@ function bootstrapCanISellItPage() {
         return ['Identify the marketplace and confirm its category restrictions, document requests and approval process before listing.'];
     }
 
+    function captureVisibleEvidenceAnswers() {
+        const data = new FormData(advancedForm);
+        currentEvidenceQuestions.forEach((item) => {
+            const value = data.get(`evidence:${item.key}`);
+            if (value) currentEvidenceAnswers[item.key] = { label: item.label, value };
+        });
+        return currentEvidenceAnswers;
+    }
+
+    function channelEvidenceStatus(assessment, transition = {}) {
+        const questions = engine.platformEvidenceQuestions(currentInput.platform, assessment.profile);
+        const confirmed = questions.filter((item) => currentEvidenceAnswers[item.key]?.value === 'yes').map((item) => item.label);
+        const missing = questions.filter((item) => currentEvidenceAnswers[item.key]?.value !== 'yes').map((item) => item.label);
+        const previousTitles = new Set((transition.previousAssessment?.platformRules || []).map((rule) => rule.title));
+        const currentTitles = new Set(assessment.platformRules.map((rule) => rule.title));
+        const added = [...currentTitles].filter((title) => !previousTitles.has(title));
+        const removed = [...previousTitles].filter((title) => !currentTitles.has(title));
+        const changed = transition.previousPlatform && transition.previousPlatform !== currentInput.platform;
+        return {
+            transition: changed
+                ? `Switched from ${transition.previousPlatform} to ${currentInput.platform}.`
+                : `Current channel: ${currentInput.platform}.`,
+            confirmed: confirmed.length ? confirmed.join('; ') : 'No platform evidence confirmed yet.',
+            missing: missing.length ? missing.join('; ') : 'No platform evidence still missing.',
+            changes: changed
+                ? [added.length && `Added: ${added.join('; ')}`, removed.length && `Removed: ${removed.join('; ')}`].filter(Boolean).join('. ') || 'No maintained platform requirements changed.'
+                : 'Select another channel to compare its platform requirements.'
+        };
+    }
+
+    function renderChannelStatus(assessment, transition = {}) {
+        const status = channelEvidenceStatus(assessment, transition);
+        return `<div class="sell-channel-status" aria-live="polite">
+            <span>Channel evidence status</span>
+            <p id="sell-channel-transition">${escapeHtml(status.transition)}</p>
+            <p><strong>Confirmed:</strong> <span id="sell-channel-confirmed">${escapeHtml(status.confirmed)}</span></p>
+            <p><strong>Still needed:</strong> <span id="sell-channel-missing">${escapeHtml(status.missing)}</span></p>
+            <p id="sell-channel-requirement-changes">${escapeHtml(status.changes)}</p>
+        </div>`;
+    }
+
     function renderPlatformCards(assessment) {
         return assessment.platformRules.length
             ? assessment.platformRules.map((rule) => `<article class="sell-requirement"><span>Platform rule</span><h3>${escapeHtml(rule.title)}</h3><p>${escapeHtml(rule.action)}</p>${renderSources({ sources: [rule.source] })}</article>`).join('')
             : '<p class="sell-panel-note">No maintained platform-specific rule is available for this channel. Legal market-access checks still apply.</p>';
     }
 
-    function updateChannelView(assessment) {
+    function updateChannelView(assessment, transition = {}) {
         const card = document.getElementById('sell-channel-decision');
         if (!card) return;
         card.className = `sell-core-decision sell-core-decision--${assessment.platformDecision.code} sell-channel-updated`;
@@ -165,6 +206,11 @@ function bootstrapCanISellItPage() {
         document.getElementById('sell-channel-overall-answer').textContent = assessment.platformDecision.answer;
         document.getElementById('sell-channel-overall-label').textContent = assessment.platformDecision.label;
         document.getElementById('sell-channel-checklist').innerHTML = platformChecklistItems(assessment).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+        const status = channelEvidenceStatus(assessment, transition);
+        document.getElementById('sell-channel-transition').textContent = status.transition;
+        document.getElementById('sell-channel-confirmed').textContent = status.confirmed;
+        document.getElementById('sell-channel-missing').textContent = status.missing;
+        document.getElementById('sell-channel-requirement-changes').textContent = status.changes;
         document.getElementById('sell-summary-platform').textContent = currentInput.platform;
         document.getElementById('sell-platform-details-title').textContent = `${currentInput.platform} listing readiness`;
         document.getElementById('sell-platform-details-cards').innerHTML = renderPlatformCards(assessment);
@@ -282,6 +328,7 @@ function bootstrapCanISellItPage() {
                     <div class="sell-channel-layer"><span>Platform check</span><strong id="sell-channel-gate-answer">${escapeHtml(assessment.platformGateDecision.answer)}</strong><h2 id="sell-channel-gate-label">${escapeHtml(assessment.platformGateDecision.label)}</h2><p id="sell-channel-gate-reason">${escapeHtml(assessment.platformGateDecision.reason)}</p></div>
                     <div class="sell-channel-layer sell-channel-layer--overall"><span>Overall listing status</span><strong id="sell-channel-overall-answer">${escapeHtml(platformDecision.answer)}</strong><p id="sell-channel-overall-label">${escapeHtml(platformDecision.label)}</p></div>
                     <div class="sell-channel-tasks"><span>Channel-specific next steps</span><ul id="sell-channel-checklist">${platformChecklistItems(assessment).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>
+                    ${renderChannelStatus(assessment)}
                 </article>
                 <article class="sell-core-decision sell-core-decision--procurement sell-core-decision--${escapeHtml(procurement.code)}">
                     <span>What should I verify before paying?</span>
@@ -368,15 +415,18 @@ function bootstrapCanISellItPage() {
         });
         document.getElementById('sell-result-platform')?.addEventListener('change', (event) => {
             if (!latestAssessmentInput) return;
+            captureVisibleEvidenceAnswers();
+            const previousPlatform = currentInput.platform;
+            const previousAssessment = latestAssessment;
             const platform = event.target.value;
             currentInput = { ...currentInput, platform };
             const entryPlatform = document.getElementById('sell-platform');
             if (entryPlatform) entryPlatform.value = platform;
-            latestAssessmentInput = { ...latestAssessmentInput, platform };
+            latestAssessmentInput = { ...latestAssessmentInput, platform, evidenceAnswers: currentEvidenceAnswers };
             const nextAssessment = engine.assess(latestAssessmentInput);
             latestAssessment = nextAssessment;
             renderEvidenceQuestions(nextAssessment.profile);
-            updateChannelView(nextAssessment);
+            updateChannelView(nextAssessment, { previousPlatform, previousAssessment });
         });
         document.querySelectorAll('[data-assistant-prompt]').forEach((button) => {
             button.addEventListener('click', async () => {
@@ -408,6 +458,8 @@ function bootstrapCanISellItPage() {
             return;
         }
         error.hidden = true;
+        currentEvidenceAnswers = {};
+        currentConfirmedDocuments = [];
         currentInput = {
             description,
             origin: document.getElementById('sell-origin').value,
@@ -482,7 +534,7 @@ function bootstrapCanISellItPage() {
     advancedForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const data = new FormData(advancedForm);
-        currentEvidenceAnswers = resolvedEvidence(data);
+        currentEvidenceAnswers = { ...currentEvidenceAnswers, ...resolvedEvidence(data) };
         currentConfirmedDocuments = confirmedDocuments(data);
         const costKeys = ['currency', 'quantity', 'purchaseUnit', 'saleUnit', 'freightTotal', 'insuranceTotal', 'otherImportTotal', 'dutyRate', 'importTaxRate', 'platformFeeRate', 'otherSellingUnit'];
         const costs = Object.fromEntries(costKeys.map((key) => [key, data.get(key)]));
@@ -534,6 +586,15 @@ function bootstrapCanISellItPage() {
             blockingQuestionKeys: currentQuickKeys
         };
         renderAssessment(engine.assess(latestAssessmentInput));
+    });
+
+    improveQuestions.addEventListener('change', (event) => {
+        if (!event.target.matches('input[name^="evidence:"]') || !latestAssessmentInput || !latestAssessment) return;
+        captureVisibleEvidenceAnswers();
+        latestAssessmentInput = { ...latestAssessmentInput, evidenceAnswers: currentEvidenceAnswers };
+        const nextAssessment = engine.assess(latestAssessmentInput);
+        latestAssessment = nextAssessment;
+        updateChannelView(nextAssessment);
     });
 
     productTypeSelect.addEventListener('change', () => {

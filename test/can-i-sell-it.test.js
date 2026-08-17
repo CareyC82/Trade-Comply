@@ -89,11 +89,11 @@ test('result page uses preliminary seller language and direct sales-channel comp
     assert.match(script, /Can I list it on this channel\?/);
     assert.match(script, /What should I verify before paying\?/);
     assert.match(script, /id="sell-result-platform"/);
-    assert.match(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\}/);
+    assert.match(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform,\s*evidenceAnswers: currentEvidenceAnswers\s*\}/);
     assert.match(script, /Platform check/);
     assert.match(script, /Overall listing status/);
     assert.match(script, /Channel-specific next steps/);
-    assert.match(script, /updateChannelView\(nextAssessment\)/);
+    assert.match(script, /updateChannelView\(nextAssessment, \{ previousPlatform, previousAssessment \}\)/);
     assert.doesNotMatch(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\};\s*renderAssessment/s);
 });
 
@@ -600,6 +600,46 @@ test('platform evidence answers produce ready, evidence-needed and not-ready sta
     assert.equal(ready.platformDecision.answer, 'READY TO LIST');
     assert.equal(blocked.platformDecision.answer, 'NOT READY TO LIST');
     assert.equal(uncertain.platformDecision.answer, 'MORE EVIDENCE NEEDED');
+});
+
+test('common evidence survives channel comparison while platform evidence remains channel-specific', () => {
+    const common = {
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        market: 'US', origin: 'CN',
+        attributes: {
+            productType: 'smart_watch', bluetooth: 'yes', wifi: 'no', cellular: 'no', battery: 'yes',
+            healthMonitoring: 'yes', medicalClaim: 'no', childUse: 'no', cameraMic: 'no'
+        },
+        documents: [], assessmentMode: 'quick', blockingQuestionKeys: [],
+        evidenceAnswers: {
+            fccGrant: 'yes', rfExposure: 'yes', batteryTransport: 'yes',
+            amazonListingApproval: 'yes', amazonDangerousGoods: 'yes'
+        }
+    };
+    const amazon = engine.assess({ ...common, platform: 'Amazon' });
+    const tiktokMissing = engine.assess({ ...common, platform: 'TikTok Shop' });
+    const tiktokReady = engine.assess({
+        ...common,
+        platform: 'TikTok Shop',
+        evidenceAnswers: {
+            ...common.evidenceAnswers,
+            tiktokElectronicsQualification: 'yes', tiktokBatteryDeclaration: 'yes'
+        }
+    });
+
+    assert.equal(amazon.platformGateDecision.code, 'ready');
+    assert.equal(tiktokMissing.platformGateDecision.code, 'evidence_needed');
+    assert.equal(tiktokReady.platformGateDecision.code, 'ready');
+    assert.equal(tiktokReady.platformDecision.answer, 'READY TO LIST');
+});
+
+test('page preserves evidence selections and refreshes channel status immediately', () => {
+    const source = fs.readFileSync(path.join(__dirname, '..', 'js/can-i-sell-it-page.js'), 'utf8');
+    assert.match(source, /currentEvidenceAnswers\[item\.key\]\?\.value === value \? 'checked'/);
+    assert.match(source, /captureVisibleEvidenceAnswers\(\);[\s\S]*previousPlatform[\s\S]*evidenceAnswers: currentEvidenceAnswers/);
+    assert.match(source, /improveQuestions\.addEventListener\('change'[\s\S]*updateChannelView\(nextAssessment\)/);
+    assert.match(source, /Channel evidence status/);
+    assert.match(source, /sell-channel-requirement-changes/);
 });
 
 test('official evidence is attached to applicable US and EU requirements', () => {
