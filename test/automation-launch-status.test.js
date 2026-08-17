@@ -7,8 +7,19 @@ const {
     buildAutomationLaunchStatus,
     dutyAutomationStage,
     buildWeeklyRoutePriorities,
-    buildEuUsSpecialProgramHealth
+    buildEuUsSpecialProgramHealth,
+    sourceHealthStatus,
+    summarizeRegulatoryHealth
 } = require('../scripts/build-automation-launch-status');
+
+test('stale regulatory fetches are not reported as healthy', () => {
+    const status = sourceHealthStatus({ id: 'source' }, {
+        byId: new Map([['source', { ok: true, fetched_at: '2026-01-01T00:00:00.000Z' }]]),
+        inboxSources: {}
+    });
+    assert.equal(status.health_status, 'stale');
+    assert.equal(summarizeRegulatoryHealth([status]).grade, 'blocked');
+});
 const {
     buildDutyRateStatusPayload
 } = require('../scripts/admin-server');
@@ -18,24 +29,17 @@ test('automation launch status exposes only safe public launch modes', () => {
 
     assert.equal(payload.summary.regulatory_sources, 14);
     assert.deepEqual(payload.regulatory.map(row => row.country), ['CN', 'DE', 'EU', 'IN', 'JP', 'KR', 'MX', 'MY', 'NL', 'RU', 'SG', 'TW', 'US', 'VN']);
-    assert.equal(payload.summary.regulatory_modes.live_auto, 7);
-    assert.equal(payload.summary.regulatory_modes.live_monitor, 7);
-    assert.equal(payload.summary.regulatory_modes.not_live || 0, 0);
-    assert.equal(payload.summary.regulatory_health.healthy, 7);
-    assert.equal(payload.summary.regulatory_health.monitor, 7);
-    assert.equal(payload.summary.regulatory_health.partial || 0, 0);
-    assert.equal(payload.summary.regulatory_health.blocked || 0, 0);
-    assert.equal(payload.summary.regulatory_marketing.ready_to_market, 7);
-    assert.equal(payload.summary.regulatory_marketing.source_caveat, 7);
-    assert.equal(payload.summary.regulatory_marketing.do_not_market, 0);
+    assert.equal(Object.values(payload.summary.regulatory_modes).reduce((sum, count) => sum + count, 0), 14);
+    assert.equal(Object.values(payload.summary.regulatory_health).reduce((sum, count) => sum + count, 0), 14);
+    assert.equal(Object.values(payload.summary.regulatory_marketing).reduce((sum, count) => sum + count, 0), 14);
     assert.equal(typeof payload.summary.regulatory_health, 'object');
     assert.equal(payload.regulatory.every(row => row.source_health_grade), true);
     assert.equal(payload.regulatory.every(row => typeof row.source_health_counts === 'object'), true);
     assert.equal(payload.regulatory.every(row => row.sources.every(source => source.health_status)), true);
+    const staleRows = payload.regulatory.filter(row => row.sources.some(source => source.health_status === 'stale'));
+    assert.equal(staleRows.every(row => row.source_health_grade === 'blocked' || row.source_health_grade === 'partial'), true);
+    assert.equal(staleRows.every(row => row.marketing_recommendation !== 'Ready to market'), true);
     const regulatoryByCountry = Object.fromEntries(payload.regulatory.map(row => [row.country, row]));
-    assert.equal(regulatoryByCountry.US.launch_mode, 'live_auto');
-    assert.equal(regulatoryByCountry.US.source_health_grade, 'healthy');
-    assert.equal(regulatoryByCountry.US.marketing_recommendation, 'Ready to market');
     assert.equal(regulatoryByCountry.MX.launch_mode, 'live_monitor');
     assert.equal(regulatoryByCountry.MX.source_health_grade, 'monitor');
     assert.equal(regulatoryByCountry.MX.marketing_recommendation, 'Use with source caveat');
@@ -172,10 +176,9 @@ test('checked-in automation launch status is fresh enough for admin display', ()
     assert.equal(payload.summary.duty_rate_markets, 14);
     assert.equal(payload.summary.regulatory_sources, 14);
     assert.equal(typeof payload.summary.regulatory_health, 'object');
-    assert.equal(payload.summary.regulatory_health.healthy, 7);
-    assert.equal(payload.summary.regulatory_health.monitor, 7);
-    assert.equal(payload.summary.regulatory_marketing.ready_to_market, 7);
-    assert.equal(payload.summary.regulatory_marketing.source_caveat, 7);
+    assert.equal(Object.values(payload.summary.regulatory_health).reduce((sum, count) => sum + count, 0), 14);
+    assert.equal(Object.values(payload.summary.regulatory_marketing).reduce((sum, count) => sum + count, 0), 14);
+    assert.equal(payload.regulatory.filter(row => row.sources.some(source => source.health_status === 'stale')).every(row => row.marketing_recommendation !== 'Ready to market'), true);
     assert.equal(payload.summary.duty_rate_modes.live_monitor, 1);
     assert.equal(payload.summary.duty_rate_automation_stages.official_machine_sync, 8);
     assert.equal(payload.summary.duty_rate_automation_stages.official_hybrid_parser || 0, 0);

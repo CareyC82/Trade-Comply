@@ -39,19 +39,28 @@ function createFeedbackId() {
 
 function getClientIp(event) {
     const headers = event.headers || {};
+    const platformIp = event.requestContext?.identity?.sourceIp
+        || event.requestContext?.http?.sourceIp;
+    if (platformIp) return platformIp;
     const forwarded = headers['x-forwarded-for'] || headers['X-Forwarded-For'];
     if (typeof forwarded === 'string' && forwarded.trim()) {
         return forwarded.split(',')[0].trim();
     }
-    return event.requestContext?.identity?.sourceIp
-        || event.requestContext?.http?.sourceIp
-        || 'unknown';
+    return 'unknown';
 }
 
 function checkRateLimit(clientIp) {
     const key = clientIp || 'unknown';
     const now = Date.now();
     const recent = (rateLimitStore.get(key) || []).filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+    if (rateLimitStore.size > 1000) {
+        for (const [storedKey, times] of rateLimitStore) {
+            const active = times.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+            if (active.length) rateLimitStore.set(storedKey, active);
+            else rateLimitStore.delete(storedKey);
+        }
+    }
+    if (rateLimitStore.size >= 1000 && !rateLimitStore.has(key)) return false;
     if (recent.length >= RATE_LIMIT_MAX) {
         return false;
     }
@@ -368,8 +377,12 @@ async function uploadFeedbackToOss(record) {
 }
 
 async function storeFeedbackRecord(record) {
-    console.log('FEEDBACK_RECORD', JSON.stringify(record));
     const result = await uploadFeedbackToOss(record);
+    console.log('FEEDBACK_STORED', JSON.stringify({
+        feedback_id: record.feedback_id,
+        event_type: record.event_type,
+        storage: result.storage
+    }));
     return result;
 }
 

@@ -11,6 +11,7 @@ const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const POST_ENTRY_RATE_PRIORITY_MATRIX_PATH = path.join(ROOT, 'data', 'post-entry-rate-priority-matrix.json');
 const GLOBAL_CRAWL_HEALTH_PATH = path.join(ROOT, 'data', 'global-crawl-source-health.json');
 const INBOX_MANIFEST_PATH = path.join(ROOT, 'data', 'inbox', 'manifest.json');
+const MAX_SOURCE_HEALTH_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 function readJson(filePath, fallback = {}) {
     try {
@@ -159,9 +160,11 @@ function sourceHealthStatus(source, lookup) {
     const live = lookup.byId.get(source.id);
     const inbox = lookup.inboxSources[sourceManifestKey(source)];
     if (live) {
+        const fetchedAt = live.fetched_at || null;
+        const stale = fetchedAt && Date.now() - Date.parse(fetchedAt) > MAX_SOURCE_HEALTH_AGE_MS;
         return {
-            health_status: live.ok ? 'fetch_ok' : (live.optional ? 'optional_issue' : 'fetch_issue'),
-            last_fetch_at: live.fetched_at || null,
+            health_status: stale ? 'stale' : live.ok ? 'fetch_ok' : (live.optional ? 'optional_issue' : 'fetch_issue'),
+            last_fetch_at: fetchedAt,
             byte_length: live.byte_length || 0,
             error: live.error || '',
             transport: live.transport || live.method || '',
@@ -170,8 +173,9 @@ function sourceHealthStatus(source, lookup) {
         };
     }
     if (inbox?.fetched_at) {
+        const stale = Date.now() - Date.parse(inbox.fetched_at) > MAX_SOURCE_HEALTH_AGE_MS;
         return {
-            health_status: 'cached_ok',
+            health_status: stale ? 'stale' : 'cached_ok',
             last_fetch_at: inbox.fetched_at,
             byte_length: inbox.byte_length || 0,
             error: '',
@@ -200,8 +204,9 @@ function summarizeRegulatoryHealth(sources) {
     const monitorCount = counts.official_link_monitor || 0;
     const optionalIssueCount = counts.optional_issue || 0;
     const pendingCount = counts.pending_first_run || 0;
+    const staleCount = counts.stale || 0;
     let grade = 'pending';
-    if (blockingIssueCount > 0) {
+    if (blockingIssueCount > 0 || staleCount > 0) {
         grade = okCount > 0 ? 'partial' : 'blocked';
     } else if (monitorCount === sources.length && sources.length > 0) {
         grade = 'monitor';
@@ -693,6 +698,8 @@ module.exports = {
     dutyAutomationStage,
     buildDutyRateHealthBoard,
     buildEuUsSpecialProgramHealth,
+    sourceHealthStatus,
+    summarizeRegulatoryHealth,
     buildDutyAutomationPriority,
     buildWeeklyRoutePriorities
 };

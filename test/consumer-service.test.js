@@ -71,3 +71,45 @@ test('health makes missing production secrets explicit', () => {
     assert.equal(app.health().productionReady, false);
     assert.ok(app.health().warnings.length >= 1);
 });
+
+test('production refuses temporary session and file encryption keys', () => {
+    const previous = process.env.NODE_ENV;
+    const previousSessionSecret = process.env.CONSUMER_SESSION_SECRET;
+    const previousFileKey = process.env.CONSUMER_FILE_ENCRYPTION_KEY;
+    process.env.NODE_ENV = 'production';
+    delete process.env.CONSUMER_SESSION_SECRET;
+    delete process.env.CONSUMER_FILE_ENCRYPTION_KEY;
+    try {
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-consumer-test-'));
+        assert.throws(() => new ConsumerService({ root }), /Production requires/);
+    } finally {
+        if (previous === undefined) delete process.env.NODE_ENV;
+        else process.env.NODE_ENV = previous;
+        if (previousSessionSecret === undefined) delete process.env.CONSUMER_SESSION_SECRET;
+        else process.env.CONSUMER_SESSION_SECRET = previousSessionSecret;
+        if (previousFileKey === undefined) delete process.env.CONSUMER_FILE_ENCRYPTION_KEY;
+        else process.env.CONSUMER_FILE_ENCRYPTION_KEY = previousFileKey;
+    }
+});
+
+test('corrupt consumer database fails closed instead of becoming an empty database', () => {
+    const app = service();
+    fs.writeFileSync(app.databaseFile, '{not-json');
+    assert.throws(() => app.read(), /database is unreadable/i);
+    assert.throws(() => app.register('new@example.com', 'long-password-new'), /database is unreadable/i);
+});
+
+test('consumer database lock prevents concurrent writers from overwriting data', () => {
+    const app = service();
+    const first = app.register('first@example.com', 'long-password-one');
+    fs.writeFileSync(app.databaseLockFile, 'occupied');
+    try {
+        assert.throws(
+            () => app.saveAssessment(first.user.id, { productLabel: 'Smart watch' }),
+            /data is busy/i
+        );
+        assert.equal(app.listAssessments(first.user.id).length, 0);
+    } finally {
+        fs.unlinkSync(app.databaseLockFile);
+    }
+});

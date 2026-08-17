@@ -16,7 +16,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: global-compliance-pipeline
+  group: production-data-writers-main
   cancel-in-progress: false
 
 jobs:
@@ -54,6 +54,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
           git add \
             data/tags.json \
             data/cases.json \
@@ -68,6 +69,7 @@ jobs:
           fi
 
           git commit -m "auto-data: daily regulatory update [auto-publish]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
           git push
 
       - name: Create guardrail cleanup GitHub Issue

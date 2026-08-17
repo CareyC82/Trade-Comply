@@ -12,14 +12,56 @@ const { ConsumerService } = require('../lib/consumer-service');
 const PORT = Number(process.env.CONSUMER_PORT || 8790);
 const service = new ConsumerService();
 const rateBuckets = new Map();
+const PUBLIC_DIRECTORIES = new Set(['css', 'js']);
+const PUBLIC_LIB_FILES = new Set([
+    'actionable-checklist.js', 'can-i-sell-it.js', 'checklist-industry-segment.js', 'checklist.js',
+    'country-registry.js', 'deep-link.js', 'enterprise-print-report.js', 'eu-us-special-program.js',
+    'hscode-dual.js', 'industry-checklist-baseline.js', 'matched-results.js', 'post-entry-value.js',
+    'pre-screen-report.js', 'product-intelligence.js', 'tariff-watch.js', 'trade-country.js',
+    'trade-flow.js', 'trade-opportunity.js', 'wearable-product-models.js'
+]);
+const PUBLIC_ROOT_EXTENSIONS = new Set(['.svg', '.ico', '.png', '.jpg', '.jpeg', '.webp']);
+const PUBLIC_ROOT_FILES = new Set([
+    'can-i-sell-it.html', 'data-center.html', 'electronics.html', 'healthcare-lab.html',
+    'hscode.html', 'index.html', 'industrial-automation.html', 'new-energy.html',
+    'opportunity.html', 'post-entry-result.html', 'post-entry.html', 'semiconductor.html',
+    'tariff-watch.html', 'trade-flow.html', 'us-market.html', 'compliance-feedback-codec.js'
+]);
+const PUBLIC_DATA_FILES = new Set([
+    'cases.json', 'catalog.json', 'catalog.schema.json', 'categories.json',
+    'china-customs-sync-status.json', 'china-industry-flow.json', 'country-registry.json', 'coverage-matrix.json',
+    'country-checklist-baselines.json', 'duty-rate-sync-status.json', 'duty-rates.json', 'incoterms.json', 'knowledge-base.json',
+    'national-trade-flow-sync-status.json', 'post-entry-rate-priority-matrix.json',
+    'quick-actions.json', 'scope-keywords.json', 'tags.json', 'trade-flow.json', 'updates.json'
+]);
 
 function rateLimit(key, limit, windowMs) {
     const now = Date.now();
+    if (rateBuckets.size > 1000) {
+        for (const [bucketKey, times] of rateBuckets) {
+            const active = times.filter((time) => now - time < windowMs);
+            if (active.length) rateBuckets.set(bucketKey, active);
+            else rateBuckets.delete(bucketKey);
+        }
+    }
+    if (rateBuckets.size >= 1000 && !rateBuckets.has(key)) return false;
     const recent = (rateBuckets.get(key) || []).filter((time) => now - time < windowMs);
     if (recent.length >= limit) return false;
     recent.push(now);
     rateBuckets.set(key, recent);
     return true;
+}
+
+function isPublicPath(requested) {
+    const normalized = requested.replace(/^\/+/, '');
+    if (!normalized || normalized.split('/').some((part) => !part || part.startsWith('.'))) return false;
+    const parts = normalized.split('/');
+    if (parts.length === 1) {
+        return PUBLIC_ROOT_FILES.has(parts[0]) || PUBLIC_ROOT_EXTENSIONS.has(path.extname(parts[0]).toLowerCase());
+    }
+    if (parts[0] === 'data') return parts.length === 2 && PUBLIC_DATA_FILES.has(parts[1]);
+    if (parts[0] === 'lib') return parts.length === 2 && PUBLIC_LIB_FILES.has(parts[1]);
+    return PUBLIC_DIRECTORIES.has(parts[0]) && ['.js', '.css'].includes(path.extname(normalized).toLowerCase());
 }
 
 function cookie(req, name) {
@@ -114,7 +156,9 @@ async function api(req, res, url) {
 }
 
 function staticFile(req, res, url) {
+    if (!['GET', 'HEAD'].includes(req.method)) return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'GET, HEAD' });
     const requested = url.pathname === '/' ? '/can-i-sell-it.html' : url.pathname;
+    if (!isPublicPath(requested)) return json(res, 404, { ok: false, error: 'Not found.' });
     const target = path.resolve(ROOT, `.${requested}`);
     if (!target.startsWith(`${ROOT}${path.sep}`) || !fs.existsSync(target) || fs.statSync(target).isDirectory()) return json(res, 404, { ok: false, error: 'Not found.' });
     const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml' };
@@ -134,4 +178,4 @@ function createConsumerServer() {
     });
 }
 if (require.main === module) createConsumerServer().listen(PORT, '127.0.0.1', () => console.log(`Consumer app: http://127.0.0.1:${PORT}/can-i-sell-it.html`));
-module.exports = { createConsumerServer, service };
+module.exports = { createConsumerServer, service, isPublicPath };

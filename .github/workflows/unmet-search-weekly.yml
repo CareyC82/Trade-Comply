@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: production-data-writers-main
+  cancel-in-progress: false
+
 jobs:
   build-backlog:
     runs-on: ubuntu-latest
