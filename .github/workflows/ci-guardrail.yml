@@ -47,5 +47,8 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Consumer release readiness
+        run: npm run check:consumer-release
+
       - name: Search quality audit
         run: npm run audit:search-quality

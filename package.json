@@ -9,6 +9,7 @@
     "audit:search-quality": "node scripts/audit-search-quality.js",
     "audit:search-quality:report": "node scripts/audit-search-quality.js --write-report",
     "check:quality": "node scripts/build-quality-status.js",
+    "check:consumer-release": "node scripts/check-consumer-release-readiness.js",
     "build:automation-launch-status": "node scripts/build-automation-launch-status.js",
     "update:exact-tariff-parser-priorities": "node scripts/update-exact-tariff-parser-priorities.js",
     "check:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js && bash scripts/with-node.sh node scripts/build-catalog.js --check",

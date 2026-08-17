@@ -477,6 +477,20 @@ test('Batch 1 model priority avoids adjacent-category conflicts', () => {
     assert.equal(engine.detectProductType('Tablet computer supplied with a USB-C charger'), 'tablet');
 });
 
+test('common seller typos still resolve to the intended electronics model', () => {
+    const samples = {
+        bluetooth_speaker: 'Bluetooh speaker with USB charging',
+        wireless_microphone: 'Wirless lapel microphone set',
+        security_camera: 'Wi-Fi securty camera',
+        wireless_keyboard: 'Bluetooth keybord',
+        mini_projector: 'Portable projetor',
+        tablet: 'Android tabelt computer'
+    };
+    Object.entries(samples).forEach(([expected, description]) => {
+        assert.equal(engine.detectProductType(description), expected, description);
+    });
+});
+
 test('negative wired and battery descriptions do not trigger radio or lithium controls', () => {
     const profile = engine.extractProfile('Wired-only USB hub without battery, no wireless and no Bluetooth.');
     assert.equal(profile.productType, 'usb_hub');
@@ -503,15 +517,28 @@ test('Batch 1 attributes trigger radio, battery, mains and recording requirement
     assert.ok(camera.supplierRequest.items.some((item) => /Recording-feature disclosure/.test(item.document)));
 });
 
-test('Batch 1 Japan and Singapore results disclose limited product coverage', () => {
+test('Batch 1 Japan and Singapore upgrade only when maintained local requirements are linked', () => {
     const japan = engine.assess({ description: 'Wi-Fi tablet computer with rechargeable lithium battery', market: 'JP', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
     const singapore = engine.assess({ description: 'Bluetooth speaker with rechargeable lithium battery', market: 'SG', platform: 'TikTok Shop', assessmentMode: 'quick', blockingQuestionKeys: [] });
-    assert.equal(japan.coverage, 'limited');
-    assert.equal(singapore.coverage, 'limited');
-    assert.match(japan.marketCoverage.label, /Limited maintained coverage.*Japan/);
-    assert.match(singapore.marketCoverage.label, /Limited maintained coverage.*Singapore/);
+    const passiveHub = engine.assess({ description: 'Wired-only USB hub without battery or AC power', market: 'JP', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    assert.equal(japan.coverage, 'deep');
+    assert.equal(singapore.coverage, 'deep');
+    assert.equal(passiveHub.coverage, 'limited');
+    assert.match(japan.marketCoverage.label, /Maintained product coverage for Japan/);
+    assert.match(singapore.marketCoverage.label, /Maintained product coverage for Singapore/);
     assert.ok(japan.requirements.some((item) => item.id === 'jp_radio'));
     assert.ok(singapore.requirements.some((item) => item.id === 'sg_imda'));
+});
+
+test('Japan and Singapore camera or microphone checks link local privacy authorities', () => {
+    const japan = engine.assess({ description: 'Wi-Fi IP security camera with microphone and no battery', market: 'JP', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    const singapore = engine.assess({ description: 'Wi-Fi IP security camera with microphone and no battery', market: 'SG', platform: 'TikTok Shop', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    const jpPrivacy = japan.requirements.find((item) => item.id === 'privacy_features');
+    const sgPrivacy = singapore.requirements.find((item) => item.id === 'privacy_features');
+    assert.ok(jpPrivacy.sources.some((source) => /ppc\.go\.jp/.test(source.url)));
+    assert.ok(sgPrivacy.sources.some((source) => /pdpc\.gov\.sg/.test(source.url)));
+    assert.equal(japan.coverage, 'deep');
+    assert.equal(singapore.coverage, 'deep');
 });
 
 test('Batch 1 products expose seller-specific risk and supplier guidance', () => {
