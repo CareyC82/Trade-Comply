@@ -3,6 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const engine = require('../lib/can-i-sell-it');
+const models = require('../lib/wearable-product-models');
 
 function positiveEvidence(requirements) {
     return Object.fromEntries(engine.evidenceQuestionsForRequirements(requirements).map((question) => [
@@ -163,4 +164,41 @@ test('consumer product, market and channel matrix never reports a ready platform
     })));
 
     assert.equal(checked, 96);
+});
+
+test('all twenty-five maintained products stay market-separated across four sales channels', () => {
+    const products = models.listProducts().filter((product) => product.id !== 'wearable_other');
+    const markets = ['US', 'EU', 'JP', 'SG'];
+    const platforms = ['Amazon', 'TikTok Shop', 'Shopify / own store', 'Other marketplace'];
+    const forbiddenByMarket = {
+        US: new Set(['red', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety']),
+        EU: new Set(['fcc', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety']),
+        JP: new Set(['fcc', 'red', 'sg_imda', 'sg_safety']),
+        SG: new Set(['fcc', 'red', 'jp_radio', 'jp_pse'])
+    };
+    let checked = 0;
+
+    products.forEach((product) => markets.forEach((market) => platforms.forEach((platform) => {
+        const result = engine.assess({
+            description: product.label,
+            market,
+            platform,
+            attributes: { productType: product.id, ...(product.defaults || {}) },
+            assessmentMode: 'quick',
+            blockingQuestionKeys: []
+        });
+        assert.equal(result.coverageStatus.supported, true, `${product.id}/${market}/${platform}`);
+        assert.notEqual(result.sellerConclusion.code, 'not_enough_information', `${product.id}/${market}/${platform}`);
+        forbiddenByMarket[market].forEach((id) => {
+            assert.ok(!result.requirements.some((item) => item.id === id), `${product.id}/${market} leaked ${id}`);
+        });
+        const expectedPlatform = platform === 'Amazon' || platform === 'TikTok Shop'
+            ? 'evidence_needed'
+            : platform === 'Shopify / own store' ? 'ready' : 'policy_unknown';
+        assert.equal(result.platformGateDecision.code, expectedPlatform, `${product.id}/${market}/${platform}`);
+        assert.ok(result.productGuidance.risk && result.productGuidance.supplier, product.id);
+        checked += 1;
+    })));
+
+    assert.equal(checked, 400);
 });

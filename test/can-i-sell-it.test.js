@@ -473,6 +473,8 @@ test('Batch 1 model priority avoids adjacent-category conflicts', () => {
     assert.equal(engine.detectProductType('Bluetooth noise-cancelling earbuds'), 'earbuds');
     assert.equal(engine.detectProductType('Kindle e-reader tablet'), 'e_reader');
     assert.equal(engine.detectProductType('Bluetooth smart watch'), 'smart_watch');
+    assert.equal(engine.detectProductType('Wi-Fi IP security camera with an AC power adapter'), 'security_camera');
+    assert.equal(engine.detectProductType('Tablet computer supplied with a USB-C charger'), 'tablet');
 });
 
 test('negative wired and battery descriptions do not trigger radio or lithium controls', () => {
@@ -510,6 +512,34 @@ test('Batch 1 Japan and Singapore results disclose limited product coverage', ()
     assert.match(singapore.marketCoverage.label, /Limited maintained coverage.*Singapore/);
     assert.ok(japan.requirements.some((item) => item.id === 'jp_radio'));
     assert.ok(singapore.requirements.some((item) => item.id === 'sg_imda'));
+});
+
+test('Batch 1 products expose seller-specific risk and supplier guidance', () => {
+    const batchOne = [
+        'bluetooth_speaker', 'wireless_microphone', 'security_camera', 'wifi_router', 'smart_plug',
+        'smart_light', 'wireless_keyboard', 'wireless_mouse', 'gaming_controller', 'mini_projector',
+        'usb_hub', 'tablet', 'e_reader', 'portable_fan', 'electric_shaver'
+    ];
+    batchOne.forEach((productType) => {
+        const guidance = engine.guidanceForProduct(productType);
+        assert.ok(guidance.risk.length > 30, productType);
+        assert.match(guidance.supplier, /^Ask for /, productType);
+    });
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /What matters for this product\?/);
+    assert.match(script, /Ask the supplier:/);
+});
+
+test('official-source freshness reports current, overdue and missing metadata states', () => {
+    const current = engine.summarizeSourceFreshness([{ sources: [{ url: 'https://example.test/current', reviewedAt: '2026-08-17', confidence: 'official' }] }], Date.parse('2026-08-17'));
+    const stale = engine.summarizeSourceFreshness([{ sources: [{ url: 'https://example.test/stale', reviewedAt: '2024-01-01', confidence: 'official' }] }], Date.parse('2026-08-17'));
+    const missing = engine.summarizeSourceFreshness([{ sources: [{ url: 'https://example.test/missing', confidence: 'official' }] }], Date.parse('2026-08-17'));
+    assert.equal(current.status, 'current');
+    assert.equal(stale.status, 'review_overdue');
+    assert.equal(missing.status, 'review_metadata_missing');
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /Official-source maintenance/);
+    assert.match(script, /Source review overdue/);
 });
 
 test('Japan and Singapore screens attach local official requirements', () => {

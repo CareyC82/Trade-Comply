@@ -301,6 +301,14 @@ function bootstrapCanISellItPage() {
         const commercial = assessment.commercialConclusion;
         const platformDecision = assessment.platformDecision;
         const procurement = assessment.procurement;
+        const guidance = assessment.productGuidance || { risk: 'Confirm the exact model and enabled functions before relying on this result.', supplier: 'Ask for every exact-model document listed below.' };
+        const freshness = assessment.sourceFreshness || { status: 'no_linked_source', sourceCount: 0, staleCount: 0, reviewedThrough: null, confidenceLevels: [] };
+        const freshnessLabel = {
+            current: 'Current review metadata',
+            review_overdue: 'Source review overdue',
+            review_metadata_missing: 'Source metadata incomplete',
+            no_linked_source: 'No linked official source'
+        }[freshness.status] || 'Source review required';
         const commercialPanel = commercial.code === 'not_calculated' ? '' : `
             <section class="sell-commercial-answer sell-commercial-answer--${escapeHtml(commercial.code)}">
                 <div><span>Commercial viability</span><strong>${escapeHtml(commercial.answer)}</strong><h2>${escapeHtml(commercial.label)}</h2><p>${escapeHtml(commercial.reason)}</p></div>
@@ -341,6 +349,7 @@ function bootstrapCanISellItPage() {
                 <article><span>Sales channel</span><strong id="sell-summary-platform">${escapeHtml(currentInput.platform)}</strong></article>
                 <article><span>Can the battery be shipped?</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
+            <section class="sell-product-guidance"><span>What matters for this product?</span><h2>${escapeHtml(guidance.risk)}</h2><p><strong>Ask the supplier:</strong> ${escapeHtml(guidance.supplier)}</p></section>
             <section class="sell-decision-trace"><span>Why this result</span><ol>${assessment.decisionTrace.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></section>
             <section class="sell-supplier-request ${supplierRequest.complete ? 'sell-supplier-request--complete' : ''}">
                 <div><span>What documents should I ask the supplier for?</span><h2>${supplierRequest.complete ? 'No document follow-up identified' : `${supplierRequest.items.length} document request${supplierRequest.items.length === 1 ? '' : 's'} ready to send`}</h2><p>${supplierRequest.complete ? 'Keep the files with the exact-model purchase record.' : 'Use Improve accuracy below when the supplier replies.'}</p></div>
@@ -351,6 +360,7 @@ function bootstrapCanISellItPage() {
             ${commercialPanel}
             <section class="sell-review-cta"><div><span>Need a second look?</span><h2>Request a complimentary review</h2><p>Prepare a non-confidential summary, then review and send it yourself in your email app. Nothing is uploaded or sent automatically. If the email draft does not open, copy the request and email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><p id="sell-review-status" aria-live="polite"></p></section>
             <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
+                <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
                 ${economicsPanel}
                 <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
                 <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-grid">${requirementCards}</div></section>
