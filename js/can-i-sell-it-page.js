@@ -54,7 +54,7 @@ function bootstrapCanISellItPage() {
     };
 
     const attributeLabels = {
-        bluetooth: 'Bluetooth', wifi: 'Wi-Fi', cellular: 'Cellular / eSIM',
+        bluetooth: 'Bluetooth', wifi: 'Wi-Fi', cellular: 'Cellular / eSIM', radioTransmitter: 'Other radio / 2.4 GHz transmitter',
         battery: 'Rechargeable lithium battery', healthMonitoring: 'Health / biometric monitoring',
         medicalClaim: 'Medical claim', childUse: 'Designed for children', cameraMic: 'Camera / microphone',
         gps: 'GPS / location tracking', display: 'Screen / projected display',
@@ -64,16 +64,13 @@ function bootstrapCanISellItPage() {
 
     function quickQuestionKeys(profile, productType = profile.productType) {
         const material = engine.materialQuestionKeys(productType);
-        const priorities = productType === 'charger'
-            ? ['mainsPowered', 'wirelessCharging']
-            : productType === 'kids_gps_watch' || productType === 'kids_electronics'
-                ? ['childUse', 'cellular', 'cameraMic', 'battery']
-                : profile.healthMonitoring === true
-                    ? ['medicalClaim', 'battery', 'cellular', 'childUse']
-                    : ['battery', 'cellular', 'bluetooth', 'wifi', 'medicalClaim'];
+        const modelPriorities = models.getProduct(productType).priorityQuestions || [];
+        const priorities = profile.healthMonitoring === true
+            ? ['medicalClaim', ...modelPriorities, 'childUse']
+            : [...modelPriorities, 'childUse', 'medicalClaim'];
         const changesMaintainedResult = (key) => {
             if (key === 'cellular') return profile.bluetooth !== true && profile.wifi !== true;
-            return ['battery', 'medicalClaim', 'childUse', 'cameraMic', 'mainsPowered', 'bluetooth', 'wifi'].includes(key);
+            return ['battery', 'medicalClaim', 'childUse', 'cameraMic', 'mainsPowered', 'bluetooth', 'wifi', 'radioTransmitter'].includes(key);
         };
         return priorities
             .filter((key) => material.includes(key) && profile[key] === 'unknown' && changesMaintainedResult(key))
@@ -337,7 +334,7 @@ function bootstrapCanISellItPage() {
                     <p>${escapeHtml(procurement.reason)}</p>
                 </article>
             </section>
-            ${assessment.coverageStatus.supported ? '' : `<section class="sell-coverage-warning"><strong>${escapeHtml(assessment.coverageStatus.label)}</strong><p>${escapeHtml(assessment.coverageStatus.detail)}</p></section>`}
+            ${assessment.coverageStatus.supported && assessment.marketCoverage.level !== 'limited' ? '' : `<section class="sell-coverage-warning"><strong>${escapeHtml(assessment.marketCoverage.level === 'limited' ? assessment.marketCoverage.label : assessment.coverageStatus.label)}</strong><p>${escapeHtml(assessment.marketCoverage.level === 'limited' ? assessment.marketCoverage.detail : assessment.coverageStatus.detail)}</p></section>`}
             <div class="sell-answer-summary">
                 <article><span>Market</span><strong>${escapeHtml(currentInput.market)}</strong></article>
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>

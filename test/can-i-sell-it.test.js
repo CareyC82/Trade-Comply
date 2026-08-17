@@ -154,7 +154,7 @@ test('review CTA has a one-column mobile action layout without fixed-width overf
     assert.match(css, /\.sell-review-actions button,\s*\.sell-review-actions a\s*\{[^}]*width:\s*100%[^}]*box-sizing:\s*border-box/s);
 });
 
-test('consumer result matrix stays differentiated across ten products, four markets and four channels', () => {
+test('consumer result matrix stays differentiated across twenty-five products, four markets and four channels', () => {
     const products = engine.buildAssessmentMatrix();
     const channels = ['Amazon', 'TikTok Shop', 'Shopify / own store', 'Other marketplace'];
     const results = products.flatMap((entry) => channels.map((platform) => engine.assess({
@@ -165,7 +165,7 @@ test('consumer result matrix stays differentiated across ten products, four mark
         blockingQuestionKeys: [],
         attributes: { productType: entry.productType, childUse: entry.productType.startsWith('kids_') ? 'yes' : 'no' }
     })));
-    assert.equal(results.length, 160);
+    assert.equal(results.length, 400);
     assert.ok(results.every((result) => ['likely_eligible', 'conditional', 'high_risk'].includes(result.sellerConclusion.code)));
     assert.deepEqual(new Set(results.map((result) => result.platformDecision.code)), new Set(['evidence_needed', 'ready', 'policy_unknown', 'not_ready']));
 });
@@ -346,11 +346,11 @@ test('uploaded exact-model files can upgrade a supplier claim to document-match 
     assert.match(result.consumerConclusion.reason, /model-reference check/i);
 });
 
-test('assessment matrix covers ten products across all four deep markets', () => {
+test('assessment matrix covers twenty-five products across all four maintained markets', () => {
     const matrix = engine.buildAssessmentMatrix();
-    assert.equal(matrix.length, 40);
+    assert.equal(matrix.length, 100);
     assert.deepEqual(new Set(matrix.map((item) => item.market)), new Set(['US', 'EU', 'JP', 'SG']));
-    assert.equal(new Set(matrix.map((item) => item.productType)).size, 10);
+    assert.equal(new Set(matrix.map((item) => item.productType)).size, 25);
 
     const smartWatch = Object.fromEntries(matrix
         .filter((item) => item.productType === 'smart_watch')
@@ -434,7 +434,7 @@ test('distinguishes all six supported wearable product models', () => {
     Object.entries(samples).forEach(([expected, description]) => {
         assert.equal(engine.extractProfile(description).productType, expected);
     });
-    assert.equal(models.listProducts().filter((item) => item.id !== 'wearable_other').length, 10);
+    assert.equal(models.listProducts().filter((item) => item.id !== 'wearable_other').length, 25);
 });
 
 test('detects the four adjacent consumer-electronics categories', () => {
@@ -442,6 +442,74 @@ test('detects the four adjacent consumer-electronics categories', () => {
     assert.equal(engine.detectProductType('10000mAh power bank portable charger'), 'power_bank');
     assert.equal(engine.detectProductType('rechargeable LED facial beauty device'), 'beauty_device');
     assert.equal(engine.detectProductType("children's electronic camera"), 'kids_electronics');
+});
+
+test('Batch 1 electronics recognize common names and aliases', () => {
+    const samples = {
+        bluetooth_speaker: ['Bluetooth speaker', 'wireless portable speaker'],
+        wireless_microphone: ['wireless lavalier microphone', 'UHF wireless mic'],
+        security_camera: ['IP camera', 'CCTV camera'],
+        wifi_router: ['wireless router', 'mesh Wi-Fi'],
+        smart_plug: ['smart outlet', 'Wi-Fi plug'],
+        smart_light: ['smart LED bulb', 'Bluetooth LED light'],
+        wireless_keyboard: ['Bluetooth keyboard', '2.4GHz keyboard'],
+        wireless_mouse: ['wireless mouse', 'Bluetooth mouse'],
+        gaming_controller: ['game controller', 'wireless gamepad'],
+        mini_projector: ['pico projector', 'portable projector'],
+        usb_hub: ['USB hub', 'USB-C docking station'],
+        tablet: ['tablet computer', 'iPad'],
+        e_reader: ['e-book reader', 'Kindle'],
+        portable_fan: ['rechargeable handheld fan', 'USB desk fan'],
+        electric_shaver: ['electric razor', 'cordless beard trimmer']
+    };
+    Object.entries(samples).forEach(([expected, aliases]) => aliases.forEach((description) => {
+        assert.equal(engine.detectProductType(description), expected, description);
+    }));
+});
+
+test('Batch 1 model priority avoids adjacent-category conflicts', () => {
+    assert.equal(engine.detectProductType("children's Wi-Fi tablet computer"), 'kids_electronics');
+    assert.equal(engine.detectProductType('10000mAh portable charger power bank'), 'power_bank');
+    assert.equal(engine.detectProductType('Bluetooth noise-cancelling earbuds'), 'earbuds');
+    assert.equal(engine.detectProductType('Kindle e-reader tablet'), 'e_reader');
+    assert.equal(engine.detectProductType('Bluetooth smart watch'), 'smart_watch');
+});
+
+test('negative wired and battery descriptions do not trigger radio or lithium controls', () => {
+    const profile = engine.extractProfile('Wired-only USB hub without battery, no wireless and no Bluetooth.');
+    assert.equal(profile.productType, 'usb_hub');
+    assert.equal(profile.bluetooth, false);
+    assert.equal(profile.wifi, false);
+    assert.equal(profile.radioTransmitter, false);
+    assert.equal(profile.battery, false);
+    const requirements = engine.marketRequirements('US', profile);
+    assert.ok(!requirements.some((item) => item.id === 'fcc'));
+    assert.ok(!requirements.some((item) => item.id === 'battery'));
+});
+
+test('Batch 1 attributes trigger radio, battery, mains and recording requirements', () => {
+    const keyboard = engine.assess({ description: '2.4GHz wireless keyboard with rechargeable lithium battery', market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    assert.ok(keyboard.requirements.some((item) => item.id === 'fcc'));
+    assert.ok(keyboard.requirements.some((item) => item.id === 'battery'));
+
+    const plug = engine.assess({ description: 'Wi-Fi smart plug with 100-240V AC input and no battery', market: 'EU', platform: 'Shopify / own store', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    assert.ok(plug.requirements.some((item) => item.id === 'red'));
+    assert.ok(plug.requirements.some((item) => item.id === 'eu_electrical'));
+
+    const camera = engine.assess({ description: 'Wi-Fi IP security camera with microphone and no battery', market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    assert.ok(camera.requirements.some((item) => item.id === 'privacy_features'));
+    assert.ok(camera.supplierRequest.items.some((item) => /Recording-feature disclosure/.test(item.document)));
+});
+
+test('Batch 1 Japan and Singapore results disclose limited product coverage', () => {
+    const japan = engine.assess({ description: 'Wi-Fi tablet computer with rechargeable lithium battery', market: 'JP', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    const singapore = engine.assess({ description: 'Bluetooth speaker with rechargeable lithium battery', market: 'SG', platform: 'TikTok Shop', assessmentMode: 'quick', blockingQuestionKeys: [] });
+    assert.equal(japan.coverage, 'limited');
+    assert.equal(singapore.coverage, 'limited');
+    assert.match(japan.marketCoverage.label, /Limited maintained coverage.*Japan/);
+    assert.match(singapore.marketCoverage.label, /Limited maintained coverage.*Singapore/);
+    assert.ok(japan.requirements.some((item) => item.id === 'jp_radio'));
+    assert.ok(singapore.requirements.some((item) => item.id === 'sg_imda'));
 });
 
 test('Japan and Singapore screens attach local official requirements', () => {

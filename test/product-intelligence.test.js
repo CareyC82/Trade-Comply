@@ -178,6 +178,18 @@ describe('product intelligence', () => {
         assert.match(enhanced.query, /battery|encryption|bluetooth/i);
     });
 
+    it('expands new consumer-electronics aliases without adding a new regulatory vertical', () => {
+        [
+            'Bluetooth speaker', 'wireless microphone', 'smart plug', 'Bluetooth LED light',
+            'wireless keyboard', 'wireless mouse', 'gaming controller', 'USB-C docking station',
+            'Kindle e-reader', 'mini projector', 'rechargeable fan', 'electric shaver'
+        ].forEach((description) => {
+            const enhanced = buildEnhancedProductQuery(description);
+            assert.equal(enhanced.profile.vertical, 'electronics', description);
+            assert.match(enhanced.query, /consumer electronics|computer peripheral/i, description);
+        });
+    });
+
     it('merges inferred precheck selections without requiring manual checkbox input', () => {
         const prepared = prepareIntelligentSearch('drone with encrypted video link and lithium battery', [], FACTORS);
         assert.ok(prepared.selections.some((item) => item.id === 'uav'));
