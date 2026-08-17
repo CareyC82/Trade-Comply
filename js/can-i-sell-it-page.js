@@ -324,18 +324,20 @@ function bootstrapCanISellItPage() {
                 status.textContent = 'Copied. You can paste this into email or supplier chat.';
             }
         });
-        const reviewText = `Complimentary review request\n\nProduct: ${currentInput.description}\nMade in: ${currentInput.origin}\nTarget market: ${currentInput.market}\nSales channel: ${currentInput.platform}\nPreliminary result: ${sellerConclusion.label}\n\nThis summary intentionally excludes supplier identity, pricing and uploaded files.`;
-        const reviewEmail = 'carey@tracewize.com';
-        const reviewSubject = `Complimentary product review: ${assessment.product.label}`;
+        const reviewContact = engine.buildReviewContact({
+            ...currentInput,
+            productLabel: assessment.product.label,
+            resultLabel: sellerConclusion.label
+        });
         const reviewEmailLink = document.getElementById('sell-open-review-email');
-        if (reviewEmailLink) reviewEmailLink.href = `mailto:${reviewEmail}?subject=${encodeURIComponent(reviewSubject)}&body=${encodeURIComponent(reviewText)}`;
+        if (reviewEmailLink) reviewEmailLink.href = reviewContact.mailto;
         document.getElementById('sell-copy-review-request')?.addEventListener('click', async () => {
             const status = document.getElementById('sell-review-status');
             try {
-                await navigator.clipboard.writeText(reviewText);
-                status.textContent = `Copied. Review it, then send it yourself to ${reviewEmail}.`;
+                await navigator.clipboard.writeText(reviewContact.text);
+                status.textContent = `Copied. Review it, then send it yourself to ${reviewContact.email}.`;
             } catch {
-                status.textContent = `Copy is unavailable in this browser. No information was sent; email ${reviewEmail} manually.`;
+                status.textContent = `Copy is unavailable in this browser. No information was sent; email ${reviewContact.email} manually.`;
             }
         });
         document.getElementById('sell-result-platform')?.addEventListener('change', (event) => {

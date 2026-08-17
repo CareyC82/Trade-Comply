@@ -107,17 +107,62 @@ test('seller conclusion uses four bounded result states and warns outside initia
     assert.match(unsupported.disclaimer, /not customs or legal advice/i);
 });
 
+test('non-electronic launch exclusions never inherit an electronics sellability result', () => {
+    ['cotton summer dress', 'red lipstick cosmetic', 'wooden toy building blocks'].forEach((description) => {
+        const result = engine.assess({ description, market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
+        assert.equal(result.coverageStatus.supported, false, description);
+        assert.equal(result.coverageStatus.code, 'outside_initial_scope', description);
+        assert.equal(result.sellerConclusion.code, 'not_enough_information', description);
+        assert.match(result.coverageStatus.detail, /outside the current electronics and smart-device models/i);
+    });
+});
+
 test('complimentary review CTA copies only a non-confidential local summary', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
     assert.match(script, /Request a complimentary review/);
     assert.match(script, /Nothing is uploaded or sent automatically/);
-    assert.match(script, /intentionally excludes supplier identity, pricing and uploaded files/);
+    const library = fs.readFileSync(path.join(__dirname, '..', 'lib', 'can-i-sell-it.js'), 'utf8');
+    assert.match(library, /intentionally excludes supplier identity, pricing and uploaded files/);
     assert.match(script, /carey@tracewize\.com/);
     assert.match(script, /mailto:/);
-    assert.match(script, /subject=\$\{encodeURIComponent\(reviewSubject\)\}/);
-    assert.match(script, /body=\$\{encodeURIComponent\(reviewText\)\}/);
+    assert.match(script, /reviewContact\.mailto/);
     assert.match(script, /review and send it yourself in your email app/i);
     assert.doesNotMatch(script, /api\(['"]\/review/);
+});
+
+test('complimentary review contact is local, encoded and inspectable before sending', () => {
+    const contact = engine.buildReviewContact({
+        description: 'Bluetooth watch & charger', origin: 'CN', market: 'US',
+        platform: 'Amazon', productLabel: 'Smart watch', resultLabel: 'Conditional — evidence required'
+    });
+    assert.equal(contact.email, 'carey@tracewize.com');
+    assert.match(contact.mailto, /^mailto:carey@tracewize\.com\?subject=/);
+    assert.match(contact.mailto, /&body=/);
+    assert.equal(decodeURIComponent(contact.mailto.split('&body=')[1]), contact.text);
+    assert.match(contact.text, /intentionally excludes supplier identity, pricing and uploaded files/);
+});
+
+test('review CTA has a one-column mobile action layout without fixed-width overflow', () => {
+    const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
+    assert.match(css, /\.sell-review-actions\s*\{[^}]*display:\s*flex[^}]*flex-wrap:\s*wrap/s);
+    assert.match(css, /@media\s*\(max-width:\s*760px\)[\s\S]*\.sell-review-actions\s*\{[^}]*grid-template-columns:\s*1fr/s);
+    assert.match(css, /\.sell-review-actions button,\s*\.sell-review-actions a\s*\{[^}]*width:\s*100%[^}]*box-sizing:\s*border-box/s);
+});
+
+test('consumer result matrix stays differentiated across ten products, four markets and four channels', () => {
+    const products = engine.buildAssessmentMatrix();
+    const channels = ['Amazon', 'TikTok Shop', 'Shopify / own store', 'Other marketplace'];
+    const results = products.flatMap((entry) => channels.map((platform) => engine.assess({
+        description: entry.label,
+        market: entry.market,
+        platform,
+        assessmentMode: 'quick',
+        blockingQuestionKeys: [],
+        attributes: { productType: entry.productType, childUse: entry.productType.startsWith('kids_') ? 'yes' : 'no' }
+    })));
+    assert.equal(results.length, 160);
+    assert.ok(results.every((result) => ['likely_eligible', 'conditional', 'high_risk'].includes(result.sellerConclusion.code)));
+    assert.deepEqual(new Set(results.map((result) => result.platformDecision.code)), new Set(['evidence_needed', 'ready', 'policy_unknown', 'not_ready']));
 });
 
 test('known wireless and battery requirements lead the preliminary result before unanswered facts', () => {

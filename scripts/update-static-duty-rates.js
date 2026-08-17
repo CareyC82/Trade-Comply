@@ -255,15 +255,28 @@ function buildOfficialArtifactEvidence({
 
 function parseIndiaTariffRows(html = '') {
     const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    let headerMap = null;
     const tableRows = rowMatches.map((rowHtml) => {
         const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
-        const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
+        if (cells.some(cell => /tariff item|hsn|cth|hs code/i.test(cell)) && cells.some(cell => /BCD|basic customs duty|basic duty/i.test(cell))) {
+            headerMap = {
+                hs: cells.findIndex(cell => /tariff item|hsn|cth|hs code/i.test(cell)),
+                description: cells.findIndex(cell => /description|goods/i.test(cell)),
+                bcd: cells.findIndex(cell => /BCD|basic customs duty|basic duty/i.test(cell)),
+                sws: cells.findIndex(cell => /SWS|social welfare/i.test(cell)),
+                igst: cells.findIndex(cell => /IGST|integrated tax/i.test(cell))
+            };
+            return null;
+        }
+        const hsCell = headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => /\b\d{6,10}\b/.test(cell));
+        const hsCode = hsCell?.match(/\b\d{6,10}\b/)?.[0] || '';
         if (!hsCode) return null;
-        const bcdCell = cells.find(cell => /BCD|basic customs duty|basic duty/i.test(cell))
+        const bcdCell = (headerMap?.bcd >= 0 ? cells[headerMap.bcd] : '')
+            || cells.find(cell => /BCD|basic customs duty|basic duty/i.test(cell))
             || cells.find(cell => /\d+(?:\.\d+)?\s*%|nil|free|exempt/i.test(cell))
             || '';
-        const swsCell = cells.find(cell => /SWS|social welfare/i.test(cell)) || '';
-        const igstCell = cells.find(cell => /IGST|integrated tax/i.test(cell)) || '';
+        const swsCell = (headerMap?.sws >= 0 ? cells[headerMap.sws] : '') || cells.find(cell => /SWS|social welfare/i.test(cell)) || '';
+        const igstCell = (headerMap?.igst >= 0 ? cells[headerMap.igst] : '') || cells.find(cell => /IGST|integrated tax/i.test(cell)) || '';
         const bcdRate = parsePercent(bcdCell);
         const swsRate = parsePercent(swsCell);
         const igstRate = parsePercent(igstCell);
@@ -271,7 +284,7 @@ function parseIndiaTariffRows(html = '') {
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: cells.find(cell => cell !== hsCode && cell !== bcdCell && cell !== swsCell && cell !== igstCell) || '',
+            item_name: (headerMap?.description >= 0 ? cells[headerMap.description] : '') || cells.find(cell => cell !== hsCell && cell !== bcdCell && cell !== swsCell && cell !== igstCell) || '',
             bcd_rate_text: bcdCell,
             sws_rate_text: swsCell,
             igst_rate_text: igstCell,
@@ -342,9 +355,9 @@ function parseIndiaOfficialJsonRows(value = '') {
             || row.tariff_item
             || ''
         ).replace(/\D/g, '');
-        const bcdText = String(row.bcd || row.bcdRate || row.bcd_rate || row.basicCustomsDuty || row.basic_duty || '');
+        const bcdText = String(row.bcd || row.bcdRate || row.bcd_rate || row.basicCustomsDuty || row.basic_duty || row.bcdDuty || row.basicCustomDutyRate || '');
         const swsText = String(row.sws || row.swsRate || row.sws_rate || row.socialWelfareSurcharge || '');
-        const igstText = String(row.igst || row.igstRate || row.igst_rate || row.integratedTax || '');
+        const igstText = String(row.igst || row.igstRate || row.igst_rate || row.integratedTax || row.igstDuty || '');
         const bcdRate = parsePercent(bcdText);
         if (!/^\d{6,10}$/.test(hsCode) || bcdRate === null) return null;
         return {

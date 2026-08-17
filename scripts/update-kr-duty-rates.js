@@ -208,14 +208,14 @@ function parseKoreaOfficialJsonRows(value = '') {
     collectArrays(payload);
     const rows = arrays.flat();
     return rows.map((row) => {
-        const hsCode = String(row.hsCode || row.hs_code || row.hsCd || row.hscode || '').replace(/\D/g, '');
-        const rateText = row.taxRate || row.tax_rate || row.base_rate || row.rate || row.aplDtyRt || '';
+        const hsCode = String(row.hsCode || row.hs_code || row.hsCd || row.hscode || row.hsSgn || row.hskNo || row.hscode10 || '').replace(/\D/g, '');
+        const rateText = row.taxRate || row.tax_rate || row.base_rate || row.rate || row.aplDtyRt || row.basRt || row.basicRate || row.wtoRate || '';
         const parsedRate = parseKoreaAdValoremRate(rateText);
         if (!hsCode || parsedRate === null) return null;
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: row.goodsName || row.goods_name || row.itemName || row.prnm || '',
+            item_name: row.goodsName || row.goods_name || row.itemName || row.prnm || row.korPrnm || row.engPrnm || '',
             base_rate_text: String(rateText),
             parsed_base_rate: parsedRate
         };

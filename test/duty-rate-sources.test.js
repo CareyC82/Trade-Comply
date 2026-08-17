@@ -1736,3 +1736,25 @@ test('official tariff artifact evidence hashes complete source bodies and blocks
     assert.equal(complete.filing_grade_eligible, true);
     assert.equal(partial.filing_grade_eligible, false);
 });
+
+test('India official parser maps named BCD SWS and IGST columns from a source fixture', () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'india-customs-tariff-table.html'), 'utf8');
+    const rows = parseIndiaTariffRows(fixture);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+        hs_code: '85171300', hs_prefix: '851713', item_name: 'Smartphones',
+        bcd_rate_text: '10%', sws_rate_text: '10%', igst_rate_text: '18%',
+        bcd_rate: 0.1, sws_rate: 0.1, igst_rate: 0.18
+    });
+});
+
+test('Korea official parser accepts tariff API field aliases from a source fixture', () => {
+    const rows = parseKoreaOfficialJsonRows({ response: { body: { items: [
+        { hskNo: '8517130000', engPrnm: 'Smartphones', basRt: '0%' },
+        { hsSgn: '8507600000', engPrnm: 'Lithium-ion accumulators', wtoRate: '8%' }
+    ] } } });
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].hs_code, '8517130000');
+    assert.equal(rows[0].parsed_base_rate, 0);
+    assert.equal(rows[0].item_name, 'Smartphones');
+});
