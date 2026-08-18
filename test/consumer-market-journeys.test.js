@@ -121,6 +121,44 @@ test('a parsed model mismatch blocks otherwise positive supplier claims', () => 
     assert.ok(result.decisionTrace.some((step) => /1 mismatched/.test(step)));
 });
 
+test('expired and wrong-market supplier files fail closed', () => {
+    const base = {
+        description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.',
+        market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { productType: 'smart_watch', bluetooth: 'yes', battery: 'yes', medicalClaim: 'no', childUse: 'no' },
+        evidenceAnswers: {
+            fccGrant: { label: 'FCC ID / Grant', value: 'yes' },
+            rfExposure: { label: 'RF exposure / SAR evidence', value: 'yes' },
+            batteryTransport: { label: 'UN38.3 test summary', value: 'yes' }
+        }
+    };
+    const expired = engine.assess({ ...base, supplierEvidence: {
+        requiredModel: 'SW-100',
+        files: [{
+            name: 'FCC-report.pdf', type: 'application/pdf', status: 'parsed',
+            parsing: {
+                model: 'SW-100', modelMatch: true, manufacturer: 'Example Labs', reportNumber: 'FCC-1',
+                reportDate: '2020-01-01', expiryDate: '2021-01-01', documentKind: 'FCC', missingFields: []
+            }
+        }]
+    } });
+    assert.equal(expired.consumerConclusion.code, 'not_yet');
+    assert.match(expired.consumerConclusion.reason, /expired/i);
+
+    const wrongMarket = engine.assess({ ...base, supplierEvidence: {
+        requiredModel: 'SW-100',
+        files: [{
+            name: 'RED-report.pdf', type: 'application/pdf', status: 'parsed',
+            parsing: {
+                model: 'SW-100', modelMatch: true, manufacturer: 'Example Labs', reportNumber: 'RED-1',
+                reportDate: '2026-08-01', documentKind: 'CE / RED', missingFields: []
+            }
+        }]
+    } });
+    assert.equal(wrongMarket.consumerConclusion.code, 'not_yet');
+    assert.match(wrongMarket.consumerConclusion.reason, /not applicable to US/i);
+});
+
 test('consumer product, market and channel matrix never reports a ready platform when market access is blocked', () => {
     const products = [
         { description: 'Bluetooth smart watch with rechargeable lithium battery. No medical claims.', attributes: { productType: 'smart_watch', bluetooth: 'yes', battery: 'yes', medicalClaim: 'no', childUse: 'no' } },

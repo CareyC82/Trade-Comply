@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { ConsumerService, detectType, extractFields } = require('../lib/consumer-service');
+const { ConsumerService, MAX_FILES_PER_ACCOUNT, detectType, extractFields } = require('../lib/consumer-service');
 
 function service() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-consumer-test-'));
@@ -39,6 +39,28 @@ test('active PDF content is rejected', () => {
     const owner = app.register('owner@example.com', 'long-password-owner').user;
     const pdf = Buffer.from('%PDF-1.4\n/JavaScript (alert)');
     assert.throws(() => app.saveFile(owner.id, { name: 'active.pdf', type: 'application/pdf', data: pdf.toString('base64') }), /Active or embedded/);
+});
+
+test('malformed Base64 is rejected before a private file is created', () => {
+    const app = service();
+    const owner = app.register('owner@example.com', 'long-password-owner').user;
+    assert.throws(() => app.saveFile(owner.id, {
+        name: 'fake.pdf', type: 'application/pdf', data: '%%%not-base64%%%'
+    }), /valid Base64/);
+    assert.equal(app.listFiles(owner.id).length, 0);
+});
+
+test('private workspace applies a bounded active-file quota', () => {
+    const app = service();
+    const owner = app.register('owner@example.com', 'long-password-owner').user;
+    const pdf = Buffer.from('%PDF-1.4\nfixture\n%%EOF').toString('base64');
+    for (let index = 0; index < MAX_FILES_PER_ACCOUNT; index += 1) {
+        app.saveFile(owner.id, { name: `report-${index}.pdf`, type: 'application/pdf', data: pdf });
+    }
+    assert.throws(() => app.saveFile(owner.id, {
+        name: 'one-too-many.pdf', type: 'application/pdf', data: pdf
+    }), /Delete an existing file/);
+    assert.equal(app.listFiles(owner.id).length, MAX_FILES_PER_ACCOUNT);
 });
 
 test('document extraction reports exact-model mismatches', () => {

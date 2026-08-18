@@ -54,6 +54,9 @@ function bootstrapCanISellItPage() {
     let currentUser = null;
     let history = [];
     let uploadedFiles = [];
+    const MAX_UPLOAD_FILES = 5;
+    const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+    const ALLOWED_UPLOAD_TYPES = new Set(['application/pdf', 'image/png', 'image/jpeg', 'image/webp']);
 
     const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -435,7 +438,7 @@ function bootstrapCanISellItPage() {
         });
         const reviewContact = engine.buildReviewContact({
             ...currentInput,
-            productLabel: assessment.product.label,
+            productLabel: assessment.coverageStatus.supported ? assessment.product.label : currentInput.description,
             resultLabel: sellerConclusion.label
         });
         const reviewEmailLink = document.getElementById('sell-open-review-email');
@@ -576,6 +579,16 @@ function bootstrapCanISellItPage() {
         const costs = Object.fromEntries(costKeys.map((key) => [key, data.get(key)]));
         uploadedFiles = [];
         const sourceFiles = Array.from(evidenceFiles.files || []);
+        const uploadProblems = [];
+        if (sourceFiles.length > MAX_UPLOAD_FILES) uploadProblems.push(`Choose no more than ${MAX_UPLOAD_FILES} files at a time.`);
+        sourceFiles.forEach((file) => {
+            if (file.size > MAX_UPLOAD_BYTES) uploadProblems.push(`${file.name} is larger than 10 MB.`);
+            if (!ALLOWED_UPLOAD_TYPES.has(file.type)) uploadProblems.push(`${file.name} is not a supported PDF, PNG, JPEG or WebP file.`);
+        });
+        if (uploadProblems.length) {
+            evidencePreview.innerHTML = uploadProblems.map((message) => `<span class="sell-evidence-error">${escapeHtml(message)}</span>`).join('');
+            return;
+        }
         if (sourceFiles.length && !currentUser) {
             accountMessage.textContent = 'Sign in to upload and parse supplier evidence. The assessment can continue without the files.';
         } else if (sourceFiles.length) {
@@ -648,7 +661,14 @@ function bootstrapCanISellItPage() {
 
     evidenceFiles.addEventListener('change', () => {
         const files = Array.from(evidenceFiles.files || []);
-        evidencePreview.innerHTML = files.length
+        const problems = files.length > MAX_UPLOAD_FILES ? [`Choose no more than ${MAX_UPLOAD_FILES} files at a time.`] : [];
+        files.forEach((file) => {
+            if (file.size > MAX_UPLOAD_BYTES) problems.push(`${file.name} is larger than 10 MB.`);
+            if (!ALLOWED_UPLOAD_TYPES.has(file.type)) problems.push(`${file.name} is not a supported PDF, PNG, JPEG or WebP file.`);
+        });
+        evidencePreview.innerHTML = problems.length
+            ? problems.map((message) => `<span class="sell-evidence-error">${escapeHtml(message)}</span>`).join('')
+            : files.length
             ? files.map((file) => `<span>${escapeHtml(file.name)} · ${(file.size / 1024).toFixed(1)} KB · pending verification</span>`).join('')
             : '';
     });

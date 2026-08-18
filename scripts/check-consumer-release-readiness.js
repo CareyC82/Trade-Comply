@@ -52,7 +52,10 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
         ['unsupported coverage exit', unsupported.sellerConclusion.code === 'not_enough_information' && unsupported.marketCoverage.level === 'unsupported'],
         ['manual email CTA', /reviewContact\.mailto/.test(page) && /Copy request/.test(page)],
         ['local supplier-request download', /sell-download-supplier-request/.test(page) && /URL\.createObjectURL/.test(page)],
-        ['private API fallback', /Private workspace server is unavailable/.test(page)]
+        ['private API fallback', /Private workspace server is unavailable/.test(page)],
+        ['visible upload limits', /up to 5 files, 10 MB each/i.test(html)],
+        ['client upload count guard', /MAX_UPLOAD_FILES\s*=\s*5/.test(page)],
+        ['client upload size guard', /MAX_UPLOAD_BYTES\s*=\s*10\s*\*\s*1024\s*\*\s*1024/.test(page)]
     ].forEach(([label, valid]) => { if (!valid) errors.push(`UI contract missing: ${label}.`); });
 
     return { ok: errors.length === 0, errors, productCount: products.length, sourceCount: Object.keys(models.sources).length };

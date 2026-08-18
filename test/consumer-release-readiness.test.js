@@ -12,6 +12,11 @@ test('consumer release gate validates products, official-source metadata and mob
     assert.ok(result.sourceCount >= 17);
 });
 
+test('release UI advertises and enforces bounded evidence uploads', () => {
+    const result = runConsumerReleaseReadiness({ now: Date.parse('2026-08-17') });
+    assert.equal(result.ok, true, result.errors.join('\n'));
+});
+
 test('release gate rejects overdue official-source reviews', () => {
     const result = runConsumerReleaseReadiness({ now: Date.parse('2028-08-17') });
     assert.equal(result.ok, false);
