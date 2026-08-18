@@ -50,5 +50,11 @@ jobs:
       - name: Consumer release readiness
         run: npm run check:consumer-release
 
+      - name: Install Chromium for consumer journeys
+        run: npx playwright install --with-deps chromium
+
+      - name: Consumer browser journeys
+        run: npm run test:consumer-browser
+
       - name: Search quality audit
         run: npm run audit:search-quality

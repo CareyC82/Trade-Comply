@@ -8,11 +8,12 @@ Run before every consumer release:
 
 ```bash
 npm run check:consumer-release
+npm run test:consumer-browser
 npm test
 git diff --check
 ```
 
-The gate verifies maintained-product count, official-source metadata and review age, US/EU/JP/SG rule separation, unsupported-product safe exits, mobile result layout, private-workspace fallback, local review-request behavior, supplier-request downloads, and client evidence-upload limits.
+The gate verifies maintained-product count, official-source metadata and review age, US/EU/JP/SG rule separation, unsupported-product safe exits, mobile result layout, private-workspace fallback, local review-request behavior, supplier-request downloads, parser-health messaging, and client evidence-upload limits. Playwright runs the supported-product, channel-switch, unsupported-product, upload-error, private-server-failure and 390 px mobile journeys in Chromium.
 
 ## Product regression
 
@@ -29,6 +30,15 @@ The gate verifies maintained-product count, official-source metadata and review 
 - Keep files encrypted at rest, scoped to the signed-in user, and delete them at retention expiry or account deletion.
 - Parsing success is not document verification. Exact model, document kind, market applicability, holder, required fields, and dates remain separate checks.
 - Model mismatch, expired evidence, wrong-market evidence, unreadable files, parser failure, and parser unavailability must all fail closed.
+- FCC, UN38.3, CE/RED, PSE and IMDA files have document-type-specific required fields; a generic parse is not sufficient.
+
+## Storage integrity
+
+- Every database update creates an atomic last-good backup snapshot.
+- A schema-valid last-good snapshot can explicitly restore an unreadable primary database before service recovery.
+- Startup audits remove orphan encrypted blobs, records with missing blobs and duplicate same-user file hashes.
+- Re-uploading the exact same file is rejected before a second encrypted blob is written.
+- `/api/consumer/health` reports parser executability, storage consistency and backup validity without exposing secrets or private filenames.
 
 ## Manual browser verification
 

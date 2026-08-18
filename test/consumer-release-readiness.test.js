@@ -17,6 +17,11 @@ test('release UI advertises and enforces bounded evidence uploads', () => {
     assert.equal(result.ok, true, result.errors.join('\n'));
 });
 
+test('release UI exposes parser health and a non-overlapping mobile dock contract', () => {
+    const result = runConsumerReleaseReadiness({ now: Date.parse('2026-08-17') });
+    assert.equal(result.ok, true, result.errors.join('\n'));
+});
+
 test('release gate rejects overdue official-source reviews', () => {
     const result = runConsumerReleaseReadiness({ now: Date.parse('2028-08-17') });
     assert.equal(result.ok, false);

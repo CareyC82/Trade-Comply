@@ -253,6 +253,21 @@ function bootstrapCanISellItPage() {
         await loadHistory();
     }
 
+    async function refreshWorkspaceHealth() {
+        const panel = document.getElementById('sell-workspace-health');
+        if (!panel) return;
+        const health = await api('/health');
+        const unavailable = [
+            !health.parsers?.pdf?.available && 'PDF verification',
+            !health.parsers?.image?.available && 'image OCR'
+        ].filter(Boolean);
+        panel.hidden = unavailable.length === 0;
+        panel.classList.toggle('sell-evidence-error', unavailable.length > 0);
+        panel.textContent = unavailable.length
+            ? `${unavailable.join(' and ')} ${unavailable.length === 1 ? 'is' : 'are'} unavailable. You can still use the preliminary assessment, but uploaded files will not be approved until the server parser is restored.`
+            : '';
+    }
+
     async function loadHistory() {
         history = currentUser ? (await api('/assessments')).assessments : [];
         renderHistory();
@@ -716,7 +731,7 @@ function bootstrapCanISellItPage() {
         await api('/account', { method: 'DELETE' }); accountMessage.textContent = 'Your account and private data were deleted.'; await refreshSession();
     });
 
-    refreshSession().catch(() => {
+    Promise.all([refreshSession(), refreshWorkspaceHealth()]).catch(() => {
         accountMessage.textContent = 'Private workspace server is unavailable. Start it with npm run dev:consumer.';
         renderHistory();
     });

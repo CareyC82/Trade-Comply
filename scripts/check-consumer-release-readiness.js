@@ -55,7 +55,9 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
         ['private API fallback', /Private workspace server is unavailable/.test(page)],
         ['visible upload limits', /up to 5 files, 10 MB each/i.test(html)],
         ['client upload count guard', /MAX_UPLOAD_FILES\s*=\s*5/.test(page)],
-        ['client upload size guard', /MAX_UPLOAD_BYTES\s*=\s*10\s*\*\s*1024\s*\*\s*1024/.test(page)]
+        ['client upload size guard', /MAX_UPLOAD_BYTES\s*=\s*10\s*\*\s*1024\s*\*\s*1024/.test(page)],
+        ['parser health warning', /refreshWorkspaceHealth/.test(page) && /uploaded files will not be approved/.test(page)],
+        ['mobile dock avoids wrapped overlay', /\.bottom-nav\s*\{[^}]*flex-wrap:\s*nowrap/s.test(css)]
     ].forEach(([label, valid]) => { if (!valid) errors.push(`UI contract missing: ${label}.`); });
 
     return { ok: errors.length === 0, errors, productCount: products.length, sourceCount: Object.keys(models.sources).length };

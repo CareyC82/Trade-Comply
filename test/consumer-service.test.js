@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { ConsumerService, MAX_FILES_PER_ACCOUNT, detectType, extractFields } = require('../lib/consumer-service');
+const { ConsumerService, MAX_FILES_PER_ACCOUNT, detectType, executableStatus, extractFields } = require('../lib/consumer-service');
 
 function service() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-consumer-test-'));
@@ -53,14 +53,24 @@ test('malformed Base64 is rejected before a private file is created', () => {
 test('private workspace applies a bounded active-file quota', () => {
     const app = service();
     const owner = app.register('owner@example.com', 'long-password-owner').user;
-    const pdf = Buffer.from('%PDF-1.4\nfixture\n%%EOF').toString('base64');
     for (let index = 0; index < MAX_FILES_PER_ACCOUNT; index += 1) {
+        const pdf = Buffer.from(`%PDF-1.4\nfixture-${index}\n%%EOF`).toString('base64');
         app.saveFile(owner.id, { name: `report-${index}.pdf`, type: 'application/pdf', data: pdf });
     }
     assert.throws(() => app.saveFile(owner.id, {
-        name: 'one-too-many.pdf', type: 'application/pdf', data: pdf
+        name: 'one-too-many.pdf', type: 'application/pdf', data: Buffer.from('%PDF-1.4\none-more\n%%EOF').toString('base64')
     }), /Delete an existing file/);
     assert.equal(app.listFiles(owner.id).length, MAX_FILES_PER_ACCOUNT);
+});
+
+test('duplicate private evidence is rejected without creating another encrypted blob', () => {
+    const app = service();
+    const owner = app.register('owner@example.com', 'long-password-owner').user;
+    const pdf = Buffer.from('%PDF-1.4\nsame-file\n%%EOF').toString('base64');
+    app.saveFile(owner.id, { name: 'first.pdf', type: 'application/pdf', data: pdf });
+    assert.throws(() => app.saveFile(owner.id, { name: 'copy.pdf', type: 'application/pdf', data: pdf }), /already stored/);
+    assert.equal(app.listFiles(owner.id).length, 1);
+    assert.equal(fs.readdirSync(app.fileRoot).length, 1);
 });
 
 test('document extraction reports exact-model mismatches', () => {
@@ -89,6 +99,25 @@ test('UN38.3 extraction recognizes its standard and exact battery-model requirem
     assert.equal(parsed.modelMatch, true);
     assert.match(parsed.standards.join(' '), /UN\s*38\.3/i);
     assert.deepEqual(parsed.missingFields, []);
+});
+
+test('document-type validators require authority-specific evidence fields', () => {
+    const fcc = extractFields('Model: SW-1\nManufacturer: Example\nReport No: R-1\nIssue Date: 2026-08-01\nEquipment authorization', 'SW-1');
+    assert.equal(fcc.documentKind, 'FCC');
+    assert.ok(fcc.missingFields.includes('FCC ID'));
+    assert.ok(fcc.missingFields.includes('FCC rule / test standard'));
+
+    const red = extractFields('Model: CAM-1\nManufacturer: Example\nReport No: R-2\nIssue Date: 2026-08-01\nRadio Equipment Directive 2014/53/EU', 'CAM-1');
+    assert.equal(red.documentKind, 'CE / RED');
+    assert.ok(red.missingFields.includes('ETSI / EN radio standard'));
+
+    const pse = extractFields('Model: PSU-1\nManufacturer: Example\nCertificate No: P-1\nIssue Date: 2026-08-01\nPSE DENAN', 'PSU-1');
+    assert.equal(pse.documentKind, 'PSE');
+    assert.ok(!pse.missingFields.includes('PSE / DENAN scope reference'));
+
+    const imda = extractFields('Model: AP-1\nManufacturer: Example\nIssue Date: 2026-08-01\nIMDA telecommunication equipment registration', 'AP-1');
+    assert.equal(imda.documentKind, 'IMDA');
+    assert.ok(imda.missingFields.includes('IMDA registration / certificate number'));
 });
 
 test('server parser records a complete exact-model result without treating a supplier claim as proof', async () => {
@@ -144,6 +173,49 @@ test('expired files and account deletion remove private blobs and records', () =
     assert.equal(fs.existsSync(path.join(app.fileRoot, `${second.id}.bin`)), false);
 });
 
+test('storage audit repairs orphan blobs, missing blobs and duplicate records', () => {
+    const app = service();
+    const owner = app.register('owner@example.com', 'long-password-owner').user;
+    const pdf = Buffer.from('%PDF-1.4\nfixture\n%%EOF');
+    const first = app.saveFile(owner.id, { name: 'first.pdf', type: 'application/pdf', data: pdf.toString('base64') });
+    fs.writeFileSync(path.join(app.fileRoot, '11111111-1111-1111-1111-111111111111.bin'), 'orphan');
+    fs.unlinkSync(path.join(app.fileRoot, `${first.id}.bin`));
+    const duplicateBlobId = '22222222-2222-2222-2222-222222222222';
+    fs.writeFileSync(path.join(app.fileRoot, `${duplicateBlobId}.bin`), 'duplicate');
+    const db = app.read();
+    db.files.push({ ...first, id: duplicateBlobId });
+    app.write(db);
+
+    const before = app.auditStorage();
+    assert.equal(before.ok, false);
+    assert.equal(before.orphanIds.length, 1);
+    assert.equal(before.missingIds.length, 1);
+    assert.equal(before.duplicateIds.length, 1);
+    const repaired = app.auditStorage({ repair: true });
+    assert.equal(repaired.repaired, true);
+    assert.equal(app.auditStorage().ok, true);
+    assert.equal(app.listFiles(owner.id).length, 0);
+});
+
+test('database updates create a schema-valid recovery snapshot', () => {
+    const app = service();
+    app.register('owner@example.com', 'long-password-owner');
+    const backup = app.verifyBackup();
+    assert.equal(backup.available, true);
+    assert.equal(backup.valid, true);
+});
+
+test('a valid last-good snapshot can restore an unreadable primary database', () => {
+    const app = service();
+    const owner = app.register('owner@example.com', 'long-password-owner').user;
+    app.saveAssessment(owner.id, { productLabel: 'Smart watch', market: 'US' });
+    fs.writeFileSync(app.databaseFile, '{broken-json');
+    const restored = app.restoreBackup();
+    assert.equal(restored.restored, true);
+    assert.equal(app.read().users.length, 1);
+    assert.equal(app.read().users[0].email, 'owner@example.com');
+});
+
 test('document extraction captures an explicit expiry date', () => {
     const parsed = extractFields('Model: TW-01\nManufacturer: Example Labs\nReport No: R-9\nIssue Date: 2025-01-01\nValid until: 2027-01-01\nStandard: FCC Part 15', 'TW-01');
     assert.equal(parsed.expiryDate, '2027-01-01');
@@ -154,6 +226,22 @@ test('health makes missing production secrets explicit', () => {
     const app = new ConsumerService({ root });
     assert.equal(app.health().productionReady, false);
     assert.ok(app.health().warnings.length >= 1);
+});
+
+test('health reports actual parser executability and treats the AI assistant as optional', () => {
+    assert.equal(executableStatus('/definitely/not/a/parser').available, false);
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-consumer-test-'));
+    const app = new ConsumerService({
+        root,
+        sessionSecret: 'session-secret-for-tests-32-bytes-long',
+        fileKey: 'file-key-for-tests-32-bytes-long',
+        parseDocument: async () => ({ text: '', engine: 'fixture-parser' })
+    });
+    const health = app.health();
+    assert.equal(health.parsers.pdf.available, true);
+    assert.equal(health.parsers.image.available, true);
+    assert.equal(health.productionReady, true);
+    assert.equal(health.openaiConfigured, false);
 });
 
 test('production refuses temporary session and file encryption keys', () => {

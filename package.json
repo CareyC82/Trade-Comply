@@ -10,6 +10,7 @@
     "audit:search-quality:report": "node scripts/audit-search-quality.js --write-report",
     "check:quality": "node scripts/build-quality-status.js",
     "check:consumer-release": "node scripts/check-consumer-release-readiness.js",
+    "test:consumer-browser": "playwright test --config=playwright.consumer.config.js",
     "build:automation-launch-status": "node scripts/build-automation-launch-status.js",
     "update:exact-tariff-parser-priorities": "node scripts/update-exact-tariff-parser-priorities.js",
     "check:catalog": "bash scripts/with-node.sh node scripts/validate-catalog.js && bash scripts/with-node.sh node scripts/build-catalog.js --check",
@@ -83,5 +84,8 @@
   "dependencies": {
     "got-scraping": "^4.2.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.1"
   }
 }
