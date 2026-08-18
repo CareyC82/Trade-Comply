@@ -94,9 +94,9 @@ function readBody(req, limit = 14 * 1024 * 1024) {
         req.on('error', reject);
     });
 }
-function user(req) { return service.authenticate(cookie(req, 'tracewize_session')); }
-function requireUser(req) {
-    const current = user(req);
+function user(req, activeService = service) { return activeService.authenticate(cookie(req, 'tracewize_session')); }
+function requireUser(req, activeService = service) {
+    const current = user(req, activeService);
     if (!current) throw Object.assign(new Error('Sign in to continue.'), { status: 401 });
     return current;
 }
@@ -109,48 +109,48 @@ function publicFile(file) {
     return safe;
 }
 
-async function api(req, res, url) {
+async function api(req, res, url, activeService = service) {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
         const origin = req.headers.origin;
         const expected = `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${req.headers.host}`;
         if (origin && origin !== expected) throw Object.assign(new Error('Cross-site request blocked.'), { status: 403 });
     }
-    if (req.method === 'GET' && url.pathname === '/api/consumer/health') return json(res, 200, service.health());
+    if (req.method === 'GET' && url.pathname === '/api/consumer/health') return json(res, 200, activeService.health());
     if (req.method === 'POST' && url.pathname === '/api/consumer/register') {
         if (!rateLimit(`auth:${req.socket.remoteAddress}`, 10, 15 * 60 * 1000)) throw Object.assign(new Error('Too many account attempts. Try again later.'), { status: 429 });
-        const body = await readBody(req, 16384); const result = service.register(body.email, body.password);
+        const body = await readBody(req, 16384); const result = activeService.register(body.email, body.password);
         return json(res, 201, { ok: true, user: result.user }, { 'Set-Cookie': sessionCookie(result.token) });
     }
     if (req.method === 'POST' && url.pathname === '/api/consumer/login') {
         if (!rateLimit(`auth:${req.socket.remoteAddress}`, 10, 15 * 60 * 1000)) throw Object.assign(new Error('Too many account attempts. Try again later.'), { status: 429 });
-        const body = await readBody(req, 16384); const result = service.login(body.email, body.password);
+        const body = await readBody(req, 16384); const result = activeService.login(body.email, body.password);
         return json(res, 200, { ok: true, user: result.user }, { 'Set-Cookie': sessionCookie(result.token) });
     }
     if (req.method === 'POST' && url.pathname === '/api/consumer/logout') return json(res, 200, { ok: true }, { 'Set-Cookie': sessionCookie('', true) });
-    if (req.method === 'GET' && url.pathname === '/api/consumer/session') return json(res, 200, { ok: true, user: user(req) });
-    const current = requireUser(req);
-    if (req.method === 'GET' && url.pathname === '/api/consumer/assessments') return json(res, 200, { ok: true, assessments: service.listAssessments(current.id) });
+    if (req.method === 'GET' && url.pathname === '/api/consumer/session') return json(res, 200, { ok: true, user: user(req, activeService) });
+    const current = requireUser(req, activeService);
+    if (req.method === 'GET' && url.pathname === '/api/consumer/assessments') return json(res, 200, { ok: true, assessments: activeService.listAssessments(current.id) });
     if (req.method === 'POST' && url.pathname === '/api/consumer/assessments') {
-        const body = await readBody(req, 512 * 1024); return json(res, 201, { ok: true, assessment: service.saveAssessment(current.id, body) });
+        const body = await readBody(req, 512 * 1024); return json(res, 201, { ok: true, assessment: activeService.saveAssessment(current.id, body) });
     }
     if (req.method === 'DELETE' && /^\/api\/consumer\/assessments\/[^/]+$/.test(url.pathname)) {
-        return json(res, service.deleteAssessment(current.id, path.basename(url.pathname)) ? 200 : 404, { ok: true });
+        return json(res, activeService.deleteAssessment(current.id, path.basename(url.pathname)) ? 200 : 404, { ok: true });
     }
-    if (req.method === 'GET' && url.pathname === '/api/consumer/files') return json(res, 200, { ok: true, files: service.listFiles(current.id).map(publicFile) });
+    if (req.method === 'GET' && url.pathname === '/api/consumer/files') return json(res, 200, { ok: true, files: activeService.listFiles(current.id).map(publicFile) });
     if (req.method === 'POST' && url.pathname === '/api/consumer/files') {
-        const body = await readBody(req); return json(res, 201, { ok: true, file: publicFile(service.saveFile(current.id, body)) });
+        const body = await readBody(req); return json(res, 201, { ok: true, file: publicFile(activeService.saveFile(current.id, body)) });
     }
     const parseMatch = url.pathname.match(/^\/api\/consumer\/files\/([^/]+)\/parse$/);
-    if (req.method === 'POST' && parseMatch) return json(res, 200, { ok: true, file: publicFile(await service.parseFile(current.id, parseMatch[1])) });
+    if (req.method === 'POST' && parseMatch) return json(res, 200, { ok: true, file: publicFile(await activeService.parseFile(current.id, parseMatch[1])) });
     if (req.method === 'DELETE' && /^\/api\/consumer\/files\/[^/]+$/.test(url.pathname)) {
-        return json(res, service.deleteFile(current.id, path.basename(url.pathname)) ? 200 : 404, { ok: true });
+        return json(res, activeService.deleteFile(current.id, path.basename(url.pathname)) ? 200 : 404, { ok: true });
     }
     if (req.method === 'POST' && url.pathname === '/api/consumer/assistant') {
         if (!rateLimit(`ai:${current.id}`, 20, 60 * 1000)) throw Object.assign(new Error('AI Assistant rate limit reached. Try again in a minute.'), { status: 429 });
-        const body = await readBody(req, 512 * 1024); return json(res, 200, { ok: true, ...(await service.askAssistant(current.id, body)) });
+        const body = await readBody(req, 512 * 1024); return json(res, 200, { ok: true, ...(await activeService.askAssistant(current.id, body)) });
     }
     if (req.method === 'DELETE' && url.pathname === '/api/consumer/account') {
-        service.deleteAccount(current.id); return json(res, 200, { ok: true }, { 'Set-Cookie': sessionCookie('', true) });
+        activeService.deleteAccount(current.id); return json(res, 200, { ok: true }, { 'Set-Cookie': sessionCookie('', true) });
     }
     return json(res, 404, { ok: false, error: 'Not found.' });
 }
@@ -166,11 +166,11 @@ function staticFile(req, res, url) {
     fs.createReadStream(target).pipe(res);
 }
 
-function createConsumerServer() {
+function createConsumerServer(activeService = service) {
     return http.createServer(async (req, res) => {
         const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
         try {
-            if (url.pathname.startsWith('/api/consumer/')) await api(req, res, url);
+            if (url.pathname.startsWith('/api/consumer/')) await api(req, res, url, activeService);
             else staticFile(req, res, url);
         } catch (error) {
             if (!res.headersSent) json(res, error.status || 500, { ok: false, error: error.status ? error.message : 'Server error.' });

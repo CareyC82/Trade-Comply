@@ -4,6 +4,16 @@ function dedupeQuestionKeys(keys = []) {
     return Array.from(new Set(keys));
 }
 
+function supplierRequestText(request = {}) {
+    return `${request.subject || 'Supplier documents required'}\n\n${request.message || ''}`.trim();
+}
+
+function supplierRequestFilename(productLabel = 'product', market = '') {
+    const safe = `${productLabel}-${market || 'market'}-supplier-document-request`
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return `${safe || 'supplier-document-request'}.txt`;
+}
+
 function bootstrapCanISellItPage() {
     const engine = globalThis.TradeComplyCanISellIt;
     const form = document.getElementById('sell-check-form');
@@ -281,7 +291,12 @@ function bootstrapCanISellItPage() {
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length
-            ? assessment.supplierEvidence.map((item) => `<li><strong>${escapeHtml(item.kind)} — ${escapeHtml(item.name)}</strong><span>${escapeHtml(item.status.replaceAll('_', ' '))}: ${escapeHtml(item.note)}</span>${item.extracted?.model ? `<small>Model: ${escapeHtml(item.extracted.model)}${item.extracted.manufacturer ? ` · Holder: ${escapeHtml(item.extracted.manufacturer)}` : ''}${item.extracted.reportDate ? ` · Date: ${escapeHtml(item.extracted.reportDate)}` : ''}</small>` : ''}</li>`).join('')
+            ? assessment.supplierEvidence.map((item) => {
+                const checkLabels = { kind: 'Document type', model: 'Exact model', holder: 'Manufacturer / holder', market: 'Target market', complete: 'Required fields', current: 'Date / validity' };
+                const checks = Object.entries(item.checks || {}).map(([key, value]) => `${checkLabels[key] || key}: ${value === true ? 'matched' : value === false ? 'failed' : 'not verified'}`).join(' · ');
+                const status = item.status === 'verified_match' ? 'Automated reference checks passed — authenticity still requires authority confirmation' : item.status.replaceAll('_', ' ');
+                return `<li><strong>${escapeHtml(item.kind)} — ${escapeHtml(item.name)}</strong><span>${escapeHtml(status)}: ${escapeHtml(item.note)}</span>${checks ? `<small>${escapeHtml(checks)}</small>` : ''}${item.extracted?.model ? `<small>Model: ${escapeHtml(item.extracted.model)}${item.extracted.manufacturer ? ` · Holder: ${escapeHtml(item.extracted.manufacturer)}` : ''}${item.extracted.reportDate ? ` · Date: ${escapeHtml(item.extracted.reportDate)}` : ''}</small>` : ''}</li>`;
+            }).join('')
             : '<li><strong>No supplier files uploaded</strong><span>Upload the exact-model reports before committing inventory.</span></li>';
         const supplierRequest = assessment.supplierRequest;
         const supplierRequestItems = supplierRequest.items.length
@@ -359,6 +374,7 @@ function bootstrapCanISellItPage() {
                 <div><span>What documents should I ask the supplier for?</span><h2>${supplierRequest.complete ? 'No document follow-up identified' : `${supplierRequest.items.length} document request${supplierRequest.items.length === 1 ? '' : 's'} ready to send`}</h2><p>${supplierRequest.complete ? 'Keep the files with the exact-model purchase record.' : 'Use Improve accuracy below when the supplier replies.'}</p></div>
                 ${supplierRequestItems}
                 <button type="button" id="sell-copy-supplier-request">${supplierRequest.complete ? 'Copy confirmation request' : 'Copy supplier request'}</button>
+                <button type="button" id="sell-download-supplier-request">Download supplier request</button>
                 <p id="sell-copy-status" class="sell-copy-status" aria-live="polite"></p>
             </section>
             ${commercialPanel}
@@ -397,7 +413,7 @@ function bootstrapCanISellItPage() {
         document.getElementById('sell-print-assessment')?.addEventListener('click', printAssessment);
         document.getElementById('sell-copy-supplier-request')?.addEventListener('click', async () => {
             const status = document.getElementById('sell-copy-status');
-            const text = `${supplierRequest.subject}\n\n${supplierRequest.message}`;
+            const text = supplierRequestText(supplierRequest);
             try {
                 await navigator.clipboard.writeText(text);
                 status.textContent = 'Copied. You can paste this into email or supplier chat.';
@@ -407,6 +423,15 @@ function bootstrapCanISellItPage() {
                 document.execCommand('copy'); textarea.remove();
                 status.textContent = 'Copied. You can paste this into email or supplier chat.';
             }
+        });
+        document.getElementById('sell-download-supplier-request')?.addEventListener('click', () => {
+            const blob = new Blob([supplierRequestText(supplierRequest)], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = supplierRequestFilename(assessment.product.label, currentInput.market);
+            document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+            document.getElementById('sell-copy-status').textContent = 'Downloaded locally. No supplier or pricing data was uploaded.';
         });
         const reviewContact = engine.buildReviewContact({
             ...currentInput,
@@ -678,5 +703,5 @@ function bootstrapCanISellItPage() {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { dedupeQuestionKeys };
+    module.exports = { dedupeQuestionKeys, supplierRequestText, supplierRequestFilename };
 }

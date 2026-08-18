@@ -201,8 +201,47 @@ test('result page exposes a copyable supplier evidence request', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
     assert.match(page, /Supplier \/ manufacturer legal name/);
     assert.match(script, /sell-copy-supplier-request/);
-    assert.match(script, /supplierRequest\.message/);
+    assert.match(script, /supplierRequestText\(supplierRequest\)/);
     assert.match(script, /navigator\.clipboard\.writeText/);
+});
+
+test('supplier request can be copied or downloaded locally without changing its contents', () => {
+    const request = engine.buildSupplierRequest({
+        requirements: engine.marketRequirements('US', { productType: 'smart_watch', bluetooth: true, battery: true }),
+        requiredModel: 'SW-01', market: 'US', platform: 'Amazon', profile: { bluetooth: true, battery: true }
+    });
+    assert.equal(pageHelpers.supplierRequestText(request), `${request.subject}\n\n${request.message}`);
+    assert.equal(pageHelpers.supplierRequestFilename('Smart watch', 'US'), 'smart-watch-us-supplier-document-request.txt');
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /sell-download-supplier-request/);
+    assert.match(script, /Downloaded locally\. No supplier or pricing data was uploaded/);
+});
+
+test('consumer page degrades safely when the optional private API is unavailable', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /Private workspace server is unavailable/);
+    assert.match(script, /The assessment can continue without the files/);
+    assert.match(script, /Sign in to upload and parse supplier evidence/);
+});
+
+test('supplier claims remain unverified until an exact-model file passes every check', () => {
+    const result = engine.assess({
+        description: 'Bluetooth smart watch with rechargeable lithium battery', market: 'US', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: [], attributes: { productType: 'smart_watch', bluetooth: 'yes', battery: 'yes' },
+        evidenceAnswers: { fccGrant: { value: 'yes' }, rfExposure: { value: 'yes' }, batteryTransport: { value: 'yes' } },
+        supplierEvidence: { requiredModel: 'SW-01', files: [] }
+    });
+    assert.ok(result.supplierRequest.items.some((item) => /no verified exact-model file/.test(item.reason)));
+    assert.notEqual(result.consumerConclusion.code, 'evidence_checked');
+});
+
+test('unreadable supplier files produce an explicit fail-closed result', () => {
+    const files = engine.analyzeSupplierEvidence({
+        market: 'US', requiredModel: 'SW-01', files: [{ name: 'blurred-fcc.pdf', type: 'application/pdf', status: 'parse_failed', parsing: { missingFields: ['readable document text'] } }]
+    });
+    assert.equal(files[0].status, 'unable_to_verify');
+    assert.match(files[0].note, /could not be read.*searchable PDF/i);
+    assert.equal(files[0].checks.model, false);
 });
 
 test('quick assessment only blocks on questions actually shown to the user', () => {

@@ -50,7 +50,9 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
         ['mobile result breakpoint', /@media\s*\(max-width:\s*700px\)/.test(css)],
         ['single-column review actions', /\.sell-review-actions\s*\{[^}]*grid-template-columns:\s*1fr/s.test(css)],
         ['unsupported coverage exit', unsupported.sellerConclusion.code === 'not_enough_information' && unsupported.marketCoverage.level === 'unsupported'],
-        ['manual email CTA', /reviewContact\.mailto/.test(page) && /Copy request/.test(page)]
+        ['manual email CTA', /reviewContact\.mailto/.test(page) && /Copy request/.test(page)],
+        ['local supplier-request download', /sell-download-supplier-request/.test(page) && /URL\.createObjectURL/.test(page)],
+        ['private API fallback', /Private workspace server is unavailable/.test(page)]
     ].forEach(([label, valid]) => { if (!valid) errors.push(`UI contract missing: ${label}.`); });
 
     return { ok: errors.length === 0, errors, productCount: products.length, sourceCount: Object.keys(models.sources).length };
