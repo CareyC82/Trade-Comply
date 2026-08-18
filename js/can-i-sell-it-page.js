@@ -1,5 +1,9 @@
 'use strict';
 
+function dedupeQuestionKeys(keys = []) {
+    return Array.from(new Set(keys));
+}
+
 function bootstrapCanISellItPage() {
     const engine = globalThis.TradeComplyCanISellIt;
     const form = document.getElementById('sell-check-form');
@@ -65,9 +69,9 @@ function bootstrapCanISellItPage() {
     function quickQuestionKeys(profile, productType = profile.productType) {
         const material = engine.materialQuestionKeys(productType);
         const modelPriorities = models.getProduct(productType).priorityQuestions || [];
-        const priorities = profile.healthMonitoring === true
+        const priorities = dedupeQuestionKeys(profile.healthMonitoring === true
             ? ['medicalClaim', ...modelPriorities, 'childUse']
-            : [...modelPriorities, 'childUse', 'medicalClaim'];
+            : [...modelPriorities, 'childUse', 'medicalClaim']);
         const changesMaintainedResult = (key) => {
             if (key === 'cellular') return profile.bluetooth !== true && profile.wifi !== true;
             return ['battery', 'medicalClaim', 'childUse', 'cameraMic', 'mainsPowered', 'bluetooth', 'wifi', 'radioTransmitter'].includes(key);
@@ -671,4 +675,8 @@ function bootstrapCanISellItPage() {
         accountMessage.textContent = 'Private workspace server is unavailable. Start it with npm run dev:consumer.';
         renderHistory();
     });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { dedupeQuestionKeys };
 }

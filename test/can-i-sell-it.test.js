@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const engine = require('../lib/can-i-sell-it');
 const models = require('../lib/wearable-product-models');
+const pageHelpers = require('../js/can-i-sell-it-page');
 
 test('extracts material smart-wearable facts without inventing unknown answers', () => {
     const profile = engine.extractProfile('Bluetooth smart ring with a rechargeable lithium battery and sleep tracking. No medical claims.');
@@ -69,6 +70,16 @@ test('consumer page is reachable from the primary navigation and declares the de
 test('quick questions do not preselect Not sure', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
     assert.doesNotMatch(script, /profile\[key\]\s*===\s*['"]unknown['"][\s\S]{0,80}checked/);
+});
+
+test('quick-question priorities remove duplicate product facts before limiting the list', () => {
+    const priorities = pageHelpers.dedupeQuestionKeys([
+        ...models.getProduct('smart_watch').priorityQuestions,
+        'childUse',
+        'medicalClaim'
+    ]);
+    assert.equal(priorities.filter((key) => key === 'childUse').length, 1);
+    assert.equal(new Set(priorities.slice(0, 2)).size, priorities.slice(0, 2).length);
 });
 
 test('consumer page shows preliminary value before optional supplier evidence', () => {
