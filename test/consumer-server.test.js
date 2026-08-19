@@ -34,7 +34,9 @@ test('consumer server allows every browser module declared by the main entry poi
 test('consumer API keeps anonymous use stateless and supports the private account lifecycle', async (t) => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-consumer-server-test-'));
     const app = new ConsumerService({ root, sessionSecret: 'session-secret-for-tests-32-bytes-long', fileKey: 'file-key-for-tests-32-bytes-long' });
-    const server = createConsumerServer(app);
+    const server = createConsumerServer(app, { fccClient: {
+        lookup: async (fccId) => ({ fccId, verified: true, status: 'official_match', records: [], source: { authority: 'FCC' } })
+    } });
     try {
         await new Promise((resolve, reject) => {
             server.once('error', reject);
@@ -56,6 +58,10 @@ test('consumer API keeps anonymous use stateless and supports the private accoun
     const anonymousSave = await request('/api/consumer/assessments', { method: 'POST', body: JSON.stringify({ productLabel: 'Smart watch' }) });
     assert.equal(anonymousSave.status, 401);
     assert.equal(app.read().assessments.length, 0);
+
+    const fccLookup = await request('/api/consumer/fcc-id/lookup', { method: 'POST', body: JSON.stringify({ fccId: 'ABC123-MODEL' }) });
+    assert.equal(fccLookup.status, 200);
+    assert.equal((await fccLookup.json()).result.verified, true);
 
     const registration = await request('/api/consumer/register', { method: 'POST', body: JSON.stringify({ email: 'buyer@example.com', password: 'long-password-buyer' }) });
     assert.equal(registration.status, 201);

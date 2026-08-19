@@ -9,8 +9,12 @@ const { loadLocalEnvFiles } = require('../lib/load-local-env');
 const ROOT = path.join(__dirname, '..');
 loadLocalEnvFiles(ROOT);
 const { ConsumerService } = require('../lib/consumer-service');
+const { FccEasClient } = require('../lib/fcc-eas-client');
+const { createLogger, validateConsumerEnvironment } = require('../lib/consumer-runtime');
 const PORT = Number(process.env.CONSUMER_PORT || 8790);
 const service = new ConsumerService();
+const fccClient = new FccEasClient();
+const log = createLogger();
 const rateBuckets = new Map();
 const PUBLIC_DIRECTORIES = new Set(['css', 'js']);
 const PUBLIC_LIB_FILES = new Set([
@@ -109,13 +113,23 @@ function publicFile(file) {
     return safe;
 }
 
-async function api(req, res, url, activeService = service) {
+async function api(req, res, url, activeService = service, activeFccClient = fccClient) {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
         const origin = req.headers.origin;
         const expected = `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${req.headers.host}`;
         if (origin && origin !== expected) throw Object.assign(new Error('Cross-site request blocked.'), { status: 403 });
     }
     if (req.method === 'GET' && url.pathname === '/api/consumer/health') return json(res, 200, activeService.health());
+    if (req.method === 'GET' && url.pathname === '/api/consumer/health/live') return json(res, 200, { ok: true });
+    if (req.method === 'GET' && url.pathname === '/api/consumer/health/ready') {
+        const health = activeService.health();
+        return json(res, health.productionReady ? 200 : 503, health);
+    }
+    if (req.method === 'POST' && url.pathname === '/api/consumer/fcc-id/lookup') {
+        if (!rateLimit(`fcc:${req.socket.remoteAddress}`, 20, 60 * 1000)) throw Object.assign(new Error('FCC lookup rate limit reached. Try again in a minute.'), { status: 429 });
+        const body = await readBody(req, 4096);
+        return json(res, 200, { ok: true, result: await activeFccClient.lookup(body.fccId) });
+    }
     if (req.method === 'POST' && url.pathname === '/api/consumer/register') {
         if (!rateLimit(`auth:${req.socket.remoteAddress}`, 10, 15 * 60 * 1000)) throw Object.assign(new Error('Too many account attempts. Try again later.'), { status: 429 });
         const body = await readBody(req, 16384); const result = activeService.register(body.email, body.password);
@@ -166,16 +180,38 @@ function staticFile(req, res, url) {
     fs.createReadStream(target).pipe(res);
 }
 
-function createConsumerServer(activeService = service) {
+function createConsumerServer(activeService = service, options = {}) {
+    const activeFccClient = options.fccClient || fccClient;
+    const activeLog = options.logger || (() => {});
     return http.createServer(async (req, res) => {
+        const started = Date.now();
         const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
+        res.once('finish', () => activeLog('info', 'http_request', { method: req.method, path: url.pathname, status: res.statusCode, durationMs: Date.now() - started }));
         try {
-            if (url.pathname.startsWith('/api/consumer/')) await api(req, res, url, activeService);
+            if (url.pathname.startsWith('/api/consumer/')) await api(req, res, url, activeService, activeFccClient);
             else staticFile(req, res, url);
         } catch (error) {
+            activeLog(error.status && error.status < 500 ? 'warn' : 'error', 'request_failed', { method: req.method, path: url.pathname, status: error.status || 500, error: error.message });
             if (!res.headersSent) json(res, error.status || 500, { ok: false, error: error.status ? error.message : 'Server error.' });
         }
     });
 }
-if (require.main === module) createConsumerServer().listen(PORT, '127.0.0.1', () => console.log(`Consumer app: http://127.0.0.1:${PORT}/can-i-sell-it.html`));
+if (require.main === module) {
+    const config = validateConsumerEnvironment();
+    const server = createConsumerServer(service, { logger: log });
+    let closing = false;
+    const shutdown = (signal) => {
+        if (closing) return;
+        closing = true;
+        log('info', 'shutdown_started', { signal });
+        server.close((error) => {
+            log(error ? 'error' : 'info', 'shutdown_complete', { signal, error: error?.message });
+            process.exit(error ? 1 : 0);
+        });
+        setTimeout(() => { log('error', 'shutdown_timeout', { signal }); process.exit(1); }, config.shutdownTimeoutMs).unref();
+    };
+    process.once('SIGTERM', () => shutdown('SIGTERM'));
+    process.once('SIGINT', () => shutdown('SIGINT'));
+    server.listen(config.port, config.host, () => log('info', 'server_started', { host: config.host, port: config.port, production: config.production }));
+}
 module.exports = { createConsumerServer, service, isPublicPath };

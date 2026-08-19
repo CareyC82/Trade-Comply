@@ -29,6 +29,12 @@ server-only `OPENAI_API_KEY`. Install `pdftotext` for PDF extraction and
 `tesseract` for image OCR. Uploaded evidence is encrypted at rest, user-scoped,
 and removed after the configured retention period (30 days by default).
 
+Production deployment and recovery commands are documented in
+[`docs/CONSUMER_OPERATIONS.md`](docs/CONSUMER_OPERATIONS.md). The optional FCC ID
+check calls the official FCC OET Equipment Authorization API on demand. It does
+not store the submitted ID, and a match remains a reference check rather than a
+complete product approval.
+
 ---
 
 ## What It Does

@@ -3907,6 +3907,14 @@ a.hub-core-card--link {
 .sell-evidence-upload { margin: 22px 0 0; padding: 18px; border: 1px solid #dbe5ef; border-radius: 10px; }
 .sell-evidence-upload legend { padding: 0 6px; color: #264661; font-weight: 900; }
 .sell-evidence-upload > p { color: #6e7e8d; font-size: .84rem; }
+.sell-fcc-lookup { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; align-items: end; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #dbe5ef; }
+.sell-fcc-lookup button { min-height: 44px; padding: 10px 16px; border: 0; border-radius: 8px; background: #1d4268; color: #fff; font-weight: 800; cursor: pointer; }
+.sell-fcc-lookup button:disabled { opacity: .6; cursor: wait; }
+.sell-fcc-lookup p { grid-column: 1 / -1; margin: 0; color: #607487; font-size: .78rem; line-height: 1.5; overflow-wrap: anywhere; }
+.sell-fcc-lookup p strong { color: inherit; }
+.sell-fcc-lookup .sell-fcc-result--match { padding: 9px 11px; border-radius: 7px; background: #edf8ef; color: #246b37; }
+.sell-fcc-lookup .sell-evidence-error { padding: 9px 11px; border-radius: 7px; background: #fff1f1; color: #a62f2f; }
+@media (max-width: 640px) { .sell-fcc-lookup { grid-template-columns: minmax(0, 1fr); } .sell-fcc-lookup button { width: 100%; } }
 .sell-evidence-upload textarea { min-height: 85px; }
 .sell-evidence-preview { display: grid; gap: 6px; margin-top: 10px; }
 .sell-evidence-preview span { padding: 8px 10px; border-radius: 7px; background: #f5f8fb; color: #607487; font-size: .78rem; }

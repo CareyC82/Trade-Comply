@@ -30,6 +30,9 @@ function bootstrapCanISellItPage() {
     const productTypeSelect = document.getElementById('sell-product-type');
     const evidenceFiles = document.getElementById('sell-evidence-files');
     const evidencePreview = document.getElementById('sell-evidence-preview');
+    const fccIdInput = document.getElementById('sell-fcc-id');
+    const fccLookupButton = document.getElementById('sell-fcc-lookup');
+    const fccLookupResult = document.getElementById('sell-fcc-result');
     const advancedTools = document.getElementById('sell-advanced-tools');
     const advancedForm = document.getElementById('sell-advanced-form');
     const historyList = document.getElementById('sell-history-list');
@@ -686,6 +689,23 @@ function bootstrapCanISellItPage() {
             : files.length
             ? files.map((file) => `<span>${escapeHtml(file.name)} · ${(file.size / 1024).toFixed(1)} KB · pending verification</span>`).join('')
             : '';
+    });
+
+    fccLookupButton.addEventListener('click', async () => {
+        const fccId = fccIdInput.value.trim();
+        fccLookupButton.disabled = true;
+        fccLookupResult.className = '';
+        fccLookupResult.textContent = 'Checking the official FCC Equipment Authorization System…';
+        try {
+            const { result: lookup } = await api('/fcc-id/lookup', { method: 'POST', body: JSON.stringify({ fccId }) });
+            fccLookupResult.className = lookup.verified ? 'sell-fcc-result--match' : 'sell-evidence-error';
+            fccLookupResult.innerHTML = lookup.verified
+                ? `<strong>Official FCC ID match found.</strong> ${escapeHtml(lookup.records[0]?.grantee || 'FCC grantee found')} · ${escapeHtml(lookup.records[0]?.grantDate || 'grant date unavailable')}. ${escapeHtml(lookup.disclaimer)} <a href="${escapeHtml(lookup.source.url)}" target="_blank" rel="noopener">Open FCC EAS</a>`
+                : `<strong>No exact official match returned.</strong> ${escapeHtml(lookup.disclaimer)} <a href="${escapeHtml(lookup.source.url)}" target="_blank" rel="noopener">Search FCC EAS manually</a>`;
+        } catch (failure) {
+            fccLookupResult.className = 'sell-evidence-error';
+            fccLookupResult.textContent = failure.message;
+        } finally { fccLookupButton.disabled = false; }
     });
 
     historyList.addEventListener('click', async (event) => {

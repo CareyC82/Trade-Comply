@@ -71,6 +71,11 @@
                     <fieldset class="sell-documents"><legend>Supplier evidence claims (optional)</legend><div id="sell-improve-questions" class="sell-question-grid"></div></fieldset>
                     <fieldset class="sell-documents"><legend>Documents already supplied</legend><div id="sell-document-options"></div></fieldset>
                     <fieldset class="sell-evidence-upload">
+                        <div class="sell-fcc-lookup">
+                            <label class="sell-check-field" for="sell-fcc-id"><span>FCC ID claimed by supplier</span><input id="sell-fcc-id" name="fccId" type="text" maxlength="24" placeholder="e.g. ABC123-MODEL"></label>
+                            <button id="sell-fcc-lookup" type="button">Check official FCC record</button>
+                            <p id="sell-fcc-result" role="status">No data is sent until you click Check. The FCC ID is queried against the official FCC EAS and is not stored by TraceWize.</p>
+                        </div>
                         <div class="sell-cost-grid">
                             <label class="sell-check-field"><span>Your ordered model</span><input name="requiredModel" type="text" placeholder="e.g. TW-RING-01"></label>
                             <label class="sell-check-field"><span>Model stated by supplier</span><input name="supplierModel" type="text" placeholder="e.g. TW-RING-01"></label>
