@@ -1,0 +1,7 @@
+# Install only on the host that owns the consumer persistent volume.
+# Every hour: retention cleanup, storage audit, backup refresh and readiness check.
+17 * * * * cd /opt/tracewize && /usr/bin/docker compose run --rm consumer node scripts/manage-consumer-workspace.js maintain >> /var/log/tracewize-consumer-maintenance.log 2>&1
+
+# Daily FCC official-interface availability probe. Non-zero exit keeps automatic
+# verification disabled while the official manual EAS link remains available.
+41 2 * * * cd /opt/tracewize && /usr/bin/docker compose run --rm consumer node scripts/manage-consumer-workspace.js fcc-probe >> /var/log/tracewize-consumer-fcc.log 2>&1
