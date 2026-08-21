@@ -11,7 +11,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 } = {}) {
     const errors = [];
     const products = models.listProducts().filter((item) => item.id !== 'wearable_other');
-    if (products.length !== 25) errors.push(`Expected 25 maintained products; found ${products.length}.`);
+    if (products.length !== 30) errors.push(`Expected 30 maintained products; found ${products.length}.`);
 
     Object.entries(models.sources).forEach(([id, source]) => {
         if (!source.url || !/^https:\/\//.test(source.url)) errors.push(`${id}: missing HTTPS official source URL.`);

@@ -204,7 +204,7 @@ test('consumer product, market and channel matrix never reports a ready platform
     assert.equal(checked, 96);
 });
 
-test('all twenty-five maintained products stay market-separated across four sales channels', () => {
+test('all thirty maintained products stay market-separated across four sales channels', () => {
     const products = models.listProducts().filter((product) => product.id !== 'wearable_other');
     const markets = ['US', 'EU', 'JP', 'SG'];
     const platforms = ['Amazon', 'TikTok Shop', 'Shopify / own store', 'Other marketplace'];
@@ -238,5 +238,5 @@ test('all twenty-five maintained products stay market-separated across four sale
         checked += 1;
     })));
 
-    assert.equal(checked, 400);
+    assert.equal(checked, 480);
 });

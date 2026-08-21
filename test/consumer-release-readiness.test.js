@@ -8,7 +8,7 @@ const { runConsumerReleaseReadiness } = require('../scripts/check-consumer-relea
 test('consumer release gate validates products, official-source metadata and mobile UI contracts', () => {
     const result = runConsumerReleaseReadiness({ now: Date.parse('2026-08-17') });
     assert.equal(result.ok, true, result.errors.join('\n'));
-    assert.equal(result.productCount, 25);
+    assert.equal(result.productCount, 30);
     assert.ok(result.sourceCount >= 17);
 });
 
