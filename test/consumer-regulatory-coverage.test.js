@@ -26,15 +26,27 @@ test('EU connected devices receive current RED cybersecurity evidence without ma
 });
 
 test('EU battery and Japan online-seller evidence are specific and date-bounded', () => {
-    const euBattery = engine.marketRequirements('EU', engine.extractProfile('Bluetooth speaker with rechargeable lithium battery'))
-        .find((item) => item.id === 'battery');
-    assert.match(euBattery.reason, /18 February 2027/);
-    assert.ok(euBattery.sources.some((source) => /batteries/i.test(source.title)));
+    const euRequirements = engine.marketRequirements('EU', engine.extractProfile('Bluetooth speaker with rechargeable lithium battery'));
+    const euBattery = euRequirements.find((item) => item.id === 'battery');
+    const euBatteryFuture = euRequirements.find((item) => item.id === 'eu_battery_future');
+    assert.equal(euBattery.requirementClass, 'mandatory');
+    assert.match(euBatteryFuture.reason, /18 February 2027/);
+    assert.equal(euBatteryFuture.requirementClass, 'future');
+    assert.ok(euBatteryFuture.sources.some((source) => /batteries/i.test(source.title)));
 
     const jpPse = engine.marketRequirements('JP', engine.extractProfile('65W mains-powered wall charger'))
         .find((item) => item.id === 'jp_pse');
     assert.ok(jpPse.sources.some((source) => /overseas sellers/i.test(source.title)));
     assert.ok(jpPse.docs.some((doc) => /Domestic responsible-person/i.test(doc)));
+    assert.equal(jpPse.requirementClass, 'scope_check');
+});
+
+test('Singapore controlled-goods mapping names the candidate scope without claiming approval', () => {
+    const requirement = engine.marketRequirements('SG', engine.extractProfile('Rechargeable portable fan'))
+        .find((item) => item.id === 'sg_safety');
+    assert.equal(requirement.requirementClass, 'scope_check');
+    assert.match(requirement.reason, /fan/i);
+    assert.match(requirement.reason, /confirm/i);
 });
 
 test('new adjacent electronics aliases resolve without conflicting with existing models', () => {

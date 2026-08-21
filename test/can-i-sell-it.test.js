@@ -108,6 +108,13 @@ test('result page uses preliminary seller language and direct sales-channel comp
     assert.doesNotMatch(script, /latestAssessmentInput\s*=\s*\{\s*\.\.\.latestAssessmentInput,\s*platform\s*\};\s*renderAssessment/s);
 });
 
+test('result requirements expose mandatory, scope-check, advisory and future labels', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
+    ['Mandatory requirement', 'Scope check required', 'Advisory', 'Future requirement'].forEach((label) => assert.match(script, new RegExp(label)));
+    ['scope_check', 'advisory', 'future'].forEach((status) => assert.match(css, new RegExp(`sell-requirement--${status}`)));
+});
+
 test('seller conclusion uses four bounded result states and warns outside initial coverage', () => {
     const unsupported = engine.assess({
         description: 'cotton summer dress', market: 'US', platform: 'Amazon',

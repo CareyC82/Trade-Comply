@@ -156,8 +156,18 @@ function bootstrapCanISellItPage() {
         return `<div class="sell-source-list">${item.sources.map((source) => `
             <a href="${escapeHtml(source.url)}" target="_blank" rel="noopener">
                 <strong>${escapeHtml(source.authority)}</strong>
-                <span>${escapeHtml(source.title)} · reviewed ${escapeHtml(source.reviewedAt)} · ${escapeHtml(source.confidence)}</span>
+                <span>${escapeHtml(source.title)} · reviewed ${escapeHtml(source.reviewedAt)} · ${escapeHtml(source.confidence)}${source.lifecycle?.status ? ` · ${escapeHtml(source.lifecycle.status.replaceAll('_', ' '))}${source.lifecycle.effectiveAt ? ` ${escapeHtml(source.lifecycle.effectiveAt)}` : ''}` : ''}</span>
             </a>`).join('')}</div>`;
+    }
+
+    function requirementLabel(item) {
+        const labels = {
+            mandatory: item.severity === 'high' ? 'Mandatory — specialist review' : 'Mandatory requirement',
+            scope_check: 'Scope check required',
+            advisory: 'Advisory',
+            future: 'Future requirement'
+        };
+        return labels[item.requirementClass] || 'Mandatory requirement';
     }
 
     function platformChecklistItems(assessment) {
@@ -300,8 +310,8 @@ function bootstrapCanISellItPage() {
 
     function renderAssessment(assessment) {
         const requirementCards = assessment.requirements.map((item) => `
-            <article class="sell-requirement ${item.severity === 'high' ? 'sell-requirement--high' : ''}">
-                <span>${item.severity === 'high' ? 'Specialist check' : 'Required check'}</span>
+            <article class="sell-requirement sell-requirement--${escapeHtml(item.requirementClass || 'mandatory')} ${item.severity === 'high' ? 'sell-requirement--high' : ''}">
+                <span>${escapeHtml(requirementLabel(item))}</span>
                 <h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.reason)}</p>${renderSources(item)}
             </article>`).join('');
         const gaps = assessment.documentGaps.length
@@ -404,7 +414,7 @@ function bootstrapCanISellItPage() {
                 <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
                 ${economicsPanel}
                 <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
-                <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-grid">${requirementCards}</div></section>
+                <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-legend" aria-label="Requirement status key"><span class="mandatory">Mandatory</span><span class="scope">Scope check</span><span class="advisory">Advisory</span><span class="future">Future</span></div><div class="sell-requirement-grid">${requirementCards}</div></section>
                 <section class="sell-result-panel"><h2>Supplier document gaps</h2><ul class="sell-gap-list">${gaps}</ul></section>
                 <section class="sell-result-panel"><h2>Uploaded supplier evidence</h2><ul class="sell-gap-list">${evidenceRows}</ul></section>
                 <section class="sell-result-panel"><h2 id="sell-platform-details-title">${escapeHtml(currentInput.platform)} listing readiness</h2><div id="sell-platform-details-cards" class="sell-requirement-grid">${platformCards}</div></section>

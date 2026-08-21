@@ -10,6 +10,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 } = {}) {
     const errors = [];
+    const warnings = [];
     const products = models.listProducts().filter((item) => item.id !== 'wearable_other');
     if (products.length !== 30) errors.push(`Expected 30 maintained products; found ${products.length}.`);
 
@@ -28,6 +29,14 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
     if (sourceHealth.source_count !== Object.keys(models.sources).length) errors.push('Regulatory source-health report is out of date.');
     if (sourceHealth.sources.some((source) => source.alerts.includes('review_overdue'))) errors.push('Regulatory source review is overdue.');
     if (sourceHealth.sources.some((source) => source.alerts.includes('source_link_failed'))) errors.push('Regulatory source-health report contains a failed official link.');
+    const snapshots = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-snapshots.json'), 'utf8'));
+    const changes = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-changes.json'), 'utf8'));
+    if (snapshots.source_count !== Object.keys(models.sources).length) errors.push('Regulatory content snapshot is out of date.');
+    if (changes.source_count !== Object.keys(models.sources).length) errors.push('Regulatory change report is out of date.');
+    snapshots.sources.forEach((source) => {
+        if (!source.content_hash || !source.last_good_at || !source.lifecycle_state) errors.push(`${source.id}: missing last-good content or lifecycle state.`);
+        if (source.status === 'last_good_degraded') warnings.push(`${source.id}: live refresh degraded; preserved last known good content.`);
+    });
 
     const forbiddenByMarket = {
         US: ['red', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety'],
@@ -68,7 +77,7 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
         ['mobile dock avoids wrapped overlay', /\.bottom-nav\s*\{[^}]*flex-wrap:\s*nowrap/s.test(css)]
     ].forEach(([label, valid]) => { if (!valid) errors.push(`UI contract missing: ${label}.`); });
 
-    return { ok: errors.length === 0, errors, productCount: products.length, sourceCount: Object.keys(models.sources).length };
+    return { ok: errors.length === 0, errors, warnings, productCount: products.length, sourceCount: Object.keys(models.sources).length };
 }
 
 if (require.main === module) {
