@@ -567,13 +567,14 @@ test('Batch 1 attributes trigger radio, battery, mains and recording requirement
     assert.ok(camera.supplierRequest.items.some((item) => /Recording-feature disclosure/.test(item.document)));
 });
 
-test('Batch 1 Japan and Singapore upgrade only when maintained local requirements are linked', () => {
+test('Batch 1 Japan and Singapore use maintained general safety when no radio rule applies', () => {
     const japan = engine.assess({ description: 'Wi-Fi tablet computer with rechargeable lithium battery', market: 'JP', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
     const singapore = engine.assess({ description: 'Bluetooth speaker with rechargeable lithium battery', market: 'SG', platform: 'TikTok Shop', assessmentMode: 'quick', blockingQuestionKeys: [] });
     const passiveHub = engine.assess({ description: 'Wired-only USB hub without battery or AC power', market: 'JP', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
     assert.equal(japan.coverage, 'deep');
     assert.equal(singapore.coverage, 'deep');
-    assert.equal(passiveHub.coverage, 'limited');
+    assert.equal(passiveHub.coverage, 'deep');
+    assert.ok(passiveHub.requirements.some((item) => item.id === 'jp_product_safety'));
     assert.match(japan.marketCoverage.label, /Maintained product coverage for Japan/);
     assert.match(singapore.marketCoverage.label, /Maintained product coverage for Singapore/);
     assert.ok(japan.requirements.some((item) => item.id === 'jp_radio'));

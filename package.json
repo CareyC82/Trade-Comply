@@ -11,6 +11,8 @@
     "check:quality": "node scripts/build-quality-status.js",
     "check:consumer-release": "node scripts/check-consumer-release-readiness.js",
     "build:consumer-regulatory-coverage": "node scripts/build-consumer-regulatory-coverage.js",
+    "audit:consumer-regulations": "node scripts/audit-regulatory-source-health.js",
+    "audit:consumer-regulations:live": "node scripts/audit-regulatory-source-health.js --probe-live",
     "test:consumer-browser": "playwright test --config=playwright.consumer.config.js",
     "build:automation-launch-status": "node scripts/build-automation-launch-status.js",
     "update:exact-tariff-parser-priorities": "node scripts/update-exact-tariff-parser-priorities.js",

@@ -22,13 +22,13 @@
       "cells_with_unsourced_requirements": 0
     },
     "JP": {
-      "deep": 19,
-      "limited": 11,
+      "deep": 30,
+      "limited": 0,
       "cells_with_unsourced_requirements": 0
     },
     "SG": {
-      "deep": 19,
-      "limited": 11,
+      "deep": 30,
+      "limited": 0,
       "cells_with_unsourced_requirements": 0
     }
   },
@@ -524,7 +524,8 @@
       ],
       "official_source_ids": [
         "jpOnlineSeller",
-        "jpPse"
+        "jpPse",
+        "jpPseProducts"
       ],
       "unsourced_requirements": []
     },
@@ -538,6 +539,7 @@
         "sg_safety"
       ],
       "official_source_ids": [
+        "sgControlledGoods",
         "sgSafety"
       ],
       "unsourced_requirements": []
@@ -588,7 +590,8 @@
       "official_source_ids": [
         "battery",
         "jpOnlineSeller",
-        "jpPse"
+        "jpPse",
+        "jpPseProducts"
       ],
       "unsourced_requirements": []
     },
@@ -884,13 +887,16 @@
       "product_id": "security_camera",
       "product": "IP / security camera",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "jp_product_safety",
         "privacy_features"
       ],
       "official_source_ids": [
-        "jpPrivacy"
+        "jpOnlineSeller",
+        "jpPrivacy",
+        "jpProductSafety"
       ],
       "unsourced_requirements": []
     },
@@ -898,13 +904,18 @@
       "product_id": "security_camera",
       "product": "IP / security camera",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "sg_general_safety",
+        "sg_safety",
         "privacy_features"
       ],
       "official_source_ids": [
-        "sgPrivacy"
+        "sgControlledGoods",
+        "sgGeneralSafety",
+        "sgPrivacy",
+        "sgSafety"
       ],
       "unsourced_requirements": []
     },
@@ -955,11 +966,14 @@
       "requirements": [
         "classification",
         "jp_radio",
-        "jp_pse"
+        "jp_pse",
+        "jp_iot_security"
       ],
       "official_source_ids": [
+        "jpIoTSecurity",
         "jpOnlineSeller",
         "jpPse",
+        "jpPseProducts",
         "jpRadio"
       ],
       "unsourced_requirements": []
@@ -972,10 +986,13 @@
       "requirements": [
         "classification",
         "sg_imda",
-        "sg_safety"
+        "sg_safety",
+        "sg_iot_security"
       ],
       "official_source_ids": [
+        "sgControlledGoods",
         "sgImda",
+        "sgIoTSecurity",
         "sgSafety"
       ],
       "unsourced_requirements": []
@@ -1023,7 +1040,8 @@
       ],
       "official_source_ids": [
         "jpOnlineSeller",
-        "jpPse"
+        "jpPse",
+        "jpPseProducts"
       ],
       "unsourced_requirements": []
     },
@@ -1037,6 +1055,7 @@
         "sg_safety"
       ],
       "official_source_ids": [
+        "sgControlledGoods",
         "sgSafety"
       ],
       "unsourced_requirements": []
@@ -1072,22 +1091,35 @@
       "product_id": "smart_light",
       "product": "Connected smart light / LED light",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "jp_product_safety",
+        "jp_pse"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
       "unsourced_requirements": []
     },
     {
       "product_id": "smart_light",
       "product": "Connected smart light / LED light",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "sg_general_safety",
+        "sg_safety"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety",
+        "sgSafety"
+      ],
       "unsourced_requirements": []
     },
     {
@@ -1243,22 +1275,33 @@
       "product_id": "gaming_controller",
       "product": "Gaming controller",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "jp_product_safety",
+        "jp_pse"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
       "unsourced_requirements": []
     },
     {
       "product_id": "gaming_controller",
       "product": "Gaming controller",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "sg_general_safety"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety"
+      ],
       "unsourced_requirements": []
     },
     {
@@ -1292,22 +1335,35 @@
       "product_id": "mini_projector",
       "product": "Mini projector",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "jp_product_safety",
+        "jp_pse"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
       "unsourced_requirements": []
     },
     {
       "product_id": "mini_projector",
       "product": "Mini projector",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "sg_general_safety",
+        "sg_safety"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety",
+        "sgSafety"
+      ],
       "unsourced_requirements": []
     },
     {
@@ -1341,22 +1397,30 @@
       "product_id": "usb_hub",
       "product": "USB hub / docking station",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "jp_product_safety"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety"
+      ],
       "unsourced_requirements": []
     },
     {
       "product_id": "usb_hub",
       "product": "USB hub / docking station",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "sg_general_safety"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety"
+      ],
       "unsourced_requirements": []
     },
     {
@@ -1407,10 +1471,12 @@
       "requirements": [
         "classification",
         "jp_radio",
+        "jp_iot_security",
         "battery"
       ],
       "official_source_ids": [
         "battery",
+        "jpIoTSecurity",
         "jpRadio"
       ],
       "unsourced_requirements": []
@@ -1423,11 +1489,13 @@
       "requirements": [
         "classification",
         "sg_imda",
+        "sg_iot_security",
         "battery"
       ],
       "official_source_ids": [
         "battery",
-        "sgImda"
+        "sgImda",
+        "sgIoTSecurity"
       ],
       "unsourced_requirements": []
     },
@@ -1479,10 +1547,12 @@
       "requirements": [
         "classification",
         "jp_radio",
+        "jp_iot_security",
         "battery"
       ],
       "official_source_ids": [
         "battery",
+        "jpIoTSecurity",
         "jpRadio"
       ],
       "unsourced_requirements": []
@@ -1495,11 +1565,13 @@
       "requirements": [
         "classification",
         "sg_imda",
+        "sg_iot_security",
         "battery"
       ],
       "official_source_ids": [
         "battery",
-        "sgImda"
+        "sgImda",
+        "sgIoTSecurity"
       ],
       "unsourced_requirements": []
     },
@@ -1534,22 +1606,35 @@
       "product_id": "portable_fan",
       "product": "USB / rechargeable portable fan",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "jp_product_safety",
+        "jp_pse"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
       "unsourced_requirements": []
     },
     {
       "product_id": "portable_fan",
       "product": "USB / rechargeable portable fan",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "sg_general_safety",
+        "sg_safety"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety",
+        "sgSafety"
+      ],
       "unsourced_requirements": []
     },
     {
@@ -1583,22 +1668,35 @@
       "product_id": "electric_shaver",
       "product": "Electric shaver",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "jp_product_safety",
+        "jp_pse"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
       "unsourced_requirements": []
     },
     {
       "product_id": "electric_shaver",
       "product": "Electric shaver",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
-        "classification"
+        "classification",
+        "sg_general_safety",
+        "sg_safety"
       ],
-      "official_source_ids": [],
+      "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety",
+        "sgSafety"
+      ],
       "unsourced_requirements": []
     },
     {
@@ -1637,13 +1735,16 @@
       "product_id": "webcam",
       "product": "Webcam / USB camera",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "jp_product_safety",
         "privacy_features"
       ],
       "official_source_ids": [
-        "jpPrivacy"
+        "jpOnlineSeller",
+        "jpPrivacy",
+        "jpProductSafety"
       ],
       "unsourced_requirements": []
     },
@@ -1651,12 +1752,15 @@
       "product_id": "webcam",
       "product": "Webcam / USB camera",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "sg_general_safety",
         "privacy_features"
       ],
       "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety",
         "sgPrivacy"
       ],
       "unsourced_requirements": []
@@ -1697,13 +1801,16 @@
       "product_id": "dash_camera",
       "product": "Dash camera",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "jp_product_safety",
         "privacy_features"
       ],
       "official_source_ids": [
-        "jpPrivacy"
+        "jpOnlineSeller",
+        "jpPrivacy",
+        "jpProductSafety"
       ],
       "unsourced_requirements": []
     },
@@ -1711,12 +1818,15 @@
       "product_id": "dash_camera",
       "product": "Dash camera",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "sg_general_safety",
         "privacy_features"
       ],
       "official_source_ids": [
+        "sgControlledGoods",
+        "sgGeneralSafety",
         "sgPrivacy"
       ],
       "unsourced_requirements": []
@@ -1757,13 +1867,19 @@
       "product_id": "video_doorbell",
       "product": "Video doorbell",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "jp_product_safety",
+        "jp_pse",
         "privacy_features"
       ],
       "official_source_ids": [
-        "jpPrivacy"
+        "jpOnlineSeller",
+        "jpPrivacy",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
       ],
       "unsourced_requirements": []
     },
@@ -1771,13 +1887,18 @@
       "product_id": "video_doorbell",
       "product": "Video doorbell",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "sg_general_safety",
+        "sg_safety",
         "privacy_features"
       ],
       "official_source_ids": [
-        "sgPrivacy"
+        "sgControlledGoods",
+        "sgGeneralSafety",
+        "sgPrivacy",
+        "sgSafety"
       ],
       "unsourced_requirements": []
     },
@@ -1822,15 +1943,17 @@
       "product_id": "baby_monitor",
       "product": "Baby monitor",
       "market": "JP",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "jp_product_safety",
         "privacy_features",
         "children"
       ],
       "official_source_ids": [
         "jpOnlineSeller",
-        "jpPrivacy"
+        "jpPrivacy",
+        "jpProductSafety"
       ],
       "unsourced_requirements": []
     },
@@ -1838,14 +1961,18 @@
       "product_id": "baby_monitor",
       "product": "Baby monitor",
       "market": "SG",
-      "coverage": "limited",
+      "coverage": "deep",
       "requirements": [
         "classification",
+        "sg_general_safety",
+        "sg_safety",
         "privacy_features",
         "children"
       ],
       "official_source_ids": [
         "sgChildrenPrivacy",
+        "sgControlledGoods",
+        "sgGeneralSafety",
         "sgPrivacy",
         "sgSafety"
       ],
@@ -1901,7 +2028,8 @@
       "official_source_ids": [
         "battery",
         "jpOnlineSeller",
-        "jpPse"
+        "jpPse",
+        "jpPseProducts"
       ],
       "unsourced_requirements": []
     },
@@ -1917,6 +2045,7 @@
       ],
       "official_source_ids": [
         "battery",
+        "sgControlledGoods",
         "sgSafety"
       ],
       "unsourced_requirements": []

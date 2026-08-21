@@ -21,6 +21,14 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
         else if (now - reviewed > maxSourceAgeDays * DAY_MS) errors.push(`${id}: source review is overdue.`);
     });
 
+    const coverageReport = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-coverage.json'), 'utf8'));
+    if (coverageReport.product_count !== products.length || coverageReport.matrix_cell_count !== products.length * 4) errors.push('Regulatory coverage report is out of date.');
+    if (coverageReport.cells.some((cell) => cell.unsourced_requirements.length)) errors.push('Regulatory coverage report contains unsourced requirements.');
+    const sourceHealth = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-source-health.json'), 'utf8'));
+    if (sourceHealth.source_count !== Object.keys(models.sources).length) errors.push('Regulatory source-health report is out of date.');
+    if (sourceHealth.sources.some((source) => source.alerts.includes('review_overdue'))) errors.push('Regulatory source review is overdue.');
+    if (sourceHealth.sources.some((source) => source.alerts.includes('source_link_failed'))) errors.push('Regulatory source-health report contains a failed official link.');
+
     const forbiddenByMarket = {
         US: ['red', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety'],
         EU: ['fcc', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety'],
