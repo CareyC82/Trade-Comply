@@ -58,6 +58,17 @@ test('Japan fan PSE candidate applies the official 300 W ceiling without overcla
     assert.equal(engine.marketRequirements('JP', engine.extractProfile('100V AC mains portable fan 400W')).some((item) => item.id === 'jp_pse'), false);
 });
 
+test('JP and SG direct-mains candidate categories do not leak into battery-only configurations', () => {
+    for (const [market, description] of [
+        ['JP', 'USB only battery smart light without AC input'],
+        ['JP', 'USB only rechargeable electric shaver without AC input'],
+        ['SG', 'USB only battery security camera without AC input'],
+        ['SG', 'USB only battery mini projector without AC input']
+    ]) assert.equal(engine.marketRequirements(market, engine.extractProfile(description)).some((item) => ['jp_pse', 'sg_safety'].includes(item.id)), false, `${market}: ${description}`);
+    const singapore = engine.marketRequirements('SG', engine.extractProfile('230V AC mains mini projector')).find((item) => item.id === 'sg_safety');
+    assert.match(singapore.reason, /230 V is within the 250 VAC category limit/);
+});
+
 test('new adjacent electronics aliases resolve without conflicting with existing models', () => {
     const samples = {
         webcam: ['USB webcam', 'computer camera'],

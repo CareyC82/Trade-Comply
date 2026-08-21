@@ -11,14 +11,20 @@ const SNAPSHOT_PATH = path.join(ROOT, 'data', 'consumer-regulatory-snapshots.jso
 const CHANGES_PATH = path.join(ROOT, 'data', 'consumer-regulatory-changes.json');
 
 async function fetchOfficial(source) {
-    try {
-        const response = await fetch(source.url, { redirect: 'follow', signal: AbortSignal.timeout(15000), headers: { 'user-agent': 'TraceWize-Regulatory-Monitor/1.0' } });
-        if (!response.ok) return { ok: false, error: `http_${response.status}` };
-        const parsed = parseOfficialPayload({ source, body: Buffer.from(await response.arrayBuffer()), contentType: response.headers.get('content-type') || '' });
-        return parsed.ok ? parsed : { ok: false, error: parsed.error, adapter: parsed.adapter };
-    } catch (error) {
-        return { ok: false, error: error.name === 'TimeoutError' ? 'timeout' : 'network_or_parser_failure' };
+    const urls = [source.url, ...(source.monitorUrls || [])];
+    let lastFailure = { ok: false, error: 'not_fetched' };
+    for (const url of urls) {
+        try {
+            const response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000), headers: { 'user-agent': 'Mozilla/5.0 (compatible; TraceWizeRegulatoryMonitor/1.0; +https://tracewize.com)', accept: 'text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.8', 'accept-language': 'en-US,en;q=0.9,ja;q=0.7' } });
+            if (!response.ok) { lastFailure = { ok: false, error: `http_${response.status}`, monitoredUrl: url }; continue; }
+            const parsed = parseOfficialPayload({ source: { ...source, url }, body: Buffer.from(await response.arrayBuffer()), contentType: response.headers.get('content-type') || '' });
+            if (parsed.ok) return { ...parsed, monitoredUrl: url };
+            lastFailure = { ok: false, error: parsed.error, adapter: parsed.adapter, monitoredUrl: url };
+        } catch (error) {
+            lastFailure = { ok: false, error: error.name === 'TimeoutError' ? 'timeout' : 'network_or_parser_failure', monitoredUrl: url };
+        }
     }
+    return lastFailure;
 }
 
 function writeJsonAtomic(file, value) {

@@ -2382,6 +2382,7 @@
             const counts = data.counts || {};
             const changes = Array.isArray(data.changes) ? data.changes : [];
             const sources = Array.isArray(data.sources) ? data.sources : [];
+            const auditEvents = Array.isArray(data.audit?.events) ? data.audit.events : [];
             const lifecycleLabel = { active: 'Active', future: 'Future', transition: 'Transition', published_pending_effective_date: 'Effective date pending', repealed: 'Repealed', replaced: 'Replaced' };
             return `
                 <div class="summary-grid">
@@ -2390,7 +2391,8 @@
                     <div class="summary-card"><strong>${escapeHtml(counts.future || 0)}</strong><span>Future requirements</span></div>
                     <div class="summary-card"><strong>${escapeHtml(counts.degraded || 0)}</strong><span>Using last-good</span></div>
                 </div>
-                ${changes.length ? `<div class="crawl-section-title"><h3>Manual review queue</h3><span class="meta">No automatic rule changes</span></div><div class="crawl-list">${changes.map(change => `<article class="crawl-item"><strong>${escapeHtml(change.id)} · ${escapeHtml(change.type)}</strong><span class="badge updater_candidate">${escapeHtml(change.review_status || 'pending_review')}</span><p class="meta">Detected ${escapeHtml(formatDateTime(change.detected_at))}</p><details><summary>Compare evidence</summary><p>${escapeHtml(change.previous_summary || change.previous || '—')}</p><p>${escapeHtml(change.current_summary || change.current || '—')}</p></details></article>`).join('')}</div>` : '<div class="empty">No official-content changes awaiting review.</div>'}
+                ${changes.length ? `<div class="crawl-section-title"><h3>Manual review queue</h3><span class="meta">No automatic rule changes</span></div><div class="crawl-list">${changes.map(change => `<article class="crawl-item regulatory-review-item" data-source-id="${escapeHtml(change.id)}" data-change-type="${escapeHtml(change.type)}"><strong>${escapeHtml(change.id)} · ${escapeHtml(change.type)}</strong><span class="badge updater_candidate">${escapeHtml(change.review_status || 'pending_review')}</span><p class="meta">Detected ${escapeHtml(formatDateTime(change.detected_at))}</p><p class="meta"><strong>Impact preview:</strong> ${escapeHtml((change.impact?.markets || []).join(', ') || 'No active market mapping')} · ${(change.impact?.products || []).length} product/market cells · requirements ${escapeHtml((change.impact?.requirement_ids || []).join(', ') || 'none')}</p><p class="meta">${escapeHtml(change.impact?.conclusion_preview || '')}</p><details><summary>Compare evidence</summary><p>${escapeHtml(change.previous_summary || change.previous || '—')}</p><p>${escapeHtml(change.current_summary || change.current || '—')}</p></details>${change.review_status === 'pending_review' ? `<label class="meta">Review note<input class="regulatory-review-note" maxlength="500" placeholder="Why was this evidence accepted or ignored?"></label><div class="row"><button type="button" class="btn-primary" data-regulatory-action="approve_evidence">Approve evidence</button><button type="button" class="btn-ghost" data-regulatory-action="ignore">Ignore change</button></div>` : `<button type="button" class="btn-ghost" data-regulatory-action="reopen">Reopen review</button>`}</article>`).join('')}</div>` : '<div class="empty">No official-content changes awaiting review.</div>'}
+                ${auditEvents.length ? `<div class="crawl-section-title"><h3>Review and rollback history</h3><span class="meta">${auditEvents.length} immutable event(s)</span></div><div class="crawl-list">${auditEvents.slice().reverse().slice(0, 20).map(event => `<article class="crawl-item"><strong>${escapeHtml(event.id)} · ${escapeHtml(event.action)}</strong><p class="meta">${escapeHtml(event.previous_status || '—')} → ${escapeHtml(event.current_status || '—')} · ${escapeHtml(formatDateTime(event.reviewed_at))} · ${escapeHtml(event.reviewed_by || '')}</p><p>${escapeHtml(event.note || 'No note')}</p></article>`).join('')}</div>` : ''}
                 <div class="crawl-section-title"><h3>Source lifecycle and fallback status</h3><span class="meta">${sources.length} source(s)</span></div>
                 <div class="crawl-list">${sources.map(source => `<article class="crawl-item"><strong>${escapeHtml(source.id)}</strong><span class="badge ${source.status === 'last_good_degraded' ? 'benchmark' : 'auto_updatable'}">${escapeHtml(source.status || '')}</span><p class="meta">${escapeHtml(lifecycleLabel[source.lifecycle_state] || source.lifecycle_state || 'Unknown')} · adapter ${escapeHtml(source.adapter || source.capture_mode || 'metadata seed')} · last good ${escapeHtml(formatDateTime(source.last_good_at))}</p>${source.fetch_error ? `<p class="meta">Refresh issue: ${escapeHtml(source.fetch_error)}; current result still uses last-good evidence.</p>` : ''}</article>`).join('')}</div>`;
         }
@@ -2400,6 +2402,20 @@
             consumerRegulatoryStatus.innerHTML = '<p class="meta">正在加载消费电子法规状态…</p>';
             try { consumerRegulatoryStatus.innerHTML = renderConsumerRegulatoryStatus(await apiFetch('/api/review/consumer-regulations')); }
             catch (err) { consumerRegulatoryStatus.innerHTML = `<div class="empty">法规状态加载失败：${escapeHtml(err.message)}</div>`; }
+        }
+
+        async function handleRegulatoryReviewAction(button) {
+            const card = button.closest('.regulatory-review-item');
+            const action = button.dataset.regulatoryAction;
+            if (!card || !action) return;
+            const note = card.querySelector('.regulatory-review-note')?.value || '';
+            if (action !== 'reopen' && !note.trim()) return window.alert('Please add a short review reason.');
+            if (!window.confirm('This records an evidence-review decision only. Product rules will not be auto-published. Continue?')) return;
+            button.disabled = true;
+            try {
+                const result = await apiFetch('/api/review/consumer-regulations', { method: 'POST', body: JSON.stringify({ id: card.dataset.sourceId, type: card.dataset.changeType, action, note }) });
+                consumerRegulatoryStatus.innerHTML = renderConsumerRegulatoryStatus(result.status);
+            } catch (error) { window.alert(error.message); button.disabled = false; }
         }
 
         async function loadCrawlSummary() {
@@ -2619,6 +2635,10 @@
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
         document.getElementById('btn-refresh-duty-rates').addEventListener('click', loadDutyRateStatus);
         document.getElementById('btn-refresh-consumer-regulations').addEventListener('click', loadConsumerRegulatoryStatus);
+        consumerRegulatoryStatus.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-regulatory-action]');
+            if (button) handleRegulatoryReviewAction(button);
+        });
         document.getElementById('btn-refresh-unmet-searches').addEventListener('click', loadUnmetSearches);
         document.getElementById('btn-refresh-quality').addEventListener('click', loadQualityStatus);
         document.getElementById('btn-refresh-coverage').addEventListener('click', loadCoverageMatrixView);

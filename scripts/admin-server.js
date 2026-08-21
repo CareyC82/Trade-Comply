@@ -49,6 +49,7 @@ const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
 const UNMET_SEARCH_BACKLOG_PATH = path.join(ROOT, 'data', 'unmet-search-backlog.json');
 const REGULATORY_SNAPSHOTS_PATH = path.join(ROOT, 'data', 'consumer-regulatory-snapshots.json');
 const REGULATORY_CHANGES_PATH = path.join(ROOT, 'data', 'consumer-regulatory-changes.json');
+const REGULATORY_REVIEW_AUDIT_PATH = path.join(ROOT, 'data', 'consumer-regulatory-review-audit.json');
 const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
@@ -342,6 +343,7 @@ async function handleDutyRateStatus(req, res) {
 }
 
 function buildConsumerRegulatoryStatusPayload() {
+    const { enrichChanges } = require('../lib/regulatory-change-review');
     const snapshots = readJsonFile(REGULATORY_SNAPSHOTS_PATH, { sources: [], source_count: 0 });
     const changes = readJsonFile(REGULATORY_CHANGES_PATH, { changes: [], pending_review_count: 0 });
     const counts = snapshots.sources.reduce((result, source) => {
@@ -349,11 +351,19 @@ function buildConsumerRegulatoryStatusPayload() {
         if (source.status === 'last_good_degraded') result.degraded = (result.degraded || 0) + 1;
         return result;
     }, {});
-    return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, pending_review_count: changes.changes.filter((item) => item.review_status === 'pending_review').length, changes: changes.changes };
+    const enriched = enrichChanges(changes);
+    return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, pending_review_count: enriched.changes.filter((item) => item.review_status === 'pending_review').length, changes: enriched.changes, audit: readJsonFile(REGULATORY_REVIEW_AUDIT_PATH, { events: [] }) };
 }
 
 async function handleConsumerRegulatoryStatus(req, res) {
-    sendJson(res, 200, buildConsumerRegulatoryStatusPayload());
+    if (req.method === 'GET') return sendJson(res, 200, buildConsumerRegulatoryStatusPayload());
+    if (req.method !== 'POST') return sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+    try {
+        const body = await readBody(req);
+        const { reviewChange } = require('../lib/regulatory-change-review');
+        const result = reviewChange({ changesFile: REGULATORY_CHANGES_PATH, auditFile: REGULATORY_REVIEW_AUDIT_PATH, id: String(body.id || ''), type: String(body.type || ''), action: String(body.action || ''), note: body.note || '' });
+        sendJson(res, 200, { ok: true, result, status: buildConsumerRegulatoryStatusPayload() });
+    } catch (error) { sendJson(res, 400, { ok: false, error: error.message }); }
 }
 
 function buildQualityStatusPayload() {
@@ -574,7 +584,7 @@ async function handleApi(req, res) {
             return;
         }
 
-        if (req.method === 'GET' && urlPath === '/api/review/consumer-regulations') {
+        if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/api/review/consumer-regulations') {
             await handleConsumerRegulatoryStatus(req, res);
             return;
         }

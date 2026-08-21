@@ -19,6 +19,8 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.match(html, /Consumer regulatory change review/);
     assert.match(html, /No automatic rule changes/);
     assert.match(html, /Using last-good/);
+    assert.match(html, /Approve evidence/);
+    assert.match(html, /Review and rollback history/);
 });
 
 test('admin page includes duty-rate automation health queue', () => {

@@ -31,9 +31,12 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
     if (sourceHealth.sources.some((source) => source.alerts.includes('source_link_failed'))) errors.push('Regulatory source-health report contains a failed official link.');
     const snapshots = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-snapshots.json'), 'utf8'));
     const changes = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-changes.json'), 'utf8'));
+    const reviewAudit = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-review-audit.json'), 'utf8'));
     if (snapshots.source_count !== Object.keys(models.sources).length) errors.push('Regulatory content snapshot is out of date.');
     if (changes.source_count !== Object.keys(models.sources).length) errors.push('Regulatory change report is out of date.');
-    if (changes.changes.some((change) => change.auto_apply !== false || change.review_status !== 'pending_review')) errors.push('Regulatory changes must remain manual-review-only until explicitly resolved.');
+    const reviewStatuses = new Set(['pending_review', 'evidence_approved', 'ignored']);
+    if (changes.changes.some((change) => change.auto_apply !== false || !reviewStatuses.has(change.review_status))) errors.push('Regulatory changes must remain manual-review-only and use a valid review status.');
+    if (!Array.isArray(reviewAudit.events) || reviewAudit.events.some((event) => event.impact?.auto_publish !== false)) errors.push('Regulatory review audit is invalid or permits automatic publication.');
     snapshots.sources.forEach((source) => {
         if (!source.content_hash || !source.last_good_at || !source.lifecycle_state) errors.push(`${source.id}: missing last-good content or lifecycle state.`);
         if (source.status === 'last_good_degraded') warnings.push(`${source.id}: live refresh degraded; preserved last known good content.`);
