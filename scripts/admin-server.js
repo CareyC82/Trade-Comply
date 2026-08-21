@@ -47,6 +47,8 @@ const DUTY_RATE_SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-statu
 const AUTOMATION_LAUNCH_STATUS_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
 const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
 const UNMET_SEARCH_BACKLOG_PATH = path.join(ROOT, 'data', 'unmet-search-backlog.json');
+const REGULATORY_SNAPSHOTS_PATH = path.join(ROOT, 'data', 'consumer-regulatory-snapshots.json');
+const REGULATORY_CHANGES_PATH = path.join(ROOT, 'data', 'consumer-regulatory-changes.json');
 const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
@@ -339,6 +341,21 @@ async function handleDutyRateStatus(req, res) {
     sendJson(res, 200, buildDutyRateStatusPayload());
 }
 
+function buildConsumerRegulatoryStatusPayload() {
+    const snapshots = readJsonFile(REGULATORY_SNAPSHOTS_PATH, { sources: [], source_count: 0 });
+    const changes = readJsonFile(REGULATORY_CHANGES_PATH, { changes: [], pending_review_count: 0 });
+    const counts = snapshots.sources.reduce((result, source) => {
+        result[source.lifecycle_state || 'unknown'] = (result[source.lifecycle_state || 'unknown'] || 0) + 1;
+        if (source.status === 'last_good_degraded') result.degraded = (result.degraded || 0) + 1;
+        return result;
+    }, {});
+    return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, pending_review_count: changes.changes.filter((item) => item.review_status === 'pending_review').length, changes: changes.changes };
+}
+
+async function handleConsumerRegulatoryStatus(req, res) {
+    sendJson(res, 200, buildConsumerRegulatoryStatusPayload());
+}
+
 function buildQualityStatusPayload() {
     const { buildQualityStatus } = require('./build-quality-status');
     return buildQualityStatus();
@@ -557,6 +574,11 @@ async function handleApi(req, res) {
             return;
         }
 
+        if (req.method === 'GET' && urlPath === '/api/review/consumer-regulations') {
+            await handleConsumerRegulatoryStatus(req, res);
+            return;
+        }
+
         if (req.method === 'GET' && urlPath === '/api/review/quality-status') {
             await handleQualityStatus(req, res);
             return;
@@ -650,6 +672,7 @@ if (require.main === module) {
 
 module.exports = {
     buildDutyRateStatusPayload,
+    buildConsumerRegulatoryStatusPayload,
     buildExactTariffFeedStatus,
     buildQualityStatusPayload,
     buildUnmetSearchBacklogPayload,

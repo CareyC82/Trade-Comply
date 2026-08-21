@@ -426,6 +426,16 @@
 
         <div id="review-panel" class="hidden">
             <div class="panel">
+                <div class="crawl-section-title">
+                    <div>
+                        <h2 style="margin:0 0 4px">Consumer regulatory change review</h2>
+                        <p class="meta" style="margin:0">官方源正文、生效状态及 last-good 保护；检测到变化后只进入人工审核，不自动发布。</p>
+                    </div>
+                    <button type="button" class="btn-ghost" id="btn-refresh-consumer-regulations">刷新法规状态</button>
+                </div>
+                <div id="consumer-regulatory-status">加载中…</div>
+            </div>
+            <div class="panel">
                 <div class="status-bar" id="status-bar">加载中…</div>
                 <div class="row">
                     <button type="button" class="btn-ghost" id="btn-refresh">刷新列表</button>
@@ -508,6 +518,7 @@
         const pendingList = document.getElementById('pending-list');
         const crawlSummary = document.getElementById('crawl-summary');
         const dutyRateStatus = document.getElementById('duty-rate-status');
+        const consumerRegulatoryStatus = document.getElementById('consumer-regulatory-status');
         const unmetSearchStatus = document.getElementById('unmet-search-status');
         const qualityStatus = document.getElementById('quality-status');
         const coverageMatrixView = document.getElementById('coverage-matrix-view');
@@ -2367,6 +2378,30 @@
             }
         }
 
+        function renderConsumerRegulatoryStatus(data) {
+            const counts = data.counts || {};
+            const changes = Array.isArray(data.changes) ? data.changes : [];
+            const sources = Array.isArray(data.sources) ? data.sources : [];
+            const lifecycleLabel = { active: 'Active', future: 'Future', transition: 'Transition', published_pending_effective_date: 'Effective date pending', repealed: 'Repealed', replaced: 'Replaced' };
+            return `
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${escapeHtml(data.source_count || 0)}</strong><span>Official sources</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(data.pending_review_count || 0)}</strong><span>Changes awaiting review</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(counts.future || 0)}</strong><span>Future requirements</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(counts.degraded || 0)}</strong><span>Using last-good</span></div>
+                </div>
+                ${changes.length ? `<div class="crawl-section-title"><h3>Manual review queue</h3><span class="meta">No automatic rule changes</span></div><div class="crawl-list">${changes.map(change => `<article class="crawl-item"><strong>${escapeHtml(change.id)} · ${escapeHtml(change.type)}</strong><span class="badge updater_candidate">${escapeHtml(change.review_status || 'pending_review')}</span><p class="meta">Detected ${escapeHtml(formatDateTime(change.detected_at))}</p><details><summary>Compare evidence</summary><p>${escapeHtml(change.previous_summary || change.previous || '—')}</p><p>${escapeHtml(change.current_summary || change.current || '—')}</p></details></article>`).join('')}</div>` : '<div class="empty">No official-content changes awaiting review.</div>'}
+                <div class="crawl-section-title"><h3>Source lifecycle and fallback status</h3><span class="meta">${sources.length} source(s)</span></div>
+                <div class="crawl-list">${sources.map(source => `<article class="crawl-item"><strong>${escapeHtml(source.id)}</strong><span class="badge ${source.status === 'last_good_degraded' ? 'benchmark' : 'auto_updatable'}">${escapeHtml(source.status || '')}</span><p class="meta">${escapeHtml(lifecycleLabel[source.lifecycle_state] || source.lifecycle_state || 'Unknown')} · adapter ${escapeHtml(source.adapter || source.capture_mode || 'metadata seed')} · last good ${escapeHtml(formatDateTime(source.last_good_at))}</p>${source.fetch_error ? `<p class="meta">Refresh issue: ${escapeHtml(source.fetch_error)}; current result still uses last-good evidence.</p>` : ''}</article>`).join('')}</div>`;
+        }
+
+        async function loadConsumerRegulatoryStatus() {
+            if (!consumerRegulatoryStatus) return;
+            consumerRegulatoryStatus.innerHTML = '<p class="meta">正在加载消费电子法规状态…</p>';
+            try { consumerRegulatoryStatus.innerHTML = renderConsumerRegulatoryStatus(await apiFetch('/api/review/consumer-regulations')); }
+            catch (err) { consumerRegulatoryStatus.innerHTML = `<div class="empty">法规状态加载失败：${escapeHtml(err.message)}</div>`; }
+        }
+
         async function loadCrawlSummary() {
             if (!crawlSummary) return;
             crawlSummary.innerHTML = '<p class="meta">正在加载抓取摘要…</p>';
@@ -2458,6 +2493,7 @@
             reviewPanel.classList.remove('hidden');
             loadCrawlSummary();
             loadDutyRateStatus();
+            loadConsumerRegulatoryStatus();
             loadUnmetSearches();
             loadQualityStatus();
             loadCoverageMatrixView();
@@ -2582,6 +2618,7 @@
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
         document.getElementById('btn-refresh-duty-rates').addEventListener('click', loadDutyRateStatus);
+        document.getElementById('btn-refresh-consumer-regulations').addEventListener('click', loadConsumerRegulatoryStatus);
         document.getElementById('btn-refresh-unmet-searches').addEventListener('click', loadUnmetSearches);
         document.getElementById('btn-refresh-quality').addEventListener('click', loadQualityStatus);
         document.getElementById('btn-refresh-coverage').addEventListener('click', loadCoverageMatrixView);
@@ -2620,7 +2657,7 @@
                 statusBar.textContent = `Connected · build ${health.build || 'unknown'} · engine ${health.engine || '—'}`;
                 showReview(true);
                 await loadPending();
-                await Promise.all([loadDutyRateStatus(), loadUnmetSearches(), loadQualityStatus()]);
+                await Promise.all([loadDutyRateStatus(), loadConsumerRegulatoryStatus(), loadUnmetSearches(), loadQualityStatus()]);
             } catch (err) {
                 setToken('');
                 showLogin();

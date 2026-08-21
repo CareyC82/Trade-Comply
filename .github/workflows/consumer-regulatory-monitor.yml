@@ -1,0 +1,44 @@
+name: Consumer Regulatory Monitor
+
+on:
+  schedule:
+    - cron: "30 18 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: consumer-regulatory-monitor-main
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Capture official source changes with last-good fallback
+        run: npm run update:consumer-regulations:live
+      - name: Verify release and manual-review guardrails
+        run: npm run check:consumer-release
+      - name: Run regulatory monitor tests
+        run: node --test test/regulatory-source-monitor.test.js test/consumer-regulatory-coverage.test.js test/consumer-release-readiness.test.js
+      - name: Commit monitoring evidence only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/consumer-regulatory-snapshots.json data/consumer-regulatory-changes.json
+          if git diff --staged --quiet; then
+            echo "No consumer regulatory source changes."
+            exit 0
+          fi
+          git commit -m "data: queue consumer regulatory source review"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}"
+          git push

@@ -33,6 +33,7 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
     const changes = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-changes.json'), 'utf8'));
     if (snapshots.source_count !== Object.keys(models.sources).length) errors.push('Regulatory content snapshot is out of date.');
     if (changes.source_count !== Object.keys(models.sources).length) errors.push('Regulatory change report is out of date.');
+    if (changes.changes.some((change) => change.auto_apply !== false || change.review_status !== 'pending_review')) errors.push('Regulatory changes must remain manual-review-only until explicitly resolved.');
     snapshots.sources.forEach((source) => {
         if (!source.content_hash || !source.last_good_at || !source.lifecycle_state) errors.push(`${source.id}: missing last-good content or lifecycle state.`);
         if (source.status === 'last_good_degraded') warnings.push(`${source.id}: live refresh degraded; preserved last known good content.`);

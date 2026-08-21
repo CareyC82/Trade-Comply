@@ -3,6 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { normalizeContent, contentHash, lifecycleState, buildSnapshot } = require('../lib/regulatory-source-monitor');
+const { adapterFor, parseOfficialPayload } = require('../lib/official-regulatory-source-adapters');
 
 const source = { authority: 'Authority', title: 'Rule title', scope: 'Official scope', url: 'https://example.gov/rule', lifecycle: { status: 'active', effectiveAt: '2025-01-01' } };
 
@@ -27,8 +28,25 @@ test('network and empty-parser failures preserve the last known good snapshot', 
     }
 });
 
+test('offline lifecycle refresh does not falsely mark official sources degraded', () => {
+    const first = buildSnapshot({ sources: { rule: source }, fetched: { rule: { ok: true, content: 'A'.repeat(100) } }, now: '2026-01-01T00:00:00Z' });
+    const next = buildSnapshot({ sources: { rule: source }, previous: first.snapshot, now: '2026-01-02T00:00:00Z' });
+    assert.equal(next.snapshot.sources[0].status, 'current');
+    assert.equal(next.snapshot.sources[0].fetched_at, '2026-01-01T00:00:00Z');
+});
+
 test('effective-date state machine separates pending, future and active rules', () => {
     assert.equal(lifecycleState({ lifecycle: { status: 'published_pending_effective_date', effectiveAt: null } }, Date.parse('2026-08-21')), 'published_pending_effective_date');
     assert.equal(lifecycleState({ lifecycle: { status: 'future', effectiveAt: '2027-02-18' } }, Date.parse('2026-08-21')), 'future');
     assert.equal(lifecycleState({ lifecycle: { status: 'future', effectiveAt: '2027-02-18' } }, Date.parse('2027-02-19')), 'active');
+});
+
+test('official adapters distinguish PDF and jurisdiction-specific HTML', () => {
+    assert.equal(adapterFor({ url: 'https://docs.fcc.gov/rule.pdf' }, 'application/pdf'), 'official_pdf_fingerprint');
+    assert.equal(adapterFor({ url: 'https://eur-lex.europa.eu/legal-content' }), 'eur_lex_html');
+    assert.equal(adapterFor({ url: 'https://www.meti.go.jp/policy/rule' }), 'jp_meti_html');
+    assert.equal(adapterFor({ url: 'https://www.consumerproductsafety.gov.sg/suppliers/cpsr/' }), 'sg_cpso_html');
+    const parsed = parseOfficialPayload({ source, body: `<html><nav>${'noise '.repeat(30)}</nav><main>${'official rule '.repeat(20)}</main></html>`, contentType: 'text/html' });
+    assert.equal(parsed.ok, true);
+    assert.doesNotMatch(parsed.content, /noise/);
 });

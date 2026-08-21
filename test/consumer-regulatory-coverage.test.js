@@ -42,11 +42,20 @@ test('EU battery and Japan online-seller evidence are specific and date-bounded'
 });
 
 test('Singapore controlled-goods mapping names the candidate scope without claiming approval', () => {
-    const requirement = engine.marketRequirements('SG', engine.extractProfile('Rechargeable portable fan'))
+    const requirement = engine.marketRequirements('SG', engine.extractProfile('230V AC mains portable fan'))
         .find((item) => item.id === 'sg_safety');
     assert.equal(requirement.requirementClass, 'scope_check');
     assert.match(requirement.reason, /fan/i);
     assert.match(requirement.reason, /confirm/i);
+    assert.match(requirement.reason, /230 V is within the 250 VAC category limit/);
+    assert.equal(engine.marketRequirements('SG', engine.extractProfile('300V AC mains portable fan')).some((item) => item.id === 'sg_safety'), false);
+    assert.equal(engine.marketRequirements('SG', engine.extractProfile('USB only rechargeable portable fan')).some((item) => item.id === 'sg_safety'), false);
+});
+
+test('Japan fan PSE candidate applies the official 300 W ceiling without overclaiming scope', () => {
+    const within = engine.marketRequirements('JP', engine.extractProfile('100V AC mains portable fan 45W')).find((item) => item.id === 'jp_pse');
+    assert.match(within.reason, /45 W is within the 300 W category limit/);
+    assert.equal(engine.marketRequirements('JP', engine.extractProfile('100V AC mains portable fan 400W')).some((item) => item.id === 'jp_pse'), false);
 });
 
 test('new adjacent electronics aliases resolve without conflicting with existing models', () => {
