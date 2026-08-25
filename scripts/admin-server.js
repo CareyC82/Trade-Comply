@@ -45,6 +45,7 @@ const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const DUTY_RATE_SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const MY_DUTY_RATE_IMPORT_STATUS_PATH = path.join(ROOT, 'data', 'my-duty-rate-import-status.json');
+const P2_DUTY_RATE_IMPORT_STATUS_PATH = path.join(ROOT, 'data', 'p2-duty-rate-import-status.json');
 const AUTOMATION_LAUNCH_STATUS_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
 const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
 const UNMET_SEARCH_BACKLOG_PATH = path.join(ROOT, 'data', 'unmet-search-backlog.json');
@@ -294,6 +295,11 @@ function buildDutyRateStatusPayload() {
             trust_gate: 'not_run',
             last_good_at: null,
             checked_at: null
+        }),
+        p2_official_artifact_imports: readJsonFile(P2_DUTY_RATE_IMPORT_STATUS_PATH, {
+            schema_version: 1,
+            updated_at: null,
+            markets: {}
         })
     };
 }

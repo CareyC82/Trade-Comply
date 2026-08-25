@@ -36,6 +36,7 @@ test('EU battery and Japan online-seller evidence are specific and date-bounded'
     assert.match(euBatteryFuture.reason, /18 February 2027/);
     assert.equal(euBatteryFuture.requirementClass, 'future');
     assert.ok(euBatteryFuture.sources.some((source) => /batteries/i.test(source.title)));
+    assert.match(euBatteryFuture.sources[0].scope, /due-diligence obligations were separately postponed to 18 August 2027/);
 
     const jpPse = engine.marketRequirements('JP', engine.extractProfile('65W mains-powered wall charger'))
         .find((item) => item.id === 'jp_pse');

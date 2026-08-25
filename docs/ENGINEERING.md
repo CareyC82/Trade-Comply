@@ -81,6 +81,20 @@ requires every row to carry an explicit rate and an exact 10-digit AHTN code, wi
 rates for the same code. Any failure updates only the Admin import status and preserves the prior
 last-good duty data. SST, preferences, exemptions, and SIRIM/MCMC/ST approvals remain separate.
 
+The remaining P2 markets use the same guarded artifact workflow:
+
+```bash
+npm run import:duty-rates:p2:dry-run -- --country=IN --file /path/to/tariff.xlsx --manifest /path/to/manifest.json
+npm run import:duty-rates:p2 -- --country=IN --file /path/to/tariff.xlsx --manifest /path/to/manifest.json
+```
+
+Use `KR`, `VN`, or `TW` for the other markets. Exact national code lengths are enforced: India and
+Vietnam 8 digits, Korea 10 digits, and Taiwan 11 digits. India additionally requires explicit BCD,
+SWS, and IGST fields; only BCD becomes the base-duty override. The manifest must identify the market
+and official authority, use the configured government HTTPS domain, declare `coverage_scope` as
+`full_tariff`, and provide complete/hash/row-count/publication/effective-date evidence. VAT/GST,
+preferences, exemptions, and product approvals remain separate layers in every market.
+
 Each response must declare `complete: true`, identify an official HTTPS source, and provide 8- or
 10-digit rows with a base-duty field and optional effective dates. Heading-only rows, conflicting
 rates, invalid dates, and incomplete snapshots are rejected. Exact overrides apply only when the
