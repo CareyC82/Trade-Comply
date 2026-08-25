@@ -44,6 +44,7 @@ const COVERAGE_MATRIX_PATH = path.join(ROOT, 'data', 'coverage-matrix.json');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json');
 const DUTY_RATE_SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
+const MY_DUTY_RATE_IMPORT_STATUS_PATH = path.join(ROOT, 'data', 'my-duty-rate-import-status.json');
 const AUTOMATION_LAUNCH_STATUS_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
 const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
 const UNMET_SEARCH_BACKLOG_PATH = path.join(ROOT, 'data', 'unmet-search-backlog.json');
@@ -287,7 +288,13 @@ function buildDutyRateStatusPayload() {
         duty_rate_sync_status: syncStatus,
         automation_launch_status: automationLaunchStatus,
         sources: Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : [],
-        exact_tariff_feeds: buildExactTariffFeedStatus(dutyPayload)
+        exact_tariff_feeds: buildExactTariffFeedStatus(dutyPayload),
+        my_official_artifact_import: readJsonFile(MY_DUTY_RATE_IMPORT_STATUS_PATH, {
+            ok: null,
+            trust_gate: 'not_run',
+            last_good_at: null,
+            checked_at: null
+        })
     };
 }
 

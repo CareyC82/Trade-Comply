@@ -65,6 +65,22 @@ classes. Mexico lines are downloaded from the official SNICE `Fracciones Arancel
 workbook: 8-digit TIGIE import rates are joined to the workbook's 2-digit NICO rows and
 published as filing-grade 10-digit codes.
 
+Malaysia uses a local, operator-supplied official artifact because the public JKDM pages do not
+currently expose a reliable complete download to the automated crawler. Supply an XLSX, CSV, or
+full HTML table together with a JSON manifest, then run:
+
+```bash
+npm run import:duty-rates:my:dry-run -- --file /path/to/tariff.xlsx --manifest /path/to/manifest.json
+npm run import:duty-rates:my -- --file /path/to/tariff.xlsx --manifest /path/to/manifest.json
+```
+
+The manifest requires `authority: "Royal Malaysian Customs Department"`,
+`coverage_scope: "full_tariff"`, `source_url` on an HTTPS `customs.gov.my` host, `published_at`,
+`effective_at`, `complete: true`, the exact `expected_rows`, and the artifact `sha256`. Publication
+requires every row to carry an explicit rate and an exact 10-digit AHTN code, with no conflicting
+rates for the same code. Any failure updates only the Admin import status and preserves the prior
+last-good duty data. SST, preferences, exemptions, and SIRIM/MCMC/ST approvals remain separate.
+
 Each response must declare `complete: true`, identify an official HTTPS source, and provide 8- or
 10-digit rows with a base-duty field and optional effective dates. Heading-only rows, conflicting
 rates, invalid dates, and incomplete snapshots are rejected. Exact overrides apply only when the

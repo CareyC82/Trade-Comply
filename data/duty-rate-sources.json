@@ -351,8 +351,8 @@
       "source_status": "hybrid_official_candidate",
       "maintenance_priority": "P2",
       "status_reason": "Malaysia maintained high-tech HS lines use exact-line duty candidates while the updater probes Royal Malaysian Customs/SST pages for parser readiness; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
-      "updater_script": "scripts/update-static-duty-rates.js",
-      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY --official-live",
+      "updater_script": "scripts/import-my-duty-rates.js",
+      "update_command": "npm run import:duty-rates:my -- --file /path/to/official-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
@@ -373,7 +373,7 @@
       ],
       "transit_route_priority": true,
       "artifact_evidence_required": true,
-      "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
+      "next_action": "Import a complete Royal Malaysian Customs tariff artifact only after its official source, hash, publication/effective dates, row count, exact 10-digit AHTN codes, and rates pass the trust gate; keep SST, preferences, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
     },
     {
       "country": "TW",

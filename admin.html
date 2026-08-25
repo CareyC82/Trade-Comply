@@ -680,6 +680,24 @@
             `;
         }
 
+        function renderMalaysiaArtifactImport(status = {}) {
+            const passed = status.ok === true;
+            const blocked = status.ok === false;
+            const artifact = status.artifact || {};
+            return `
+                <div class="crawl-section-title"><h3>Malaysia official tariff artifact</h3><span class="meta">local, manual import · last-good protected</span></div>
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${passed ? 'CURRENT' : blocked ? 'BLOCKED' : 'NOT RUN'}</strong><span>Trust gate</span></div>
+                    <div class="summary-card"><strong>${artifact.parsed_row_count || 0}</strong><span>Validated 10-digit AHTN rows</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(formatDateTime(status.last_good_at))}</strong><span>Last good import</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(artifact.effective_at || '—')}</strong><span>Effective date</span></div>
+                </div>
+                <p class="meta">${escapeHtml(status.error || (passed
+                    ? `Official artifact verified: ${artifact.file_name || 'file'} · SHA-256 ${String(artifact.sha256 || '').slice(0, 12)}…`
+                    : 'No complete Royal Malaysian Customs artifact has passed the import gate yet. Existing maintained rates remain active.'))}</p>
+            `;
+        }
+
         function listValue(item, field) {
             return escapeHtml((item[field] || []).join(', '));
         }
@@ -2342,6 +2360,7 @@
                 dutyRateStatus.innerHTML = `
                     ${renderAutomationLaunchStatus(automationLaunchStatus, chinaCustomsStatus, nationalTradeFlowStatus)}
                     ${renderExactTariffFeeds(data.exact_tariff_feeds || {})}
+                    ${renderMalaysiaArtifactImport(data.my_official_artifact_import || {})}
                     ${renderDutyBusinessSummary(businessSummary)}
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">
