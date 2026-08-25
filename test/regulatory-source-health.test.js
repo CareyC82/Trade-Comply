@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { auditSources, cadenceDays } = require('../scripts/audit-regulatory-source-health');
+const { auditSources, cadenceDays, probeSource } = require('../scripts/audit-regulatory-source-health');
 
 test('regulatory source audit schedules reviews and flags pending effective dates', async () => {
     const report = await auditSources({ now: new Date('2026-08-21T00:00:00Z') });
@@ -40,4 +40,16 @@ test('regulatory source audit exposes failed links without leaking network error
 
 test('official programs are reviewed more often than static official sources', () => {
     assert.ok(cadenceDays({ confidence: 'official_program' }) < cadenceDays({ confidence: 'official' }));
+});
+
+test('source health accepts a reachable official fallback while retaining the primary attempt', async () => {
+    const link = await probeSource({
+        url: 'https://authority.example/old',
+        monitorUrls: ['https://authority.example/current.pdf']
+    }, async (url) => url.endsWith('/old')
+        ? { status: 'http_error', http_status: 404, final_url: url }
+        : { status: 'reachable', http_status: 200, final_url: url });
+    assert.equal(link.status, 'reachable');
+    assert.equal(link.monitored_url, 'https://authority.example/current.pdf');
+    assert.equal(link.attempts.length, 2);
 });

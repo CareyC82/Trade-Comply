@@ -34,6 +34,32 @@ test('snapshot carries an explicit manual-review fallback policy', () => {
     assert.deepEqual(result.snapshot.sources[0].monitor_policy, { mode: 'last_good_manual_review', review_every_days: 30 });
 });
 
+test('a recent documented manual review keeps an access-blocked official source current without claiming automation', () => {
+    const now = '2026-08-25T00:00:00.000Z';
+    const source = {
+        authority: 'Official authority', title: 'Blocked official page', url: 'https://example.gov/rule',
+        reviewedAt: '2026-08-21', monitorPolicy: { mode: 'automatic_with_manual_fallback', reviewEveryDays: 30 }
+    };
+    const previous = {
+        sources: [{ id: 'blocked', url: source.url, content_hash: 'abc', content_summary: 'prior official capture', status: 'current' }]
+    };
+    const result = buildSnapshot({ sources: { blocked: source }, previous, fetched: { blocked: { ok: false, error: 'http_403' } }, now });
+    assert.equal(result.snapshot.sources[0].status, 'manual_review_current');
+    assert.equal(result.snapshot.sources[0].preserved_last_good, true);
+    assert.equal(result.snapshot.sources[0].manually_reviewed_at, '2026-08-21');
+    assert.equal(result.snapshot.sources[0].fetch_error, 'http_403');
+});
+
+test('an expired manual review falls back to an explicit degraded last-good state', () => {
+    const source = {
+        authority: 'Official authority', title: 'Blocked official page', url: 'https://example.gov/rule',
+        reviewedAt: '2026-01-01', monitorPolicy: { mode: 'automatic_with_manual_fallback', reviewEveryDays: 30 }
+    };
+    const previous = { sources: [{ id: 'blocked', content_hash: 'abc', content_summary: 'prior official capture' }] };
+    const result = buildSnapshot({ sources: { blocked: source }, previous, fetched: { blocked: { ok: false, error: 'http_403' } }, now: '2026-08-25T00:00:00.000Z' });
+    assert.equal(result.snapshot.sources[0].status, 'last_good_degraded');
+});
+
 test('offline lifecycle refresh does not falsely mark official sources degraded', () => {
     const first = buildSnapshot({ sources: { rule: source }, fetched: { rule: { ok: true, content: 'A'.repeat(100) } }, now: '2026-01-01T00:00:00Z' });
     const next = buildSnapshot({ sources: { rule: source }, previous: first.snapshot, now: '2026-01-02T00:00:00Z' });

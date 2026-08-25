@@ -20,7 +20,9 @@ async function probeUrl(url) {
     try {
         let response = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
         if (response.status === 405) response = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
+        const abuseBlocked = /abuse-detection|apology_objects/i.test(response.url || '');
         const status = response.ok ? 'reachable'
+            : abuseBlocked ? 'access_blocked'
             : [401, 403, 429].includes(response.status) ? 'access_blocked'
                 : 'http_error';
         return { status, http_status: response.status, final_url: response.url };
@@ -31,6 +33,19 @@ async function probeUrl(url) {
     }
 }
 
+async function probeSource(source, probe) {
+    const urls = [source.url, ...(source.monitorUrls || [])].filter(Boolean);
+    const attempts = [];
+    for (const url of urls) {
+        const result = await probe(url);
+        attempts.push({ url, ...result });
+        if (['reachable', 'access_blocked'].includes(result.status)) {
+            return { ...result, monitored_url: url, attempts };
+        }
+    }
+    return { ...(attempts.at(-1) || { status: 'unreachable', error: 'network_error' }), attempts };
+}
+
 async function auditSources({ now = new Date(), probe = null } = {}) {
     const nowMs = now instanceof Date ? now.getTime() : Date.parse(now);
     const rows = [];
@@ -38,7 +53,7 @@ async function auditSources({ now = new Date(), probe = null } = {}) {
         const reviewedMs = Date.parse(source.reviewedAt || '');
         const intervalDays = cadenceDays(source);
         const nextReviewMs = Number.isFinite(reviewedMs) ? reviewedMs + intervalDays * DAY_MS : null;
-        const link = probe ? await probe(source.url) : { status: 'not_probed' };
+        const link = probe ? await probeSource(source, probe) : { status: 'not_probed' };
         const alerts = [];
         if (!Number.isFinite(reviewedMs)) alerts.push('review_date_missing');
         else if (nextReviewMs < nowMs) alerts.push('review_overdue');
@@ -86,4 +101,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { cadenceDays, probeUrl, auditSources };
+module.exports = { cadenceDays, probeUrl, probeSource, auditSources };

@@ -367,6 +367,11 @@ function bootstrapCanISellItPage() {
         const platformDecision = assessment.platformDecision;
         const procurement = assessment.procurement;
         const guidance = assessment.productGuidance || { risk: 'Confirm the exact model and enabled functions before relying on this result.', supplier: 'Ask for every exact-model document listed below.' };
+        const actionPlan = assessment.sellerActionPlan || {
+            purchase: `${procurement.answer}: ${procurement.label}`,
+            supplier: guidance.supplier,
+            next: assessment.nextActions[0]
+        };
         const freshness = assessment.sourceFreshness || { status: 'no_linked_source', sourceCount: 0, staleCount: 0, reviewedThrough: null, confidenceLevels: [] };
         const freshnessLabel = {
             current: 'Current review metadata',
@@ -415,6 +420,14 @@ function bootstrapCanISellItPage() {
                 <article><span>Sales channel</span><strong id="sell-summary-platform">${escapeHtml(currentInput.platform)}</strong></article>
                 <article><span>Can the battery be shipped?</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
+            <section class="sell-result-panel sell-action-summary" aria-label="Your next three actions">
+                <h2>Your next three actions</h2>
+                <ol class="sell-action-list">
+                    <li><strong>Purchase decision:</strong> ${escapeHtml(actionPlan.purchase)}</li>
+                    <li><strong>Supplier evidence:</strong> ${escapeHtml(actionPlan.supplier)}</li>
+                    <li><strong>Next step:</strong> ${escapeHtml(actionPlan.next)}</li>
+                </ol>
+            </section>
             <section class="sell-product-guidance"><span>What matters for this product?</span><h2>${escapeHtml(guidance.risk)}</h2><p><strong>Ask the supplier:</strong> ${escapeHtml(guidance.supplier)}</p></section>
             <section class="sell-decision-trace"><span>Why this result</span><ol>${assessment.decisionTrace.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></section>
             <section class="sell-supplier-request ${supplierRequest.complete ? 'sell-supplier-request--complete' : ''}">

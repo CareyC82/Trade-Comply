@@ -548,6 +548,45 @@ test('common seller typos still resolve to the intended electronics model', () =
     });
 });
 
+test('additional seller spellings and adjacent aliases resolve conservatively', () => {
+    const samples = {
+        tablet: ['tablt device with wifi', 'tablet'],
+        bluetooth_speaker: ['BT sound box with battery', 'bluetooth speeker'],
+        wireless_microphone: ['wireless mircophone', 'lavalier mic'],
+        wifi_router: ['wireless gateway', 'mesh router system'],
+        usb_hub: ['Type-C dockingstation', 'Thunderbolt laptop dock']
+    };
+    Object.entries(samples).forEach(([expected, descriptions]) => descriptions.forEach((description) => {
+        assert.equal(engine.extractProfile(description).productType, expected, description);
+    }));
+});
+
+test('seller action plan gives a purchase decision, supplier request and immediate next step', () => {
+    const supported = engine.assess({
+        description: 'Bluetooth speaker with rechargeable lithium battery', market: 'US', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    assert.match(supported.sellerActionPlan.purchase, /DO NOT PURCHASE|PROCEED/i);
+    assert.match(supported.sellerActionPlan.supplier, /FCC|UN38|supplier request/i);
+    assert.match(supported.sellerActionPlan.next, /Amazon|exact model|channel/i);
+
+    const unsupported = engine.assess({
+        description: 'cotton summer dress', market: 'US', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    assert.match(unsupported.sellerActionPlan.purchase, /outside maintained coverage/i);
+    assert.match(unsupported.sellerActionPlan.next, /complimentary review/i);
+});
+
+test('result page exposes the three actionable seller answers before technical details', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /Your next three actions/);
+    assert.match(script, /Purchase decision:/);
+    assert.match(script, /Supplier evidence:/);
+    assert.match(script, /Next step:/);
+    assert.ok(script.indexOf('Your next three actions') < script.indexOf('Technical details, official sources'));
+});
+
 test('negative wired and battery descriptions do not trigger radio or lithium controls', () => {
     const profile = engine.extractProfile('Wired-only USB hub without battery, no wireless and no Bluetooth.');
     assert.equal(profile.productType, 'usb_hub');

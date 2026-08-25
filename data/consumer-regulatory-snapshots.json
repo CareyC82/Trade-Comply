@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-25T06:27:57.002Z",
+  "generated_at": "2026-08-25T06:58:16.126Z",
   "source_count": 32,
   "sources": [
     {
       "id": "fcc",
       "url": "https://www.fcc.gov/general/equipment-authorization-procedures",
-      "content_hash": "c83a8f02271a1f01a25ddcbbe76176b57fbf2a0d113d7af67f88905ce869916e",
-      "content_summary": "U.S. Federal Communications Commission. Equipment Authorization Procedures. Official PDF bytes 426072. SHA256 742b44c379ed6ff9dc12c5361d18aff7911c2285b666a17cbb56be0adb3bd37c.",
+      "content_hash": "1424e29eab3cb293afda43f6790023e74466c0f31e23b472dd07805e64d4c9f3",
+      "content_summary": "U.S. Federal Communications Commission. Equipment Authorization Procedures. RF devices must follow the applicable authorization path before U.S. marketing or importation. Official PDF bytes 426072. SHA256 742b44c379ed6ff9dc12c5361d18aff7911c2285b666a17cbb56be0adb3bd37c.",
       "capture_mode": "official_content",
       "adapter": "official_pdf_fingerprint",
       "monitored_url": "https://docs.fcc.gov/public/attachments/FCC-15-92A1.pdf",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -31,9 +31,9 @@
       "capture_mode": "official_content",
       "adapter": "us_fcc_html",
       "monitored_url": "https://apps.fcc.gov/oetcf/kdb/forms/FTSSearchResultPage.cfm?id=20676&switch=P",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
       "last_good_at": "2026-08-23T18:53:35.737Z",
-      "status": "last_good_degraded",
+      "status": "manual_review_current",
       "preserved_last_good": true,
       "lifecycle_state": "active",
       "lifecycle": {
@@ -43,20 +43,21 @@
       "monitor_policy": {
         "mode": "last_good_manual_review",
         "review_every_days": 30
-      }
+      },
+      "manually_reviewed_at": "2026-08-21"
     },
     {
       "id": "fccMarketplace2026",
       "url": "https://docs.fcc.gov/public/attachments/FCC-26-50A1.pdf",
-      "content_hash": "3b1fc95d2d88135f2401cf5384f14c33212d5d45c5bde138ef7104a28254cf7b",
-      "content_summary": "U.S. Federal Communications Commission. FCC 26-50 — online marketplace equipment-authorization rules. Official PDF bytes 548489. SHA256 2cd32b8af0f2f383b08ecb22b9c4359170d78d7e18b639ca6a7c7b272bf849a2.",
+      "content_hash": "0aafb8461e935d81db7278da112b30a98c894a12b1ffde3a4027eae5808a3d63",
+      "content_summary": "U.S. Federal Communications Commission. FCC 26-50 — online marketplace equipment-authorization rules. New or materially updated marketplace listings for certified RF devices will face FCC ID display and validation duties after the applicable Federal Register transition period; small-seller and used-device exceptions are fact-specific. Official PDF bytes 548489. SHA256 2cd32b8af0f2f383b08ecb22b9c4359170d78d7e18b639ca6a7c7b272bf849a2.",
       "capture_mode": "official_content",
       "adapter": "official_pdf_fingerprint",
       "monitored_url": "https://docs.fcc.gov/public/attachments/FCC-26-50A1.pdf",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:22:36.683Z",
-      "status": "last_good_degraded",
-      "preserved_last_good": true,
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
+      "status": "current",
+      "preserved_last_good": false,
       "lifecycle_state": "published_pending_effective_date",
       "lifecycle": {
         "status": "published_pending_effective_date",
@@ -65,10 +66,8 @@
         "transition": "180 or 270 days after Federal Register publication, depending on marketplace category"
       },
       "monitor_policy": {
-        "mode": "last_good_manual_review",
-        "review_every_days": 30
-      },
-      "fetch_error": "timeout"
+        "mode": "automatic"
+      }
     },
     {
       "id": "usElectrical",
@@ -78,9 +77,9 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.osha.gov/nationally-recognized-testing-laboratory-program",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
       "last_good_at": "2026-08-23T18:53:35.737Z",
-      "status": "last_good_degraded",
+      "status": "manual_review_current",
       "preserved_last_good": true,
       "lifecycle_state": "active",
       "lifecycle": {
@@ -88,9 +87,10 @@
       },
       "fetch_error": "http_403",
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
-      }
+      },
+      "manually_reviewed_at": "2026-08-21"
     },
     {
       "id": "fda",
@@ -100,8 +100,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.fda.gov/medical-devices/classify-your-medical-device/how-determine-if-your-product-medical-device",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -115,13 +115,13 @@
     {
       "id": "ftcIot",
       "url": "https://www.ftc.gov/business-guidance/resources/careful-connections-keeping-internet-things-secure",
-      "content_hash": "b4d65ba7cfcdc125dcc7ab2345c78f13507c87450daf57de2aedb16bbcf30fa4",
-      "content_summary": "U.S. Federal Trade Commission. Careful Connections: Keeping the Internet of Things Secure. Official PDF bytes 517915. SHA256 76e480028941d17c52344142ecb2428109cc7f894e9ddd4fac0e5a88684a3745.",
+      "content_hash": "f11cd6b084a671387a559091c67080e7d0a0f777da90e0c96ae25dcaec06bf6e",
+      "content_summary": "U.S. Federal Trade Commission. Careful Connections: Keeping the Internet of Things Secure. Connected-device makers should account for collected data, disclosures, security design and ongoing support. Official PDF bytes 517915. SHA256 76e480028941d17c52344142ecb2428109cc7f894e9ddd4fac0e5a88684a3745.",
       "capture_mode": "official_content",
       "adapter": "official_pdf_fingerprint",
       "monitored_url": "https://www.ftc.gov/system/files/documents/plain-language/913a_careful_connections.pdf",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -140,8 +140,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -160,8 +160,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.cpsc.gov/Business--Manufacturing/Testing-Certification/Childrens-Product-Certificate",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -180,8 +180,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/radio-equipment-directive-red_en",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -200,9 +200,9 @@
       "capture_mode": "official_content",
       "adapter": "eur_lex_html",
       "monitored_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R0030",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
       "last_good_at": "2026-08-23T18:53:35.737Z",
-      "status": "last_good_degraded",
+      "status": "manual_review_current",
       "preserved_last_good": true,
       "fetch_error": "official_content_identity_mismatch",
       "lifecycle_state": "active",
@@ -211,9 +211,10 @@
         "effectiveAt": "2025-08-01"
       },
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
-      }
+      },
+      "manually_reviewed_at": "2026-08-21"
     },
     {
       "id": "lvd",
@@ -223,8 +224,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/low-voltage-directive-lvd_en",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -243,8 +244,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -263,8 +264,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/batteries_en",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "future",
@@ -279,13 +280,13 @@
     {
       "id": "gpsr",
       "url": "https://commission.europa.eu/document/download/a281b150-19fd-44f9-bef8-c6018f9c4792_en",
-      "content_hash": "749d438e1f8ab25ea9c1d27d57e5606cd61201e535b2e9a104f92a39872674d2",
-      "content_summary": "European Commission. General Product Safety Regulation (EU) 2023/988. Official PDF bytes 574020. SHA256 64bae9c868ec45d92bedfdecb4c54cbd1b88b01abc404469c32425d8b0546899.",
+      "content_hash": "95372d622a3079a6d2db9122b27ce4f9359d15475ec9ae23e618c90cbb23d1c1",
+      "content_summary": "European Commission. General Product Safety Regulation (EU) 2023/988. Consumer products require safety, traceability, responsible-person, and online-offer information controls. Official PDF bytes 574020. SHA256 64bae9c868ec45d92bedfdecb4c54cbd1b88b01abc404469c32425d8b0546899.",
       "capture_mode": "official_content",
       "adapter": "official_pdf_fingerprint",
       "monitored_url": "https://commission.europa.eu/document/download/a281b150-19fd-44f9-bef8-c6018f9c4792_en",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -304,8 +305,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://health.ec.europa.eu/medical-devices-new-regulations/overview_en",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -324,8 +325,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.edpb.europa.eu/documents/guideline/guidelines-32019-on-processing-of-personal-data-through-video-devices_en",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -344,19 +345,20 @@
       "capture_mode": "official_content",
       "adapter": "eur_lex_html",
       "monitored_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
       "last_good_at": "2026-08-23T18:53:35.737Z",
-      "status": "last_good_degraded",
+      "status": "manual_review_current",
       "preserved_last_good": true,
       "lifecycle_state": "active",
       "lifecycle": {
         "status": "active"
       },
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
       },
-      "fetch_error": "official_content_identity_mismatch"
+      "fetch_error": "official_content_identity_mismatch",
+      "manually_reviewed_at": "2026-08-21"
     },
     {
       "id": "battery",
@@ -364,9 +366,9 @@
       "content_hash": "b534bb8c84cba119a156c2e958c1af9d956e06ac1620657b771932224f4f44c7",
       "content_summary": "United Nations Economic Commission for Europe. UN Manual of Tests and Criteria — subsection 38.3. Lithium cell and battery types must meet the applicable transport testing and test-summary requirements.",
       "capture_mode": "metadata_seed",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
       "last_good_at": "2026-08-21T07:05:40.735Z",
-      "status": "last_good_degraded",
+      "status": "manual_review_current",
       "preserved_last_good": true,
       "lifecycle_state": "active",
       "lifecycle": {
@@ -374,9 +376,10 @@
       },
       "fetch_error": "http_403",
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
-      }
+      },
+      "manually_reviewed_at": "2026-08-21"
     },
     {
       "id": "jpRadio",
@@ -386,9 +389,9 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.tele.soumu.go.jp/e/sys/equ/tech/",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
       "last_good_at": "2026-08-23T18:53:35.737Z",
-      "status": "last_good_degraded",
+      "status": "manual_review_current",
       "preserved_last_good": true,
       "lifecycle_state": "active",
       "lifecycle": {
@@ -398,7 +401,8 @@
       "monitor_policy": {
         "mode": "last_good_manual_review",
         "review_every_days": 30
-      }
+      },
+      "manually_reviewed_at": "2026-08-21"
     },
     {
       "id": "jpPse",
@@ -408,19 +412,18 @@
       "capture_mode": "official_content",
       "adapter": "jp_meti_html",
       "monitored_url": "https://www.meti.go.jp/english/policy/economy/consumer/pse/index.html",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:22:36.683Z",
-      "status": "last_good_degraded",
-      "preserved_last_good": true,
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
+      "status": "current",
+      "preserved_last_good": false,
       "lifecycle_state": "active",
       "lifecycle": {
         "status": "active"
       },
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
-      },
-      "fetch_error": "invalid_pdf_payload"
+      }
     },
     {
       "id": "jpOnlineSeller",
@@ -430,20 +433,19 @@
       "capture_mode": "official_content",
       "adapter": "jp_meti_html",
       "monitored_url": "https://www.meti.go.jp/product_safety/consumer/system/06.html",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:22:36.683Z",
-      "status": "last_good_degraded",
-      "preserved_last_good": true,
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
+      "status": "current",
+      "preserved_last_good": false,
       "lifecycle_state": "active",
       "lifecycle": {
         "status": "active",
         "effectiveAt": "2025-12-25"
       },
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
-      },
-      "fetch_error": "official_content_identity_mismatch"
+      }
     },
     {
       "id": "jpPseProducts",
@@ -453,19 +455,18 @@
       "capture_mode": "official_content",
       "adapter": "jp_meti_html",
       "monitored_url": "https://www.meti.go.jp/policy/consumer/seian/denan/non_specified_electrical.html",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:22:36.683Z",
-      "status": "last_good_degraded",
-      "preserved_last_good": true,
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
+      "status": "current",
+      "preserved_last_good": false,
       "lifecycle_state": "active",
       "lifecycle": {
         "status": "active"
       },
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
-      },
-      "fetch_error": "invalid_pdf_payload"
+      }
     },
     {
       "id": "jpProductSafety",
@@ -475,19 +476,18 @@
       "capture_mode": "official_content",
       "adapter": "jp_meti_html",
       "monitored_url": "https://www.meti.go.jp/english/policy/economy/consumer/product_safety/pse_procedure/index.html",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:22:36.683Z",
-      "status": "last_good_degraded",
-      "preserved_last_good": true,
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
+      "status": "current",
+      "preserved_last_good": false,
       "lifecycle_state": "active",
       "lifecycle": {
         "status": "active"
       },
       "monitor_policy": {
-        "mode": "last_good_manual_review",
+        "mode": "automatic_with_manual_fallback",
         "review_every_days": 30
-      },
-      "fetch_error": "official_content_identity_mismatch"
+      }
     },
     {
       "id": "jpIoTSecurity",
@@ -497,8 +497,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.ipa.go.jp/en/security/jc-star/index.html",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -517,8 +517,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.ppc.go.jp/en/legal/",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -532,13 +532,13 @@
     {
       "id": "sgImda",
       "url": "https://iris.imda.gov.sg/application/general-equipment-registration-%28ger%29",
-      "content_hash": "8389df93d5077f13610a214c881f39a46233d5768c4d11033008e91cb1dac441",
-      "content_summary": "Singapore IMDA. Telecommunication Equipment Registration. Official PDF bytes 608763. SHA256 537f20836dc643979ca4e41a6763104cd4748c2688c1c0568ba3dbc9dfd88820.",
+      "content_hash": "6a394b3b53f43c23fe69c1c78a881622195078be7defae4f64a9eb635f62d1b0",
+      "content_summary": "Singapore IMDA. Telecommunication Equipment Registration. Telecommunication and radio equipment sold for local use may require dealer licensing and IMDA registration. Official PDF bytes 608763. SHA256 537f20836dc643979ca4e41a6763104cd4748c2688c1c0568ba3dbc9dfd88820.",
       "capture_mode": "official_content",
       "adapter": "official_pdf_fingerprint",
       "monitored_url": "https://www.imda.gov.sg/-/media/imda/files/regulations-and-licensing/regulations/frameworks-and-policies/dealer-and-equipment-registration/equipment-registration-framework/eqrguide-june2024.pdf",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -557,8 +557,8 @@
       "capture_mode": "official_content",
       "adapter": "sg_cpso_html",
       "monitored_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/overview-of-cpsr/",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -577,8 +577,8 @@
       "capture_mode": "official_content",
       "adapter": "sg_cpso_html",
       "monitored_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/list-of-controlled-goods/",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -597,8 +597,8 @@
       "capture_mode": "official_content",
       "adapter": "sg_cpso_html",
       "monitored_url": "https://www.consumerproductsafety.gov.sg/suppliers/cgsr/",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -617,8 +617,8 @@
       "capture_mode": "official_content",
       "adapter": "official_html",
       "monitored_url": "https://www.csa.gov.sg/our-programmes/certification-and-labelling-schemes/cybersecurity-labelling-scheme/about/",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -632,13 +632,13 @@
     {
       "id": "sgPrivacy",
       "url": "https://www.pdpc.gov.sg/guidelines-and-consultation/2020/02/advisory-guidelines-on-the-personal-data-protection-act-for-selected-topics",
-      "content_hash": "a8af909c343bc73113aa682255747153b746f9f284f28dd968245c234a7b6ba9",
-      "content_summary": "Singapore Personal Data Protection Commission. Advisory Guidelines on the PDPA for Selected Topics. Official PDF bytes 726039. SHA256 2731a70fb6acb2aaabdc3077a4042a590d6e01b51866440cb9ae53d9efa0b63a.",
+      "content_hash": "c2456dabffcebe89db1e07d027253fff860fa4fb6ffa451b197a4610614766d2",
+      "content_summary": "Singapore Personal Data Protection Commission. Advisory Guidelines on the PDPA for Selected Topics. Photography, video and audio products require appropriate notification, purpose, consent and protection controls when personal data is handled. Official PDF bytes 726039. SHA256 2731a70fb6acb2aaabdc3077a4042a590d6e01b51866440cb9ae53d9efa0b63a.",
       "capture_mode": "official_content",
       "adapter": "official_pdf_fingerprint",
       "monitored_url": "https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Legislation-and-Guidelines/FINAL-Advisory-Guidelines-on-PDPA-for-Selected-Topics-31-August-2018.pdf",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
@@ -652,13 +652,13 @@
     {
       "id": "sgChildrenPrivacy",
       "url": "https://www.pdpc.gov.sg/guidelines-and-consultation/2024/03/advisory-guidelines-on-the-pdpa-for-childrens-personal-data-in-the-digital-environment",
-      "content_hash": "c20f6e18c8bf4433aad956e24638ab0c1b39771e4a588f1a4e7152fb934a6907",
-      "content_summary": "Singapore Personal Data Protection Commission. Advisory Guidelines on the PDPA for Children's Personal Data in the Digital Environment. Official PDF bytes 461940. SHA256 2f4b720d2ac1057657313e25e9d1ff52e23b6bd7306ac25eaf2ac5c8d7502762.",
+      "content_hash": "ca6cf04416ce0c70c195e4674fdbcafa5dd1178d11ddc74aaf70faea0a9313ab",
+      "content_summary": "Singapore Personal Data Protection Commission. Advisory Guidelines on the PDPA for Children's Personal Data in the Digital Environment. The PDPC guidance explains how Singapore PDPA obligations apply to children’s personal data in digital products and services. Official PDF bytes 461940. SHA256 2f4b720d2ac1057657313e25e9d1ff52e23b6bd7306ac25eaf2ac5c8d7502762.",
       "capture_mode": "official_content",
       "adapter": "official_pdf_fingerprint",
       "monitored_url": "https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-on-the-pdpa-for-children%27s-personal-data-in-the-digital-environment_mar24.pdf",
-      "fetched_at": "2026-08-25T06:24:21.290Z",
-      "last_good_at": "2026-08-25T06:24:21.290Z",
+      "fetched_at": "2026-08-25T06:58:16.126Z",
+      "last_good_at": "2026-08-25T06:58:16.126Z",
       "status": "current",
       "preserved_last_good": false,
       "lifecycle_state": "active",
