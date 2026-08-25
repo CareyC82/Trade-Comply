@@ -14,24 +14,648 @@
     "US": {
       "deep": 30,
       "limited": 0,
-      "cells_with_unsourced_requirements": 0
+      "cells_with_unsourced_requirements": 0,
+      "cells_using_last_good_sources": 17,
+      "limited_cells": 0
     },
     "EU": {
       "deep": 30,
       "limited": 0,
-      "cells_with_unsourced_requirements": 0
+      "cells_with_unsourced_requirements": 0,
+      "cells_using_last_good_sources": 13,
+      "limited_cells": 0
     },
     "JP": {
       "deep": 30,
       "limited": 0,
-      "cells_with_unsourced_requirements": 0
+      "cells_with_unsourced_requirements": 0,
+      "cells_using_last_good_sources": 29,
+      "limited_cells": 0
     },
     "SG": {
       "deep": 30,
       "limited": 0,
-      "cells_with_unsourced_requirements": 0
+      "cells_with_unsourced_requirements": 0,
+      "cells_using_last_good_sources": 10,
+      "limited_cells": 0
     }
   },
+  "remediation_queue": [
+    {
+      "product_id": "smart_watch",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_watch",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_watch",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_watch",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_ring",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_ring",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_ring",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_ring",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "fitness_tracker",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "fitness_tracker",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:gdpr",
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "fitness_tracker",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "fitness_tracker",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "kids_gps_watch",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "kids_gps_watch",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:gdpr",
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "kids_gps_watch",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "kids_gps_watch",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "earbuds",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "earbuds",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "earbuds",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "earbuds",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_glasses",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_glasses",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_glasses",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_glasses",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "charger",
+      "market": "US",
+      "issues": [
+        "last_good_source:usElectrical"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "charger",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "power_bank",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "power_bank",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "power_bank",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "power_bank",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "kids_electronics",
+      "market": "EU",
+      "issues": [
+        "last_good_source:gdpr"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "kids_electronics",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "bluetooth_speaker",
+      "market": "US",
+      "issues": [
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "bluetooth_speaker",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wireless_microphone",
+      "market": "US",
+      "issues": [
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wireless_microphone",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "security_camera",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wifi_router",
+      "market": "US",
+      "issues": [
+        "last_good_source:fccExposure",
+        "last_good_source:usElectrical"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wifi_router",
+      "market": "EU",
+      "issues": [
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wifi_router",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_plug",
+      "market": "US",
+      "issues": [
+        "last_good_source:usElectrical"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_plug",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "smart_light",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wireless_keyboard",
+      "market": "US",
+      "issues": [
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wireless_keyboard",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wireless_mouse",
+      "market": "US",
+      "issues": [
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "wireless_mouse",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "gaming_controller",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "mini_projector",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "usb_hub",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "tablet",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "tablet",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "tablet",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "tablet",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "e_reader",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "e_reader",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "e_reader",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "e_reader",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "portable_fan",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "electric_shaver",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "webcam",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "dash_camera",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "video_doorbell",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "baby_monitor",
+      "market": "EU",
+      "issues": [
+        "last_good_source:gdpr"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "baby_monitor",
+      "market": "JP",
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "robot_vacuum",
+      "market": "US",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:usElectrical"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "robot_vacuum",
+      "market": "EU",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "robot_vacuum",
+      "market": "JP",
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    },
+    {
+      "product_id": "robot_vacuum",
+      "market": "SG",
+      "issues": [
+        "last_good_source:battery"
+      ],
+      "next_action": "Restore automated official capture or complete the scheduled manual source review."
+    }
+  ],
   "cells": [
     {
       "product_id": "smart_watch",
@@ -48,7 +672,16 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "smart_watch",
@@ -72,7 +705,16 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "smart_watch",
@@ -88,7 +730,16 @@
         "battery",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "smart_watch",
@@ -104,7 +755,14 @@
         "battery",
         "sgImda"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "smart_ring",
@@ -121,7 +779,16 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "smart_ring",
@@ -145,7 +812,16 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "smart_ring",
@@ -161,7 +837,16 @@
         "battery",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "smart_ring",
@@ -177,7 +862,14 @@
         "battery",
         "sgImda"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "fitness_tracker",
@@ -196,7 +888,16 @@
         "fccExposure",
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "fitness_tracker",
@@ -222,7 +923,18 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "gdpr",
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:gdpr",
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "fitness_tracker",
@@ -240,7 +952,16 @@
         "jpPrivacy",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "fitness_tracker",
@@ -258,7 +979,14 @@
         "sgImda",
         "sgPrivacy"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "kids_gps_watch",
@@ -278,7 +1006,16 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "kids_gps_watch",
@@ -304,7 +1041,18 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "gdpr",
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:gdpr",
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "kids_gps_watch",
@@ -323,7 +1071,18 @@
         "jpPrivacy",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpOnlineSeller",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "kids_gps_watch",
@@ -342,7 +1101,14 @@
         "sgImda",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "earbuds",
@@ -361,7 +1127,16 @@
         "fccExposure",
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "earbuds",
@@ -387,7 +1162,16 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "earbuds",
@@ -405,7 +1189,16 @@
         "jpPrivacy",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "earbuds",
@@ -423,7 +1216,14 @@
         "sgImda",
         "sgPrivacy"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "smart_glasses",
@@ -437,7 +1237,14 @@
       "official_source_ids": [
         "battery"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "smart_glasses",
@@ -457,7 +1264,14 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "smart_glasses",
@@ -471,7 +1285,14 @@
       "official_source_ids": [
         "battery"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "smart_glasses",
@@ -485,7 +1306,14 @@
       "official_source_ids": [
         "battery"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "charger",
@@ -499,7 +1327,14 @@
       "official_source_ids": [
         "usElectrical"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "usElectrical"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:usElectrical"
+      ]
     },
     {
       "product_id": "charger",
@@ -517,7 +1352,10 @@
         "lvd",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "charger",
@@ -533,7 +1371,18 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "charger",
@@ -548,7 +1397,10 @@
         "sgControlledGoods",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "power_bank",
@@ -562,7 +1414,14 @@
       "official_source_ids": [
         "battery"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "power_bank",
@@ -582,7 +1441,14 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "power_bank",
@@ -600,7 +1466,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpOnlineSeller",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "power_bank",
@@ -614,7 +1493,14 @@
       "official_source_ids": [
         "battery"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "beauty_device",
@@ -625,7 +1511,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "beauty_device",
@@ -641,7 +1530,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "beauty_device",
@@ -652,7 +1544,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "beauty_device",
@@ -663,7 +1558,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "kids_electronics",
@@ -678,7 +1576,10 @@
         "coppa",
         "cpscChildren"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "kids_electronics",
@@ -696,7 +1597,14 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "gdpr"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:gdpr"
+      ]
     },
     {
       "product_id": "kids_electronics",
@@ -711,7 +1619,14 @@
         "jpOnlineSeller",
         "jpPrivacy"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller"
+      ]
     },
     {
       "product_id": "kids_electronics",
@@ -726,7 +1641,10 @@
         "sgChildrenPrivacy",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "bluetooth_speaker",
@@ -741,7 +1659,14 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "bluetooth_speaker",
@@ -759,7 +1684,10 @@
         "red",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "bluetooth_speaker",
@@ -773,7 +1701,14 @@
       "official_source_ids": [
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "bluetooth_speaker",
@@ -787,7 +1722,10 @@
       "official_source_ids": [
         "sgImda"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "wireless_microphone",
@@ -804,7 +1742,14 @@
         "fccExposure",
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "wireless_microphone",
@@ -824,7 +1769,10 @@
         "red",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "wireless_microphone",
@@ -840,7 +1788,14 @@
         "jpPrivacy",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "wireless_microphone",
@@ -856,7 +1811,10 @@
         "sgImda",
         "sgPrivacy"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "security_camera",
@@ -870,7 +1828,10 @@
       "official_source_ids": [
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "security_camera",
@@ -888,7 +1849,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "security_camera",
@@ -905,7 +1869,16 @@
         "jpPrivacy",
         "jpProductSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ]
     },
     {
       "product_id": "security_camera",
@@ -924,7 +1897,10 @@
         "sgPrivacy",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "wifi_router",
@@ -941,7 +1917,16 @@
         "fccExposure",
         "usElectrical"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "fccExposure",
+        "usElectrical"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:fccExposure",
+        "last_good_source:usElectrical"
+      ]
     },
     {
       "product_id": "wifi_router",
@@ -963,7 +1948,14 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "wifi_router",
@@ -983,7 +1975,20 @@
         "jpPseProducts",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpPse",
+        "jpPseProducts",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "wifi_router",
@@ -1002,7 +2007,10 @@
         "sgIoTSecurity",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "smart_plug",
@@ -1016,7 +2024,14 @@
       "official_source_ids": [
         "usElectrical"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "usElectrical"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:usElectrical"
+      ]
     },
     {
       "product_id": "smart_plug",
@@ -1034,7 +2049,10 @@
         "lvd",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "smart_plug",
@@ -1050,7 +2068,18 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "smart_plug",
@@ -1065,7 +2094,10 @@
         "sgControlledGoods",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "smart_light",
@@ -1076,7 +2108,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "smart_light",
@@ -1092,7 +2127,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "smart_light",
@@ -1110,7 +2148,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "smart_light",
@@ -1127,7 +2178,10 @@
         "sgGeneralSafety",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "wireless_keyboard",
@@ -1142,7 +2196,14 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "wireless_keyboard",
@@ -1160,7 +2221,10 @@
         "red",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "wireless_keyboard",
@@ -1174,7 +2238,14 @@
       "official_source_ids": [
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "wireless_keyboard",
@@ -1188,7 +2259,10 @@
       "official_source_ids": [
         "sgImda"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "wireless_mouse",
@@ -1203,7 +2277,14 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "wireless_mouse",
@@ -1221,7 +2302,10 @@
         "red",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "wireless_mouse",
@@ -1235,7 +2319,14 @@
       "official_source_ids": [
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "wireless_mouse",
@@ -1249,7 +2340,10 @@
       "official_source_ids": [
         "sgImda"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "gaming_controller",
@@ -1260,7 +2354,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "gaming_controller",
@@ -1276,7 +2373,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "gaming_controller",
@@ -1294,7 +2394,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "gaming_controller",
@@ -1309,7 +2422,10 @@
         "sgControlledGoods",
         "sgGeneralSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "mini_projector",
@@ -1320,7 +2436,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "mini_projector",
@@ -1336,7 +2455,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "mini_projector",
@@ -1354,7 +2476,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "mini_projector",
@@ -1371,7 +2506,10 @@
         "sgGeneralSafety",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "usb_hub",
@@ -1382,7 +2520,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "usb_hub",
@@ -1398,7 +2539,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "usb_hub",
@@ -1413,7 +2557,16 @@
         "jpOnlineSeller",
         "jpProductSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ]
     },
     {
       "product_id": "usb_hub",
@@ -1428,7 +2581,10 @@
         "sgControlledGoods",
         "sgGeneralSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "tablet",
@@ -1445,7 +2601,16 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "tablet",
@@ -1469,7 +2634,16 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "tablet",
@@ -1487,7 +2661,16 @@
         "jpIoTSecurity",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "tablet",
@@ -1505,7 +2688,14 @@
         "sgImda",
         "sgIoTSecurity"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "e_reader",
@@ -1522,7 +2712,16 @@
         "fcc",
         "fccExposure"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "fccExposure"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:fccExposure"
+      ]
     },
     {
       "product_id": "e_reader",
@@ -1546,7 +2745,16 @@
         "redCyber",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "redCyber"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:redCyber"
+      ]
     },
     {
       "product_id": "e_reader",
@@ -1564,7 +2772,16 @@
         "jpIoTSecurity",
         "jpRadio"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpRadio"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpRadio"
+      ]
     },
     {
       "product_id": "e_reader",
@@ -1582,7 +2799,14 @@
         "sgImda",
         "sgIoTSecurity"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "portable_fan",
@@ -1593,7 +2817,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "portable_fan",
@@ -1609,7 +2836,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "portable_fan",
@@ -1627,7 +2857,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "portable_fan",
@@ -1644,7 +2887,10 @@
         "sgGeneralSafety",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "electric_shaver",
@@ -1655,7 +2901,10 @@
         "classification"
       ],
       "official_source_ids": [],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "electric_shaver",
@@ -1671,7 +2920,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "electric_shaver",
@@ -1689,7 +2941,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "electric_shaver",
@@ -1706,7 +2971,10 @@
         "sgGeneralSafety",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "webcam",
@@ -1720,7 +2988,10 @@
       "official_source_ids": [
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "webcam",
@@ -1738,7 +3009,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "webcam",
@@ -1755,7 +3029,16 @@
         "jpPrivacy",
         "jpProductSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ]
     },
     {
       "product_id": "webcam",
@@ -1772,7 +3055,10 @@
         "sgGeneralSafety",
         "sgPrivacy"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "dash_camera",
@@ -1786,7 +3072,10 @@
       "official_source_ids": [
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "dash_camera",
@@ -1804,7 +3093,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "dash_camera",
@@ -1821,7 +3113,16 @@
         "jpPrivacy",
         "jpProductSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ]
     },
     {
       "product_id": "dash_camera",
@@ -1838,7 +3139,10 @@
         "sgGeneralSafety",
         "sgPrivacy"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "video_doorbell",
@@ -1852,7 +3156,10 @@
       "official_source_ids": [
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "video_doorbell",
@@ -1870,7 +3177,10 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "video_doorbell",
@@ -1890,7 +3200,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "video_doorbell",
@@ -1909,7 +3232,10 @@
         "sgPrivacy",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "baby_monitor",
@@ -1926,7 +3252,10 @@
         "cpscChildren",
         "ftcIot"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "baby_monitor",
@@ -1946,7 +3275,14 @@
         "gpsr",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "gdpr"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:gdpr"
+      ]
     },
     {
       "product_id": "baby_monitor",
@@ -1964,7 +3300,16 @@
         "jpPrivacy",
         "jpProductSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "jpOnlineSeller",
+        "jpProductSafety"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpProductSafety"
+      ]
     },
     {
       "product_id": "baby_monitor",
@@ -1985,7 +3330,10 @@
         "sgPrivacy",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [],
+      "material_attribute_gaps": [],
+      "issues": []
     },
     {
       "product_id": "robot_vacuum",
@@ -2001,7 +3349,16 @@
         "battery",
         "usElectrical"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "usElectrical"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:usElectrical"
+      ]
     },
     {
       "product_id": "robot_vacuum",
@@ -2023,7 +3380,14 @@
         "lvd",
         "rohs"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     },
     {
       "product_id": "robot_vacuum",
@@ -2041,7 +3405,20 @@
         "jpPse",
         "jpPseProducts"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery",
+        "jpOnlineSeller",
+        "jpPse",
+        "jpPseProducts"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery",
+        "last_good_source:jpOnlineSeller",
+        "last_good_source:jpPse",
+        "last_good_source:jpPseProducts"
+      ]
     },
     {
       "product_id": "robot_vacuum",
@@ -2058,7 +3435,14 @@
         "sgControlledGoods",
         "sgSafety"
       ],
-      "unsourced_requirements": []
+      "unsourced_requirements": [],
+      "degraded_source_ids": [
+        "battery"
+      ],
+      "material_attribute_gaps": [],
+      "issues": [
+        "last_good_source:battery"
+      ]
     }
   ]
 }

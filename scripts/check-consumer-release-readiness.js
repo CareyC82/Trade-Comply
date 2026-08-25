@@ -34,7 +34,7 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
     const reviewAudit = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-review-audit.json'), 'utf8'));
     if (snapshots.source_count !== Object.keys(models.sources).length) errors.push('Regulatory content snapshot is out of date.');
     if (changes.source_count !== Object.keys(models.sources).length) errors.push('Regulatory change report is out of date.');
-    const reviewStatuses = new Set(['pending_review', 'evidence_approved', 'ignored']);
+    const reviewStatuses = new Set(['pending_review', 'baseline_captured', 'capture_recovered', 'superseded', 'evidence_approved', 'ignored']);
     if (changes.changes.some((change) => change.auto_apply !== false || !reviewStatuses.has(change.review_status))) errors.push('Regulatory changes must remain manual-review-only and use a valid review status.');
     if (!Array.isArray(reviewAudit.events) || reviewAudit.events.some((event) => event.impact?.auto_publish !== false)) errors.push('Regulatory review audit is invalid or permits automatic publication.');
     snapshots.sources.forEach((source) => {

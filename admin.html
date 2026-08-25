@@ -2380,14 +2380,17 @@
 
         function renderConsumerRegulatoryStatus(data) {
             const counts = data.counts || {};
-            const changes = Array.isArray(data.changes) ? data.changes : [];
+            const allChanges = Array.isArray(data.changes) ? data.changes : [];
+            const changes = allChanges.filter(change => change.review_status === 'pending_review');
+            const archivedChanges = allChanges.filter(change => change.review_status !== 'pending_review');
             const sources = Array.isArray(data.sources) ? data.sources : [];
             const auditEvents = Array.isArray(data.audit?.events) ? data.audit.events : [];
-            const lifecycleLabel = { active: 'Active', future: 'Future', transition: 'Transition', published_pending_effective_date: 'Effective date pending', repealed: 'Repealed', replaced: 'Replaced' };
+            const lifecycleLabel = { active: 'Active', future: 'Future', transition: 'Transition', published_pending_effective_date: 'Effective date pending', expired: 'Expired', repealed: 'Repealed', replaced: 'Replaced' };
             return `
                 <div class="summary-grid">
                     <div class="summary-card"><strong>${escapeHtml(data.source_count || 0)}</strong><span>Official sources</span></div>
                     <div class="summary-card"><strong>${escapeHtml(data.pending_review_count || 0)}</strong><span>Changes awaiting review</span></div>
+                    <div class="summary-card"><strong>${escapeHtml(archivedChanges.length)}</strong><span>Non-rule captures archived</span></div>
                     <div class="summary-card"><strong>${escapeHtml(counts.future || 0)}</strong><span>Future requirements</span></div>
                     <div class="summary-card"><strong>${escapeHtml(counts.degraded || 0)}</strong><span>Using last-good</span></div>
                 </div>

@@ -649,6 +649,16 @@ test('Singapore exact scope consumes rated voltage and power supplied by the use
     assert.match(script, /await regulatorySnapshotsReady/);
 });
 
+test('power descriptions distinguish direct mains from a bundled adaptor and use the upper voltage range', () => {
+    const adapter = engine.extractProfile('Mini projector with a bundled 45W USB-C power adapter rated 100-240V, no battery');
+    assert.equal(adapter.mainsPowered, false);
+    assert.equal(adapter.bundledAdapter, true);
+    assert.equal(adapter.ratedVoltage, 240);
+    assert.equal(adapter.ratedPower, 45);
+    const singapore = engine.assess({ description: 'Mini projector with bundled adapter', market: 'SG', origin: 'CN', platform: 'Other', attributes: { ...adapter, productType: 'mini_projector' }, documents: [] });
+    assert.ok(singapore.requirements.some((item) => item.id === 'sg_safety'));
+});
+
 test('Japan and Singapore screens attach local official requirements', () => {
     const japan = engine.assess({
         description: 'Bluetooth 65W wall charger with AC input and no battery',

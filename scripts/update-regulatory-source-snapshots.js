@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const models = require('../lib/wearable-product-models');
-const { buildSnapshot } = require('../lib/regulatory-source-monitor');
+const { buildSnapshot, classifyChange } = require('../lib/regulatory-source-monitor');
 const { parseOfficialPayload } = require('../lib/official-regulatory-source-adapters');
 
 const ROOT = path.join(__dirname, '..');
@@ -46,12 +46,23 @@ async function run({ live = false, dryRun = false, now = new Date().toISOString(
     const fetched = {};
     if (live) await Promise.all(Object.entries(models.sources).map(async ([id, source]) => { fetched[id] = await fetchOfficial(source); }));
     const result = buildSnapshot({ sources: models.sources, previous, fetched, now });
-    const newlyDetected = result.changes.map((change) => ({ ...change, review_status: 'pending_review', auto_apply: false }));
-    const unresolved = (previousChanges.changes || []).filter((change) => change.review_status === 'pending_review');
-    const mergedChanges = [...unresolved, ...newlyDetected].filter((change, index, rows) => rows.findIndex((candidate) => candidate.id === change.id && candidate.type === change.type && candidate.current_hash === change.current_hash && candidate.current === change.current) === index);
+    const classify = (change) => {
+        const classification = classifyChange(change, models.sources[change.id] || {}, result.snapshot.sources.find((row) => row.id === change.id));
+        return { ...change, change_classification: classification,
+            review_status: classification === 'baseline_capture' ? 'baseline_captured'
+                : classification === 'superseded_capture' ? 'superseded'
+                    : ['capture_recovery', 'monitor_target_upgrade'].includes(classification) ? 'capture_recovered'
+                    : (change.review_status || 'pending_review'), auto_apply: false };
+    };
+    const newlyDetected = result.changes.map(classify);
+    const retained = (previousChanges.changes || []).filter((change) => !['evidence_approved', 'ignored'].includes(change.review_status)).map(classify);
+    const mergedChanges = [...retained, ...newlyDetected].filter((change, index, rows) => rows.findIndex((candidate) => candidate.id === change.id && candidate.type === change.type && candidate.current_hash === change.current_hash && candidate.current === change.current) === index);
     const changeReport = {
         schema_version: 1, generated_at: now, source_count: Object.keys(models.sources).length,
-        pending_review_count: mergedChanges.length,
+        pending_review_count: mergedChanges.filter((change) => change.review_status === 'pending_review').length,
+        baseline_capture_count: mergedChanges.filter((change) => change.change_classification === 'baseline_capture').length,
+        superseded_capture_count: mergedChanges.filter((change) => change.change_classification === 'superseded_capture').length,
+        recovered_capture_count: mergedChanges.filter((change) => ['capture_recovery', 'monitor_target_upgrade'].includes(change.change_classification)).length,
         changes: mergedChanges
     };
     if (!dryRun) {

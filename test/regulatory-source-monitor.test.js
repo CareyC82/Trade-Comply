@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { normalizeContent, contentHash, lifecycleState, buildSnapshot } = require('../lib/regulatory-source-monitor');
+const { normalizeContent, contentHash, metadataSeed, contentIdentityMatches, classifyChange, lifecycleState, buildSnapshot } = require('../lib/regulatory-source-monitor');
 const { adapterFor, parseOfficialPayload } = require('../lib/official-regulatory-source-adapters');
 
 const source = { authority: 'Authority', title: 'Rule title', scope: 'Official scope', url: 'https://example.gov/rule', lifecycle: { status: 'active', effectiveAt: '2025-01-01' } };
@@ -45,6 +45,19 @@ test('effective-date state machine separates pending, future and active rules', 
     assert.equal(lifecycleState({ lifecycle: { status: 'published_pending_effective_date', effectiveAt: null } }, Date.parse('2026-08-21')), 'published_pending_effective_date');
     assert.equal(lifecycleState({ lifecycle: { status: 'future', effectiveAt: '2027-02-18' } }, Date.parse('2026-08-21')), 'future');
     assert.equal(lifecycleState({ lifecycle: { status: 'future', effectiveAt: '2027-02-18' } }, Date.parse('2027-02-19')), 'active');
+    assert.equal(lifecycleState({ lifecycle: { status: 'active', effectiveAt: '2026-01-01', transitionEndAt: '2026-12-31' } }, Date.parse('2026-08-21')), 'transition');
+    assert.equal(lifecycleState({ lifecycle: { status: 'active', sunsetAt: '2026-08-01' } }, Date.parse('2026-08-21')), 'expired');
+});
+
+test('baseline captures are archived separately while wrong official pages stay pending', () => {
+    const monitored = { ...source, monitorRequiredTerms: ['rule title'] };
+    const baseline = { type: 'content_changed', previous_hash: contentHash(metadataSeed(monitored)), current_summary: 'Rule title official text' };
+    assert.equal(contentIdentityMatches(monitored, baseline.current_summary), true);
+    assert.equal(classifyChange(baseline, monitored, { content_summary: baseline.current_summary }), 'baseline_capture');
+    assert.equal(classifyChange({ ...baseline, current_summary: 'Unrelated navigation page' }, monitored, { content_summary: 'Unrelated navigation page' }), 'invalid_capture');
+    assert.equal(classifyChange({ ...baseline, current_hash: 'old' }, monitored, { content_hash: 'new', content_summary: baseline.current_summary }), 'superseded_capture');
+    assert.equal(classifyChange({ ...baseline, previous_hash: 'old', previous_summary: 'Wrong page' }, monitored, { content_summary: baseline.current_summary }), 'capture_recovery');
+    assert.equal(classifyChange({ ...baseline, previous_hash: 'migration' }, { ...monitored, monitorMigrationHashes: ['migration'] }, { content_summary: baseline.current_summary }), 'monitor_target_upgrade');
 });
 
 test('official adapters distinguish PDF and jurisdiction-specific HTML', () => {
@@ -55,6 +68,13 @@ test('official adapters distinguish PDF and jurisdiction-specific HTML', () => {
     const parsed = parseOfficialPayload({ source, body: `<html><nav>${'noise '.repeat(30)}</nav><main>${'official rule '.repeat(20)}</main></html>`, contentType: 'text/html' });
     assert.equal(parsed.ok, true);
     assert.doesNotMatch(parsed.content, /noise/);
+});
+
+test('official HTML parser selects the largest content region instead of a government-site banner', () => {
+    const parsed = parseOfficialPayload({ source, body: `<main>${'government header '.repeat(8)}</main><main>${'controlled goods safety mark '.repeat(20)}</main>`, contentType: 'text/html' });
+    assert.equal(parsed.ok, true);
+    assert.match(parsed.content, /controlled goods safety mark/);
+    assert.doesNotMatch(parsed.content, /government header/);
 });
 
 test('live monitor requires source identity terms before accepting an official page', () => {

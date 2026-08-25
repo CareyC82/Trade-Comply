@@ -9,6 +9,9 @@ test('regulatory coverage report spans thirty products and four markets', () => 
     const report = buildReport();
     assert.equal(report.product_count, 30);
     assert.equal(report.matrix_cell_count, 120);
+    assert.ok(Array.isArray(report.remediation_queue));
+    assert.ok(Object.values(report.market_summary).every((market) => Number.isInteger(market.cells_using_last_good_sources)));
+    assert.ok(report.cells.every((cell) => Array.isArray(cell.material_attribute_gaps) && Array.isArray(cell.issues)));
     assert.deepEqual(report.markets, ['US', 'EU', 'JP', 'SG']);
     assert.equal(report.market_summary.US.deep, 30);
     assert.equal(report.market_summary.EU.deep, 30);
