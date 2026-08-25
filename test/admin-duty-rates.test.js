@@ -42,6 +42,8 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Official tariff artifact workbench/);
     assert.match(html, /Preview import/);
     assert.match(html, /Confirm import/);
+    assert.match(html, /Hybrid → official exact promotion queue/);
+    assert.match(html, /Filing-grade regression matrix/);
     assert.match(html, /Unmet Search Workbench/);
     assert.match(html, /Only real captured searches are shown/);
 });
@@ -96,6 +98,9 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(payload.duty_rate_sync_status.source_run_plan.every(row => typeof row.change_count === 'number'));
     assert.ok(payload.sources.some(source => source.country === 'KR' && /CustomsTariffList\.do/.test(source.official_url || '')));
     assert.equal(typeof payload.business_summary, 'object');
+    assert.equal(payload.filing_grade_regression.ok, true, JSON.stringify(payload.filing_grade_regression.failures));
+    assert.equal(payload.filing_grade_regression.market_count, 14);
+    assert.equal(payload.hybrid_promotion_queue.length, 5);
     assert.ok(payload.business_summary.sync_conclusion);
     assert.ok(payload.business_summary.priority_conclusion);
     assert.ok(Array.isArray(payload.business_summary.next_actions));

@@ -46,6 +46,7 @@ const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json')
 const DUTY_RATE_SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const MY_DUTY_RATE_IMPORT_STATUS_PATH = path.join(ROOT, 'data', 'my-duty-rate-import-status.json');
 const P2_DUTY_RATE_IMPORT_STATUS_PATH = path.join(ROOT, 'data', 'p2-duty-rate-import-status.json');
+const EXACT_TARIFF_PRIORITIES_PATH = path.join(ROOT, 'data', 'exact-tariff-parser-priorities.json');
 const DUTY_RATE_IMPORT_AUDIT_PATH = path.join(ROOT, 'data', 'duty-rate-import-audit.json');
 const DUTY_RATE_VERSIONS_DIR = path.join(ROOT, 'data', 'duty-rate-versions');
 const AUTOMATION_LAUNCH_STATUS_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
@@ -263,11 +264,33 @@ function readDutyArtifactAudit() {
     };
 }
 
+function buildHybridTariffPromotionQueue() {
+    const priorities = readJsonFile(EXACT_TARIFF_PRIORITIES_PATH, { priorities: [] }).priorities || [];
+    const myStatus = readJsonFile(MY_DUTY_RATE_IMPORT_STATUS_PATH, {});
+    const p2Markets = readJsonFile(P2_DUTY_RATE_IMPORT_STATUS_PATH, { markets: {} }).markets || {};
+    return ['MY', 'KR', 'IN', 'VN', 'TW'].map((country) => {
+        const status = country === 'MY' ? myStatus : p2Markets[country] || {};
+        const seen = new Set();
+        const routes = priorities.filter((row) => row.import_country === country && !seen.has(row.product_id) && seen.add(row.product_id)).slice(0, 5);
+        return {
+            country,
+            promotion_status: status.ok === true ? 'official_artifact_imported' : 'artifact_required',
+            last_good_at: status.last_good_at || null,
+            exact_row_count: status.artifact?.parsed_row_count || 0,
+            priority_routes: routes.map((row) => ({ product_id: row.product_id, route: row.route, hs_code: row.hs_code, impact_score: row.impact_score, next_action: row.next_action })),
+            safe_next_action: status.ok === true
+                ? 'Run filing-grade regression and review remaining ambiguous tariff lines before promotion.'
+                : 'Import a complete official artifact through Preview import; do not promote heading-only rows.'
+        };
+    });
+}
+
 function buildDutyRateStatusPayload() {
     const { runDutyRateHealthCheck } = require('./check-duty-rates');
     const { runPostEntryTaxCoverageCheck } = require('./check-post-entry-tax-coverage');
     const health = runDutyRateHealthCheck();
     const taxCoverage = runPostEntryTaxCoverageCheck();
+    const { buildFilingGradeRegression } = require('../lib/filing-grade-regression');
     const sourcesPayload = readJsonFile(DUTY_RATE_SOURCES_PATH, { sources: [] });
     const dutyPayload = readJsonFile(DUTY_RATES_PATH, { rules: [] });
     const exportTaxPayload = readJsonFile(EXPORT_TAX_RATES_PATH, { rules: [] });
@@ -310,6 +333,7 @@ function buildDutyRateStatusPayload() {
             export_tax: taxCoverage.export_tax,
             failures: taxCoverage.failures
         },
+        filing_grade_regression: buildFilingGradeRegression(dutyPayload),
         duty_rate_sync_status: syncStatus,
         automation_launch_status: automationLaunchStatus,
         sources: Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : [],
@@ -325,7 +349,8 @@ function buildDutyRateStatusPayload() {
             updated_at: null,
             markets: {}
         }),
-        artifact_import_audit: readDutyArtifactAudit()
+        artifact_import_audit: readDutyArtifactAudit(),
+        hybrid_promotion_queue: buildHybridTariffPromotionQueue()
     };
 }
 

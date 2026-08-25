@@ -5346,6 +5346,25 @@ button.feedback-link:hover {
     margin-bottom: 14px;
 }
 
+.tariff-effective-control {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.tariff-effective-control div { display: grid; gap: 3px; }
+.tariff-effective-control span { color: var(--color-text-secondary); font-size: 0.8rem; }
+.tariff-effective-control input { min-height: 42px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: 8px; }
+.tariff-effective-control .tariff-period-badge { padding: 7px 10px; border-radius: 999px; background: #e0f2fe; color: #075985; font-weight: 800; }
+.tariff-effective-period { font-weight: 700; }
+.tariff-upcoming-section { border-left: 5px solid #d97706; }
+
 .tariff-watch-section-heading h2 {
     margin: 0 0 6px;
     color: var(--color-primary);
@@ -6105,6 +6124,8 @@ button.feedback-link:hover {
     .tariff-automation-action {
         grid-template-columns: 1fr;
     }
+
+    .tariff-effective-control { align-items: stretch; flex-direction: column; }
 
     .tariff-market-signal-card__head {
         display: grid;

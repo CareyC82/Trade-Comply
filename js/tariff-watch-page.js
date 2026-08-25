@@ -167,6 +167,9 @@
     }
 
     function renderMarketSignalCard(row) {
+        const period = row.effectiveFrom || row.effectiveTo
+            ? `${row.effectiveFrom || 'earliest'} → ${row.effectiveTo || 'open-ended'}`
+            : 'No bounded effective period';
         return `
             <article class="tariff-market-signal-card">
                 <div class="tariff-market-signal-card__head">
@@ -189,8 +192,26 @@
                     <div><span>Freshness</span><strong>${escapeHtml(row.freshnessLabel || 'Date unavailable')}</strong></div>
                 </div>
                 <small>${escapeHtml(row.useStatus?.guidance || row.trustDetail || row.sourceText || 'Confirm exact HS, origin, and entry date before filing.')}</small>
+                <small class="tariff-effective-period">Effective period: ${escapeHtml(period)}</small>
             </article>
         `;
+    }
+
+    function renderEffectiveDateControl(model) {
+        return `<section class="tariff-effective-control" aria-label="Tariff effective date">
+            <div><strong>Rates in force on</strong><span>Historical, current and future tariff periods stay separate.</span></div>
+            <input id="tariff-as-of-date" type="date" value="${escapeHtml(model.asOfDate)}" aria-label="Tariff effective date">
+            <span class="tariff-period-badge">Selected date · ${escapeHtml(model.asOfDate)}</span>
+        </section>`;
+    }
+
+    function renderUpcomingRates(model, marketKey = '') {
+        const rows = (model.upcomingTariffRows || []).filter((row) => !marketKey || row.marketKey === marketKey);
+        if (!rows.length) return '';
+        return `<section class="tariff-watch-section tariff-upcoming-section">
+            <div class="tariff-watch-section-heading"><h2>Future effective rates</h2><p>Published periods after ${escapeHtml(model.asOfDate)}. These rates are not applied to the selected date.</p></div>
+            <div class="tariff-current-table">${rows.slice(0, 20).map(renderCurrentTariffRow).join('')}</div>
+        </section>`;
     }
 
     function renderMarketSignalGroup(title, description, rows, tone) {
@@ -346,6 +367,7 @@
                     </div>
                 </div>
                 ${renderSpecialPrograms(model, market)}
+                ${renderUpcomingRates(model, market?.marketKey)}
                 ${renderMarketDetailSummary(market, rows)}
                 ${renderMarketActionPanel(model, market)}
                 <div class="tariff-market-signal-groups" aria-label="Market tariff signal list">
@@ -438,10 +460,17 @@
         `;
 
         mount.innerHTML = `
+            ${renderEffectiveDateControl(model)}
             ${introHtml}
             ${bodyHtml}
+            ${selectedMarket ? '' : renderUpcomingRates(model)}
             ${adminHtml}
         `;
+        document.getElementById('tariff-as-of-date')?.addEventListener('change', (event) => {
+            const params = new URLSearchParams(global.location?.search || '');
+            params.set('date', event.target.value);
+            global.location.search = params.toString();
+        });
     }
 
     async function bootstrapTariffWatchPage() {
@@ -451,7 +480,9 @@
             loadTariffWatchStatus(),
             loadDutyRates()
         ]);
-        renderTariffWatch(api.buildTariffWatchModel({ syncStatus: status, dutyRates, limit: 8 }));
+        const requestedDate = new URLSearchParams(global.location?.search || '').get('date');
+        const asOfDate = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '') ? requestedDate : new Date().toISOString().slice(0, 10);
+        renderTariffWatch(api.buildTariffWatchModel({ syncStatus: status, dutyRates, limit: 8, asOfDate }));
     }
 
     async function mountTariffWatchAlert(container, routeContext = {}) {

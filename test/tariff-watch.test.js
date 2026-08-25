@@ -303,3 +303,10 @@ test('tariff watch is exposed in primary navigation and result alerts', () => {
     assert.doesNotMatch(readFile('js/tariff-watch-page.js'), /Current tariff snapshot/);
     assert.doesNotMatch(readFile('js/tariff-watch-page.js'), /Route change radar/);
 });
+
+test('tariff watch page exposes an effective-date selector and future-rate section', () => {
+    const page = fs.readFileSync(path.join(__dirname, '..', 'js', 'tariff-watch-page.js'), 'utf8');
+    assert.match(page, /tariff-as-of-date/);
+    assert.match(page, /Future effective rates/);
+    assert.match(page, /upcomingTariffRows/);
+});

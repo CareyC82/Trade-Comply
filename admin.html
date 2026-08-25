@@ -472,7 +472,11 @@
                     <div class="coverage-table-wrap"><table class="coverage-table"><tbody>
                         <tr><th>Market</th><td><select id="artifact-country"><option>MY</option><option>IN</option><option>KR</option><option>VN</option><option>TW</option></select></td></tr>
                         <tr><th>Official file</th><td><input id="artifact-file" type="file" accept=".xlsx,.xls,.csv,.tsv,.txt,.html,.htm,.json"></td></tr>
-                        <tr><th>Manifest JSON</th><td><textarea id="artifact-manifest" rows="9" style="width:100%;box-sizing:border-box" placeholder='{"authority":"...","country":"MY","source_url":"https://...","coverage_scope":"full_tariff","complete":true,"published_at":"YYYY-MM-DD","effective_at":"YYYY-MM-DD","expected_rows":123}'></textarea><p class="meta">SHA-256 会由浏览器计算并自动加入，无需手工填写。</p></td></tr>
+                        <tr><th>Official authority</th><td><input id="artifact-authority" value="Royal Malaysian Customs" style="width:100%;box-sizing:border-box"></td></tr>
+                        <tr><th>Official source URL</th><td><input id="artifact-source-url" type="url" placeholder="https://official-authority.example/tariff" style="width:100%;box-sizing:border-box"></td></tr>
+                        <tr><th>Published / effective</th><td><div class="row"><label>Published <input id="artifact-published-at" type="date"></label><label>Effective <input id="artifact-effective-at" type="date"></label></div></td></tr>
+                        <tr><th>Expected rows</th><td><input id="artifact-expected-rows" type="number" min="1" step="1" placeholder="Exact parsed row count"><p class="meta">必须与文件实际解析行数一致；这能阻止不完整文件覆盖 last-good。</p></td></tr>
+                        <tr><th>Coverage declaration</th><td><label><input id="artifact-complete" type="checkbox"> I confirm this is the complete official tariff artifact, not a search-result excerpt.</label><details><summary>Technical manifest preview</summary><pre id="artifact-manifest-preview" style="white-space:pre-wrap"></pre></details><p class="meta">SHA-256 会由浏览器计算并自动加入。</p></td></tr>
                     </tbody></table></div>
                     <div class="row"><button type="button" class="btn-primary" id="btn-preview-artifact">Preview import</button><button type="button" class="btn-approve" id="btn-publish-artifact" disabled>Confirm import</button></div>
                     <div id="artifact-preview" class="meta" style="margin-top:12px">尚未预览。</div>
@@ -542,6 +546,7 @@
         let currentCoveragePayload = null;
         let currentArtifactPreview = null;
         let currentArtifactUpload = null;
+        const artifactAuthorities = { MY: 'Royal Malaysian Customs', IN: 'Central Board of Indirect Taxes and Customs (CBIC)', KR: 'Korea Customs Service', VN: 'Vietnam Customs', TW: 'Customs Administration, Ministry of Finance Taiwan' };
 
         function getCurrentAdminOrigin() {
             if (/^(127\.0\.0\.1|localhost)$/.test(window.location.hostname) && window.location.port === '8787') {
@@ -738,6 +743,18 @@
                 </tbody></table></div>`;
         }
 
+        function renderHybridPromotionQueue(rows = []) {
+            return `<div class="crawl-section-title"><h3>Hybrid → official exact promotion queue</h3><span class="meta">Evidence-gated</span></div>
+                <div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Market</th><th>Status</th><th>Official rows</th><th>Priority product / route / HS</th><th>Safe next action</th></tr></thead><tbody>
+                ${rows.map(row => `<tr><td><strong>${escapeHtml(row.country)}</strong></td><td>${escapeHtml(row.promotion_status)}</td><td>${row.exact_row_count || 0}</td><td>${(row.priority_routes || []).map(item => `${escapeHtml(item.product_id)} · ${escapeHtml(item.route)} · ${escapeHtml(item.hs_code)}`).join('<br>') || 'No queued route'}</td><td>${escapeHtml(row.safe_next_action)}</td></tr>`).join('')}</tbody></table></div>`;
+        }
+
+        function renderFilingGradeRegression(result = {}) {
+            return `<div class="crawl-section-title"><h3>Filing-grade regression matrix</h3><span class="badge ${result.ok ? 'auto_updatable' : 'benchmark'}">${result.ok ? 'PASS' : 'BLOCKED'}</span></div>
+                <div class="summary-grid"><div class="summary-card"><strong>${result.checked_rows || 0}</strong><span>Effective-dated exact rows</span></div><div class="summary-card"><strong>${result.market_count || 0}</strong><span>Markets checked</span></div><div class="summary-card"><strong>${result.historical_rows || 0}</strong><span>Historical periods</span></div><div class="summary-card"><strong>${result.future_rows || 0}</strong><span>Future periods</span></div></div>
+                ${(result.failures || []).length ? `<div class="empty">${escapeHtml(result.failures.slice(0, 10).map(row => `${row.type}: ${row.rule_id} ${row.hs_code}`).join(' | '))}</div>` : '<p class="meta">Market, origin, exact HS and entry-date resolution are internally consistent. Add-on and trade-remedy layers remain separately gated.</p>'}`;
+        }
+
         async function fileToBase64(file) {
             const bytes = new Uint8Array(await file.arrayBuffer());
             let binary = '';
@@ -758,14 +775,31 @@
                 const content = await fileToBase64(file);
                 const hashBytes = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
                 const sha256 = [...new Uint8Array(hashBytes)].map(value => value.toString(16).padStart(2, '0')).join('');
-                const manifest = JSON.parse(document.getElementById('artifact-manifest').value || '{}');
+                const country = document.getElementById('artifact-country').value;
+                const manifest = {
+                    authority: document.getElementById('artifact-authority').value.trim(),
+                    country,
+                    source_url: document.getElementById('artifact-source-url').value.trim(),
+                    coverage_scope: 'full_tariff',
+                    complete: document.getElementById('artifact-complete').checked,
+                    published_at: document.getElementById('artifact-published-at').value,
+                    effective_at: document.getElementById('artifact-effective-at').value,
+                    expected_rows: Number(document.getElementById('artifact-expected-rows').value)
+                };
                 manifest.sha256 = sha256;
-                const request = { action: 'preview', country: document.getElementById('artifact-country').value, file_name: file.name, content_base64: content, manifest };
+                document.getElementById('artifact-manifest-preview').textContent = JSON.stringify(manifest, null, 2);
+                const request = { action: 'preview', country, file_name: file.name, content_base64: content, manifest };
                 const result = await apiFetch('/api/review/duty-artifacts', { method: 'POST', body: JSON.stringify(request) });
                 currentArtifactUpload = request;
                 currentArtifactPreview = result;
                 const diff = result.diff || {};
-                output.innerHTML = `<div class="${result.ok ? 'status-bar' : 'empty'}"><strong>${result.ok ? 'PREVIEW PASSED' : 'IMPORT BLOCKED'}</strong> · added ${diff.added_count || 0}, changed ${diff.changed_count || 0}, removed ${diff.removed_count || 0}${(diff.anomalies || []).length ? `<br>${escapeHtml(diff.anomalies.join(' | '))}` : ''}</div>`;
+                const rowLabel = row => `${row.rule_id || 'rule'} · ${row.hs_code || 'HS'} · ${Number(row.base_rate || 0) * 100}%`;
+                output.innerHTML = `<div class="${result.ok ? 'status-bar' : 'empty'}"><strong>${result.ok ? 'PREVIEW PASSED' : 'IMPORT BLOCKED'}</strong> · added ${diff.added_count || 0}, changed ${diff.changed_count || 0}, removed ${diff.removed_count || 0}${(diff.anomalies || []).length ? `<br>${escapeHtml(diff.anomalies.join(' | '))}` : ''}</div>
+                    <details open><summary>Exact HS changes</summary>
+                    ${(diff.added || []).length ? `<p><strong>Added</strong><br>${(diff.added || []).slice(0, 20).map(row => escapeHtml(rowLabel(row))).join('<br>')}</p>` : ''}
+                    ${(diff.changed || []).length ? `<p><strong>Changed</strong><br>${(diff.changed || []).slice(0, 20).map(change => escapeHtml(`${change.before.hs_code}: ${Number(change.before.base_rate) * 100}% → ${Number(change.after.base_rate) * 100}%`)).join('<br>')}</p>` : ''}
+                    ${(diff.removed || []).length ? `<p><strong>Removed / period closed</strong><br>${(diff.removed || []).slice(0, 20).map(row => escapeHtml(rowLabel(row))).join('<br>')}</p>` : ''}
+                    ${!(diff.added || []).length && !(diff.changed || []).length && !(diff.removed || []).length ? '<p>No active-rate difference.</p>' : ''}</details>`;
                 publish.disabled = !result.ok;
             } catch (error) {
                 output.innerHTML = `<div class="empty">预览失败：${escapeHtml(error.message)}</div>`;
@@ -2452,6 +2486,8 @@
                     ${renderExactTariffFeeds(data.exact_tariff_feeds || {})}
                     ${renderMalaysiaArtifactImport(data.my_official_artifact_import || {})}
                     ${renderP2ArtifactImports(data.p2_official_artifact_imports || {})}
+                    ${renderHybridPromotionQueue(data.hybrid_promotion_queue || [])}
+                    ${renderFilingGradeRegression(data.filing_grade_regression || {})}
                     ${renderDutyBusinessSummary(businessSummary)}
                     ${renderDutySyncStatus(syncStatus, roadmap)}
                     <div class="summary-grid">
@@ -2508,6 +2544,7 @@
                     <div class="summary-card"><strong>${escapeHtml(counts.degraded || 0)}</strong><span>Using last-good</span></div>
                 </div>
                 ${changes.length ? `<p class="meta"><strong>Affected questions:</strong> ${escapeHtml([...new Set(changes.flatMap(change => change.impact?.question_ids || []))].join(', ') || 'none')}</p>` : ''}
+                ${changes.length ? `<div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Source change</th><th>Lifecycle</th><th>Effective timing</th><th>Conclusion delta</th></tr></thead><tbody>${changes.map(change => `<tr><td>${escapeHtml(change.id)}</td><td>${escapeHtml(change.impact?.lifecycle_status || 'unknown')}</td><td>${escapeHtml(change.impact?.effective_timing || 'Confirm date')}</td><td>${escapeHtml(change.impact?.conclusion_delta?.status || 'pending review')}<br><span class="meta">${escapeHtml(change.impact?.conclusion_delta?.explanation || '')}</span></td></tr>`).join('')}</tbody></table></div>` : ''}
                 ${changes.length ? `<div class="crawl-section-title"><h3>Manual review queue</h3><span class="meta">No automatic rule changes</span></div><div class="crawl-list">${changes.map(change => `<article class="crawl-item regulatory-review-item" data-source-id="${escapeHtml(change.id)}" data-change-type="${escapeHtml(change.type)}"><strong>${escapeHtml(change.id)} · ${escapeHtml(change.type)}</strong><span class="badge updater_candidate">${escapeHtml(change.review_status || 'pending_review')}</span><p class="meta">Detected ${escapeHtml(formatDateTime(change.detected_at))}</p><p class="meta"><strong>Impact preview:</strong> ${escapeHtml((change.impact?.markets || []).join(', ') || 'No active market mapping')} · ${(change.impact?.products || []).length} product/market cells · requirements ${escapeHtml((change.impact?.requirement_ids || []).join(', ') || 'none')}</p><p class="meta"><strong>Current user conclusions:</strong> ${escapeHtml((change.impact?.current_conclusion_states || []).join(', ') || 'none')}</p><p class="meta"><strong>Affected products:</strong> ${escapeHtml((change.impact?.products || []).slice(0, 8).map(item => `${item.label} (${item.market}: ${item.current_conclusion_label || item.current_conclusion})`).join('; ') || 'none')}${(change.impact?.products || []).length > 8 ? `; +${(change.impact?.products || []).length - 8} more` : ''}</p><p class="meta">${escapeHtml(change.impact?.conclusion_preview || '')}</p><details><summary>Compare evidence</summary><p>${escapeHtml(change.previous_summary || change.previous || '—')}</p><p>${escapeHtml(change.current_summary || change.current || '—')}</p></details><details><summary>Draft rule-change proposal</summary><p class="meta">Draft only · never auto-applied · files: ${escapeHtml((change.rule_proposal?.proposed_files || []).join(', ') || 'generated after evidence review')}</p><ul>${(change.rule_proposal?.review_checklist || []).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></details>${change.review_status === 'pending_review' ? `<label class="meta">Review note<input class="regulatory-review-note" maxlength="500" placeholder="Why was this evidence accepted or ignored?"></label><div class="row"><button type="button" class="btn-primary" data-regulatory-action="approve_evidence">Approve evidence</button><button type="button" class="btn-ghost" data-regulatory-action="ignore">Ignore change</button></div>` : `<button type="button" class="btn-ghost" data-regulatory-action="reopen">Reopen review</button>`}</article>`).join('')}</div>` : '<div class="empty">No official-content changes awaiting review.</div>'}
                 ${auditEvents.length ? `<div class="crawl-section-title"><h3>Review and rollback history</h3><span class="meta">${auditEvents.length} immutable event(s)</span></div><div class="crawl-list">${auditEvents.slice().reverse().slice(0, 20).map(event => `<article class="crawl-item"><strong>${escapeHtml(event.id)} · ${escapeHtml(event.action)}</strong><p class="meta">${escapeHtml(event.previous_status || '—')} → ${escapeHtml(event.current_status || '—')} · ${escapeHtml(formatDateTime(event.reviewed_at))} · ${escapeHtml(event.reviewed_by || '')}</p><p>${escapeHtml(event.note || 'No note')}</p></article>`).join('')}</div>` : ''}
                 <div class="crawl-section-title"><h3>Source lifecycle and fallback status</h3><span class="meta">${sources.length} source(s)</span></div>
@@ -2751,6 +2788,11 @@
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
         document.getElementById('btn-refresh-duty-rates').addEventListener('click', loadDutyRateStatus);
+        document.getElementById('artifact-country').addEventListener('change', (event) => {
+            document.getElementById('artifact-authority').value = artifactAuthorities[event.target.value] || '';
+            currentArtifactPreview = null;
+            document.getElementById('btn-publish-artifact').disabled = true;
+        });
         document.getElementById('btn-preview-artifact').addEventListener('click', previewDutyArtifact);
         document.getElementById('btn-publish-artifact').addEventListener('click', publishDutyArtifact);
         document.getElementById('artifact-history').addEventListener('click', (event) => {

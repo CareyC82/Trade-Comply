@@ -1150,6 +1150,8 @@
         if (dutyImpactLabel) dutyImpactLabel.textContent = isExport ? 'Filing impact' : 'Duty impact';
         const subtitle = $('post-entry-result-subtitle');
         if (subtitle) subtitle.textContent = snapshot.subtitle || 'Post-entry review result.';
+        const effectivePeriod = $('post-entry-effective-period');
+        if (effectivePeriod) effectivePeriod.textContent = `Rate period selected: ${String(snapshot.subtitle || '').split('·').pop().trim()} · Historical and future rates are not mixed.`;
         const route = $('post-entry-result-route');
         if (route) route.textContent = snapshot.route || '';
         const decisionStrip = $('post-entry-decision-strip');
