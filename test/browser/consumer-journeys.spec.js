@@ -18,6 +18,23 @@ test('supported product shows a preliminary result and channel-specific copy', a
     await expect(page.locator('#sell-summary-platform')).toHaveText('TikTok Shop');
     await expect(page.locator('#sell-channel-gate-reason')).toContainText('TikTok Shop');
     await expect(page.locator('#sell-channel-gate-reason')).not.toHaveText(amazonReason);
+    await expect(page.locator('.sell-action-summary')).toContainText('Purchase decision:');
+    await expect(page.locator('.sell-action-summary')).toContainText('Supplier evidence:');
+    await expect(page.locator('.sell-action-summary')).toContainText('Next step:');
+});
+
+test('wired no-battery products do not inherit radio or lithium actions', async ({ page }) => {
+    await submitProduct(page, 'Wired-only USB hub with no battery, no Wi-Fi, no Bluetooth and no AC power, for adults');
+    await expect(page.locator('.sell-action-summary')).not.toContainText('UN38.3');
+    await expect(page.locator('.sell-action-summary')).not.toContainText('FCC');
+    await expect(page.locator('.sell-answer-summary')).toContainText('No lithium-battery restriction identified');
+});
+
+test('child-directed electronics remain specialist-gated in the actionable summary', async ({ page }) => {
+    await submitProduct(page, 'Kids GPS watch with cellular, camera and rechargeable lithium battery');
+    await expect(page.locator('#sell-result')).toContainText('High risk — specialist review');
+    await expect(page.locator('.sell-action-summary')).toContainText(/DO NOT PURCHASE/i);
+    await expect(page.locator('.sell-action-summary')).toContainText(/children|specialist/i);
 });
 
 test('unsupported product exits safely and prepares a manual review email', async ({ page }) => {

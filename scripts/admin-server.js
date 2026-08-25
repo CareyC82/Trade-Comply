@@ -348,6 +348,7 @@ function buildConsumerRegulatoryStatusPayload() {
     const changes = readJsonFile(REGULATORY_CHANGES_PATH, { changes: [], pending_review_count: 0 });
     const counts = snapshots.sources.reduce((result, source) => {
         result[source.lifecycle_state || 'unknown'] = (result[source.lifecycle_state || 'unknown'] || 0) + 1;
+        result[source.status || 'unknown_status'] = (result[source.status || 'unknown_status'] || 0) + 1;
         if (source.status === 'last_good_degraded') result.degraded = (result.degraded || 0) + 1;
         return result;
     }, {});

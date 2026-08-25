@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { normalizeContent, contentHash, metadataSeed, contentIdentityMatches, classifyChange, lifecycleState, buildSnapshot } = require('../lib/regulatory-source-monitor');
+const { normalizeContent, contentHash, metadataSeed, contentIdentityMatches, capturedBinaryHash, classifyChange, lifecycleState, buildSnapshot } = require('../lib/regulatory-source-monitor');
 const { adapterFor, parseOfficialPayload } = require('../lib/official-regulatory-source-adapters');
 
 const source = { authority: 'Authority', title: 'Rule title', scope: 'Official scope', url: 'https://example.gov/rule', lifecycle: { status: 'active', effectiveAt: '2025-01-01' } };
@@ -84,6 +84,17 @@ test('baseline captures are archived separately while wrong official pages stay 
     assert.equal(classifyChange({ ...baseline, current_hash: 'old' }, monitored, { content_hash: 'new', content_summary: baseline.current_summary }), 'superseded_capture');
     assert.equal(classifyChange({ ...baseline, previous_hash: 'old', previous_summary: 'Wrong page' }, monitored, { content_summary: baseline.current_summary }), 'capture_recovery');
     assert.equal(classifyChange({ ...baseline, previous_hash: 'migration' }, { ...monitored, monitorMigrationHashes: ['migration'] }, { content_summary: baseline.current_summary }), 'monitor_target_upgrade');
+});
+
+test('unchanged official PDF bytes with enriched monitor metadata are not treated as a legal-content change', () => {
+    const sha = 'a'.repeat(64);
+    const change = {
+        type: 'content_changed',
+        previous_summary: `Authority. Rule. Official PDF bytes 1000. SHA256 ${sha}.`,
+        current_summary: `Authority. Rule. Maintained scope explanation. Official PDF bytes 1000. SHA256 ${sha}.`
+    };
+    assert.equal(capturedBinaryHash(change.previous_summary), sha);
+    assert.equal(classifyChange(change, {}, { content_summary: change.current_summary }), 'monitor_metadata_enrichment');
 });
 
 test('official adapters distinguish PDF and jurisdiction-specific HTML', () => {

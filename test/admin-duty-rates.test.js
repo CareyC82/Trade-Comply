@@ -19,6 +19,10 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.match(html, /Consumer regulatory change review/);
     assert.match(html, /No automatic rule changes/);
     assert.match(html, /Using last-good/);
+    assert.match(html, /Automatic capture current/);
+    assert.match(html, /Manual review current/);
+    assert.match(html, /Current user conclusions/);
+    assert.equal(payload.counts.current + payload.counts.manual_review_current + (payload.counts.last_good_degraded || 0), payload.source_count);
     assert.match(html, /Approve evidence/);
     assert.match(html, /Review and rollback history/);
 });

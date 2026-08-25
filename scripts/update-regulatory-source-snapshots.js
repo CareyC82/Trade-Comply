@@ -51,6 +51,7 @@ async function run({ live = false, dryRun = false, now = new Date().toISOString(
         return { ...change, change_classification: classification,
             review_status: classification === 'baseline_capture' ? 'baseline_captured'
                 : classification === 'superseded_capture' ? 'superseded'
+                    : classification === 'monitor_metadata_enrichment' ? 'superseded'
                     : ['capture_recovery', 'monitor_target_upgrade'].includes(classification) ? 'capture_recovered'
                     : (change.review_status || 'pending_review'), auto_apply: false };
     };
