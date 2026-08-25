@@ -465,6 +465,19 @@
                     <button type="button" class="btn-ghost" id="btn-refresh-duty-rates">刷新税率源状态</button>
                 </div>
                 <div id="duty-rate-status">加载中…</div>
+                <div class="item" style="margin-top:16px">
+                    <div class="crawl-section-title">
+                        <div><h3 style="margin:0">Official tariff artifact workbench</h3><p class="meta">本地预览不会修改税率。只有预览通过后才能确认发布；发布前会自动保存可回滚快照。</p></div>
+                    </div>
+                    <div class="coverage-table-wrap"><table class="coverage-table"><tbody>
+                        <tr><th>Market</th><td><select id="artifact-country"><option>MY</option><option>IN</option><option>KR</option><option>VN</option><option>TW</option></select></td></tr>
+                        <tr><th>Official file</th><td><input id="artifact-file" type="file" accept=".xlsx,.xls,.csv,.tsv,.txt,.html,.htm,.json"></td></tr>
+                        <tr><th>Manifest JSON</th><td><textarea id="artifact-manifest" rows="9" style="width:100%;box-sizing:border-box" placeholder='{"authority":"...","country":"MY","source_url":"https://...","coverage_scope":"full_tariff","complete":true,"published_at":"YYYY-MM-DD","effective_at":"YYYY-MM-DD","expected_rows":123}'></textarea><p class="meta">SHA-256 会由浏览器计算并自动加入，无需手工填写。</p></td></tr>
+                    </tbody></table></div>
+                    <div class="row"><button type="button" class="btn-primary" id="btn-preview-artifact">Preview import</button><button type="button" class="btn-approve" id="btn-publish-artifact" disabled>Confirm import</button></div>
+                    <div id="artifact-preview" class="meta" style="margin-top:12px">尚未预览。</div>
+                    <div id="artifact-history" style="margin-top:16px"></div>
+                </div>
             </div>
             <div class="panel">
                 <div class="crawl-section-title">
@@ -527,6 +540,8 @@
         const apiBaseInput = document.getElementById('api-base');
         const passwordInput = document.getElementById('password');
         let currentCoveragePayload = null;
+        let currentArtifactPreview = null;
+        let currentArtifactUpload = null;
 
         function getCurrentAdminOrigin() {
             if (/^(127\.0\.0\.1|localhost)$/.test(window.location.hostname) && window.location.port === '8787') {
@@ -712,6 +727,65 @@
                     <tbody>${rows}</tbody>
                 </table></div>
             `;
+        }
+
+        function renderArtifactHistory(audit = {}) {
+            const events = (audit.events || []).slice().reverse();
+            if (!events.length) return '<p class="meta">No published artifact versions yet.</p>';
+            return `<div class="crawl-section-title"><h3>Import history</h3><span class="meta">${events.length} event(s)</span></div>
+                <div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Time</th><th>Market</th><th>Action</th><th>Effective</th><th>Diff</th><th>Restore</th></tr></thead><tbody>
+                ${events.map(event => `<tr><td>${escapeHtml(formatDateTime(event.created_at))}</td><td>${escapeHtml(event.country || '—')}</td><td>${escapeHtml(event.type)}</td><td>${escapeHtml(event.effective_at || '—')}</td><td>${event.diff ? `+${event.diff.added_count} / ~${event.diff.changed_count} / −${event.diff.removed_count}` : '—'}</td><td>${event.type === 'publish' && event.rollback_available ? `<button type="button" class="btn-reject" data-artifact-rollback="${escapeHtml(event.id)}">Rollback</button>` : '—'}</td></tr>`).join('')}
+                </tbody></table></div>`;
+        }
+
+        async function fileToBase64(file) {
+            const bytes = new Uint8Array(await file.arrayBuffer());
+            let binary = '';
+            const block = 0x8000;
+            for (let index = 0; index < bytes.length; index += block) binary += String.fromCharCode(...bytes.subarray(index, index + block));
+            return btoa(binary);
+        }
+
+        async function previewDutyArtifact() {
+            const output = document.getElementById('artifact-preview');
+            const publish = document.getElementById('btn-publish-artifact');
+            publish.disabled = true;
+            currentArtifactPreview = null;
+            const file = document.getElementById('artifact-file').files[0];
+            if (!file) return output.innerHTML = '<div class="empty">请选择官方文件。</div>';
+            try {
+                output.textContent = '正在本地验证并生成差异预览…';
+                const content = await fileToBase64(file);
+                const hashBytes = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+                const sha256 = [...new Uint8Array(hashBytes)].map(value => value.toString(16).padStart(2, '0')).join('');
+                const manifest = JSON.parse(document.getElementById('artifact-manifest').value || '{}');
+                manifest.sha256 = sha256;
+                const request = { action: 'preview', country: document.getElementById('artifact-country').value, file_name: file.name, content_base64: content, manifest };
+                const result = await apiFetch('/api/review/duty-artifacts', { method: 'POST', body: JSON.stringify(request) });
+                currentArtifactUpload = request;
+                currentArtifactPreview = result;
+                const diff = result.diff || {};
+                output.innerHTML = `<div class="${result.ok ? 'status-bar' : 'empty'}"><strong>${result.ok ? 'PREVIEW PASSED' : 'IMPORT BLOCKED'}</strong> · added ${diff.added_count || 0}, changed ${diff.changed_count || 0}, removed ${diff.removed_count || 0}${(diff.anomalies || []).length ? `<br>${escapeHtml(diff.anomalies.join(' | '))}` : ''}</div>`;
+                publish.disabled = !result.ok;
+            } catch (error) {
+                output.innerHTML = `<div class="empty">预览失败：${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function publishDutyArtifact() {
+            if (!currentArtifactPreview?.ok || !currentArtifactUpload) return;
+            if (!window.confirm('确认发布已预览的官方税率文件？系统会先保存旧版本快照。')) return;
+            const result = await apiFetch('/api/review/duty-artifacts', { method: 'POST', body: JSON.stringify({ ...currentArtifactUpload, action: 'publish', preview_digest: currentArtifactPreview.preview_digest }) });
+            document.getElementById('artifact-preview').innerHTML = `<div class="status-bar">发布完成，版本 ${escapeHtml(result.version_id)}</div>`;
+            currentArtifactPreview = null;
+            document.getElementById('btn-publish-artifact').disabled = true;
+            await loadDutyRateStatus();
+        }
+
+        async function rollbackDutyArtifact(versionId) {
+            if (!window.confirm(`确认恢复版本 ${versionId} 发布前的税率快照？`)) return;
+            await apiFetch('/api/review/duty-artifacts', { method: 'POST', body: JSON.stringify({ action: 'rollback', version_id: versionId }) });
+            await loadDutyRateStatus();
         }
 
         function listValue(item, field) {
@@ -2409,6 +2483,7 @@
                     <div class="crawl-section-title"><h3>Source roadmap</h3><span class="meta">${sources.length} 个源</span></div>
                     <div class="duty-source-grid">${sources.length ? sources.map(renderDutySource).join('') : '<div class="empty">暂无税率源配置。</div>'}</div>
                 `;
+                document.getElementById('artifact-history').innerHTML = renderArtifactHistory(data.artifact_import_audit || {});
             } catch (err) {
                 dutyRateStatus.innerHTML = `<div class="empty">税率源状态加载失败：${escapeHtml(err.message)}</div>`;
             }
@@ -2432,6 +2507,7 @@
                     <div class="summary-card"><strong>${escapeHtml(counts.manual_review_current || 0)}</strong><span>Manual review current</span></div>
                     <div class="summary-card"><strong>${escapeHtml(counts.degraded || 0)}</strong><span>Using last-good</span></div>
                 </div>
+                ${changes.length ? `<p class="meta"><strong>Affected questions:</strong> ${escapeHtml([...new Set(changes.flatMap(change => change.impact?.question_ids || []))].join(', ') || 'none')}</p>` : ''}
                 ${changes.length ? `<div class="crawl-section-title"><h3>Manual review queue</h3><span class="meta">No automatic rule changes</span></div><div class="crawl-list">${changes.map(change => `<article class="crawl-item regulatory-review-item" data-source-id="${escapeHtml(change.id)}" data-change-type="${escapeHtml(change.type)}"><strong>${escapeHtml(change.id)} · ${escapeHtml(change.type)}</strong><span class="badge updater_candidate">${escapeHtml(change.review_status || 'pending_review')}</span><p class="meta">Detected ${escapeHtml(formatDateTime(change.detected_at))}</p><p class="meta"><strong>Impact preview:</strong> ${escapeHtml((change.impact?.markets || []).join(', ') || 'No active market mapping')} · ${(change.impact?.products || []).length} product/market cells · requirements ${escapeHtml((change.impact?.requirement_ids || []).join(', ') || 'none')}</p><p class="meta"><strong>Current user conclusions:</strong> ${escapeHtml((change.impact?.current_conclusion_states || []).join(', ') || 'none')}</p><p class="meta"><strong>Affected products:</strong> ${escapeHtml((change.impact?.products || []).slice(0, 8).map(item => `${item.label} (${item.market}: ${item.current_conclusion_label || item.current_conclusion})`).join('; ') || 'none')}${(change.impact?.products || []).length > 8 ? `; +${(change.impact?.products || []).length - 8} more` : ''}</p><p class="meta">${escapeHtml(change.impact?.conclusion_preview || '')}</p><details><summary>Compare evidence</summary><p>${escapeHtml(change.previous_summary || change.previous || '—')}</p><p>${escapeHtml(change.current_summary || change.current || '—')}</p></details><details><summary>Draft rule-change proposal</summary><p class="meta">Draft only · never auto-applied · files: ${escapeHtml((change.rule_proposal?.proposed_files || []).join(', ') || 'generated after evidence review')}</p><ul>${(change.rule_proposal?.review_checklist || []).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></details>${change.review_status === 'pending_review' ? `<label class="meta">Review note<input class="regulatory-review-note" maxlength="500" placeholder="Why was this evidence accepted or ignored?"></label><div class="row"><button type="button" class="btn-primary" data-regulatory-action="approve_evidence">Approve evidence</button><button type="button" class="btn-ghost" data-regulatory-action="ignore">Ignore change</button></div>` : `<button type="button" class="btn-ghost" data-regulatory-action="reopen">Reopen review</button>`}</article>`).join('')}</div>` : '<div class="empty">No official-content changes awaiting review.</div>'}
                 ${auditEvents.length ? `<div class="crawl-section-title"><h3>Review and rollback history</h3><span class="meta">${auditEvents.length} immutable event(s)</span></div><div class="crawl-list">${auditEvents.slice().reverse().slice(0, 20).map(event => `<article class="crawl-item"><strong>${escapeHtml(event.id)} · ${escapeHtml(event.action)}</strong><p class="meta">${escapeHtml(event.previous_status || '—')} → ${escapeHtml(event.current_status || '—')} · ${escapeHtml(formatDateTime(event.reviewed_at))} · ${escapeHtml(event.reviewed_by || '')}</p><p>${escapeHtml(event.note || 'No note')}</p></article>`).join('')}</div>` : ''}
                 <div class="crawl-section-title"><h3>Source lifecycle and fallback status</h3><span class="meta">${sources.length} source(s)</span></div>
@@ -2675,6 +2751,12 @@
         document.getElementById('btn-refresh').addEventListener('click', loadPending);
         document.getElementById('btn-refresh-crawl-summary').addEventListener('click', loadCrawlSummary);
         document.getElementById('btn-refresh-duty-rates').addEventListener('click', loadDutyRateStatus);
+        document.getElementById('btn-preview-artifact').addEventListener('click', previewDutyArtifact);
+        document.getElementById('btn-publish-artifact').addEventListener('click', publishDutyArtifact);
+        document.getElementById('artifact-history').addEventListener('click', (event) => {
+            const button = event.target.closest('[data-artifact-rollback]');
+            if (button) rollbackDutyArtifact(button.dataset.artifactRollback);
+        });
         document.getElementById('btn-refresh-consumer-regulations').addEventListener('click', loadConsumerRegulatoryStatus);
         consumerRegulatoryStatus.addEventListener('click', (event) => {
             const button = event.target.closest('[data-regulatory-action]');

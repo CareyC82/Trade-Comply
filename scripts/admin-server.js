@@ -46,6 +46,8 @@ const DUTY_RATE_SOURCES_PATH = path.join(ROOT, 'data', 'duty-rate-sources.json')
 const DUTY_RATE_SYNC_STATUS_PATH = path.join(ROOT, 'data', 'duty-rate-sync-status.json');
 const MY_DUTY_RATE_IMPORT_STATUS_PATH = path.join(ROOT, 'data', 'my-duty-rate-import-status.json');
 const P2_DUTY_RATE_IMPORT_STATUS_PATH = path.join(ROOT, 'data', 'p2-duty-rate-import-status.json');
+const DUTY_RATE_IMPORT_AUDIT_PATH = path.join(ROOT, 'data', 'duty-rate-import-audit.json');
+const DUTY_RATE_VERSIONS_DIR = path.join(ROOT, 'data', 'duty-rate-versions');
 const AUTOMATION_LAUNCH_STATUS_PATH = path.join(ROOT, 'data', 'automation-launch-status.json');
 const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
 const UNMET_SEARCH_BACKLOG_PATH = path.join(ROOT, 'data', 'unmet-search-backlog.json');
@@ -100,10 +102,19 @@ function denyAdminRoute(req, res, auth, urlPath) {
     sendJson(res, 403, buildAdminForbiddenPayload(auth));
 }
 
-function readBody(req) {
+function readBody(req, maxBytes = 1024 * 1024) {
     return new Promise((resolve, reject) => {
         const chunks = [];
-        req.on('data', chunk => chunks.push(chunk));
+        let size = 0;
+        req.on('data', chunk => {
+            size += chunk.length;
+            if (size > maxBytes) {
+                reject(new Error(`Request body exceeds ${Math.round(maxBytes / 1024 / 1024)} MB limit`));
+                req.destroy();
+                return;
+            }
+            chunks.push(chunk);
+        });
         req.on('end', () => {
             const raw = Buffer.concat(chunks).toString('utf8').trim();
             if (!raw) {
@@ -239,6 +250,19 @@ function readJsonFile(filePath, fallback = {}) {
     }
 }
 
+function readDutyArtifactAudit() {
+    const audit = readJsonFile(DUTY_RATE_IMPORT_AUDIT_PATH, { schema_version: 1, updated_at: null, events: [] });
+    return {
+        ...audit,
+        events: (audit.events || []).map(({ version_path, ...event }) => ({
+            ...event,
+            rollback_available: event.type === 'publish' && event.rollback_available === true
+                ? fs.existsSync(path.join(DUTY_RATE_VERSIONS_DIR, `${event.id}.json`))
+                : false
+        }))
+    };
+}
+
 function buildDutyRateStatusPayload() {
     const { runDutyRateHealthCheck } = require('./check-duty-rates');
     const { runPostEntryTaxCoverageCheck } = require('./check-post-entry-tax-coverage');
@@ -300,7 +324,8 @@ function buildDutyRateStatusPayload() {
             schema_version: 1,
             updated_at: null,
             markets: {}
-        })
+        }),
+        artifact_import_audit: readDutyArtifactAudit()
     };
 }
 
@@ -353,6 +378,44 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
 
 async function handleDutyRateStatus(req, res) {
     sendJson(res, 200, buildDutyRateStatusPayload());
+}
+
+function artifactStatusPath(country) {
+    return String(country || '').toUpperCase() === 'MY'
+        ? MY_DUTY_RATE_IMPORT_STATUS_PATH
+        : P2_DUTY_RATE_IMPORT_STATUS_PATH;
+}
+
+async function handleDutyRateArtifacts(req, res) {
+    const workflow = require('../lib/duty-rate-artifact-workflow');
+    if (req.method === 'GET') {
+        return sendJson(res, 200, {
+            ok: true,
+            supported_countries: [...workflow.SUPPORTED],
+            max_artifact_bytes: workflow.MAX_ARTIFACT_BYTES,
+            audit: readDutyArtifactAudit()
+        });
+    }
+    const body = await readBody(req, 21 * 1024 * 1024);
+    const common = {
+        country: body.country,
+        fileName: body.file_name,
+        contentBase64: body.content_base64,
+        manifest: body.manifest,
+        dutyRatesPath: DUTY_RATES_PATH,
+        statusPath: artifactStatusPath(body.country),
+        auditPath: DUTY_RATE_IMPORT_AUDIT_PATH,
+        versionsDir: DUTY_RATE_VERSIONS_DIR
+    };
+    if (body.action === 'preview') return sendJson(res, 200, workflow.previewArtifact(common));
+    if (body.action === 'publish') return sendJson(res, 200, workflow.publishArtifact({ ...common, previewDigest: body.preview_digest }));
+    if (body.action === 'rollback') return sendJson(res, 200, workflow.rollbackArtifact({
+        versionId: body.version_id,
+        dutyRatesPath: DUTY_RATES_PATH,
+        auditPath: DUTY_RATE_IMPORT_AUDIT_PATH,
+        versionsDir: DUTY_RATE_VERSIONS_DIR
+    }));
+    return sendJson(res, 400, { ok: false, error: 'action must be preview, publish or rollback' });
 }
 
 function buildConsumerRegulatoryStatusPayload() {
@@ -595,6 +658,11 @@ async function handleApi(req, res) {
 
         if (req.method === 'GET' && urlPath === '/api/review/duty-rates') {
             await handleDutyRateStatus(req, res);
+            return;
+        }
+
+        if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/api/review/duty-artifacts') {
+            await handleDutyRateArtifacts(req, res);
             return;
         }
 

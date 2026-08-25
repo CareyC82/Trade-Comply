@@ -25,6 +25,7 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.equal(payload.counts.current + payload.counts.manual_review_current + (payload.counts.last_good_degraded || 0), payload.source_count);
     assert.match(html, /Approve evidence/);
     assert.match(html, /Review and rollback history/);
+    assert.match(html, /Affected questions/);
 });
 
 test('admin page includes duty-rate automation health queue', () => {
@@ -38,6 +39,9 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Priority:/);
     assert.match(html, /<strong>Run:<\/strong>/);
     assert.match(html, /Official exact tariff feeds/);
+    assert.match(html, /Official tariff artifact workbench/);
+    assert.match(html, /Preview import/);
+    assert.match(html, /Confirm import/);
     assert.match(html, /Unmet Search Workbench/);
     assert.match(html, /Only real captured searches are shown/);
 });

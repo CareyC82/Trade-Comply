@@ -12,6 +12,7 @@ test('regulatory source impact preview identifies affected products without auto
     assert.ok(impact.markets.includes('SG'));
     assert.ok(impact.products.some((item) => item.id === 'portable_fan'));
     assert.ok(impact.requirement_ids.includes('sg_safety'));
+    assert.ok(impact.question_ids.length > 0);
     assert.ok(impact.current_conclusion_states.length > 0);
     assert.ok(impact.products.every((item) => item.current_conclusion && item.current_conclusion_label));
     assert.equal(impact.auto_publish, false);

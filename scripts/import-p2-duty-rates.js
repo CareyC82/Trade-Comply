@@ -11,6 +11,7 @@ const {
     parseTaiwanTariffRows
 } = require('./update-static-duty-rates');
 const { parseKoreaTariffRateRows, parseKoreaOfficialJsonRows } = require('./update-kr-duty-rates');
+const { mergeEffectiveOverrides } = require('../lib/versioned-duty-overrides');
 
 const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
@@ -186,7 +187,11 @@ function applyRows(country, payload, rows, manifest, checkedAt, sha256) {
         const prefixes = (rule.hs_prefixes || []).map(digits).filter(Boolean);
         const matched = rows.filter((row) => prefixes.some((prefix) => row.hs_code.startsWith(prefix)));
         if (!matched.length) continue;
-        rule.exact_code_overrides = matched.map((row) => buildOverride(country, row, manifest, checkedAt, sha256));
+        rule.exact_code_overrides = mergeEffectiveOverrides(
+            rule.exact_code_overrides || [],
+            matched.map((row) => buildOverride(country, row, manifest, checkedAt, sha256)),
+            manifest.effective_at
+        );
         rule.last_checked_at = checkedAt;
         changed.push({ rule: rule.id, exact_row_count: matched.length });
     }
