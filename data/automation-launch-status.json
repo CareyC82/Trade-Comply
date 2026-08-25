@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-24T18:57:21.791Z",
+  "updated_at": "2026-08-25T18:56:12.591Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -193,14 +193,14 @@
       "quotas": 20
     },
     "annex_total": 242,
-    "quota_checked_at": "2026-08-24T18:54:32.410Z",
+    "quota_checked_at": "2026-08-25T18:53:08.763Z",
     "quota_expected": 20,
     "quota_checked": 20,
     "quota_errors": 0,
     "quota_alerts": {
       "available": 20
     },
-    "specific_duty_checked_at": "2026-08-24T18:54:43.320Z",
+    "specific_duty_checked_at": "2026-08-25T18:53:28.806Z",
     "specific_duty_annex_lines": 21,
     "specific_duty_exact_codes": 27,
     "specific_duty_rows": 54,
@@ -1061,7 +1061,7 @@
       "source_status": "hybrid_official_candidate",
       "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "npm run update:duty-rates:in:official",
+      "update_command": "npm run import:duty-rates:p2 -- --country=IN --file /path/to/icegate-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:in",
       "official_url": "https://www.icegate.gov.in/",
       "official_probe_urls": [
@@ -1103,7 +1103,7 @@
       "source_status": "hybrid_official_candidate",
       "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "npm run update:duty-rates:kr:official",
+      "update_command": "npm run import:duty-rates:p2 -- --country=KR --file /path/to/kcs-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:kr",
       "official_url": "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
       "official_probe_urls": [
@@ -1145,7 +1145,7 @@
       "source_status": "hybrid_official_candidate",
       "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY --official-live",
+      "update_command": "npm run import:duty-rates:my -- --file /path/to/official-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_url": "https://ezhs.customs.gov.my/",
       "official_probe_urls": [
@@ -1170,7 +1170,7 @@
       ],
       "transit_route_priority": true,
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
-      "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed.",
+      "next_action": "Import a complete Royal Malaysian Customs tariff artifact only after its official source, hash, publication/effective dates, row count, exact 10-digit AHTN codes, and rates pass the trust gate; keep SST, preferences, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed.",
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
@@ -1188,7 +1188,7 @@
       "source_status": "hybrid_official_candidate",
       "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=TW --official-live",
+      "update_command": "npm run import:duty-rates:p2 -- --country=TW --file /path/to/taiwan-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=TW --probe-live",
       "official_url": "https://portal.sw.nat.gov.tw/APGQ/GC453?request_locale=zh_TW",
       "official_probe_urls": [
@@ -1231,7 +1231,7 @@
       "source_status": "hybrid_official_candidate",
       "machine_readable": "candidate",
       "maintenance_priority": "P2",
-      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=VN --official-live",
+      "update_command": "npm run import:duty-rates:p2 -- --country=VN --file /path/to/vietnam-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
       "official_url": "https://www.customs.gov.vn/",
       "official_probe_urls": [
@@ -1314,7 +1314,7 @@
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "npm run update:duty-rates:in:official",
+      "update_command": "npm run import:duty-rates:p2 -- --country=IN --file /path/to/icegate-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:in",
       "official_probe_urls": [
         "https://www.icegate.gov.in/",
@@ -1373,7 +1373,7 @@
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "npm run update:duty-rates:kr:official",
+      "update_command": "npm run import:duty-rates:p2 -- --country=KR --file /path/to/kcs-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:kr",
       "official_probe_urls": [
         "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037",
@@ -1432,7 +1432,7 @@
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=MY --official-live",
+      "update_command": "npm run import:duty-rates:my -- --file /path/to/official-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
         "https://ezhs.customs.gov.my/",
@@ -1485,7 +1485,7 @@
         "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
       },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
-      "next_action": "Use official probe status to promote a Royal Malaysian Customs/SST parser only after exact HS rows are machine-readable; keep SST, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
+      "next_action": "Import a complete Royal Malaysian Customs tariff artifact only after its official source, hash, publication/effective dates, row count, exact 10-digit AHTN codes, and rates pass the trust gate; keep SST, preferences, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
     },
     {
       "country": "TW",
@@ -1493,7 +1493,7 @@
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=TW --official-live",
+      "update_command": "npm run import:duty-rates:p2 -- --country=TW --file /path/to/taiwan-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=TW --probe-live",
       "official_probe_urls": [
         "https://portal.sw.nat.gov.tw/APGQ/GC453?request_locale=zh_TW",
@@ -1554,7 +1554,7 @@
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
-      "update_command": "node --use-system-ca scripts/update-static-duty-rates.js --countries=VN --official-live",
+      "update_command": "npm run import:duty-rates:p2 -- --country=VN --file /path/to/vietnam-tariff.xlsx --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=VN --probe-live",
       "official_probe_urls": [
         "https://www.customs.gov.vn/",
