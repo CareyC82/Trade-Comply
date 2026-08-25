@@ -622,9 +622,31 @@ test('official-source freshness reports current, overdue and missing metadata st
     assert.equal(current.status, 'current');
     assert.equal(stale.status, 'review_overdue');
     assert.equal(missing.status, 'review_metadata_missing');
+    const degraded = engine.summarizeSourceFreshness([{ sources: [{ url: 'https://example.test/last-good', reviewedAt: '2026-08-17', confidence: 'official', monitorStatus: 'last_good_degraded', lastGoodAt: '2026-08-16T00:00:00Z' }] }], Date.parse('2026-08-17'));
+    assert.equal(degraded.status, 'using_last_good');
+    assert.equal(degraded.degradedCount, 1);
+    assert.equal(degraded.lastGoodThrough, '2026-08-16T00:00:00Z');
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
     assert.match(script, /Official-source maintenance/);
     assert.match(script, /Source review overdue/);
+});
+
+test('Singapore exact scope consumes rated voltage and power supplied by the user', () => {
+    const within = engine.assess({
+        description: 'Mini projector with 230 V AC input, rated 45 W, Wi-Fi and no battery', market: 'SG', origin: 'CN', platform: 'Other',
+        attributes: { productType: 'mini_projector', mainsPowered: 'yes', bundledAdapter: 'no', ratedVoltage: 230, ratedPower: 45, wifi: 'yes', bluetooth: 'no', battery: 'no' }, documents: []
+    });
+    assert.equal(within.profile.ratedVoltage, 230);
+    assert.equal(within.profile.ratedPower, 45);
+    assert.ok(within.requirements.some((item) => item.id === 'sg_safety'));
+    const outside = engine.assess({
+        description: 'Mini projector with 300 V AC input, rated 45 W, Wi-Fi and no battery', market: 'SG', origin: 'CN', platform: 'Other',
+        attributes: { productType: 'mini_projector', mainsPowered: 'yes', bundledAdapter: 'no', ratedVoltage: 300, ratedPower: 45, wifi: 'yes', bluetooth: 'no', battery: 'no' }, documents: []
+    });
+    assert.ok(!outside.requirements.some((item) => item.id === 'sg_safety'));
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /type="number" name="\$\{key\}"/);
+    assert.match(script, /await regulatorySnapshotsReady/);
 });
 
 test('Japan and Singapore screens attach local official requirements', () => {

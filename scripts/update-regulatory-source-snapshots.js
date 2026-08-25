@@ -15,10 +15,17 @@ async function fetchOfficial(source) {
     let lastFailure = { ok: false, error: 'not_fetched' };
     for (const url of urls) {
         try {
-            const response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000), headers: { 'user-agent': 'Mozilla/5.0 (compatible; TraceWizeRegulatoryMonitor/1.0; +https://tracewize.com)', accept: 'text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.8', 'accept-language': 'en-US,en;q=0.9,ja;q=0.7' } });
+            const timeoutMs = source.monitorTimeoutMs || (/\.pdf(?:$|\?)/i.test(url) ? 30000 : 20000);
+            const response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(timeoutMs), headers: { 'user-agent': 'Mozilla/5.0 (compatible; TraceWizeRegulatoryMonitor/1.0; +https://tracewize.com)', accept: 'text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.8', 'accept-language': 'en-US,en;q=0.9,ja;q=0.7' } });
             if (!response.ok) { lastFailure = { ok: false, error: `http_${response.status}`, monitoredUrl: url }; continue; }
             const parsed = parseOfficialPayload({ source: { ...source, url }, body: Buffer.from(await response.arrayBuffer()), contentType: response.headers.get('content-type') || '' });
-            if (parsed.ok) return { ...parsed, monitoredUrl: url };
+            const requiredTerms = source.monitorRequiredTerms || [];
+            const hasRequiredTerms = requiredTerms.every((term) => parsed.content?.toLowerCase().includes(String(term).toLowerCase()));
+            if (parsed.ok && hasRequiredTerms) return { ...parsed, monitoredUrl: url };
+            if (parsed.ok && !hasRequiredTerms) {
+                lastFailure = { ok: false, error: 'official_content_identity_mismatch', adapter: parsed.adapter, monitoredUrl: url };
+                continue;
+            }
             lastFailure = { ok: false, error: parsed.error, adapter: parsed.adapter, monitoredUrl: url };
         } catch (error) {
             lastFailure = { ok: false, error: error.name === 'TimeoutError' ? 'timeout' : 'network_or_parser_failure', monitoredUrl: url };

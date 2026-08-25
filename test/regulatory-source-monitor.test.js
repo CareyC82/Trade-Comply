@@ -28,6 +28,12 @@ test('network and empty-parser failures preserve the last known good snapshot', 
     }
 });
 
+test('snapshot carries an explicit manual-review fallback policy', () => {
+    const policySource = { ...source, monitorPolicy: { mode: 'last_good_manual_review', reviewEveryDays: 30 } };
+    const result = buildSnapshot({ sources: { rule: policySource }, fetched: { rule: { ok: false, error: 'blocked' } }, now: '2026-01-01T00:00:00Z' });
+    assert.deepEqual(result.snapshot.sources[0].monitor_policy, { mode: 'last_good_manual_review', review_every_days: 30 });
+});
+
 test('offline lifecycle refresh does not falsely mark official sources degraded', () => {
     const first = buildSnapshot({ sources: { rule: source }, fetched: { rule: { ok: true, content: 'A'.repeat(100) } }, now: '2026-01-01T00:00:00Z' });
     const next = buildSnapshot({ sources: { rule: source }, previous: first.snapshot, now: '2026-01-02T00:00:00Z' });
@@ -49,4 +55,10 @@ test('official adapters distinguish PDF and jurisdiction-specific HTML', () => {
     const parsed = parseOfficialPayload({ source, body: `<html><nav>${'noise '.repeat(30)}</nav><main>${'official rule '.repeat(20)}</main></html>`, contentType: 'text/html' });
     assert.equal(parsed.ok, true);
     assert.doesNotMatch(parsed.content, /noise/);
+});
+
+test('live monitor requires source identity terms before accepting an official page', () => {
+    const script = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'scripts', 'update-regulatory-source-snapshots.js'), 'utf8');
+    assert.match(script, /monitorRequiredTerms/);
+    assert.match(script, /official_content_identity_mismatch/);
 });

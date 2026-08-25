@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { buildImpact, reviewChange } = require('../lib/regulatory-change-review');
+const { buildImpact, buildRuleProposal, reviewChange } = require('../lib/regulatory-change-review');
 
 test('regulatory source impact preview identifies affected products without auto-publishing', () => {
     const impact = buildImpact('sgControlledGoods');
@@ -13,6 +13,16 @@ test('regulatory source impact preview identifies affected products without auto
     assert.ok(impact.products.some((item) => item.id === 'portable_fan'));
     assert.ok(impact.requirement_ids.includes('sg_safety'));
     assert.equal(impact.auto_publish, false);
+});
+
+test('rule proposals are draft-only, scoped and require a separate tested code review', () => {
+    const proposal = buildRuleProposal('sgControlledGoods');
+    assert.equal(proposal.status, 'draft_only');
+    assert.equal(proposal.auto_apply, false);
+    assert.ok(proposal.affected_markets.includes('SG'));
+    assert.ok(proposal.affected_products.includes('portable_fan'));
+    assert.ok(proposal.proposed_files.includes('lib/can-i-sell-it.js'));
+    assert.match(proposal.review_checklist.at(-1), /never publish a rule automatically/i);
 });
 
 test('approve, ignore and reopen actions remain evidence-only and append rollback history', () => {
@@ -23,6 +33,8 @@ test('approve, ignore and reopen actions remain evidence-only and append rollbac
     const approved = reviewChange({ changesFile, auditFile, id: 'sgControlledGoods', type: 'content_changed', action: 'approve_evidence', note: 'Official page update reviewed.', now: '2026-08-21T00:00:00Z' });
     assert.equal(approved.change.review_status, 'evidence_approved');
     assert.equal(approved.change.auto_apply, false);
+    assert.equal(approved.change.rule_proposal.status, 'draft_only');
+    assert.equal(approved.audit_event.rule_proposal.auto_apply, false);
     const reopened = reviewChange({ changesFile, auditFile, id: 'sgControlledGoods', type: 'content_changed', action: 'reopen', now: '2026-08-22T00:00:00Z' });
     assert.equal(reopened.change.review_status, 'pending_review');
     const audit = JSON.parse(fs.readFileSync(auditFile, 'utf8'));

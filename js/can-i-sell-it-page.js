@@ -80,20 +80,34 @@ function bootstrapCanISellItPage() {
         gps: 'GPS / location tracking', display: 'Screen / projected display',
         wirelessCharging: 'Wireless charging', noiseCancellation: 'Active noise cancellation'
         , mainsPowered: 'AC mains powered'
+        , bundledAdapter: 'AC adaptor included', ratedVoltage: 'Rated AC input voltage (V)', ratedPower: 'Rated input power (W)'
     };
+
+    const regulatorySnapshotsReady = fetch('data/consumer-regulatory-snapshots.json', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null).then((payload) => {
+        (payload?.sources || []).forEach((snapshot) => {
+            if (!models.sources[snapshot.id]) return;
+            Object.assign(models.sources[snapshot.id], { monitorStatus: snapshot.status, lastGoodAt: snapshot.last_good_at, lifecycleState: snapshot.lifecycle_state, monitorAdapter: snapshot.adapter || snapshot.capture_mode });
+        });
+    }).catch(() => null);
 
     function quickQuestionKeys(profile, productType = profile.productType) {
         const material = engine.materialQuestionKeys(productType);
         const modelPriorities = models.getProduct(productType).priorityQuestions || [];
-        const priorities = dedupeQuestionKeys(profile.healthMonitoring === true
+        const scope = models.marketScopeMappings?.[currentInput?.market]?.[productType];
+        const scopePriorities = scope
+            ? (profile.mainsPowered === 'unknown' ? ['mainsPowered', 'bundledAdapter']
+                : profile.mainsPowered === true || profile.bundledAdapter === true
+                    ? [scope.maxVoltage ? 'ratedVoltage' : null, scope.maxPower ? 'ratedPower' : null].filter(Boolean)
+                    : []) : [];
+        const priorities = dedupeQuestionKeys([...scopePriorities, ...(profile.healthMonitoring === true
             ? ['medicalClaim', ...modelPriorities, 'childUse']
-            : [...modelPriorities, 'childUse', 'medicalClaim']);
+            : [...modelPriorities, 'childUse', 'medicalClaim'])]);
         const changesMaintainedResult = (key) => {
             if (key === 'cellular') return profile.bluetooth !== true && profile.wifi !== true;
-            return ['battery', 'medicalClaim', 'childUse', 'cameraMic', 'mainsPowered', 'bluetooth', 'wifi', 'radioTransmitter'].includes(key);
+            return ['battery', 'medicalClaim', 'childUse', 'cameraMic', 'mainsPowered', 'bundledAdapter', 'ratedVoltage', 'ratedPower', 'bluetooth', 'wifi', 'radioTransmitter'].includes(key);
         };
         return priorities
-            .filter((key) => material.includes(key) && profile[key] === 'unknown' && changesMaintainedResult(key))
+            .filter((key) => material.includes(key) && (profile[key] === 'unknown' || profile[key] === null) && changesMaintainedResult(key))
             .slice(0, 2);
     }
 
@@ -106,8 +120,9 @@ function bootstrapCanISellItPage() {
         questions.innerHTML = keys.map((key) => `
             <fieldset class="sell-question sell-question--fact">
                 <legend>${escapeHtml(attributeLabels[key])}</legend>
-                <small>Product fact — Yes may add requirements; it does not mean “pass”.</small>
-                ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${key === 'childUse' && value === 'yes' ? 'Yes — children’s product' : key === 'childUse' && value === 'no' ? 'No — general audience' : value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
+                ${['ratedVoltage', 'ratedPower'].includes(key)
+                    ? `<small>Use the rating label or supplier specification. Leave blank if unknown.</small><input type="number" name="${key}" min="0" step="0.1" inputmode="decimal" value="${Number.isFinite(profile[key]) ? escapeHtml(profile[key]) : ''}" placeholder="${key === 'ratedVoltage' ? 'e.g. 230' : 'e.g. 45'}">`
+                    : `<small>Product fact — Yes may add requirements; it does not mean “pass”.</small>${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="${key}" value="${value}" ${profile[key] === true && value === 'yes' ? 'checked' : profile[key] === false && value === 'no' ? 'checked' : ''}> ${key === 'childUse' && value === 'yes' ? 'Yes — children’s product' : key === 'childUse' && value === 'no' ? 'No — general audience' : value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}`}
             </fieldset>`).join('');
         questions.hidden = keys.length === 0;
         document.getElementById('sell-assistant-follow-up').innerHTML = `<strong>Optional accuracy check</strong><p>${keys.length ? `These ${keys.length} answer${keys.length === 1 ? '' : 's'} may change the preliminary result.` : 'No additional product facts are needed for this description.'}</p>`;
@@ -357,6 +372,7 @@ function bootstrapCanISellItPage() {
             current: 'Current review metadata',
             review_overdue: 'Source review overdue',
             review_metadata_missing: 'Source metadata incomplete',
+            using_last_good: 'Using last-good official snapshot',
             no_linked_source: 'No linked official source'
         }[freshness.status] || 'Source review required';
         const commercialPanel = commercial.code === 'not_calculated' ? '' : `
@@ -411,7 +427,7 @@ function bootstrapCanISellItPage() {
             ${commercialPanel}
             <section class="sell-review-cta"><div><span>Need a second look?</span><h2>Request a complimentary review</h2><p>Prepare a non-confidential summary, then review and send it yourself in your email app. Nothing is uploaded or sent automatically. If the email draft does not open, copy the request and email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><p id="sell-review-status" aria-live="polite"></p></section>
             <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
-                <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
+                <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}${freshness.degradedCount ? ` · ${escapeHtml(freshness.degradedCount)} source refresh unavailable; last-good retained${freshness.lastGoodThrough ? ` from ${escapeHtml(freshness.lastGoodThrough)}` : ''}` : ''}${freshness.futureCount ? ` · ${escapeHtml(freshness.futureCount)} future requirement` : ''}${freshness.pendingEffectiveDateCount ? ` · ${escapeHtml(freshness.pendingEffectiveDateCount)} effective date pending` : ''}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
                 ${economicsPanel}
                 <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
                 <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-legend" aria-label="Requirement status key"><span class="mandatory">Mandatory</span><span class="scope">Scope check</span><span class="advisory">Advisory</span><span class="future">Future</span></div><div class="sell-requirement-grid">${requirementCards}</div></section>
@@ -516,8 +532,9 @@ function bootstrapCanISellItPage() {
         });
     });
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        await regulatorySnapshotsReady;
         const description = document.getElementById('sell-description').value.trim();
         if (!description) {
             error.textContent = 'Please describe the product first.';
@@ -561,7 +578,9 @@ function bootstrapCanISellItPage() {
         engine.materialQuestionKeys(productType).forEach((key) => {
             const answer = data.get(key);
             const inferred = currentProfile[key];
-            attributes[key] = answer || (inferred === true ? 'yes' : inferred === false ? 'no' : 'unknown');
+            attributes[key] = ['ratedVoltage', 'ratedPower'].includes(key)
+                ? (answer || (Number.isFinite(inferred) ? inferred : 'unknown'))
+                : (answer || (inferred === true ? 'yes' : inferred === false ? 'no' : 'unknown'));
         });
         return attributes;
     }
@@ -593,9 +612,13 @@ function bootstrapCanISellItPage() {
             blockingQuestionKeys: currentQuickKeys
         };
         const assessment = engine.assess(latestAssessmentInput);
+        currentProfile = assessment.profile;
+        const nextFactKeys = renderFactQuestions(assessment.profile, assessment.profile.productType);
+        latestAssessmentInput.blockingQuestionKeys = nextFactKeys;
         renderEvidenceQuestions(assessment.profile);
         renderDocumentOptions(currentInput.market, assessment.profile);
         renderAssessment(assessment);
+        followUp.hidden = nextFactKeys.length === 0;
     });
 
     advancedForm.addEventListener('submit', async (event) => {
