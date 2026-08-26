@@ -42,6 +42,7 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Official tariff artifact workbench/);
     assert.match(html, /Preview import/);
     assert.match(html, /Confirm import/);
+    assert.match(html, /accept="[^"]*\.pdf/);
     assert.match(html, /Hybrid → official exact promotion queue/);
     assert.match(html, /Filing-grade regression matrix/);
     assert.match(html, /Unmet Search Workbench/);

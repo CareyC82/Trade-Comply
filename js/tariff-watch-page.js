@@ -422,6 +422,10 @@
             }
             const hs = String((item.candidate_hs || [])[0] || '').replace(/\D/g, '');
             if (hs) params.set('hs', hs);
+            const product = String(item.products?.[0]?.label || '');
+            if (product) params.set('product', product);
+            if (/^\d{4}-\d{2}-\d{2}$/.test(String(item.effective_date || ''))) params.set('effective_date', item.effective_date);
+            if (item.id) params.set('change', String(item.id));
             return `post-entry.html?${params.toString()}`;
         };
         return `<section class="tariff-watch-section tariff-regulatory-impact-section">

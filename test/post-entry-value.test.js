@@ -576,3 +576,12 @@ test('Post-Entry exposes EU-US evidence inputs and three-state eligibility resul
     assert.match(resultHtml, /post-entry-program-eligibility/);
     assert.match(resultHtml, /Potentially eligible/);
 });
+
+test('Post-Entry accepts pending regulatory context and ISO effective-date deep links', () => {
+    const formHtml = fs.readFileSync(path.join(__dirname, '..', 'post-entry.html'), 'utf8');
+    const pageScript = fs.readFileSync(path.join(__dirname, '..', 'js', 'post-entry-page.js'), 'utf8');
+    assert.match(formHtml, /post-entry-regulatory-context/);
+    assert.match(pageScript, /params\.get\('effective_date'\)/);
+    assert.match(pageScript, /Prefilled from pending regulatory review/);
+    assert.match(pageScript, /year\.slice\(-2\)/);
+});

@@ -17,6 +17,6 @@ test('regulatory route impact publishes only pending human-review changes with p
 });
 
 test('regulatory impact builds a prefilled Post-Entry route without inventing an origin', () => {
-    assert.equal(buildPostEntryHref({ affected_routes: ['US -> SG'], candidate_hs: ['8517.62'] }), 'post-entry.html?from=US&to=SG&hs=851762&focus=import');
+    assert.equal(buildPostEntryHref({ id: 'fcc', affected_routes: ['US -> SG'], candidate_hs: ['8517.62'], products: [{ label: 'Wi-Fi router' }], effective_date: '2026-09-01' }), 'post-entry.html?from=US&to=SG&hs=851762&product=Wi-Fi+router&effective_date=2026-09-01&change=fcc&focus=import');
     assert.equal(buildPostEntryHref({ affected_routes: ['Any maintained origin -> EU'], candidate_hs: ['8542'] }), 'post-entry.html?to=EU&hs=8542&focus=import');
 });

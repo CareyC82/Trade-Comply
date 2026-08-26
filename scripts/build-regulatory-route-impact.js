@@ -49,6 +49,10 @@ function buildPostEntryHref(impact = {}) {
     if (route.from) params.set('from', route.from);
     if (route.to) params.set('to', route.to);
     if (hs) params.set('hs', hs);
+    const product = String(impact.products?.[0]?.label || '');
+    if (product) params.set('product', product);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(impact.effective_date || ''))) params.set('effective_date', impact.effective_date);
+    if (impact.id) params.set('change', String(impact.id));
     params.set('focus', 'import');
     return `post-entry.html?${params.toString()}`;
 }

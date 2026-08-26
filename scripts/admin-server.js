@@ -421,7 +421,7 @@ async function handleDutyRateArtifacts(req, res) {
             audit: readDutyArtifactAudit()
         });
     }
-    const body = await readBody(req, 21 * 1024 * 1024);
+    const body = await readBody(req, workflow.MAX_UPLOAD_BODY_BYTES);
     const common = {
         country: body.country,
         fileName: body.file_name,

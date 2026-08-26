@@ -1245,7 +1245,9 @@
         const to = normalizeCountryParam(params.get('to') || params.get('import') || params.get('country') || '');
         const focus = String(params.get('focus') || '').toLowerCase();
         const hs = String(params.get('hs') || params.get('hscode') || params.get('hs_code') || '').replace(/\D/g, '');
-        const entryDate = params.get('entryDate') || params.get('entry_date') || '';
+        const entryDate = params.get('entryDate') || params.get('entry_date') || params.get('effective_date') || '';
+        const product = String(params.get('product') || '').slice(0, 120);
+        const change = String(params.get('change') || '').slice(0, 120);
 
         if (from) {
             const origin = $('post-entry-origin-country');
@@ -1264,6 +1266,14 @@
         }
         if (/^\d{2}\s\/\s\d{2}\s\/\s\d{2}$/.test(entryDate)) {
             setEntryDateParts(entryDate);
+        } else if (/^\d{4}-\d{2}-\d{2}$/.test(entryDate)) {
+            const [year, month, day] = entryDate.split('-');
+            setEntryDateParts(`${month} / ${day} / ${year.slice(-2)}`);
+        }
+        const context = $('post-entry-regulatory-context');
+        if (context && (product || change)) {
+            context.hidden = false;
+            context.textContent = `Prefilled from pending regulatory review${change ? ` ${change}` : ''}${product ? ` for ${product}` : ''}. Confirm the route, HS code and effective date against the official text before filing.`;
         }
     }
 

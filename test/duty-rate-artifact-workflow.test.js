@@ -25,10 +25,23 @@ test('artifact workflow previews without mutation, versions publishes, and suppo
         assert.deepEqual(JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8')), JSON.parse(before));
         assert.throws(() => publishArtifact({ ...files, previewDigest: 'wrong' }), /Preview changed/);
         const published = publishArtifact({ ...files, previewDigest: preview.preview_digest });
-        assert.equal(JSON.parse(fs.readFileSync(files.auditPath)).events.length, 1);
+        const publishEvent = JSON.parse(fs.readFileSync(files.auditPath)).events[0];
+        assert.match(publishEvent.snapshot_sha256, /^[a-f0-9]{64}$/);
+        assert.equal(publishEvent.authority, 'Royal Malaysian Customs');
+        assert.equal(publishEvent.published_at, '2026-08-20');
         assert.notEqual(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
         assert.equal(rollbackArtifact({ versionId: published.version_id, dutyRatesPath: files.dutyRatesPath, versionsDir: files.versionsDir, auditPath: files.auditPath }).ok, true);
         assert.deepEqual(JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8')), JSON.parse(before));
         assert.equal(JSON.parse(fs.readFileSync(files.auditPath)).events[0].rollback_available, false);
+    } finally { fs.rmSync(files.directory, { recursive: true, force: true }); }
+});
+
+test('artifact rollback blocks a tampered historical snapshot', () => {
+    const files = fixture();
+    try {
+        const preview = previewArtifact(files);
+        const published = publishArtifact({ ...files, previewDigest: preview.preview_digest });
+        fs.appendFileSync(path.join(files.versionsDir, `${published.version_id}.json`), 'tampered');
+        assert.throws(() => rollbackArtifact({ versionId: published.version_id, dutyRatesPath: files.dutyRatesPath, versionsDir: files.versionsDir, auditPath: files.auditPath }), /hash mismatch/);
     } finally { fs.rmSync(files.directory, { recursive: true, force: true }); }
 });
