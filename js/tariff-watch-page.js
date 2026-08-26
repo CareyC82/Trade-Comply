@@ -410,13 +410,27 @@
 
     function renderRegulatoryImpacts(payload = {}) {
         const impacts = Array.isArray(payload.impacts) ? payload.impacts : [];
+        const postEntryHref = (item) => {
+            const route = String((item.affected_routes || [])[0] || '').match(/^\s*([A-Z]{2})\s*->\s*([A-Z]{2})\s*$/i);
+            const params = new URLSearchParams({ focus: 'import' });
+            if (route) {
+                params.set('from', route[1].toUpperCase());
+                params.set('to', route[2].toUpperCase());
+            } else {
+                const destination = String((item.markets || [])[0] || '').toUpperCase();
+                if (/^[A-Z]{2}$/.test(destination)) params.set('to', destination);
+            }
+            const hs = String((item.candidate_hs || [])[0] || '').replace(/\D/g, '');
+            if (hs) params.set('hs', hs);
+            return `post-entry.html?${params.toString()}`;
+        };
         return `<section class="tariff-watch-section tariff-regulatory-impact-section">
             <div class="tariff-watch-section-heading"><h2>Regulatory changes affecting products and routes</h2><p>Pending human review only. These source changes do not automatically alter a sellability or filing conclusion.</p></div>
             ${impacts.length ? `<div class="tariff-regulatory-impact-list">${impacts.slice(0, 12).map(item => `<article class="tariff-regulatory-impact-card">
                 <div><span>${escapeHtml(item.id)}</span><strong>${escapeHtml(item.effective_timing || 'Effective date requires confirmation')}</strong></div>
                 <p>${escapeHtml((item.products || []).slice(0, 5).map(product => product.label).join(', ') || 'No maintained product mapped')}</p>
                 <small>HS ${escapeHtml((item.candidate_hs || []).slice(0, 8).join(', ') || 'classification required')} · ${escapeHtml((item.affected_routes || []).join(', ') || 'route review required')}</small>
-                <a href="post-entry.html">Re-check an affected Post-Entry route</a>
+                <a href="${escapeHtml(postEntryHref(item))}">Re-check this route in Post-Entry</a>
             </article>`).join('')}</div>` : '<p class="tariff-watch-empty">No pending regulatory source change is currently mapped to a maintained product or route.</p>'}
         </section>`;
     }

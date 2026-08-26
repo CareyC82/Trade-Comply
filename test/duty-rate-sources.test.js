@@ -1564,6 +1564,20 @@ test('India CIP JSON parser splits HSN BCD SWS and IGST layers', () => {
     assert.equal(rows[0].igst_rate, 0.18);
 });
 
+test('India official JSON parser de-duplicates nested references to the same tariff line', () => {
+    const row = { hsn: '85176290', bcd: '10%', sws: '10%', igst: '18%' };
+    const rows = parseIndiaOfficialJsonRows({ response: { rows: [row], duplicate: [row] } });
+    assert.equal(rows.length, 1);
+});
+
+test('Korea parser never converts a missing rate to duty-free and honors the named base-rate column', () => {
+    assert.equal(parseKoreaAdValoremRate(''), null);
+    const rows = parseKoreaTariffRateRows('<table><tr><th>HS Code</th><th>Description</th><th>Basic Rate</th><th>Other Rate</th></tr><tr><td>8517629000</td><td>Router</td><td>8%</td><td>0%</td></tr></table>');
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].parsed_base_rate, 0.08);
+    assert.equal(rows[0].item_name, 'Router');
+});
+
 test('India CIP fixture parses nested official response fields', () => {
     const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'india-cip-tariff-response.json'), 'utf8');
     const rows = parseIndiaOfficialJsonRows(fixture);

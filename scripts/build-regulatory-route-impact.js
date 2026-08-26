@@ -33,6 +33,26 @@ function buildRegulatoryRouteImpact(payload = {}) {
     };
 }
 
+function parseAffectedRoute(route = '') {
+    const match = String(route).match(/^\s*(.+?)\s*->\s*([A-Z]{2})\s*$/i);
+    if (!match) return { from: '', to: '' };
+    return {
+        from: /^[A-Z]{2}$/i.test(match[1].trim()) ? match[1].trim().toUpperCase() : '',
+        to: match[2].toUpperCase()
+    };
+}
+
+function buildPostEntryHref(impact = {}) {
+    const route = parseAffectedRoute((impact.affected_routes || [])[0]);
+    const hs = String((impact.candidate_hs || [])[0] || '').replace(/\D/g, '');
+    const params = new URLSearchParams();
+    if (route.from) params.set('from', route.from);
+    if (route.to) params.set('to', route.to);
+    if (hs) params.set('hs', hs);
+    params.set('focus', 'import');
+    return `post-entry.html?${params.toString()}`;
+}
+
 function main() {
     const payload = JSON.parse(fs.readFileSync(INPUT, 'utf8'));
     const result = buildRegulatoryRouteImpact(payload);
@@ -41,4 +61,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { buildRegulatoryRouteImpact };
+module.exports = { buildRegulatoryRouteImpact, buildPostEntryHref, parseAffectedRoute };

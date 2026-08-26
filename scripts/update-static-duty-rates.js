@@ -371,7 +371,12 @@ function parseIndiaOfficialJsonRows(value = '') {
             sws_rate: parsePercent(swsText),
             igst_rate: parsePercent(igstText)
         };
-    }).filter(Boolean);
+    }).filter(Boolean).filter((row, index, rows) => index === rows.findIndex(candidate => (
+        candidate.hs_code === row.hs_code
+        && candidate.bcd_rate === row.bcd_rate
+        && candidate.sws_rate === row.sws_rate
+        && candidate.igst_rate === row.igst_rate
+    )));
 }
 
 function normalizeGenericRateText(value = '') {

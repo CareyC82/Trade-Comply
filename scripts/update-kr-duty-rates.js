@@ -142,27 +142,38 @@ function stripHtml(value = '') {
 
 function parseKoreaAdValoremRate(value = '') {
     const text = stripHtml(value);
-    if (!text || /free|免税|무세/i.test(text) || /^0(?:\.0+)?\s*%$/i.test(text)) return 0;
+    if (!text) return null;
+    if (/free|免税|면세|무세/i.test(text) || /^0(?:\.0+)?\s*%$/i.test(text)) return 0;
     const percent = text.match(/(\d+(?:\.\d+)?)\s*%/);
     return percent ? Number(percent[1]) / 100 : null;
 }
 
 function parseKoreaTariffRateRows(html = '') {
     const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    let headerMap = null;
     const tableRows = rowMatches.map((rowHtml) => {
         const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
-        const hsCode = cells.find(cell => /\b\d{6,10}\b/.test(cell))?.match(/\b\d{6,10}\b/)?.[0] || '';
-        const rateCell = cells.find(cell => /free|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
+        if (cells.some(cell => /HS\s*(?:Code|Korea)|세번/i.test(cell)) && cells.some(cell => /basic|general|WTO|기본|기본세율/i.test(cell))) {
+            headerMap = {
+                hs: cells.findIndex(cell => /HS\s*(?:Code|Korea)|세번/i.test(cell)),
+                description: cells.findIndex(cell => /description|품명|goods/i.test(cell)),
+                rate: cells.findIndex(cell => /basic|general|WTO|기본|기본세율/i.test(cell))
+            };
+            return null;
+        }
+        const hsCell = headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => /\b\d{6,10}\b/.test(cell));
+        const hsCode = hsCell?.match(/\b\d{6,10}\b/)?.[0] || '';
+        const rateCell = (headerMap?.rate >= 0 ? cells[headerMap.rate] : '') || cells.find(cell => /free|면세|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
         const parsedRate = parseKoreaAdValoremRate(rateCell);
         if (!hsCode || parsedRate === null) return null;
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: cells.find(cell => cell !== hsCode && cell !== rateCell) || '',
+            item_name: (headerMap?.description >= 0 ? cells[headerMap.description] : '') || cells.find(cell => cell !== hsCell && cell !== rateCell) || '',
             base_rate_text: rateCell,
             parsed_base_rate: parsedRate
         };
-    }).filter(Boolean);
+    }).filter(Boolean).filter((row, index, rows) => index === rows.findIndex(candidate => candidate.hs_code === row.hs_code && candidate.parsed_base_rate === row.parsed_base_rate));
     if (tableRows.length) return tableRows;
 
     return stripHtml(html)

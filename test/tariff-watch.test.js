@@ -310,6 +310,7 @@ test('tariff watch page exposes an effective-date selector and future-rate secti
     assert.match(page, /Future effective rates/);
     assert.match(page, /regulatory-route-impact\.json/);
     assert.match(page, /Regulatory changes affecting products and routes/);
-    assert.match(page, /Re-check an affected Post-Entry route/);
+    assert.match(page, /Re-check this route in Post-Entry/);
+    assert.match(page, /post-entry\.html\?\$\{params\.toString\(\)\}/);
     assert.match(page, /upcomingTariffRows/);
 });
