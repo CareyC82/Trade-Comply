@@ -599,6 +599,13 @@ test('negative wired and battery descriptions do not trigger radio or lithium co
     assert.ok(!requirements.some((item) => item.id === 'battery'));
 });
 
+test('negative child-audience wording does not trigger specialist review', () => {
+    for (const description of ['Bluetooth speaker not designed for children', 'Smart watch for a general audience', 'Tablet not marketed to kids']) {
+        const profile = engine.extractProfile(description);
+        assert.equal(profile.childUse, false, description);
+    }
+});
+
 test('Batch 1 attributes trigger radio, battery, mains and recording requirements', () => {
     const keyboard = engine.assess({ description: '2.4GHz wireless keyboard with rechargeable lithium battery', market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
     assert.ok(keyboard.requirements.some((item) => item.id === 'fcc'));

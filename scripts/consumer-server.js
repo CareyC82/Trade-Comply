@@ -34,7 +34,7 @@ const PUBLIC_ROOT_FILES = new Set([
 const PUBLIC_DATA_FILES = new Set([
     'cases.json', 'catalog.json', 'catalog.schema.json', 'categories.json',
     'china-customs-sync-status.json', 'china-industry-flow.json', 'country-registry.json', 'coverage-matrix.json',
-    'country-checklist-baselines.json', 'duty-rate-sync-status.json', 'duty-rates.json', 'incoterms.json', 'knowledge-base.json',
+    'consumer-regulatory-snapshots.json', 'country-checklist-baselines.json', 'duty-rate-sync-status.json', 'duty-rates.json', 'incoterms.json', 'knowledge-base.json',
     'national-trade-flow-sync-status.json', 'post-entry-rate-priority-matrix.json',
     'quick-actions.json', 'scope-keywords.json', 'tags.json', 'trade-flow.json', 'updates.json'
 ]);

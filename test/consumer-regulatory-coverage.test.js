@@ -15,6 +15,8 @@ test('regulatory coverage report spans thirty products and four markets', () => 
     assert.deepEqual(report.markets, ['US', 'EU', 'JP', 'SG']);
     assert.equal(report.market_summary.US.deep, 30);
     assert.equal(report.market_summary.EU.deep, 30);
+    assert.equal(report.attribute_scenario_audit.matrix_cell_count, 30 * 4 * 7);
+    assert.equal(report.attribute_scenario_audit.issue_count, 0, JSON.stringify(report.attribute_scenario_audit.issues.slice(0, 10)));
 });
 
 test('EU connected devices receive current RED cybersecurity evidence without market leakage', () => {

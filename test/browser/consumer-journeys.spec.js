@@ -23,6 +23,12 @@ test('supported product shows a preliminary result and channel-specific copy', a
     await expect(page.locator('.sell-action-summary')).toContainText('Next step:');
 });
 
+test('explicitly not designed for children does not trigger a specialist gate', async ({ page }) => {
+    await submitProduct(page, 'Bluetooth speaker with rechargeable lithium battery, not designed for children');
+    await expect(page.locator('#sell-result')).not.toContainText('High risk — specialist review');
+    await expect(page.locator('#sell-result')).toContainText('Conditional');
+});
+
 test('wired no-battery products do not inherit radio or lithium actions', async ({ page }) => {
     await submitProduct(page, 'Wired-only USB hub with no battery, no Wi-Fi, no Bluetooth and no AC power, for adults');
     await expect(page.locator('.sell-action-summary')).not.toContainText('UN38.3');

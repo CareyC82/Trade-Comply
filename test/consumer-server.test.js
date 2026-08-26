@@ -14,6 +14,7 @@ test('consumer server exposes only explicit public assets', () => {
     assert.equal(isPublicPath('/js/main.js'), true);
     assert.equal(isPublicPath('/lib/can-i-sell-it.js'), true);
     assert.equal(isPublicPath('/data/duty-rates.json'), true);
+    assert.equal(isPublicPath('/data/consumer-regulatory-snapshots.json'), true);
     assert.equal(isPublicPath('/admin.html'), false);
     assert.equal(isPublicPath('/.env'), false);
     assert.equal(isPublicPath('/.env.example'), false);

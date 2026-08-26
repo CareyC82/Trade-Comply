@@ -25,6 +25,9 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.equal(payload.counts.current + payload.counts.manual_review_current + (payload.counts.last_good_degraded || 0), payload.source_count);
     assert.match(html, /Approve evidence/);
     assert.match(html, /Review and rollback history/);
+    assert.match(html, /Rule lifecycle audit/);
+    assert.match(html, /Change categories:/);
+    assert.equal(payload.lifecycle_audit.source_count > 0, true);
     assert.match(html, /Affected questions/);
 });
 

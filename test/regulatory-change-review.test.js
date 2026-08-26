@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { buildImpact, buildRuleProposal, reviewChange } = require('../lib/regulatory-change-review');
+const { buildImpact, buildRuleProposal, enrichChanges, reviewChange } = require('../lib/regulatory-change-review');
 
 test('regulatory source impact preview identifies affected products without auto-publishing', () => {
     const impact = buildImpact('sgControlledGoods');
@@ -22,6 +22,13 @@ test('regulatory source impact preview identifies affected products without auto
     assert.ok(impact.candidate_hs.length > 0);
     assert.ok(impact.affected_routes.includes('Any maintained origin -> SG'));
     assert.equal(impact.auto_publish, false);
+});
+
+test('regulatory change analysis classifies affected rule fields but never auto-applies', () => {
+    const result = enrichChanges({ changes: [{ id: 'fccEquipment', current_summary: 'FCC ID label and marketplace listing evidence changed' }] }).changes[0];
+    assert.ok(result.change_analysis.categories.includes('labeling'));
+    assert.ok(result.change_analysis.categories.includes('platform_listing'));
+    assert.equal(result.change_analysis.automatic_rule_change, false);
 });
 
 test('rule proposals are draft-only, scoped and require a separate tested code review', () => {

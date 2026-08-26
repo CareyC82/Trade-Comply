@@ -445,6 +445,8 @@ async function handleDutyRateArtifacts(req, res) {
 
 function buildConsumerRegulatoryStatusPayload() {
     const { enrichChanges } = require('../lib/regulatory-change-review');
+    const { buildLifecycleAudit } = require('../lib/regulatory-lifecycle-audit');
+    const models = require('../lib/wearable-product-models');
     const snapshots = readJsonFile(REGULATORY_SNAPSHOTS_PATH, { sources: [], source_count: 0 });
     const changes = readJsonFile(REGULATORY_CHANGES_PATH, { changes: [], pending_review_count: 0 });
     const counts = snapshots.sources.reduce((result, source) => {
@@ -454,7 +456,7 @@ function buildConsumerRegulatoryStatusPayload() {
         return result;
     }, {});
     const enriched = enrichChanges(changes);
-    return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, pending_review_count: enriched.changes.filter((item) => item.review_status === 'pending_review').length, changes: enriched.changes, audit: readJsonFile(REGULATORY_REVIEW_AUDIT_PATH, { events: [] }) };
+    return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, lifecycle_audit: buildLifecycleAudit(models.sources), pending_review_count: enriched.changes.filter((item) => item.review_status === 'pending_review').length, changes: enriched.changes, audit: readJsonFile(REGULATORY_REVIEW_AUDIT_PATH, { events: [] }) };
 }
 
 async function handleConsumerRegulatoryStatus(req, res) {
