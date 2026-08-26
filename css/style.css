@@ -8105,6 +8105,13 @@ button.feedback-link:hover {
 }
 
 /* Final cascade: keep every bottom-navigation tool title on one scale. */
+.tariff-regulatory-impact-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.tariff-regulatory-impact-card { display: grid; gap: 10px; padding: 18px; border: 1px solid #d7e2ef; border-left: 5px solid #c98600; border-radius: 16px; background: #fff; }
+.tariff-regulatory-impact-card div { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.tariff-regulatory-impact-card span { color: #6b7c8e; font-weight: 800; text-transform: uppercase; }
+.tariff-regulatory-impact-card p, .tariff-regulatory-impact-card small { margin: 0; }
+.tariff-regulatory-impact-card a { color: #174979; font-weight: 800; }
+
 #incoterm-view .incoterm-page-title,
 .hscode-page-title,
 .post-entry-page-title,

@@ -343,6 +343,7 @@
       "authority": "Royal Malaysian Customs Department",
       "official_url": "https://ezhs.customs.gov.my/",
       "official_probe_urls": [
+        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
         "https://ezhs.customs.gov.my/",
         "https://mysst.customs.gov.my/",
         "https://tariff.customs.gov.my/"
@@ -352,7 +353,7 @@
       "maintenance_priority": "P2",
       "status_reason": "Malaysia maintained high-tech HS lines use exact-line duty candidates while the updater probes Royal Malaysian Customs/SST pages for parser readiness; SST, exemptions, SIRIM/MCMC/ST scope, and preferential-origin treatment remain separate checks.",
       "updater_script": "scripts/import-my-duty-rates.js",
-      "update_command": "npm run import:duty-rates:my -- --file /path/to/official-tariff.xlsx --manifest /path/to/manifest.json",
+      "update_command": "npm run import:duty-rates:my -- --file /path/to/PUA_384.pdf --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",

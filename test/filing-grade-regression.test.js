@@ -27,3 +27,17 @@ test('filing-grade matrix blocks overlapping official periods', () => {
     assert.equal(result.ok, false);
     assert.ok(result.failures.some((row) => row.type === 'overlapping_effective_periods'));
 });
+
+test('filing-grade matrix verifies an official special-program effective-date boundary', () => {
+    const result = buildFilingGradeRegression({
+        rules: [],
+        special_programs: [{
+            id: 'EU-US-TEST', import_markets: ['EU'], origin_countries: ['US'],
+            effective_from: '2026-07-01', official_url: 'https://eur-lex.europa.eu/example'
+        }]
+    }, { asOfDate: '2026-08-26' });
+    assert.equal(result.ok, true);
+    assert.equal(result.special_program_count, 1);
+    assert.equal(result.special_program_rows[0].active_before, false);
+    assert.equal(result.special_program_rows[0].active_on_start, true);
+});

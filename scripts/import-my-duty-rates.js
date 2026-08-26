@@ -6,6 +6,7 @@
  * gate passes.
  */
 const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const XLSX = require('xlsx');
@@ -78,8 +79,34 @@ function parseStructuredRows(rows) {
     }).filter((row) => row.hs_code || row.source_rate_text);
 }
 
+function parseMalaysiaPdfText(text = '') {
+    const rows = [];
+    for (const line of String(text).split(/\r?\n/)) {
+        const match = line.match(/^\s*(\d{4})[.\s-]*(\d{2})[.\s-]*(\d{2})[.\s-]*(\d{2})\s+(.+)$/);
+        if (!match) continue;
+        const remainder = match[5].trim();
+        const rateMatches = [...remainder.matchAll(/(?:^|\s)(Free|Nil|\d+(?:\.\d+)?\s*%)(?=\s|$)/gi)];
+        if (!rateMatches.length) continue;
+        const rateText = rateMatches[0][1];
+        const description = remainder.slice(0, rateMatches[0].index).replace(/\s{2,}\S{1,8}\s*$/, '').trim();
+        rows.push({
+            hs_code: `${match[1]}${match[2]}${match[3]}${match[4]}`,
+            base_rate: parseRate(rateText),
+            description,
+            source_rate_text: rateText
+        });
+    }
+    return rows;
+}
+
 function parseArtifact(filePath, buffer = fs.readFileSync(filePath)) {
     const ext = path.extname(filePath).toLowerCase();
+    if (ext === '.pdf') {
+        const text = execFileSync(process.env.PDFTOTEXT_BIN || 'pdftotext', ['-layout', filePath, '-'], {
+            encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 120000
+        });
+        return parseMalaysiaPdfText(text);
+    }
     if (ext === '.html' || ext === '.htm') {
         return parseMalaysiaTariffRows(buffer.toString('utf8')).map((row) => ({
             ...row,
@@ -268,6 +295,7 @@ if (require.main === module) main();
 
 module.exports = {
     parseArtifact,
+    parseMalaysiaPdfText,
     parseStructuredRows,
     validateManifest,
     validateRows,

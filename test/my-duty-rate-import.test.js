@@ -7,6 +7,7 @@ const path = require('node:path');
 const {
     importMalaysiaDutyRates,
     parseArtifact,
+    parseMalaysiaPdfText,
     sha256
 } = require('../scripts/import-my-duty-rates');
 const { buildDutyRateStatusPayload } = require('../scripts/admin-server');
@@ -86,6 +87,17 @@ test('MY importer parses full HTML split AHTN columns', () => {
     const rows = parseArtifact(htmlPath);
     assert.equal(rows[0].hs_code, '8517620000');
     assert.equal(rows[0].base_rate, 0);
+});
+
+test('MY importer parses official Customs Duties Order layout text into exact AHTN rows', () => {
+    const rows = parseMalaysiaPdfText([
+        '  8471.30.20 00   Tablet computers                         u      Free       Free',
+        '  8517.62.00 00   Machines for reception and transmission u      5%         Free',
+        '  8507.60.90 00   Other lithium-ion accumulators           u      10%        Free'
+    ].join('\n'));
+    assert.deepEqual(rows.map((row) => [row.hs_code, row.base_rate]), [
+        ['8471302000', 0], ['8517620000', 0.05], ['8507609000', 0.1]
+    ]);
 });
 
 test('MY importer blocks incomplete artifacts and preserves last-good duty file', () => {

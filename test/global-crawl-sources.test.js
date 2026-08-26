@@ -61,10 +61,13 @@ describe('global-crawl-sources', () => {
         assert.equal(byId['us-ustr'].url, 'https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions');
         assert.equal(byId['us-ofac'].url, 'https://ofac.treasury.gov/recent-actions');
         assert.equal(byId['us-fcc'].url, 'https://www.fcc.gov/news-events/headlines');
-        assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/homepage.html?ihcl=en');
-        assert.equal(byId['eu-nonpreferential-origin'].url, 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1422');
+        assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/oj/direct-access.html');
+        assert.equal(byId['eu-lex'].monitor_only, true);
+        assert.equal(byId['eu-nonpreferential-origin'].url, 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1422');
+        assert.equal(byId['eu-nonpreferential-origin'].monitor_only, true);
         assert.equal(byId['eu-nonpreferential-origin'].type, 'import');
-        assert.equal(byId['eu-us-adjusted-duties-2026'].url, 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R1455');
+        assert.equal(byId['eu-us-adjusted-duties-2026'].url, 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1455');
+        assert.equal(byId['eu-us-adjusted-duties-2026'].monitor_only, true);
         assert.equal(byId['eu-us-adjusted-duties-2026'].type, 'import');
         assert.equal(byId['eu-trade'].url, 'https://policy.trade.ec.europa.eu/news_en');
         assert.equal(byId['de-zoll'].url, 'https://www.zoll.de/EN/Home/home_node.html');

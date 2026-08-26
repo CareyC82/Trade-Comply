@@ -41,6 +41,9 @@ jobs:
       - name: Verify catalog artifact is fresh
         run: node scripts/build-catalog.js --check
 
+      - name: Block filing-grade tariff regressions
+        run: npm run check:filing-grade
+
       - name: Verify FC package boots
         run: bash scripts/package-fc.sh
 

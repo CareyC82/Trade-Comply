@@ -51,6 +51,9 @@ jobs:
       - name: Verify maintained route coverage
         run: npm run check:route-coverage
 
+      - name: Block filing-grade tariff regressions
+        run: npm run check:filing-grade
+
       - name: Verify duty-rate sync output
         run: npm test
 

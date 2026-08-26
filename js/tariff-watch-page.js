@@ -6,6 +6,7 @@
 (function (global) {
     let syncStatusCache = null;
     let dutyRatesCache = null;
+    let regulatoryImpactCache = null;
 
     function escapeHtml(value) {
         return String(value ?? '')
@@ -55,6 +56,18 @@
             };
         }
         return dutyRatesCache;
+    }
+
+    async function loadRegulatoryImpacts() {
+        if (regulatoryImpactCache) return regulatoryImpactCache;
+        try {
+            const response = await fetch(`data/regulatory-route-impact.json?v=${global.TradeComplyBuild || Date.now()}`, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            regulatoryImpactCache = await response.json();
+        } catch (error) {
+            regulatoryImpactCache = { impacts: [] };
+        }
+        return regulatoryImpactCache;
     }
 
     function formatDate(value) {
@@ -395,6 +408,19 @@
         `;
     }
 
+    function renderRegulatoryImpacts(payload = {}) {
+        const impacts = Array.isArray(payload.impacts) ? payload.impacts : [];
+        return `<section class="tariff-watch-section tariff-regulatory-impact-section">
+            <div class="tariff-watch-section-heading"><h2>Regulatory changes affecting products and routes</h2><p>Pending human review only. These source changes do not automatically alter a sellability or filing conclusion.</p></div>
+            ${impacts.length ? `<div class="tariff-regulatory-impact-list">${impacts.slice(0, 12).map(item => `<article class="tariff-regulatory-impact-card">
+                <div><span>${escapeHtml(item.id)}</span><strong>${escapeHtml(item.effective_timing || 'Effective date requires confirmation')}</strong></div>
+                <p>${escapeHtml((item.products || []).slice(0, 5).map(product => product.label).join(', ') || 'No maintained product mapped')}</p>
+                <small>HS ${escapeHtml((item.candidate_hs || []).slice(0, 8).join(', ') || 'classification required')} · ${escapeHtml((item.affected_routes || []).join(', ') || 'route review required')}</small>
+                <a href="post-entry.html">Re-check an affected Post-Entry route</a>
+            </article>`).join('')}</div>` : '<p class="tariff-watch-empty">No pending regulatory source change is currently mapped to a maintained product or route.</p>'}
+        </section>`;
+    }
+
     function renderTariffWatch(model) {
         const mount = document.getElementById('tariff-watch-root');
         if (!mount) return;
@@ -464,6 +490,7 @@
             ${introHtml}
             ${bodyHtml}
             ${selectedMarket ? '' : renderUpcomingRates(model)}
+            ${selectedMarket ? '' : renderRegulatoryImpacts(model.regulatoryImpacts)}
             ${adminHtml}
         `;
         document.getElementById('tariff-as-of-date')?.addEventListener('change', (event) => {
@@ -476,13 +503,14 @@
     async function bootstrapTariffWatchPage() {
         const api = global.TraceWizeTariffWatch;
         if (!api) return;
-        const [status, dutyRates] = await Promise.all([
+        const [status, dutyRates, regulatoryImpacts] = await Promise.all([
             loadTariffWatchStatus(),
-            loadDutyRates()
+            loadDutyRates(),
+            loadRegulatoryImpacts()
         ]);
         const requestedDate = new URLSearchParams(global.location?.search || '').get('date');
         const asOfDate = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '') ? requestedDate : new Date().toISOString().slice(0, 10);
-        renderTariffWatch(api.buildTariffWatchModel({ syncStatus: status, dutyRates, limit: 8, asOfDate }));
+        renderTariffWatch({ ...api.buildTariffWatchModel({ syncStatus: status, dutyRates, limit: 8, asOfDate }), regulatoryImpacts });
     }
 
     async function mountTariffWatchAlert(container, routeContext = {}) {
