@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Guarded official-artifact importer for IN, KR, VN and TW tariff schedules. */
+/** Guarded official-artifact importer for IN, KR, VN, TW and RU tariff schedules. */
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -45,6 +45,13 @@ const MARKET_CONFIG = {
         codeLength: 11,
         label: 'Taiwan Customs Administration',
         separate: 'Business tax, preferences, BSMI inspection and NCC approval remain separate checks.'
+    },
+    RU: {
+        authority: /Eurasian Economic Commission|Federal Customs Service|EAEU/i,
+        host: /(^|\.)(eec\.eaeunion\.org|customs\.gov\.ru)$/i,
+        codeLength: 10,
+        label: 'EAEU / Russia tariff authority',
+        separate: 'Import VAT, sanctions, restricted-party controls, preferences and product approvals remain separate checks.'
     }
 };
 
@@ -114,7 +121,8 @@ function parseArtifact(country, filePath, buffer = fs.readFileSync(filePath)) {
         const rows = country === 'IN' ? parseIndiaTariffRows(body)
             : country === 'KR' ? parseKoreaTariffRateRows(body)
                 : country === 'VN' ? parseVietnamTariffRows(body)
-                    : parseTaiwanTariffRows(body);
+                    : country === 'TW' ? parseTaiwanTariffRows(body) : [];
+        if (country === 'RU') throw new Error('RU HTML is not accepted; use a complete official structured XLSX/CSV schedule');
         return adaptDelegatedRows(country, rows);
     }
     if (['.xlsx', '.xls', '.csv', '.tsv', '.txt'].includes(ext)) {

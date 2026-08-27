@@ -1,12 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-25T08:04:36.358Z",
+  "generated_at": "2026-08-27T06:12:32.131Z",
   "live_links_probed": true,
   "probe_status": "completed",
   "probe_alerts": [],
   "source_count": 32,
   "alert_count": 1,
   "failed_link_count": 0,
+  "automatic_monitoring_ready_count": 11,
+  "automatic_monitoring_blocked_count": 21,
   "sources": [
     {
       "id": "fcc",
@@ -29,6 +31,15 @@
             "http_status": 403,
             "final_url": "https://www.fcc.gov/general/equipment-authorization-procedures"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -56,6 +67,16 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "last_good_manual_review",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required",
+          "manual_fallback_still_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -79,6 +100,15 @@
             "http_status": 200,
             "final_url": "https://docs.fcc.gov/public/attachments/FCC-26-50A1.pdf"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": [
@@ -108,6 +138,16 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required",
+          "manual_fallback_still_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -131,6 +171,15 @@
             "http_status": 404,
             "final_url": "https://www.fda.gov/apology_objects/abuse-detection-apology.html"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -158,6 +207,13 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
+      },
       "alerts": []
     },
     {
@@ -183,6 +239,13 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
+      },
       "alerts": []
     },
     {
@@ -206,6 +269,15 @@
             "http_status": 403,
             "final_url": "https://www.cpsc.gov/Business--Manufacturing/Testing-Certification/Childrens-Product-Certificate"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -233,6 +305,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -256,6 +337,15 @@
             "http_status": 202,
             "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R0030"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "manual_fallback_still_required"
         ]
       },
       "alerts": []
@@ -283,6 +373,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -306,6 +405,15 @@
             "http_status": 200,
             "final_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -333,6 +441,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -356,6 +473,15 @@
             "http_status": 200,
             "final_url": "https://commission.europa.eu/document/download/a281b150-19fd-44f9-bef8-c6018f9c4792_en"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -383,6 +509,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -406,6 +541,15 @@
             "http_status": 200,
             "final_url": "https://www.edpb.europa.eu/documents/guideline/guidelines-32019-on-processing-of-personal-data-through-video-devices_en"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -433,6 +577,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "manual_fallback_still_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -456,6 +609,17 @@
             "http_status": 403,
             "final_url": "https://unece.org/transport/dangerous-goods/manual-tests-and-criteria-rev8"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": false,
+        "identity_verified": false,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "official_content_capture_required",
+          "monitor_identity_terms_required",
+          "manual_fallback_still_required"
         ]
       },
       "alerts": []
@@ -483,6 +647,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "last_good_manual_review",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "manual_fallback_still_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -506,6 +679,15 @@
             "http_status": 403,
             "final_url": "https://www.meti.go.jp/policy/consumer/seian/denan/"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "manual_fallback_still_required"
         ]
       },
       "alerts": []
@@ -533,6 +715,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "manual_fallback_still_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -556,6 +747,15 @@
             "http_status": 403,
             "final_url": "https://www.meti.go.jp/policy/consumer/seian/denan/non_specified_electrical.html"
           }
+        ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "manual_fallback_still_required"
         ]
       },
       "alerts": []
@@ -583,6 +783,15 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic_with_manual_fallback",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": false,
+        "blockers": [
+          "manual_fallback_still_required"
+        ]
+      },
       "alerts": []
     },
     {
@@ -607,6 +816,13 @@
             "final_url": "https://www.ipa.go.jp/en/security/jc-star/index.html"
           }
         ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     },
@@ -633,6 +849,13 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
+      },
       "alerts": []
     },
     {
@@ -657,6 +880,13 @@
             "final_url": "https://iris.imda.gov.sg/application/general-equipment-registration-%28ger%29"
           }
         ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     },
@@ -683,6 +913,13 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
+      },
       "alerts": []
     },
     {
@@ -707,6 +944,13 @@
             "final_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/list-of-controlled-goods/"
           }
         ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     },
@@ -733,6 +977,13 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
+      },
       "alerts": []
     },
     {
@@ -757,6 +1008,13 @@
             "final_url": "https://www.csa.gov.sg/our-programmes/certification-and-labelling-schemes/cybersecurity-labelling-scheme/about/"
           }
         ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     },
@@ -789,6 +1047,13 @@
           }
         ]
       },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
+      },
       "alerts": []
     },
     {
@@ -819,6 +1084,13 @@
             "final_url": "https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-on-the-pdpa-for-children%27s-personal-data-in-the-digital-environment_mar24.pdf"
           }
         ]
+      },
+      "automation_readiness": {
+        "policy_mode": "automatic",
+        "structured_capture": true,
+        "identity_verified": true,
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     }

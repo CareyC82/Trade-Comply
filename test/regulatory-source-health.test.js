@@ -2,7 +2,16 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { auditSources, cadenceDays, probeSource } = require('../scripts/audit-regulatory-source-health');
+const { auditSources, automationReadiness, cadenceDays, probeSource } = require('../scripts/audit-regulatory-source-health');
+
+test('automatic source promotion requires structured current content and verified identity', () => {
+    const source = { monitorRequiredTerms: ['authority', 'regulation'], monitorPolicy: { mode: 'automatic' } };
+    const ready = automationReadiness(source, { capture_mode: 'official_content', content_hash: 'abc', last_good_at: '2026-08-26', status: 'current', content_summary: 'Authority regulation text' });
+    assert.equal(ready.eligible_for_automatic_monitoring, true);
+    const blocked = automationReadiness({ ...source, monitorPolicy: { mode: 'last_good_manual_review' } }, { capture_mode: 'metadata_seed', content_summary: 'Authority' });
+    assert.equal(blocked.eligible_for_automatic_monitoring, false);
+    assert.ok(blocked.blockers.includes('manual_fallback_still_required'));
+});
 
 test('regulatory source audit schedules reviews and flags pending effective dates', async () => {
     const report = await auditSources({ now: new Date('2026-08-21T00:00:00Z') });

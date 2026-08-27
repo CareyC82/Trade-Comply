@@ -52,19 +52,18 @@ test('automation launch status exposes only safe public launch modes', () => {
 
     assert.equal(payload.summary.duty_rate_markets, 14);
     assert.equal(payload.summary.duty_rate_modes.live_auto, 8);
-    assert.equal(payload.summary.duty_rate_modes.live_hybrid, 5);
-    assert.equal(payload.summary.duty_rate_modes.live_monitor, 1);
+    assert.equal(payload.summary.duty_rate_modes.live_hybrid, 6);
+    assert.equal(payload.summary.duty_rate_modes.live_monitor || 0, 0);
     assert.deepEqual(payload.summary.duty_rate_automation_stages, {
         official_machine_sync: 8,
-        official_probe_candidate: 5,
-        official_link_monitor: 1
+        official_probe_candidate: 6
     });
     assert.deepEqual(payload.summary.duty_rate_launch_levels.official_exact, ['CN', 'DE', 'EU', 'JP', 'MX', 'NL', 'SG', 'US']);
-    assert.equal(payload.summary.duty_rate_launch_levels.hybrid_official.length, 5);
+    assert.equal(payload.summary.duty_rate_launch_levels.hybrid_official.length, 6);
     assert.equal(payload.summary.duty_rate_launch_levels.maintained_benchmark.length, 0);
     assert.equal(payload.summary.duty_rate_launch_levels.parser_gap.length, 6);
     assert.deepEqual(payload.summary.filing_grade_auto_countries, ['CN', 'DE', 'EU', 'JP', 'MX', 'NL', 'SG', 'US']);
-    assert.deepEqual(payload.summary.parser_gap_countries, ['IN', 'KR', 'MY', 'TW', 'VN', 'RU']);
+    assert.deepEqual(payload.summary.parser_gap_countries, ['IN', 'KR', 'MY', 'RU', 'TW', 'VN']);
 
     const byCountry = Object.fromEntries(payload.duty_rates.map(row => [row.country, row]));
     assert.equal(byCountry.US.launch_mode, 'live_auto');
@@ -90,8 +89,8 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.ok(byCountry.CN.rate_change_drivers.some(driver => /import VAT/.test(driver)));
     assert.ok(byCountry.MY.official_probe_urls.length >= 2);
     assert.equal(byCountry.MY.transit_route_priority, true);
-    assert.equal(byCountry.RU.launch_mode, 'live_monitor');
-    assert.equal(byCountry.RU.rate_automation_stage, 'official_link_monitor');
+    assert.equal(byCountry.RU.launch_mode, 'live_hybrid');
+    assert.equal(byCountry.RU.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.RU.filing_grade_auto, false);
     assert.equal(payload.duty_rate_priority_queue.length, 6);
     assert.deepEqual(payload.duty_rate_priority_queue.slice(0, 2).map(row => row.country), ['IN', 'KR']);
@@ -179,12 +178,12 @@ test('checked-in automation launch status is fresh enough for admin display', ()
     assert.equal(Object.values(payload.summary.regulatory_health).reduce((sum, count) => sum + count, 0), 14);
     assert.equal(Object.values(payload.summary.regulatory_marketing).reduce((sum, count) => sum + count, 0), 14);
     assert.equal(payload.regulatory.filter(row => row.sources.some(source => source.health_status === 'stale')).every(row => row.marketing_recommendation !== 'Ready to market'), true);
-    assert.equal(payload.summary.duty_rate_modes.live_monitor, 1);
+    assert.equal(payload.summary.duty_rate_modes.live_monitor || 0, 0);
     assert.equal(payload.summary.duty_rate_automation_stages.official_machine_sync, 8);
     assert.equal(payload.summary.duty_rate_automation_stages.official_hybrid_parser || 0, 0);
-    assert.equal(payload.summary.duty_rate_automation_stages.official_probe_candidate, 5);
+    assert.equal(payload.summary.duty_rate_automation_stages.official_probe_candidate, 6);
     assert.equal(payload.summary.duty_rate_automation_stages.maintained_exact_map || 0, 0);
-    assert.equal(payload.summary.duty_rate_automation_stages.official_link_monitor, 1);
+    assert.equal(payload.summary.duty_rate_automation_stages.official_link_monitor || 0, 0);
     assert.equal(payload.duty_rate_priority_queue.length, 6);
     assert.equal(payload.duty_rate_priority_queue.some(row => row.country === 'JP'), false);
     assert.equal(payload.weekly_route_priorities.length, 5);
@@ -204,7 +203,7 @@ test('admin duty-rate status includes automation launch board payload', () => {
         true
     );
     assert.equal(
-        payload.automation_launch_status.duty_rate_priority_queue.some(row => row.country === 'RU' && row.rate_automation_stage === 'official_link_monitor'),
+        payload.automation_launch_status.duty_rate_priority_queue.some(row => row.country === 'RU' && row.rate_automation_stage === 'official_probe_candidate'),
         true
     );
     assert.equal(payload.automation_launch_status.weekly_route_priorities.length, 5);

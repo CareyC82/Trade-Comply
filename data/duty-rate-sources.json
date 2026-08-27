@@ -343,10 +343,10 @@
       "authority": "Royal Malaysian Customs Department",
       "official_url": "https://ezhs.customs.gov.my/",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "machine_readable": "candidate",
       "source_status": "hybrid_official_candidate",
@@ -418,12 +418,17 @@
       "name": "Russia / EAEU tariff and VAT",
       "authority": "Federal Customs Service / EAEU framework",
       "official_url": "https://customs.gov.ru/",
-      "machine_readable": false,
-      "source_status": "official_link",
-      "maintenance_priority": "P3",
-      "status_reason": "Official customs source link is monitored, but exact EAEU tariff-line parsing is not wired yet and sanctions scope must stay separate from ordinary duty math.",
-      "updater_script": "scripts/update-static-duty-rates.js",
-      "update_command": "npm run update:duty-rates:static -- --countries=RU",
+      "official_probe_urls": [
+        "https://customs.gov.ru/",
+        "https://eec.eaeunion.org/"
+      ],
+      "machine_readable": "candidate",
+      "source_status": "hybrid_official_candidate",
+      "maintenance_priority": "P2",
+      "status_reason": "A guarded 10-digit official XLSX/CSV artifact path is available, but no Russia/EAEU line is promoted until the complete schedule, authority, source domain, hash, publication/effective dates and row count pass the trust gate. Sanctions remain separate.",
+      "updater_script": "scripts/import-p2-duty-rates.js",
+      "update_command": "npm run import:duty-rates:p2 -- --country RU --file /path/to/official-eaeu.xlsx --manifest /path/to/manifest.json",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=RU --probe-live",
       "last_sync_field": "last_static_benchmark_sync_at",
       "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
       "source_use_cases": [
@@ -441,7 +446,8 @@
         "Russia sanctions, restricted-party, or export-control updates",
         "Import licensing or controlled-technology scope changes"
       ],
-      "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math."
+      "artifact_evidence_required": true,
+      "next_action": "Import a complete official 10-digit EAEU/Russia XLSX/CSV artifact through the guarded preview/publish workflow; keep sanctions and restricted-party scope flags separate from ordinary duty math."
     }
   ]
 }

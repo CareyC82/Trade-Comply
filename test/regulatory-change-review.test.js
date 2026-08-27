@@ -57,3 +57,19 @@ test('approve, ignore and reopen actions remain evidence-only and append rollbac
     assert.equal(audit.events.length, 2);
     assert.equal(audit.events[1].previous_status, 'evidence_approved');
 });
+
+test('rule publication requires approved evidence, passing test digest and reviewed commit', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'reg-release-'));
+    const changesFile = path.join(directory, 'changes.json');
+    const auditFile = path.join(directory, 'audit.json');
+    fs.writeFileSync(changesFile, JSON.stringify({ schema_version: 1, pending_review_count: 1, changes: [{ id: 'jpRadio', type: 'content_changed', review_status: 'pending_review', auto_apply: false }] }));
+    assert.throws(() => reviewChange({ changesFile, auditFile, id: 'jpRadio', type: 'content_changed', action: 'record_rule_tests', testEvidence: { passed: true, commands: ['npm test'], result_digest: 'a'.repeat(64) } }), /approved/);
+    reviewChange({ changesFile, auditFile, id: 'jpRadio', type: 'content_changed', action: 'approve_evidence' });
+    const tested = reviewChange({ changesFile, auditFile, id: 'jpRadio', type: 'content_changed', action: 'record_rule_tests', testEvidence: { passed: true, commands: ['node --test test/jp-sg-regulatory-depth.test.js', 'npm test'], result_digest: 'a'.repeat(64) } });
+    assert.equal(tested.change.review_status, 'rule_tests_passed');
+    assert.throws(() => reviewChange({ changesFile, auditFile, id: 'jpRadio', type: 'content_changed', action: 'publish_rule_release', releaseCommit: 'bad' }), /commit/);
+    const published = reviewChange({ changesFile, auditFile, id: 'jpRadio', type: 'content_changed', action: 'publish_rule_release', releaseCommit: 'abcdef1234567' });
+    assert.equal(published.change.review_status, 'rule_published');
+    assert.equal(published.change.auto_apply, false);
+    assert.equal(JSON.parse(fs.readFileSync(auditFile)).events.length, 3);
+});

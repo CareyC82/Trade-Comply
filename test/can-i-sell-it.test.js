@@ -597,6 +597,12 @@ test('negative wired and battery descriptions do not trigger radio or lithium co
     const requirements = engine.marketRequirements('US', profile);
     assert.ok(!requirements.some((item) => item.id === 'fcc'));
     assert.ok(!requirements.some((item) => item.id === 'battery'));
+    const listed = engine.extractProfile('Wired-only USB hub without Wi-Fi, Bluetooth, radio or battery.');
+    assert.equal(listed.bluetooth, false);
+    assert.equal(listed.wifi, false);
+    assert.equal(listed.radioTransmitter, false);
+    assert.equal(listed.battery, false);
+    assert.ok(engine.marketRequirements('US', listed).some((item) => item.id === 'fcc_unintentional'));
 });
 
 test('negative child-audience wording does not trigger specialist review', () => {

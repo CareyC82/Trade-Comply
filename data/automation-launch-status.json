@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-26T20:01:44.591Z",
+  "updated_at": "2026-08-27T06:08:19.396Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -24,13 +24,11 @@
     },
     "duty_rate_modes": {
       "live_auto": 8,
-      "live_hybrid": 5,
-      "live_monitor": 1
+      "live_hybrid": 6
     },
     "duty_rate_automation_stages": {
       "official_machine_sync": 8,
-      "official_probe_candidate": 5,
-      "official_link_monitor": 1
+      "official_probe_candidate": 6
     },
     "duty_rate_launch_levels": {
       "official_exact": [
@@ -47,20 +45,19 @@
         "IN",
         "KR",
         "MY",
+        "RU",
         "TW",
         "VN"
       ],
       "maintained_benchmark": [],
-      "monitor_only": [
-        "RU"
-      ],
+      "monitor_only": [],
       "parser_gap": [
         "IN",
         "KR",
         "MY",
+        "RU",
         "TW",
-        "VN",
-        "RU"
+        "VN"
       ]
     },
     "public_launch_countries": [
@@ -75,9 +72,9 @@
       "IN",
       "KR",
       "MY",
+      "RU",
       "TW",
-      "VN",
-      "RU"
+      "VN"
     ],
     "filing_grade_auto_countries": [
       "CN",
@@ -93,14 +90,14 @@
       "IN",
       "KR",
       "MY",
+      "RU",
       "TW",
-      "VN",
-      "RU"
+      "VN"
     ],
     "weekly_route_priority_count": 5
   },
   "duty_rate_health_board": {
-    "headline": "8 official exact market(s), 5 hybrid official market(s), 0 maintained exact-map market(s).",
+    "headline": "8 official exact market(s), 6 hybrid official market(s), 0 maintained exact-map market(s).",
     "next_action": "Next route parser priority: MY Tablet computer (847130).",
     "cards": [
       {
@@ -122,11 +119,12 @@
       {
         "key": "hybrid_official",
         "label": "Hybrid official",
-        "count": 5,
+        "count": 6,
         "countries": [
           "IN",
           "KR",
           "MY",
+          "RU",
           "TW",
           "VN"
         ],
@@ -174,9 +172,9 @@
           "IN",
           "KR",
           "MY",
+          "RU",
           "TW",
-          "VN",
-          "RU"
+          "VN"
         ],
         "note": "Needs exact official tariff-row parser before filing-grade automation claims."
       }
@@ -1151,10 +1149,10 @@
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_url": "https://ezhs.customs.gov.my/",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "source_use_cases": [
         "direct import duty pre-check",
@@ -1174,6 +1172,48 @@
       "transit_route_priority": true,
       "current_scope": "Maintained Malaysia exact-line base-duty candidates plus SST/exemption and product-approval review reminders.",
       "next_action": "Import a complete Royal Malaysian Customs tariff artifact only after its official source, hash, publication/effective dates, row count, exact 10-digit AHTN codes, and rates pass the trust gate; keep SST, preferences, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed.",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "parser_gap": true,
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
+      "launch_mode": "live_hybrid",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live hybrid",
+      "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "RU",
+      "name": "Russia / EAEU tariff and VAT",
+      "source_status": "hybrid_official_candidate",
+      "machine_readable": "candidate",
+      "maintenance_priority": "P2",
+      "update_command": "npm run import:duty-rates:p2 -- --country RU --file /path/to/official-eaeu.xlsx --manifest /path/to/manifest.json",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=RU --probe-live",
+      "official_url": "https://customs.gov.ru/",
+      "official_probe_urls": [
+        "https://customs.gov.ru/",
+        "https://eec.eaeunion.org/"
+      ],
+      "source_use_cases": [
+        "Russia/EAEU duty and VAT screening",
+        "sanctions and restricted-party scope review",
+        "high-risk electronics export feasibility screening"
+      ],
+      "parser_subtasks": [
+        "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
+        "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
+        "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
+      ],
+      "rate_change_drivers": [
+        "EAEU tariff schedule or VAT changes",
+        "Russia sanctions, restricted-party, or export-control updates",
+        "Import licensing or controlled-technology scope changes"
+      ],
+      "transit_route_priority": false,
+      "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
+      "next_action": "Import a complete official 10-digit EAEU/Russia XLSX/CSV artifact through the guarded preview/publish workflow; keep sanctions and restricted-party scope flags separate from ordinary duty math.",
       "rate_automation_stage": "official_probe_candidate",
       "automation_claim": "Official source probe wired; parser promotion still gated",
       "public_claim": "Official-linked candidate coverage with parser caveat",
@@ -1269,45 +1309,6 @@
       "filing_grade_auto": false,
       "label": "Live hybrid",
       "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
-      "country": "RU",
-      "name": "Russia / EAEU tariff and VAT",
-      "source_status": "official_link",
-      "machine_readable": false,
-      "maintenance_priority": "P3",
-      "update_command": "npm run update:duty-rates:static -- --countries=RU",
-      "probe_command": "",
-      "official_url": "https://customs.gov.ru/",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Russia/EAEU duty and VAT screening",
-        "sanctions and restricted-party scope review",
-        "high-risk electronics export feasibility screening"
-      ],
-      "parser_subtasks": [
-        "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
-        "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
-        "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
-      ],
-      "rate_change_drivers": [
-        "EAEU tariff schedule or VAT changes",
-        "Russia sanctions, restricted-party, or export-control updates",
-        "Import licensing or controlled-technology scope changes"
-      ],
-      "transit_route_priority": false,
-      "current_scope": "Official-link monitored EAEU duty/VAT screening plus sanctions and restricted-party scope warning.",
-      "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math.",
-      "rate_automation_stage": "official_link_monitor",
-      "automation_claim": "Official source link monitored",
-      "public_claim": "Source monitored; do not show as automated rate extraction",
-      "parser_gap": true,
-      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
-      "launch_mode": "live_monitor",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live monitor",
-      "note": "Official source is monitored, but exact machine-readable parsing is not live yet."
     }
   ],
   "duty_rate_priority_queue": [
@@ -1438,10 +1439,10 @@
       "update_command": "npm run import:duty-rates:my -- --file /path/to/PUA_384.pdf --manifest /path/to/manifest.json",
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "source_use_cases": [
         "direct import duty pre-check",
@@ -1466,10 +1467,10 @@
         "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
         "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
         "official_probe_urls": [
-          "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+          "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+          "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
           "https://ezhs.customs.gov.my/",
-          "https://mysst.customs.gov.my/",
-          "https://tariff.customs.gov.my/"
+          "https://mysst.customs.gov.my/ms/sst-orders/"
         ],
         "source_use_cases": [
           "direct import duty pre-check",
@@ -1491,6 +1492,65 @@
       },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Import a complete Royal Malaysian Customs tariff artifact only after its official source, hash, publication/effective dates, row count, exact 10-digit AHTN codes, and rates pass the trust gate; keep SST, preferences, exemptions, SIRIM/MCMC/ST, and transit evidence separately refreshed."
+    },
+    {
+      "country": "RU",
+      "maintenance_priority": "P2",
+      "rate_automation_stage": "official_probe_candidate",
+      "automation_claim": "Official source probe wired; parser promotion still gated",
+      "public_claim": "Official-linked candidate coverage with parser caveat",
+      "update_command": "npm run import:duty-rates:p2 -- --country RU --file /path/to/official-eaeu.xlsx --manifest /path/to/manifest.json",
+      "probe_command": "npm run probe:duty-rates:static -- --countries=RU --probe-live",
+      "official_probe_urls": [
+        "https://customs.gov.ru/",
+        "https://eec.eaeunion.org/"
+      ],
+      "source_use_cases": [
+        "Russia/EAEU duty and VAT screening",
+        "sanctions and restricted-party scope review",
+        "high-risk electronics export feasibility screening"
+      ],
+      "parser_subtasks": [
+        "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
+        "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
+        "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
+      ],
+      "rate_change_drivers": [
+        "EAEU tariff schedule or VAT changes",
+        "Russia sanctions, restricted-party, or export-control updates",
+        "Import licensing or controlled-technology scope changes"
+      ],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "RU",
+        "priority": "P2",
+        "stage": "official_probe_candidate",
+        "task": "Run live official probe, verify parsed rows, then connect exact HS parser when rows are reliable.",
+        "probe_command": "npm run probe:duty-rates:static -- --countries=RU --probe-live",
+        "official_probe_urls": [
+          "https://customs.gov.ru/",
+          "https://eec.eaeunion.org/"
+        ],
+        "source_use_cases": [
+          "Russia/EAEU duty and VAT screening",
+          "sanctions and restricted-party scope review",
+          "high-risk electronics export feasibility screening"
+        ],
+        "parser_subtasks": [
+          "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
+          "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
+          "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
+        ],
+        "rate_change_drivers": [
+          "EAEU tariff schedule or VAT changes",
+          "Russia sanctions, restricted-party, or export-control updates",
+          "Import licensing or controlled-technology scope changes"
+        ],
+        "transit_route_priority": false,
+        "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
+      },
+      "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
+      "next_action": "Import a complete official 10-digit EAEU/Russia XLSX/CSV artifact through the guarded preview/publish workflow; keep sanctions and restricted-party scope flags separate from ordinary duty math."
     },
     {
       "country": "TW",
@@ -1611,59 +1671,6 @@
       },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
-    },
-    {
-      "country": "RU",
-      "maintenance_priority": "P3",
-      "rate_automation_stage": "official_link_monitor",
-      "automation_claim": "Official source link monitored",
-      "public_claim": "Source monitored; do not show as automated rate extraction",
-      "update_command": "npm run update:duty-rates:static -- --countries=RU",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [
-        "Russia/EAEU duty and VAT screening",
-        "sanctions and restricted-party scope review",
-        "high-risk electronics export feasibility screening"
-      ],
-      "parser_subtasks": [
-        "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
-        "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
-        "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
-      ],
-      "rate_change_drivers": [
-        "EAEU tariff schedule or VAT changes",
-        "Russia sanctions, restricted-party, or export-control updates",
-        "Import licensing or controlled-technology scope changes"
-      ],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "RU",
-        "priority": "P3",
-        "stage": "official_link_monitor",
-        "task": "Keep official link monitoring live and add parser only when machine-readable tariff rows become available.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [
-          "Russia/EAEU duty and VAT screening",
-          "sanctions and restricted-party scope review",
-          "high-risk electronics export feasibility screening"
-        ],
-        "parser_subtasks": [
-          "Connect exact EAEU tariff-line rows before using Russia rates for pricing or post-entry math.",
-          "Keep ordinary customs duty, VAT, sanctions, export-control, and restricted-party screening as separate gates.",
-          "Block opportunity or transit recommendations where sanctions or controlled-technology restrictions override duty savings."
-        ],
-        "rate_change_drivers": [
-          "EAEU tariff schedule or VAT changes",
-          "Russia sanctions, restricted-party, or export-control updates",
-          "Import licensing or controlled-technology scope changes"
-        ],
-        "transit_route_priority": false,
-        "next_action": "Connect exact tariff-line parser before using rate math beyond screening."
-      },
-      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
-      "next_action": "Connect an exact EAEU/Russia tariff-line parser; keep sanctions and restricted-party scope flags separate from ordinary duty math."
     }
   ],
   "weekly_route_priorities": [
@@ -1684,10 +1691,10 @@
       "transit_route_priority": true,
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "why_priority": "MY Tablet computer is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
@@ -1709,10 +1716,10 @@
       "transit_route_priority": true,
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "why_priority": "MY Smartphone / 5G cellular is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
@@ -1734,10 +1741,10 @@
       "transit_route_priority": true,
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "why_priority": "MY Wireless router / network equipment is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
@@ -1759,10 +1766,10 @@
       "transit_route_priority": true,
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "why_priority": "MY EV charger / power converter is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."
@@ -1784,10 +1791,10 @@
       "transit_route_priority": true,
       "probe_command": "npm run probe:duty-rates:static -- --countries=MY --probe-live",
       "official_probe_urls": [
-        "https://www.customs.gov.my/images/06-prosedur/perintah-kastam/perintah/PUA_384.pdf",
+        "https://www.customs.gov.my/en/Documents/FAQ%20-%20PDK%202022%2020220530.pdf",
+        "https://www.customs.gov.my/en/business/facilitation/malaysia-national-trade-repository-mntr",
         "https://ezhs.customs.gov.my/",
-        "https://mysst.customs.gov.my/",
-        "https://tariff.customs.gov.my/"
+        "https://mysst.customs.gov.my/ms/sst-orders/"
       ],
       "why_priority": "MY Lithium battery / ESS is blocked by official_probe_candidate; promote exact tariff-row parsing or official source mapping before filing-grade use.",
       "next_action": "Replace maintained candidates with verified official parser output where unambiguous."

@@ -10,10 +10,18 @@ const { previewArtifact, publishArtifact, rollbackArtifact } = require('../lib/d
 function fixture() {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'artifact-workflow-test-'));
     const dutyRatesPath = path.join(directory, 'duty-rates.json');
-    const csv = 'hs_code,import_rate,description\n8517620000,5%,Router\n';
+    const csv = [
+        'hs_code,import_rate,description',
+        '8471302000,0%,Tablet',
+        '8504409000,5%,Charger',
+        '8507609000,5%,Battery',
+        '8517620000,5%,Router',
+        '8525891000,10%,Camera',
+        ''
+    ].join('\n');
     const sha256 = crypto.createHash('sha256').update(csv).digest('hex');
     fs.writeFileSync(dutyRatesPath, JSON.stringify({ rules: [{ id: 'my-router', import_country: 'MY', hs_prefixes: ['851762'], exact_code_overrides: [] }] }));
-    return { directory, dutyRatesPath, statusPath: path.join(directory, 'status.json'), auditPath: path.join(directory, 'audit.json'), versionsDir: path.join(directory, 'versions'), country: 'MY', fileName: 'official.csv', contentBase64: Buffer.from(csv).toString('base64'), manifest: { authority: 'Royal Malaysian Customs', source_url: 'https://www.customs.gov.my/tariff.csv', coverage_scope: 'full_tariff', complete: true, published_at: '2026-08-20', effective_at: '2026-09-01', expected_rows: 1, sha256 } };
+    return { directory, dutyRatesPath, statusPath: path.join(directory, 'status.json'), auditPath: path.join(directory, 'audit.json'), versionsDir: path.join(directory, 'versions'), country: 'MY', fileName: 'official.csv', contentBase64: Buffer.from(csv).toString('base64'), manifest: { authority: 'Royal Malaysian Customs', source_url: 'https://www.customs.gov.my/tariff.csv', coverage_scope: 'full_tariff', complete: true, published_at: '2026-08-20', effective_at: '2026-09-01', expected_rows: 5, sha256 } };
 }
 
 test('artifact workflow previews without mutation, versions publishes, and supports audited rollback', () => {

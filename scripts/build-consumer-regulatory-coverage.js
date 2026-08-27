@@ -47,6 +47,11 @@ function buildReport() {
             .map((item) => item.id);
         const officialSourceIds = Array.from(new Set(requirements.flatMap((item) => (item.sources || []).map((source) => source.id)))).sort();
         const degradedSources = officialSourceIds.filter((id) => sourceStatus[id] === 'last_good_degraded');
+        const bindingRequirements = requirements.filter((item) => ['mandatory', 'scope_check'].includes(item.requirementClass));
+        const productSpecificRequirements = bindingRequirements.filter((item) => item.id !== 'classification');
+        const evidenceDepth = productSpecificRequirements.length
+            ? 'product_and_attribute_specific'
+            : bindingRequirements.length ? 'baseline_market_safety' : 'advisory_only';
         const materialUnknowns = engine.materialQuestionKeys(product.id).filter((key) => profile[key] === engine.UNKNOWN).slice(0, 6);
         return {
             product_id: product.id,
@@ -57,11 +62,18 @@ function buildReport() {
             official_source_ids: officialSourceIds,
             unsourced_requirements: unsourced,
             degraded_source_ids: degradedSources,
+            evidence_depth: evidenceDepth,
+            binding_requirement_ids: bindingRequirements.map((item) => item.id),
+            product_specific_requirement_ids: productSpecificRequirements.map((item) => item.id),
+            coverage_limitation: ['JP', 'SG'].includes(market) && evidenceDepth === 'baseline_market_safety'
+                ? 'Only baseline market-safety evidence applies to the current known attributes; confirm exact model, power and radio configuration before relying on the result.'
+                : null,
             material_attribute_gaps: materialUnknowns,
             issues: [
                 ...unsourced.map((id) => `unsourced_requirement:${id}`),
                 ...degradedSources.map((id) => `last_good_source:${id}`),
-                ...(marketCoverage.level === 'limited' ? ['limited_market_coverage'] : [])
+                ...(marketCoverage.level === 'limited' ? ['limited_market_coverage'] : []),
+                ...(['JP', 'SG'].includes(market) && evidenceDepth === 'advisory_only' ? ['insufficient_binding_evidence'] : [])
             ]
         };
     }));
@@ -79,6 +91,8 @@ function buildReport() {
                 limited: rows.filter((cell) => cell.coverage === 'limited').length,
                 cells_with_unsourced_requirements: rows.filter((cell) => cell.unsourced_requirements.length).length,
                 cells_using_last_good_sources: rows.filter((cell) => cell.degraded_source_ids.length).length,
+                product_specific_cells: rows.filter((cell) => cell.evidence_depth === 'product_and_attribute_specific').length,
+                baseline_only_cells: rows.filter((cell) => cell.evidence_depth === 'baseline_market_safety').length,
                 limited_cells: rows.filter((cell) => cell.coverage === 'limited').length
             }];
         })),

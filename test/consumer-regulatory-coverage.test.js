@@ -17,6 +17,9 @@ test('regulatory coverage report spans thirty products and four markets', () => 
     assert.equal(report.market_summary.EU.deep, 30);
     assert.equal(report.attribute_scenario_audit.matrix_cell_count, 30 * 4 * 7);
     assert.equal(report.attribute_scenario_audit.issue_count, 0, JSON.stringify(report.attribute_scenario_audit.issues.slice(0, 10)));
+    assert.ok(report.cells.every((cell) => ['product_and_attribute_specific', 'baseline_market_safety', 'advisory_only'].includes(cell.evidence_depth)));
+    assert.ok(Object.values(report.market_summary).every((market) => Number.isInteger(market.product_specific_cells) && Number.isInteger(market.baseline_only_cells)));
+    assert.ok(report.cells.filter((cell) => ['JP', 'SG'].includes(cell.market) && cell.evidence_depth === 'baseline_market_safety').every((cell) => cell.coverage_limitation));
 });
 
 test('EU connected devices receive current RED cybersecurity evidence without market leakage', () => {
@@ -104,4 +107,14 @@ test('FCC marketplace change is disclosed as pending and does not become a legal
         market: 'EU', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: []
     });
     assert.ok(!eu.platformRules.some((rule) => rule.id === 'amazon-fcc-id-readiness'));
+});
+
+test('wired US digital electronics receive a Part 15B scope check without a false transmitter claim', () => {
+    const requirements = engine.marketRequirements('US', engine.extractProfile('Wired-only USB hub without Wi-Fi, Bluetooth, radio or battery'));
+    const part15b = requirements.find((item) => item.id === 'fcc_unintentional');
+    assert.ok(part15b);
+    assert.equal(part15b.requirementClass, 'scope_check');
+    assert.match(part15b.reason, /unintentional radiator/i);
+    assert.ok(part15b.docs.some((item) => /Part 15B/i.test(item)));
+    assert.equal(requirements.some((item) => item.id === 'fcc'), false);
 });

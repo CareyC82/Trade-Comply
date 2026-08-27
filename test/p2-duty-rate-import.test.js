@@ -12,7 +12,8 @@ const CASES = {
     IN: { authority: 'Central Board of Indirect Taxes and Customs / ICEGATE', url: 'https://www.icegate.gov.in/tariff.xlsx', code: '85176200', csv: 'HS Code,Description,BCD,SWS,IGST\n85176200,Router,10%,10%,18%' },
     KR: { authority: 'Korea Customs Service', url: 'https://www.customs.go.kr/tariff.xlsx', code: '8517620000', csv: 'HS Code,Description,Import Rate\n8517620000,Router,8%' },
     VN: { authority: 'Vietnam Customs', url: 'https://www.customs.gov.vn/tariff.xlsx', code: '85176200', csv: 'HS Code,Description,MFN Rate\n85176200,Router,5%' },
-    TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://portal.sw.nat.gov.tw/tariff.xlsx', code: '85176200000', csv: 'CCC Code,Description,Import Rate\n85176200000,Router,4%' }
+    TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://portal.sw.nat.gov.tw/tariff.xlsx', code: '85176200000', csv: 'CCC Code,Description,Import Rate\n85176200000,Router,4%' },
+    RU: { authority: 'Eurasian Economic Commission', url: 'https://eec.eaeunion.org/tariff.xlsx', code: '8517620000', csv: 'HS Code,Description,Import Rate\n8517620000,Router,5%' }
 };
 
 function fixture(country, overrides = {}) {
@@ -77,10 +78,10 @@ test('P2 importer rejects wrong code length, mixed rates and incomplete artifact
     assert.equal(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
 });
 
-test('Admin exposes all four P2 artifact gates', () => {
+test('Admin exposes guarded P2 artifact gates including Russia/EAEU', () => {
     const payload = buildDutyRateStatusPayload();
     assert.deepEqual(Object.keys(payload.p2_official_artifact_imports.markets), ['IN', 'KR', 'VN', 'TW']);
     const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
     assert.match(html, /P2 official tariff artifacts/);
-    assert.match(html, /IN · KR · VN · TW/);
+    assert.match(html, /IN · KR · VN · TW · RU/);
 });

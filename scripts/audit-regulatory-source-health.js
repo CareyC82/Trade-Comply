@@ -14,6 +14,29 @@ function cadenceDays(source) {
     return 270;
 }
 
+function automationReadiness(source, snapshot = {}) {
+    const requiredTerms = source.monitorRequiredTerms || [];
+    const policyMode = source.monitorPolicy?.mode || 'automatic';
+    const structuredCapture = snapshot.capture_mode === 'official_content'
+        && Boolean(snapshot.content_hash)
+        && Boolean(snapshot.last_good_at);
+    const identityVerified = requiredTerms.length > 0
+        && requiredTerms.every((term) => String(snapshot.content_summary || '').toLowerCase().includes(String(term).toLowerCase()));
+    const blockers = [];
+    if (!structuredCapture) blockers.push('official_content_capture_required');
+    if (!requiredTerms.length) blockers.push('monitor_identity_terms_required');
+    else if (!identityVerified) blockers.push('source_identity_not_verified');
+    if (['last_good_degraded', 'baseline_seed'].includes(snapshot.status)) blockers.push('current_capture_required');
+    if (['last_good_manual_review', 'automatic_with_manual_fallback'].includes(policyMode)) blockers.push('manual_fallback_still_required');
+    return {
+        policy_mode: policyMode,
+        structured_capture: structuredCapture,
+        identity_verified: identityVerified,
+        eligible_for_automatic_monitoring: blockers.length === 0,
+        blockers
+    };
+}
+
 async function probeUrl(url) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
@@ -46,14 +69,16 @@ async function probeSource(source, probe) {
     return { ...(attempts.at(-1) || { status: 'unreachable', error: 'network_error' }), attempts };
 }
 
-async function auditSources({ now = new Date(), probe = null } = {}) {
+async function auditSources({ now = new Date(), probe = null, snapshots = null } = {}) {
     const nowMs = now instanceof Date ? now.getTime() : Date.parse(now);
     const rows = [];
+    const snapshotById = new Map((snapshots?.sources || []).map((row) => [row.id, row]));
     for (const [id, source] of Object.entries(models.sources)) {
         const reviewedMs = Date.parse(source.reviewedAt || '');
         const intervalDays = cadenceDays(source);
         const nextReviewMs = Number.isFinite(reviewedMs) ? reviewedMs + intervalDays * DAY_MS : null;
         const link = probe ? await probeSource(source, probe) : { status: 'not_probed' };
+        const readiness = automationReadiness(source, snapshotById.get(id) || {});
         const alerts = [];
         if (!Number.isFinite(reviewedMs)) alerts.push('review_date_missing');
         else if (nextReviewMs < nowMs) alerts.push('review_overdue');
@@ -70,6 +95,7 @@ async function auditSources({ now = new Date(), probe = null } = {}) {
             review_interval_days: intervalDays,
             next_review_at: nextReviewMs ? new Date(nextReviewMs).toISOString().slice(0, 10) : null,
             link,
+            automation_readiness: readiness,
             alerts
         });
     }
@@ -88,17 +114,21 @@ async function auditSources({ now = new Date(), probe = null } = {}) {
         source_count: rows.length,
         alert_count: rows.filter((row) => row.alerts.length).length,
         failed_link_count: rows.filter((row) => row.alerts.includes('source_link_failed')).length,
+        automatic_monitoring_ready_count: rows.filter((row) => row.automation_readiness.eligible_for_automatic_monitoring).length,
+        automatic_monitoring_blocked_count: rows.filter((row) => !row.automation_readiness.eligible_for_automatic_monitoring).length,
         sources: rows
     };
 }
 
 if (require.main === module) {
     const live = process.argv.includes('--probe-live');
-    auditSources({ now: new Date(), probe: live ? probeUrl : null }).then((report) => {
+    const snapshotsPath = path.join(ROOT, 'data', 'consumer-regulatory-snapshots.json');
+    const snapshots = fs.existsSync(snapshotsPath) ? JSON.parse(fs.readFileSync(snapshotsPath, 'utf8')) : null;
+    auditSources({ now: new Date(), probe: live ? probeUrl : null, snapshots }).then((report) => {
         fs.writeFileSync(OUTPUT, `${JSON.stringify(report, null, 2)}\n`);
         console.log(`Wrote ${path.relative(ROOT, OUTPUT)} (${report.source_count} sources, ${report.alert_count} alerts)`);
         if (report.failed_link_count) process.exitCode = 1;
     });
 }
 
-module.exports = { cadenceDays, probeUrl, probeSource, auditSources };
+module.exports = { cadenceDays, automationReadiness, probeUrl, probeSource, auditSources };

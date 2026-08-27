@@ -55,6 +55,7 @@ const UNMET_SEARCH_BACKLOG_PATH = path.join(ROOT, 'data', 'unmet-search-backlog.
 const REGULATORY_SNAPSHOTS_PATH = path.join(ROOT, 'data', 'consumer-regulatory-snapshots.json');
 const REGULATORY_CHANGES_PATH = path.join(ROOT, 'data', 'consumer-regulatory-changes.json');
 const REGULATORY_REVIEW_AUDIT_PATH = path.join(ROOT, 'data', 'consumer-regulatory-review-audit.json');
+const REGULATORY_ACCURACY_STATUS_PATH = path.join(ROOT, 'data', 'regulatory-accuracy-status.json');
 const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
@@ -268,7 +269,7 @@ function buildHybridTariffPromotionQueue() {
     const priorities = readJsonFile(EXACT_TARIFF_PRIORITIES_PATH, { priorities: [] }).priorities || [];
     const myStatus = readJsonFile(MY_DUTY_RATE_IMPORT_STATUS_PATH, {});
     const p2Markets = readJsonFile(P2_DUTY_RATE_IMPORT_STATUS_PATH, { markets: {} }).markets || {};
-    return ['MY', 'KR', 'IN', 'VN', 'TW'].map((country) => {
+    return ['MY', 'KR', 'IN', 'VN', 'TW', 'RU'].map((country) => {
         const status = country === 'MY' ? myStatus : p2Markets[country] || {};
         const seen = new Set();
         const routes = priorities.filter((row) => row.import_country === country && !seen.has(row.product_id) && seen.add(row.product_id)).slice(0, 5);
@@ -456,7 +457,7 @@ function buildConsumerRegulatoryStatusPayload() {
         return result;
     }, {});
     const enriched = enrichChanges(changes);
-    return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, lifecycle_audit: buildLifecycleAudit(models.sources), pending_review_count: enriched.changes.filter((item) => item.review_status === 'pending_review').length, changes: enriched.changes, audit: readJsonFile(REGULATORY_REVIEW_AUDIT_PATH, { events: [] }) };
+    return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, lifecycle_audit: buildLifecycleAudit(models.sources), accuracy_status: readJsonFile(REGULATORY_ACCURACY_STATUS_PATH, null), pending_review_count: enriched.changes.filter((item) => item.review_status === 'pending_review').length, changes: enriched.changes, audit: readJsonFile(REGULATORY_REVIEW_AUDIT_PATH, { events: [] }) };
 }
 
 async function handleConsumerRegulatoryStatus(req, res) {
@@ -465,7 +466,16 @@ async function handleConsumerRegulatoryStatus(req, res) {
     try {
         const body = await readBody(req);
         const { reviewChange } = require('../lib/regulatory-change-review');
-        const result = reviewChange({ changesFile: REGULATORY_CHANGES_PATH, auditFile: REGULATORY_REVIEW_AUDIT_PATH, id: String(body.id || ''), type: String(body.type || ''), action: String(body.action || ''), note: body.note || '' });
+        const result = reviewChange({
+            changesFile: REGULATORY_CHANGES_PATH,
+            auditFile: REGULATORY_REVIEW_AUDIT_PATH,
+            id: String(body.id || ''),
+            type: String(body.type || ''),
+            action: String(body.action || ''),
+            note: body.note || '',
+            testEvidence: body.test_evidence || null,
+            releaseCommit: body.release_commit || ''
+        });
         sendJson(res, 200, { ok: true, result, status: buildConsumerRegulatoryStatusPayload() });
     } catch (error) { sendJson(res, 400, { ok: false, error: error.message }); }
 }

@@ -16,6 +16,7 @@ const { mergeEffectiveOverrides } = require('../lib/versioned-duty-overrides');
 const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const STATUS_PATH = path.join(ROOT, 'data', 'my-duty-rate-import-status.json');
+const REQUIRED_PRIORITY_PREFIXES = ['847130', '850440', '850760', '851762', '8525'];
 const OFFICIAL_HOST_RE = /(^|\.)customs\.gov\.my$/i;
 
 function readJson(filePath) {
@@ -173,6 +174,9 @@ function validateRows(rows) {
         byCode.set(row.hs_code, row);
     });
     if (!byCode.size) errors.push('artifact contains no exact 10-digit AHTN rows');
+    REQUIRED_PRIORITY_PREFIXES.forEach((prefix) => {
+        if (![...byCode.keys()].some((code) => code.startsWith(prefix))) errors.push(`priority tariff family ${prefix} is missing`);
+    });
     return { errors, rows: [...byCode.values()].sort((a, b) => a.hs_code.localeCompare(b.hs_code)) };
 }
 
@@ -301,5 +305,6 @@ module.exports = {
     validateRows,
     applyRows,
     importMalaysiaDutyRates,
+    REQUIRED_PRIORITY_PREFIXES,
     sha256
 };

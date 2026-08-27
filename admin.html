@@ -726,7 +726,7 @@
                 return `<tr><td><strong>${country}</strong></td><td>${escapeHtml(item.trust_gate || 'not_run')}</td><td>${artifact.parsed_row_count || 0}</td><td>${escapeHtml(artifact.effective_at || '—')}</td><td>${escapeHtml(formatDateTime(item.last_good_at))}</td><td><span class="meta">${escapeHtml(item.error || '—')}</span></td></tr>`;
             }).join('');
             return `
-                <div class="crawl-section-title"><h3>P2 official tariff artifacts</h3><span class="meta">IN · KR · VN · TW · last-good protected</span></div>
+                <div class="crawl-section-title"><h3>P2 official tariff artifacts</h3><span class="meta">IN · KR · VN · TW · RU · last-good protected</span></div>
                 <div class="coverage-table-wrap"><table class="coverage-table">
                     <thead><tr><th>Market</th><th>Trust gate</th><th>Exact rows</th><th>Effective</th><th>Last good</th><th>Error</th></tr></thead>
                     <tbody>${rows}</tbody>

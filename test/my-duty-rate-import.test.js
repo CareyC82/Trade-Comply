@@ -80,6 +80,22 @@ test('MY importer accepts complete official CSV and covers router tablet charger
     setDutyRulesForTest(null);
 });
 
+test('MY filing-grade promotion blocks a nominally complete artifact missing tablet 847130', () => {
+    const files = fixture();
+    const csv = fs.readFileSync(files.artifactPath, 'utf8').split('\n').filter((line) => !line.startsWith('847130')).join('\n');
+    fs.writeFileSync(files.artifactPath, csv);
+    const manifest = JSON.parse(fs.readFileSync(files.manifestPath, 'utf8'));
+    manifest.expected_rows = 4;
+    manifest.sha256 = sha256(Buffer.from(csv));
+    fs.writeFileSync(files.manifestPath, JSON.stringify(manifest));
+    const before = fs.readFileSync(files.dutyRatesPath, 'utf8');
+    const result = importMalaysiaDutyRates({ ...files });
+    assert.equal(result.ok, false);
+    assert.match(result.error, /847130/);
+    assert.equal(result.trust_gate, 'blocked_last_good_preserved');
+    assert.equal(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
+});
+
 test('MY importer parses full HTML split AHTN columns', () => {
     const files = fixture();
     const htmlPath = path.join(files.dir, 'tariff.html');

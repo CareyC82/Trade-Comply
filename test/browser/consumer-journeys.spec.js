@@ -32,7 +32,9 @@ test('explicitly not designed for children does not trigger a specialist gate', 
 test('wired no-battery products do not inherit radio or lithium actions', async ({ page }) => {
     await submitProduct(page, 'Wired-only USB hub with no battery, no Wi-Fi, no Bluetooth and no AC power, for adults');
     await expect(page.locator('.sell-action-summary')).not.toContainText('UN38.3');
-    await expect(page.locator('.sell-action-summary')).not.toContainText('FCC');
+    await expect(page.locator('.sell-action-summary')).toContainText('FCC Part 15B');
+    await expect(page.locator('.sell-action-summary')).not.toContainText('FCC ID');
+    await expect(page.locator('.sell-action-summary')).not.toContainText('RF exposure');
     await expect(page.locator('.sell-answer-summary')).toContainText('No lithium-battery restriction identified');
 });
 

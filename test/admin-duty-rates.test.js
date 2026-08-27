@@ -28,6 +28,8 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.match(html, /Rule lifecycle audit/);
     assert.match(html, /Change categories:/);
     assert.equal(payload.lifecycle_audit.source_count > 0, true);
+    assert.ok(payload.accuracy_status);
+    assert.equal(payload.accuracy_status.reviewed_change_pipeline.automatic_rule_publication, false);
     assert.match(html, /Affected questions/);
 });
 
@@ -104,7 +106,8 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(typeof payload.business_summary, 'object');
     assert.equal(payload.filing_grade_regression.ok, true, JSON.stringify(payload.filing_grade_regression.failures));
     assert.equal(payload.filing_grade_regression.market_count, 14);
-    assert.equal(payload.hybrid_promotion_queue.length, 5);
+    assert.equal(payload.hybrid_promotion_queue.length, 6);
+    assert.ok(payload.hybrid_promotion_queue.some((row) => row.country === 'RU' && row.promotion_status === 'artifact_required'));
     assert.ok(payload.business_summary.sync_conclusion);
     assert.ok(payload.business_summary.priority_conclusion);
     assert.ok(Array.isArray(payload.business_summary.next_actions));
