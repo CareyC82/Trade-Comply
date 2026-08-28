@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-08-15T19:03:12.070Z",
+  "updated_at": "2026-08-28T08:56:45.113Z",
   "sources": [
     {
       "id": "un-comtrade-monthly",
@@ -30,7 +30,7 @@
       "frequency": "monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "note": "Official monthly merchandise-trade values reported by participating markets and published by the United Nations Statistics Division.",
-      "last_attempt_at": "2026-08-28T08:35:12.526Z",
+      "last_attempt_at": "2026-08-28T08:55:36.042Z",
       "last_success_at": "2026-08-15T19:03:12.070Z",
       "latest_period": "2026-06",
       "row_count": 9537,
@@ -175,7 +175,7 @@
         }
       ],
       "partner_last_success_at": "2026-08-15T19:03:12.070Z",
-      "last_error": "Official batch shrank unexpectedly from 15877 to 4823 maintained row(s)"
+      "last_error": "Official batch shrank unexpectedly from 15877 to 4816 maintained row(s)"
     },
     {
       "id": "us-census-international-trade",
@@ -183,10 +183,16 @@
       "markets": [
         "US"
       ],
-      "status": "key_required",
+      "status": "official_current",
       "frequency": "monthly",
       "source_url": "https://api.census.gov/data/timeseries/intltrade.html",
-      "note": "Connector is ready. Add CENSUS_API_KEY to GitHub Actions to synchronize official HS import/export value."
+      "note": "Connector is ready. Add CENSUS_API_KEY to GitHub Actions to synchronize official HS import/export value.",
+      "role": "official_aggregator",
+      "market_roles": {
+        "CN": "historical_fallback_and_cross_validation",
+        "default": "primary_official_aggregator"
+      },
+      "last_success_at": "2026-08-28T08:56:45.113Z"
     },
     {
       "id": "eurostat-comext",
@@ -169506,6 +169512,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2025-06",
+      "imports_value_usd": 1914123250,
+      "exports_value_usd": 465304668,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
       "hs_code": "850440",
       "month": "2025-07",
       "imports_value_usd": 1677944413,
@@ -169656,6 +169675,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2025-07",
+      "imports_value_usd": 2599478884,
+      "exports_value_usd": 530892431,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
       "status": "official"
     },
     {
@@ -169818,6 +169850,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2025-08",
+      "imports_value_usd": 2331282827,
+      "exports_value_usd": 579310965,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
       "hs_code": "850440",
       "month": "2025-09",
       "imports_value_usd": 1572644143,
@@ -169968,6 +170013,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2025-09",
+      "imports_value_usd": 1634214106,
+      "exports_value_usd": 608290647,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
       "status": "official"
     },
     {
@@ -170130,6 +170188,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2025-10",
+      "imports_value_usd": 1885263568,
+      "exports_value_usd": 674752250,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
       "hs_code": "850440",
       "month": "2025-11",
       "imports_value_usd": 1365979510,
@@ -170280,6 +170351,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2025-11",
+      "imports_value_usd": 1892868997,
+      "exports_value_usd": 545218726,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
       "status": "official"
     },
     {
@@ -170442,6 +170526,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2025-12",
+      "imports_value_usd": 2302240207,
+      "exports_value_usd": 367752284,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
       "hs_code": "850440",
       "month": "2026-01",
       "imports_value_usd": 1439540811,
@@ -170592,6 +170689,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2026-01",
+      "imports_value_usd": 1767903134,
+      "exports_value_usd": 374812742,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
       "status": "official"
     },
     {
@@ -170754,6 +170864,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2026-02",
+      "imports_value_usd": 1670105153,
+      "exports_value_usd": 437807517,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
       "hs_code": "850440",
       "month": "2026-03",
       "imports_value_usd": 1689710776,
@@ -170904,6 +171027,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2026-03",
+      "imports_value_usd": 1882635705,
+      "exports_value_usd": 537531538,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
       "status": "official"
     },
     {
@@ -171066,6 +171202,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2026-04",
+      "imports_value_usd": 2390039962,
+      "exports_value_usd": 480588687,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
       "hs_code": "850440",
       "month": "2026-05",
       "imports_value_usd": 1825065185,
@@ -171222,6 +171371,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2026-05",
+      "imports_value_usd": 1945616159,
+      "exports_value_usd": 509536058,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
       "hs_code": "850440",
       "month": "2026-06",
       "imports_value_usd": 1872926742,
@@ -171372,6 +171534,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "hs_code": "8507",
+      "month": "2026-06",
+      "imports_value_usd": 2061929551,
+      "exports_value_usd": 529304696,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:24.520Z",
       "status": "official"
     },
     {
@@ -177046,6 +177221,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2025-06",
+      "imports_value_usd": 21484732885,
+      "exports_value_usd": 4748814534,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
       "hs_code": "847130",
       "month": "2025-07",
       "imports_value_usd": 4645486237,
@@ -177352,6 +177540,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2025-07",
+      "imports_value_usd": 24362330788,
+      "exports_value_usd": 5280112235,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
       "status": "official"
     },
     {
@@ -177670,6 +177871,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2025-08",
+      "imports_value_usd": 23606083426,
+      "exports_value_usd": 7458294511,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
       "hs_code": "847130",
       "month": "2025-09",
       "imports_value_usd": 4082220980,
@@ -177976,6 +178190,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2025-09",
+      "imports_value_usd": 20396036759,
+      "exports_value_usd": 5152886933,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
       "status": "official"
     },
     {
@@ -178294,6 +178521,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2025-10",
+      "imports_value_usd": 25440165308,
+      "exports_value_usd": 4889157716,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
       "hs_code": "847130",
       "month": "2025-11",
       "imports_value_usd": 3717246422,
@@ -178600,6 +178840,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2025-11",
+      "imports_value_usd": 27897636301,
+      "exports_value_usd": 5650618544,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
       "status": "official"
     },
     {
@@ -178918,6 +179171,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2025-12",
+      "imports_value_usd": 27909596276,
+      "exports_value_usd": 6278816523,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
       "hs_code": "847130",
       "month": "2026-01",
       "imports_value_usd": 3361721565,
@@ -179224,6 +179490,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2026-01",
+      "imports_value_usd": 27488062732,
+      "exports_value_usd": 8561274332,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
       "status": "official"
     },
     {
@@ -179542,6 +179821,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2026-02",
+      "imports_value_usd": 28169654686,
+      "exports_value_usd": 5001141673,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
       "hs_code": "847130",
       "month": "2026-03",
       "imports_value_usd": 4595268807,
@@ -179848,6 +180140,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2026-03",
+      "imports_value_usd": 32613158623,
+      "exports_value_usd": 7341676171,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
       "status": "official"
     },
     {
@@ -180166,6 +180471,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2026-04",
+      "imports_value_usd": 35262741625,
+      "exports_value_usd": 8391073889,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
       "hs_code": "847130",
       "month": "2026-05",
       "imports_value_usd": 5052095681,
@@ -180478,6 +180796,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2026-05",
+      "imports_value_usd": 35711744148,
+      "exports_value_usd": 6277182547,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
       "hs_code": "847130",
       "month": "2026-06",
       "imports_value_usd": 5417683372,
@@ -180784,6 +181115,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "hs_code": "8471",
+      "month": "2026-06",
+      "imports_value_usd": 35199413826,
+      "exports_value_usd": 5853501500,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:08.765Z",
       "status": "official"
     },
     {
@@ -182207,6 +182551,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2025-06",
+      "imports_value_usd": 748876927,
+      "exports_value_usd": 260105064,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
       "hs_code": "950450",
       "month": "2025-07",
       "imports_value_usd": 568621520,
@@ -182279,6 +182636,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2025-07",
+      "imports_value_usd": 769757923,
+      "exports_value_usd": 217286100,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
       "status": "official"
     },
     {
@@ -182363,6 +182733,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2025-08",
+      "imports_value_usd": 818603354,
+      "exports_value_usd": 276768481,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
       "hs_code": "950450",
       "month": "2025-09",
       "imports_value_usd": 718142890,
@@ -182435,6 +182818,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2025-09",
+      "imports_value_usd": 949764053,
+      "exports_value_usd": 266908491,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
       "status": "official"
     },
     {
@@ -182519,6 +182915,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2025-10",
+      "imports_value_usd": 1003715682,
+      "exports_value_usd": 312670863,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
       "hs_code": "950450",
       "month": "2025-11",
       "imports_value_usd": 862741186,
@@ -182591,6 +183000,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2025-11",
+      "imports_value_usd": 1048707561,
+      "exports_value_usd": 274425467,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
       "status": "official"
     },
     {
@@ -182675,6 +183097,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2025-12",
+      "imports_value_usd": 714063437,
+      "exports_value_usd": 207237658,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
       "hs_code": "950450",
       "month": "2026-01",
       "imports_value_usd": 449990227,
@@ -182747,6 +183182,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2026-01",
+      "imports_value_usd": 599721683,
+      "exports_value_usd": 184980791,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
       "status": "official"
     },
     {
@@ -182831,6 +183279,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2026-02",
+      "imports_value_usd": 466468379,
+      "exports_value_usd": 195602890,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
       "hs_code": "950450",
       "month": "2026-03",
       "imports_value_usd": 208719781,
@@ -182903,6 +183364,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2026-03",
+      "imports_value_usd": 418249590,
+      "exports_value_usd": 264169777,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
       "status": "official"
     },
     {
@@ -182987,6 +183461,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2026-04",
+      "imports_value_usd": 486428085,
+      "exports_value_usd": 215258556,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
       "hs_code": "950450",
       "month": "2026-05",
       "imports_value_usd": 236454286,
@@ -183065,6 +183552,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2026-05",
+      "imports_value_usd": 429633065,
+      "exports_value_usd": 238452299,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
       "hs_code": "950450",
       "month": "2026-06",
       "imports_value_usd": 341083951,
@@ -183137,6 +183637,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "hs_code": "9504",
+      "month": "2026-06",
+      "imports_value_usd": 581523729,
+      "exports_value_usd": 250154014,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:45.078Z",
       "status": "official"
     },
     {
@@ -185977,6 +186490,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2025-06",
+      "imports_value_usd": 3957586982,
+      "exports_value_usd": 3289889048,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
       "hs_code": "901890",
       "month": "2025-07",
       "imports_value_usd": 1946710185,
@@ -186127,6 +186653,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2025-07",
+      "imports_value_usd": 3956237148,
+      "exports_value_usd": 3216302449,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
       "status": "official"
     },
     {
@@ -186289,6 +186828,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2025-08",
+      "imports_value_usd": 3494076971,
+      "exports_value_usd": 3174231317,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
       "hs_code": "901890",
       "month": "2025-09",
       "imports_value_usd": 1818676683,
@@ -186439,6 +186991,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2025-09",
+      "imports_value_usd": 3608018585,
+      "exports_value_usd": 2946906953,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
       "status": "official"
     },
     {
@@ -186601,6 +187166,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2025-10",
+      "imports_value_usd": 3637033947,
+      "exports_value_usd": 3301199879,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
       "hs_code": "901890",
       "month": "2025-11",
       "imports_value_usd": 1685501286,
@@ -186751,6 +187329,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2025-11",
+      "imports_value_usd": 3325507263,
+      "exports_value_usd": 3035090540,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
       "status": "official"
     },
     {
@@ -186913,6 +187504,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2025-12",
+      "imports_value_usd": 3464872381,
+      "exports_value_usd": 2978787860,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
       "hs_code": "901890",
       "month": "2026-01",
       "imports_value_usd": 1549730943,
@@ -187063,6 +187667,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2026-01",
+      "imports_value_usd": 3007655155,
+      "exports_value_usd": 2788308039,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
       "status": "official"
     },
     {
@@ -187225,6 +187842,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2026-02",
+      "imports_value_usd": 3299108776,
+      "exports_value_usd": 2892967910,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
       "hs_code": "901890",
       "month": "2026-03",
       "imports_value_usd": 1839581007,
@@ -187375,6 +188005,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2026-03",
+      "imports_value_usd": 3784292494,
+      "exports_value_usd": 3435999968,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
       "status": "official"
     },
     {
@@ -187537,6 +188180,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2026-04",
+      "imports_value_usd": 3392738707,
+      "exports_value_usd": 3083287634,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
       "hs_code": "901890",
       "month": "2026-05",
       "imports_value_usd": 1708842817,
@@ -187693,6 +188349,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2026-05",
+      "imports_value_usd": 3428784559,
+      "exports_value_usd": 3177995659,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
       "hs_code": "901890",
       "month": "2026-06",
       "imports_value_usd": 1806382604,
@@ -187843,6 +188512,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "hs_code": "9018",
+      "month": "2026-06",
+      "imports_value_usd": 3733661349,
+      "exports_value_usd": 3184180315,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:40.834Z",
       "status": "official"
     },
     {
@@ -189266,6 +189948,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2025-06",
+      "imports_value_usd": 1028602546,
+      "exports_value_usd": 689840092,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
       "hs_code": "847950",
       "month": "2025-07",
       "imports_value_usd": 54792604,
@@ -189338,6 +190033,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2025-07",
+      "imports_value_usd": 1143378689,
+      "exports_value_usd": 601890187,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
       "status": "official"
     },
     {
@@ -189422,6 +190130,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2025-08",
+      "imports_value_usd": 975331952,
+      "exports_value_usd": 664427776,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
       "hs_code": "847950",
       "month": "2025-09",
       "imports_value_usd": 59954426,
@@ -189494,6 +190215,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2025-09",
+      "imports_value_usd": 1023855335,
+      "exports_value_usd": 556686157,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
       "status": "official"
     },
     {
@@ -189578,6 +190312,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2025-10",
+      "imports_value_usd": 1032961059,
+      "exports_value_usd": 706312252,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
       "hs_code": "847950",
       "month": "2025-11",
       "imports_value_usd": 52666257,
@@ -189650,6 +190397,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2025-11",
+      "imports_value_usd": 1045645748,
+      "exports_value_usd": 613472320,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
       "status": "official"
     },
     {
@@ -189734,6 +190494,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2025-12",
+      "imports_value_usd": 1098406193,
+      "exports_value_usd": 602069926,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
       "hs_code": "847950",
       "month": "2026-01",
       "imports_value_usd": 60680449,
@@ -189806,6 +190579,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2026-01",
+      "imports_value_usd": 1044086444,
+      "exports_value_usd": 480157278,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
       "status": "official"
     },
     {
@@ -189890,6 +190676,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2026-02",
+      "imports_value_usd": 879158260,
+      "exports_value_usd": 506341459,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
       "hs_code": "847950",
       "month": "2026-03",
       "imports_value_usd": 87352357,
@@ -189962,6 +190761,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2026-03",
+      "imports_value_usd": 1225819009,
+      "exports_value_usd": 620782419,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
       "status": "official"
     },
     {
@@ -190046,6 +190858,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2026-04",
+      "imports_value_usd": 1299782685,
+      "exports_value_usd": 594554699,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
       "hs_code": "847950",
       "month": "2026-05",
       "imports_value_usd": 86802179,
@@ -190124,6 +190949,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2026-05",
+      "imports_value_usd": 1153121842,
+      "exports_value_usd": 617888362,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
       "hs_code": "847950",
       "month": "2026-06",
       "imports_value_usd": 122955981,
@@ -190196,6 +191034,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "hs_code": "8479",
+      "month": "2026-06",
+      "imports_value_usd": 1331351735,
+      "exports_value_usd": 593015914,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:39.908Z",
       "status": "official"
     },
     {
@@ -191619,6 +192470,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2025-06",
+      "imports_value_usd": 3642299904,
+      "exports_value_usd": 4361192718,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
       "hs_code": "854232",
       "month": "2025-07",
       "imports_value_usd": 148640517,
@@ -191691,6 +192555,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2025-07",
+      "imports_value_usd": 3120436836,
+      "exports_value_usd": 4258427664,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
       "status": "official"
     },
     {
@@ -191775,6 +192652,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2025-08",
+      "imports_value_usd": 2999605235,
+      "exports_value_usd": 4431914423,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
       "hs_code": "854232",
       "month": "2025-09",
       "imports_value_usd": 151206015,
@@ -191847,6 +192737,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2025-09",
+      "imports_value_usd": 3484927936,
+      "exports_value_usd": 4008328377,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
       "status": "official"
     },
     {
@@ -191931,6 +192834,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2025-10",
+      "imports_value_usd": 3384996002,
+      "exports_value_usd": 4292068545,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
       "hs_code": "854232",
       "month": "2025-11",
       "imports_value_usd": 221837020,
@@ -192003,6 +192919,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2025-11",
+      "imports_value_usd": 4154579842,
+      "exports_value_usd": 3762295868,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
       "status": "official"
     },
     {
@@ -192087,6 +193016,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2025-12",
+      "imports_value_usd": 4878196401,
+      "exports_value_usd": 4335953775,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
       "hs_code": "854232",
       "month": "2026-01",
       "imports_value_usd": 277491278,
@@ -192159,6 +193101,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2026-01",
+      "imports_value_usd": 4057995325,
+      "exports_value_usd": 4756007211,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
       "status": "official"
     },
     {
@@ -192243,6 +193198,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2026-02",
+      "imports_value_usd": 4086600171,
+      "exports_value_usd": 4850061482,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
       "hs_code": "854232",
       "month": "2026-03",
       "imports_value_usd": 438515776,
@@ -192315,6 +193283,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2026-03",
+      "imports_value_usd": 4684700629,
+      "exports_value_usd": 4988863905,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
       "status": "official"
     },
     {
@@ -192399,6 +193380,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2026-04",
+      "imports_value_usd": 4396721767,
+      "exports_value_usd": 4401876258,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
       "hs_code": "854232",
       "month": "2026-05",
       "imports_value_usd": 648147477,
@@ -192477,6 +193471,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2026-05",
+      "imports_value_usd": 4476331643,
+      "exports_value_usd": 4528746404,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
       "hs_code": "854232",
       "month": "2026-06",
       "imports_value_usd": 953473688,
@@ -192549,6 +193556,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "hs_code": "8542",
+      "month": "2026-06",
+      "imports_value_usd": 5022811092,
+      "exports_value_usd": 4582525438,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.774Z",
       "status": "official"
     },
     {
@@ -198223,6 +199243,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2025-06",
+      "imports_value_usd": 3642299904,
+      "exports_value_usd": 4361192718,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
       "hs_code": "847150",
       "month": "2025-07",
       "imports_value_usd": 16636467403,
@@ -198529,6 +199562,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2025-07",
+      "imports_value_usd": 3120436836,
+      "exports_value_usd": 4258427664,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
       "status": "official"
     },
     {
@@ -198847,6 +199893,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2025-08",
+      "imports_value_usd": 2999605235,
+      "exports_value_usd": 4431914423,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
       "hs_code": "847150",
       "month": "2025-09",
       "imports_value_usd": 13870231405,
@@ -199153,6 +200212,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2025-09",
+      "imports_value_usd": 3484927936,
+      "exports_value_usd": 4008328377,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
       "status": "official"
     },
     {
@@ -199471,6 +200543,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2025-10",
+      "imports_value_usd": 3384996002,
+      "exports_value_usd": 4292068545,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
       "hs_code": "847150",
       "month": "2025-11",
       "imports_value_usd": 21098810763,
@@ -199777,6 +200862,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2025-11",
+      "imports_value_usd": 4154579842,
+      "exports_value_usd": 3762295868,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
       "status": "official"
     },
     {
@@ -200095,6 +201193,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2025-12",
+      "imports_value_usd": 4878196401,
+      "exports_value_usd": 4335953775,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
       "hs_code": "847150",
       "month": "2026-01",
       "imports_value_usd": 20620017655,
@@ -200401,6 +201512,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2026-01",
+      "imports_value_usd": 4057995325,
+      "exports_value_usd": 4756007211,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
       "status": "official"
     },
     {
@@ -200719,6 +201843,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2026-02",
+      "imports_value_usd": 4086600171,
+      "exports_value_usd": 4850061482,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
       "hs_code": "847150",
       "month": "2026-03",
       "imports_value_usd": 23498123821,
@@ -201025,6 +202162,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2026-03",
+      "imports_value_usd": 4684700629,
+      "exports_value_usd": 4988863905,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
       "status": "official"
     },
     {
@@ -201343,6 +202493,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2026-04",
+      "imports_value_usd": 4396721767,
+      "exports_value_usd": 4401876258,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
       "hs_code": "847150",
       "month": "2026-05",
       "imports_value_usd": 26029484861,
@@ -201655,6 +202818,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2026-05",
+      "imports_value_usd": 4476331643,
+      "exports_value_usd": 4528746404,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
       "hs_code": "847150",
       "month": "2026-06",
       "imports_value_usd": 24745111194,
@@ -201961,6 +203137,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "hs_code": "8542",
+      "month": "2026-06",
+      "imports_value_usd": 5022811092,
+      "exports_value_usd": 4582525438,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:55:49.443Z",
       "status": "official"
     },
     {
@@ -203345,6 +204534,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2025-06",
+      "imports_value_usd": 1665049539,
+      "exports_value_usd": 476585464,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
       "hs_code": "854143",
       "month": "2025-07",
       "imports_value_usd": 610007227,
@@ -203404,6 +204606,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2025-07",
+      "imports_value_usd": 1299902532,
+      "exports_value_usd": 518021291,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
       "status": "official"
     },
     {
@@ -203488,6 +204703,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2025-08",
+      "imports_value_usd": 1012129858,
+      "exports_value_usd": 506897972,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
       "hs_code": "854143",
       "month": "2025-09",
       "imports_value_usd": 439637137,
@@ -203560,6 +204788,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2025-09",
+      "imports_value_usd": 1005617232,
+      "exports_value_usd": 599278923,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
       "status": "official"
     },
     {
@@ -203644,6 +204885,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2025-10",
+      "imports_value_usd": 1010499315,
+      "exports_value_usd": 691499183,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
       "hs_code": "854143",
       "month": "2025-11",
       "imports_value_usd": 631286392,
@@ -203722,6 +204976,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2025-11",
+      "imports_value_usd": 1447264071,
+      "exports_value_usd": 808261839,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
       "hs_code": "854143",
       "month": "2025-12",
       "imports_value_usd": 555010622,
@@ -203781,6 +205048,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:44.840Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2025-12",
+      "imports_value_usd": 1205996599,
+      "exports_value_usd": 841072069,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
       "status": "official"
     },
     {
@@ -203865,6 +205145,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2026-01",
+      "imports_value_usd": 930937044,
+      "exports_value_usd": 941222449,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
       "hs_code": "854143",
       "month": "2026-02",
       "imports_value_usd": 260458822,
@@ -203924,6 +205217,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:09.854Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2026-02",
+      "imports_value_usd": 921237919,
+      "exports_value_usd": 923997559,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
       "status": "official"
     },
     {
@@ -204008,6 +205314,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2026-03",
+      "imports_value_usd": 994122912,
+      "exports_value_usd": 1014709408,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
       "hs_code": "854143",
       "month": "2026-04",
       "imports_value_usd": 460884946,
@@ -204080,6 +205399,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:36.317Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2026-04",
+      "imports_value_usd": 1175472986,
+      "exports_value_usd": 987561643,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
       "status": "official"
     },
     {
@@ -204164,6 +205496,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2026-05",
+      "imports_value_usd": 1121008034,
+      "exports_value_usd": 745746931,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
       "hs_code": "854143",
       "month": "2026-06",
       "imports_value_usd": 396271951,
@@ -204236,6 +205581,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "hs_code": "8541",
+      "month": "2026-06",
+      "imports_value_usd": 1285017907,
+      "exports_value_usd": 821571403,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:28.674Z",
       "status": "official"
     },
     {
@@ -207076,6 +208434,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2025-06",
+      "imports_value_usd": 10937567675,
+      "exports_value_usd": 3673418768,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
       "hs_code": "851713",
       "month": "2025-07",
       "imports_value_usd": 3049504712,
@@ -207226,6 +208597,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:15.832Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2025-07",
+      "imports_value_usd": 11072024275,
+      "exports_value_usd": 3839191433,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
       "status": "official"
     },
     {
@@ -207388,6 +208772,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2025-08",
+      "imports_value_usd": 9352205488,
+      "exports_value_usd": 3768967803,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
       "hs_code": "851713",
       "month": "2025-09",
       "imports_value_usd": 4815899394,
@@ -207538,6 +208935,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:00:43.990Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2025-09",
+      "imports_value_usd": 12705505790,
+      "exports_value_usd": 3485746552,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
       "status": "official"
     },
     {
@@ -207700,6 +209110,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2025-10",
+      "imports_value_usd": 15474784528,
+      "exports_value_usd": 4447648451,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
       "hs_code": "851713",
       "month": "2025-11",
       "imports_value_usd": 5358901178,
@@ -207850,6 +209273,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:31.987Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2025-11",
+      "imports_value_usd": 13508549040,
+      "exports_value_usd": 4285717536,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
       "status": "official"
     },
     {
@@ -208012,6 +209448,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2025-12",
+      "imports_value_usd": 14943545041,
+      "exports_value_usd": 4831162006,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
       "hs_code": "851713",
       "month": "2026-01",
       "imports_value_usd": 4055493375,
@@ -208162,6 +209611,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:01:57.208Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2026-01",
+      "imports_value_usd": 14044545657,
+      "exports_value_usd": 4126064877,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
       "status": "official"
     },
     {
@@ -208324,6 +209786,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2026-02",
+      "imports_value_usd": 11192920566,
+      "exports_value_usd": 4169964696,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
       "hs_code": "851713",
       "month": "2026-03",
       "imports_value_usd": 3832467646,
@@ -208474,6 +209949,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:02:22.744Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2026-03",
+      "imports_value_usd": 14671273115,
+      "exports_value_usd": 4209938943,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
       "status": "official"
     },
     {
@@ -208636,6 +210124,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2026-04",
+      "imports_value_usd": 15223915972,
+      "exports_value_usd": 4109113859,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
       "hs_code": "851713",
       "month": "2026-05",
       "imports_value_usd": 4414929159,
@@ -208792,6 +210293,19 @@
       "market": "US",
       "partner": "WORLD",
       "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2026-05",
+      "imports_value_usd": 15092333377,
+      "exports_value_usd": 4319827952,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
       "hs_code": "851713",
       "month": "2026-06",
       "imports_value_usd": 4405963671,
@@ -208942,6 +210456,19 @@
       "source_id": "un-comtrade-monthly",
       "source_url": "https://comtradeapi.un.org/public/v1/preview/C/M/HS",
       "fetched_at": "2026-08-15T19:03:02.893Z",
+      "status": "official"
+    },
+    {
+      "market": "US",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "hs_code": "8517",
+      "month": "2026-06",
+      "imports_value_usd": 17237599999,
+      "exports_value_usd": 4645355203,
+      "source_id": "us-census-international-trade",
+      "source_url": "https://api.census.gov/data/timeseries/intltrade/exports/hs.html",
+      "fetched_at": "2026-08-28T08:56:17.409Z",
       "status": "official"
     },
     {
@@ -209181,7 +210708,7 @@
   ],
   "national_connector_status": {
     "schema_version": "1.0",
-    "generated_at": "2026-08-28T08:35:13.929Z",
+    "generated_at": "2026-08-28T08:56:46.923Z",
     "ok": true,
     "publish_policy": "complete_batch_only_last_good_retained",
     "summary": {
@@ -209448,7 +210975,7 @@
         "raw_ingest_status": "production_ready",
         "raw_ingest_note": "Japan Customs 6/9-digit commodity-country rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly JPY-to-USD conversion evidence.",
         "probe_status": "official_probe_ok",
-        "last_checked_at": "2026-08-28T08:35:13.143Z",
+        "last_checked_at": "2026-08-28T08:56:45.955Z",
         "probe_note": ""
       },
       "KR": {
@@ -209543,7 +211070,7 @@
         "raw_ingest_status": "api_key_pending",
         "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available.",
         "probe_status": "api_key_pending",
-        "last_checked_at": "2026-08-28T08:35:13.145Z",
+        "last_checked_at": "2026-08-28T08:56:45.957Z",
         "probe_note": "KR_DATA_GO_KR_SERVICE_KEY is not configured; UN Comtrade historical fallback remains available."
       },
       "SG": {
@@ -209638,7 +211165,7 @@
         "raw_ingest_status": "production_ready",
         "raw_ingest_note": "SingStat T010001 AHTN commodity-market rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly SGD-to-USD conversion evidence.",
         "probe_status": "probe_degraded",
-        "last_checked_at": "2026-08-28T08:35:13.927Z",
+        "last_checked_at": "2026-08-28T08:56:46.921Z",
         "probe_note": "",
         "probe_error": "HTTP 400"
       }
