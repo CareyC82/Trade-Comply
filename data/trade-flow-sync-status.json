@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-15T19:03:13.663Z",
-  "ok": true,
+  "generated_at": "2026-08-28T08:02:46.011Z",
+  "ok": false,
   "publish_policy": "complete_batch_only_last_good_retained",
   "connectors": {
     "comtrade": {
-      "ok": true,
+      "ok": false,
       "skipped": false,
-      "row_count": 31417,
+      "row_count": 0,
       "partner_row_count": 21880,
       "partner_markets": [
         "CN",
@@ -147,7 +147,8 @@
           "period": "202606",
           "error": "No usable partner rows"
         }
-      ]
+      ],
+      "error": "Official batch shrank unexpectedly from 15877 to 4806 maintained row(s)"
     },
     "census": {
       "ok": true,
@@ -261,7 +262,7 @@
           "raw_ingest_status": "production_ready",
           "raw_ingest_note": "Japan Customs 6/9-digit commodity-country rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly JPY-to-USD conversion evidence.",
           "probe_status": "official_probe_ok",
-          "last_checked_at": "2026-08-15T19:03:12.835Z",
+          "last_checked_at": "2026-08-28T08:02:45.085Z",
           "probe_note": ""
         },
         "KR": {
@@ -356,7 +357,7 @@
           "raw_ingest_status": "api_key_pending",
           "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available.",
           "probe_status": "api_key_pending",
-          "last_checked_at": "2026-08-15T19:03:12.838Z",
+          "last_checked_at": "2026-08-28T08:02:45.087Z",
           "probe_note": "KR_DATA_GO_KR_SERVICE_KEY is not configured; UN Comtrade historical fallback remains available."
         },
         "SG": {
@@ -451,7 +452,7 @@
           "raw_ingest_status": "production_ready",
           "raw_ingest_note": "SingStat T010001 AHTN commodity-market rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly SGD-to-USD conversion evidence.",
           "probe_status": "probe_degraded",
-          "last_checked_at": "2026-08-15T19:03:13.635Z",
+          "last_checked_at": "2026-08-28T08:02:45.983Z",
           "probe_note": "",
           "probe_error": "HTTP 400"
         }
