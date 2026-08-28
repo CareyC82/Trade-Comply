@@ -90,9 +90,11 @@ function rowMatchesScope(row, scope = {}) {
     const months = scope.months instanceof Set ? scope.months : new Set(scope.months || []);
     const markets = scope.markets instanceof Set ? scope.markets : new Set(scope.markets || []);
     const industries = scope.industryIds instanceof Set ? scope.industryIds : new Set(scope.industryIds || []);
+    const partners = scope.partners instanceof Set ? scope.partners : new Set(scope.partners || []);
     return (!months.size || months.has(row.month))
         && (!markets.size || markets.has(row.market))
-        && (!industries.size || industries.has(row.industry_id));
+        && (!industries.size || industries.has(row.industry_id))
+        && (!partners.size || partners.has(row.partner));
 }
 
 function replaceSourceScope(existing, incoming, sourceId, scope = {}) {
@@ -659,7 +661,12 @@ async function syncComtrade(payload, {
             requestedIds: periods,
             completedIds,
             latestMonth: months.at(-1),
-            scope: { months, markets: Object.keys(COMTRADE_REPORTERS), industryIds: INDUSTRIES.map((industry) => industry.id) }
+            scope: {
+                months,
+                markets: Object.keys(COMTRADE_REPORTERS),
+                industryIds: INDUSTRIES.map((industry) => industry.id),
+                partners: ['WORLD']
+            }
         });
         if (!validation.ok) throw new Error(validation.reason);
         payload.series = replaceComtradeRows(existing, incoming, successfulPartnerBatches, {

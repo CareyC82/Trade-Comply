@@ -21,6 +21,7 @@ const {
     syncComtrade,
     syncNationalOfficialConnectors,
     syncOfficialBatches,
+    validateCompleteBatch,
     validateOfficialManifest
 } = require('../scripts/update-trade-flow');
 
@@ -202,6 +203,26 @@ test('replaceComtradeRows refreshes successful partners and preserves failed par
     assert.equal(result.find((row) => row.partner === 'WORLD').imports_value_usd, 10);
     assert.equal(result.find((row) => row.partner === 'US').imports_value_usd, 20);
     assert.equal(result.find((row) => row.partner === 'JP').imports_value_usd, 3);
+});
+
+test('Comtrade completeness compares WORLD aggregates without counting partner detail rows', () => {
+    const base = {
+        source_id: 'un-comtrade-monthly', market: 'US', industry_id: 'memory',
+        hs_code: '854232', month: '2026-05', imports_value_usd: 10, exports_value_usd: 5
+    };
+    const result = validateCompleteBatch({
+        existing: [
+            { ...base, partner: 'WORLD' },
+            ...Array.from({ length: 40 }, (_, index) => ({ ...base, partner: `PARTNER-${index}` }))
+        ],
+        incoming: [{ ...base, partner: 'WORLD', imports_value_usd: 12 }],
+        sourceId: 'un-comtrade-monthly',
+        requestedIds: ['202605'],
+        completedIds: ['202605'],
+        latestMonth: '2026-05',
+        scope: { months: ['2026-05'], markets: ['US'], industryIds: ['memory'], partners: ['WORLD'] }
+    });
+    assert.equal(result.ok, true);
 });
 
 test('syncComtrade replaces its own rows and marks official source current', async () => {
