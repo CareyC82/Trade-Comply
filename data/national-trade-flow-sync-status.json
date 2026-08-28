@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-28T08:56:46.923Z",
+  "generated_at": "2026-08-28T09:27:06.279Z",
   "ok": true,
   "publish_policy": "complete_batch_only_last_good_retained",
   "summary": {
@@ -178,7 +178,7 @@
       "connector_name": "Japan Customs monthly trade statistics",
       "official_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm",
       "status": "official_feed_pending",
-      "latest_period": "2026-05",
+      "latest_period": "2026-06",
       "official_latest_period": "2099-08",
       "synchronized_through": "",
       "active_data_tier": "historical_fallback",
@@ -262,12 +262,12 @@
       ],
       "status_reason": "The latest official month is known, but no validated industry batch has been published.",
       "official_row_count": 0,
-      "fallback_row_count": 3115,
+      "fallback_row_count": 3207,
       "raw_data_capability": "commodity_country_feed",
       "raw_ingest_status": "production_ready",
       "raw_ingest_note": "Japan Customs 6/9-digit commodity-country rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly JPY-to-USD conversion evidence.",
       "probe_status": "official_probe_ok",
-      "last_checked_at": "2026-08-28T08:56:45.955Z",
+      "last_checked_at": "2026-08-28T09:27:05.345Z",
       "probe_note": ""
     },
     "KR": {
@@ -362,7 +362,7 @@
       "raw_ingest_status": "api_key_pending",
       "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available.",
       "probe_status": "api_key_pending",
-      "last_checked_at": "2026-08-28T08:56:45.957Z",
+      "last_checked_at": "2026-08-28T09:27:05.347Z",
       "probe_note": "KR_DATA_GO_KR_SERVICE_KEY is not configured; UN Comtrade historical fallback remains available."
     },
     "SG": {
@@ -457,7 +457,7 @@
       "raw_ingest_status": "production_ready",
       "raw_ingest_note": "SingStat T010001 AHTN commodity-market rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly SGD-to-USD conversion evidence.",
       "probe_status": "probe_degraded",
-      "last_checked_at": "2026-08-28T08:56:46.921Z",
+      "last_checked_at": "2026-08-28T09:27:06.278Z",
       "probe_note": "",
       "probe_error": "HTTP 400"
     }
