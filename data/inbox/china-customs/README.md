@@ -11,6 +11,17 @@ Use `manifest.json` when a batch spans multiple files. The manifest should list
 every required month, industry, and direction. See
 `docs/china-customs-export-manifest.example.json`.
 
+After placing the official files here, validate the batch and generate the
+manifest (replace the month with the latest month visibly shown by the official
+platform):
+
+```sh
+npm run prepare:trade-flow:cn -- --latest=2026-05
+```
+
+The command does not estimate missing values. It stops and lists every missing
+month, industry, and direction until the official batch is complete.
+
 The importer stages incomplete batches in
 `data/china-customs-pending-batch.json`. Production data in
 `data/china-industry-flow.json` is replaced only after every required

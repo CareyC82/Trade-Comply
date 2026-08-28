@@ -56,7 +56,7 @@ For a multi-month refresh, declare the batch contract at the top level:
   "required_months": ["2026-03", "2026-04", "2026-05"],
   "required_directions": ["imports", "exports"],
   "required_industries": [
-    "semiconductor_ai", "memory", "computing", "telecom", "battery_storage",
+    "semiconductor_ai", "memory", "computing", "telecom", "battery_energy",
     "solar", "industrial_automation", "healthcare_lab", "gaming"
   ],
   "entries": []
@@ -68,8 +68,15 @@ The import is rejected before publication when a required month, industry, or di
 Then run:
 
 ```bash
+CHINA_CUSTOMS_LATEST_PERIOD=2026-05 npm run prepare:trade-flow:cn
 node scripts/update-china-customs-flow.js --manifest=data/inbox/china-customs/manifest.json
 ```
+
+The preparation command parses every supported file in the inbox and refuses to
+write `manifest.json` unless every imported month contains all nine industries
+and both trade directions. Set the latest period to the month visibly shown by
+the official platform; the command also rejects a batch whose newest file month
+does not match it.
 
 Each imported local file is recorded with its byte size and SHA-256 digest in `data/china-customs-sync-status.json`. If parsing or validation fails, the last-good monthly series is left unchanged.
 
