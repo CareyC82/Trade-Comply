@@ -1,11 +1,13 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-07-15T00:00:00.000Z",
+  "updated_at": "2026-08-28T07:16:25.415Z",
   "sources": [
     {
       "id": "china-customs-major-industries",
       "name": "China Customs major import and export industries",
-      "markets": ["CN"],
+      "markets": [
+        "CN"
+      ],
       "status": "official_current",
       "role": "primary_market_source",
       "priority": 100,
@@ -20,7 +22,17 @@
         "healthcare_lab",
         "gaming"
       ],
-      "covered_industries": ["semiconductor_ai", "computing", "telecom", "healthcare_lab"],
+      "covered_industries": [
+        "battery_energy",
+        "computing",
+        "gaming",
+        "healthcare_lab",
+        "industrial_automation",
+        "memory",
+        "semiconductor_ai",
+        "solar",
+        "telecom"
+      ],
       "category_proxies": {
         "memory": "semiconductor_ai"
       },
@@ -28,10 +40,10 @@
       "fallback_source_id": "un-comtrade-monthly",
       "frequency": "monthly",
       "aggregation_level": "industry",
-      "latest_period": "2026-02",
-      "synchronized_through": "2026-02",
-      "official_platform_latest_period": "2026-05",
-      "connector_status": "update_required",
+      "latest_period": "2026-07",
+      "synchronized_through": "2026-07",
+      "official_platform_latest_period": "2026-07",
+      "connector_status": "current",
       "source_url": "http://stats.customs.gov.cn/",
       "backup_source_url": "https://english.customs.gov.cn/Statistics/Statistics",
       "note": "Primary China-market source. The China Customs online query platform exposes data through 2026-05, while the maintained TraceWize industry summary is synchronized through 2026-02. English GACC tables and UN Comtrade are validation fallbacks, not substitutes for the current China source."
@@ -39,83 +51,1172 @@
   ],
   "series": [
     {
-      "market": "CN", "partner": "WORLD", "industry_id": "semiconductor_ai", "month": "2025-12",
-      "imports_value_usd": 44898100000, "exports_value_usd": 21863000000,
-      "imports_available": true, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Integrated circuits and semiconductor devices",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/83fb6750-e095-47c6-9890-14979f5a22e8.html",
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "month": "2026-03",
+      "imports_value_usd": 268968504,
+      "exports_value_usd": 10161136015,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Batteries & energy storage",
+      "hs_codes": [
+        "8507"
+      ],
+      "product_names": [
+        "蓄电池，包括隔板，不论是否矩形（包括正方形）"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
       "status": "official"
     },
     {
-      "market": "CN", "partner": "WORLD", "industry_id": "semiconductor_ai", "month": "2026-01",
-      "imports_value_usd": null, "exports_value_usd": 22914700000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Integrated circuits",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
-      "status": "official", "derived_from_ytd": true
-    },
-    {
-      "market": "CN", "partner": "WORLD", "industry_id": "semiconductor_ai", "month": "2026-02",
-      "imports_value_usd": null, "exports_value_usd": 20409700000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Integrated circuits",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "month": "2026-04",
+      "imports_value_usd": 294523622,
+      "exports_value_usd": 8421904645,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Batteries & energy storage",
+      "hs_codes": [
+        "8507"
+      ],
+      "product_names": [
+        "蓄电池，包括隔板，不论是否矩形（包括正方形）"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
       "status": "official"
     },
     {
-      "market": "CN", "partner": "WORLD", "industry_id": "computing", "month": "2025-12",
-      "imports_value_usd": 9708400000, "exports_value_usd": 19737900000,
-      "imports_available": true, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Automatic data processing equipment and components",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/83fb6750-e095-47c6-9890-14979f5a22e8.html",
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "month": "2026-05",
+      "imports_value_usd": 290930275,
+      "exports_value_usd": 8477186850,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Batteries & energy storage",
+      "hs_codes": [
+        "8507"
+      ],
+      "product_names": [
+        "蓄电池，包括隔板，不论是否矩形（包括正方形）"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
       "status": "official"
     },
     {
-      "market": "CN", "partner": "WORLD", "industry_id": "computing", "month": "2026-01",
-      "imports_value_usd": null, "exports_value_usd": 19151200000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Automatic data processing equipment and parts",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
-      "status": "official", "derived_from_ytd": true
-    },
-    {
-      "market": "CN", "partner": "WORLD", "industry_id": "computing", "month": "2026-02",
-      "imports_value_usd": null, "exports_value_usd": 17306200000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Automatic data processing equipment and parts",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "month": "2026-06",
+      "imports_value_usd": 286430460,
+      "exports_value_usd": 9177978850,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Batteries & energy storage",
+      "hs_codes": [
+        "8507"
+      ],
+      "product_names": [
+        "蓄电池，包括隔板，不论是否矩形（包括正方形）"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
       "status": "official"
     },
     {
-      "market": "CN", "partner": "WORLD", "industry_id": "telecom", "month": "2026-01",
-      "imports_value_usd": null, "exports_value_usd": 13470500000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Mobile phones and audio/video devices",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
-      "status": "official", "derived_from_ytd": true
-    },
-    {
-      "market": "CN", "partner": "WORLD", "industry_id": "telecom", "month": "2026-02",
-      "imports_value_usd": null, "exports_value_usd": 10366900000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Mobile phones and audio/video devices",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "battery_energy",
+      "month": "2026-07",
+      "imports_value_usd": 297272719,
+      "exports_value_usd": 9882845341,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Batteries & energy storage",
+      "hs_codes": [
+        "8507"
+      ],
+      "product_names": [
+        "蓄电池，包括隔板，不论是否矩形（包括正方形）"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
       "status": "official"
     },
     {
-      "market": "CN", "partner": "WORLD", "industry_id": "healthcare_lab", "month": "2026-01",
-      "imports_value_usd": null, "exports_value_usd": 1944700000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Medical or surgical instruments and apparatuses",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
-      "status": "official", "derived_from_ytd": true
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2025-12",
+      "imports_value_usd": 9708400000,
+      "exports_value_usd": 19737900000,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Automatic data processing equipment and components",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/83fb6750-e095-47c6-9890-14979f5a22e8.html",
+      "status": "official"
     },
     {
-      "market": "CN", "partner": "WORLD", "industry_id": "healthcare_lab", "month": "2026-02",
-      "imports_value_usd": null, "exports_value_usd": 1617500000,
-      "imports_available": false, "exports_available": true,
-      "aggregation_level": "industry", "scope_label": "Medical or surgical instruments and apparatuses",
-      "source_id": "china-customs-major-industries", "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2026-01",
+      "imports_value_usd": null,
+      "exports_value_usd": 19151200000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Automatic data processing equipment and parts",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official",
+      "derived_from_ytd": true
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2026-02",
+      "imports_value_usd": null,
+      "exports_value_usd": 17306200000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Automatic data processing equipment and parts",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2026-03",
+      "imports_value_usd": 7499218434,
+      "exports_value_usd": 15127701167,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Computers & data processing",
+      "hs_codes": [
+        "8471"
+      ],
+      "product_names": [
+        "自动数据处理设备及其部件；其他品目未列名的磁性或光学阅读机、将数据以代码形式转录到数据记录媒体的机器及处理这些数据的机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2026-04",
+      "imports_value_usd": 8201624218,
+      "exports_value_usd": 14721680275,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Computers & data processing",
+      "hs_codes": [
+        "8471"
+      ],
+      "product_names": [
+        "自动数据处理设备及其部件；其他品目未列名的磁性或光学阅读机、将数据以代码形式转录到数据记录媒体的机器及处理这些数据的机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2026-05",
+      "imports_value_usd": 7494995268,
+      "exports_value_usd": 14179109613,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Computers & data processing",
+      "hs_codes": [
+        "8471"
+      ],
+      "product_names": [
+        "自动数据处理设备及其部件；其他品目未列名的磁性或光学阅读机、将数据以代码形式转录到数据记录媒体的机器及处理这些数据的机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2026-06",
+      "imports_value_usd": 9205203465,
+      "exports_value_usd": 17280201645,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Computers & data processing",
+      "hs_codes": [
+        "8471"
+      ],
+      "product_names": [
+        "自动数据处理设备及其部件；其他品目未列名的磁性或光学阅读机、将数据以代码形式转录到数据记录媒体的机器及处理这些数据的机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "computing",
+      "month": "2026-07",
+      "imports_value_usd": 10477634837,
+      "exports_value_usd": 15637751012,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Computers & data processing",
+      "hs_codes": [
+        "8471"
+      ],
+      "product_names": [
+        "自动数据处理设备及其部件；其他品目未列名的磁性或光学阅读机、将数据以代码形式转录到数据记录媒体的机器及处理这些数据的机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "month": "2026-03",
+      "imports_value_usd": 162983677,
+      "exports_value_usd": 607243322,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Gaming & interactive electronics",
+      "hs_codes": [
+        "9504"
+      ],
+      "product_names": [
+        "视频游戏控制器及设备，桌上或室内游戏，包括弹球机、台球、娱乐专用桌及保龄球自动球道设备，用硬币、钞票、银行卡、代币或任何其他支付方式使其工作的游乐机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "month": "2026-04",
+      "imports_value_usd": 133053912,
+      "exports_value_usd": 725474116,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Gaming & interactive electronics",
+      "hs_codes": [
+        "9504"
+      ],
+      "product_names": [
+        "视频游戏控制器及设备，桌上或室内游戏，包括弹球机、台球、娱乐专用桌及保龄球自动球道设备，用硬币、钞票、银行卡、代币或任何其他支付方式使其工作的游乐机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "month": "2026-05",
+      "imports_value_usd": 125526699,
+      "exports_value_usd": 850750669,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Gaming & interactive electronics",
+      "hs_codes": [
+        "9504"
+      ],
+      "product_names": [
+        "视频游戏控制器及设备，桌上或室内游戏，包括弹球机、台球、娱乐专用桌及保龄球自动球道设备，用硬币、钞票、银行卡、代币或任何其他支付方式使其工作的游乐机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "month": "2026-06",
+      "imports_value_usd": 153155111,
+      "exports_value_usd": 1161719792,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Gaming & interactive electronics",
+      "hs_codes": [
+        "9504"
+      ],
+      "product_names": [
+        "视频游戏控制器及设备，桌上或室内游戏，包括弹球机、台球、娱乐专用桌及保龄球自动球道设备，用硬币、钞票、银行卡、代币或任何其他支付方式使其工作的游乐机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "gaming",
+      "month": "2026-07",
+      "imports_value_usd": 115794260,
+      "exports_value_usd": 1262983798,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Gaming & interactive electronics",
+      "hs_codes": [
+        "9504"
+      ],
+      "product_names": [
+        "视频游戏控制器及设备，桌上或室内游戏，包括弹球机、台球、娱乐专用桌及保龄球自动球道设备，用硬币、钞票、银行卡、代币或任何其他支付方式使其工作的游乐机器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "month": "2026-01",
+      "imports_value_usd": null,
+      "exports_value_usd": 1944700000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Medical or surgical instruments and apparatuses",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official",
+      "derived_from_ytd": true
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "month": "2026-02",
+      "imports_value_usd": null,
+      "exports_value_usd": 1617500000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Medical or surgical instruments and apparatuses",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "month": "2026-03",
+      "imports_value_usd": 1677913112,
+      "exports_value_usd": 1351089379,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Healthcare & laboratory equipment",
+      "hs_codes": [
+        "9018",
+        "9027"
+      ],
+      "product_names": [
+        "医疗、外科、牙科或兽医用仪器及器具，包括闪烁扫描装置、其他电气医疗装置及视力检查仪器",
+        "理化分析仪器及装置（例如，偏振仪、折光仪、分光仪、气体或烟雾分析仪）；测量或检验黏性、多孔性、膨胀性、表面张力及类似性能的仪器及装置；测量或检验热量、声量或光量的仪器及装置（包括曝光表）；检镜切片机"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "month": "2026-04",
+      "imports_value_usd": 1563479134,
+      "exports_value_usd": 1490314770,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Healthcare & laboratory equipment",
+      "hs_codes": [
+        "9018",
+        "9027"
+      ],
+      "product_names": [
+        "医疗、外科、牙科或兽医用仪器及器具，包括闪烁扫描装置、其他电气医疗装置及视力检查仪器",
+        "理化分析仪器及装置（例如，偏振仪、折光仪、分光仪、气体或烟雾分析仪）；测量或检验黏性、多孔性、膨胀性、表面张力及类似性能的仪器及装置；测量或检验热量、声量或光量的仪器及装置（包括曝光表）；检镜切片机"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "month": "2026-05",
+      "imports_value_usd": 1338623572,
+      "exports_value_usd": 1518222901,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Healthcare & laboratory equipment",
+      "hs_codes": [
+        "9018",
+        "9027"
+      ],
+      "product_names": [
+        "医疗、外科、牙科或兽医用仪器及器具，包括闪烁扫描装置、其他电气医疗装置及视力检查仪器",
+        "理化分析仪器及装置（例如，偏振仪、折光仪、分光仪、气体或烟雾分析仪）；测量或检验黏性、多孔性、膨胀性、表面张力及类似性能的仪器及装置；测量或检验热量、声量或光量的仪器及装置（包括曝光表）；检镜切片机"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "month": "2026-06",
+      "imports_value_usd": 1662566960,
+      "exports_value_usd": 1739346048,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Healthcare & laboratory equipment",
+      "hs_codes": [
+        "9018",
+        "9027"
+      ],
+      "product_names": [
+        "医疗、外科、牙科或兽医用仪器及器具，包括闪烁扫描装置、其他电气医疗装置及视力检查仪器",
+        "理化分析仪器及装置（例如，偏振仪、折光仪、分光仪、气体或烟雾分析仪）；测量或检验黏性、多孔性、膨胀性、表面张力及类似性能的仪器及装置；测量或检验热量、声量或光量的仪器及装置（包括曝光表）；检镜切片机"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "healthcare_lab",
+      "month": "2026-07",
+      "imports_value_usd": 1652799236,
+      "exports_value_usd": 1686473701,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Healthcare & laboratory equipment",
+      "hs_codes": [
+        "9018",
+        "9027"
+      ],
+      "product_names": [
+        "医疗、外科、牙科或兽医用仪器及器具，包括闪烁扫描装置、其他电气医疗装置及视力检查仪器",
+        "理化分析仪器及装置（例如，偏振仪、折光仪、分光仪、气体或烟雾分析仪）；测量或检验黏性、多孔性、膨胀性、表面张力及类似性能的仪器及装置；测量或检验热量、声量或光量的仪器及装置（包括曝光表）；检镜切片机"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "month": "2026-03",
+      "imports_value_usd": 1383784615,
+      "exports_value_usd": 2969360049,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Industrial automation",
+      "hs_codes": [
+        "8479",
+        "8537"
+      ],
+      "product_names": [
+        "本章其他品目未列名的具有独立功能的机器及机械器具",
+        "用于电气控制或电力分配的盘、板、台、柜及其他基座，装有两个或多个品目8535或8536所列的装置，包括装有第90章所列仪器或装置，以及数控装置，但品目8517的交换机除外"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "month": "2026-04",
+      "imports_value_usd": 1467550740,
+      "exports_value_usd": 3416638708,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Industrial automation",
+      "hs_codes": [
+        "8479",
+        "8537"
+      ],
+      "product_names": [
+        "本章其他品目未列名的具有独立功能的机器及机械器具",
+        "用于电气控制或电力分配的盘、板、台、柜及其他基座，装有两个或多个品目8535或8536所列的装置，包括装有第90章所列仪器或装置，以及数控装置，但品目8517的交换机除外"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "month": "2026-05",
+      "imports_value_usd": 1217664502,
+      "exports_value_usd": 3307689537,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Industrial automation",
+      "hs_codes": [
+        "8479",
+        "8537"
+      ],
+      "product_names": [
+        "本章其他品目未列名的具有独立功能的机器及机械器具",
+        "用于电气控制或电力分配的盘、板、台、柜及其他基座，装有两个或多个品目8535或8536所列的装置，包括装有第90章所列仪器或装置，以及数控装置，但品目8517的交换机除外"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "month": "2026-06",
+      "imports_value_usd": 1473439344,
+      "exports_value_usd": 3728788122,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Industrial automation",
+      "hs_codes": [
+        "8479",
+        "8537"
+      ],
+      "product_names": [
+        "本章其他品目未列名的具有独立功能的机器及机械器具",
+        "用于电气控制或电力分配的盘、板、台、柜及其他基座，装有两个或多个品目8535或8536所列的装置，包括装有第90章所列仪器或装置，以及数控装置，但品目8517的交换机除外"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "industrial_automation",
+      "month": "2026-07",
+      "imports_value_usd": 1426503163,
+      "exports_value_usd": 3694647277,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Industrial automation",
+      "hs_codes": [
+        "8479",
+        "8537"
+      ],
+      "product_names": [
+        "本章其他品目未列名的具有独立功能的机器及机械器具",
+        "用于电气控制或电力分配的盘、板、台、柜及其他基座，装有两个或多个品目8535或8536所列的装置，包括装有第90章所列仪器或装置，以及数控装置，但品目8517的交换机除外"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "month": "2026-03",
+      "imports_value_usd": 23326515241,
+      "exports_value_usd": 19140147288,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Memory components",
+      "hs_codes": [
+        "854232"
+      ],
+      "product_names": [
+        "存储器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "month": "2026-04",
+      "imports_value_usd": 26796570284,
+      "exports_value_usd": 21791752975,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Memory components",
+      "hs_codes": [
+        "854232"
+      ],
+      "product_names": [
+        "存储器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "month": "2026-05",
+      "imports_value_usd": 30770692765,
+      "exports_value_usd": 26640781264,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Memory components",
+      "hs_codes": [
+        "854232"
+      ],
+      "product_names": [
+        "存储器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "month": "2026-06",
+      "imports_value_usd": 32042137761,
+      "exports_value_usd": 28514441772,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Memory components",
+      "hs_codes": [
+        "854232"
+      ],
+      "product_names": [
+        "存储器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "memory",
+      "month": "2026-07",
+      "imports_value_usd": 34773307579,
+      "exports_value_usd": 28637416374,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Memory components",
+      "hs_codes": [
+        "854232"
+      ],
+      "product_names": [
+        "存储器"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2025-12",
+      "imports_value_usd": 44898100000,
+      "exports_value_usd": 21863000000,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Integrated circuits and semiconductor devices",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/83fb6750-e095-47c6-9890-14979f5a22e8.html",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2026-01",
+      "imports_value_usd": null,
+      "exports_value_usd": 22914700000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Integrated circuits",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official",
+      "derived_from_ytd": true
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2026-02",
+      "imports_value_usd": null,
+      "exports_value_usd": 20409700000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Integrated circuits",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2026-03",
+      "imports_value_usd": 52394222155,
+      "exports_value_usd": 35729085309,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Semiconductors & AI hardware",
+      "hs_codes": [
+        "8541",
+        "8542"
+      ],
+      "product_names": [
+        "半导体器件（例如，二极管、晶体管，半导体基换能器）；光敏半导体器件，包括不论是否装在组件内或组装成块的光电池；发光二极管（LED），不论是否与其他发光二极管（LED）组装；已装配的压电晶体",
+        "集成电路"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2026-04",
+      "imports_value_usd": 56456838956,
+      "exports_value_usd": 36102037486,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Semiconductors & AI hardware",
+      "hs_codes": [
+        "8541",
+        "8542"
+      ],
+      "product_names": [
+        "半导体器件（例如，二极管、晶体管，半导体基换能器）；光敏半导体器件，包括不论是否装在组件内或组装成块的光电池；发光二极管（LED），不论是否与其他发光二极管（LED）组装；已装配的压电晶体",
+        "集成电路"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2026-05",
+      "imports_value_usd": 58971304641,
+      "exports_value_usd": 39660677881,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Semiconductors & AI hardware",
+      "hs_codes": [
+        "8541",
+        "8542"
+      ],
+      "product_names": [
+        "半导体器件（例如，二极管、晶体管，半导体基换能器）；光敏半导体器件，包括不论是否装在组件内或组装成块的光电池；发光二极管（LED），不论是否与其他发光二极管（LED）组装；已装配的压电晶体",
+        "集成电路"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2026-06",
+      "imports_value_usd": 62445076964,
+      "exports_value_usd": 42686452740,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Semiconductors & AI hardware",
+      "hs_codes": [
+        "8541",
+        "8542"
+      ],
+      "product_names": [
+        "半导体器件（例如，二极管、晶体管，半导体基换能器）；光敏半导体器件，包括不论是否装在组件内或组装成块的光电池；发光二极管（LED），不论是否与其他发光二极管（LED）组装；已装配的压电晶体",
+        "集成电路"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "semiconductor_ai",
+      "month": "2026-07",
+      "imports_value_usd": 66774061745,
+      "exports_value_usd": 42898412932,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Semiconductors & AI hardware",
+      "hs_codes": [
+        "8541",
+        "8542"
+      ],
+      "product_names": [
+        "半导体器件（例如，二极管、晶体管，半导体基换能器）；光敏半导体器件，包括不论是否装在组件内或组装成块的光电池；发光二极管（LED），不论是否与其他发光二极管（LED）组装；已装配的压电晶体",
+        "集成电路"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "month": "2026-03",
+      "imports_value_usd": 47360523,
+      "exports_value_usd": 4525036225,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Solar & photovoltaic",
+      "hs_codes": [
+        "854142",
+        "854143"
+      ],
+      "product_names": [
+        "未装在组件内或组装成块的光电池",
+        "已装在组件内或组装成块的光电池"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "month": "2026-04",
+      "imports_value_usd": 42431425,
+      "exports_value_usd": 3124153679,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Solar & photovoltaic",
+      "hs_codes": [
+        "854142",
+        "854143"
+      ],
+      "product_names": [
+        "未装在组件内或组装成块的光电池",
+        "已装在组件内或组装成块的光电池"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "month": "2026-05",
+      "imports_value_usd": 47929108,
+      "exports_value_usd": 2230269400,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Solar & photovoltaic",
+      "hs_codes": [
+        "854142",
+        "854143"
+      ],
+      "product_names": [
+        "未装在组件内或组装成块的光电池",
+        "已装在组件内或组装成块的光电池"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "month": "2026-06",
+      "imports_value_usd": 34966582,
+      "exports_value_usd": 2488635889,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Solar & photovoltaic",
+      "hs_codes": [
+        "854142",
+        "854143"
+      ],
+      "product_names": [
+        "未装在组件内或组装成块的光电池",
+        "已装在组件内或组装成块的光电池"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "solar",
+      "month": "2026-07",
+      "imports_value_usd": 53512073,
+      "exports_value_usd": 2134596460,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Solar & photovoltaic",
+      "hs_codes": [
+        "854142",
+        "854143"
+      ],
+      "product_names": [
+        "未装在组件内或组装成块的光电池",
+        "已装在组件内或组装成块的光电池"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "month": "2026-01",
+      "imports_value_usd": null,
+      "exports_value_usd": 13470500000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Mobile phones and audio/video devices",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official",
+      "derived_from_ytd": true
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "month": "2026-02",
+      "imports_value_usd": null,
+      "exports_value_usd": 10366900000,
+      "imports_available": false,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Mobile phones and audio/video devices",
+      "source_id": "china-customs-major-industries",
+      "source_url": "https://english.customs.gov.cn/Statics/c8f7f5f6-8197-4d36-a8cf-2a7b4b3680d7.html",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "month": "2026-03",
+      "imports_value_usd": 4165374423,
+      "exports_value_usd": 20918795198,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Telecom & connected devices",
+      "hs_codes": [
+        "8517",
+        "8525",
+        "8526",
+        "8529"
+      ],
+      "product_names": [
+        "电话机，包括用于蜂窝网络或其他无线网络的智能手机及其他电话机；其他发送或接收声音、图像或其他数据用的设备，包括有线或无线网络（例如，局域网或广域网）的通信设备，品目8443、8525、8527或8528的发送或接收设备除外",
+        "无线电广播、电视发送设备，不论是否装有接收装置或声音的录制、重放装置；电视摄像机、数字照相机及视频摄录一体机",
+        "雷达设备、无线电导航设备及无线电遥控设备",
+        "专用于或主要用于品目8524至8528所列装置或设备的零件"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "month": "2026-04",
+      "imports_value_usd": 4876532082,
+      "exports_value_usd": 21168097406,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Telecom & connected devices",
+      "hs_codes": [
+        "8517",
+        "8525",
+        "8526",
+        "8529"
+      ],
+      "product_names": [
+        "电话机，包括用于蜂窝网络或其他无线网络的智能手机及其他电话机；其他发送或接收声音、图像或其他数据用的设备，包括有线或无线网络（例如，局域网或广域网）的通信设备，品目8443、8525、8527或8528的发送或接收设备除外",
+        "无线电广播、电视发送设备，不论是否装有接收装置或声音的录制、重放装置；电视摄像机、数字照相机及视频摄录一体机",
+        "雷达设备、无线电导航设备及无线电遥控设备",
+        "专用于或主要用于品目8524至8528所列装置或设备的零件"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "month": "2026-05",
+      "imports_value_usd": 4127702416,
+      "exports_value_usd": 22602809036,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Telecom & connected devices",
+      "hs_codes": [
+        "8517",
+        "8525",
+        "8526",
+        "8529"
+      ],
+      "product_names": [
+        "电话机，包括用于蜂窝网络或其他无线网络的智能手机及其他电话机；其他发送或接收声音、图像或其他数据用的设备，包括有线或无线网络（例如，局域网或广域网）的通信设备，品目8443、8525、8527或8528的发送或接收设备除外",
+        "无线电广播、电视发送设备，不论是否装有接收装置或声音的录制、重放装置；电视摄像机、数字照相机及视频摄录一体机",
+        "雷达设备、无线电导航设备及无线电遥控设备",
+        "专用于或主要用于品目8524至8528所列装置或设备的零件"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "month": "2026-06",
+      "imports_value_usd": 4390236194,
+      "exports_value_usd": 22774520035,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Telecom & connected devices",
+      "hs_codes": [
+        "8517",
+        "8525",
+        "8526",
+        "8529"
+      ],
+      "product_names": [
+        "电话机，包括用于蜂窝网络或其他无线网络的智能手机及其他电话机；其他发送或接收声音、图像或其他数据用的设备，包括有线或无线网络（例如，局域网或广域网）的通信设备，品目8443、8525、8527或8528的发送或接收设备除外",
+        "无线电广播、电视发送设备，不论是否装有接收装置或声音的录制、重放装置；电视摄像机、数字照相机及视频摄录一体机",
+        "雷达设备、无线电导航设备及无线电遥控设备",
+        "专用于或主要用于品目8524至8528所列装置或设备的零件"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
+      "status": "official"
+    },
+    {
+      "market": "CN",
+      "partner": "WORLD",
+      "industry_id": "telecom",
+      "month": "2026-07",
+      "imports_value_usd": 5367355829,
+      "exports_value_usd": 22780747107,
+      "imports_available": true,
+      "exports_available": true,
+      "aggregation_level": "industry",
+      "scope_label": "Telecom & connected devices",
+      "hs_codes": [
+        "8517",
+        "8525",
+        "8526",
+        "8529"
+      ],
+      "product_names": [
+        "电话机，包括用于蜂窝网络或其他无线网络的智能手机及其他电话机；其他发送或接收声音、图像或其他数据用的设备，包括有线或无线网络（例如，局域网或广域网）的通信设备，品目8443、8525、8527或8528的发送或接收设备除外",
+        "无线电广播、电视发送设备，不论是否装有接收装置或声音的录制、重放装置；电视摄像机、数字照相机及视频摄录一体机",
+        "雷达设备、无线电导航设备及无线电遥控设备",
+        "专用于或主要用于品目8524至8528所列装置或设备的零件"
+      ],
+      "source_id": "china-customs-major-industries",
+      "source_url": "http://stats.customs.gov.cn/",
       "status": "official"
     }
   ]

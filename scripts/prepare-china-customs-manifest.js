@@ -34,7 +34,11 @@ function buildManifest(directory = DEFAULT_INBOX, values = {}) {
     const files = supportedFiles(absoluteDirectory);
     if (!files.length) throw new Error(`No official China Customs exports found in ${directory}`);
 
-    const payloads = files.map((file) => parseOfficialFile(path.join(absoluteDirectory, file)));
+    const parsedFiles = files.map((file) => ({
+        file,
+        payload: parseOfficialFile(path.join(absoluteDirectory, file))
+    }));
+    const payloads = parsedFiles.map((row) => row.payload);
     const payload = combineOfficialPayloads(payloads);
     const latestPeriod = normalizeMonth(
         values.latestPeriod || payload.official_platform_latest_period,
@@ -62,7 +66,14 @@ function buildManifest(directory = DEFAULT_INBOX, values = {}) {
         required_months: requiredMonths,
         required_directions: ['imports', 'exports'],
         required_industries: INDUSTRIES.map((row) => row.id),
-        entries: files.map((file) => ({ file }))
+        entries: parsedFiles.map(({ file, payload: filePayload }) => {
+            const hasImports = filePayload.series.some((row) => row.imports_value_usd !== null && row.imports_value_usd !== undefined);
+            const hasExports = filePayload.series.some((row) => row.exports_value_usd !== null && row.exports_value_usd !== undefined);
+            return {
+                file,
+                ...(hasImports !== hasExports ? { direction: hasImports ? 'imports' : 'exports' } : {})
+            };
+        })
     };
 }
 

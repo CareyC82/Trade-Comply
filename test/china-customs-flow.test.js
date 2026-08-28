@@ -141,6 +141,11 @@ test('China Customs raw commodity-code exports map into maintained industries', 
     assert.equal(payload.series.find((row) => row.industry_id === 'battery_energy').imports_value_usd, 300);
 });
 
+test('China Customs maps current photovoltaic cell and module subheadings to solar', () => {
+    assert.equal(industryForHsCode('85414200'), 'solar');
+    assert.equal(industryForHsCode('85414300'), 'solar');
+});
+
 test('China Customs raw exports deduplicate identical HS value rows and retain evidence', () => {
     const payload = parseOfficialCsv([
         '统计月份,进出口类型,商品编码,商品名称,金额（美元）',
@@ -207,6 +212,34 @@ test('China Customs CSV refuses ambiguous non-USD value columns', () => {
         '月份,行业,进口金额,出口金额',
         '2026-05,semiconductor,100,200'
     ].join('\n')), /explicit USD trade-value columns/);
+});
+
+test('China Customs native GB18030 CSV accepts the platform USD column when direction is explicit', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-gb18030-'));
+    const body = Buffer.from('22cafdbeddc4ead4c2222c22c9ccc6b7b1e0c2eb222c22c3c0d4aa220a22323032363033222c2238353432222c22313030220a', 'hex');
+    const filePath = path.join(directory, '2026-03-imports.csv');
+    fs.writeFileSync(filePath, body);
+
+    const payload = parseOfficialFile(filePath, { default_direction: undefined });
+    assert.equal(payload.series.length, 1);
+    assert.equal(payload.series[0].month, '2026-03');
+    assert.equal(payload.series[0].industry_id, 'semiconductor_ai');
+    assert.equal(payload.series[0].imports_value_usd, 100);
+    assert.equal(payload.series[0].exports_value_usd, null);
+});
+
+test('China Customs data-month header overrides a range in the export filename', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tracewize-cn-customs-data-month-'));
+    const filePath = path.join(directory, '2026-03_2026-07-exports.csv');
+    fs.writeFileSync(filePath, [
+        '数据年月,商品编码,美元',
+        '202603,8542,100',
+        '202607,8542,200'
+    ].join('\n'));
+
+    const payload = parseOfficialFile(filePath);
+    assert.deepEqual(payload.series.map((row) => row.month), ['2026-03', '2026-07']);
+    assert.deepEqual(payload.series.map((row) => row.exports_value_usd), [100, 200]);
 });
 
 test('China Customs diagnostics expose the real March to May backlog', () => {

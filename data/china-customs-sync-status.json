@@ -1,17 +1,15 @@
 {
   "schema_version": 1,
   "source_id": "china-customs-major-industries",
-  "attempted_at": "2026-08-15T19:03:13.944Z",
-  "ok": false,
-  "data_updated": false,
-  "connector_status": "update_required",
-  "source_mode": "not_configured",
-  "official_platform_latest_period": "2026-05",
-  "synchronized_through": "2026-02",
+  "attempted_at": "2026-08-28T07:16:25.424Z",
+  "ok": true,
+  "data_updated": true,
+  "connector_status": "current",
+  "source_mode": "manifest",
+  "official_platform_latest_period": "2026-07",
+  "synchronized_through": "2026-07",
   "required_periods": [
-    "2026-03",
-    "2026-04",
-    "2026-05"
+    "2026-07"
   ],
   "supported_industries": [
     "semiconductor_ai",
@@ -25,720 +23,106 @@
     "gaming"
   ],
   "covered_industries": [
-    "semiconductor_ai",
+    "battery_energy",
     "computing",
-    "telecom",
-    "healthcare_lab"
+    "gaming",
+    "healthcare_lab",
+    "industrial_automation",
+    "memory",
+    "semiconductor_ai",
+    "solar",
+    "telecom"
   ],
   "coverage": {
-    "latest_period_in_data": "2026-02",
-    "official_platform_latest_period": "2026-05",
-    "missing_periods": [
-      "2026-03",
-      "2026-04",
-      "2026-05"
-    ],
-    "target_period": "2026-05",
-    "industries_covered_at_target": [],
-    "missing_industries_at_target": [
-      "semiconductor_ai",
-      "memory",
-      "computing",
-      "telecom",
+    "latest_period_in_data": "2026-07",
+    "official_platform_latest_period": "2026-07",
+    "missing_periods": [],
+    "target_period": "2026-07",
+    "industries_covered_at_target": [
       "battery_energy",
-      "solar",
-      "industrial_automation",
+      "computing",
+      "gaming",
       "healthcare_lab",
-      "gaming"
+      "industrial_automation",
+      "memory",
+      "semiconductor_ai",
+      "solar",
+      "telecom"
     ],
-    "missing_directions_at_target": [
-      "battery_energy:exports",
-      "battery_energy:imports",
-      "computing:exports",
-      "computing:imports",
-      "gaming:exports",
-      "gaming:imports",
-      "healthcare_lab:exports",
-      "healthcare_lab:imports",
-      "industrial_automation:exports",
-      "industrial_automation:imports",
-      "memory:exports",
-      "memory:imports",
-      "semiconductor_ai:exports",
-      "semiconductor_ai:imports",
-      "solar:exports",
-      "solar:imports",
-      "telecom:exports",
-      "telecom:imports"
-    ],
-    "complete": false,
+    "missing_industries_at_target": [],
+    "missing_directions_at_target": [],
+    "complete": true,
     "required_periods": [
-      "2026-03",
-      "2026-04",
-      "2026-05"
+      "2026-07"
     ],
-    "required_combination_count": 54,
-    "completed_combination_count": 0,
-    "missing_combinations": [
-      {
-        "month": "2026-03",
-        "industry_id": "semiconductor_ai",
-        "direction": "imports",
-        "key": "2026-03:semiconductor_ai:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "semiconductor_ai",
-        "direction": "exports",
-        "key": "2026-03:semiconductor_ai:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "memory",
-        "direction": "imports",
-        "key": "2026-03:memory:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "memory",
-        "direction": "exports",
-        "key": "2026-03:memory:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "computing",
-        "direction": "imports",
-        "key": "2026-03:computing:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "computing",
-        "direction": "exports",
-        "key": "2026-03:computing:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "telecom",
-        "direction": "imports",
-        "key": "2026-03:telecom:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "telecom",
-        "direction": "exports",
-        "key": "2026-03:telecom:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "battery_energy",
-        "direction": "imports",
-        "key": "2026-03:battery_energy:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "battery_energy",
-        "direction": "exports",
-        "key": "2026-03:battery_energy:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "solar",
-        "direction": "imports",
-        "key": "2026-03:solar:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "solar",
-        "direction": "exports",
-        "key": "2026-03:solar:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "industrial_automation",
-        "direction": "imports",
-        "key": "2026-03:industrial_automation:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "industrial_automation",
-        "direction": "exports",
-        "key": "2026-03:industrial_automation:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "healthcare_lab",
-        "direction": "imports",
-        "key": "2026-03:healthcare_lab:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "healthcare_lab",
-        "direction": "exports",
-        "key": "2026-03:healthcare_lab:exports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "gaming",
-        "direction": "imports",
-        "key": "2026-03:gaming:imports"
-      },
-      {
-        "month": "2026-03",
-        "industry_id": "gaming",
-        "direction": "exports",
-        "key": "2026-03:gaming:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "semiconductor_ai",
-        "direction": "imports",
-        "key": "2026-04:semiconductor_ai:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "semiconductor_ai",
-        "direction": "exports",
-        "key": "2026-04:semiconductor_ai:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "memory",
-        "direction": "imports",
-        "key": "2026-04:memory:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "memory",
-        "direction": "exports",
-        "key": "2026-04:memory:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "computing",
-        "direction": "imports",
-        "key": "2026-04:computing:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "computing",
-        "direction": "exports",
-        "key": "2026-04:computing:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "telecom",
-        "direction": "imports",
-        "key": "2026-04:telecom:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "telecom",
-        "direction": "exports",
-        "key": "2026-04:telecom:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "battery_energy",
-        "direction": "imports",
-        "key": "2026-04:battery_energy:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "battery_energy",
-        "direction": "exports",
-        "key": "2026-04:battery_energy:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "solar",
-        "direction": "imports",
-        "key": "2026-04:solar:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "solar",
-        "direction": "exports",
-        "key": "2026-04:solar:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "industrial_automation",
-        "direction": "imports",
-        "key": "2026-04:industrial_automation:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "industrial_automation",
-        "direction": "exports",
-        "key": "2026-04:industrial_automation:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "healthcare_lab",
-        "direction": "imports",
-        "key": "2026-04:healthcare_lab:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "healthcare_lab",
-        "direction": "exports",
-        "key": "2026-04:healthcare_lab:exports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "gaming",
-        "direction": "imports",
-        "key": "2026-04:gaming:imports"
-      },
-      {
-        "month": "2026-04",
-        "industry_id": "gaming",
-        "direction": "exports",
-        "key": "2026-04:gaming:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "semiconductor_ai",
-        "direction": "imports",
-        "key": "2026-05:semiconductor_ai:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "semiconductor_ai",
-        "direction": "exports",
-        "key": "2026-05:semiconductor_ai:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "memory",
-        "direction": "imports",
-        "key": "2026-05:memory:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "memory",
-        "direction": "exports",
-        "key": "2026-05:memory:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "computing",
-        "direction": "imports",
-        "key": "2026-05:computing:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "computing",
-        "direction": "exports",
-        "key": "2026-05:computing:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "telecom",
-        "direction": "imports",
-        "key": "2026-05:telecom:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "telecom",
-        "direction": "exports",
-        "key": "2026-05:telecom:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "battery_energy",
-        "direction": "imports",
-        "key": "2026-05:battery_energy:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "battery_energy",
-        "direction": "exports",
-        "key": "2026-05:battery_energy:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "solar",
-        "direction": "imports",
-        "key": "2026-05:solar:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "solar",
-        "direction": "exports",
-        "key": "2026-05:solar:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "industrial_automation",
-        "direction": "imports",
-        "key": "2026-05:industrial_automation:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "industrial_automation",
-        "direction": "exports",
-        "key": "2026-05:industrial_automation:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "healthcare_lab",
-        "direction": "imports",
-        "key": "2026-05:healthcare_lab:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "healthcare_lab",
-        "direction": "exports",
-        "key": "2026-05:healthcare_lab:exports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "gaming",
-        "direction": "imports",
-        "key": "2026-05:gaming:imports"
-      },
-      {
-        "month": "2026-05",
-        "industry_id": "gaming",
-        "direction": "exports",
-        "key": "2026-05:gaming:exports"
-      }
-    ],
-    "batch_complete": false
+    "required_combination_count": 18,
+    "completed_combination_count": 18,
+    "missing_combinations": [],
+    "batch_complete": true
   },
-  "reason": "Add normalized official exports to data/inbox/china-customs, or configure CHINA_CUSTOMS_FLOW_URL / CHINA_CUSTOMS_FLOW_FILE. Last-good data was preserved.",
+  "reason": "China Customs industry data passed the complete month × industry × direction gate and was promoted to production.",
+  "source_location": "/Users/careychen/Desktop/AI/Chinacomply/data/inbox/china-customs/manifest.json",
+  "source_files": [
+    "data/inbox/china-customs/2026-03_2026-07-exports.csv",
+    "data/inbox/china-customs/2026-03_2026-07-imports.csv",
+    "data/inbox/china-customs/2026-03_2026-07-supplement-exports.csv",
+    "data/inbox/china-customs/2026-03_2026-07-supplement-imports.csv"
+  ],
+  "source_evidence": [
+    {
+      "path": "data/inbox/china-customs/2026-03_2026-07-exports.csv",
+      "bytes": 9341,
+      "sha256": "5273cf469f661ad866c00722cd70b941485bec0d26d16e32df1dbc6dea44b8ac",
+      "source_url": "http://stats.customs.gov.cn/",
+      "month": null,
+      "direction": "exports"
+    },
+    {
+      "path": "data/inbox/china-customs/2026-03_2026-07-imports.csv",
+      "bytes": 9281,
+      "sha256": "469e59c48bdcc3ac6f8e4dc5a4d61ce78b0fd2f5c38ab4c026e6f53e0da54870",
+      "source_url": "http://stats.customs.gov.cn/",
+      "month": null,
+      "direction": "imports"
+    },
+    {
+      "path": "data/inbox/china-customs/2026-03_2026-07-supplement-exports.csv",
+      "bytes": 936,
+      "sha256": "0597860863eaf68e50e0d48d8df8c5371ddb2d338ce4be2d01309f20de4a4bf6",
+      "source_url": "http://stats.customs.gov.cn/",
+      "month": null,
+      "direction": "exports"
+    },
+    {
+      "path": "data/inbox/china-customs/2026-03_2026-07-supplement-imports.csv",
+      "bytes": 911,
+      "sha256": "69afe66362ea1408f1c9d1c0c07d9a3363e632f55a42972822ca40e0491582a5",
+      "source_url": "http://stats.customs.gov.cn/",
+      "month": null,
+      "direction": "imports"
+    }
+  ],
+  "staged_synchronized_through": null,
+  "staged_covered_industries": [],
+  "rows_received": 45,
+  "industries_received": [
+    "battery_energy",
+    "computing",
+    "gaming",
+    "healthcare_lab",
+    "industrial_automation",
+    "memory",
+    "semiconductor_ai",
+    "solar",
+    "telecom"
+  ],
   "pending_batch_active": false,
   "pending_batch_path": "data/china-customs-pending-batch.json",
   "pending_rows": 0,
-  "pending_missing_combinations": [
-    {
-      "month": "2026-03",
-      "industry_id": "semiconductor_ai",
-      "direction": "imports",
-      "key": "2026-03:semiconductor_ai:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "semiconductor_ai",
-      "direction": "exports",
-      "key": "2026-03:semiconductor_ai:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "memory",
-      "direction": "imports",
-      "key": "2026-03:memory:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "memory",
-      "direction": "exports",
-      "key": "2026-03:memory:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "computing",
-      "direction": "imports",
-      "key": "2026-03:computing:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "computing",
-      "direction": "exports",
-      "key": "2026-03:computing:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "telecom",
-      "direction": "imports",
-      "key": "2026-03:telecom:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "telecom",
-      "direction": "exports",
-      "key": "2026-03:telecom:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "battery_energy",
-      "direction": "imports",
-      "key": "2026-03:battery_energy:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "battery_energy",
-      "direction": "exports",
-      "key": "2026-03:battery_energy:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "solar",
-      "direction": "imports",
-      "key": "2026-03:solar:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "solar",
-      "direction": "exports",
-      "key": "2026-03:solar:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "industrial_automation",
-      "direction": "imports",
-      "key": "2026-03:industrial_automation:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "industrial_automation",
-      "direction": "exports",
-      "key": "2026-03:industrial_automation:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "healthcare_lab",
-      "direction": "imports",
-      "key": "2026-03:healthcare_lab:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "healthcare_lab",
-      "direction": "exports",
-      "key": "2026-03:healthcare_lab:exports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "gaming",
-      "direction": "imports",
-      "key": "2026-03:gaming:imports"
-    },
-    {
-      "month": "2026-03",
-      "industry_id": "gaming",
-      "direction": "exports",
-      "key": "2026-03:gaming:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "semiconductor_ai",
-      "direction": "imports",
-      "key": "2026-04:semiconductor_ai:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "semiconductor_ai",
-      "direction": "exports",
-      "key": "2026-04:semiconductor_ai:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "memory",
-      "direction": "imports",
-      "key": "2026-04:memory:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "memory",
-      "direction": "exports",
-      "key": "2026-04:memory:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "computing",
-      "direction": "imports",
-      "key": "2026-04:computing:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "computing",
-      "direction": "exports",
-      "key": "2026-04:computing:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "telecom",
-      "direction": "imports",
-      "key": "2026-04:telecom:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "telecom",
-      "direction": "exports",
-      "key": "2026-04:telecom:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "battery_energy",
-      "direction": "imports",
-      "key": "2026-04:battery_energy:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "battery_energy",
-      "direction": "exports",
-      "key": "2026-04:battery_energy:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "solar",
-      "direction": "imports",
-      "key": "2026-04:solar:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "solar",
-      "direction": "exports",
-      "key": "2026-04:solar:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "industrial_automation",
-      "direction": "imports",
-      "key": "2026-04:industrial_automation:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "industrial_automation",
-      "direction": "exports",
-      "key": "2026-04:industrial_automation:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "healthcare_lab",
-      "direction": "imports",
-      "key": "2026-04:healthcare_lab:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "healthcare_lab",
-      "direction": "exports",
-      "key": "2026-04:healthcare_lab:exports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "gaming",
-      "direction": "imports",
-      "key": "2026-04:gaming:imports"
-    },
-    {
-      "month": "2026-04",
-      "industry_id": "gaming",
-      "direction": "exports",
-      "key": "2026-04:gaming:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "semiconductor_ai",
-      "direction": "imports",
-      "key": "2026-05:semiconductor_ai:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "semiconductor_ai",
-      "direction": "exports",
-      "key": "2026-05:semiconductor_ai:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "memory",
-      "direction": "imports",
-      "key": "2026-05:memory:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "memory",
-      "direction": "exports",
-      "key": "2026-05:memory:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "computing",
-      "direction": "imports",
-      "key": "2026-05:computing:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "computing",
-      "direction": "exports",
-      "key": "2026-05:computing:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "telecom",
-      "direction": "imports",
-      "key": "2026-05:telecom:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "telecom",
-      "direction": "exports",
-      "key": "2026-05:telecom:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "battery_energy",
-      "direction": "imports",
-      "key": "2026-05:battery_energy:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "battery_energy",
-      "direction": "exports",
-      "key": "2026-05:battery_energy:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "solar",
-      "direction": "imports",
-      "key": "2026-05:solar:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "solar",
-      "direction": "exports",
-      "key": "2026-05:solar:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "industrial_automation",
-      "direction": "imports",
-      "key": "2026-05:industrial_automation:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "industrial_automation",
-      "direction": "exports",
-      "key": "2026-05:industrial_automation:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "healthcare_lab",
-      "direction": "imports",
-      "key": "2026-05:healthcare_lab:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "healthcare_lab",
-      "direction": "exports",
-      "key": "2026-05:healthcare_lab:exports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "gaming",
-      "direction": "imports",
-      "key": "2026-05:gaming:imports"
-    },
-    {
-      "month": "2026-05",
-      "industry_id": "gaming",
-      "direction": "exports",
-      "key": "2026-05:gaming:exports"
-    }
-  ],
+  "pending_missing_combinations": [],
+  "last_success_at": "2026-08-28T07:16:25.424Z",
   "coverage_plan": {
     "path": "data/china-customs-sync-plan.json",
-    "missing_direction_count": 54
+    "missing_direction_count": 0
   }
 }

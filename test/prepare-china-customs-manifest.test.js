@@ -28,6 +28,24 @@ test('prepares a relative-path manifest only for a complete official batch', () 
     assert.deepEqual(manifest.entries, [{ file: '2026-05-official.csv' }]);
 });
 
+test('records a single-file trade direction explicitly for audit evidence', () => {
+    const directory = tempInbox();
+    fs.writeFileSync(path.join(directory, '2026-05-imports.csv'), [
+        'month,industry,imports_value_usd',
+        ...INDUSTRIES.map(({ id }) => `2026-05,${id},1`)
+    ].join('\n'));
+    fs.writeFileSync(path.join(directory, '2026-05-exports.csv'), [
+        'month,industry,exports_value_usd',
+        ...INDUSTRIES.map(({ id }) => `2026-05,${id},2`)
+    ].join('\n'));
+
+    const manifest = buildManifest(directory, { latestPeriod: '2026-05' });
+    assert.deepEqual(manifest.entries, [
+        { file: '2026-05-exports.csv', direction: 'exports' },
+        { file: '2026-05-imports.csv', direction: 'imports' }
+    ]);
+});
+
 test('refuses to prepare a manifest for incomplete or stale official files', () => {
     const directory = tempInbox();
     fs.writeFileSync(path.join(directory, '2026-05-memory.csv'), [
