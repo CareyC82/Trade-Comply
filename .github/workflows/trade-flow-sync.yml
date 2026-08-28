@@ -59,6 +59,7 @@ jobs:
 
       - name: Sync official monthly trade flow
         id: trade_flow_sync
+        if: github.event_name != 'push'
         continue-on-error: true
         env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}

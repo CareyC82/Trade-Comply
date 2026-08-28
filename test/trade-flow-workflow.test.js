@@ -21,3 +21,10 @@ test('trade-flow push paths exclude generated outputs to prevent commit loops', 
     assert.doesNotMatch(pushBlock, /china-customs-sync-status\.json/);
     assert.doesNotMatch(pushBlock, /china-customs-sync-plan\.json/);
 });
+
+test('China Customs push runs do not fail on unrelated national connectors', () => {
+    const officialSyncStep = workflow.match(/- name: Sync official monthly trade flow([\s\S]*?)- name: Sync China Customs industry flow/)?.[1] || '';
+    const chinaSyncStep = workflow.match(/- name: Sync China Customs industry flow([\s\S]*?)- name: Verify trade-flow output/)?.[1] || '';
+    assert.match(officialSyncStep, /if: github\.event_name != 'push'/);
+    assert.doesNotMatch(chinaSyncStep, /github\.event_name != 'push'/);
+});
