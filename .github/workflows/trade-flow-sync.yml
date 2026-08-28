@@ -1,6 +1,12 @@
 name: Monthly Trade Flow Sync
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/trade-flow-sync.yml"
+      - "data/inbox/china-customs/**"
   schedule:
     - cron: "32 18 15 * *"
   workflow_dispatch:
