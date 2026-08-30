@@ -1,6 +1,181 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-25T07:18:41.548Z",
-  "source_change_count": 0,
-  "impacts": []
+  "generated_at": "2026-08-30T21:16:09.368Z",
+  "source_change_count": 3,
+  "impacts": [
+    {
+      "id": "fda",
+      "type": "content_changed",
+      "detected_at": "2026-08-30T21:16:09.368Z",
+      "review_status": "pending_review",
+      "markets": [],
+      "products": [],
+      "candidate_hs": [],
+      "affected_routes": [],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [],
+        "after": [],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "coppa",
+      "type": "content_changed",
+      "detected_at": "2026-08-30T21:16:09.368Z",
+      "review_status": "pending_review",
+      "markets": [
+        "US"
+      ],
+      "products": [
+        {
+          "id": "kids_gps_watch",
+          "label": "Kids GPS watch",
+          "market": "US",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> US",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "kids_electronics",
+          "label": "Children’s electronic product",
+          "market": "US",
+          "candidate_hs": [
+            "9503.00",
+            "8525.89",
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> US",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "baby_monitor",
+          "label": "Baby monitor",
+          "market": "US",
+          "candidate_hs": [
+            "8525.89",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> US",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        }
+      ],
+      "candidate_hs": [
+        "8517.13",
+        "8517.62",
+        "9503.00",
+        "8525.89",
+        "8471.30"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> US"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "high_risk"
+        ],
+        "after": [
+          "high_risk"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "sgIoTSecurity",
+      "type": "content_changed",
+      "detected_at": "2026-08-30T21:16:09.368Z",
+      "review_status": "pending_review",
+      "markets": [
+        "SG"
+      ],
+      "products": [
+        {
+          "id": "wifi_router",
+          "label": "Wi-Fi router",
+          "market": "SG",
+          "candidate_hs": [
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "tablet",
+          "label": "Tablet computer",
+          "market": "SG",
+          "candidate_hs": [
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "e_reader",
+          "label": "E-reader",
+          "market": "SG",
+          "candidate_hs": [
+            "8471.30",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8517.62",
+        "8471.30",
+        "8543.70"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> SG"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional"
+        ],
+        "after": [
+          "conditional"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    }
+  ]
 }
