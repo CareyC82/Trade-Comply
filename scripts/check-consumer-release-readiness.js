@@ -23,7 +23,8 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
     });
 
     const coverageReport = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-coverage.json'), 'utf8'));
-    if (coverageReport.product_count !== products.length || coverageReport.matrix_cell_count !== products.length * 4) errors.push('Regulatory coverage report is out of date.');
+    const maintainedMarkets = ['US', 'EU', 'JP', 'SG', 'AU', 'NZ'];
+    if (coverageReport.product_count !== products.length || coverageReport.matrix_cell_count !== products.length * maintainedMarkets.length) errors.push('Regulatory coverage report is out of date.');
     if (coverageReport.cells.some((cell) => cell.unsourced_requirements.length)) errors.push('Regulatory coverage report contains unsourced requirements.');
     const sourceHealth = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'consumer-regulatory-source-health.json'), 'utf8'));
     if (sourceHealth.source_count !== Object.keys(models.sources).length) errors.push('Regulatory source-health report is out of date.');
@@ -46,7 +47,9 @@ function runConsumerReleaseReadiness({ now = Date.now(), maxSourceAgeDays = 370 
         US: ['red', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety'],
         EU: ['fcc', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety'],
         JP: ['fcc', 'red', 'sg_imda', 'sg_safety'],
-        SG: ['fcc', 'red', 'jp_radio', 'jp_pse']
+        SG: ['fcc', 'red', 'jp_radio', 'jp_pse'],
+        AU: ['fcc', 'red', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety', 'nz_radio'],
+        NZ: ['fcc', 'red', 'jp_radio', 'jp_pse', 'sg_imda', 'sg_safety', 'au_radio']
     };
     products.forEach((product) => Object.entries(forbiddenByMarket).forEach(([market, forbidden]) => {
         const result = engine.assess({

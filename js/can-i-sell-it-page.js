@@ -75,13 +75,15 @@ function bootstrapCanISellItPage() {
 
     const attributeLabels = {
         bluetooth: 'Bluetooth', wifi: 'Wi-Fi', cellular: 'Cellular / eSIM', radioTransmitter: 'Other radio / 2.4 GHz transmitter',
-        battery: 'Rechargeable lithium battery', healthMonitoring: 'Health / biometric monitoring',
+        battery: 'Rechargeable lithium battery', coinBattery: 'Button / coin battery', healthMonitoring: 'Health / biometric monitoring',
         medicalClaim: 'Medical claim', childUse: 'Designed for children', cameraMic: 'Camera / microphone',
         gps: 'GPS / location tracking', display: 'Screen / projected display',
         wirelessCharging: 'Wireless charging', noiseCancellation: 'Active noise cancellation'
         , mainsPowered: 'AC mains powered'
         , bundledAdapter: 'AC adaptor included', ratedVoltage: 'Rated AC input voltage (V)', ratedPower: 'Rated input power (W)'
     };
+
+    const runAssessment = (input) => input.market === 'ANZ' ? engine.assessAnz(input) : engine.assess(input);
 
     const regulatorySnapshotsReady = fetch('data/consumer-regulatory-snapshots.json', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null).then((payload) => {
         (payload?.sources || []).forEach((snapshot) => {
@@ -93,7 +95,9 @@ function bootstrapCanISellItPage() {
     function quickQuestionKeys(profile, productType = profile.productType) {
         const material = engine.materialQuestionKeys(productType);
         const modelPriorities = models.getProduct(productType).priorityQuestions || [];
-        const scope = models.marketScopeMappings?.[currentInput?.market]?.[productType];
+        const scope = currentInput?.market === 'ANZ'
+            ? (models.marketScopeMappings?.AU?.[productType] || models.marketScopeMappings?.NZ?.[productType])
+            : models.marketScopeMappings?.[currentInput?.market]?.[productType];
         const scopePriorities = scope
             ? (profile.mainsPowered === 'unknown' ? ['mainsPowered', 'bundledAdapter']
                 : profile.mainsPowered === true || profile.bundledAdapter === true
@@ -131,8 +135,11 @@ function bootstrapCanISellItPage() {
 
     function renderEvidenceQuestions(profile) {
         const platformQuestions = engine.platformEvidenceQuestions(currentInput.platform, profile);
+        const applicableRequirements = currentInput.market === 'ANZ'
+            ? runAssessment({ ...currentInput, attributes: profile, documents: [], assessmentMode: 'quick', blockingQuestionKeys: [] }).requirements
+            : engine.marketRequirements(currentInput.market, profile);
         const marketQuestions = engine.evidenceQuestionsForRequirements(
-            engine.marketRequirements(currentInput.market, profile)
+            applicableRequirements
         );
         currentEvidenceQuestions = [
             ...platformQuestions,
@@ -151,7 +158,7 @@ function bootstrapCanISellItPage() {
     }
 
     function renderDocumentOptions(market, profile) {
-        const preliminary = engine.assess({ ...currentInput, market, attributes: profile, documents: [] });
+        const preliminary = runAssessment({ ...currentInput, market, attributes: profile, documents: [] });
         documentOptions.innerHTML = preliminary.requirements.map((item) => `
             <label><input type="checkbox" name="documents" value="${escapeHtml(item.id)}"> ${escapeHtml(labels[item.id] || item.title)}</label>`).join('');
     }
@@ -172,10 +179,18 @@ function bootstrapCanISellItPage() {
             <a href="${escapeHtml(source.url)}" target="_blank" rel="noopener">
                 <strong>${escapeHtml(source.authority)}</strong>
                 <span>${escapeHtml(source.title)} · reviewed ${escapeHtml(source.reviewedAt)} · ${escapeHtml(source.confidence)}${source.lifecycle?.status ? ` · ${escapeHtml(source.lifecycle.status.replaceAll('_', ' '))}${source.lifecycle.effectiveAt ? ` ${escapeHtml(source.lifecycle.effectiveAt)}` : ''}` : ''}</span>
+                <small>Verification boundary: ${escapeHtml(source.scope || 'Confirm the exact-model and transaction scope with the authority or a qualified professional.')}</small>
             </a>`).join('')}</div>`;
     }
 
     function requirementLabel(item) {
+        const coverageLabels = {
+            official_exact_requirement: 'Official exact requirement',
+            official_linked_baseline: 'Official-linked baseline',
+            preliminary_applicability_signal: 'Preliminary applicability signal',
+            monitor_professional_confirmation_required: 'Monitor / professional confirmation required'
+        };
+        if (item.coverageLevel && coverageLabels[item.coverageLevel]) return coverageLabels[item.coverageLevel];
         const labels = {
             mandatory: item.severity === 'high' ? 'Mandatory — specialist review' : 'Mandatory requirement',
             scope_check: 'Scope check required',
@@ -324,6 +339,20 @@ function bootstrapCanISellItPage() {
     }
 
     function renderAssessment(assessment) {
+        const list = (items = []) => items.length ? items.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>None identified from the supplied facts.</li>';
+        const anzPanel = assessment.anzComparison ? `
+            <section class="sell-result-panel sell-anz-comparison" aria-label="Australia and New Zealand comparison">
+                <h2>Australia + New Zealand comparison</h2>
+                <p class="sell-panel-note">Shared test evidence may reduce duplicate work, but local registrations, declarations, labels and supplier responsibilities remain separate.</p>
+                <div class="sell-requirement-grid">
+                    <article class="sell-requirement"><span>Shared / reusable evidence</span><ul>${list(assessment.anzComparison.sharedEvidence)}</ul></article>
+                    <article class="sell-requirement"><span>Australia-specific actions</span><ul>${list(assessment.anzComparison.australiaActions)}</ul></article>
+                    <article class="sell-requirement"><span>New Zealand-specific actions</span><ul>${list(assessment.anzComparison.newZealandActions)}</ul></article>
+                    <article class="sell-requirement sell-requirement--scope_check"><span>Not automatically transferable</span><ul>${list(assessment.anzComparison.notAutomaticallyTransferable)}</ul></article>
+                    <article class="sell-requirement sell-requirement--scope_check"><span>Missing facts</span><ul>${list(assessment.anzComparison.missingFacts)}</ul></article>
+                    <article class="sell-requirement sell-requirement--advisory"><span>Professional confirmation</span><ul>${list(assessment.anzComparison.professionalConfirmation)}</ul></article>
+                </div>
+            </section>` : '';
         const requirementCards = assessment.requirements.map((item) => `
             <article class="sell-requirement sell-requirement--${escapeHtml(item.requirementClass || 'mandatory')} ${item.severity === 'high' ? 'sell-requirement--high' : ''}">
                 <span>${escapeHtml(requirementLabel(item))}</span>
@@ -333,7 +362,7 @@ function bootstrapCanISellItPage() {
             ? assessment.documentGaps.map((gap) => `<li><strong>${escapeHtml(gap.document)}</strong><span>${escapeHtml(gap.requirement)}</span></li>`).join('')
             : '<li><strong>No document gaps selected by this pre-check</strong><span>Still verify every file against the exact model and supplier.</span></li>';
         const tariffRows = assessment.tariffOptions.length
-            ? assessment.tariffOptions.map((row) => `<li><strong>HS ${escapeHtml(row.hsCode)}</strong><span>${row.rate === null ? 'Rate not covered' : `${(row.rate * 100).toFixed(2)}% candidate signal`} · ${escapeHtml(row.exact ? 'exact-line source match' : row.sourceStatus)}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
+            ? assessment.tariffOptions.map((row) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.rate === null ? 'Rate not covered' : `${(row.rate * 100).toFixed(2)}% candidate signal`} · ${escapeHtml(row.exact ? 'exact-line source match' : row.sourceStatus)}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length
@@ -360,7 +389,7 @@ function bootstrapCanISellItPage() {
                     <article><span>Contribution margin</span><strong>${economics.marginRate === null ? 'Pending' : `${(economics.marginRate * 100).toFixed(1)}%`}</strong></article>
                     <article><span>Break-even sale price</span><strong>${money(economics.breakEvenPrice, economics.currency)}</strong></article>
                 </div><p class="sell-panel-note">${escapeHtml(economics.caveat)}</p>
-            </section>` : '<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">Add purchase price and expected selling price to calculate the commercial result.</p></section>';
+            </section>` : `<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">${escapeHtml(assessment.economicsNote || 'Add purchase price and expected selling price to calculate the commercial result.')}</p></section>`;
         const conclusion = assessment.consumerConclusion;
         const sellerConclusion = assessment.sellerConclusion;
         const commercial = assessment.commercialConclusion;
@@ -420,6 +449,7 @@ function bootstrapCanISellItPage() {
                 <article><span>Sales channel</span><strong id="sell-summary-platform">${escapeHtml(currentInput.platform)}</strong></article>
                 <article><span>Can the battery be shipped?</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
+            ${anzPanel}
             <section class="sell-result-panel sell-action-summary" aria-label="Your next three actions">
                 <h2>Your next three actions</h2>
                 <ol class="sell-action-list">
@@ -443,7 +473,7 @@ function bootstrapCanISellItPage() {
                 <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}${freshness.degradedCount ? ` · ${escapeHtml(freshness.degradedCount)} source refresh unavailable; last-good retained${freshness.lastGoodThrough ? ` from ${escapeHtml(freshness.lastGoodThrough)}` : ''}` : ''}${freshness.futureCount ? ` · ${escapeHtml(freshness.futureCount)} future requirement` : ''}${freshness.pendingEffectiveDateCount ? ` · ${escapeHtml(freshness.pendingEffectiveDateCount)} effective date pending` : ''}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
                 ${economicsPanel}
                 <section class="sell-result-panel"><h2>Candidate HS and maintained tariff signals</h2><p class="sell-panel-note">${escapeHtml(assessment.product.hsNote)}</p><ul class="sell-gap-list">${tariffRows}</ul></section>
-                <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-legend" aria-label="Requirement status key"><span class="mandatory">Mandatory</span><span class="scope">Scope check</span><span class="advisory">Advisory</span><span class="future">Future</span></div><div class="sell-requirement-grid">${requirementCards}</div></section>
+                <section class="sell-result-panel"><h2>What applies to this product</h2><div class="sell-requirement-legend" aria-label="Coverage confidence key"><span class="mandatory">Official exact requirement</span><span class="scope">Official-linked baseline</span><span class="advisory">Preliminary applicability signal</span><span class="future">Monitor / professional confirmation required</span></div><div class="sell-requirement-grid">${requirementCards}</div></section>
                 <section class="sell-result-panel"><h2>Supplier document gaps</h2><ul class="sell-gap-list">${gaps}</ul></section>
                 <section class="sell-result-panel"><h2>Uploaded supplier evidence</h2><ul class="sell-gap-list">${evidenceRows}</ul></section>
                 <section class="sell-result-panel"><h2 id="sell-platform-details-title">${escapeHtml(currentInput.platform)} listing readiness</h2><div id="sell-platform-details-cards" class="sell-requirement-grid">${platformCards}</div></section>
@@ -519,7 +549,7 @@ function bootstrapCanISellItPage() {
             const entryPlatform = document.getElementById('sell-platform');
             if (entryPlatform) entryPlatform.value = platform;
             latestAssessmentInput = { ...latestAssessmentInput, platform, evidenceAnswers: currentEvidenceAnswers };
-            const nextAssessment = engine.assess(latestAssessmentInput);
+            const nextAssessment = runAssessment(latestAssessmentInput);
             latestAssessment = nextAssessment;
             renderEvidenceQuestions(nextAssessment.profile);
             updateChannelView(nextAssessment, { previousPlatform, previousAssessment });
@@ -579,7 +609,7 @@ function bootstrapCanISellItPage() {
             assessmentMode: 'quick',
             blockingQuestionKeys: factKeys
         };
-        const preliminary = engine.assess(latestAssessmentInput);
+        const preliminary = runAssessment(latestAssessmentInput);
         renderEvidenceQuestions(preliminary.profile);
         renderAssessment(preliminary);
         followUp.hidden = factKeys.length === 0;
@@ -624,7 +654,7 @@ function bootstrapCanISellItPage() {
             assessmentMode: 'quick',
             blockingQuestionKeys: currentQuickKeys
         };
-        const assessment = engine.assess(latestAssessmentInput);
+        const assessment = runAssessment(latestAssessmentInput);
         currentProfile = assessment.profile;
         const nextFactKeys = renderFactQuestions(assessment.profile, assessment.profile.productType);
         latestAssessmentInput.blockingQuestionKeys = nextFactKeys;
@@ -698,14 +728,14 @@ function bootstrapCanISellItPage() {
             assessmentMode: 'quick',
             blockingQuestionKeys: currentQuickKeys
         };
-        renderAssessment(engine.assess(latestAssessmentInput));
+        renderAssessment(runAssessment(latestAssessmentInput));
     });
 
     improveQuestions.addEventListener('change', (event) => {
         if (!event.target.matches('input[name^="evidence:"]') || !latestAssessmentInput || !latestAssessment) return;
         captureVisibleEvidenceAnswers();
         latestAssessmentInput = { ...latestAssessmentInput, evidenceAnswers: currentEvidenceAnswers };
-        const nextAssessment = engine.assess(latestAssessmentInput);
+        const nextAssessment = runAssessment(latestAssessmentInput);
         latestAssessment = nextAssessment;
         updateChannelView(nextAssessment);
     });

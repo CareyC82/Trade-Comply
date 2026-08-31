@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-05-29T00:00:00.000Z",
+  "updated_at": "2026-08-31T00:00:00.000Z",
   "canonical_codes": [
     "CN",
     "US",
@@ -17,6 +17,8 @@
     "JP",
     "KR",
     "IN",
+    "AU",
+    "NZ",
     "GLOBAL"
   ],
   "route_options": [
@@ -79,6 +81,14 @@
     {
       "value": "IN",
       "label": "India"
+    },
+    {
+      "value": "AU",
+      "label": "Australia"
+    },
+    {
+      "value": "NZ",
+      "label": "New Zealand"
     },
     {
       "value": "GLOBAL",
@@ -169,7 +179,9 @@
     "Other": "GLOBAL",
     "Vietnam": "VN",
     "Malaysia": "MY",
-    "India": "IN"
+    "India": "IN",
+    "Australia": "AU",
+    "New Zealand": "NZ"
   },
   "aliases": {
     "USA": "US",
@@ -204,7 +216,12 @@
     "MY": "MY",
     "INDIA": "IN",
     "BHARAT": "IN",
-    "IN": "IN"
+    "IN": "IN",
+    "AUSTRALIA": "AU",
+    "AU": "AU",
+    "NEW ZEALAND": "NZ",
+    "AOTEAROA": "NZ",
+    "NZ": "NZ"
   },
   "market_themes": {
     "US": "FCC certification (Part 15/18); Section 301 tariff risk; BIS export controls & Entity List",
@@ -221,7 +238,9 @@
     "GLOBAL": "General high-tech trade baseline; certification, customs, control, and tariff signals where applicable",
     "VN": "Vietnam MIC ICT/radio conformity, MOIT energy labeling, customs classification, and battery/ESS import checks",
     "MY": "Malaysia MCMC/SIRIM telecom approval, ST electrical safety COA, customs classification, and battery/ESS import checks",
-    "IN": "India BIS quality-control orders, WPC wireless approvals, customs valuation, BCD/SWS/IGST, e-waste and battery rules"
+    "IN": "India BIS quality-control orders, WPC wireless approvals, customs valuation, BCD/SWS/IGST, e-waste and battery rules",
+    "AU": "Australia ACMA radio/EMC/telecommunications, RCM responsible-supplier records, EESS electrical safety, product safety and import checks",
+    "NZ": "New Zealand RSM radio/EMC, RCM or R-NZ labelling, WorkSafe electrical safety, product safety and import checks"
   },
   "compliance_focus": {
     "RU": {
@@ -298,6 +317,16 @@
       "priority": "high",
       "export": "Screen India export controls, SCOMET dual-use exposure, DGFT licensing, BIS/QCO documentation, and origin evidence for outbound electronics.",
       "import": "Check India BCD/SWS/IGST, BIS quality-control orders, WPC wireless approvals, e-waste/battery rules, and customs valuation before import."
+    },
+    "AU": {
+      "priority": "medium",
+      "export": "Screen ACMA radio, EMC and telecommunications applicability, RCM and responsible-supplier records, EESS scope, product safety and import evidence.",
+      "import": "Check Australia-origin technology, exact-model conformity evidence and any re-export conditions."
+    },
+    "NZ": {
+      "priority": "medium",
+      "export": "Screen RSM radio/EMC conformity level, RCM or R-NZ marking, licence-to-supply, WorkSafe electrical safety and importer evidence.",
+      "import": "Check New Zealand-origin technology, exact-model conformity evidence and any re-export conditions."
     }
   }
 }

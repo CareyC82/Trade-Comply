@@ -5,17 +5,17 @@ const assert = require('node:assert/strict');
 const { buildReport } = require('../scripts/build-consumer-regulatory-coverage');
 const engine = require('../lib/can-i-sell-it');
 
-test('regulatory coverage report spans thirty products and four markets', () => {
+test('regulatory coverage report spans thirty products and six markets', () => {
     const report = buildReport();
     assert.equal(report.product_count, 30);
-    assert.equal(report.matrix_cell_count, 120);
+    assert.equal(report.matrix_cell_count, 180);
     assert.ok(Array.isArray(report.remediation_queue));
     assert.ok(Object.values(report.market_summary).every((market) => Number.isInteger(market.cells_using_last_good_sources)));
     assert.ok(report.cells.every((cell) => Array.isArray(cell.material_attribute_gaps) && Array.isArray(cell.issues)));
-    assert.deepEqual(report.markets, ['US', 'EU', 'JP', 'SG']);
+    assert.deepEqual(report.markets, ['US', 'EU', 'JP', 'SG', 'AU', 'NZ']);
     assert.equal(report.market_summary.US.deep, 30);
     assert.equal(report.market_summary.EU.deep, 30);
-    assert.equal(report.attribute_scenario_audit.matrix_cell_count, 30 * 4 * 7);
+    assert.equal(report.attribute_scenario_audit.matrix_cell_count, 30 * 6 * 7);
     assert.equal(report.attribute_scenario_audit.issue_count, 0, JSON.stringify(report.attribute_scenario_audit.issues.slice(0, 10)));
     assert.ok(report.cells.every((cell) => ['product_and_attribute_specific', 'baseline_market_safety', 'advisory_only'].includes(cell.evidence_depth)));
     assert.ok(Object.values(report.market_summary).every((market) => Number.isInteger(market.product_specific_cells) && Number.isInteger(market.baseline_only_cells)));

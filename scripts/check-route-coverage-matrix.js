@@ -7,7 +7,7 @@ const country = require('../lib/trade-country');
 const matchedResults = require('../lib/matched-results');
 const { search } = require('../js/search');
 
-const ROUTE_COUNTRIES = ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'IN', 'TW', 'RU', 'ASEAN'];
+const ROUTE_COUNTRIES = ['US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'JP', 'KR', 'IN', 'AU', 'NZ', 'TW', 'RU', 'ASEAN'];
 const PRODUCTS = [
     'gpu ai accelerator chip',
     'H200',

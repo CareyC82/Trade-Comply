@@ -20,6 +20,8 @@ describe('country-registry', () => {
         assert.equal(normalizeCountryCode('Russia'), 'RU');
         assert.equal(normalizeCountryCode('Taiwan (China)'), 'TW');
         assert.equal(normalizeCountryCode('India'), 'IN');
+        assert.equal(normalizeCountryCode('Australia'), 'AU');
+        assert.equal(normalizeCountryCode('New Zealand'), 'NZ');
         assert.equal(normalizeCountryCode('Other'), 'GLOBAL');
     });
 
@@ -37,6 +39,8 @@ describe('country-registry', () => {
         assert.match(getComplianceFocus('VN', 'import'), /Vietnam MIC/i);
         assert.match(getComplianceFocus('MY', 'import'), /SIRIM/i);
         assert.match(getComplianceFocus('IN', 'import'), /BCD/i);
+        assert.match(getComplianceFocus('AU', 'export'), /ACMA/i);
+        assert.match(getComplianceFocus('NZ', 'export'), /RSM/i);
     });
 
     it('maps route focus to the legacy matching context', () => {
@@ -55,7 +59,7 @@ describe('country-registry', () => {
         assert.equal(getConfiguredCoverageLevel('US', 'import'), 'full');
         assert.equal(getConfiguredCoverageLevel('SG', 'export'), 'full');
         assert.equal(getConfiguredCoverageLevel('MX', 'export'), 'full');
-        ['CN', 'US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'ASEAN', 'RU', 'TW', 'JP', 'KR', 'IN'].forEach((country) => {
+        ['CN', 'US', 'EU', 'DE', 'NL', 'SG', 'MX', 'VN', 'MY', 'ASEAN', 'RU', 'TW', 'JP', 'KR', 'IN', 'AU', 'NZ'].forEach((country) => {
             if (country !== 'US') {
                 assert.equal(getConfiguredCoverageLevel(country, 'import'), 'full', `${country} import should be full`);
             }

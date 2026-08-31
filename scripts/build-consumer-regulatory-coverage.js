@@ -8,9 +8,9 @@ const models = require('../lib/wearable-product-models');
 const ROOT = path.join(__dirname, '..');
 const OUTPUT = path.join(ROOT, 'data', 'consumer-regulatory-coverage.json');
 const SNAPSHOTS = path.join(ROOT, 'data', 'consumer-regulatory-snapshots.json');
-const MARKETS = ['US', 'EU', 'JP', 'SG'];
+const MARKETS = ['US', 'EU', 'JP', 'SG', 'AU', 'NZ'];
 const ATTRIBUTE_SCENARIOS = [
-    { id: 'wired_no_battery', attributes: { bluetooth: false, wifi: false, cellular: false, radioTransmitter: false, battery: false, mainsPowered: false, cameraMic: false, childUse: false, medicalClaim: false } },
+    { id: 'wired_no_battery', attributes: { bluetooth: false, wifi: false, cellular: false, radioTransmitter: false, battery: false, coinBattery: false, mainsPowered: false, cameraMic: false, childUse: false, medicalClaim: false } },
     { id: 'wireless_battery', attributes: { bluetooth: true, wifi: true, cellular: false, radioTransmitter: true, battery: true, mainsPowered: false, cameraMic: false, childUse: false, medicalClaim: false } },
     { id: 'cellular_camera', attributes: { bluetooth: false, wifi: false, cellular: true, battery: true, mainsPowered: false, cameraMic: true, childUse: false, medicalClaim: false } },
     { id: 'ac_mains', attributes: { bluetooth: false, wifi: false, cellular: false, battery: false, mainsPowered: true, ratedVoltage: 230, ratedPower: 45, cameraMic: false, childUse: false, medicalClaim: false } },
@@ -25,8 +25,8 @@ function buildAttributeScenarioAudit(products) {
         const requirements = engine.marketRequirements(market, profile);
         const ids = requirements.map(item => item.id);
         const issues = [];
-        if (scenario.id === 'wired_no_battery' && ids.some(id => ['fcc', 'red', 'red_cybersecurity', 'jp_radio', 'sg_imda', 'battery', 'eu_battery_future'].includes(id))) issues.push('negative_attribute_leak');
-        if (scenario.id === 'wireless_battery' && (!ids.includes('battery') || !ids.some(id => ({ US: ['fcc'], EU: ['red'], JP: ['jp_radio'], SG: ['sg_imda'] }[market] || []).includes(id)))) issues.push('wireless_or_battery_requirement_missing');
+        if (scenario.id === 'wired_no_battery' && ids.some(id => ['fcc', 'red', 'red_cybersecurity', 'jp_radio', 'sg_imda', 'au_radio', 'nz_radio', 'battery', 'eu_battery_future'].includes(id))) issues.push('negative_attribute_leak');
+        if (scenario.id === 'wireless_battery' && (!ids.includes('battery') || !ids.some(id => ({ US: ['fcc'], EU: ['red'], JP: ['jp_radio'], SG: ['sg_imda'], AU: ['au_radio'], NZ: ['nz_radio'] }[market] || []).includes(id)))) issues.push('wireless_or_battery_requirement_missing');
         const assessment = engine.assess({ description: product.label, market, origin: 'CN', platform: 'Other', attributes: profile, assessmentMode: 'quick', blockingQuestionKeys: [] });
         if (['child_directed', 'medical_claim'].includes(scenario.id) && assessment.sellerConclusion.code !== 'high_risk') issues.push('specialist_review_not_triggered');
         return { product_id: product.id, market, scenario: scenario.id, requirement_ids: ids, conclusion: assessment.sellerConclusion.code, issues };
@@ -59,6 +59,15 @@ function buildReport() {
             market,
             coverage: marketCoverage.level,
             requirements: requirements.map((item) => item.id),
+            requirement_details: requirements.map((item) => ({
+                id: item.id,
+                jurisdiction: item.jurisdiction || market,
+                framework: item.framework || null,
+                coverage_level: item.coverageLevel,
+                transferability: item.transferability,
+                source_ids: (item.sources || []).map((source) => source.id),
+                verification_boundary: item.reason
+            })),
             official_source_ids: officialSourceIds,
             unsourced_requirements: unsourced,
             degraded_source_ids: degradedSources,

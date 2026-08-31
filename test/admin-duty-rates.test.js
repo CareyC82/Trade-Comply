@@ -14,7 +14,7 @@ const {
 test('admin exposes consumer regulatory lifecycle, last-good status and manual review queue', () => {
     const payload = buildConsumerRegulatoryStatusPayload();
     const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
-    assert.equal(payload.source_count, 32);
+    assert.equal(payload.source_count, 52);
     assert.ok(payload.sources.every((source) => source.content_hash && source.last_good_at));
     assert.match(html, /Consumer regulatory change review/);
     assert.match(html, /No automatic rule changes/);
@@ -22,7 +22,7 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.match(html, /Automatic capture current/);
     assert.match(html, /Manual review current/);
     assert.match(html, /Current user conclusions/);
-    assert.equal(payload.counts.current + payload.counts.manual_review_current + (payload.counts.last_good_degraded || 0), payload.source_count);
+    assert.equal(payload.counts.current + payload.counts.manual_review_current + (payload.counts.last_good_degraded || 0) + (payload.counts.baseline_seed || 0), payload.source_count);
     assert.match(html, /Approve evidence/);
     assert.match(html, /Review and rollback history/);
     assert.match(html, /Rule lifecycle audit/);

@@ -172,7 +172,7 @@ test('review CTA has a one-column mobile action layout without fixed-width overf
     assert.match(css, /\.sell-review-actions button,\s*\.sell-review-actions a\s*\{[^}]*width:\s*100%[^}]*box-sizing:\s*border-box/s);
 });
 
-test('consumer result matrix stays differentiated across thirty products, four markets and four channels', () => {
+test('consumer result matrix stays differentiated across thirty products, six markets and four channels', () => {
     const products = engine.buildAssessmentMatrix();
     const channels = ['Amazon', 'TikTok Shop', 'Shopify / own store', 'Other marketplace'];
     const results = products.flatMap((entry) => channels.map((platform) => engine.assess({
@@ -183,7 +183,7 @@ test('consumer result matrix stays differentiated across thirty products, four m
         blockingQuestionKeys: [],
         attributes: { productType: entry.productType, childUse: entry.productType.startsWith('kids_') ? 'yes' : 'no' }
     })));
-    assert.equal(results.length, 480);
+    assert.equal(results.length, 720);
     assert.ok(results.every((result) => ['likely_eligible', 'conditional', 'high_risk'].includes(result.sellerConclusion.code)));
     assert.deepEqual(new Set(results.map((result) => result.platformDecision.code)), new Set(['evidence_needed', 'ready', 'policy_unknown', 'not_ready']));
 });
@@ -403,10 +403,10 @@ test('uploaded exact-model files can upgrade a supplier claim to document-match 
     assert.match(result.consumerConclusion.reason, /model-reference check/i);
 });
 
-test('assessment matrix covers thirty products across all four maintained markets', () => {
+test('assessment matrix covers thirty products across all six maintained markets', () => {
     const matrix = engine.buildAssessmentMatrix();
-    assert.equal(matrix.length, 120);
-    assert.deepEqual(new Set(matrix.map((item) => item.market)), new Set(['US', 'EU', 'JP', 'SG']));
+    assert.equal(matrix.length, 180);
+    assert.deepEqual(new Set(matrix.map((item) => item.market)), new Set(['US', 'EU', 'JP', 'SG', 'AU', 'NZ']));
     assert.equal(new Set(matrix.map((item) => item.productType)).size, 30);
 
     const smartWatch = Object.fromEntries(matrix
@@ -418,6 +418,8 @@ test('assessment matrix covers thirty products across all four maintained market
     assert.ok(smartWatch.EU.includes('euResponsiblePerson'));
     assert.ok(smartWatch.JP.includes('jpRadioEvidence'));
     assert.ok(smartWatch.SG.includes('sgImdaEvidence'));
+    assert.ok(smartWatch.AU.includes('auRadioEvidence'));
+    assert.ok(smartWatch.NZ.includes('nzRadioEvidence'));
     Object.values(smartWatch).forEach((questions) => assert.ok(questions.includes('batteryTransport')));
 });
 
