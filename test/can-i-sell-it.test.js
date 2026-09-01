@@ -86,7 +86,7 @@ test('consumer page shows preliminary value before optional supplier evidence', 
     const page = fs.readFileSync(path.join(__dirname, '..', 'can-i-sell-it.html'), 'utf8');
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
     assert.match(page, /Initial coverage/);
-    assert.match(page, /consumer electronics, smart devices, wireless and battery products/i);
+    assert.match(page, /Maintained market coverage includes the United States, European Union, Australia and New Zealand/i);
     assert.match(script, /renderFactQuestions/);
     assert.match(script, /renderEvidenceQuestions\(preliminary\.profile\)/);
     assert.match(script, /renderAssessment\(preliminary\)/);
