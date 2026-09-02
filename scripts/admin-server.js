@@ -360,7 +360,9 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
         EU: 'EU_TARIC_EXACT_LINES_URL',
         CN: 'CN_CUSTOMS_EXACT_TARIFF_URL',
         SG: 'SG_AHTN_EXACT_TARIFF_URL',
-        MX: 'MX_TIGIE_NICO_EXACT_TARIFF_URL'
+        MX: 'MX_TIGIE_NICO_EXACT_TARIFF_URL',
+        AU: 'AU_ABF_EXACT_TARIFF_URL',
+        NZ: 'NZ_WORKING_TARIFF_EXACT_URL'
     };
     const sync = dutyPayload.last_exact_national_tariff_sync || {};
     const results = new Map((sync.results || []).map((row) => [row.country, row]));
@@ -386,8 +388,8 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
                 country,
                 target_markets: targetMarkets,
                 env_name: envName,
-                configured: ['EU', 'CN', 'SG', 'MX'].includes(country) || Boolean(String(process.env[envName] || '').trim()),
-                connector_type: ['EU', 'CN', 'SG', 'MX'].includes(country) ? 'direct_official' : 'normalized_feed',
+                configured: ['EU', 'CN', 'SG', 'MX', 'AU', 'NZ'].includes(country) || Boolean(String(process.env[envName] || '').trim()),
+                connector_type: ['EU', 'CN', 'SG', 'MX', 'AU', 'NZ'].includes(country) ? 'direct_official' : 'normalized_feed',
                 status: result.ok === false ? 'failed'
                     : result.skipped ? 'not_configured'
                         : result.ok ? 'current'

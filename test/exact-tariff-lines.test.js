@@ -85,6 +85,31 @@ test('official national sync applies exact rows only to matching market rules', 
     assert.deepEqual(dutyPayload.rules[1].exact_code_overrides, []);
 });
 
+test('partial exact sync preserves status history for other markets', async () => {
+    const dutyPayload = {
+        rules: [{ id: 'sg-chip', import_country: 'SG', hs_prefixes: ['854231'], exact_code_overrides: [] }],
+        last_exact_national_tariff_sync: {
+            results: [{ country: 'EU', ok: true, skipped: false, row_count: 10 }]
+        }
+    };
+    const result = await syncExactNationalTariffs({
+        dutyPayload,
+        env: { SG_AHTN_EXACT_TARIFF_URL: 'https://official.example/sg.json' },
+        countries: ['SG'],
+        dryRun: true,
+        fetchImpl: async () => ({
+            ok: true,
+            json: async () => ({
+                complete: true,
+                source: { url: 'https://tablebuilder.singstat.gov.sg/' },
+                rows: [{ ahtn_code: '85423100', duty_rate: 0 }]
+            })
+        })
+    });
+    assert.deepEqual(result.results.map((row) => row.country), ['EU', 'SG']);
+    assert.equal(result.results.find((row) => row.country === 'EU').row_count, 10);
+});
+
 test('official exact sync preserves shorter maintained search candidates', () => {
     const payload = {
         rules: [{

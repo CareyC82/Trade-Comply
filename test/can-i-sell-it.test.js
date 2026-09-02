@@ -72,6 +72,18 @@ test('quick questions do not preselect Not sure', () => {
     assert.doesNotMatch(script, /profile\[key\]\s*===\s*['"]unknown['"][\s\S]{0,80}checked/);
 });
 
+test('ANZ flow exposes separate exact tariff inputs and validates filing-code length', () => {
+    const root = path.join(__dirname, '..');
+    const page = fs.readFileSync(path.join(root, 'can-i-sell-it.html'), 'utf8');
+    const script = fs.readFileSync(path.join(root, 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(page, /id="sell-exact-hs-au"[^>]*placeholder="8 digits"/);
+    assert.match(page, /id="sell-exact-hs-nz"[^>]*placeholder="8 digits"/);
+    assert.match(script, /validateExactHsInputs/);
+    assert.match(script, /must contain.*digits/);
+    assert.match(script, /exactHsCodeAu:\s*normalizeExactHs/);
+    assert.match(script, /exactHsCodeNz:\s*normalizeExactHs/);
+});
+
 test('quick-question priorities remove duplicate product facts before limiting the list', () => {
     const priorities = pageHelpers.dedupeQuestionKeys([
         ...models.getProduct('smart_watch').priorityQuestions,

@@ -454,24 +454,30 @@
       "name": "Australia Current Tariff and import GST",
       "authority": "Australian Border Force",
       "official_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
-      "machine_readable": false,
-      "source_status": "official_link",
+      "machine_readable": "official_html_parser",
+      "source_status": "official_machine_synced",
       "maintenance_priority": "P1",
-      "status_reason": "Schedule 3 provides exact classification and general rates; the current product flow exposes the official baseline and requires the exact national tariff line before duty is relied on.",
-      "current_scope": "Official-linked Schedule 3 duty boundary, 10% import GST and ABF customs-value method. Preferences and concessions are not assumed.",
-      "next_action": "Add a versioned Schedule 3 exact-line parser and keep origin preferences, concessions and trade remedies separate."
+      "status_reason": "The maintained electronics chapters in ABF Schedule 3 are parsed into exact 8-digit general-duty rows with completeness checks.",
+      "updater_script": "scripts/update-exact-national-tariffs.js",
+      "update_command": "npm run update:duty-rates:anz:official",
+      "probe_command": "npm run update:duty-rates:anz:official:dry-run",
+      "current_scope": "Official machine-synced 8-digit general-duty rows for maintained electronics prefixes, 10% import GST and ABF customs-value method. Preferences, TCOs, concessions and trade remedies are not assumed.",
+      "next_action": "Monitor ABF HTML schema and effective dates; keep origin preferences, TCOs, concessions and trade remedies as separate scope checks."
     },
     {
       "country": "NZ",
       "name": "New Zealand Working Tariff, GST and goods levies",
       "authority": "New Zealand Customs Service",
       "official_url": "https://www.customs.govt.nz/business/tariffs/working-tariff-document",
-      "machine_readable": false,
-      "source_status": "official_link",
+      "machine_readable": "official_pdf_parser",
+      "source_status": "official_machine_synced",
       "maintenance_priority": "P1",
-      "status_reason": "The Working Tariff provides exact tariff items; the current product flow exposes the official baseline and requires an exact tariff item before duty is relied on.",
-      "current_scope": "Official-linked Working Tariff boundary, 15% import GST and current value/transport-mode goods levies. Preferences are not assumed.",
-      "next_action": "Add a versioned Working Tariff exact-line parser and monitor current goods-levy rates and effective dates."
+      "status_reason": "The maintained electronics sections in the NZ Working Tariff are parsed into exact 8-digit Normal duty rows with completeness checks; Preferential rates remain separate.",
+      "updater_script": "scripts/update-exact-national-tariffs.js",
+      "update_command": "npm run update:duty-rates:anz:official",
+      "probe_command": "npm run update:duty-rates:anz:official:dry-run",
+      "current_scope": "Official machine-synced 8-digit Normal duty rows for maintained electronics prefixes, 15% import GST and current value/transport-mode goods levies. Preferential rates are not assumed.",
+      "next_action": "Monitor Working Tariff PDF schema, current goods levies and effective dates; keep preferential-origin eligibility separate."
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "version": "2026-09-02",
-  "generated_at": "2026-09-02T01:59:30.872Z",
+  "generated_at": "2026-09-02T02:48:26.118Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -4882,7 +4882,9 @@
       "priority_band": "P2",
       "impact_score": 0,
       "why_priority": "*->AU 841451 / 847130 / 847160 / 847180 / 850440 / 850760 / 8508 / 8510 / 8517 / 8518 / 8525 / 8528 / 8531 / 8536 / 8537 / 8539 / 8543 / 9004 / 9019 / 9029 / 9405 / 9503 / 9504 remains a rule-level exact-rate gap: Australia electronics import duty and GST baseline is official_link.",
-      "rate_change_drivers": [],
+      "rate_change_drivers": [
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage."
+      ],
       "scope_components": [
         "battery_chemistry_scope",
         "power_conversion_scope",
@@ -4896,7 +4898,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
@@ -4915,7 +4917,9 @@
       "priority_band": "P2",
       "impact_score": 0,
       "why_priority": "*->NZ 841451 / 847130 / 847160 / 847180 / 850440 / 850760 / 8508 / 8510 / 8517 / 8518 / 8525 / 8528 / 8531 / 8536 / 8537 / 8539 / 8543 / 9004 / 9019 / 9029 / 9405 / 9503 / 9504 remains a rule-level exact-rate gap: New Zealand electronics import duty, GST and goods-levy baseline is official_link.",
-      "rate_change_drivers": [],
+      "rate_change_drivers": [
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage."
+      ],
       "scope_components": [
         "battery_chemistry_scope",
         "power_conversion_scope",
@@ -4929,7 +4933,7 @@
       "parser_subtasks": [
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Create exact-code override rows before promoting this rule beyond screening."
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-02T01:59:30.784Z",
+  "updated_at": "2026-09-02T02:48:26.036Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -23,23 +23,23 @@
       "do_not_market": 7
     },
     "duty_rate_modes": {
-      "live_auto": 8,
-      "live_hybrid": 6,
-      "live_monitor": 2
+      "live_auto": 10,
+      "live_hybrid": 6
     },
     "duty_rate_automation_stages": {
-      "official_machine_sync": 8,
-      "official_probe_candidate": 6,
-      "official_link_monitor": 2
+      "official_machine_sync": 10,
+      "official_probe_candidate": 6
     },
     "duty_rate_launch_levels": {
       "official_exact": [
+        "AU",
         "CN",
         "DE",
         "EU",
         "JP",
         "MX",
         "NL",
+        "NZ",
         "SG",
         "US"
       ],
@@ -52,28 +52,25 @@
         "VN"
       ],
       "maintained_benchmark": [],
-      "monitor_only": [
-        "AU",
-        "NZ"
-      ],
+      "monitor_only": [],
       "parser_gap": [
         "IN",
         "KR",
         "MY",
         "RU",
         "TW",
-        "VN",
-        "AU",
-        "NZ"
+        "VN"
       ]
     },
     "public_launch_countries": [
+      "AU",
       "CN",
       "DE",
       "EU",
       "JP",
       "MX",
       "NL",
+      "NZ",
       "SG",
       "US",
       "IN",
@@ -81,17 +78,17 @@
       "MY",
       "RU",
       "TW",
-      "VN",
-      "AU",
-      "NZ"
+      "VN"
     ],
     "filing_grade_auto_countries": [
+      "AU",
       "CN",
       "DE",
       "EU",
       "JP",
       "MX",
       "NL",
+      "NZ",
       "SG",
       "US"
     ],
@@ -101,27 +98,27 @@
       "MY",
       "RU",
       "TW",
-      "VN",
-      "AU",
-      "NZ"
+      "VN"
     ],
     "weekly_route_priority_count": 5
   },
   "duty_rate_health_board": {
-    "headline": "8 official exact market(s), 6 hybrid official market(s), 0 maintained exact-map market(s).",
+    "headline": "10 official exact market(s), 6 hybrid official market(s), 0 maintained exact-map market(s).",
     "next_action": "Next route parser priority: MY Tablet computer (847130).",
     "cards": [
       {
         "key": "official_exact",
         "label": "Official exact",
-        "count": 8,
+        "count": 10,
         "countries": [
+          "AU",
           "CN",
           "DE",
           "EU",
           "JP",
           "MX",
           "NL",
+          "NZ",
           "SG",
           "US"
         ],
@@ -153,16 +150,16 @@
         "label": "P0/P1 source priorities",
         "count": 10,
         "countries": [
+          "AU",
           "CN",
           "DE",
           "EU",
           "JP",
           "MX",
           "NL",
+          "NZ",
           "SG",
-          "US",
-          "AU",
-          "NZ"
+          "US"
         ],
         "note": "Highest-value markets to keep fresh first."
       },
@@ -180,16 +177,14 @@
       {
         "key": "parser_gap",
         "label": "Parser gaps",
-        "count": 8,
+        "count": 6,
         "countries": [
           "IN",
           "KR",
           "MY",
           "RU",
           "TW",
-          "VN",
-          "AU",
-          "NZ"
+          "VN"
         ],
         "note": "Needs exact official tariff-row parser before filing-grade automation claims."
       }
@@ -774,6 +769,33 @@
   ],
   "duty_rates": [
     {
+      "country": "AU",
+      "name": "Australia Current Tariff and import GST",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_html_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:anz:official",
+      "probe_command": "npm run update:duty-rates:anz:official:dry-run",
+      "official_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "parser_subtasks": [],
+      "rate_change_drivers": [],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced 8-digit general-duty rows for maintained electronics prefixes, 10% import GST and ABF customs-value method. Preferences, TCOs, concessions and trade remedies are not assumed.",
+      "next_action": "Monitor ABF HTML schema and effective dates; keep origin preferences, TCOs, concessions and trade remedies as separate scope checks.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
       "country": "CN",
       "name": "China import tariff / VAT",
       "source_status": "official_machine_synced",
@@ -993,6 +1015,33 @@
       "transit_route_priority": false,
       "current_scope": "Official machine-synced EU TARIC exact duty with safe 8-digit aggregation and Dutch VAT shown separately.",
       "next_action": "Monitor TARIC and Dutch VAT changes while keeping non-base-duty measures separate.",
+      "rate_automation_stage": "official_machine_sync",
+      "automation_claim": "Official machine-readable tariff sync",
+      "public_claim": "Filing-grade auto for maintained HS prefixes",
+      "parser_gap": false,
+      "next_upgrade": "Monitor upstream schema and add scope layers such as trade remedies separately.",
+      "launch_mode": "live_auto",
+      "public_launch": true,
+      "filing_grade_auto": true,
+      "label": "Live auto",
+      "note": "Official machine-readable source is connected to daily sync."
+    },
+    {
+      "country": "NZ",
+      "name": "New Zealand Working Tariff, GST and goods levies",
+      "source_status": "official_machine_synced",
+      "machine_readable": "official_pdf_parser",
+      "maintenance_priority": "P1",
+      "update_command": "npm run update:duty-rates:anz:official",
+      "probe_command": "npm run update:duty-rates:anz:official:dry-run",
+      "official_url": "https://www.customs.govt.nz/business/tariffs/working-tariff-document",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "parser_subtasks": [],
+      "rate_change_drivers": [],
+      "transit_route_priority": false,
+      "current_scope": "Official machine-synced 8-digit Normal duty rows for maintained electronics prefixes, 15% import GST and current value/transport-mode goods levies. Preferential rates are not assumed.",
+      "next_action": "Monitor Working Tariff PDF schema, current goods levies and effective dates; keep preferential-origin eligibility separate.",
       "rate_automation_stage": "official_machine_sync",
       "automation_claim": "Official machine-readable tariff sync",
       "public_claim": "Filing-grade auto for maintained HS prefixes",
@@ -1324,60 +1373,6 @@
       "filing_grade_auto": false,
       "label": "Live hybrid",
       "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
-    },
-    {
-      "country": "AU",
-      "name": "Australia Current Tariff and import GST",
-      "source_status": "official_link",
-      "machine_readable": false,
-      "maintenance_priority": "P1",
-      "update_command": "",
-      "probe_command": "",
-      "official_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
-      "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
-      "transit_route_priority": false,
-      "current_scope": "Official-linked Schedule 3 duty boundary, 10% import GST and ABF customs-value method. Preferences and concessions are not assumed.",
-      "next_action": "Add a versioned Schedule 3 exact-line parser and keep origin preferences, concessions and trade remedies separate.",
-      "rate_automation_stage": "official_link_monitor",
-      "automation_claim": "Official source link monitored",
-      "public_claim": "Source monitored; do not show as automated rate extraction",
-      "parser_gap": true,
-      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
-      "launch_mode": "live_monitor",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live monitor",
-      "note": "Official source is monitored, but exact machine-readable parsing is not live yet."
-    },
-    {
-      "country": "NZ",
-      "name": "New Zealand Working Tariff, GST and goods levies",
-      "source_status": "official_link",
-      "machine_readable": false,
-      "maintenance_priority": "P1",
-      "update_command": "",
-      "probe_command": "",
-      "official_url": "https://www.customs.govt.nz/business/tariffs/working-tariff-document",
-      "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
-      "transit_route_priority": false,
-      "current_scope": "Official-linked Working Tariff boundary, 15% import GST and current value/transport-mode goods levies. Preferences are not assumed.",
-      "next_action": "Add a versioned Working Tariff exact-line parser and monitor current goods-levy rates and effective dates.",
-      "rate_automation_stage": "official_link_monitor",
-      "automation_claim": "Official source link monitored",
-      "public_claim": "Source monitored; do not show as automated rate extraction",
-      "parser_gap": true,
-      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
-      "launch_mode": "live_monitor",
-      "public_launch": true,
-      "filing_grade_auto": false,
-      "label": "Live monitor",
-      "note": "Official source is monitored, but exact machine-readable parsing is not live yet."
     }
   ],
   "duty_rate_priority_queue": [
@@ -1740,64 +1735,6 @@
       },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
-    },
-    {
-      "country": "AU",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_link_monitor",
-      "automation_claim": "Official source link monitored",
-      "public_claim": "Source monitored; do not show as automated rate extraction",
-      "update_command": "",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "AU",
-        "priority": "P1",
-        "stage": "official_link_monitor",
-        "task": "Keep official link monitoring live and add parser only when machine-readable tariff rows become available.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
-        "transit_route_priority": false,
-        "next_action": "Connect exact tariff-line parser before using rate math beyond screening."
-      },
-      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
-      "next_action": "Add a versioned Schedule 3 exact-line parser and keep origin preferences, concessions and trade remedies separate."
-    },
-    {
-      "country": "NZ",
-      "maintenance_priority": "P1",
-      "rate_automation_stage": "official_link_monitor",
-      "automation_claim": "Official source link monitored",
-      "public_claim": "Source monitored; do not show as automated rate extraction",
-      "update_command": "",
-      "probe_command": "",
-      "official_probe_urls": [],
-      "source_use_cases": [],
-      "parser_subtasks": [],
-      "rate_change_drivers": [],
-      "transit_route_priority": false,
-      "parser_gap_task": {
-        "country": "NZ",
-        "priority": "P1",
-        "stage": "official_link_monitor",
-        "task": "Keep official link monitoring live and add parser only when machine-readable tariff rows become available.",
-        "probe_command": "",
-        "official_probe_urls": [],
-        "source_use_cases": [],
-        "parser_subtasks": [],
-        "rate_change_drivers": [],
-        "transit_route_priority": false,
-        "next_action": "Connect exact tariff-line parser before using rate math beyond screening."
-      },
-      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
-      "next_action": "Add a versioned Working Tariff exact-line parser and monitor current goods-levy rates and effective dates."
     }
   ],
   "weekly_route_priorities": [

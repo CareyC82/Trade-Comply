@@ -46,6 +46,12 @@
                     <label class="sell-check-field"><span>Target market</span><select id="sell-market"><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="AU">Australia</option><option value="NZ">New Zealand</option><option value="ANZ">Australia + New Zealand comparison</option></select></label>
                     <label class="sell-check-field"><span>Sales channel</span><select id="sell-platform"><option>Amazon</option><option>TikTok Shop</option><option>Shopify / own store</option><option>Other marketplace</option></select></label>
                 </div>
+                <div class="sell-check-grid sell-exact-hs-fields">
+                    <label id="sell-exact-hs-single-field" class="sell-check-field"><span>Exact national HS code (optional)</span><input id="sell-exact-hs" inputmode="numeric" maxlength="12" placeholder="8 or 10 digits"></label>
+                    <label id="sell-exact-hs-au-field" class="sell-check-field" hidden><span>Australia tariff code (optional)</span><input id="sell-exact-hs-au" inputmode="numeric" maxlength="12" placeholder="8 digits"></label>
+                    <label id="sell-exact-hs-nz-field" class="sell-check-field" hidden><span>New Zealand tariff item (optional)</span><input id="sell-exact-hs-nz" inputmode="numeric" maxlength="12" placeholder="8 digits"></label>
+                </div>
+                <p class="sell-panel-note">Use the destination’s exact tariff code only when already confirmed. A product-family candidate is not treated as filing-grade.</p>
                 <button class="sell-check-primary" type="submit">Show preliminary result</button>
                 <div id="sell-check-error" class="post-entry-error" hidden role="alert"></div>
             </section>

@@ -44,6 +44,10 @@ function bootstrapCanISellItPage() {
     const accountSignedIn = document.getElementById('sell-account-signed-in');
     const accountEmail = document.getElementById('sell-account-email');
     const accountMessage = document.getElementById('sell-account-message');
+    const marketSelect = document.getElementById('sell-market');
+    const exactHsSingleField = document.getElementById('sell-exact-hs-single-field');
+    const exactHsAuField = document.getElementById('sell-exact-hs-au-field');
+    const exactHsNzField = document.getElementById('sell-exact-hs-nz-field');
     let currentInput = null;
     let dutyRates = null;
     let latestAssessment = null;
@@ -60,6 +64,37 @@ function bootstrapCanISellItPage() {
     const MAX_UPLOAD_FILES = 5;
     const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
     const ALLOWED_UPLOAD_TYPES = new Set(['application/pdf', 'image/png', 'image/jpeg', 'image/webp']);
+
+    function updateExactHsFields() {
+        const anz = marketSelect.value === 'ANZ';
+        exactHsSingleField.hidden = anz;
+        exactHsAuField.hidden = !anz;
+        exactHsNzField.hidden = !anz;
+    }
+    marketSelect.addEventListener('change', updateExactHsFields);
+    updateExactHsFields();
+
+    function normalizeExactHs(value) {
+        return String(value || '').replace(/[^0-9]/g, '');
+    }
+
+    function validateExactHsInputs(market) {
+        const checks = market === 'ANZ'
+            ? [
+                ['Australia tariff code', document.getElementById('sell-exact-hs-au').value],
+                ['New Zealand tariff item', document.getElementById('sell-exact-hs-nz').value]
+            ]
+            : [['Exact national HS code', document.getElementById('sell-exact-hs').value]];
+        for (const [label, value] of checks) {
+            if (!String(value || '').trim()) continue;
+            const code = normalizeExactHs(value);
+            const validLengths = ['AU', 'NZ', 'ANZ'].includes(market) ? [8] : [8, 10];
+            if (!validLengths.includes(code.length)) {
+                return `${label} must contain ${validLengths.join(' or ')} digits.`;
+            }
+        }
+        return '';
+    }
 
     const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -362,7 +397,7 @@ function bootstrapCanISellItPage() {
             ? assessment.documentGaps.map((gap) => `<li><strong>${escapeHtml(gap.document)}</strong><span>${escapeHtml(gap.requirement)}</span></li>`).join('')
             : '<li><strong>No document gaps selected by this pre-check</strong><span>Still verify every file against the exact model and supplier.</span></li>';
         const tariffRows = assessment.tariffOptions.length
-            ? assessment.tariffOptions.map((row) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.classificationRequired ? ' · candidate HS only, not filing-grade' : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
+            ? assessment.tariffOptions.map((row) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.classificationMismatch ? 'Entered code does not match this product model · ' : ''}${row.exactConflict ? 'Conflicting active official rates — professional confirmation required' : (row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`)} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.classificationRequired ? ' · candidate HS only, not filing-grade' : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length
@@ -601,14 +636,24 @@ function bootstrapCanISellItPage() {
             error.hidden = false;
             return;
         }
+        const market = document.getElementById('sell-market').value;
+        const exactHsError = validateExactHsInputs(market);
+        if (exactHsError) {
+            error.textContent = exactHsError;
+            error.hidden = false;
+            return;
+        }
         error.hidden = true;
         currentEvidenceAnswers = {};
         currentConfirmedDocuments = [];
         currentInput = {
             description,
             origin: document.getElementById('sell-origin').value,
-            market: document.getElementById('sell-market').value,
+            market,
             platform: document.getElementById('sell-platform').value,
+            exactHsCode: normalizeExactHs(document.getElementById('sell-exact-hs').value),
+            exactHsCodeAu: normalizeExactHs(document.getElementById('sell-exact-hs-au').value),
+            exactHsCodeNz: normalizeExactHs(document.getElementById('sell-exact-hs-nz').value),
             dutyRates
         };
         const profile = engine.extractProfile(description);

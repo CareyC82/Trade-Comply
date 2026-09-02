@@ -54,7 +54,7 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Only real captured searches are shown/);
 });
 
-test('admin exact tariff feed status covers the four P1 connector groups without exposing URLs', () => {
+test('admin exact tariff feed status covers all six exact connector groups without exposing URLs', () => {
     const payload = buildExactTariffFeedStatus({
         rules: [],
         last_exact_national_tariff_sync: {
@@ -64,7 +64,7 @@ test('admin exact tariff feed status covers the four P1 connector groups without
         }
     });
 
-    assert.deepEqual(payload.markets.map((row) => row.country), ['EU', 'CN', 'SG', 'MX']);
+    assert.deepEqual(payload.markets.map((row) => row.country), ['EU', 'CN', 'SG', 'MX', 'AU', 'NZ']);
     assert.deepEqual(payload.markets[0].target_markets, ['EU', 'DE', 'NL']);
     assert.equal(payload.markets[0].status, 'current');
     assert.equal(payload.markets[0].row_count, 12);
@@ -72,6 +72,8 @@ test('admin exact tariff feed status covers the four P1 connector groups without
     assert.ok(payload.markets.every((row) => !Object.hasOwn(row, 'url')));
     assert.equal(payload.markets[0].connector_type, 'direct_official');
     assert.equal(payload.markets[1].connector_type, 'direct_official');
+    assert.equal(payload.markets[4].connector_type, 'direct_official');
+    assert.equal(payload.markets[5].connector_type, 'direct_official');
 });
 
 test('admin unmet-search payload has an honest empty Top 10 state', () => {
@@ -105,7 +107,7 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(payload.sources.some(source => source.country === 'KR' && /CustomsTariffList\.do/.test(source.official_url || '')));
     assert.equal(typeof payload.business_summary, 'object');
     assert.equal(payload.filing_grade_regression.ok, true, JSON.stringify(payload.filing_grade_regression.failures));
-    assert.equal(payload.filing_grade_regression.market_count, 14);
+    assert.equal(payload.filing_grade_regression.market_count, 16);
     assert.equal(payload.hybrid_promotion_queue.length, 6);
     assert.ok(payload.hybrid_promotion_queue.some((row) => row.country === 'RU' && row.promotion_status === 'artifact_required'));
     assert.ok(payload.business_summary.sync_conclusion);
@@ -150,9 +152,9 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(Array.isArray(payload.source_roadmap_summary.next_source_priorities));
     assert.ok(Array.isArray(payload.source_roadmap_summary.automation_backlog));
     assert.ok(payload.source_roadmap_summary.automation_backlog_summary.parser_gap_count > 0);
-    assert.deepEqual(payload.source_roadmap_summary.automation_backlog.slice(0, 3).map(row => row.country), ['AU', 'NZ', 'IN']);
-    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'AU'));
-    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'NZ'));
+    assert.deepEqual(payload.source_roadmap_summary.automation_backlog.slice(0, 2).map(row => row.country), ['IN', 'KR']);
+    assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'AU'), false);
+    assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'NZ'), false);
     assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'EU'), false);
     assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
         row.country === 'IN'
