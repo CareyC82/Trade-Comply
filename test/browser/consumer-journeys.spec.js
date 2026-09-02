@@ -99,6 +99,38 @@ test('Australia exact tariff selector refreshes the result and links to Post-Ent
     expect(href).toContain('to=AU');
 });
 
+test('New Zealand exact tariff, supplier request and local report actions stay connected', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await page.getByLabel('Product name or short description').fill('65W GaN USB-C charger with 100-240V AC input, no battery, for adults');
+    await page.getByLabel('Target market').selectOption('NZ');
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    await page.locator('.sell-result-details').click();
+    const selector = page.locator('[data-exact-tariff-select][data-market="NZ"]').first();
+    await expect(selector).toBeVisible();
+    const value = await selector.locator('option:not([value=""])').first().getAttribute('value');
+    await selector.selectOption(value);
+    await expect(page.locator('#sell-result')).toContainText('New Zealand Customs Service');
+    await expect(page.locator('#sell-result')).toContainText('not applied automatically');
+    await expect(page.locator('.sell-supplier-request')).toContainText(/electrical|adaptor|tariff/i);
+    await expect(page.getByRole('button', { name: 'Download supplier request' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Print / Save PDF' })).toBeVisible();
+});
+
+test('ANZ comparison keeps shared evidence and local obligations separate', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await page.getByLabel('Product name or short description').fill('Power bank with rechargeable lithium battery, no wireless, for adults');
+    await page.getByLabel('Target market').selectOption('ANZ');
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    const comparison = page.locator('.sell-anz-comparison');
+    await expect(comparison).toContainText('Shared / reusable evidence');
+    await expect(comparison).toContainText('Australia-specific actions');
+    await expect(comparison).toContainText('New Zealand-specific actions');
+    await expect(comparison).toContainText('Not automatically transferable');
+    await page.locator('.sell-result-details').click();
+    await expect(page.locator('[data-exact-tariff-select][data-market="AU"]').first()).toBeVisible();
+    await expect(page.locator('[data-exact-tariff-select][data-market="NZ"]').first()).toBeVisible();
+});
+
 test('private workspace failure leaves the anonymous assessment usable', async ({ page }) => {
     await page.route('**/api/consumer/**', (route) => route.abort());
     await submitProduct(page, 'Bluetooth speaker with rechargeable lithium battery');

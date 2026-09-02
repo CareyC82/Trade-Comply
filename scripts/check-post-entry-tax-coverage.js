@@ -12,9 +12,11 @@ const path = require('path');
 const {
     runDutyRateHealthCheck
 } = require('./check-duty-rates');
+const { buildExactTariffHealth } = require('./check-exact-tariff-sync-health');
 
 const ROOT = path.join(__dirname, '..');
 const EXPORT_TAX_RATES_PATH = path.join(ROOT, 'data', 'export-tax-rates.json');
+const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const COUNTRY_REGISTRY_PATH = path.join(ROOT, 'data', 'country-registry.json');
 const EXPORT_TAX_PRIORITY_HS_PREFIXES = [
     '847130',
@@ -127,6 +129,7 @@ function summarizeExportTaxCoverage(exportPayload, {
 
 function runPostEntryTaxCoverageCheck() {
     const importDuty = runDutyRateHealthCheck();
+    const anzExactTariffs = buildExactTariffHealth(readJson(DUTY_RATES_PATH));
     const exportPayload = readJson(EXPORT_TAX_RATES_PATH);
     const exportTax = summarizeExportTaxCoverage(exportPayload);
     const failures = [];
@@ -138,6 +141,13 @@ function runPostEntryTaxCoverageCheck() {
             failures: failure.failures || [String(failure)]
         });
     });
+    if (!anzExactTariffs.ok) {
+        failures.push({
+            scope: 'import_duty',
+            id: 'anz-exact-tariff-health',
+            failures: anzExactTariffs.issues
+        });
+    }
     if (exportTax.missing_countries.length) {
         failures.push({
             scope: 'export_tax',
@@ -171,6 +181,7 @@ function runPostEntryTaxCoverageCheck() {
         ok: Boolean(importDuty.ok) && failures.length === 0,
         generated_at: new Date().toISOString(),
         import_duty: importDuty,
+        anz_exact_tariffs: anzExactTariffs,
         export_tax: exportTax,
         failures
     };

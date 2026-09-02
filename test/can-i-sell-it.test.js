@@ -85,6 +85,7 @@ test('ANZ flow exposes separate exact tariff inputs and validates filing-code le
     assert.match(script, /data-exact-tariff-select/);
     assert.match(script, /Open in Post-Entry/);
     assert.match(script, /Preferences, concessions and additional measures/);
+    assert.match(script, /reviewed/);
 });
 
 test('quick-question priorities remove duplicate product facts before limiting the list', () => {

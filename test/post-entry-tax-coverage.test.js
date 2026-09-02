@@ -50,6 +50,8 @@ test('combined Post-Entry tax coverage check separates import duty from export-s
 
     assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
     assert.equal(result.import_duty.duty_rate_gap_matrix.missing_total, 0);
+    assert.equal(result.anz_exact_tariffs.ok, true, JSON.stringify(result.anz_exact_tariffs.issues));
+    assert.deepEqual(result.anz_exact_tariffs.markets.map((row) => row.family_coverage.missing_products), [[], []]);
     assert.equal(result.export_tax.missing_total, 0);
     assert.ok(result.export_tax.rate_status_counts.exact_hs_required >= 1);
     assert.ok(result.export_tax.rate_status_counts.not_rate_based >= 1);

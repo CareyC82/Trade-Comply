@@ -112,6 +112,8 @@ test('ANZ candidate tariff rows expose selectable exact lines and conditional me
     assert.equal(row.exact, false);
     assert.equal(row.classificationRequired, true);
     assert.ok(row.conditionalMeasures.some((item) => item.id === 'origin_preference' && item.status === 'not_applied'));
+    assert.equal(row.conditionalMeasures[0].authority, 'Australian Border Force');
+    assert.match(row.conditionalMeasures[0].reviewedAt, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(result.supplierRequest.items.some((item) => /rules-of-origin/.test(item.document)));
     assert.ok(result.supplierRequest.items.some((item) => /concession/i.test(item.document)));
 });

@@ -397,7 +397,7 @@ function bootstrapCanISellItPage() {
 
     function renderConditionalMeasures(row) {
         if (!(row.conditionalMeasures || []).length) return '';
-        return `<details class="sell-tariff-conditions"><summary>Preferences, concessions and additional measures</summary><ul>${row.conditionalMeasures.map((item) => `<li><strong>${escapeHtml(item.label)} — ${escapeHtml(item.status === 'not_applied' ? 'not applied automatically' : 'scope check')}</strong><span>${escapeHtml(item.detail)} · <a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">official source</a></span></li>`).join('')}</ul></details>`;
+        return `<details class="sell-tariff-conditions"><summary>Preferences, concessions and additional measures</summary><ul>${row.conditionalMeasures.map((item) => `<li><strong>${escapeHtml(item.label)} — ${escapeHtml(item.status === 'not_applied' ? 'not applied automatically' : 'scope check')}</strong><span>${escapeHtml(item.detail)} · ${escapeHtml(item.authority || 'Official authority')}${item.reviewedAt ? ` · reviewed ${escapeHtml(item.reviewedAt)}` : ''} · <a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">official source</a></span></li>`).join('')}</ul></details>`;
     }
 
     function renderAssessment(assessment) {
