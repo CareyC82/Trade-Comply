@@ -3940,6 +3940,13 @@ a.hub-core-card--link {
 .sell-readiness-grid small { color: #6e7e8d; font-size: .78rem; line-height: 1.45; }
 .sell-result-panel { margin-top: 14px; }
 .sell-result-panel h2 { margin: 0 0 18px; color: #173c64; font-size: 1.15rem; }
+.sell-tariff-selector { display: grid; gap: 7px; width: 100%; margin-top: 10px; }
+.sell-tariff-selector > span { color: #5f7084; font-size: .84rem; }
+.sell-tariff-selector select { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #c8d6e5; border-radius: 10px; background: #fff; color: #173c64; }
+.sell-tariff-conditions { width: 100%; margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: #fff8e8; box-sizing: border-box; }
+.sell-tariff-conditions summary { cursor: pointer; color: #684b0b; font-weight: 700; }
+.sell-tariff-conditions ul { margin: 10px 0 0; padding-left: 20px; }
+.sell-tariff-conditions li + li { margin-top: 8px; }
 .sell-requirement-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .sell-requirement { padding: 18px; border: 1px solid #dce6f0; border-left: 4px solid #2c6dac; border-radius: 9px; }
 .sell-requirement--high { border-left-color: #b43c3c; background: #fffafa; }
@@ -4165,6 +4172,7 @@ a.hub-core-card--link {
     .sell-check-hero h1 { font-size: 1.48rem; }
     .sell-check-scope-row { display: grid; gap: 5px; text-align: left; }
     .sell-check-card, .sell-result-panel { padding: 16px; }
+    .sell-tariff-selector select { font-size: 16px; }
     .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid,
     .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-core-decisions,
     .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }

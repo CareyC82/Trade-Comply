@@ -82,6 +82,23 @@ test('mobile result and review actions do not overflow and remain touchable', as
     });
 });
 
+test('Australia exact tariff selector refreshes the result and links to Post-Entry', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await page.getByLabel('Product name or short description').fill('Portable Bluetooth speaker with rechargeable lithium battery, for adults');
+    await page.getByLabel('Target market').selectOption('AU');
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    await page.locator('.sell-result-details').click();
+    const selector = page.locator('[data-exact-tariff-select][data-market="AU"]').first();
+    await expect(selector).toBeVisible();
+    const value = await selector.locator('option:not([value=""])').first().getAttribute('value');
+    await selector.selectOption(value);
+    await expect(page.locator('#sell-result')).toContainText('official exact-line match');
+    await expect(page.locator('#sell-result')).toContainText('not applied automatically');
+    const href = await page.locator('a', { hasText: 'Open in Post-Entry' }).first().getAttribute('href');
+    expect(href).toContain(`hs=${value}`);
+    expect(href).toContain('to=AU');
+});
+
 test('private workspace failure leaves the anonymous assessment usable', async ({ page }) => {
     await page.route('**/api/consumer/**', (route) => route.abort());
     await submitProduct(page, 'Bluetooth speaker with rechargeable lithium battery');

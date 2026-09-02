@@ -373,6 +373,33 @@ function bootstrapCanISellItPage() {
         setTimeout(() => document.body.classList.remove('sell-print-mode'), 500);
     }
 
+    function postEntryHref(row, assessment) {
+        const market = row.market || currentInput.market;
+        const params = new URLSearchParams({
+            from: currentInput.origin,
+            to: market,
+            hs: row.hsCode,
+            product: assessment.product.label,
+            focus: 'import'
+        });
+        if (row.lastCheckedAt) params.set('effective_date', String(row.lastCheckedAt).slice(0, 10));
+        return `post-entry.html?${params.toString()}`;
+    }
+
+    function renderTariffCandidateSelector(row, rowIndex) {
+        if (row.exact || !(row.candidateExactLines || []).length) return '';
+        const options = row.candidateExactLines.map((line) => {
+            const rate = line.baseRate === null ? 'rate pending' : `${(line.baseRate * 100).toFixed(2)}%`;
+            return `<option value="${escapeHtml(line.hsCode)}">${escapeHtml(line.hsCode)} · ${escapeHtml(rate)} · ${escapeHtml(line.description || 'official tariff description')}</option>`;
+        }).join('');
+        return `<label class="sell-tariff-selector"><span>Select the exact line only after its official description matches the product</span><select data-exact-tariff-select data-market="${escapeHtml(row.market || currentInput.market)}" data-row="${rowIndex}"><option value="">Choose an official exact tariff line</option>${options}</select></label>`;
+    }
+
+    function renderConditionalMeasures(row) {
+        if (!(row.conditionalMeasures || []).length) return '';
+        return `<details class="sell-tariff-conditions"><summary>Preferences, concessions and additional measures</summary><ul>${row.conditionalMeasures.map((item) => `<li><strong>${escapeHtml(item.label)} — ${escapeHtml(item.status === 'not_applied' ? 'not applied automatically' : 'scope check')}</strong><span>${escapeHtml(item.detail)} · <a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">official source</a></span></li>`).join('')}</ul></details>`;
+    }
+
     function renderAssessment(assessment) {
         const list = (items = []) => items.length ? items.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>None identified from the supplied facts.</li>';
         const anzPanel = assessment.anzComparison ? `
@@ -397,7 +424,7 @@ function bootstrapCanISellItPage() {
             ? assessment.documentGaps.map((gap) => `<li><strong>${escapeHtml(gap.document)}</strong><span>${escapeHtml(gap.requirement)}</span></li>`).join('')
             : '<li><strong>No document gaps selected by this pre-check</strong><span>Still verify every file against the exact model and supplier.</span></li>';
         const tariffRows = assessment.tariffOptions.length
-            ? assessment.tariffOptions.map((row) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.classificationMismatch ? 'Entered code does not match this product model · ' : ''}${row.exactConflict ? 'Conflicting active official rates — professional confirmation required' : (row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`)} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.classificationRequired ? ' · candidate HS only, not filing-grade' : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
+            ? assessment.tariffOptions.map((row, rowIndex) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.classificationMismatch ? 'Entered code does not match this product model · ' : ''}${row.exactConflict ? 'Conflicting active official rates — professional confirmation required' : (row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`)} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.classificationRequired ? ' · candidate HS only, not filing-grade' : ''}${row.lastCheckedAt ? ` · checked ${escapeHtml(String(row.lastCheckedAt).slice(0, 10))}` : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''} · <a href="${escapeHtml(postEntryHref(row, assessment))}">Open in Post-Entry</a></span>${renderTariffCandidateSelector(row, rowIndex)}${renderConditionalMeasures(row)}</li>`).join('')
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length
@@ -553,6 +580,27 @@ function bootstrapCanISellItPage() {
             }) }).then(loadHistory).catch((failure) => { accountMessage.textContent = failure.message; });
         });
         document.getElementById('sell-print-assessment')?.addEventListener('click', printAssessment);
+        document.querySelectorAll('[data-exact-tariff-select]').forEach((select) => {
+            select.addEventListener('change', () => {
+                const code = normalizeExactHs(select.value);
+                if (!code) return;
+                const market = select.dataset.market;
+                if (currentInput.market === 'ANZ') {
+                    if (market === 'AU') {
+                        currentInput.exactHsCodeAu = code;
+                        document.getElementById('sell-exact-hs-au').value = code;
+                    } else if (market === 'NZ') {
+                        currentInput.exactHsCodeNz = code;
+                        document.getElementById('sell-exact-hs-nz').value = code;
+                    }
+                } else {
+                    currentInput.exactHsCode = code;
+                    document.getElementById('sell-exact-hs').value = code;
+                }
+                latestAssessmentInput = { ...latestAssessmentInput, ...currentInput };
+                renderAssessment(runAssessment(latestAssessmentInput));
+            });
+        });
         document.getElementById('sell-copy-supplier-request')?.addEventListener('click', async () => {
             const status = document.getElementById('sell-copy-status');
             const text = supplierRequestText(supplierRequest);

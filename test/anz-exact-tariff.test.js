@@ -10,6 +10,7 @@ const {
 } = require('../lib/australia-abf-tariff');
 const { parseNzWorkingTariffText } = require('../lib/new-zealand-working-tariff');
 const { fetchNewZealandOfficialPayload } = require('../scripts/update-exact-national-tariffs');
+const { assertHealthyExactBatch } = require('../scripts/update-exact-national-tariffs');
 
 const AU_HTML = `
 <table><tbody>
@@ -89,4 +90,40 @@ test('entered national tariff code must remain compatible with the detected prod
         exactHsCode: '85044090', dutyRates: { rules: [] }, assessmentMode: 'quick', blockingQuestionKeys: []
     });
     assert.equal(result.tariffOptions[0].classificationMismatch, true);
+});
+
+test('ANZ candidate tariff rows expose selectable exact lines and conditional measures without applying preference', () => {
+    const dutyRates = {
+        rules: [{
+            import_country: 'AU', origin_country: '*', hs_prefixes: ['8518'], base_rate: null,
+            exact_code_overrides: [
+                { hs_code: '85182100', base_rate: 0, description: 'Single loudspeaker', effective_from: '2026-01-01', source_url: 'https://abf.example/851821' },
+                { hs_code: '85182200', base_rate: 0.05, description: 'Multiple loudspeakers', effective_from: '2026-01-01', source_url: 'https://abf.example/851822' }
+            ]
+        }]
+    };
+    const result = engine.assess({
+        description: 'Bluetooth speaker', origin: 'CN', market: 'AU', platform: 'Amazon', dutyRates,
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    const lines = result.tariffOptions.flatMap((item) => item.candidateExactLines);
+    const row = result.tariffOptions[0];
+    assert.deepEqual(lines.map((item) => item.hsCode), ['85182100', '85182200']);
+    assert.equal(row.exact, false);
+    assert.equal(row.classificationRequired, true);
+    assert.ok(row.conditionalMeasures.some((item) => item.id === 'origin_preference' && item.status === 'not_applied'));
+    assert.ok(result.supplierRequest.items.some((item) => /rules-of-origin/.test(item.document)));
+    assert.ok(result.supplierRequest.items.some((item) => /concession/i.test(item.document)));
+});
+
+test('unexpected official batch shrink is rejected before last-good exact rows are replaced', () => {
+    const dutyPayload = { rules: [{
+        import_country: 'AU',
+        exact_code_overrides: Array.from({ length: 100 }, (_, index) => ({ hs_code: String(84000000 + index) }))
+    }] };
+    assert.throws(() => assertHealthyExactBatch(
+        dutyPayload,
+        'AU',
+        Array.from({ length: 60 }, (_, index) => ({ hs_code: String(85000000 + index) }))
+    ), /shrank unexpectedly.*last-good rows retained/);
 });

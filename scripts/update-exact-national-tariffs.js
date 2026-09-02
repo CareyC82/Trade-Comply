@@ -20,6 +20,24 @@ const FEEDS = {
     NZ: 'NZ_WORKING_TARIFF_EXACT_URL'
 };
 
+function countExistingExactRows(dutyPayload, country) {
+    return new Set((dutyPayload.rules || [])
+        .filter((rule) => rule.import_country === country)
+        .flatMap((rule) => rule.exact_code_overrides || [])
+        .map((row) => String(row.hs_code || '').replace(/\D/g, ''))
+        .filter((code) => code.length === 8 || code.length === 10)).size;
+}
+
+function assertHealthyExactBatch(dutyPayload, country, rows) {
+    const incomingCount = new Set(rows.map((row) => String(row.hs_code || '').replace(/\D/g, ''))).size;
+    const lastGoodCount = countExistingExactRows(dutyPayload, country);
+    const minimumRetained = lastGoodCount >= 20 ? Math.ceil(lastGoodCount * 0.7) : 1;
+    if (incomingCount < minimumRetained) {
+        throw new Error(`Official ${country} exact tariff batch shrank unexpectedly from ${lastGoodCount} to ${incomingCount} row(s); last-good rows retained`);
+    }
+    return { incoming_count: incomingCount, last_good_count: lastGoodCount, minimum_retained: minimumRetained };
+}
+
 async function fetchOfficialPayload(url, fetchImpl = global.fetch) {
     const response = await fetchImpl(url, { headers: { accept: 'application/json' } });
     if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
@@ -158,8 +176,9 @@ async function syncExactNationalTariffs({
                 raw = await buildChinaCustomsExactPayload(prefixes, { fetchImpl });
             }
             const rows = parseExactTariffRows(raw, { country, checkedAt });
+            const health = assertHealthyExactBatch(dutyPayload, country, rows);
             const changedRules = applyExactTariffRows(dutyPayload, country, rows);
-            results.push({ country, ok: true, skipped: false, row_count: rows.length, changed_rules: changedRules });
+            results.push({ country, ok: true, skipped: false, row_count: rows.length, changed_rules: changedRules, health });
         } catch (error) {
             results.push({ country, ok: false, skipped: false, error: String(error.message || error) });
         }
@@ -201,5 +220,7 @@ module.exports = {
     fetchMexicoOfficialPayload,
     fetchAustraliaOfficialPayload,
     fetchNewZealandOfficialPayload,
+    countExistingExactRows,
+    assertHealthyExactBatch,
     syncExactNationalTariffs
 };
