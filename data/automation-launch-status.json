@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-01T20:59:39.840Z",
+  "updated_at": "2026-09-02T01:59:30.784Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -8,27 +8,29 @@
   },
   "summary": {
     "regulatory_sources": 14,
-    "duty_rate_markets": 14,
+    "duty_rate_markets": 16,
     "regulatory_modes": {
-      "live_auto": 7,
+      "not_live": 7,
       "live_monitor": 7
     },
     "regulatory_health": {
-      "healthy": 7,
+      "blocked": 7,
       "monitor": 7
     },
     "regulatory_marketing": {
-      "ready_to_market": 7,
+      "ready_to_market": 0,
       "source_caveat": 7,
-      "do_not_market": 0
+      "do_not_market": 7
     },
     "duty_rate_modes": {
       "live_auto": 8,
-      "live_hybrid": 6
+      "live_hybrid": 6,
+      "live_monitor": 2
     },
     "duty_rate_automation_stages": {
       "official_machine_sync": 8,
-      "official_probe_candidate": 6
+      "official_probe_candidate": 6,
+      "official_link_monitor": 2
     },
     "duty_rate_launch_levels": {
       "official_exact": [
@@ -50,14 +52,19 @@
         "VN"
       ],
       "maintained_benchmark": [],
-      "monitor_only": [],
+      "monitor_only": [
+        "AU",
+        "NZ"
+      ],
       "parser_gap": [
         "IN",
         "KR",
         "MY",
         "RU",
         "TW",
-        "VN"
+        "VN",
+        "AU",
+        "NZ"
       ]
     },
     "public_launch_countries": [
@@ -74,7 +81,9 @@
       "MY",
       "RU",
       "TW",
-      "VN"
+      "VN",
+      "AU",
+      "NZ"
     ],
     "filing_grade_auto_countries": [
       "CN",
@@ -92,7 +101,9 @@
       "MY",
       "RU",
       "TW",
-      "VN"
+      "VN",
+      "AU",
+      "NZ"
     ],
     "weekly_route_priority_count": 5
   },
@@ -140,7 +151,7 @@
       {
         "key": "p0_p1",
         "label": "P0/P1 source priorities",
-        "count": 8,
+        "count": 10,
         "countries": [
           "CN",
           "DE",
@@ -149,7 +160,9 @@
           "MX",
           "NL",
           "SG",
-          "US"
+          "US",
+          "AU",
+          "NZ"
         ],
         "note": "Highest-value markets to keep fresh first."
       },
@@ -167,14 +180,16 @@
       {
         "key": "parser_gap",
         "label": "Parser gaps",
-        "count": 6,
+        "count": 8,
         "countries": [
           "IN",
           "KR",
           "MY",
           "RU",
           "TW",
-          "VN"
+          "VN",
+          "AU",
+          "NZ"
         ],
         "note": "Needs exact official tariff-row parser before filing-grade automation claims."
       }
@@ -210,13 +225,13 @@
   "regulatory": [
     {
       "country": "CN",
-      "launch_mode": "live_auto",
-      "public_launch": true,
+      "launch_mode": "not_live",
+      "public_launch": false,
       "filing_grade_auto": false,
       "source_count": 2,
-      "source_health_grade": "healthy",
+      "source_health_grade": "blocked",
       "source_health_counts": {
-        "fetch_ok": 2
+        "stale": 2
       },
       "sources": [
         {
@@ -225,7 +240,7 @@
           "type": "export",
           "method": "fetch",
           "url": "https://www.mofcom.gov.cn/zwgk/zcfb/",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:24.245Z",
           "byte_length": 645,
           "error": "",
@@ -239,7 +254,7 @@
           "type": "both",
           "method": "got-scraping",
           "url": "http://www.customs.gov.cn/customs/302249/302266/index.html",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:43.783Z",
           "byte_length": 1416,
           "error": "",
@@ -248,8 +263,8 @@
           "monitor_only": false
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
-      "marketing_recommendation": "Ready to market",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
+      "marketing_recommendation": "Do not market as automated yet",
       "health_updated_at": "2026-08-26T00:54:57.027Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
@@ -286,14 +301,14 @@
     },
     {
       "country": "EU",
-      "launch_mode": "live_auto",
-      "public_launch": true,
+      "launch_mode": "not_live",
+      "public_launch": false,
       "filing_grade_auto": false,
       "source_count": 4,
-      "source_health_grade": "healthy",
+      "source_health_grade": "blocked",
       "source_health_counts": {
         "official_link_monitor": 3,
-        "fetch_ok": 1
+        "stale": 1
       },
       "sources": [
         {
@@ -344,7 +359,7 @@
           "type": "both",
           "method": "fetch",
           "url": "https://policy.trade.ec.europa.eu/news_en",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:51.420Z",
           "byte_length": 6014,
           "error": "",
@@ -353,20 +368,20 @@
           "monitor_only": false
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
-      "marketing_recommendation": "Ready to market",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
+      "marketing_recommendation": "Do not market as automated yet",
       "health_updated_at": "2026-08-26T00:54:57.027Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
       "country": "IN",
-      "launch_mode": "live_auto",
-      "public_launch": true,
+      "launch_mode": "not_live",
+      "public_launch": false,
       "filing_grade_auto": false,
       "source_count": 1,
-      "source_health_grade": "healthy",
+      "source_health_grade": "blocked",
       "source_health_counts": {
-        "fetch_ok": 1
+        "stale": 1
       },
       "sources": [
         {
@@ -375,7 +390,7 @@
           "type": "both",
           "method": "fetch",
           "url": "https://www.dgft.gov.in/CP/?opt=notification",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:57.026Z",
           "byte_length": 12144,
           "error": "",
@@ -384,20 +399,20 @@
           "monitor_only": false
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
-      "marketing_recommendation": "Ready to market",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
+      "marketing_recommendation": "Do not market as automated yet",
       "health_updated_at": "2026-08-26T00:54:57.027Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
       "country": "JP",
-      "launch_mode": "live_auto",
-      "public_launch": true,
+      "launch_mode": "not_live",
+      "public_launch": false,
       "filing_grade_auto": false,
       "source_count": 1,
-      "source_health_grade": "healthy",
+      "source_health_grade": "blocked",
       "source_health_counts": {
-        "fetch_ok": 1
+        "stale": 1
       },
       "sources": [
         {
@@ -406,7 +421,7 @@
           "type": "both",
           "method": "fetch",
           "url": "https://www.meti.go.jp/english/press/",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:52.356Z",
           "byte_length": 4860,
           "error": "",
@@ -415,20 +430,20 @@
           "monitor_only": false
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
-      "marketing_recommendation": "Ready to market",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
+      "marketing_recommendation": "Do not market as automated yet",
       "health_updated_at": "2026-08-26T00:54:57.027Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
       "country": "KR",
-      "launch_mode": "live_auto",
-      "public_launch": true,
+      "launch_mode": "not_live",
+      "public_launch": false,
       "filing_grade_auto": false,
       "source_count": 1,
-      "source_health_grade": "healthy",
+      "source_health_grade": "blocked",
       "source_health_counts": {
-        "fetch_ok": 1
+        "stale": 1
       },
       "sources": [
         {
@@ -437,7 +452,7 @@
           "type": "both",
           "method": "fetch",
           "url": "https://www.customs.go.kr/english/main.do",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:53.082Z",
           "byte_length": 4499,
           "error": "",
@@ -446,8 +461,8 @@
           "monitor_only": false
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
-      "marketing_recommendation": "Ready to market",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
+      "marketing_recommendation": "Do not market as automated yet",
       "health_updated_at": "2026-08-26T00:54:57.027Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
@@ -577,13 +592,13 @@
     },
     {
       "country": "SG",
-      "launch_mode": "live_auto",
-      "public_launch": true,
+      "launch_mode": "not_live",
+      "public_launch": false,
       "filing_grade_auto": false,
       "source_count": 1,
-      "source_health_grade": "healthy",
+      "source_health_grade": "blocked",
       "source_health_counts": {
-        "fetch_ok": 1
+        "stale": 1
       },
       "sources": [
         {
@@ -592,7 +607,7 @@
           "type": "both",
           "method": "fetch",
           "url": "https://www.customs.gov.sg/news/",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:55.375Z",
           "byte_length": 1335,
           "error": "",
@@ -601,8 +616,8 @@
           "monitor_only": false
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
-      "marketing_recommendation": "Ready to market",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
+      "marketing_recommendation": "Do not market as automated yet",
       "health_updated_at": "2026-08-26T00:54:57.027Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
@@ -639,13 +654,13 @@
     },
     {
       "country": "US",
-      "launch_mode": "live_auto",
-      "public_launch": true,
+      "launch_mode": "not_live",
+      "public_launch": false,
       "filing_grade_auto": false,
       "source_count": 5,
-      "source_health_grade": "healthy",
+      "source_health_grade": "blocked",
       "source_health_counts": {
-        "fetch_ok": 4,
+        "stale": 4,
         "optional_issue": 1
       },
       "sources": [
@@ -655,7 +670,7 @@
           "type": "export",
           "method": "fetch",
           "url": "https://www.bis.doc.gov/index.php/about-bis/newsroom",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:45.137Z",
           "byte_length": 5089,
           "error": "",
@@ -669,7 +684,7 @@
           "type": "import",
           "method": "fetch",
           "url": "https://www.cbp.gov/trade/automated/newsflash",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:48.207Z",
           "byte_length": 5136,
           "error": "",
@@ -683,7 +698,7 @@
           "type": "import",
           "method": "fetch",
           "url": "https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:48.835Z",
           "byte_length": 1351,
           "error": "",
@@ -697,7 +712,7 @@
           "type": "both",
           "method": "fetch",
           "url": "https://ofac.treasury.gov/recent-actions",
-          "health_status": "fetch_ok",
+          "health_status": "stale",
           "last_fetch_at": "2026-08-26T00:54:49.587Z",
           "byte_length": 4207,
           "error": "",
@@ -720,8 +735,8 @@
           "monitor_only": false
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
-      "marketing_recommendation": "Ready to market",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
+      "marketing_recommendation": "Do not market as automated yet",
       "health_updated_at": "2026-08-26T00:54:57.027Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
@@ -1309,6 +1324,60 @@
       "filing_grade_auto": false,
       "label": "Live hybrid",
       "note": "Official-linked or maintained exact map is live; exact tariff-line scope stays gated where needed."
+    },
+    {
+      "country": "AU",
+      "name": "Australia Current Tariff and import GST",
+      "source_status": "official_link",
+      "machine_readable": false,
+      "maintenance_priority": "P1",
+      "update_command": "",
+      "probe_command": "",
+      "official_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "parser_subtasks": [],
+      "rate_change_drivers": [],
+      "transit_route_priority": false,
+      "current_scope": "Official-linked Schedule 3 duty boundary, 10% import GST and ABF customs-value method. Preferences and concessions are not assumed.",
+      "next_action": "Add a versioned Schedule 3 exact-line parser and keep origin preferences, concessions and trade remedies separate.",
+      "rate_automation_stage": "official_link_monitor",
+      "automation_claim": "Official source link monitored",
+      "public_claim": "Source monitored; do not show as automated rate extraction",
+      "parser_gap": true,
+      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live monitor",
+      "note": "Official source is monitored, but exact machine-readable parsing is not live yet."
+    },
+    {
+      "country": "NZ",
+      "name": "New Zealand Working Tariff, GST and goods levies",
+      "source_status": "official_link",
+      "machine_readable": false,
+      "maintenance_priority": "P1",
+      "update_command": "",
+      "probe_command": "",
+      "official_url": "https://www.customs.govt.nz/business/tariffs/working-tariff-document",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "parser_subtasks": [],
+      "rate_change_drivers": [],
+      "transit_route_priority": false,
+      "current_scope": "Official-linked Working Tariff boundary, 15% import GST and current value/transport-mode goods levies. Preferences are not assumed.",
+      "next_action": "Add a versioned Working Tariff exact-line parser and monitor current goods-levy rates and effective dates.",
+      "rate_automation_stage": "official_link_monitor",
+      "automation_claim": "Official source link monitored",
+      "public_claim": "Source monitored; do not show as automated rate extraction",
+      "parser_gap": true,
+      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
+      "launch_mode": "live_monitor",
+      "public_launch": true,
+      "filing_grade_auto": false,
+      "label": "Live monitor",
+      "note": "Official source is monitored, but exact machine-readable parsing is not live yet."
     }
   ],
   "duty_rate_priority_queue": [
@@ -1671,6 +1740,64 @@
       },
       "next_upgrade": "Replace maintained candidates with verified official parser output where unambiguous.",
       "next_action": "Use official probe status to promote a Vietnam Customs/VNACCS parser only after exact HS rows are machine-readable; keep VAT, origin scope, and transit evidence separately refreshed."
+    },
+    {
+      "country": "AU",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_link_monitor",
+      "automation_claim": "Official source link monitored",
+      "public_claim": "Source monitored; do not show as automated rate extraction",
+      "update_command": "",
+      "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "parser_subtasks": [],
+      "rate_change_drivers": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "AU",
+        "priority": "P1",
+        "stage": "official_link_monitor",
+        "task": "Keep official link monitoring live and add parser only when machine-readable tariff rows become available.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "parser_subtasks": [],
+        "rate_change_drivers": [],
+        "transit_route_priority": false,
+        "next_action": "Connect exact tariff-line parser before using rate math beyond screening."
+      },
+      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
+      "next_action": "Add a versioned Schedule 3 exact-line parser and keep origin preferences, concessions and trade remedies separate."
+    },
+    {
+      "country": "NZ",
+      "maintenance_priority": "P1",
+      "rate_automation_stage": "official_link_monitor",
+      "automation_claim": "Official source link monitored",
+      "public_claim": "Source monitored; do not show as automated rate extraction",
+      "update_command": "",
+      "probe_command": "",
+      "official_probe_urls": [],
+      "source_use_cases": [],
+      "parser_subtasks": [],
+      "rate_change_drivers": [],
+      "transit_route_priority": false,
+      "parser_gap_task": {
+        "country": "NZ",
+        "priority": "P1",
+        "stage": "official_link_monitor",
+        "task": "Keep official link monitoring live and add parser only when machine-readable tariff rows become available.",
+        "probe_command": "",
+        "official_probe_urls": [],
+        "source_use_cases": [],
+        "parser_subtasks": [],
+        "rate_change_drivers": [],
+        "transit_route_priority": false,
+        "next_action": "Connect exact tariff-line parser before using rate math beyond screening."
+      },
+      "next_upgrade": "Connect exact tariff-line parser before using rate math beyond screening.",
+      "next_action": "Add a versioned Working Tariff exact-line parser and monitor current goods-levy rates and effective dates."
     }
   ],
   "weekly_route_priorities": [

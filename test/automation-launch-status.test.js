@@ -50,22 +50,25 @@ test('automation launch status exposes only safe public launch modes', () => {
         assert.equal(regulatoryByCountry[country].public_launch, true);
     });
 
-    assert.equal(payload.summary.duty_rate_markets, 14);
+    assert.equal(payload.summary.duty_rate_markets, 16);
     assert.equal(payload.summary.duty_rate_modes.live_auto, 8);
     assert.equal(payload.summary.duty_rate_modes.live_hybrid, 6);
-    assert.equal(payload.summary.duty_rate_modes.live_monitor || 0, 0);
+    assert.equal(payload.summary.duty_rate_modes.live_monitor, 2);
     assert.deepEqual(payload.summary.duty_rate_automation_stages, {
         official_machine_sync: 8,
-        official_probe_candidate: 6
+        official_probe_candidate: 6,
+        official_link_monitor: 2
     });
     assert.deepEqual(payload.summary.duty_rate_launch_levels.official_exact, ['CN', 'DE', 'EU', 'JP', 'MX', 'NL', 'SG', 'US']);
     assert.equal(payload.summary.duty_rate_launch_levels.hybrid_official.length, 6);
     assert.equal(payload.summary.duty_rate_launch_levels.maintained_benchmark.length, 0);
-    assert.equal(payload.summary.duty_rate_launch_levels.parser_gap.length, 6);
+    assert.equal(payload.summary.duty_rate_launch_levels.parser_gap.length, 8);
     assert.deepEqual(payload.summary.filing_grade_auto_countries, ['CN', 'DE', 'EU', 'JP', 'MX', 'NL', 'SG', 'US']);
-    assert.deepEqual(payload.summary.parser_gap_countries, ['IN', 'KR', 'MY', 'RU', 'TW', 'VN']);
+    assert.deepEqual(payload.summary.parser_gap_countries, ['IN', 'KR', 'MY', 'RU', 'TW', 'VN', 'AU', 'NZ']);
 
     const byCountry = Object.fromEntries(payload.duty_rates.map(row => [row.country, row]));
+    assert.equal(byCountry.AU.launch_mode, 'live_monitor');
+    assert.equal(byCountry.NZ.launch_mode, 'live_monitor');
     assert.equal(byCountry.US.launch_mode, 'live_auto');
     assert.equal(byCountry.US.rate_automation_stage, 'official_machine_sync');
     assert.equal(byCountry.US.parser_gap, false);
@@ -92,8 +95,10 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.equal(byCountry.RU.launch_mode, 'live_hybrid');
     assert.equal(byCountry.RU.rate_automation_stage, 'official_probe_candidate');
     assert.equal(byCountry.RU.filing_grade_auto, false);
-    assert.equal(payload.duty_rate_priority_queue.length, 6);
+    assert.equal(payload.duty_rate_priority_queue.length, 8);
     assert.deepEqual(payload.duty_rate_priority_queue.slice(0, 2).map(row => row.country), ['IN', 'KR']);
+    assert.ok(payload.duty_rate_priority_queue.some(row => row.country === 'AU'));
+    assert.ok(payload.duty_rate_priority_queue.some(row => row.country === 'NZ'));
     assert.equal(payload.duty_rate_priority_queue.some(row => row.country === 'CN'), false);
     assert.equal(payload.duty_rate_priority_queue.some(row => row.country === 'EU'), false);
     assert.equal(payload.duty_rate_priority_queue.some(row => row.country === 'MX'), false);
@@ -106,7 +111,7 @@ test('automation launch status exposes only safe public launch modes', () => {
     assert.match(payload.duty_rate_health_board.headline, /official exact/);
     assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'official_exact' && card.countries.includes('US')), true);
     assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'p0_p1' && card.countries.includes('CN') && card.countries.includes('MX')), true);
-    assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'parser_gap' && card.count === 6), true);
+    assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'parser_gap' && card.count === 8), true);
     assert.equal(payload.eu_us_special_program_health.id, 'EU-US-2026-1455');
     assert.equal(payload.eu_us_special_program_health.annex_total, 242);
     assert.equal(payload.eu_us_special_program_health.quota_expected, 20);
@@ -172,19 +177,19 @@ test('checked-in automation launch status is fresh enough for admin display', ()
     const payload = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
     assert.equal(payload.schema_version, 1);
-    assert.equal(payload.summary.duty_rate_markets, 14);
+    assert.equal(payload.summary.duty_rate_markets, 16);
     assert.equal(payload.summary.regulatory_sources, 14);
     assert.equal(typeof payload.summary.regulatory_health, 'object');
     assert.equal(Object.values(payload.summary.regulatory_health).reduce((sum, count) => sum + count, 0), 14);
     assert.equal(Object.values(payload.summary.regulatory_marketing).reduce((sum, count) => sum + count, 0), 14);
     assert.equal(payload.regulatory.filter(row => row.sources.some(source => source.health_status === 'stale')).every(row => row.marketing_recommendation !== 'Ready to market'), true);
-    assert.equal(payload.summary.duty_rate_modes.live_monitor || 0, 0);
+    assert.equal(payload.summary.duty_rate_modes.live_monitor, 2);
     assert.equal(payload.summary.duty_rate_automation_stages.official_machine_sync, 8);
     assert.equal(payload.summary.duty_rate_automation_stages.official_hybrid_parser || 0, 0);
     assert.equal(payload.summary.duty_rate_automation_stages.official_probe_candidate, 6);
     assert.equal(payload.summary.duty_rate_automation_stages.maintained_exact_map || 0, 0);
-    assert.equal(payload.summary.duty_rate_automation_stages.official_link_monitor || 0, 0);
-    assert.equal(payload.duty_rate_priority_queue.length, 6);
+    assert.equal(payload.summary.duty_rate_automation_stages.official_link_monitor, 2);
+    assert.equal(payload.duty_rate_priority_queue.length, 8);
     assert.equal(payload.duty_rate_priority_queue.some(row => row.country === 'JP'), false);
     assert.equal(payload.weekly_route_priorities.length, 5);
     assert.equal(payload.duty_rate_health_board.cards.some(card => card.key === 'p0_p1' && card.countries.includes('CN')), true);
@@ -194,7 +199,7 @@ test('admin duty-rate status includes automation launch board payload', () => {
     const payload = buildDutyRateStatusPayload();
 
     assert.equal(payload.ok, true, JSON.stringify(payload.failures, null, 2));
-    assert.equal(payload.automation_launch_status.summary.duty_rate_markets, 14);
+    assert.equal(payload.automation_launch_status.summary.duty_rate_markets, 16);
     assert.equal(payload.automation_launch_status.summary.regulatory_sources, 14);
     assert.equal(typeof payload.automation_launch_status.summary.regulatory_health, 'object');
     assert.equal(payload.automation_launch_status.summary.duty_rate_automation_stages.official_machine_sync, 8);

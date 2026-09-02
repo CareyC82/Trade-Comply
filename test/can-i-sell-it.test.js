@@ -203,6 +203,60 @@ test('known wireless and battery requirements lead the preliminary result before
     assert.doesNotMatch(result.sellerConclusion.reason, /^Is it designed for children\??$/i);
 });
 
+test('candidate HS prefixes are never promoted to an official exact-line match', () => {
+    const signal = engine.findDutySignal({
+        origin: 'CN', market: 'AU', hsCode: '8518',
+        dutyRates: { rules: [{
+            import_country: 'AU', origin_country: '*', hs_prefixes: ['8518'], base_rate: null,
+            exact_code_overrides: [{ hs_code: '85182100', base_rate: 0.05, source_status: 'official_source_checked' }]
+        }] }
+    });
+    assert.equal(signal.exact, false);
+    assert.equal(signal.classificationRequired, true);
+    assert.equal(signal.rate, 0.05);
+    const exact = engine.findDutySignal({
+        origin: 'CN', market: 'AU', hsCode: '85182100',
+        dutyRates: { rules: [{
+            import_country: 'AU', origin_country: '*', hs_prefixes: ['8518'], base_rate: null,
+            exact_code_overrides: [{ hs_code: '85182100', base_rate: 0.05, source_status: 'official_source_checked' }]
+        }] }
+    });
+    assert.equal(exact.exact, true);
+});
+
+test('ANZ landed-cost calculations use separate GST, valuation and NZ levy treatment', () => {
+    const costs = {
+        currency: 'NZD', quantity: 10, purchaseUnit: 150, saleUnit: 250,
+        freightTotal: 100, insuranceTotal: 20, shippingMode: 'air'
+    };
+    const au = engine.estimateEconomics(costs, { rate: 0.05, importTaxBenchmarkRate: 0.10 }, 'AU');
+    const nz = engine.estimateEconomics(costs, { rate: 0, importTaxBenchmarkRate: 0.15 }, 'NZ');
+    assert.equal(au.customsValue, 1500);
+    assert.equal(au.taxBase, 1695);
+    assert.equal(au.importTax, 169.5);
+    assert.equal(au.borderFeeBeforeTax, 0);
+    assert.equal(nz.customsValue, 1500);
+    assert.equal(nz.borderFeeBeforeTax, 51.81);
+    assert.equal(nz.importTax, (1500 + 100 + 20 + 51.81) * 0.15);
+});
+
+test('Australia plus New Zealand returns two independent commercial estimates', () => {
+    const dutyRates = require('../data/duty-rates.json');
+    const result = engine.assessAnz({
+        description: 'Bluetooth speaker with rechargeable lithium battery',
+        origin: 'CN', market: 'ANZ', platform: 'Amazon', dutyRates,
+        assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { bluetooth: 'yes', battery: 'yes', childUse: 'no', medicalClaim: 'no' },
+        costs: { currency: 'AUD', quantity: 20, purchaseUnit: 80, saleUnit: 160, freightTotal: 100, shippingMode: 'sea' }
+    });
+    assert.ok(result.economicsByMarket.AU);
+    assert.ok(result.economicsByMarket.NZ);
+    assert.equal(result.economicsByMarket.AU.importTaxRate, 0.10);
+    assert.equal(result.economicsByMarket.NZ.importTaxRate, 0.15);
+    assert.equal(result.economics, null);
+    assert.match(result.economicsNote, /calculated separately/i);
+});
+
 test('result page exposes a copyable supplier evidence request', () => {
     const page = fs.readFileSync(path.join(__dirname, '..', 'can-i-sell-it.html'), 'utf8');
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');

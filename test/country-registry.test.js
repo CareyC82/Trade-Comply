@@ -29,7 +29,7 @@ describe('country-registry', () => {
         const exportValues = getExportOptions().map((o) => o.value);
         const importValues = getImportOptions().map((o) => o.value);
         assert.deepEqual(exportValues, ['US', 'EU', 'IN', 'VN', 'MY', 'ASEAN', 'RU', 'GLOBAL']);
-        assert.deepEqual(importValues, ['TW', 'JP', 'KR', 'VN', 'MY', 'IN', 'US', 'GLOBAL']);
+        assert.deepEqual(importValues, ['AU', 'NZ', 'TW', 'JP', 'KR', 'VN', 'MY', 'IN', 'US', 'GLOBAL']);
     });
 
     it('provides regional compliance focus for RU and TW', () => {

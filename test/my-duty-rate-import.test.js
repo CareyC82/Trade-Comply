@@ -56,7 +56,7 @@ function fixture() {
 
 test('MY importer accepts complete official CSV and covers router tablet charger battery and camera', () => {
     const files = fixture();
-    const result = importMalaysiaDutyRates({ ...files, now: new Date('2026-08-25T00:00:00Z') });
+    const result = importMalaysiaDutyRates({ ...files, now: new Date() });
     assert.equal(result.ok, true, result.error);
     assert.equal(result.artifact.parsed_row_count, 5);
     const payload = JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8'));

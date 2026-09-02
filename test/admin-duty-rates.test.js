@@ -150,7 +150,9 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.ok(Array.isArray(payload.source_roadmap_summary.next_source_priorities));
     assert.ok(Array.isArray(payload.source_roadmap_summary.automation_backlog));
     assert.ok(payload.source_roadmap_summary.automation_backlog_summary.parser_gap_count > 0);
-    assert.deepEqual(payload.source_roadmap_summary.automation_backlog.slice(0, 3).map(row => row.country), ['IN', 'KR', 'MY']);
+    assert.deepEqual(payload.source_roadmap_summary.automation_backlog.slice(0, 3).map(row => row.country), ['AU', 'NZ', 'IN']);
+    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'AU'));
+    assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'NZ'));
     assert.equal(payload.source_roadmap_summary.automation_backlog.some(row => row.country === 'EU'), false);
     assert.ok(payload.source_roadmap_summary.automation_backlog.some(row => (
         row.country === 'IN'

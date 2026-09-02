@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-27",
+  "updated_at": "2026-09-02",
   "notes": "Operational roadmap for Post-Entry duty-rate sources. Source status controls product trust wording: auto_updatable means a maintained script can refresh official machine-readable rates; hybrid_official_candidate means some maintained rules can be promoted from an official parser while ambiguous prefixes stay scope-check gated; benchmark_updatable means a maintained script can refresh local benchmark metadata but the rate remains indicative; official_link means an official source is identified but not machine-refreshed yet; benchmark means local pre-check math only.",
   "sources": [
     {
@@ -448,6 +448,30 @@
       ],
       "artifact_evidence_required": true,
       "next_action": "Import a complete official 10-digit EAEU/Russia XLSX/CSV artifact through the guarded preview/publish workflow; keep sanctions and restricted-party scope flags separate from ordinary duty math."
+    },
+    {
+      "country": "AU",
+      "name": "Australia Current Tariff and import GST",
+      "authority": "Australian Border Force",
+      "official_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
+      "machine_readable": false,
+      "source_status": "official_link",
+      "maintenance_priority": "P1",
+      "status_reason": "Schedule 3 provides exact classification and general rates; the current product flow exposes the official baseline and requires the exact national tariff line before duty is relied on.",
+      "current_scope": "Official-linked Schedule 3 duty boundary, 10% import GST and ABF customs-value method. Preferences and concessions are not assumed.",
+      "next_action": "Add a versioned Schedule 3 exact-line parser and keep origin preferences, concessions and trade remedies separate."
+    },
+    {
+      "country": "NZ",
+      "name": "New Zealand Working Tariff, GST and goods levies",
+      "authority": "New Zealand Customs Service",
+      "official_url": "https://www.customs.govt.nz/business/tariffs/working-tariff-document",
+      "machine_readable": false,
+      "source_status": "official_link",
+      "maintenance_priority": "P1",
+      "status_reason": "The Working Tariff provides exact tariff items; the current product flow exposes the official baseline and requires an exact tariff item before duty is relied on.",
+      "current_scope": "Official-linked Working Tariff boundary, 15% import GST and current value/transport-mode goods levies. Preferences are not assumed.",
+      "next_action": "Add a versioned Working Tariff exact-line parser and monitor current goods-levy rates and effective dates."
     }
   ]
 }

@@ -362,7 +362,7 @@ function bootstrapCanISellItPage() {
             ? assessment.documentGaps.map((gap) => `<li><strong>${escapeHtml(gap.document)}</strong><span>${escapeHtml(gap.requirement)}</span></li>`).join('')
             : '<li><strong>No document gaps selected by this pre-check</strong><span>Still verify every file against the exact model and supplier.</span></li>';
         const tariffRows = assessment.tariffOptions.length
-            ? assessment.tariffOptions.map((row) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.rate === null ? 'Rate not covered' : `${(row.rate * 100).toFixed(2)}% candidate signal`} · ${escapeHtml(row.exact ? 'exact-line source match' : row.sourceStatus)}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
+            ? assessment.tariffOptions.map((row) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.classificationRequired ? ' · candidate HS only, not filing-grade' : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''}</span></li>`).join('')
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length
@@ -378,6 +378,23 @@ function bootstrapCanISellItPage() {
             ? `<ul>${supplierRequest.items.map((item) => `<li><strong>${escapeHtml(item.document)}</strong><span>${escapeHtml(item.reason)}</span></li>`).join('')}</ul>`
             : '<p>All applicable uploaded evidence passed the automated reference and completeness checks.</p>';
         const platformCards = renderPlatformCards(assessment);
+        const economicsCard = (value, title = 'Landed cost and margin estimate') => value ? `
+            <section class="sell-result-panel"><h2>${escapeHtml(title)}</h2>
+                <div class="sell-economics-grid">
+                    <article><span>Customs value</span><strong>${money(value.customsValue, value.currency)}</strong></article>
+                    <article><span>Estimated duty</span><strong>${money(value.duty, value.currency)}</strong><small>${value.dutyRate === null ? 'Exact rate missing' : `${(value.dutyRate * 100).toFixed(2)}% · ${value.dutyRateBasis}`}</small></article>
+                    <article><span>GST / import tax base</span><strong>${money(value.taxBase, value.currency)}</strong></article>
+                    <article><span>Import tax / GST</span><strong>${money(value.importTax, value.currency)}</strong><small>${(value.importTaxRate * 100).toFixed(2)}% · ${value.importTaxRateBasis}</small></article>
+                    ${value.borderFeeStatus ? `<article><span>Border goods levies</span><strong>${money(value.borderFeeBeforeTax, value.currency)}</strong><small>${escapeHtml(value.borderFeeStatus)}</small></article>` : ''}
+                    <article><span>Landed cost / unit</span><strong>${money(value.landedUnit, value.currency)}</strong></article>
+                    <article><span>Contribution / unit</span><strong>${money(value.profitUnit, value.currency)}</strong></article>
+                    <article><span>Contribution margin</span><strong>${value.marginRate === null ? 'Pending' : `${(value.marginRate * 100).toFixed(1)}%`}</strong></article>
+                    <article><span>Break-even sale price</span><strong>${money(value.breakEvenPrice, value.currency)}</strong></article>
+                </div><p class="sell-panel-note">${escapeHtml(value.caveat)}</p>
+            </section>` : '';
+        const anzEconomics = assessment.economicsByMarket
+            ? `${economicsCard(assessment.economicsByMarket.AU, 'Australia landed cost estimate')}${economicsCard(assessment.economicsByMarket.NZ, 'New Zealand landed cost estimate')}`
+            : '';
         const economicsPanel = economics ? `
             <section class="sell-result-panel"><h2>Landed cost and margin estimate</h2>
                 <div class="sell-economics-grid">
@@ -389,7 +406,7 @@ function bootstrapCanISellItPage() {
                     <article><span>Contribution margin</span><strong>${economics.marginRate === null ? 'Pending' : `${(economics.marginRate * 100).toFixed(1)}%`}</strong></article>
                     <article><span>Break-even sale price</span><strong>${money(economics.breakEvenPrice, economics.currency)}</strong></article>
                 </div><p class="sell-panel-note">${escapeHtml(economics.caveat)}</p>
-            </section>` : `<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">${escapeHtml(assessment.economicsNote || 'Add purchase price and expected selling price to calculate the commercial result.')}</p></section>`;
+            </section>` : (anzEconomics || `<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">${escapeHtml(assessment.economicsNote || 'Add purchase price and expected selling price to calculate the commercial result.')}</p></section>`);
         const conclusion = assessment.consumerConclusion;
         const sellerConclusion = assessment.sellerConclusion;
         const commercial = assessment.commercialConclusion;
@@ -669,7 +686,7 @@ function bootstrapCanISellItPage() {
         const data = new FormData(advancedForm);
         currentEvidenceAnswers = { ...currentEvidenceAnswers, ...resolvedEvidence(data) };
         currentConfirmedDocuments = confirmedDocuments(data);
-        const costKeys = ['currency', 'quantity', 'purchaseUnit', 'saleUnit', 'freightTotal', 'insuranceTotal', 'otherImportTotal', 'dutyRate', 'importTaxRate', 'platformFeeRate', 'otherSellingUnit'];
+        const costKeys = ['currency', 'quantity', 'purchaseUnit', 'saleUnit', 'freightTotal', 'insuranceTotal', 'shippingMode', 'otherImportTotal', 'dutyRate', 'importTaxRate', 'platformFeeRate', 'otherSellingUnit'];
         const costs = Object.fromEntries(costKeys.map((key) => [key, data.get(key)]));
         uploadedFiles = [];
         const sourceFiles = Array.from(evidenceFiles.files || []);

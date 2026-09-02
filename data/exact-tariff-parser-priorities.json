@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-01",
-  "generated_at": "2026-09-01T20:59:39.983Z",
+  "version": "2026-09-02",
+  "generated_at": "2026-09-02T01:59:30.872Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -4864,6 +4864,72 @@
         "Map the broad HS prefix to exact official tariff-line candidates.",
         "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
         "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-AU-GLOBAL-ELECTRONICS-IMPORT-BASELINE",
+      "rule_id": "AU-GLOBAL-ELECTRONICS-IMPORT-BASELINE",
+      "route": "*->AU",
+      "product_id": "Australia electronics import duty and GST baseline",
+      "import_country": "AU",
+      "origin_country": "*",
+      "hs_code": "841451 / 847130 / 847160 / 847180 / 850440 / 850760 / 8508 / 8510 / 8517 / 8518 / 8525 / 8528 / 8531 / 8536 / 8537 / 8539 / 8543 / 9004 / 9019 / 9029 / 9405 / 9503 / 9504",
+      "source_status": "official_link",
+      "source_trust": "official_heading_only",
+      "parser_target": "AU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 0,
+      "why_priority": "*->AU 841451 / 847130 / 847160 / 847180 / 850440 / 850760 / 8508 / 8510 / 8517 / 8518 / 8525 / 8528 / 8531 / 8536 / 8537 / 8539 / 8543 / 9004 / 9019 / 9029 / 9405 / 9503 / 9504 remains a rule-level exact-rate gap: Australia electronics import duty and GST baseline is official_link.",
+      "rate_change_drivers": [],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "power_conversion_scope",
+        "portable_adp_scope",
+        "camera_transmission_scope",
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NZ-GLOBAL-ELECTRONICS-IMPORT-BASELINE",
+      "rule_id": "NZ-GLOBAL-ELECTRONICS-IMPORT-BASELINE",
+      "route": "*->NZ",
+      "product_id": "New Zealand electronics import duty, GST and goods-levy baseline",
+      "import_country": "NZ",
+      "origin_country": "*",
+      "hs_code": "841451 / 847130 / 847160 / 847180 / 850440 / 850760 / 8508 / 8510 / 8517 / 8518 / 8525 / 8528 / 8531 / 8536 / 8537 / 8539 / 8543 / 9004 / 9019 / 9029 / 9405 / 9503 / 9504",
+      "source_status": "official_link",
+      "source_trust": "official_heading_only",
+      "parser_target": "NZ exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 0,
+      "why_priority": "*->NZ 841451 / 847130 / 847160 / 847180 / 850440 / 850760 / 8508 / 8510 / 8517 / 8518 / 8525 / 8528 / 8531 / 8536 / 8537 / 8539 / 8543 / 9004 / 9019 / 9029 / 9405 / 9503 / 9504 remains a rule-level exact-rate gap: New Zealand electronics import duty, GST and goods-levy baseline is official_link.",
+      "rate_change_drivers": [],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "power_conversion_scope",
+        "portable_adp_scope",
+        "camera_transmission_scope",
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Create exact-code override rows before promoting this rule beyond screening."
       ],
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     }

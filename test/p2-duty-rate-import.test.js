@@ -38,7 +38,7 @@ function fixture(country, overrides = {}) {
 for (const country of Object.keys(CASES)) {
     test(`${country} complete official artifact publishes exact national tariff rows`, () => {
         const files = fixture(country);
-        const result = importP2DutyRates({ ...files, now: new Date('2026-08-25T00:00:00Z') });
+        const result = importP2DutyRates({ ...files, now: new Date() });
         assert.equal(result.ok, true, result.error);
         const payload = JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8'));
         const rule = payload.rules[0];

@@ -9,12 +9,14 @@ const {
 } = require('../lib/exact-tariff-lines');
 const { syncExactNationalTariffs } = require('../scripts/update-exact-national-tariffs');
 
-test('parses official EU, China, Singapore, and Mexico exact tariff line fields', () => {
+test('parses official EU, China, Singapore, Mexico, Australia and New Zealand exact tariff line fields', () => {
     const fixtures = [
         ['EU', { taric_code: '8542319000', third_country_duty: '3.2%' }],
         ['CN', { 税则号列: '8542319000', mfn_rate: 0 }],
         ['SG', { ahtn_code: '85423100', customs_duty_rate: 'Free' }],
-        ['MX', { tigie_code: '85423101', igi_rate: '5%' }]
+        ['MX', { tigie_code: '85423101', igi_rate: '5%' }],
+        ['AU', { hs_code: '85182100', general_rate: '5%' }],
+        ['NZ', { hs_code: '85182100', normal_rate: 'Free' }]
     ];
     fixtures.forEach(([country, row]) => {
         const parsed = parseExactTariffRows({
