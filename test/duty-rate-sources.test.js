@@ -1460,6 +1460,19 @@ test('Korea official failure explicitly preserves maintained last-good candidate
     assert.equal(result.writes_official_machine_rates, false);
 });
 
+test('Korea reachable official source with no parsed rows preserves last-good candidates', async () => {
+    const result = await updateKoreaRulesFromOfficialSource({
+        dryRun: true,
+        fetcher: async () => ({ status_code: 200, body: '<html><body>No tariff table</body></html>' })
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.official_fetch_degraded, true);
+    assert.equal(result.official_fetch_degraded_reason, 'official_source_returned_no_rate_rows');
+    assert.equal(result.preserved_last_good, true);
+    assert.equal(result.fallback_mode, 'maintained_exact_candidates');
+    assert.equal(result.writes_official_machine_rates, false);
+});
+
 test('India official candidate can parse BCD SWS and IGST rows', () => {
     const html = `
         <table>
@@ -1591,6 +1604,19 @@ test('India official failure explicitly preserves maintained last-good candidate
     });
     assert.equal(result.ok, true);
     assert.equal(result.official_fetch_degraded, true);
+    assert.equal(result.preserved_last_good, true);
+    assert.equal(result.fallback_mode, 'maintained_exact_candidates');
+    assert.equal(result.writes_official_machine_rates, false);
+});
+
+test('India reachable official source with no parsed rows preserves last-good candidates', async () => {
+    const result = await require('../scripts/update-static-duty-rates').updateIndiaRulesFromOfficialSource({
+        dryRun: true,
+        fetcher: async () => ({ status_code: 200, body: '<html><body>No tariff table</body></html>' })
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.official_fetch_degraded, true);
+    assert.equal(result.official_fetch_degraded_reason, 'official_source_returned_no_rate_rows');
     assert.equal(result.preserved_last_good, true);
     assert.equal(result.fallback_mode, 'maintained_exact_candidates');
     assert.equal(result.writes_official_machine_rates, false);

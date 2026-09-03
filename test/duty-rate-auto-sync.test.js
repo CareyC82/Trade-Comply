@@ -21,6 +21,10 @@ const {
 const {
     buildDiagnosticLines
 } = require('../scripts/print-duty-rate-sync-diagnostics');
+const {
+    dutyRateTestFiles,
+    runVerification
+} = require('../scripts/verify-duty-rate-sync-output');
 
 test('material duty-rate changes are detected by percentage-point threshold', () => {
     assert.equal(isMaterialRateChange({
@@ -304,18 +308,49 @@ test('conflicting official rates inside one multi-prefix rule block auto-apply',
     assert.match(payload.exceptions[0].reason, /USITC duty-rate updater reported/);
 });
 
-test('GitHub duty-rate workflow runs tests before committing sync output', () => {
+test('GitHub duty-rate workflow separates baseline tests from generated-output verification', () => {
     const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'duty-rate-sync.yml'), 'utf8');
 
     assert.match(workflow, /cron:\s*"12 18 \* \* \*"/);
     assert.match(workflow, /npm run sync:duty-rates:auto/);
     assert.match(workflow, /npm test/);
+    assert.match(workflow, /Verify repository test baseline[\s\S]*npm test[\s\S]*Run duty-rate auto sync/);
+    assert.match(workflow, /Verify duty-rate sync output[\s\S]*npm run verify:duty-rate-sync/);
     assert.match(workflow, /node scripts\/print-duty-rate-sync-diagnostics\.js/);
     assert.match(workflow, /if:\s*always\(\)/);
     assert.match(workflow, /actions\/upload-artifact@v4/);
     assert.match(workflow, /data\/duty-rate-sync-status\.json/);
     assert.match(workflow, /data\/duty-rate-sources\.json/);
     assert.match(workflow, /git pull --rebase --autostash origin/);
+});
+
+test('duty-rate output verifier scopes tests and reports each failed check', () => {
+    const testFiles = dutyRateTestFiles(path.join(__dirname, '..'));
+    assert.ok(testFiles.includes('test/duty-rate-auto-sync.test.js'));
+    assert.ok(testFiles.includes('test/post-entry-tax-coverage.test.js'));
+    assert.equal(testFiles.includes('test/search-quality.test.js'), false);
+
+    const lines = [];
+    let callCount = 0;
+    const result = runVerification({
+        root: path.join(__dirname, '..'),
+        runner(command, args) {
+            callCount += 1;
+            return callCount === 2
+                ? { status: 1, stdout: 'failing test: IN parser', stderr: '' }
+                : { status: 0, stdout: '', stderr: '' };
+        },
+        output: {
+            log: line => lines.push(String(line)),
+            error: line => lines.push(String(line))
+        }
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.failures.length, 1);
+    assert.equal(result.failures[0].label, 'Post-Entry tax coverage');
+    assert.match(lines.join('\n'), /::error title=Post-Entry tax coverage/);
+    assert.match(lines.join('\n'), /Duty-rate source diagnostics/);
 });
 
 test('duty-rate diagnostics print source watchlist and parser priority queue', () => {
