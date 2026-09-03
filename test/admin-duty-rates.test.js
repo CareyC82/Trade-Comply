@@ -53,6 +53,10 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Priority families/);
     assert.match(html, /Rate layers/);
     assert.match(html, /kept separate/);
+    assert.match(html, /Priority HS coverage:/);
+    assert.match(html, /artifactMarketDefaults/);
+    assert.match(html, /Central Board of Indirect Taxes and Customs \/ ICEGATE/);
+    assert.match(html, /Korea Customs Service/);
     assert.match(html, /Unmet Search Workbench/);
     assert.match(html, /Only real captured searches are shown/);
 });

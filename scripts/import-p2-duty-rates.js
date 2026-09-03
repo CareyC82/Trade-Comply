@@ -16,6 +16,7 @@ const { mergeEffectiveOverrides } = require('../lib/versioned-duty-overrides');
 const ROOT = path.join(__dirname, '..');
 const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const STATUS_PATH = path.join(ROOT, 'data', 'p2-duty-rate-import-status.json');
+const PRIORITIES_PATH = path.join(ROOT, 'data', 'exact-tariff-parser-priorities.json');
 
 const MARKET_CONFIG = {
     IN: {
@@ -56,6 +57,20 @@ const MARKET_CONFIG = {
         separate: 'Import VAT, sanctions, restricted-party controls, preferences and product approvals remain separate checks.'
     }
 };
+
+function priorityPrefixesFor(country, prioritiesPath = PRIORITIES_PATH) {
+    const fallback = MARKET_CONFIG[country]?.priorityPrefixes || [];
+    try {
+        const payload = readJson(prioritiesPath);
+        const prefixes = [...new Set((payload.priorities || [])
+            .filter((row) => String(row.import_country || '').toUpperCase() === country)
+            .map((row) => digits(row.hs_code))
+            .filter(Boolean))];
+        return prefixes.length ? prefixes : fallback;
+    } catch {
+        return fallback;
+    }
+}
 
 function readJson(filePath) { return JSON.parse(fs.readFileSync(filePath, 'utf8')); }
 function hash(buffer) { return crypto.createHash('sha256').update(buffer).digest('hex'); }
@@ -139,7 +154,7 @@ function parseArtifact(country, filePath, buffer = fs.readFileSync(filePath)) {
     throw new Error(`Unsupported ${country} artifact type: ${ext || '(none)'}`);
 }
 
-function validate(country, manifest, buffer, parsedRows) {
+function validate(country, manifest, buffer, parsedRows, prioritiesPath) {
     const config = MARKET_CONFIG[country];
     const errors = [];
     if (!config) return { errors: [`unsupported market ${country}`], rows: [], sha256: hash(buffer) };
@@ -172,7 +187,7 @@ function validate(country, manifest, buffer, parsedRows) {
     });
     if (!parsedRows.length) errors.push('artifact contains no tariff rows');
     const rows = [...new Map(parsedRows.map((row) => [row.hs_code, row])).values()].sort((a, b) => a.hs_code.localeCompare(b.hs_code));
-    const priorityCoverage = Object.fromEntries((config.priorityPrefixes || []).map((prefix) => {
+    const priorityCoverage = Object.fromEntries(priorityPrefixesFor(country, prioritiesPath).map((prefix) => {
         const exactCodes = rows.filter((row) => row.hs_code.startsWith(prefix)).map((row) => row.hs_code);
         if (!exactCodes.length) errors.push(`priority tariff family ${prefix} is missing`);
         return [prefix, { covered: exactCodes.length > 0, exact_codes: exactCodes }];
@@ -223,7 +238,7 @@ function applyRows(country, payload, rows, manifest, checkedAt, sha256) {
     return changed;
 }
 
-function importP2DutyRates({ country, artifactPath, manifestPath, dutyRatesPath = DUTY_RATES_PATH, statusPath = STATUS_PATH, dryRun = false, now = new Date() }) {
+function importP2DutyRates({ country, artifactPath, manifestPath, dutyRatesPath = DUTY_RATES_PATH, statusPath = STATUS_PATH, prioritiesPath = PRIORITIES_PATH, dryRun = false, now = new Date() }) {
     country = String(country || '').toUpperCase();
     const checkedAt = now.toISOString();
     const statusPayload = fs.existsSync(statusPath) ? readJson(statusPath) : { schema_version: 1, markets: {} };
@@ -234,7 +249,7 @@ function importP2DutyRates({ country, artifactPath, manifestPath, dutyRatesPath 
         const buffer = fs.readFileSync(artifactPath);
         const manifest = readJson(manifestPath);
         const parsed = parseArtifact(country, artifactPath, buffer);
-        const gate = validate(country, manifest, buffer, parsed);
+        const gate = validate(country, manifest, buffer, parsed, prioritiesPath);
         if (gate.errors.length) throw new Error(gate.errors.join('; '));
         const payload = readJson(dutyRatesPath);
         const changedRules = applyRows(country, payload, gate.rows, manifest, checkedAt, gate.sha256);
@@ -281,4 +296,4 @@ if (require.main === module) {
     process.exit(result.ok ? 0 : 1);
 }
 
-module.exports = { MARKET_CONFIG, parseArtifact, normalizeStructuredRows, validate, applyRows, importP2DutyRates, hash };
+module.exports = { MARKET_CONFIG, parseArtifact, normalizeStructuredRows, validate, priorityPrefixesFor, applyRows, importP2DutyRates, hash };

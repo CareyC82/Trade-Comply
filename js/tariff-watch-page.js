@@ -183,6 +183,12 @@
         const period = row.effectiveFrom || row.effectiveTo
             ? `${row.effectiveFrom || 'earliest'} → ${row.effectiveTo || 'open-ended'}`
             : 'No bounded effective period';
+        const layers = row.rateLayers || {};
+        const layerNotes = [
+            layers.sws !== null && layers.sws !== undefined ? `SWS ${(Number(layers.sws) * 100).toFixed(2)}% — separate` : '',
+            layers.igst !== null && layers.igst !== undefined ? `IGST ${(Number(layers.igst) * 100).toFixed(2)}% — separate import tax` : '',
+            layers.preferenceRateText ? `FTA preference ${layers.preferenceRateText} — origin evidence required` : ''
+        ].filter(Boolean);
         return `
             <article class="tariff-market-signal-card">
                 <div class="tariff-market-signal-card__head">
@@ -204,6 +210,7 @@
                     <div><span>Source trust</span><strong>${escapeHtml(row.confidence)}</strong></div>
                     <div><span>Freshness</span><strong>${escapeHtml(row.freshnessLabel || 'Date unavailable')}</strong></div>
                 </div>
+                ${layerNotes.length ? `<small><strong>Separate rate layers:</strong> ${escapeHtml(layerNotes.join(' · '))}</small>` : ''}
                 <small>${escapeHtml(row.useStatus?.guidance || row.trustDetail || row.sourceText || 'Confirm exact HS, origin, and entry date before filing.')}</small>
                 <small class="tariff-effective-period">Effective period: ${escapeHtml(period)}</small>
             </article>

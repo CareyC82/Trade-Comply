@@ -769,6 +769,24 @@
             return btoa(binary);
         }
 
+        const artifactMarketDefaults = {
+            MY: { authority: 'Royal Malaysian Customs', url: 'https://ezhs.customs.gov.my/' },
+            IN: { authority: 'Central Board of Indirect Taxes and Customs / ICEGATE', url: 'https://foservices.icegate.gov.in/cip/cip/' },
+            KR: { authority: 'Korea Customs Service', url: 'https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037' },
+            VN: { authority: 'Vietnam Customs', url: 'https://www.customs.gov.vn/' },
+            TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://portal.sw.nat.gov.tw/' }
+        };
+
+        function applyArtifactMarketDefaults() {
+            const country = document.getElementById('artifact-country').value;
+            const defaults = artifactMarketDefaults[country] || {};
+            document.getElementById('artifact-authority').value = defaults.authority || '';
+            document.getElementById('artifact-source-url').value = defaults.url || '';
+            document.getElementById('artifact-preview').textContent = `${country}: select a complete official artifact. Preview will list every required priority HS family and block incomplete coverage.`;
+            document.getElementById('btn-publish-artifact').disabled = true;
+            currentArtifactPreview = null;
+        }
+
         async function previewDutyArtifact() {
             const output = document.getElementById('artifact-preview');
             const publish = document.getElementById('btn-publish-artifact');
@@ -799,8 +817,12 @@
                 currentArtifactUpload = request;
                 currentArtifactPreview = result;
                 const diff = result.diff || {};
+                const priority = result.importer_result?.priority_coverage || {};
+                const missingPriority = Object.entries(priority).filter(([, value]) => !value?.covered).map(([prefix]) => prefix);
+                const coveredPriority = Object.entries(priority).filter(([, value]) => value?.covered).map(([prefix]) => prefix);
                 const rowLabel = row => `${row.rule_id || 'rule'} · ${row.hs_code || 'HS'} · ${Number(row.base_rate || 0) * 100}%`;
                 output.innerHTML = `<div class="${result.ok ? 'status-bar' : 'empty'}"><strong>${result.ok ? 'PREVIEW PASSED' : 'IMPORT BLOCKED'}</strong> · added ${diff.added_count || 0}, changed ${diff.changed_count || 0}, removed ${diff.removed_count || 0}${(diff.anomalies || []).length ? `<br>${escapeHtml(diff.anomalies.join(' | '))}` : ''}</div>
+                    ${Object.keys(priority).length ? `<p><strong>Priority HS coverage:</strong> ${coveredPriority.length}/${Object.keys(priority).length}${coveredPriority.length ? `<br><span class="meta">Covered: ${escapeHtml(coveredPriority.join(', '))}</span>` : ''}${missingPriority.length ? `<br><span class="error">Missing: ${escapeHtml(missingPriority.join(', '))}</span>` : ''}</p>` : ''}
                     <details open><summary>Exact HS changes</summary>
                     ${(diff.added || []).length ? `<p><strong>Added</strong><br>${(diff.added || []).slice(0, 20).map(row => escapeHtml(rowLabel(row))).join('<br>')}</p>` : ''}
                     ${(diff.changed || []).length ? `<p><strong>Changed</strong><br>${(diff.changed || []).slice(0, 20).map(change => escapeHtml(`${change.before.hs_code}: ${Number(change.before.base_rate) * 100}% → ${Number(change.after.base_rate) * 100}%`)).join('<br>')}</p>` : ''}
@@ -2806,6 +2828,7 @@
             document.getElementById('btn-publish-artifact').disabled = true;
         });
         document.getElementById('btn-preview-artifact').addEventListener('click', previewDutyArtifact);
+        document.getElementById('artifact-country').addEventListener('change', applyArtifactMarketDefaults);
         document.getElementById('btn-publish-artifact').addEventListener('click', publishDutyArtifact);
         document.getElementById('artifact-history').addEventListener('click', (event) => {
             const button = event.target.closest('[data-artifact-rollback]');
