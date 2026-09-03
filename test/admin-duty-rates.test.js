@@ -50,8 +50,18 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /accept="[^"]*\.pdf/);
     assert.match(html, /Hybrid → official exact promotion queue/);
     assert.match(html, /Filing-grade regression matrix/);
+    assert.match(html, /Priority families/);
+    assert.match(html, /Rate layers/);
+    assert.match(html, /kept separate/);
     assert.match(html, /Unmet Search Workbench/);
     assert.match(html, /Only real captured searches are shown/);
+});
+
+test('admin page explains parser drift and official access barriers', () => {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
+    assert.match(html, /Parser drift:/);
+    assert.match(html, /Access barrier:/);
+    assert.match(html, /Observed fields:/);
 });
 
 test('admin exact tariff feed status covers all six exact connector groups without exposing URLs', () => {

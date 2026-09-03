@@ -85,6 +85,39 @@ test('official fetch degradation classifier gives repair-focused categories', ()
     assert.equal(noRows.category, 'parser_no_rows');
     assert.match(noRows.label, /parser found no rate rows/i);
     assert.match(noRows.action, /parser fixture/i);
+
+    const drift = classifyOfficialFetchDegradation('reachable_response_no_supported_tariff_rows');
+    assert.equal(drift.category, 'parser_schema_drift');
+    assert.match(drift.action, /observed response fields/i);
+
+    const barrier = classifyOfficialFetchDegradation('official_access_barrier: login required');
+    assert.equal(barrier.category, 'access_limited');
+    assert.match(barrier.action, /downloadable artifact|API/i);
+});
+
+test('official fetch summary carries parser drift telemetry into the source run plan', () => {
+    const run = buildRunSummary('India Customs official-live', {
+        ok: true,
+        official_fetch_degraded: true,
+        official_fetch_degraded_reason: 'official_source_returned_no_rate_rows',
+        official_fetch: {
+            ok: false,
+            row_count: 0,
+            parser_diagnostics: {
+                parser_version: 2,
+                response_format: 'json',
+                schema_drift_detected: true,
+                schema_drift_reason: 'reachable_response_no_supported_tariff_rows',
+                observed_fields: ['newTariffShape']
+            }
+        }
+    });
+    const plan = buildSourceRunPlan({
+        sourcesPayload: { sources: [{ country: 'IN', source_status: 'hybrid_official_candidate', maintenance_priority: 'P2' }] },
+        runs: [run]
+    });
+    assert.equal(plan[0].official_fetch_summary.schema_drift_detected, true);
+    assert.deepEqual(plan[0].official_fetch_summary.observed_fields, ['newTariffShape']);
 });
 
 test('official write pass is blocked after dry-run source degradation', () => {

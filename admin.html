@@ -723,12 +723,18 @@
             const rows = ['IN', 'KR', 'VN', 'TW'].map((country) => {
                 const item = markets[country] || {};
                 const artifact = item.artifact || {};
-                return `<tr><td><strong>${country}</strong></td><td>${escapeHtml(item.trust_gate || 'not_run')}</td><td>${artifact.parsed_row_count || 0}</td><td>${escapeHtml(artifact.effective_at || '—')}</td><td>${escapeHtml(formatDateTime(item.last_good_at))}</td><td><span class="meta">${escapeHtml(item.error || '—')}</span></td></tr>`;
+                const priority = Object.values(item.priority_coverage || {});
+                const covered = priority.filter((entry) => entry && entry.covered).length;
+                const layers = item.rate_layer_policy || {};
+                const layerLabel = layers.base_duty
+                    ? `${layers.base_duty}; ${(layers.separate_layers || []).join(', ')} kept separate`
+                    : '—';
+                return `<tr><td><strong>${country}</strong></td><td>${escapeHtml(item.trust_gate || 'not_run')}</td><td>${artifact.parsed_row_count || 0}</td><td>${priority.length ? `${covered}/${priority.length}` : '—'}</td><td><span class="meta">${escapeHtml(layerLabel)}</span></td><td>${escapeHtml(artifact.effective_at || '—')}</td><td>${escapeHtml(formatDateTime(item.last_good_at))}</td><td><span class="meta">${escapeHtml(item.error || '—')}</span></td></tr>`;
             }).join('');
             return `
                 <div class="crawl-section-title"><h3>P2 official tariff artifacts</h3><span class="meta">IN · KR · VN · TW · RU · last-good protected</span></div>
                 <div class="coverage-table-wrap"><table class="coverage-table">
-                    <thead><tr><th>Market</th><th>Trust gate</th><th>Exact rows</th><th>Effective</th><th>Last good</th><th>Error</th></tr></thead>
+                    <thead><tr><th>Market</th><th>Trust gate</th><th>Exact rows</th><th>Priority families</th><th>Rate layers</th><th>Effective</th><th>Last good</th><th>Error</th></tr></thead>
                     <tbody>${rows}</tbody>
                 </table></div>
             `;
@@ -1273,6 +1279,9 @@
                     ${summary.official_url && summary.official_url !== summary.lookup_url ? `<div class="grade-note">Source: <a href="${escapeHtml(summary.official_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(summary.official_url)}</a></div>` : ''}
                     ${summary.degraded_reason ? `<div class="grade-note">Official fetch: ${escapeHtml(summary.degraded_reason)}${summary.degraded_detail ? ` · ${escapeHtml(summary.degraded_detail)}` : ''}</div>` : ''}
                     ${summary.degraded_category ? `<div class="grade-note">Diagnosis: ${escapeHtml(summary.degraded_category)}</div>` : ''}
+                    ${summary.schema_drift_detected ? `<div class="grade-note"><strong>Parser drift:</strong> ${escapeHtml(summary.schema_drift_reason || 'Official response structure changed')} · parser v${escapeHtml(summary.parser_version || '—')}</div>` : ''}
+                    ${summary.access_barrier ? '<div class="grade-note"><strong>Access barrier:</strong> official page requires an interactive session; last-good data remains active.</div>' : ''}
+                    ${Array.isArray(summary.observed_fields) && summary.observed_fields.length ? `<div class="grade-note">Observed fields: <code>${escapeHtml(summary.observed_fields.slice(0, 12).join(', '))}</code></div>` : ''}
                     ${summary.degraded_action ? `<div class="grade-note">Fix: ${escapeHtml(summary.degraded_action)}</div>` : ''}
                 `;
             };

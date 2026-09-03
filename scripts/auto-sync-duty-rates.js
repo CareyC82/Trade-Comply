@@ -67,9 +67,11 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
     const changes = Array.isArray(result.changes) ? result.changes : [];
     const errors = Array.isArray(result.errors) ? result.errors : [];
     const degradedDetail = result.official_fetch_degraded_detail || result.official_fetch?.error || '';
+    const parserDiagnostics = result.official_fetch?.parser_diagnostics || null;
     const degradedDiagnosis = classifyOfficialFetchDegradation([
         result.official_fetch_degraded_reason,
-        degradedDetail
+        degradedDetail,
+        parserDiagnostics?.schema_drift_reason
     ].filter(Boolean).join(' '));
     return {
         source,
@@ -82,6 +84,7 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         countries: Array.isArray(result.countries) ? result.countries : [],
         writes_official_machine_rates: Boolean(result.writes_official_machine_rates),
         official_fetch: result.official_fetch || null,
+        parser_diagnostics: parserDiagnostics,
         official_fetch_degraded: Boolean(result.official_fetch_degraded),
         official_fetch_degraded_reason: result.official_fetch_degraded_reason || '',
         official_fetch_degraded_detail: degradedDetail,
@@ -104,6 +107,7 @@ function buildOfficialFetchSummary(run = {}) {
         ? officialFetch.query_attempts
         : [];
     const exactQuerySummary = officialFetch?.exact_query_summary || null;
+    const parserDiagnostics = officialFetch?.parser_diagnostics || run?.parser_diagnostics || null;
     const matchedQueries = Number(exactQuerySummary?.matched ?? queryAttempts.filter(row => Number(row?.row_count || 0) > 0).length);
     const attemptedQueries = Number(exactQuerySummary?.attempted ?? queryAttempts.length);
     return {
@@ -120,6 +124,12 @@ function buildOfficialFetchSummary(run = {}) {
         exact_query_attempted: Number.isFinite(attemptedQueries) ? attemptedQueries : 0,
         exact_query_matched: Number.isFinite(matchedQueries) ? matchedQueries : 0,
         parser_ready: Boolean(officialFetch?.machine_parser_ready || officialFetch?.writes_official_machine_rates || run?.writes_official_machine_rates),
+        parser_version: parserDiagnostics?.parser_version || null,
+        response_format: parserDiagnostics?.response_format || '',
+        schema_drift_detected: Boolean(parserDiagnostics?.schema_drift_detected),
+        schema_drift_reason: parserDiagnostics?.schema_drift_reason || '',
+        access_barrier: Boolean(parserDiagnostics?.access_barrier),
+        observed_fields: Array.isArray(parserDiagnostics?.observed_fields) ? parserDiagnostics.observed_fields : [],
         status_label: run?.official_fetch_degraded
             ? 'Official fetch degraded'
             : matchedQueries > 0
@@ -160,6 +170,20 @@ function classifyOfficialFetchDegradation(detail = '') {
             category: '',
             label: '',
             action: ''
+        };
+    }
+    if (text.includes('official_access_barrier') || text.includes('captcha') || text.includes('login required') || text.includes('session expired')) {
+        return {
+            category: 'access_limited',
+            label: 'Official source requires an interactive session',
+            action: 'Use an official downloadable artifact or approved API; retain last-good rates and do not treat the page shell as tariff data.'
+        };
+    }
+    if (text.includes('reachable_response_no_supported_tariff_rows') || text.includes('schema_drift')) {
+        return {
+            category: 'parser_schema_drift',
+            label: 'Official response structure changed',
+            action: 'Inspect observed response fields, update the source fixture/parser, and keep last-good exact rows until regression tests pass.'
         };
     }
     if (
@@ -433,6 +457,7 @@ function buildSourceRunPlan({ sourcesPayload = {}, runs = [] } = {}) {
                 recovery_command: recoveryCommand,
                 recovery_hint: recoveryHint,
                 official_fetch_summary: buildOfficialFetchSummary(run),
+                parser_diagnostics: run?.official_fetch?.parser_diagnostics || run?.parser_diagnostics || null,
                 official_probe_live_status: liveProbe ? {
                     checked: Boolean(liveProbe.checked ?? liveProbe.official_probe?.checked),
                     ok: liveProbe.ok ?? liveProbe.official_probe?.ok ?? null,

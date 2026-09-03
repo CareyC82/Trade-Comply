@@ -9,8 +9,18 @@ const { findDutyRule, setDutyRulesForTest } = require('../lib/post-entry-value')
 const { buildDutyRateStatusPayload } = require('../scripts/admin-server');
 
 const CASES = {
-    IN: { authority: 'Central Board of Indirect Taxes and Customs / ICEGATE', url: 'https://www.icegate.gov.in/tariff.xlsx', code: '85176200', csv: 'HS Code,Description,BCD,SWS,IGST\n85176200,Router,10%,10%,18%' },
-    KR: { authority: 'Korea Customs Service', url: 'https://www.customs.go.kr/tariff.xlsx', code: '8517620000', csv: 'HS Code,Description,Import Rate\n8517620000,Router,8%' },
+    IN: { authority: 'Central Board of Indirect Taxes and Customs / ICEGATE', url: 'https://www.icegate.gov.in/tariff.xlsx', code: '85176200', csv: [
+        'HS Code,Description,BCD,SWS,IGST',
+        '84713010,Tablet,0%,10%,18%', '85044010,Power converter,10%,10%,18%',
+        '85076000,Lithium-ion battery,10%,10%,18%', '85171300,Smartphone,10%,10%,18%',
+        '85176200,Router,10%,10%,18%', '85423100,Processor,0%,10%,18%'
+    ].join('\n') },
+    KR: { authority: 'Korea Customs Service', url: 'https://www.customs.go.kr/tariff.xlsx', code: '8517620000', csv: [
+        'HS Code,Description,Import Rate,FTA Rate',
+        '8471300000,Tablet,0%,0%', '8504400000,Power converter,8%,0%',
+        '8507600000,Lithium-ion battery,8%,0%', '8517130000,Smartphone,0%,0%',
+        '8517620000,Router,8%,0%', '8542310000,Processor,0%,0%'
+    ].join('\n') },
     VN: { authority: 'Vietnam Customs', url: 'https://www.customs.gov.vn/tariff.xlsx', code: '85176200', csv: 'HS Code,Description,MFN Rate\n85176200,Router,5%' },
     TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://portal.sw.nat.gov.tw/tariff.xlsx', code: '85176200000', csv: 'CCC Code,Description,Import Rate\n85176200000,Router,4%' },
     RU: { authority: 'Eurasian Economic Commission', url: 'https://eec.eaeunion.org/tariff.xlsx', code: '8517620000', csv: 'HS Code,Description,Import Rate\n8517620000,Router,5%' }
@@ -42,8 +52,9 @@ for (const country of Object.keys(CASES)) {
         assert.equal(result.ok, true, result.error);
         const payload = JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8'));
         const rule = payload.rules[0];
-        assert.equal(rule.exact_code_overrides[0].hs_code, files.code);
-        assert.equal(rule.exact_code_overrides[0].confidence, 'Official exact tariff line');
+        const exactOverride = rule.exact_code_overrides.find((row) => row.hs_code === files.code);
+        assert.ok(exactOverride);
+        assert.equal(exactOverride.confidence, 'Official exact tariff line');
         assert.equal(rule.add_on_layers.length, 1, 'tax layer must remain separate');
         const tariffRow = buildTariffRows(payload).find((row) => row.hsScope === files.code);
         assert.equal(tariffRow.trustLabel, 'Exact HS');
@@ -58,11 +69,42 @@ test('India artifact records BCD, SWS and IGST without merging tax layers into b
     const files = fixture('IN');
     const result = importP2DutyRates({ ...files });
     assert.equal(result.ok, true);
-    const override = JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8')).rules[0].exact_code_overrides[0];
+    const override = JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8')).rules[0].exact_code_overrides
+        .find((row) => row.hs_code === '85176200');
     assert.equal(override.base_rate, 0.1);
     assert.equal(override.sws_rate, 0.1);
     assert.equal(override.igst_rate, 0.18);
     assert.match(override.source_note, /SWS.*separate/i);
+    assert.deepEqual(result.rate_layer_policy, { base_duty: 'BCD', separate_layers: ['SWS', 'IGST'] });
+    assert.ok(Object.values(result.priority_coverage).every((entry) => entry.covered));
+});
+
+test('Korea artifact keeps 10-digit base duty separate from FTA preference and VAT', () => {
+    const files = fixture('KR');
+    const result = importP2DutyRates({ ...files });
+    assert.equal(result.ok, true);
+    const override = JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8')).rules[0].exact_code_overrides
+        .find((row) => row.hs_code === '8517620000');
+    assert.equal(override.base_rate, 0.08);
+    assert.equal(override.preference_rate_text, '0');
+    assert.equal(override.preference_rate_status, 'separate_origin_eligibility_check_required');
+    assert.deepEqual(result.rate_layer_policy, {
+        base_duty: 'KCS base/MFN rate',
+        separate_layers: ['FTA preference', 'VAT']
+    });
+});
+
+test('India and Korea imports block incomplete priority-family coverage and preserve last-good', () => {
+    for (const country of ['IN', 'KR']) {
+        const item = CASES[country];
+        const rows = item.csv.split('\n');
+        const files = fixture(country, { csv: rows.slice(0, -1).join('\n') });
+        const before = fs.readFileSync(files.dutyRatesPath, 'utf8');
+        const result = importP2DutyRates({ ...files });
+        assert.equal(result.ok, false);
+        assert.match(result.error, /priority tariff family 854231 is missing/);
+        assert.equal(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
+    }
 });
 
 test('P2 importer rejects wrong code length, mixed rates and incomplete artifacts while preserving last-good', () => {

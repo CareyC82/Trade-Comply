@@ -23,14 +23,16 @@ const MARKET_CONFIG = {
         host: /(^|\.)(icegate\.gov\.in|cbic\.gov\.in)$/i,
         codeLength: 8,
         label: 'India Customs',
-        separate: 'SWS, IGST, exemptions, BIS/QCO and WPC remain separate checks.'
+        separate: 'SWS, IGST, exemptions, BIS/QCO and WPC remain separate checks.',
+        priorityPrefixes: ['847130', '850440', '850760', '851713', '851762', '854231']
     },
     KR: {
         authority: /Korea Customs Service/i,
         host: /(^|\.)(customs\.go\.kr)$/i,
         codeLength: 10,
         label: 'Korea Customs Service',
-        separate: 'VAT, FTA preferences and KC/KCC approvals remain separate checks.'
+        separate: 'VAT, FTA preferences and KC/KCC approvals remain separate checks.',
+        priorityPrefixes: ['847130', '850440', '850760', '851713', '851762', '854231']
     },
     VN: {
         authority: /Vietnam Customs|General Department of Customs/i,
@@ -92,7 +94,10 @@ function normalizeStructuredRows(country, rows) {
             source_rate_text: String(baseText || ''),
             description: String(pick(row, ['description', 'goods_description', 'commodity_description', 'item_name']) || ''),
             sws_rate: country === 'IN' ? rate(pick(row, ['sws', 'sws_rate', 'social_welfare_surcharge'])) : null,
-            igst_rate: country === 'IN' ? rate(pick(row, ['igst', 'igst_rate', 'integrated_tax'])) : null
+            igst_rate: country === 'IN' ? rate(pick(row, ['igst', 'igst_rate', 'integrated_tax'])) : null,
+            preference_rate_text: country === 'KR'
+                ? String(pick(row, ['fta_rate', 'preferential_rate', 'agreement_rate', 'special_rate']) ?? '')
+                : ''
         };
     }).filter((row) => row.hs_code || row.source_rate_text);
 }
@@ -104,7 +109,8 @@ function adaptDelegatedRows(country, rows) {
         source_rate_text: String(country === 'IN' ? row.bcd_rate_text || '' : country === 'KR' ? row.base_rate_text || '' : row.rate_text || ''),
         description: String(row.item_name || ''),
         sws_rate: country === 'IN' ? row.sws_rate : null,
-        igst_rate: country === 'IN' ? row.igst_rate : null
+        igst_rate: country === 'IN' ? row.igst_rate : null,
+        preference_rate_text: ''
     }));
 }
 
@@ -166,7 +172,12 @@ function validate(country, manifest, buffer, parsedRows) {
     });
     if (!parsedRows.length) errors.push('artifact contains no tariff rows');
     const rows = [...new Map(parsedRows.map((row) => [row.hs_code, row])).values()].sort((a, b) => a.hs_code.localeCompare(b.hs_code));
-    return { errors, rows, sha256 };
+    const priorityCoverage = Object.fromEntries((config.priorityPrefixes || []).map((prefix) => {
+        const exactCodes = rows.filter((row) => row.hs_code.startsWith(prefix)).map((row) => row.hs_code);
+        if (!exactCodes.length) errors.push(`priority tariff family ${prefix} is missing`);
+        return [prefix, { covered: exactCodes.length > 0, exact_codes: exactCodes }];
+    }));
+    return { errors, rows, sha256, priority_coverage: priorityCoverage };
 }
 
 function buildOverride(country, row, manifest, checkedAt, sha256) {
@@ -184,7 +195,10 @@ function buildOverride(country, row, manifest, checkedAt, sha256) {
         last_checked_at: checkedAt,
         effective_from: String(manifest.effective_at).slice(0, 10),
         artifact_sha256: sha256,
-        ...(country === 'IN' ? { sws_rate: row.sws_rate, igst_rate: row.igst_rate } : {})
+        ...(country === 'IN' ? { sws_rate: row.sws_rate, igst_rate: row.igst_rate } : {}),
+        ...(country === 'KR' && row.preference_rate_text
+            ? { preference_rate_text: row.preference_rate_text, preference_rate_status: 'separate_origin_eligibility_check_required' }
+            : {})
     };
 }
 
@@ -227,6 +241,12 @@ function importP2DutyRates({ country, artifactPath, manifestPath, dutyRatesPath 
         const marketStatus = {
             ok: true, checked_at: checkedAt, last_good_at: dryRun ? prior.last_good_at || null : checkedAt,
             dry_run: dryRun, trust_gate: 'passed', changed_rules: changedRules,
+            priority_coverage: gate.priority_coverage,
+            rate_layer_policy: country === 'IN'
+                ? { base_duty: 'BCD', separate_layers: ['SWS', 'IGST'] }
+                : country === 'KR'
+                    ? { base_duty: 'KCS base/MFN rate', separate_layers: ['FTA preference', 'VAT'] }
+                    : null,
             artifact: { file_name: path.basename(artifactPath), sha256: gate.sha256, source_url: manifest.source_url,
                 published_at: manifest.published_at, effective_at: manifest.effective_at, parsed_row_count: gate.rows.length }
         };

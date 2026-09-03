@@ -25,7 +25,14 @@ function summarizeOfficialFetch(summary = null) {
     const detail = summary.degraded_reason
         ? `; ${summary.degraded_reason}${summary.degraded_detail ? ` (${summary.degraded_detail})` : ''}`
         : '';
-    return `${status}; ${exact}${detail}`;
+    const parser = summary.schema_drift_detected
+        ? `; schema drift (${summary.schema_drift_reason || 'unsupported response shape'})`
+        : summary.access_barrier
+            ? '; official source access barrier'
+            : summary.response_format
+                ? `; ${summary.response_format} parser v${summary.parser_version || '?'}`
+                : '';
+    return `${status}; ${exact}${detail}${parser}`;
 }
 
 function buildDiagnosticLines(payload) {
