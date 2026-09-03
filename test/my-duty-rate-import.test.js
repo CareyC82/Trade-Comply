@@ -59,6 +59,9 @@ test('MY importer accepts complete official CSV and covers router tablet charger
     const result = importMalaysiaDutyRates({ ...files, now: new Date() });
     assert.equal(result.ok, true, result.error);
     assert.equal(result.artifact.parsed_row_count, 5);
+    assert.equal(result.priority_coverage['847130'].covered, true);
+    assert.deepEqual(result.tablet_847130.exact_codes, ['8471302000']);
+    assert.equal(result.tablet_847130.filing_grade_path_ready, true);
     const payload = JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8'));
     const rule = payload.rules[0];
     assert.deepEqual(rule.exact_code_overrides.map((row) => row.hs_code), [

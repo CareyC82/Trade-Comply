@@ -148,6 +148,54 @@ function parseKoreaAdValoremRate(value = '') {
     return percent ? Number(percent[1]) / 100 : null;
 }
 
+function scalarValue(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value !== 'object') return value;
+    for (const key of ['value', 'rate', 'taxRate', 'dutyRate', 'percentage', 'displayValue', 'text']) {
+        if (value[key] !== null && value[key] !== undefined && value[key] !== '') return scalarValue(value[key]);
+    }
+    return '';
+}
+
+function firstRowValue(row, names) {
+    for (const name of names) {
+        if (!Object.hasOwn(row, name)) continue;
+        const value = scalarValue(row[name]);
+        if (String(value).trim()) return value;
+    }
+    return '';
+}
+
+function inspectKoreaOfficialResponse(body = '', rows = []) {
+    const source = String(body || '');
+    const trimmed = source.trim();
+    let responseFormat = /^\s*[\[{]/.test(trimmed) ? 'json' : /<html|<table|<!doctype/i.test(source) ? 'html' : 'text';
+    let observedFields = [];
+    if (responseFormat === 'json') {
+        try {
+            const fields = new Set();
+            const visit = (node, depth = 0) => {
+                if (!node || typeof node !== 'object' || depth > 5) return;
+                if (!Array.isArray(node)) Object.keys(node).forEach(key => fields.add(key));
+                Object.values(node).forEach(value => visit(value, depth + 1));
+            };
+            visit(JSON.parse(trimmed));
+            observedFields = [...fields].sort().slice(0, 40);
+        } catch (_error) {
+            responseFormat = 'text';
+        }
+    }
+    const accessBarrier = /captcha|access denied|forbidden|sign\s*in|login required|session expired|enable javascript/i.test(stripHtml(source));
+    return {
+        parser_version: 2,
+        response_format: responseFormat,
+        observed_fields: observedFields,
+        access_barrier: accessBarrier,
+        schema_drift_detected: !accessBarrier && trimmed.length > 0 && rows.length === 0,
+        schema_drift_reason: accessBarrier ? 'official_access_barrier' : trimmed.length > 0 && rows.length === 0 ? 'reachable_response_no_supported_tariff_rows' : ''
+    };
+}
+
 function parseKoreaTariffRateRows(html = '') {
     const rowMatches = String(html).match(/<tr[\s\S]*?<\/tr>/gi) || [];
     let headerMap = null;
@@ -161,8 +209,8 @@ function parseKoreaTariffRateRows(html = '') {
             };
             return null;
         }
-        const hsCell = headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => /\b\d{6,10}\b/.test(cell));
-        const hsCode = hsCell?.match(/\b\d{6,10}\b/)?.[0] || '';
+        const hsCell = headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => /\b\d{10}\b/.test(cell));
+        const hsCode = hsCell?.match(/\b\d{10}\b/)?.[0] || '';
         const rateCell = (headerMap?.rate >= 0 ? cells[headerMap.rate] : '') || cells.find(cell => /free|면세|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
         const parsedRate = parseKoreaAdValoremRate(rateCell);
         if (!hsCode || parsedRate === null) return null;
@@ -177,9 +225,9 @@ function parseKoreaTariffRateRows(html = '') {
     if (tableRows.length) return tableRows;
 
     return stripHtml(html)
-        .split(/(?=\b\d{6,10}\b)/)
+        .split(/(?=\b\d{10}\b)/)
         .map((line) => {
-            const hsCode = line.match(/\b\d{6,10}\b/)?.[0] || '';
+            const hsCode = line.match(/\b\d{10}\b/)?.[0] || '';
             if (!hsCode) return null;
             const rateText = line.match(/(?:basic rate|customs duty|WTO|general|base rate)[:\s-]*(free|무세|免税|\d+(?:\.\d+)?\s*%)/i)?.[0]
                 || line.match(/\b(free|무세|免税|\d+(?:\.\d+)?\s*%)\b/i)?.[0]
@@ -219,14 +267,20 @@ function parseKoreaOfficialJsonRows(value = '') {
     collectArrays(payload);
     const rows = arrays.flat();
     return rows.map((row) => {
-        const hsCode = String(row.hsCode || row.hs_code || row.hsCd || row.hscode || row.hsSgn || row.hskNo || row.hscode10 || '').replace(/\D/g, '');
-        const rateText = row.taxRate || row.tax_rate || row.base_rate || row.rate || row.aplDtyRt || row.basRt || row.basicRate || row.wtoRate || '';
+        const hsCode = String(firstRowValue(row, [
+            'hsCode', 'hs_code', 'hsCd', 'hscode', 'hsSgn', 'hskNo', 'hscode10', 'hsKndCd',
+            'tariffCode', 'commodityCode'
+        ])).replace(/\D/g, '');
+        const rateText = firstRowValue(row, [
+            'taxRate', 'tax_rate', 'base_rate', 'rate', 'aplDtyRt', 'basRt', 'basicRate',
+            'wtoRate', 'genRt', 'generalRate', 'mfnRate'
+        ]);
         const parsedRate = parseKoreaAdValoremRate(rateText);
-        if (!hsCode || parsedRate === null) return null;
+        if (!/^\d{10}$/.test(hsCode) || parsedRate === null) return null;
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: row.goodsName || row.goods_name || row.itemName || row.prnm || row.korPrnm || row.engPrnm || '',
+            item_name: String(firstRowValue(row, ['goodsName', 'goods_name', 'itemName', 'prnm', 'korPrnm', 'engPrnm', 'commodityName'])),
             base_rate_text: String(rateText),
             parsed_base_rate: parsedRate
         };
@@ -276,10 +330,12 @@ async function fetchKoreaOfficialRows({
                 ...parseKoreaOfficialJsonRows(candidateResponse.body || ''),
                 ...parseKoreaTariffRateRows(candidateResponse.body || '')
             ];
+            const parserDiagnostics = inspectKoreaOfficialResponse(candidateResponse.body || '', candidateRows);
             sourceAttempts.push({
                 official_url: sourceUrl,
                 status_code: candidateResponse.status_code,
-                row_count: candidateRows.length
+                row_count: candidateRows.length,
+                parser_diagnostics: parserDiagnostics
             });
             if (!response || candidateRows.length > rows.length) {
                 response = candidateResponse;
@@ -325,10 +381,12 @@ async function fetchKoreaOfficialRows({
                     candidate.hs_code === row.hs_code
                     && candidate.parsed_base_rate === row.parsed_base_rate
                 )));
+                const parserDiagnostics = inspectKoreaOfficialResponse(lookup.body || '', lookupRows);
                 queryAttempts.push({
                     hs_code: hsCode,
                     status_code: lookup.status_code,
-                    row_count: lookupRows.length
+                    row_count: lookupRows.length,
+                    parser_diagnostics: parserDiagnostics
                 });
                 rows = rows.concat(lookupRows);
             } catch (error) {
@@ -348,6 +406,9 @@ async function fetchKoreaOfficialRows({
         lookup_url: lookupUrl,
         source_attempts: sourceAttempts,
         query_attempts: queryAttempts,
+        parser_diagnostics: rows.length
+            ? { parser_version: 2, schema_drift_detected: false, schema_drift_reason: '' }
+            : inspectKoreaOfficialResponse(response.body || '', rows),
         rows,
         row_count: rows.length
     };
@@ -679,7 +740,8 @@ async function updateKoreaRulesFromOfficialSource({ dryRun = false, fetcher = fe
             matched: (official.query_attempts || []).filter(attempt => Number(attempt.row_count || 0) > 0).length,
             failed: (official.query_attempts || []).filter(attempt => attempt.error || (attempt.status_code && attempt.status_code >= 400)).length
         },
-        error: official.error || ''
+        error: official.error || '',
+        parser_diagnostics: official.parser_diagnostics || null
     };
     result.official_fetch_degraded = !official.ok;
     result.official_fetch_degraded_reason = degradedReason;
@@ -727,6 +789,7 @@ module.exports = {
     parseKoreaAdValoremRate,
     parseKoreaTariffRateRows,
     parseKoreaOfficialJsonRows,
+    inspectKoreaOfficialResponse,
     fetchKoreaOfficialRows,
     buildKoreaOfficialRateCandidate,
     buildKoreaOfficialCandidateForRule,

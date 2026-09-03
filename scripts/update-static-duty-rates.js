@@ -227,9 +227,58 @@ function stripHtml(value = '') {
 
 function parsePercent(value = '') {
     const text = stripHtml(value);
-    if (!text || /^(free|nil|exempt|0(?:\.0+)?\s*%)$/i.test(text)) return 0;
+    if (!text) return null;
+    if (/^(free|nil|exempt|0(?:\.0+)?\s*%)$/i.test(text)) return 0;
     const match = text.match(/(\d+(?:\.\d+)?)\s*%/);
     return match ? Number(match[1]) / 100 : null;
+}
+
+function scalarValue(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value !== 'object') return value;
+    for (const key of ['value', 'rate', 'taxRate', 'dutyRate', 'percentage', 'displayValue', 'text']) {
+        if (value[key] !== null && value[key] !== undefined && value[key] !== '') return scalarValue(value[key]);
+    }
+    return '';
+}
+
+function firstRowValue(row, names) {
+    for (const name of names) {
+        if (!Object.hasOwn(row, name)) continue;
+        const value = scalarValue(row[name]);
+        if (String(value).trim()) return value;
+    }
+    return '';
+}
+
+function inspectOfficialResponse(body = '', rows = []) {
+    const source = String(body || '');
+    const trimmed = source.trim();
+    let responseFormat = /^\s*[\[{]/.test(trimmed) ? 'json' : /<html|<table|<!doctype/i.test(source) ? 'html' : 'text';
+    let observedFields = [];
+    if (responseFormat === 'json') {
+        try {
+            const fields = new Set();
+            const visit = (node, depth = 0) => {
+                if (!node || typeof node !== 'object' || depth > 5) return;
+                if (!Array.isArray(node)) Object.keys(node).forEach(key => fields.add(key));
+                Object.values(node).forEach(value => visit(value, depth + 1));
+            };
+            visit(JSON.parse(trimmed));
+            observedFields = [...fields].sort().slice(0, 40);
+        } catch (_error) {
+            responseFormat = 'text';
+        }
+    }
+    const accessBarrier = /captcha|access denied|forbidden|sign\s*in|login required|session expired|enable javascript/i.test(stripHtml(source));
+    return {
+        parser_version: 2,
+        response_format: responseFormat,
+        observed_fields: observedFields,
+        access_barrier: accessBarrier,
+        schema_drift_detected: !accessBarrier && trimmed.length > 0 && rows.length === 0,
+        schema_drift_reason: accessBarrier ? 'official_access_barrier' : trimmed.length > 0 && rows.length === 0 ? 'reachable_response_no_supported_tariff_rows' : ''
+    };
 }
 
 function buildOfficialArtifactEvidence({
@@ -344,26 +393,26 @@ function parseIndiaOfficialJsonRows(value = '') {
     collectArrays(payload);
     const sourceRows = candidateArrays.flat();
     return sourceRows.map((row) => {
-        const hsCode = String(
-            row.hsn
-            || row.hsnCode
-            || row.hsnCd
-            || row.hsCode
-            || row.hsCd
-            || row.cth
-            || row.tariffItem
-            || row.tariff_item
-            || ''
-        ).replace(/\D/g, '');
-        const bcdText = String(row.bcd || row.bcdRate || row.bcd_rate || row.basicCustomsDuty || row.basic_duty || row.bcdDuty || row.basicCustomDutyRate || '');
-        const swsText = String(row.sws || row.swsRate || row.sws_rate || row.socialWelfareSurcharge || '');
-        const igstText = String(row.igst || row.igstRate || row.igst_rate || row.integratedTax || row.igstDuty || '');
+        const hsCode = String(firstRowValue(row, [
+            'hsn', 'hsnCode', 'hsnCd', 'hsCode', 'hsCd', 'cth', 'tariffItem', 'tariff_item',
+            'tariffItemCode', 'tariff_item_code', 'commodityCode'
+        ])).replace(/\D/g, '');
+        const bcdText = String(firstRowValue(row, [
+            'bcd', 'bcdRate', 'bcd_rate', 'basicCustomsDuty', 'basic_duty', 'bcdDuty',
+            'basicCustomDutyRate', 'basicCustomsDutyRate', 'standardBcdRate'
+        ]));
+        const swsText = String(firstRowValue(row, [
+            'sws', 'swsRate', 'sws_rate', 'socialWelfareSurcharge', 'socialWelfareSurchargeRate'
+        ]));
+        const igstText = String(firstRowValue(row, [
+            'igst', 'igstRate', 'igst_rate', 'integratedTax', 'igstDuty', 'integratedGstRate'
+        ]));
         const bcdRate = parsePercent(bcdText);
         if (!/^\d{6,10}$/.test(hsCode) || bcdRate === null) return null;
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: String(row.description || row.goodsDescription || row.itemName || row.itemDescription || ''),
+            item_name: String(firstRowValue(row, ['description', 'goodsDescription', 'itemName', 'itemDescription', 'commodityDescription'])),
             bcd_rate_text: bcdText,
             sws_rate_text: swsText,
             igst_rate_text: igstText,
@@ -678,6 +727,7 @@ async function fetchIndiaOfficialRows({
                 && candidate.igst_rate === row.igst_rate
             )));
             const acceptableStatus = response.status_code >= 200 && response.status_code < 400;
+            const parserDiagnostics = inspectOfficialResponse(response.body || '', rows);
             const attempt = {
                 ok: acceptableStatus && rows.length > 0,
                 status_code: response.status_code,
@@ -685,6 +735,7 @@ async function fetchIndiaOfficialRows({
                 rows,
                 row_count: rows.length,
                 partial: Boolean(response.partial),
+                parser_diagnostics: parserDiagnostics,
                 error: response.error || ''
             };
             attempts.push({
@@ -692,6 +743,7 @@ async function fetchIndiaOfficialRows({
                 status_code: response.status_code,
                 row_count: rows.length,
                 partial: Boolean(response.partial),
+                parser_diagnostics: parserDiagnostics,
                 error: response.error || ''
             });
             if (attempt.ok) {
@@ -1436,7 +1488,8 @@ async function updateIndiaRulesFromOfficialSource({ dryRun = false, fetcher = fe
         row_count: official.row_count,
         partial: Boolean(official.partial),
         error: official.error || '',
-        attempts: official.attempts || []
+        attempts: official.attempts || [],
+        parser_diagnostics: official.parser_diagnostics || null
     };
     result.official_fetch_degraded = !official.ok;
     result.official_fetch_degraded_reason = degradedReason;
@@ -1521,6 +1574,7 @@ module.exports = {
     parseTaiwanTariffRows,
     parseVietnamTariffRows,
     parsePercent,
+    inspectOfficialResponse,
     probeIndiaReadiness,
     probeStaticBenchmarkReadiness,
     probeStaticBenchmarkReadinessLive,

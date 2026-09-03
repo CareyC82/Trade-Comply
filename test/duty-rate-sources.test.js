@@ -64,6 +64,7 @@ const {
     KR_UNIPASS_TARIFF_URL,
     parseKoreaAdValoremRate,
     parseKoreaOfficialJsonRows,
+    inspectKoreaOfficialResponse,
     parseKoreaTariffRateRows,
     parseKoreaTariffDbHtml,
     probeKoreaReadiness,
@@ -83,6 +84,7 @@ const {
     parseGenericTariffRows,
     parseIndiaTariffRows,
     parseIndiaOfficialJsonRows,
+    inspectOfficialResponse,
     parseMalaysiaTariffRows,
     parseTaiwanTariffRows,
     parseVietnamTariffRows,
@@ -1448,6 +1450,23 @@ test('Korea Customs fixture parses nested official response fields', () => {
     );
 });
 
+test('Korea parser accepts nested rate objects but only emits guarded 10-digit HSK rows', () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'korea-customs-tariff-response-v2.json'), 'utf8');
+    const rows = parseKoreaOfficialJsonRows(fixture);
+    assert.deepEqual(rows.map(row => [row.hs_code, row.parsed_base_rate]), [['8517629000', 0.08]]);
+    assert.equal(parseKoreaOfficialJsonRows({ rows: [{ hsCd: '851762', basicRate: '0%' }] }).length, 0);
+});
+
+test('Korea official response diagnostics distinguish schema drift from access barriers', () => {
+    const drift = inspectKoreaOfficialResponse('{"result":{"renamedRows":[]}}', []);
+    assert.equal(drift.response_format, 'json');
+    assert.equal(drift.schema_drift_detected, true);
+    assert.ok(drift.observed_fields.includes('renamedRows'));
+    const barrier = inspectKoreaOfficialResponse('<html>Session expired. Enable JavaScript.</html>', []);
+    assert.equal(barrier.access_barrier, true);
+    assert.equal(barrier.schema_drift_detected, false);
+});
+
 test('Korea official failure explicitly preserves maintained last-good candidates', async () => {
     const result = await updateKoreaRulesFromOfficialSource({
         dryRun: true,
@@ -1471,6 +1490,7 @@ test('Korea reachable official source with no parsed rows preserves last-good ca
     assert.equal(result.preserved_last_good, true);
     assert.equal(result.fallback_mode, 'maintained_exact_candidates');
     assert.equal(result.writes_official_machine_rates, false);
+    assert.equal(result.official_fetch.parser_diagnostics.schema_drift_detected, true);
 });
 
 test('India official candidate can parse BCD SWS and IGST rows', () => {
@@ -1597,6 +1617,29 @@ test('India CIP fixture parses nested official response fields', () => {
     );
 });
 
+test('India CIP parser accepts nested rate objects and preserves BCD SWS IGST as separate layers', () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'india-cip-tariff-response-v2.json'), 'utf8');
+    const rows = parseIndiaOfficialJsonRows(fixture);
+    assert.deepEqual(
+        [rows[0].hs_code, rows[0].bcd_rate, rows[0].sws_rate, rows[0].igst_rate],
+        ['85176290', 0.1, 0.1, 0.18]
+    );
+});
+
+test('India parser never converts a missing BCD field to duty-free', () => {
+    const rows = parseIndiaOfficialJsonRows({ rows: [{ hsnCode: '85176290', swsRate: '10%', igstRate: '18%' }] });
+    assert.equal(rows.length, 0);
+});
+
+test('India official response diagnostics flag reachable schema drift and not login barriers', () => {
+    const drift = inspectOfficialResponse('{"payload":{"newTariffShape":[]}}', []);
+    assert.equal(drift.schema_drift_detected, true);
+    assert.ok(drift.observed_fields.includes('newTariffShape'));
+    const barrier = inspectOfficialResponse('<html>Login required</html>', []);
+    assert.equal(barrier.access_barrier, true);
+    assert.equal(barrier.schema_drift_detected, false);
+});
+
 test('India official failure explicitly preserves maintained last-good candidates', async () => {
     const result = await require('../scripts/update-static-duty-rates').updateIndiaRulesFromOfficialSource({
         dryRun: true,
@@ -1620,6 +1663,7 @@ test('India reachable official source with no parsed rows preserves last-good ca
     assert.equal(result.preserved_last_good, true);
     assert.equal(result.fallback_mode, 'maintained_exact_candidates');
     assert.equal(result.writes_official_machine_rates, false);
+    assert.equal(result.official_fetch.parser_diagnostics.schema_drift_detected, true);
 });
 
 test('India official probe tries candidate sources before falling back to maintained exact map', async () => {

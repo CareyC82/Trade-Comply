@@ -174,10 +174,20 @@ function validateRows(rows) {
         byCode.set(row.hs_code, row);
     });
     if (!byCode.size) errors.push('artifact contains no exact 10-digit AHTN rows');
+    const priorityCoverage = {};
     REQUIRED_PRIORITY_PREFIXES.forEach((prefix) => {
+        const exactCodes = [...byCode.keys()].filter((code) => code.startsWith(prefix));
+        priorityCoverage[prefix] = {
+            covered: exactCodes.length > 0,
+            exact_codes: exactCodes
+        };
         if (![...byCode.keys()].some((code) => code.startsWith(prefix))) errors.push(`priority tariff family ${prefix} is missing`);
     });
-    return { errors, rows: [...byCode.values()].sort((a, b) => a.hs_code.localeCompare(b.hs_code)) };
+    return {
+        errors,
+        rows: [...byCode.values()].sort((a, b) => a.hs_code.localeCompare(b.hs_code)),
+        priority_coverage: priorityCoverage
+    };
 }
 
 function buildOverride(row, manifest, checkedAt, hash) {
@@ -256,6 +266,12 @@ function importMalaysiaDutyRates({ artifactPath, manifestPath, dutyRatesPath = D
                 coverage_scope: manifest.coverage_scope
             },
             changed_rules: changedRules,
+            priority_coverage: rowCheck.priority_coverage,
+            tablet_847130: {
+                filing_grade_path_ready: rowCheck.priority_coverage['847130'].covered,
+                exact_codes: rowCheck.priority_coverage['847130'].exact_codes,
+                note: 'Exact 10-digit Royal Malaysian Customs rows only; SST, origin preference and product approvals remain separate.'
+            },
             trust_gate: 'passed'
         };
         if (!dryRun) {
