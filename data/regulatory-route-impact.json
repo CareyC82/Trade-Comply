@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-31T13:29:13.250Z",
-  "source_change_count": 3,
+  "generated_at": "2026-09-06T20:32:49.960Z",
+  "source_change_count": 5,
   "impacts": [
     {
       "id": "fda",
@@ -162,6 +162,296 @@
       ],
       "affected_routes": [
         "Any maintained origin -> SG"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional"
+        ],
+        "after": [
+          "conditional"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "red",
+      "type": "content_changed",
+      "detected_at": "2026-09-06T20:32:49.960Z",
+      "review_status": "pending_review",
+      "markets": [
+        "EU"
+      ],
+      "products": [
+        {
+          "id": "smart_watch",
+          "label": "Smart watch",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_ring",
+          "label": "Smart ring",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "fitness_tracker",
+          "label": "Fitness band / tracker",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62",
+            "9029.10"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "kids_gps_watch",
+          "label": "Kids GPS watch",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "earbuds",
+          "label": "Bluetooth earbuds",
+          "market": "EU",
+          "candidate_hs": [
+            "8518.30"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "bluetooth_speaker",
+          "label": "Bluetooth speaker",
+          "market": "EU",
+          "candidate_hs": [
+            "8518.21",
+            "8518.22"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "wireless_microphone",
+          "label": "Wireless microphone",
+          "market": "EU",
+          "candidate_hs": [
+            "8518.10"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "wifi_router",
+          "label": "Wi-Fi router",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "wireless_keyboard",
+          "label": "Wireless keyboard",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.60"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "wireless_mouse",
+          "label": "Wireless mouse",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.60"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "tablet",
+          "label": "Tablet computer",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "e_reader",
+          "label": "E-reader",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.30",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8517.13",
+        "8517.62",
+        "8543.70",
+        "9029.10",
+        "8518.30",
+        "8518.21",
+        "8518.22",
+        "8518.10",
+        "8471.60",
+        "8471.30"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> EU"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional",
+          "high_risk"
+        ],
+        "after": [
+          "conditional",
+          "high_risk"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "jpIoTSecurity",
+      "type": "content_changed",
+      "detected_at": "2026-09-06T20:32:49.960Z",
+      "review_status": "pending_review",
+      "markets": [
+        "JP"
+      ],
+      "products": [
+        {
+          "id": "wifi_router",
+          "label": "Wi-Fi router",
+          "market": "JP",
+          "candidate_hs": [
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> JP",
+          "requirement_ids": [
+            "jp_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "tablet",
+          "label": "Tablet computer",
+          "market": "JP",
+          "candidate_hs": [
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> JP",
+          "requirement_ids": [
+            "jp_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "e_reader",
+          "label": "E-reader",
+          "market": "JP",
+          "candidate_hs": [
+            "8471.30",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> JP",
+          "requirement_ids": [
+            "jp_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8517.62",
+        "8471.30",
+        "8543.70"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> JP"
       ],
       "effective_date": null,
       "effective_timing": "Effective date requires official confirmation",
