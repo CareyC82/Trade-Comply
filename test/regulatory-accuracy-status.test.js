@@ -16,7 +16,9 @@ test('accuracy status joins lifecycle, product depth, reviewed publication and p
     assert.ok(report.tariff_parser_gaps.markets.includes('MY'));
     assert.ok(report.tariff_parser_gaps.markets.includes('RU'));
     assert.equal(report.tariff_parser_gaps.malaysia_priority_hs, '847130');
-    assert.deepEqual(Object.keys(report.tariff_parser_gaps.artifact_readiness), ['IN', 'KR', 'MY', 'RU', 'TW', 'VN']);
+    assert.deepEqual(report.tariff_parser_gaps.official_artifact_import_priority, ['IN', 'KR', 'MY', 'VN', 'TW', 'RU']);
+    assert.deepEqual(Object.keys(report.tariff_parser_gaps.artifact_readiness), ['IN', 'KR', 'MY', 'VN', 'TW', 'RU']);
+    assert.equal(report.tariff_parser_gaps.artifact_readiness.IN.priority, 1);
     assert.equal(report.tariff_parser_gaps.artifact_readiness.IN.ready, false);
     assert.match(report.tariff_parser_gaps.artifact_readiness.KR.next_action, /official KR tariff artifact/);
     assert.equal(typeof report.source_control.global_transport_health.regulatory_market_grades, 'object');

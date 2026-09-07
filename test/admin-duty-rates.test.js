@@ -8,8 +8,16 @@ const {
     buildConsumerRegulatoryStatusPayload,
     buildExactTariffFeedStatus,
     buildQualityStatusPayload,
-    buildUnmetSearchBacklogPayload
+    buildUnmetSearchBacklogPayload,
+    buildHybridTariffPromotionQueue
 } = require('../scripts/admin-server');
+
+test('official artifact promotion queue follows the approved filing-grade order', () => {
+    const queue = buildHybridTariffPromotionQueue();
+    assert.deepEqual(queue.map((row) => row.country), ['IN', 'KR', 'MY', 'VN', 'TW', 'RU']);
+    assert.deepEqual(queue.map((row) => row.priority), [1, 2, 3, 4, 5, 6]);
+    assert.ok(queue.every((row) => /official artifact|filing-grade regression/i.test(row.safe_next_action)));
+});
 
 test('admin exposes consumer regulatory lifecycle, last-good status and manual review queue', () => {
     const payload = buildConsumerRegulatoryStatusPayload();
@@ -31,6 +39,8 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.ok(payload.accuracy_status);
     assert.equal(payload.accuracy_status.reviewed_change_pipeline.automatic_rule_publication, false);
     assert.match(html, /Affected questions/);
+    assert.match(html, /Regulatory accuracy overview/);
+    assert.match(html, /Official files awaiting import/);
 });
 
 test('admin page includes duty-rate automation health queue', () => {
@@ -57,6 +67,8 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /artifactMarketDefaults/);
     assert.match(html, /Central Board of Indirect Taxes and Customs \/ ICEGATE/);
     assert.match(html, /Korea Customs Service/);
+    assert.match(html, /IN → KR → MY → VN → TW → RU/);
+    assert.match(html, /data-open-artifact-market/);
     assert.match(html, /Unmet Search Workbench/);
     assert.match(html, /Only real captured searches are shown/);
 });

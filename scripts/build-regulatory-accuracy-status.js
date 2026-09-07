@@ -36,7 +36,8 @@ function buildAccuracyStatus(now = new Date()) {
         return result;
     }, {});
     const parserGaps = launch.summary?.duty_rate_launch_levels?.parser_gap || [];
-    const artifactReadiness = Object.fromEntries(parserGaps.map((market) => {
+    const importPriority = ['IN', 'KR', 'MY', 'VN', 'TW', 'RU'];
+    const artifactReadiness = Object.fromEntries(importPriority.filter((market) => parserGaps.includes(market)).map((market, index) => {
         const status = market === 'MY' ? malaysiaImport : p2Imports.markets?.[market] || {};
         const ready = status.ok === true && status.trust_gate === 'passed';
         return [market, {
@@ -45,6 +46,8 @@ function buildAccuracyStatus(now = new Date()) {
             checked_at: status.checked_at || null,
             exact_row_count: Number(status.artifact?.parsed_row_count || 0),
             ready,
+            priority: index + 1,
+            workbench_market: market,
             next_action: ready
                 ? 'Keep the official artifact current and monitor its effective date.'
                 : `Provide a complete official ${market} tariff artifact and manifest; preview it before publication.`
@@ -86,6 +89,7 @@ function buildAccuracyStatus(now = new Date()) {
         },
         tariff_parser_gaps: {
             markets: parserGaps,
+            official_artifact_import_priority: importPriority,
             filing_grade_markets: launch.summary?.filing_grade_auto_countries || [],
             artifact_readiness: artifactReadiness,
             malaysia_priority_hs: '847130',

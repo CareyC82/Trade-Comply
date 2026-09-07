@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-07T07:14:10.845Z",
+  "generated_at": "2026-09-07T07:46:38.453Z",
   "ok": true,
   "source_control": {
     "source_count": 52,
@@ -13,22 +13,23 @@
     ],
     "global_transport_health": {
       "freshness": {
-        "timestamp": "2026-08-26T00:54:57.027Z",
-        "age_days": 12.26,
-        "current": false,
+        "timestamp": "2026-09-07T07:45:52.665Z",
+        "age_days": 0,
+        "current": true,
         "max_age_days": 2
       },
       "source_count": 22,
-      "ok_count": 21,
-      "error_count": 0,
+      "ok_count": 19,
+      "error_count": 1,
       "regulatory_market_grades": {
-        "blocked": 7,
-        "monitor": 7
+        "healthy": 6,
+        "monitor": 7,
+        "partial": 1
       }
     },
     "automation_launch_freshness": {
-      "timestamp": "2026-09-06T20:22:36.691Z",
-      "age_days": 0.45,
+      "timestamp": "2026-09-07T07:46:38.234Z",
+      "age_days": 0,
       "current": true,
       "max_age_days": 2
     }
@@ -65,6 +66,14 @@
       "TW",
       "VN"
     ],
+    "official_artifact_import_priority": [
+      "IN",
+      "KR",
+      "MY",
+      "VN",
+      "TW",
+      "RU"
+    ],
     "filing_grade_markets": [
       "AU",
       "CN",
@@ -84,6 +93,8 @@
         "checked_at": null,
         "exact_row_count": 0,
         "ready": false,
+        "priority": 1,
+        "workbench_market": "IN",
         "next_action": "Provide a complete official IN tariff artifact and manifest; preview it before publication."
       },
       "KR": {
@@ -92,6 +103,8 @@
         "checked_at": null,
         "exact_row_count": 0,
         "ready": false,
+        "priority": 2,
+        "workbench_market": "KR",
         "next_action": "Provide a complete official KR tariff artifact and manifest; preview it before publication."
       },
       "MY": {
@@ -100,23 +113,9 @@
         "checked_at": null,
         "exact_row_count": 0,
         "ready": false,
+        "priority": 3,
+        "workbench_market": "MY",
         "next_action": "Provide a complete official MY tariff artifact and manifest; preview it before publication."
-      },
-      "RU": {
-        "trust_gate": "not_run",
-        "last_good_at": null,
-        "checked_at": null,
-        "exact_row_count": 0,
-        "ready": false,
-        "next_action": "Provide a complete official RU tariff artifact and manifest; preview it before publication."
-      },
-      "TW": {
-        "trust_gate": "not_run",
-        "last_good_at": null,
-        "checked_at": null,
-        "exact_row_count": 0,
-        "ready": false,
-        "next_action": "Provide a complete official TW tariff artifact and manifest; preview it before publication."
       },
       "VN": {
         "trust_gate": "not_run",
@@ -124,7 +123,29 @@
         "checked_at": null,
         "exact_row_count": 0,
         "ready": false,
+        "priority": 4,
+        "workbench_market": "VN",
         "next_action": "Provide a complete official VN tariff artifact and manifest; preview it before publication."
+      },
+      "TW": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "priority": 5,
+        "workbench_market": "TW",
+        "next_action": "Provide a complete official TW tariff artifact and manifest; preview it before publication."
+      },
+      "RU": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "priority": 6,
+        "workbench_market": "RU",
+        "next_action": "Provide a complete official RU tariff artifact and manifest; preview it before publication."
       }
     },
     "malaysia_priority_hs": "847130",

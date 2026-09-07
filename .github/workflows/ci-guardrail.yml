@@ -44,6 +44,9 @@ jobs:
       - name: Block filing-grade tariff regressions
         run: npm run check:filing-grade
 
+      - name: Block stale regulatory health snapshots
+        run: npm run check:regulatory-accuracy-health
+
       - name: Verify FC package boots
         run: bash scripts/package-fc.sh
 

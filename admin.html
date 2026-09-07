@@ -470,9 +470,9 @@
                         <div><h3 style="margin:0">Official tariff artifact workbench</h3><p class="meta">本地预览不会修改税率。只有预览通过后才能确认发布；发布前会自动保存可回滚快照。</p></div>
                     </div>
                     <div class="coverage-table-wrap"><table class="coverage-table"><tbody>
-                        <tr><th>Market</th><td><select id="artifact-country"><option>MY</option><option>IN</option><option>KR</option><option>VN</option><option>TW</option><option>RU</option></select></td></tr>
+                        <tr><th>Market</th><td><select id="artifact-country"><option>IN</option><option>KR</option><option>MY</option><option>VN</option><option>TW</option><option>RU</option></select></td></tr>
                         <tr><th>Official file</th><td><input id="artifact-file" type="file" accept=".xlsx,.xls,.csv,.tsv,.txt,.html,.htm,.json,.pdf"><p class="meta">PDF is accepted for Malaysia. The server verifies the complete file, SHA-256, declared row count and exact 10-digit AHTN rows before preview can pass.</p></td></tr>
-                        <tr><th>Official authority</th><td><input id="artifact-authority" value="Royal Malaysian Customs" style="width:100%;box-sizing:border-box"></td></tr>
+                        <tr><th>Official authority</th><td><input id="artifact-authority" value="Central Board of Indirect Taxes and Customs / ICEGATE" style="width:100%;box-sizing:border-box"></td></tr>
                         <tr><th>Official source URL</th><td><input id="artifact-source-url" type="url" placeholder="https://official-authority.example/tariff" style="width:100%;box-sizing:border-box"></td></tr>
                         <tr><th>Published / effective</th><td><div class="row"><label>Published <input id="artifact-published-at" type="date"></label><label>Effective <input id="artifact-effective-at" type="date"></label></div></td></tr>
                         <tr><th>Expected rows</th><td><input id="artifact-expected-rows" type="number" min="1" step="1" placeholder="Exact parsed row count"><p class="meta">必须与文件实际解析行数一致；这能阻止不完整文件覆盖 last-good。</p></td></tr>
@@ -750,9 +750,43 @@
         }
 
         function renderHybridPromotionQueue(rows = []) {
-            return `<div class="crawl-section-title"><h3>Hybrid → official exact promotion queue</h3><span class="meta">Evidence-gated</span></div>
-                <div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Market</th><th>Status</th><th>Official rows</th><th>Priority product / route / HS</th><th>Safe next action</th></tr></thead><tbody>
-                ${rows.map(row => `<tr><td><strong>${escapeHtml(row.country)}</strong></td><td>${escapeHtml(row.promotion_status)}</td><td>${row.exact_row_count || 0}</td><td>${(row.priority_routes || []).map(item => `${escapeHtml(item.product_id)} · ${escapeHtml(item.route)} · ${escapeHtml(item.hs_code)}`).join('<br>') || 'No queued route'}</td><td>${escapeHtml(row.safe_next_action)}</td></tr>`).join('')}</tbody></table></div>`;
+            return `<div class="crawl-section-title"><h3>Hybrid → official exact promotion queue</h3><span class="meta">IN → KR → MY → VN → TW → RU · evidence-gated</span></div>
+                <div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Priority</th><th>Market</th><th>Status</th><th>Official rows</th><th>Priority product / route / HS</th><th>Safe next action</th><th>Workbench</th></tr></thead><tbody>
+                ${rows.map(row => `<tr><td>${row.priority || '—'}</td><td><strong>${escapeHtml(row.country)}</strong></td><td>${escapeHtml(row.promotion_status)}</td><td>${row.exact_row_count || 0}</td><td>${(row.priority_routes || []).map(item => `${escapeHtml(item.product_id)} · ${escapeHtml(item.route)} · ${escapeHtml(item.hs_code)}`).join('<br>') || 'No queued route'}</td><td>${escapeHtml(row.safe_next_action)}</td><td><button type="button" class="btn-ghost" data-open-artifact-market="${escapeHtml(row.country)}">Open</button></td></tr>`).join('')}</tbody></table></div>`;
+        }
+
+        function renderRegulatoryAccuracyOverview(accuracy = {}) {
+            const source = accuracy.source_control || {};
+            const transport = source.global_transport_health || {};
+            const transportFreshness = transport.freshness || {};
+            const launchFreshness = source.automation_launch_freshness || {};
+            const grades = transport.regulatory_market_grades || {};
+            const blockedCount = Number(grades.blocked || 0);
+            const hybridCount = Number(grades.hybrid || 0);
+            const gaps = accuracy.tariff_parser_gaps || {};
+            const priority = gaps.official_artifact_import_priority || ['IN', 'KR', 'MY', 'VN', 'TW', 'RU'];
+            const readiness = gaps.artifact_readiness || {};
+            const waiting = priority.filter(market => !readiness[market]?.ready);
+            const stale = [
+                !transportFreshness.current ? `Global source health (${transportFreshness.age_days ?? 'unknown'} days old)` : '',
+                !launchFreshness.current ? `Automation launch status (${launchFreshness.age_days ?? 'unknown'} days old)` : ''
+            ].filter(Boolean);
+            const nextActions = [];
+            if (stale.length) nextActions.push('Run the official-source health workflow before relying on new changes. Last-good data remains active.');
+            if (blockedCount) nextActions.push(`Review ${blockedCount} blocked market connector(s) in the source-health detail below.`);
+            if (waiting.length) nextActions.push(`Import complete official tariff artifacts in order: ${waiting.join(' → ')}.`);
+            if (!nextActions.length) nextActions.push('No accuracy blockers detected; continue scheduled monitoring and effective-date review.');
+            return `
+                <div class="crawl-section-title"><h3>Regulatory accuracy overview</h3><span class="badge ${stale.length || blockedCount ? 'benchmark' : 'auto_updatable'}">${stale.length || blockedCount ? 'ACTION REQUIRED' : 'CURRENT'}</span></div>
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${stale.length}</strong><span>Stale health snapshots</span></div>
+                    <div class="summary-card"><strong>${blockedCount}</strong><span>Blocked markets</span></div>
+                    <div class="summary-card"><strong>${hybridCount}</strong><span>Hybrid markets</span></div>
+                    <div class="summary-card"><strong>${waiting.length}</strong><span>Official files awaiting import</span></div>
+                </div>
+                ${stale.length ? `<p class="meta"><strong>Stale:</strong> ${escapeHtml(stale.join(' · '))}</p>` : '<p class="meta">Source-health and automation snapshots are within the 2-day freshness boundary.</p>'}
+                <p class="meta"><strong>Blocked:</strong> ${blockedCount} · <strong>Hybrid:</strong> ${hybridCount} · <strong>Monitor:</strong> ${Number(grades.monitor || 0)}</p>
+                <ol>${nextActions.map(action => `<li>${escapeHtml(action)}</li>`).join('')}</ol>`;
         }
 
         function renderFilingGradeRegression(result = {}) {
@@ -2568,6 +2602,7 @@
             const lifecycleLabel = { active: 'Active', future: 'Future', transition: 'Transition', published_pending_effective_date: 'Effective date pending', expired: 'Expired', repealed: 'Repealed', replaced: 'Replaced' };
             const lifecycleAudit = data.lifecycle_audit || { issue_count: 0, rows: [] };
             return `
+                ${renderRegulatoryAccuracyOverview(data.accuracy_status || {})}
                 <div class="summary-grid">
                     <div class="summary-card"><strong>${escapeHtml(data.source_count || 0)}</strong><span>Official sources</span></div>
                     <div class="summary-card"><strong>${escapeHtml(data.pending_review_count || 0)}</strong><span>Changes awaiting review</span></div>
@@ -2831,10 +2866,19 @@
         });
         document.getElementById('btn-preview-artifact').addEventListener('click', previewDutyArtifact);
         document.getElementById('artifact-country').addEventListener('change', applyArtifactMarketDefaults);
+        applyArtifactMarketDefaults();
         document.getElementById('btn-publish-artifact').addEventListener('click', publishDutyArtifact);
         document.getElementById('artifact-history').addEventListener('click', (event) => {
             const button = event.target.closest('[data-artifact-rollback]');
             if (button) rollbackDutyArtifact(button.dataset.artifactRollback);
+        });
+        dutyRateStatus.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-open-artifact-market]');
+            if (!button) return;
+            document.getElementById('artifact-country').value = button.dataset.openArtifactMarket;
+            applyArtifactMarketDefaults();
+            document.getElementById('artifact-country').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('artifact-file').focus();
         });
         document.getElementById('btn-refresh-consumer-regulations').addEventListener('click', loadConsumerRegulatoryStatus);
         consumerRegulatoryStatus.addEventListener('click', (event) => {

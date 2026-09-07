@@ -269,12 +269,13 @@ function buildHybridTariffPromotionQueue() {
     const priorities = readJsonFile(EXACT_TARIFF_PRIORITIES_PATH, { priorities: [] }).priorities || [];
     const myStatus = readJsonFile(MY_DUTY_RATE_IMPORT_STATUS_PATH, {});
     const p2Markets = readJsonFile(P2_DUTY_RATE_IMPORT_STATUS_PATH, { markets: {} }).markets || {};
-    return ['MY', 'KR', 'IN', 'VN', 'TW', 'RU'].map((country) => {
+    return ['IN', 'KR', 'MY', 'VN', 'TW', 'RU'].map((country, index) => {
         const status = country === 'MY' ? myStatus : p2Markets[country] || {};
         const seen = new Set();
         const routes = priorities.filter((row) => row.import_country === country && !seen.has(row.product_id) && seen.add(row.product_id)).slice(0, 5);
         return {
             country,
+            priority: index + 1,
             promotion_status: status.ok === true ? 'official_artifact_imported' : 'artifact_required',
             last_good_at: status.last_good_at || null,
             exact_row_count: status.artifact?.parsed_row_count || 0,
@@ -807,6 +808,7 @@ module.exports = {
     buildExactTariffFeedStatus,
     buildQualityStatusPayload,
     buildUnmetSearchBacklogPayload,
+    buildHybridTariffPromotionQueue,
     createAdminServer,
     startAdminServer
 };
