@@ -41,6 +41,8 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.match(html, /Affected questions/);
     assert.match(html, /Regulatory accuracy overview/);
     assert.match(html, /Official files awaiting import/);
+    assert.match(html, /Repair action/);
+    assert.match(html, /No active official-source transport failures/);
 });
 
 test('admin page includes duty-rate automation health queue', () => {

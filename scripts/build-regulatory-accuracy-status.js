@@ -54,6 +54,20 @@ function buildAccuracyStatus(now = new Date()) {
         }];
     }));
     const baselineCells = coverage.cells.filter((cell) => cell.evidence_depth !== 'product_and_attribute_specific');
+    const degradedSources = (globalHealth.sources || []).filter((row) => !row.ok && !row.monitor_only).map((row) => ({
+        id: row.id,
+        country: row.country,
+        optional: Boolean(row.optional),
+        error: row.error || 'Official source fetch failed',
+        last_checked_at: globalHealth.generated_at || null,
+        next_action: row.id === 'zh-gac'
+            ? 'Retry the Chinese notice list; use the official English GACC newsroom fallback when the Chinese WAF remains unavailable.'
+            : row.id === 'us-ustr'
+                ? 'Retry the Section 301 page and its official investigations-index fallback; verify the content fingerprint before accepting it.'
+                : row.id === 'us-fcc'
+                    ? 'Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access.'
+                    : 'Retry the official source and inspect its identity fingerprint before changing any rule.'
+    }));
     return {
         schema_version: 1,
         generated_at: now.toISOString(),
@@ -64,6 +78,7 @@ function buildAccuracyStatus(now = new Date()) {
             automatic_monitoring_ready_count: health.automatic_monitoring_ready_count || 0,
             automatic_monitoring_blocked_count: health.automatic_monitoring_blocked_count || lifecycle.source_count,
             failed_link_count: health.failed_link_count || 0,
+            degraded_sources: degradedSources,
             pending_effective_date_sources: (health.sources || []).filter((row) => row.alerts?.includes('effective_date_pending')).map((row) => row.id),
             global_transport_health: {
                 freshness: freshness(globalHealth.generated_at, now, 2),

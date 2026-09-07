@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-07T08:04:18.019Z",
+  "generated_at": "2026-09-07T08:25:28.292Z",
   "ok": true,
   "source_control": {
     "source_count": 52,
@@ -8,28 +8,36 @@
     "automatic_monitoring_ready_count": 8,
     "automatic_monitoring_blocked_count": 44,
     "failed_link_count": 0,
+    "degraded_sources": [
+      {
+        "id": "us-fcc",
+        "country": "US",
+        "optional": true,
+        "error": "HTTP 403 (site WAF may block bots; tried https://apps.fcc.gov/oetcf/kdb/index.cfm)",
+        "last_checked_at": "2026-09-07T08:22:51.403Z",
+        "next_action": "Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access."
+      }
+    ],
     "pending_effective_date_sources": [
       "fccMarketplace2026"
     ],
     "global_transport_health": {
       "freshness": {
-        "timestamp": "2026-09-07T08:03:47.299Z",
+        "timestamp": "2026-09-07T08:22:51.403Z",
         "age_days": 0,
         "current": true,
         "max_age_days": 2
       },
       "source_count": 22,
-      "ok_count": 18,
-      "error_count": 2,
+      "ok_count": 21,
+      "error_count": 0,
       "regulatory_market_grades": {
-        "blocked": 1,
-        "monitor": 7,
-        "healthy": 5,
-        "partial": 1
+        "healthy": 7,
+        "monitor": 7
       }
     },
     "automation_launch_freshness": {
-      "timestamp": "2026-09-07T08:04:17.771Z",
+      "timestamp": "2026-09-07T08:25:28.026Z",
       "age_days": 0,
       "current": true,
       "max_age_days": 2

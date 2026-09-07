@@ -761,6 +761,7 @@
             const transportFreshness = transport.freshness || {};
             const launchFreshness = source.automation_launch_freshness || {};
             const grades = transport.regulatory_market_grades || {};
+            const degradedSources = source.degraded_sources || [];
             const blockedCount = Number(grades.blocked || 0);
             const hybridCount = Number(grades.hybrid || 0);
             const gaps = accuracy.tariff_parser_gaps || {};
@@ -786,6 +787,7 @@
                 </div>
                 ${stale.length ? `<p class="meta"><strong>Stale:</strong> ${escapeHtml(stale.join(' · '))}</p>` : '<p class="meta">Source-health and automation snapshots are within the 2-day freshness boundary.</p>'}
                 <p class="meta"><strong>Blocked:</strong> ${blockedCount} · <strong>Hybrid:</strong> ${hybridCount} · <strong>Monitor:</strong> ${Number(grades.monitor || 0)}</p>
+                ${degradedSources.length ? `<div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Source</th><th>Market</th><th>State</th><th>Failure</th><th>Repair action</th></tr></thead><tbody>${degradedSources.map(row => `<tr><td><strong>${escapeHtml(row.id)}</strong></td><td>${escapeHtml(row.country || '—')}</td><td>${row.optional ? 'Optional degraded' : 'Blocked'}</td><td><span class="meta">${escapeHtml(row.error)}</span></td><td>${escapeHtml(row.next_action)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="meta">No active official-source transport failures.</p>'}
                 <ol>${nextActions.map(action => `<li>${escapeHtml(action)}</li>`).join('')}</ol>`;
         }
 

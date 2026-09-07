@@ -57,10 +57,13 @@ describe('global-crawl-sources', () => {
         const byId = Object.fromEntries(GLOBAL_CRAWL_SOURCES.map((row) => [row.id, row]));
         assert.equal(byId['zh-mofcom'].url, 'https://www.mofcom.gov.cn/zwgk/zcfb/');
         assert.equal(byId['zh-gac'].method, 'got-scraping');
+        assert.equal(byId['zh-gac'].legacy_options.fallback_url, 'http://english.customs.gov.cn/newsroom/news');
         assert.equal(byId['us-cbp'].url, 'https://www.cbp.gov/trade/automated/newsflash');
         assert.equal(byId['us-ustr'].url, 'https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions');
+        assert.equal(byId['us-ustr'].fallback_url, 'https://www.ustr.gov/issue-areas/enforcement/section-301-investigations');
         assert.equal(byId['us-ofac'].url, 'https://ofac.treasury.gov/recent-actions');
         assert.equal(byId['us-fcc'].url, 'https://www.fcc.gov/news-events/headlines');
+        assert.equal(byId['us-fcc'].fallback_url, 'https://apps.fcc.gov/oetcf/kdb/index.cfm');
         assert.equal(byId['eu-lex'].url, 'https://eur-lex.europa.eu/oj/direct-access.html');
         assert.equal(byId['eu-lex'].monitor_only, true);
         assert.equal(byId['eu-nonpreferential-origin'].url, 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1422');

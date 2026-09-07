@@ -154,3 +154,8 @@ test('Admin exposes guarded P2 artifact gates including Russia/EAEU', () => {
     assert.match(html, /const rows = \['IN', 'KR', 'VN', 'TW', 'RU'\]/);
     assert.match(html, /RU: 'Eurasian Economic Commission'/);
 });
+
+test('artifact workbench names every supported guarded market in validation errors', () => {
+    const workflow = require('../lib/duty-rate-artifact-workflow');
+    assert.throws(() => workflow.previewArtifact({ country: 'US' }), /IN, KR, MY, VN, TW or RU/);
+});
