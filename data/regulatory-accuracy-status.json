@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-07T08:46:56.870Z",
+  "generated_at": "2026-09-07T09:01:14.886Z",
   "ok": true,
   "source_control": {
     "source_count": 52,
@@ -16,10 +16,10 @@
         "error": "HTTP 403 (site WAF may block bots; tried https://apps.fcc.gov/oetcf/kdb/index.cfm)",
         "last_checked_at": "2026-09-07T08:22:51.403Z",
         "official_url": "https://apps.fcc.gov/oetcf/kdb/index.cfm",
-        "manual_reviewed_at": null,
-        "manual_review_due_at": null,
-        "manual_review_current": false,
-        "evidence_boundary": "",
+        "manual_reviewed_at": "2026-09-07",
+        "manual_review_due_at": "2026-10-07",
+        "manual_review_current": true,
+        "evidence_boundary": "Manual review confirms the official guidance index was checked; it does not verify any product or FCC ID.",
         "next_action": "Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access."
       }
     ],
@@ -29,7 +29,7 @@
     "global_transport_health": {
       "freshness": {
         "timestamp": "2026-09-07T08:22:51.403Z",
-        "age_days": 0.02,
+        "age_days": 0.03,
         "current": true,
         "max_age_days": 2
       },
@@ -43,7 +43,7 @@
     },
     "automation_launch_freshness": {
       "timestamp": "2026-09-07T08:25:28.026Z",
-      "age_days": 0.01,
+      "age_days": 0.02,
       "current": true,
       "max_age_days": 2
     }
