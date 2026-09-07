@@ -20,9 +20,28 @@ test('stale regulatory fetches are not reported as healthy', () => {
     assert.equal(status.health_status, 'stale');
     assert.equal(summarizeRegulatoryHealth([status]).grade, 'blocked');
 });
+
+test('fresh regulatory health snapshots restore live source status', () => {
+    const status = sourceHealthStatus({ id: 'source' }, {
+        byId: new Map([['source', { ok: true, fetched_at: new Date().toISOString(), byte_length: 42 }]]),
+        inboxSources: {}
+    });
+    assert.equal(status.health_status, 'fetch_ok');
+    assert.equal(summarizeRegulatoryHealth([status]).grade, 'healthy');
+});
 const {
     buildDutyRateStatusPayload
 } = require('../scripts/admin-server');
+
+test('daily regulatory workflow refreshes and commits source health before launch status', () => {
+    const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'global-compliance-pipeline.yml'), 'utf8');
+    const healthStep = workflow.indexOf('npm run fetch:global -- --write-health --allow-degraded');
+    const launchStep = workflow.indexOf('npm run build:automation-launch-status');
+    assert.ok(healthStep > -1);
+    assert.ok(launchStep > healthStep);
+    assert.match(workflow, /data\/global-crawl-source-health\.json/);
+    assert.match(workflow, /data\/automation-launch-status\.json/);
+});
 
 test('automation launch status exposes only safe public launch modes', () => {
     const payload = buildAutomationLaunchStatus();

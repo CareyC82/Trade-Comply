@@ -16,6 +16,7 @@ const {
     buildSourceRunPlan,
     buildAutomationDigest,
     buildSyncStatusPayload,
+    addDegradationHistory,
     runAutoDutyRateSync
 } = require('../scripts/auto-sync-duty-rates');
 const {
@@ -36,6 +37,31 @@ test('material duty-rate changes are detected by percentage-point threshold', ()
         new_base_rate: 0.035
     }), false);
     assert.equal(MATERIAL_RATE_CHANGE_THRESHOLD, 0.03);
+});
+
+test('degraded source history records duration and resets after recovery', () => {
+    const previous = {
+        source_run_plan: [{
+            country: 'IN',
+            run_status: 'degraded',
+            degraded_category: 'interactive_lookup',
+            degraded_since: '2026-09-01T00:00:00.000Z',
+            consecutive_degraded_runs: 2
+        }]
+    };
+    const rows = addDegradationHistory([{
+        country: 'IN',
+        run_status: 'degraded',
+        degraded_category: 'interactive_lookup'
+    }, {
+        country: 'KR',
+        run_status: 'ok'
+    }], previous, '2026-09-03T12:00:00.000Z');
+    assert.equal(rows[0].degraded_since, '2026-09-01T00:00:00.000Z');
+    assert.equal(rows[0].degraded_days, 2);
+    assert.equal(rows[0].consecutive_degraded_runs, 3);
+    assert.equal(rows[1].degraded_since, null);
+    assert.equal(rows[1].consecutive_degraded_runs, 0);
 });
 
 test('EU-US Annex hash changes are counted and preserved in sync status', () => {

@@ -35,6 +35,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install Node.js dependencies
+        run: npm ci
+
       - name: Install Python dependencies
         run: pip install -r pipeline/requirements.txt
 
@@ -50,6 +53,12 @@ jobs:
           fi
           echo "=== CRON JOB WORKFLOW STEP DONE: global-compliance-pipeline ==="
 
+      - name: Refresh official source transport health
+        run: npm run fetch:global -- --write-health --allow-degraded
+
+      - name: Refresh automation launch status
+        run: npm run build:automation-launch-status
+
       - name: Commit auto-published production data
         run: |
           git config user.name "github-actions[bot]"
@@ -61,7 +70,9 @@ jobs:
             data/catalog.json \
             data/pending_data.json \
             data/pending_data/pipeline_batch.json \
-            data/pending_data/guardrail_report.json
+            data/pending_data/guardrail_report.json \
+            data/global-crawl-source-health.json \
+            data/automation-launch-status.json
 
           if git diff --staged --quiet; then
             echo "No pipeline publish changes."

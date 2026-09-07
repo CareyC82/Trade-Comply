@@ -129,6 +129,7 @@ function buildOfficialFetchSummary(run = {}) {
         schema_drift_detected: Boolean(parserDiagnostics?.schema_drift_detected),
         schema_drift_reason: parserDiagnostics?.schema_drift_reason || '',
         access_barrier: Boolean(parserDiagnostics?.access_barrier),
+        interactive_lookup: Boolean(parserDiagnostics?.interactive_lookup),
         observed_fields: Array.isArray(parserDiagnostics?.observed_fields) ? parserDiagnostics.observed_fields : [],
         status_label: run?.official_fetch_degraded
             ? 'Official fetch degraded'
@@ -177,6 +178,13 @@ function classifyOfficialFetchDegradation(detail = '') {
             category: 'access_limited',
             label: 'Official source requires an interactive session',
             action: 'Use an official downloadable artifact or approved API; retain last-good rates and do not treat the page shell as tariff data.'
+        };
+    }
+    if (text.includes('interactive_lookup_requires_query_or_export')) {
+        return {
+            category: 'interactive_lookup',
+            label: 'Official tariff data requires a query or export',
+            action: 'Use the official query endpoint or a signed official export; retain last-good rates and do not parse the public application shell.'
         };
     }
     if (text.includes('reachable_response_no_supported_tariff_rows') || text.includes('schema_drift')) {
@@ -659,7 +667,32 @@ function buildCiDiagnostics({ exceptions = [], runs = [], sourceRunPlan = [], he
     };
 }
 
-function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt, sourceRunPlan = [] } = {}) {
+function addDegradationHistory(sourceRunPlan = [], previousPayload = null, finishedAt = new Date().toISOString()) {
+    const previousRows = new Map((previousPayload?.source_run_plan || []).map(row => [row.country, row]));
+    return sourceRunPlan.map((row) => {
+        if (row.run_status !== 'degraded') {
+            return { ...row, degraded_since: null, degraded_days: 0, consecutive_degraded_runs: 0 };
+        }
+        const previous = previousRows.get(row.country);
+        const sameDegradation = previous?.run_status === 'degraded'
+            && (previous.degraded_category || '') === (row.degraded_category || '');
+        const degradedSince = sameDegradation && previous.degraded_since
+            ? previous.degraded_since
+            : finishedAt;
+        const elapsed = Math.max(0, Date.parse(finishedAt) - Date.parse(degradedSince));
+        return {
+            ...row,
+            degraded_since: degradedSince,
+            degraded_days: Number.isFinite(elapsed) ? Math.floor(elapsed / 86400000) : 0,
+            consecutive_degraded_runs: sameDegradation
+                ? Number(previous.consecutive_degraded_runs || 1) + 1
+                : 1
+        };
+    });
+}
+
+function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedAt, sourceRunPlan = [], previousPayload = null } = {}) {
+    sourceRunPlan = addDegradationHistory(sourceRunPlan, previousPayload, finishedAt || new Date().toISOString());
     const autoApplied = runs.filter(run => run.applied);
     const exceptions = runs.flatMap(run => buildExceptionsForRun(run));
     const stageCounts = sourceRunPlan.reduce((acc, row) => {
@@ -1025,7 +1058,14 @@ async function runAutoDutyRateSync({
         sourcesPayload: readJson(DUTY_RATE_SOURCES_PATH, { sources: [] }),
         runs
     });
-    const payload = buildSyncStatusPayload({ runs, health, startedAt, finishedAt, sourceRunPlan });
+    const payload = buildSyncStatusPayload({
+        runs,
+        health,
+        startedAt,
+        finishedAt,
+        sourceRunPlan,
+        previousPayload: readJson(SYNC_STATUS_PATH, null)
+    });
 
     if (!dryRun) {
         writeJson(SYNC_STATUS_PATH, payload);
@@ -1061,6 +1101,7 @@ module.exports = {
     buildSourceRunPlan,
     buildAutomationDigest,
     buildCiDiagnostics,
+    addDegradationHistory,
     buildSyncStatusPayload,
     runAutoDutyRateSync
 };

@@ -1322,6 +1322,7 @@
                             <div class="grade-note">${escapeHtml(row.source_status || '')} · ${escapeHtml(row.run_source || '')}</div>
                             ${row.degraded_reason ? `<div class="grade-note">Reason: ${escapeHtml(row.degraded_reason)}${row.degraded_detail ? ` · ${escapeHtml(row.degraded_detail)}` : ''}</div>` : ''}
                             ${row.degraded_label ? `<div class="grade-note">Diagnosis: ${escapeHtml(row.degraded_label)}${row.degraded_category ? ` · ${escapeHtml(row.degraded_category)}` : ''}</div>` : ''}
+                            ${row.degraded_since ? `<div class="grade-note">持续时间：${escapeHtml(String(row.degraded_days || 0))} 天 · 连续 ${escapeHtml(String(row.consecutive_degraded_runs || 1))} 次 · 自 ${escapeHtml(formatDateTime(row.degraded_since))}</div>` : ''}
                             ${row.degraded_action ? `<div class="grade-note">Fix: ${escapeHtml(row.degraded_action)}</div>` : ''}
                             ${row.update_command ? `<div class="grade-note">Sync: <code>${escapeHtml(row.update_command)}</code></div>` : ''}
                             ${row.probe_command ? `<div class="grade-note">Probe: <code>${escapeHtml(row.probe_command)}</code></div>` : ''}

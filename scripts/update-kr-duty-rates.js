@@ -16,7 +16,7 @@ const KR_CUSTOMS_URL = 'https://www.customs.go.kr/english/main.do';
 const KR_TARIFF_DB_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037';
 const KR_TARIFF_LOOKUP_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffView.do';
 const KR_UNIPASS_TARIFF_URL = 'https://tunipass.customs.go.kr/clip/hsinfosrch/openULS0201002Q.do';
-const REQUEST_TIMEOUT_MS = 15000;
+const REQUEST_TIMEOUT_MS = 30000;
 
 const KR_BENCHMARK = {
     base_rate: 0,
@@ -315,7 +315,7 @@ function normalizeKoreaHs10(value = '') {
 async function fetchKoreaOfficialRows({
     fetcher = fetchText,
     url = KR_TARIFF_DB_URL,
-    sourceUrls = [url, KR_UNIPASS_TARIFF_URL],
+    sourceUrls = [url, KR_UNIPASS_TARIFF_URL, KR_CUSTOMS_URL],
     lookupUrl = KR_TARIFF_LOOKUP_URL,
     queryHsCodes = KR_EXACT_CODE_CANDIDATES.map(normalizeKoreaHs10)
 } = {}) {

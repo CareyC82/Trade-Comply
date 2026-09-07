@@ -27,6 +27,8 @@ function summarizeOfficialFetch(summary = null) {
         : '';
     const parser = summary.schema_drift_detected
         ? `; schema drift (${summary.schema_drift_reason || 'unsupported response shape'})`
+        : summary.interactive_lookup
+            ? '; interactive lookup requires an official query or export'
         : summary.access_barrier
             ? '; official source access barrier'
             : summary.response_format
@@ -141,6 +143,9 @@ function buildDiagnosticLines(payload) {
             }
             if (row.degraded_label || row.degraded_category) {
                 lines.push(`     diagnosis: ${row.degraded_label || row.degraded_category}`);
+            }
+            if (row.degraded_since) {
+                lines.push(`     duration: since ${row.degraded_since} · ${Number(row.degraded_days || 0)} day(s) · ${Number(row.consecutive_degraded_runs || 1)} consecutive run(s)`);
             }
             if (row.degraded_action) {
                 lines.push(`     fix: ${row.degraded_action}`);

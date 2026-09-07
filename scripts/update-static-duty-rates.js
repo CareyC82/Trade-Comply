@@ -270,14 +270,27 @@ function inspectOfficialResponse(body = '', rows = []) {
             responseFormat = 'text';
         }
     }
-    const accessBarrier = /captcha|access denied|forbidden|sign\s*in|login required|session expired|enable javascript/i.test(stripHtml(source));
+    const visibleText = stripHtml(source);
+    const accessBarrier = /captcha|access denied|forbidden|sign\s*in|login required|session expired|enable javascript/i.test(visibleText);
+    const interactiveLookup = rows.length === 0 && (
+        /<script[^>]+src=/i.test(source)
+        && /(?:cip|tariff|duty|customs)/i.test(`${source} ${visibleText}`)
+        && !/<tr[\s\S]*?\b(?:BCD|basic customs duty|hsn|tariff item)\b[\s\S]*?<\/tr>/i.test(source)
+    );
     return {
         parser_version: 2,
         response_format: responseFormat,
         observed_fields: observedFields,
         access_barrier: accessBarrier,
-        schema_drift_detected: !accessBarrier && trimmed.length > 0 && rows.length === 0,
-        schema_drift_reason: accessBarrier ? 'official_access_barrier' : trimmed.length > 0 && rows.length === 0 ? 'reachable_response_no_supported_tariff_rows' : ''
+        interactive_lookup: interactiveLookup,
+        schema_drift_detected: !accessBarrier && !interactiveLookup && trimmed.length > 0 && rows.length === 0,
+        schema_drift_reason: accessBarrier
+            ? 'official_access_barrier'
+            : interactiveLookup
+                ? 'interactive_lookup_requires_query_or_export'
+                : trimmed.length > 0 && rows.length === 0
+                    ? 'reachable_response_no_supported_tariff_rows'
+                    : ''
     };
 }
 

@@ -1640,6 +1640,13 @@ test('India official response diagnostics flag reachable schema drift and not lo
     assert.equal(barrier.schema_drift_detected, false);
 });
 
+test('India official response diagnostics distinguish an interactive CIP shell from schema drift', () => {
+    const shell = inspectOfficialResponse('<html><script src="/cip/app.js"></script><body>Customs tariff lookup</body></html>', []);
+    assert.equal(shell.interactive_lookup, true);
+    assert.equal(shell.schema_drift_detected, false);
+    assert.equal(shell.schema_drift_reason, 'interactive_lookup_requires_query_or_export');
+});
+
 test('India official failure explicitly preserves maintained last-good candidates', async () => {
     const result = await require('../scripts/update-static-duty-rates').updateIndiaRulesFromOfficialSource({
         dryRun: true,

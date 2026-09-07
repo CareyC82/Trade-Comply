@@ -17,6 +17,7 @@ const HEALTH_PATH = path.join(ROOT, 'data', 'global-crawl-source-health.json');
 
 async function main() {
     const writeHealth = process.argv.includes('--write-health');
+    const allowDegraded = process.argv.includes('--allow-degraded');
     const result = await runGlobalSourceFetchLoop();
     const health = summarizeFetchHealth(result);
     if (writeHealth) {
@@ -42,7 +43,7 @@ async function main() {
             error: row.error
         }))
     }, null, 2));
-    process.exit(result.ok ? 0 : 1);
+    process.exit(result.ok || allowDegraded ? 0 : 1);
 }
 
 main().catch((error) => {
