@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-31T13:36:11.972Z",
+  "generated_at": "2026-09-07T07:14:10.845Z",
   "ok": true,
   "source_control": {
     "source_count": 52,
@@ -10,7 +10,28 @@
     "failed_link_count": 0,
     "pending_effective_date_sources": [
       "fccMarketplace2026"
-    ]
+    ],
+    "global_transport_health": {
+      "freshness": {
+        "timestamp": "2026-08-26T00:54:57.027Z",
+        "age_days": 12.26,
+        "current": false,
+        "max_age_days": 2
+      },
+      "source_count": 22,
+      "ok_count": 21,
+      "error_count": 0,
+      "regulatory_market_grades": {
+        "blocked": 7,
+        "monitor": 7
+      }
+    },
+    "automation_launch_freshness": {
+      "timestamp": "2026-09-06T20:22:36.691Z",
+      "age_days": 0.45,
+      "current": true,
+      "max_age_days": 2
+    }
   },
   "product_market_depth": {
     "product_count": 30,
@@ -22,10 +43,10 @@
   },
   "reviewed_change_pipeline": {
     "status_counts": {
-      "superseded": 28,
-      "baseline_captured": 17,
+      "superseded": 30,
+      "baseline_captured": 29,
       "capture_recovered": 4,
-      "pending_review": 3
+      "pending_review": 5
     },
     "automatic_rule_publication": false,
     "required_release_states": [
@@ -45,15 +66,67 @@
       "VN"
     ],
     "filing_grade_markets": [
+      "AU",
       "CN",
       "DE",
       "EU",
       "JP",
       "MX",
       "NL",
+      "NZ",
       "SG",
       "US"
     ],
+    "artifact_readiness": {
+      "IN": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "next_action": "Provide a complete official IN tariff artifact and manifest; preview it before publication."
+      },
+      "KR": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "next_action": "Provide a complete official KR tariff artifact and manifest; preview it before publication."
+      },
+      "MY": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "next_action": "Provide a complete official MY tariff artifact and manifest; preview it before publication."
+      },
+      "RU": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "next_action": "Provide a complete official RU tariff artifact and manifest; preview it before publication."
+      },
+      "TW": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "next_action": "Provide a complete official TW tariff artifact and manifest; preview it before publication."
+      },
+      "VN": {
+        "trust_gate": "not_run",
+        "last_good_at": null,
+        "checked_at": null,
+        "exact_row_count": 0,
+        "ready": false,
+        "next_action": "Provide a complete official VN tariff artifact and manifest; preview it before publication."
+      }
+    },
     "malaysia_priority_hs": "847130",
     "malaysia_artifact_gate": "complete official 10-digit artifact required",
     "russia_artifact_gate": "complete official 10-digit XLSX/CSV artifact required; sanctions remain separate"

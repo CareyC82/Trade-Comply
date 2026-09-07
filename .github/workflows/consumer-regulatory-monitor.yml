@@ -28,6 +28,10 @@ jobs:
         run: npm run update:consumer-regulations:live
       - name: Build product and route impact review artifact
         run: npm run build:regulatory-route-impact
+      - name: Refresh automation launch status
+        run: npm run build:automation-launch-status
+      - name: Refresh regulatory accuracy status
+        run: npm run build:regulatory-accuracy-status -- --allow-blocked
       - name: Verify release and manual-review guardrails
         run: npm run check:consumer-release
       - name: Run regulatory monitor tests
@@ -36,7 +40,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/consumer-regulatory-snapshots.json data/consumer-regulatory-changes.json data/regulatory-route-impact.json
+          git add data/consumer-regulatory-snapshots.json data/consumer-regulatory-changes.json data/regulatory-route-impact.json data/automation-launch-status.json data/regulatory-accuracy-status.json
           if git diff --staged --quiet; then
             echo "No consumer regulatory source changes."
             exit 0

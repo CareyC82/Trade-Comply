@@ -59,6 +59,9 @@ jobs:
       - name: Refresh automation launch status
         run: npm run build:automation-launch-status
 
+      - name: Refresh regulatory accuracy status
+        run: npm run build:regulatory-accuracy-status -- --allow-blocked
+
       - name: Commit auto-published production data
         run: |
           git config user.name "github-actions[bot]"
@@ -72,7 +75,8 @@ jobs:
             data/pending_data/pipeline_batch.json \
             data/pending_data/guardrail_report.json \
             data/global-crawl-source-health.json \
-            data/automation-launch-status.json
+            data/automation-launch-status.json \
+            data/regulatory-accuracy-status.json
 
           if git diff --staged --quiet; then
             echo "No pipeline publish changes."

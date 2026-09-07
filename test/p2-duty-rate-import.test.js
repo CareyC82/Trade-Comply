@@ -150,4 +150,7 @@ test('Admin exposes guarded P2 artifact gates including Russia/EAEU', () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
     assert.match(html, /P2 official tariff artifacts/);
     assert.match(html, /IN · KR · VN · TW · RU/);
+    assert.match(html, /<option>RU<\/option>/);
+    assert.match(html, /const rows = \['IN', 'KR', 'VN', 'TW', 'RU'\]/);
+    assert.match(html, /RU: 'Eurasian Economic Commission'/);
 });

@@ -41,6 +41,8 @@ test('daily regulatory workflow refreshes and commits source health before launc
     assert.ok(launchStep > healthStep);
     assert.match(workflow, /data\/global-crawl-source-health\.json/);
     assert.match(workflow, /data\/automation-launch-status\.json/);
+    assert.match(workflow, /npm run build:regulatory-accuracy-status -- --allow-blocked/);
+    assert.match(workflow, /data\/regulatory-accuracy-status\.json/);
 });
 
 test('automation launch status exposes only safe public launch modes', () => {

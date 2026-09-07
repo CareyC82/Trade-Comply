@@ -470,7 +470,7 @@
                         <div><h3 style="margin:0">Official tariff artifact workbench</h3><p class="meta">本地预览不会修改税率。只有预览通过后才能确认发布；发布前会自动保存可回滚快照。</p></div>
                     </div>
                     <div class="coverage-table-wrap"><table class="coverage-table"><tbody>
-                        <tr><th>Market</th><td><select id="artifact-country"><option>MY</option><option>IN</option><option>KR</option><option>VN</option><option>TW</option></select></td></tr>
+                        <tr><th>Market</th><td><select id="artifact-country"><option>MY</option><option>IN</option><option>KR</option><option>VN</option><option>TW</option><option>RU</option></select></td></tr>
                         <tr><th>Official file</th><td><input id="artifact-file" type="file" accept=".xlsx,.xls,.csv,.tsv,.txt,.html,.htm,.json,.pdf"><p class="meta">PDF is accepted for Malaysia. The server verifies the complete file, SHA-256, declared row count and exact 10-digit AHTN rows before preview can pass.</p></td></tr>
                         <tr><th>Official authority</th><td><input id="artifact-authority" value="Royal Malaysian Customs" style="width:100%;box-sizing:border-box"></td></tr>
                         <tr><th>Official source URL</th><td><input id="artifact-source-url" type="url" placeholder="https://official-authority.example/tariff" style="width:100%;box-sizing:border-box"></td></tr>
@@ -546,7 +546,7 @@
         let currentCoveragePayload = null;
         let currentArtifactPreview = null;
         let currentArtifactUpload = null;
-        const artifactAuthorities = { MY: 'Royal Malaysian Customs', IN: 'Central Board of Indirect Taxes and Customs (CBIC)', KR: 'Korea Customs Service', VN: 'Vietnam Customs', TW: 'Customs Administration, Ministry of Finance Taiwan' };
+        const artifactAuthorities = { MY: 'Royal Malaysian Customs', IN: 'Central Board of Indirect Taxes and Customs (CBIC)', KR: 'Korea Customs Service', VN: 'Vietnam Customs', TW: 'Customs Administration, Ministry of Finance Taiwan', RU: 'Eurasian Economic Commission' };
 
         function getCurrentAdminOrigin() {
             if (/^(127\.0\.0\.1|localhost)$/.test(window.location.hostname) && window.location.port === '8787') {
@@ -720,7 +720,7 @@
 
         function renderP2ArtifactImports(status = {}) {
             const markets = status.markets || {};
-            const rows = ['IN', 'KR', 'VN', 'TW'].map((country) => {
+            const rows = ['IN', 'KR', 'VN', 'TW', 'RU'].map((country) => {
                 const item = markets[country] || {};
                 const artifact = item.artifact || {};
                 const priority = Object.values(item.priority_coverage || {});
@@ -774,7 +774,8 @@
             IN: { authority: 'Central Board of Indirect Taxes and Customs / ICEGATE', url: 'https://foservices.icegate.gov.in/cip/cip/' },
             KR: { authority: 'Korea Customs Service', url: 'https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037' },
             VN: { authority: 'Vietnam Customs', url: 'https://www.customs.gov.vn/' },
-            TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://portal.sw.nat.gov.tw/' }
+            TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://portal.sw.nat.gov.tw/' },
+            RU: { authority: 'Eurasian Economic Commission', url: 'https://eec.eaeunion.org/' }
         };
 
         function applyArtifactMarketDefaults() {
