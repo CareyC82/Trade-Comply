@@ -17,6 +17,8 @@ test('official artifact promotion queue follows the approved filing-grade order'
     assert.deepEqual(queue.map((row) => row.country), ['IN', 'KR', 'MY', 'VN', 'TW', 'RU']);
     assert.deepEqual(queue.map((row) => row.priority), [1, 2, 3, 4, 5, 6]);
     assert.ok(queue.every((row) => /official artifact|filing-grade regression/i.test(row.safe_next_action)));
+    assert.ok(queue.every((row) => row.acquisition?.url?.startsWith('https://')));
+    assert.ok(queue.every((row) => row.acquisition?.note));
 });
 
 test('admin exposes consumer regulatory lifecycle, last-good status and manual review queue', () => {
@@ -42,6 +44,8 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.match(html, /Regulatory accuracy overview/);
     assert.match(html, /Official files awaiting import/);
     assert.match(html, /Repair action/);
+    assert.match(html, /Manual review/);
+    assert.match(html, /Open official source/);
     assert.match(html, /No active official-source transport failures/);
 });
 

@@ -56,6 +56,7 @@ const REGULATORY_SNAPSHOTS_PATH = path.join(ROOT, 'data', 'consumer-regulatory-s
 const REGULATORY_CHANGES_PATH = path.join(ROOT, 'data', 'consumer-regulatory-changes.json');
 const REGULATORY_REVIEW_AUDIT_PATH = path.join(ROOT, 'data', 'consumer-regulatory-review-audit.json');
 const REGULATORY_ACCURACY_STATUS_PATH = path.join(ROOT, 'data', 'regulatory-accuracy-status.json');
+const { ARTIFACT_SOURCES } = require('../lib/duty-rate-artifact-sources');
 const COVERAGE_LEVELS = new Set(['full', 'partial', 'baseline', 'none']);
 
 /** Re-read .env.local / .env so keys work without restart after file is created. */
@@ -282,7 +283,8 @@ function buildHybridTariffPromotionQueue() {
             priority_routes: routes.map((row) => ({ product_id: row.product_id, route: row.route, hs_code: row.hs_code, impact_score: row.impact_score, next_action: row.next_action })),
             safe_next_action: status.ok === true
                 ? 'Run filing-grade regression and review remaining ambiguous tariff lines before promotion.'
-                : 'Import a complete official artifact through Preview import; do not promote heading-only rows.'
+                : 'Import a complete official artifact through Preview import; do not promote heading-only rows.',
+            acquisition: ARTIFACT_SOURCES[country]
         };
     });
 }

@@ -751,8 +751,8 @@
 
         function renderHybridPromotionQueue(rows = []) {
             return `<div class="crawl-section-title"><h3>Hybrid → official exact promotion queue</h3><span class="meta">IN → KR → MY → VN → TW → RU · evidence-gated</span></div>
-                <div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Priority</th><th>Market</th><th>Status</th><th>Official rows</th><th>Priority product / route / HS</th><th>Safe next action</th><th>Workbench</th></tr></thead><tbody>
-                ${rows.map(row => `<tr><td>${row.priority || '—'}</td><td><strong>${escapeHtml(row.country)}</strong></td><td>${escapeHtml(row.promotion_status)}</td><td>${row.exact_row_count || 0}</td><td>${(row.priority_routes || []).map(item => `${escapeHtml(item.product_id)} · ${escapeHtml(item.route)} · ${escapeHtml(item.hs_code)}`).join('<br>') || 'No queued route'}</td><td>${escapeHtml(row.safe_next_action)}</td><td><button type="button" class="btn-ghost" data-open-artifact-market="${escapeHtml(row.country)}">Open</button></td></tr>`).join('')}</tbody></table></div>`;
+                <div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Priority</th><th>Market</th><th>Status</th><th>Official rows</th><th>Priority product / route / HS</th><th>Official acquisition</th><th>Safe next action</th><th>Workbench</th></tr></thead><tbody>
+                ${rows.map(row => `<tr><td>${row.priority || '—'}</td><td><strong>${escapeHtml(row.country)}</strong></td><td>${escapeHtml(row.promotion_status)}</td><td>${row.exact_row_count || 0}</td><td>${(row.priority_routes || []).map(item => `${escapeHtml(item.product_id)} · ${escapeHtml(item.route)} · ${escapeHtml(item.hs_code)}`).join('<br>') || 'No queued route'}</td><td><a href="${escapeHtml(row.acquisition?.url || '#')}" target="_blank" rel="noopener">Open official source</a><br><span class="meta">${escapeHtml(row.acquisition?.note || '')}</span></td><td>${escapeHtml(row.safe_next_action)}</td><td><button type="button" class="btn-ghost" data-open-artifact-market="${escapeHtml(row.country)}">Open</button></td></tr>`).join('')}</tbody></table></div>`;
         }
 
         function renderRegulatoryAccuracyOverview(accuracy = {}) {
@@ -787,7 +787,7 @@
                 </div>
                 ${stale.length ? `<p class="meta"><strong>Stale:</strong> ${escapeHtml(stale.join(' · '))}</p>` : '<p class="meta">Source-health and automation snapshots are within the 2-day freshness boundary.</p>'}
                 <p class="meta"><strong>Blocked:</strong> ${blockedCount} · <strong>Hybrid:</strong> ${hybridCount} · <strong>Monitor:</strong> ${Number(grades.monitor || 0)}</p>
-                ${degradedSources.length ? `<div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Source</th><th>Market</th><th>State</th><th>Failure</th><th>Repair action</th></tr></thead><tbody>${degradedSources.map(row => `<tr><td><strong>${escapeHtml(row.id)}</strong></td><td>${escapeHtml(row.country || '—')}</td><td>${row.optional ? 'Optional degraded' : 'Blocked'}</td><td><span class="meta">${escapeHtml(row.error)}</span></td><td>${escapeHtml(row.next_action)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="meta">No active official-source transport failures.</p>'}
+                ${degradedSources.length ? `<div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Source</th><th>Market</th><th>State</th><th>Failure</th><th>Manual review</th><th>Repair action</th></tr></thead><tbody>${degradedSources.map(row => `<tr><td><strong>${escapeHtml(row.id)}</strong></td><td>${escapeHtml(row.country || '—')}</td><td>${row.optional ? 'Optional degraded' : 'Blocked'}</td><td><span class="meta">${escapeHtml(row.error)}</span></td><td>${row.official_url ? `<a href="${escapeHtml(row.official_url)}" target="_blank" rel="noopener">Open official source</a><br>` : ''}<span class="meta">Reviewed ${escapeHtml(row.manual_reviewed_at || 'not recorded')} · due ${escapeHtml(row.manual_review_due_at || 'now')} · ${row.manual_review_current ? 'current' : 'overdue'}</span></td><td>${escapeHtml(row.next_action)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="meta">No active official-source transport failures.</p>'}
                 <ol>${nextActions.map(action => `<li>${escapeHtml(action)}</li>`).join('')}</ol>`;
         }
 
@@ -806,12 +806,12 @@
         }
 
         const artifactMarketDefaults = {
-            MY: { authority: 'Royal Malaysian Customs', url: 'https://ezhs.customs.gov.my/' },
+            MY: { authority: 'Royal Malaysian Customs Department', url: 'https://ezhs.customs.gov.my/' },
             IN: { authority: 'Central Board of Indirect Taxes and Customs / ICEGATE', url: 'https://foservices.icegate.gov.in/cip/cip/' },
             KR: { authority: 'Korea Customs Service', url: 'https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037' },
             VN: { authority: 'Vietnam Customs', url: 'https://www.customs.gov.vn/' },
-            TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://portal.sw.nat.gov.tw/' },
-            RU: { authority: 'Eurasian Economic Commission', url: 'https://eec.eaeunion.org/' }
+            TW: { authority: 'Customs Administration, Ministry of Finance', url: 'https://web.customs.gov.tw/singlehtml/1205?cntId=cus1_112173_1205' },
+            RU: { authority: 'Eurasian Economic Commission', url: 'https://eec.eaeunion.org/en/comission/direction/tam_sotr/dep_tamoj_zak/tptssp.php' }
         };
 
         function applyArtifactMarketDefaults() {

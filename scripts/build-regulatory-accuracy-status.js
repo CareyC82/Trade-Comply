@@ -54,12 +54,25 @@ function buildAccuracyStatus(now = new Date()) {
         }];
     }));
     const baselineCells = coverage.cells.filter((cell) => cell.evidence_depth !== 'product_and_attribute_specific');
-    const degradedSources = (globalHealth.sources || []).filter((row) => !row.ok && !row.monitor_only).map((row) => ({
+    const manualReviews = read('data/manual-source-reviews.json', { sources: {} });
+    const degradedSources = (globalHealth.sources || []).filter((row) => !row.ok && !row.monitor_only).map((row) => {
+        const manual = manualReviews.sources?.[row.id] || {};
+        const intervalDays = row.id === 'us-fcc' ? 30 : null;
+        const reviewedMs = Date.parse(manual.reviewed_at || '');
+        const reviewDueAt = Number.isFinite(reviewedMs) && intervalDays
+            ? new Date(reviewedMs + intervalDays * 86400000).toISOString().slice(0, 10)
+            : null;
+        return ({
         id: row.id,
         country: row.country,
         optional: Boolean(row.optional),
         error: row.error || 'Official source fetch failed',
         last_checked_at: globalHealth.generated_at || null,
+        official_url: row.id === 'us-fcc' ? 'https://apps.fcc.gov/oetcf/kdb/index.cfm' : row.url,
+        manual_reviewed_at: manual.reviewed_at || null,
+        manual_review_due_at: reviewDueAt,
+        manual_review_current: Boolean(reviewDueAt && Date.parse(reviewDueAt) >= now.getTime()),
+        evidence_boundary: manual.evidence_boundary || '',
         next_action: row.id === 'zh-gac'
             ? 'Retry the Chinese notice list; use the official English GACC newsroom fallback when the Chinese WAF remains unavailable.'
             : row.id === 'us-ustr'
@@ -67,7 +80,8 @@ function buildAccuracyStatus(now = new Date()) {
                 : row.id === 'us-fcc'
                     ? 'Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access.'
                     : 'Retry the official source and inspect its identity fingerprint before changing any rule.'
-    }));
+        });
+    });
     return {
         schema_version: 1,
         generated_at: now.toISOString(),
