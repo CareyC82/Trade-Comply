@@ -144,6 +144,18 @@ test('P2 importer rejects wrong code length, mixed rates and incomplete artifact
     assert.equal(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
 });
 
+test('P2 importer blocks duplicate exact codes and impossible manifest dates', () => {
+    const base = CASES.KR.csv.split('\n');
+    const files = fixture('KR', { csv: [...base, base[1]].join('\n') });
+    let manifest = JSON.parse(fs.readFileSync(files.manifestPath, 'utf8'));
+    manifest.published_at = '2026-99-99';
+    fs.writeFileSync(files.manifestPath, JSON.stringify(manifest));
+    const result = importP2DutyRates({ ...files });
+    assert.equal(result.ok, false);
+    assert.match(result.error, /duplicate exact tariff code 8471300000/);
+    assert.match(result.error, /published_at must be a valid ISO date/);
+});
+
 test('Admin exposes guarded P2 artifact gates including Russia/EAEU', () => {
     const payload = buildDutyRateStatusPayload();
     assert.deepEqual(Object.keys(payload.p2_official_artifact_imports.markets), ['IN', 'KR', 'VN', 'TW']);

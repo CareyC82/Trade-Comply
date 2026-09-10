@@ -1626,6 +1626,42 @@ test('India CIP parser accepts nested rate objects and preserves BCD SWS IGST as
     );
 });
 
+test('India parser tolerates normalized ICEGATE field spelling changes', () => {
+    const rows = parseIndiaOfficialJsonRows({ payload: [{
+        'CTH Code': '85044090',
+        'Effective BCD Rate': '15%',
+        'SWC Rate': '10%',
+        'IGST Levy Rate': '18%',
+        'Commodity Description': 'Power supplies'
+    }] });
+    assert.deepEqual([rows[0].hs_code, rows[0].bcd_rate, rows[0].sws_rate, rows[0].igst_rate], ['85044090', 0.15, 0.1, 0.18]);
+});
+
+test('India fetch falls back to guarded exact I4C queries when the landing pages contain no rows', async () => {
+    const official = await fetchIndiaOfficialRows({
+        queryHsCodes: ['85044090'],
+        source: { official_url: 'https://www.icegate.gov.in/', official_probe_urls: ['https://www.icegate.gov.in/'] },
+        fetcher: async (url) => ({
+            status_code: 200,
+            body: url.includes('cdc_duty_details.jsp')
+                ? '<table><tr><th>HS Code</th><th>Description</th><th>BCD</th><th>SWS</th><th>IGST</th></tr><tr><td>85044090</td><td>Power supply</td><td>15%</td><td>10%</td><td>18%</td></tr></table>'
+                : '<html><script src="cip.js"></script><h1>Customs tariff search</h1></html>'
+        })
+    });
+    assert.equal(official.ok, true);
+    assert.equal(official.rows[0].hs_code, '85044090');
+    assert.equal(official.query_attempts.length, 1);
+    assert.equal(official.query_attempts[0].row_count, 1);
+});
+
+test('Korea parser accepts the official TAX RATE heading, dotted HSK and normalized JSON fields', () => {
+    const htmlRows = parseKoreaTariffRateRows('<table><tr><th>HS CODE</th><th>GOODS NAME</th><th>TAX RATE</th></tr><tr><td>8517.62.9000</td><td>Router</td><td>8%</td></tr></table>');
+    assert.equal(htmlRows[0].hs_code, '8517629000');
+    assert.equal(htmlRows[0].parsed_base_rate, 0.08);
+    const jsonRows = parseKoreaOfficialJsonRows({ response: { items: [{ 'HSK No': '8517629000', 'Tax Rt': '8%' }] } });
+    assert.equal(jsonRows[0].parsed_base_rate, 0.08);
+});
+
 test('India parser never converts a missing BCD field to duty-free', () => {
     const rows = parseIndiaOfficialJsonRows({ rows: [{ hsnCode: '85176290', swsRate: '10%', igstRate: '18%' }] });
     assert.equal(rows.length, 0);

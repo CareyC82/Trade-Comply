@@ -58,6 +58,12 @@ function rowValue(row, names) {
     }
     return '';
 }
+function validDate(value) {
+    const text = String(value || '');
+    if (!/^\d{4}-\d{2}-\d{2}(?:T|$)/.test(text)) return false;
+    const parsed = new Date(text);
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === text.slice(0, 10);
+}
 
 function parseStructuredRows(rows) {
     return rows.map((raw) => {
@@ -147,8 +153,9 @@ function validateManifest(manifest, artifactBuffer, rows) {
         errors.push('source_url must be a valid official URL');
     }
     if (!manifest.complete) errors.push('manifest.complete must be true');
-    if (!/^\d{4}-\d{2}-\d{2}/.test(String(manifest.published_at || ''))) errors.push('published_at is required');
-    if (!/^\d{4}-\d{2}-\d{2}/.test(String(manifest.effective_at || ''))) errors.push('effective_at is required');
+    if (!validDate(manifest.published_at)) errors.push('published_at must be a valid ISO date');
+    if (!validDate(manifest.effective_at)) errors.push('effective_at must be a valid ISO date');
+    if (validDate(manifest.published_at) && Date.parse(manifest.published_at) > Date.now() + 86400000) errors.push('published_at cannot be in the future');
     const actualHash = sha256(artifactBuffer);
     if (!/^[a-f0-9]{64}$/i.test(String(manifest.sha256 || '')) || actualHash !== String(manifest.sha256).toLowerCase()) {
         errors.push('artifact sha256 does not match manifest');
@@ -167,8 +174,10 @@ function validateRows(rows) {
         if (!/^\d{10}$/.test(row.hs_code)) errors.push(`row ${index + 1}: exact 10-digit AHTN code required`);
         if (!Number.isFinite(row.base_rate) || row.base_rate < 0 || row.base_rate > 10) errors.push(`row ${index + 1}: explicit valid import rate required`);
         if (!/^\d{10}$/.test(row.hs_code) || !Number.isFinite(row.base_rate)) return;
-        if (byCode.has(row.hs_code) && byCode.get(row.hs_code).base_rate !== row.base_rate) {
-            errors.push(`conflicting rates for ${row.hs_code}`);
+        if (byCode.has(row.hs_code)) {
+            errors.push(byCode.get(row.hs_code).base_rate !== row.base_rate
+                ? `conflicting rates for ${row.hs_code}`
+                : `duplicate exact tariff code ${row.hs_code}`);
             return;
         }
         byCode.set(row.hs_code, row);
@@ -256,6 +265,7 @@ function importMalaysiaDutyRates({ artifactPath, manifestPath, dutyRatesPath = D
             checked_at: checkedAt,
             last_good_at: dryRun ? previousStatus.last_good_at || null : checkedAt,
             dry_run: dryRun,
+            effective_state: Date.parse(manifest.effective_at) > now.getTime() ? 'future' : 'active',
         artifact: {
                 file_name: path.basename(artifactPath),
                 sha256: manifestCheck.actualHash,

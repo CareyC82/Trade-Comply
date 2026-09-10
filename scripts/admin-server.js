@@ -438,6 +438,7 @@ async function handleDutyRateArtifacts(req, res) {
         auditPath: DUTY_RATE_IMPORT_AUDIT_PATH,
         versionsDir: DUTY_RATE_VERSIONS_DIR
     };
+    if (body.action === 'inspect') return sendJson(res, 200, workflow.inspectArtifact(common));
     if (body.action === 'preview') return sendJson(res, 200, workflow.previewArtifact(common));
     if (body.action === 'publish') return sendJson(res, 200, workflow.publishArtifact({ ...common, previewDigest: body.preview_digest }));
     if (body.action === 'rollback') return sendJson(res, 200, workflow.rollbackArtifact({
@@ -446,7 +447,7 @@ async function handleDutyRateArtifacts(req, res) {
         auditPath: DUTY_RATE_IMPORT_AUDIT_PATH,
         versionsDir: DUTY_RATE_VERSIONS_DIR
     }));
-    return sendJson(res, 400, { ok: false, error: 'action must be preview, publish or rollback' });
+    return sendJson(res, 400, { ok: false, error: 'action must be inspect, preview, publish or rollback' });
 }
 
 function buildConsumerRegulatoryStatusPayload() {

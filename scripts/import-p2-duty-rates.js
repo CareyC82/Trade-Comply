@@ -95,6 +95,12 @@ function pick(row, names) {
     for (const name of names) if (String(row[name] ?? '').trim()) return row[name];
     return '';
 }
+function validDate(value) {
+    const text = String(value || '');
+    if (!/^\d{4}-\d{2}-\d{2}(?:T|$)/.test(text)) return false;
+    const parsed = new Date(text);
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === text.slice(0, 10);
+}
 
 function normalizeStructuredRows(country, rows) {
     return rows.map((raw) => {
@@ -162,8 +168,9 @@ function validate(country, manifest, buffer, parsedRows, prioritiesPath) {
     if (manifest.country !== country) errors.push(`manifest.country must be ${country}`);
     if (manifest.coverage_scope !== 'full_tariff') errors.push('coverage_scope must be full_tariff');
     if (manifest.complete !== true) errors.push('manifest.complete must be true');
-    if (!/^\d{4}-\d{2}-\d{2}/.test(String(manifest.published_at || ''))) errors.push('published_at is required');
-    if (!/^\d{4}-\d{2}-\d{2}/.test(String(manifest.effective_at || ''))) errors.push('effective_at is required');
+    if (!validDate(manifest.published_at)) errors.push('published_at must be a valid ISO date');
+    if (!validDate(manifest.effective_at)) errors.push('effective_at must be a valid ISO date');
+    if (validDate(manifest.published_at) && Date.parse(manifest.published_at) > Date.now() + 86400000) errors.push('published_at cannot be in the future');
     try {
         const url = new URL(String(manifest.source_url || ''));
         if (url.protocol !== 'https:' || !config.host.test(url.hostname)) errors.push('source_url must use the configured official HTTPS domain');
@@ -182,7 +189,7 @@ function validate(country, manifest, buffer, parsedRows, prioritiesPath) {
         }
         const prior = unique.get(row.hs_code);
         const signature = `${row.base_rate}|${row.sws_rate}|${row.igst_rate}`;
-        if (prior && prior !== signature) errors.push(`conflicting rates for ${row.hs_code}`);
+        if (prior) errors.push(prior !== signature ? `conflicting rates for ${row.hs_code}` : `duplicate exact tariff code ${row.hs_code}`);
         else unique.set(row.hs_code, signature);
     });
     if (!parsedRows.length) errors.push('artifact contains no tariff rows');
@@ -265,6 +272,7 @@ function importP2DutyRates({ country, artifactPath, manifestPath, dutyRatesPath 
             artifact: { file_name: path.basename(artifactPath), sha256: gate.sha256, source_url: manifest.source_url,
                 published_at: manifest.published_at, effective_at: manifest.effective_at, parsed_row_count: gate.rows.length }
         };
+        marketStatus.effective_state = Date.parse(manifest.effective_at) > now.getTime() ? 'future' : 'active';
         if (!dryRun) {
             atomicWrite(dutyRatesPath, payload);
             statusPayload.updated_at = checkedAt;

@@ -248,6 +248,12 @@ function firstRowValue(row, names) {
         const value = scalarValue(row[name]);
         if (String(value).trim()) return value;
     }
+    const normalizedNames = new Set(names.map((name) => String(name).replace(/[^a-z0-9]/gi, '').toLowerCase()));
+    for (const [key, rawValue] of Object.entries(row || {})) {
+        if (!normalizedNames.has(String(key).replace(/[^a-z0-9]/gi, '').toLowerCase())) continue;
+        const value = scalarValue(rawValue);
+        if (String(value).trim()) return value;
+    }
     return '';
 }
 
@@ -408,17 +414,17 @@ function parseIndiaOfficialJsonRows(value = '') {
     return sourceRows.map((row) => {
         const hsCode = String(firstRowValue(row, [
             'hsn', 'hsnCode', 'hsnCd', 'hsCode', 'hsCd', 'cth', 'tariffItem', 'tariff_item',
-            'tariffItemCode', 'tariff_item_code', 'commodityCode'
+            'tariffItemCode', 'tariff_item_code', 'commodityCode', 'cthCode', 'customsTariffHead'
         ])).replace(/\D/g, '');
         const bcdText = String(firstRowValue(row, [
             'bcd', 'bcdRate', 'bcd_rate', 'basicCustomsDuty', 'basic_duty', 'bcdDuty',
-            'basicCustomDutyRate', 'basicCustomsDutyRate', 'standardBcdRate'
+            'basicCustomDutyRate', 'basicCustomsDutyRate', 'standardBcdRate', 'bcdTariffRate', 'effectiveBcdRate'
         ]));
         const swsText = String(firstRowValue(row, [
-            'sws', 'swsRate', 'sws_rate', 'socialWelfareSurcharge', 'socialWelfareSurchargeRate'
+            'sws', 'swsRate', 'sws_rate', 'swc', 'swcRate', 'socialWelfareSurcharge', 'socialWelfareSurchargeRate'
         ]));
         const igstText = String(firstRowValue(row, [
-            'igst', 'igstRate', 'igst_rate', 'integratedTax', 'igstDuty', 'integratedGstRate'
+            'igst', 'igstRate', 'igst_rate', 'integratedTax', 'igstDuty', 'integratedGstRate', 'igstLevyRate', 'gstRate'
         ]));
         const bcdRate = parsePercent(bcdText);
         if (!/^\d{6,10}$/.test(hsCode) || bcdRate === null) return null;
@@ -722,7 +728,10 @@ async function fetchStaticOfficialProbe({
 
 async function fetchIndiaOfficialRows({
     fetcher = fetchText,
-    source = getSource('IN')
+    source = getSource('IN'),
+    queryHsCodes = STATIC_EXACT_CODE_CANDIDATES.map((code) => code.padEnd(8, '0')),
+    maxQueryCount = 6,
+    queryConcurrency = 3
 } = {}) {
     const urls = getOfficialProbeUrls(source, 'https://www.icegate.gov.in/');
     const attempts = [];
@@ -789,6 +798,36 @@ async function fetchIndiaOfficialRows({
             }
         }
     }
+    const queryAttempts = [];
+    const queryRows = [];
+    if ((!best || !best.rows?.length) && Array.isArray(queryHsCodes)) {
+        const codes = [...new Set(queryHsCodes.map((value) => String(value).replace(/\D/g, '').slice(0, 8)).filter((value) => /^\d{8}$/.test(value)))]
+            .slice(0, Math.max(1, maxQueryCount));
+        for (let offset = 0; offset < codes.length; offset += Math.max(1, queryConcurrency)) {
+            const outcomes = await Promise.all(codes.slice(offset, offset + Math.max(1, queryConcurrency)).map(async (hsCode) => {
+                const queryUrl = `https://www.icegate.gov.in/Webappl/cdc_duty_details.jsp?cntrycd=&cth_duty_nw=${encodeURIComponent(hsCode)}`;
+                try {
+                    const response = await fetcher(queryUrl, { timeoutMs: 10000 });
+                    const rows = [...parseIndiaOfficialJsonRows(response.body || ''), ...parseIndiaTariffRows(response.body || '')]
+                        .filter((row) => row.hs_code === hsCode);
+                    return { attempt: { hs_code: hsCode, official_url: queryUrl, status_code: response.status_code, row_count: rows.length,
+                        parser_diagnostics: inspectOfficialResponse(response.body || '', rows) }, rows };
+                } catch (error) {
+                    return { attempt: { hs_code: hsCode, official_url: queryUrl, status_code: null, row_count: 0, error: error.message }, rows: [] };
+                }
+            }));
+            for (const outcome of outcomes) {
+                queryAttempts.push(outcome.attempt);
+                queryRows.push(...outcome.rows);
+            }
+        }
+    }
+    if (queryRows.length) {
+        const rows = queryRows.filter((row, index, allRows) => index === allRows.findIndex((candidate) => candidate.hs_code === row.hs_code
+            && candidate.bcd_rate === row.bcd_rate && candidate.sws_rate === row.sws_rate && candidate.igst_rate === row.igst_rate));
+        return { ok: true, status_code: 200, official_url: queryAttempts.find((row) => row.row_count)?.official_url || '', rows,
+            row_count: rows.length, partial: true, parser_diagnostics: { parser_version: 3, schema_drift_detected: false, schema_drift_reason: '' }, attempts, query_attempts: queryAttempts };
+    }
     const selected = best || {
         ok: false,
         status_code: null,
@@ -800,7 +839,8 @@ async function fetchIndiaOfficialRows({
     };
     return {
         ...selected,
-        attempts
+        attempts,
+        query_attempts: queryAttempts
     };
 }
 
@@ -1460,6 +1500,7 @@ async function updateCountriesFromOfficialSources({ countries, dryRun = false, f
         partial: official.partial,
         error: official.error || '',
         attempts: official.attempts || [],
+        query_attempts: official.query_attempts || [],
         artifact: official.artifact || null
     }]));
     result.writes_official_machine_rates = Object.keys(officialTariffRows).length > 0;

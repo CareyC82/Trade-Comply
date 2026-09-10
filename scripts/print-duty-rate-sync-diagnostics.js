@@ -170,13 +170,43 @@ function buildDiagnosticLines(payload) {
     return lines;
 }
 
+function escapeAnnotation(value) {
+    return String(value || '').replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+}
+
+function buildAnnotations(payload) {
+    if (!payload) return ['::error title=Duty-rate sync status missing::data/duty-rate-sync-status.json was not produced.'];
+    const diagnostics = payload.ci_diagnostics || {};
+    const degraded = Array.isArray(diagnostics.degraded_details) ? diagnostics.degraded_details : [];
+    const lines = degraded.slice(0, 10).map((row) => {
+        const title = `${row.country || 'Market'} · ${row.label || row.category || 'official source degraded'}`;
+        const message = [row.reason, row.action, row.recovery_command ? `Rerun: ${row.recovery_command}` : '', 'Last-good rates were retained.']
+            .filter(Boolean).join(' · ');
+        return `::warning file=data/duty-rate-sync-status.json,title=${escapeAnnotation(title)}::${escapeAnnotation(message)}`;
+    });
+    if ((diagnostics.outcome || payload.status) === 'failed') {
+        lines.unshift(`::error file=data/duty-rate-sync-status.json,title=Duty-rate sync failed::${escapeAnnotation(diagnostics.summary || diagnostics.next_action || 'Inspect the uploaded diagnostics artifact.')}`);
+    }
+    return lines;
+}
+
+function markdownSummary(lines) {
+    return ['## Duty-rate sync diagnostics', '', ...lines.slice(1)].join('\n') + '\n';
+}
+
 function main() {
-    buildDiagnosticLines(readJson(STATUS_PATH)).forEach(line => console.log(line));
+    const payload = readJson(STATUS_PATH);
+    const lines = buildDiagnosticLines(payload);
+    lines.forEach(line => console.log(line));
+    buildAnnotations(payload).forEach(line => console.log(line));
+    if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdownSummary(lines));
 }
 
 module.exports = {
     buildDiagnosticLines,
-    summarizeOfficialFetch
+    summarizeOfficialFetch,
+    buildAnnotations,
+    markdownSummary
 };
 
 if (require.main === module) {

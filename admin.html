@@ -478,7 +478,7 @@
                         <tr><th>Expected rows</th><td><input id="artifact-expected-rows" type="number" min="1" step="1" placeholder="Exact parsed row count"><p class="meta">必须与文件实际解析行数一致；这能阻止不完整文件覆盖 last-good。</p></td></tr>
                         <tr><th>Coverage declaration</th><td><label><input id="artifact-complete" type="checkbox"> I confirm this is the complete official tariff artifact, not a search-result excerpt.</label><details><summary>Technical manifest preview</summary><pre id="artifact-manifest-preview" style="white-space:pre-wrap"></pre></details><p class="meta">SHA-256 会由浏览器计算并自动加入。</p></td></tr>
                     </tbody></table></div>
-                    <div class="row"><button type="button" class="btn-primary" id="btn-preview-artifact">Preview import</button><button type="button" class="btn-approve" id="btn-publish-artifact" disabled>Confirm import</button></div>
+                    <div class="row"><button type="button" class="btn-ghost" id="btn-inspect-artifact">Inspect file</button><button type="button" class="btn-primary" id="btn-preview-artifact">Preview import</button><button type="button" class="btn-approve" id="btn-publish-artifact" disabled>Confirm import</button></div>
                     <div id="artifact-preview" class="meta" style="margin-top:12px">尚未预览。</div>
                     <div id="artifact-history" style="margin-top:16px"></div>
                 </div>
@@ -822,6 +822,30 @@
             document.getElementById('artifact-preview').textContent = `${country}: select a complete official artifact. Preview will list every required priority HS family and block incomplete coverage.`;
             document.getElementById('btn-publish-artifact').disabled = true;
             currentArtifactPreview = null;
+        }
+
+        async function inspectDutyArtifact() {
+            const output = document.getElementById('artifact-preview');
+            const file = document.getElementById('artifact-file').files[0];
+            if (!file) return output.innerHTML = '<div class="empty">请选择官方文件。</div>';
+            try {
+                output.textContent = '正在识别文件结构和精确税号…';
+                const country = document.getElementById('artifact-country').value;
+                const result = await apiFetch('/api/review/duty-artifacts', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'inspect', country, file_name: file.name, content_base64: await fileToBase64(file) })
+                });
+                document.getElementById('artifact-expected-rows').value = result.parsed_row_count || '';
+                const missing = Object.entries(result.priority_coverage || {}).filter(([, covered]) => !covered).map(([prefix]) => prefix);
+                const duplicates = (result.duplicate_codes || []).map((row) => `${row.code} × ${row.count}`);
+                output.innerHTML = `<div class="${result.ok ? 'status-bar' : 'empty'}"><strong>${result.ok ? 'FILE RECOGNIZED' : 'NO EXACT ROWS FOUND'}</strong> · parsed ${result.parsed_row_count || 0}, exact ${result.exact_row_count || 0}, invalid ${result.invalid_row_count || 0}</div>
+                    <p class="meta">Expected national code length: ${escapeHtml(result.expected_code_length)} digits. Parsed row count has been filled in automatically; complete coverage must still be confirmed by the operator.</p>
+                    ${missing.length ? `<p class="error">Missing priority HS families: ${escapeHtml(missing.join(', '))}</p>` : '<p class="meta">All maintained priority HS families were detected.</p>'}
+                    ${duplicates.length ? `<p class="error">Duplicate exact codes (preview will block): ${escapeHtml(duplicates.join(', '))}</p>` : ''}
+                    <details><summary>Parsed sample</summary><pre>${escapeHtml(JSON.stringify(result.sample_rows || [], null, 2))}</pre></details>`;
+            } catch (error) {
+                output.innerHTML = `<div class="empty">文件识别失败：${escapeHtml(error.message)}</div>`;
+            }
         }
 
         async function previewDutyArtifact() {
@@ -2866,6 +2890,7 @@
             currentArtifactPreview = null;
             document.getElementById('btn-publish-artifact').disabled = true;
         });
+        document.getElementById('btn-inspect-artifact').addEventListener('click', inspectDutyArtifact);
         document.getElementById('btn-preview-artifact').addEventListener('click', previewDutyArtifact);
         document.getElementById('artifact-country').addEventListener('change', applyArtifactMarketDefaults);
         applyArtifactMarketDefaults();

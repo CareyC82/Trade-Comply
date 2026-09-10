@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { previewArtifact, publishArtifact, rollbackArtifact } = require('../lib/duty-rate-artifact-workflow');
+const { inspectArtifact, previewArtifact, publishArtifact, rollbackArtifact } = require('../lib/duty-rate-artifact-workflow');
 
 function fixture() {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'artifact-workflow-test-'));
@@ -41,6 +41,21 @@ test('artifact workflow previews without mutation, versions publishes, and suppo
         assert.equal(rollbackArtifact({ versionId: published.version_id, dutyRatesPath: files.dutyRatesPath, versionsDir: files.versionsDir, auditPath: files.auditPath }).ok, true);
         assert.deepEqual(JSON.parse(fs.readFileSync(files.dutyRatesPath, 'utf8')), JSON.parse(before));
         assert.equal(JSON.parse(fs.readFileSync(files.auditPath)).events[0].rollback_available, false);
+    } finally { fs.rmSync(files.directory, { recursive: true, force: true }); }
+});
+
+test('artifact inspection reports parsed rows and priority gaps without a manifest or mutation', () => {
+    const files = fixture();
+    try {
+        const before = fs.readFileSync(files.dutyRatesPath, 'utf8');
+        const result = inspectArtifact(files);
+        assert.equal(result.ok, true);
+        assert.equal(result.parsed_row_count, 5);
+        assert.equal(result.expected_code_length, 10);
+        assert.equal(result.artifact_sha256, files.manifest.sha256);
+        assert.equal(result.priority_coverage['851762'], true);
+        assert.equal(result.duplicate_codes.length, 0);
+        assert.equal(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
     } finally { fs.rmSync(files.directory, { recursive: true, force: true }); }
 });
 

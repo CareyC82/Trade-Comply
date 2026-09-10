@@ -163,6 +163,12 @@ function firstRowValue(row, names) {
         const value = scalarValue(row[name]);
         if (String(value).trim()) return value;
     }
+    const normalizedNames = new Set(names.map((name) => String(name).replace(/[^a-z0-9]/gi, '').toLowerCase()));
+    for (const [key, rawValue] of Object.entries(row || {})) {
+        if (!normalizedNames.has(String(key).replace(/[^a-z0-9]/gi, '').toLowerCase())) continue;
+        const value = scalarValue(rawValue);
+        if (String(value).trim()) return value;
+    }
     return '';
 }
 
@@ -201,16 +207,16 @@ function parseKoreaTariffRateRows(html = '') {
     let headerMap = null;
     const tableRows = rowMatches.map((rowHtml) => {
         const cells = (rowHtml.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || []).map(stripHtml);
-        if (cells.some(cell => /HS\s*(?:Code|Korea)|세번/i.test(cell)) && cells.some(cell => /basic|general|WTO|기본|기본세율/i.test(cell))) {
+        if (cells.some(cell => /HS\s*(?:Code|Korea)|세번/i.test(cell)) && cells.some(cell => /tax\s*rate|basic|general|WTO|기본|기본세율/i.test(cell))) {
             headerMap = {
                 hs: cells.findIndex(cell => /HS\s*(?:Code|Korea)|세번/i.test(cell)),
                 description: cells.findIndex(cell => /description|품명|goods/i.test(cell)),
-                rate: cells.findIndex(cell => /basic|general|WTO|기본|기본세율/i.test(cell))
+                rate: cells.findIndex(cell => /tax\s*rate|basic|general|WTO|기본|기본세율/i.test(cell))
             };
             return null;
         }
-        const hsCell = headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => /\b\d{10}\b/.test(cell));
-        const hsCode = hsCell?.match(/\b\d{10}\b/)?.[0] || '';
+        const hsCell = headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => String(cell).replace(/\D/g, '').length === 10);
+        const hsCode = String(hsCell || '').replace(/\D/g, '').slice(0, 10);
         const rateCell = (headerMap?.rate >= 0 ? cells[headerMap.rate] : '') || cells.find(cell => /free|면세|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
         const parsedRate = parseKoreaAdValoremRate(rateCell);
         if (!hsCode || parsedRate === null) return null;
@@ -273,7 +279,7 @@ function parseKoreaOfficialJsonRows(value = '') {
         ])).replace(/\D/g, '');
         const rateText = firstRowValue(row, [
             'taxRate', 'tax_rate', 'base_rate', 'rate', 'aplDtyRt', 'basRt', 'basicRate',
-            'wtoRate', 'genRt', 'generalRate', 'mfnRate'
+            'wtoRate', 'genRt', 'generalRate', 'mfnRate', 'taxRt', 'trfRt', 'appliedDutyRate'
         ]);
         const parsedRate = parseKoreaAdValoremRate(rateText);
         if (!/^\d{10}$/.test(hsCode) || parsedRate === null) return null;
@@ -368,11 +374,11 @@ async function fetchKoreaOfficialRows({
     const queryAttempts = [];
     if (!rows.length && Array.isArray(queryHsCodes) && queryHsCodes.length) {
         for (const hsCode of queryHsCodes.map(normalizeKoreaHs10).filter(Boolean)) {
-            try {
-                const lookup = await fetcher(lookupUrl, {
+            for (const endpoint of [lookupUrl, KR_TARIFF_DB_URL]) try {
+                const lookup = await fetcher(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `customsSeachType=Y&hsCode=${encodeURIComponent(hsCode)}`
+                    body: `customsSeachType=Y&hsCode=${encodeURIComponent(hsCode)}&searchCondition=hsCode&searchKeyword=${encodeURIComponent(hsCode)}`
                 });
                 const lookupRows = [
                     ...parseKoreaOfficialJsonRows(lookup.body || ''),
@@ -384,14 +390,17 @@ async function fetchKoreaOfficialRows({
                 const parserDiagnostics = inspectKoreaOfficialResponse(lookup.body || '', lookupRows);
                 queryAttempts.push({
                     hs_code: hsCode,
+                    lookup_url: endpoint,
                     status_code: lookup.status_code,
                     row_count: lookupRows.length,
                     parser_diagnostics: parserDiagnostics
                 });
                 rows = rows.concat(lookupRows);
+                if (lookupRows.length) break;
             } catch (error) {
                 queryAttempts.push({
                     hs_code: hsCode,
+                    lookup_url: endpoint,
                     status_code: null,
                     row_count: 0,
                     error: error.message

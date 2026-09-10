@@ -155,6 +155,27 @@ test('MY importer blocks conflicting exact rates and preserves prior successful 
     assert.equal(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
 });
 
+test('MY importer blocks duplicate exact tariff codes even when their rates agree', () => {
+    const files = fixture();
+    const duplicate = [
+        'HS Code,Description,Import Rate',
+        '8517620000,Router,0%',
+        '8517620000,Router duplicate,0%'
+    ].join('\n');
+    fs.writeFileSync(files.artifactPath, duplicate);
+    fs.writeFileSync(files.manifestPath, JSON.stringify({
+        authority: 'Royal Malaysian Customs Department', coverage_scope: 'full_tariff',
+        source_url: 'https://ezhs.customs.gov.my/tariff-file', published_at: '2026-08-02', effective_at: '2026-08-16',
+        complete: true, expected_rows: 2, sha256: sha256(Buffer.from(duplicate))
+    }));
+    const before = fs.readFileSync(files.dutyRatesPath, 'utf8');
+    const result = importMalaysiaDutyRates({ ...files, now: new Date('2026-08-25T00:00:00Z') });
+    assert.equal(result.ok, false);
+    assert.match(result.error, /duplicate exact tariff code 8517620000/);
+    assert.equal(result.trust_gate, 'blocked_last_good_preserved');
+    assert.equal(fs.readFileSync(files.dutyRatesPath, 'utf8'), before);
+});
+
 test('Admin exposes MY artifact trust gate without treating it as SST or approvals', () => {
     const payload = buildDutyRateStatusPayload();
     assert.equal(typeof payload.my_official_artifact_import, 'object');
@@ -162,4 +183,6 @@ test('Admin exposes MY artifact trust gate without treating it as SST or approva
     const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
     assert.match(html, /Malaysia official tariff artifact/);
     assert.match(html, /last-good protected/);
+    assert.match(html, /Inspect file/);
+    assert.match(html, /action: 'inspect'/);
 });

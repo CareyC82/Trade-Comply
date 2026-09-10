@@ -20,7 +20,9 @@ const {
     runAutoDutyRateSync
 } = require('../scripts/auto-sync-duty-rates');
 const {
-    buildDiagnosticLines
+    buildDiagnosticLines,
+    buildAnnotations,
+    markdownSummary
 } = require('../scripts/print-duty-rate-sync-diagnostics');
 const {
     dutyRateTestFiles,
@@ -496,6 +498,25 @@ test('duty-rate diagnostics print source watchlist and parser priority queue', (
     assert.match(lines, /diagnosis: Network transport/);
     assert.match(lines, /Automation priority queue/);
     assert.match(lines, /Promote Japan Customs parser/);
+});
+
+test('duty-rate diagnostics produce actionable GitHub annotations and summary markdown', () => {
+    const payload = {
+        status: 'ok',
+        ci_diagnostics: {
+            outcome: 'completed_with_degraded_sources',
+            summary: 'One source is degraded.',
+            next_action: 'Repair India parser.',
+            degraded_details: [{ country: 'IN', label: 'Parser schema drift', reason: 'no rows', action: 'Update field map', recovery_command: 'npm run probe:duty-rates:in' }]
+        },
+        counts: { sources_checked: 1, degraded_sources: 1 }
+    };
+    const annotations = buildAnnotations(payload);
+    assert.equal(annotations.length, 1);
+    assert.match(annotations[0], /::warning file=data\/duty-rate-sync-status\.json,title=IN · Parser schema drift/);
+    assert.match(annotations[0], /npm run probe:duty-rates:in/);
+    assert.match(annotations[0], /Last-good rates were retained/);
+    assert.match(markdownSummary(buildDiagnosticLines(payload)), /^## Duty-rate sync diagnostics/m);
 });
 
 test('source run plan maps roadmap sources to daily updater runs', () => {
