@@ -174,7 +174,7 @@ test('compliance readiness review CTA copies only a non-confidential local summa
     assert.match(library, /does not issue RCM approvals, certifications or registrations/);
     assert.match(script, /carey@tracewize\.com/);
     assert.match(script, /mailto:/);
-    assert.match(script, /reviewContact\.mailto/);
+    assert.match(script, /reviewContact\(\)\.mailto/);
     assert.match(script, /inspect and send it yourself in your email app/i);
     assert.doesNotMatch(script, /api\(['"]\/review/);
 });
@@ -190,6 +190,37 @@ test('compliance review contact is local, encoded and inspectable before sending
     assert.equal(decodeURIComponent(contact.mailto.split('&body=')[1]), contact.text);
     assert.match(contact.text, /intentionally excludes supplier identity, pricing and uploaded files/);
     assert.match(contact.text, /Nothing has been submitted automatically/);
+});
+
+test('prepared review contact adds only the entered non-confidential technical fields', () => {
+    const contact = engine.buildReviewContact({
+        description: 'Bluetooth speaker', origin: 'CN', market: 'AU', platform: 'Amazon',
+        productLabel: 'Bluetooth speaker', resultLabel: 'Conditional', reviewService: 'Single Product Review',
+        reviewDetails: { exactModel: 'SPK-100', power: 'USB-C 5V', wireless: 'Bluetooth 5.3', battery: 'BAT-02 18 Wh', documents: 'UN38.3, radio report', skuCount: 1 }
+    });
+    assert.match(contact.text, /Exact model: SPK-100/);
+    assert.match(contact.text, /Battery: BAT-02 18 Wh/);
+    assert.match(contact.text, /Number of SKUs: 1/);
+    assert.doesNotMatch(contact.text, /supplier name|purchase price/i);
+});
+
+test('review brief distinguishes Match, Mismatch, Missing and Unverified without treating presence as authenticity', () => {
+    const matrix = engine.buildEvidenceConsistencyMatrix({
+        profile: { battery: true, bundledAdapter: true, bluetooth: true },
+        supplierEvidence: [
+            { status: 'incomplete_verification', checks: { model: true, holder: false }, extracted: { standards: ['IEC 62368-1'], batteryModel: 'BAT-02', adapterModel: '', radioModule: 'BT-M1', hardwareRevision: '' } }
+        ]
+    });
+    assert.equal(matrix.find((item) => item.key === 'product_model').status, 'Match');
+    assert.equal(matrix.find((item) => item.key === 'manufacturer').status, 'Mismatch');
+    assert.equal(matrix.find((item) => item.key === 'standards').status, 'Unverified');
+    assert.equal(matrix.find((item) => item.key === 'adapter').status, 'Missing');
+    const brief = engine.buildComplianceReviewBrief({
+        profile: { battery: true }, coverage: { supported: true }, verdict: 'conditional', requirements: [],
+        supplierEvidence: [], documentGaps: [{ document: 'UN38.3' }], nextActions: ['Verify exact model']
+    });
+    assert.equal(brief.overall, 'Amber');
+    assert.equal(brief.costTiming.status, 'Unknown');
 });
 
 test('human review recommendation changes by product range, evidence and ANZ electrical scope', () => {

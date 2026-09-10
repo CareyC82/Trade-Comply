@@ -84,6 +84,13 @@ test('document extraction reports exact-model mismatches', () => {
     assert.deepEqual(parsed.missingFields, []);
 });
 
+test('document extraction captures component references for evidence consistency review', () => {
+    const parsed = extractFields('Model: SPK-100\nManufacturer: Example Audio Ltd\nReport No: REP-100\nIssue Date: 2026-09-01\nAdapter Model: PA-65\nBluetooth Module Model: BT-M1\nHardware Revision: R2\nBattery Model: BAT-02\nStandard IEC 62368-1', 'SPK-100');
+    assert.equal(parsed.adapterModel, 'PA-65');
+    assert.equal(parsed.radioModule, 'BT-M1');
+    assert.equal(parsed.hardwareRevision, 'R2');
+});
+
 test('document extraction exposes incomplete reports instead of treating parse success as verification', () => {
     const parsed = extractFields('Model: TW-01\nUN38.3 test summary', 'TW-01');
     assert.equal(parsed.modelMatch, true);
