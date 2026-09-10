@@ -3826,6 +3826,8 @@ a.hub-core-card--link {
 }
 .sell-check-scope { color: var(--color-warning-text); font-size: .79rem; line-height: 1.45; }
 .sell-check-scope strong { color: var(--color-warning-text); }
+.sell-review-path { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 10px auto 0; color: #526a81; font-size: .78rem; }
+.sell-review-path strong { color: #173c64; }
 
 .sell-check-form,
 .sell-check-card,
@@ -4073,6 +4075,16 @@ a.hub-core-card--link {
 .sell-review-actions button, .sell-review-actions a { border: 1px solid #fff; border-radius: 8px; background: #fff; color: #173c64; padding: 10px 14px; font: inherit; font-weight: 850; line-height: 1.2; text-align: center; text-decoration: none; cursor: pointer; }
 .sell-review-actions a { background: transparent; color: #fff; }
 #sell-review-status { grid-column: 1 / -1; min-height: 1em; }
+.sell-review-market-message { margin-top: 8px !important; padding: 8px 10px; border-left: 3px solid #f1c75b; background: rgba(255,255,255,.08); color: #fff !important; font-weight: 800; }
+.sell-review-scope { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.28); padding-top: 10px; }
+.sell-review-scope summary { cursor: pointer; color: #fff; font-size: .8rem; font-weight: 850; }
+.sell-review-scope > div { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+.sell-review-scope > .sell-review-service-options { grid-template-columns: repeat(3, 1fr); }
+.sell-review-service-options section { padding: 9px; border-radius: 8px; background: rgba(255,255,255,.08); }
+.sell-review-service-options p { margin-top: 4px; }
+.sell-review-scope section > strong { color: #fff; font-size: .78rem; }
+.sell-review-scope ul { margin: 6px 0 0; padding-left: 18px; color: #dbe8f4; font-size: .76rem; line-height: 1.5; }
+.sell-review-scope > p { margin-top: 9px; }
 .sell-result-details { margin-top: 14px; border: 1px solid #dce5ed; border-radius: 12px; background: #fff; }
 .sell-result-details > summary { padding: 14px 16px; color: #264661; font-weight: 800; cursor: pointer; }
 .sell-result-details > .sell-result-panel { margin: 0 14px 14px; box-shadow: none; }
@@ -4159,6 +4171,7 @@ a.hub-core-card--link {
     .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-core-decisions,
     .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }
     .sell-review-cta { grid-template-columns: 1fr; }
+    .sell-review-scope > div, .sell-review-scope > .sell-review-service-options { grid-template-columns: 1fr; }
     .sell-review-actions { grid-column: 1; grid-row: auto; display: grid; grid-template-columns: 1fr; }
     .sell-review-actions button, .sell-review-actions a { width: 100%; box-sizing: border-box; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }

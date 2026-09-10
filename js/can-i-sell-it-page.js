@@ -485,6 +485,12 @@ function bootstrapCanISellItPage() {
         const platformDecision = assessment.platformDecision;
         const procurement = assessment.procurement;
         const guidance = assessment.productGuidance || { risk: 'Confirm the exact model and enabled functions before relying on this result.', supplier: 'Ask for every exact-model document listed below.' };
+        const service = assessment.serviceRecommendation || {
+            title: 'Import Compliance Readiness Review', service: 'Single Product Review', reason: 'Review the exact product and unresolved evidence before ordering.',
+            marketMessage: '', requestedInputs: [], deliverables: [], boundary: 'TraceWize provides preliminary compliance screening and evidence-readiness review, not certification or legal advice.'
+        };
+        const serviceInputs = service.requestedInputs.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+        const serviceDeliverables = service.deliverables.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
         const actionPlan = assessment.sellerActionPlan || {
             purchase: `${procurement.answer}: ${procurement.label}`,
             supplier: guidance.supplier,
@@ -557,7 +563,7 @@ function bootstrapCanISellItPage() {
                 <p id="sell-copy-status" class="sell-copy-status" aria-live="polite"></p>
             </section>
             ${commercialPanel}
-            <section class="sell-review-cta"><div><span>Need a second look?</span><h2>Request a complimentary review</h2><p>Prepare a non-confidential summary, then review and send it yourself in your email app. Nothing is uploaded or sent automatically. If the email draft does not open, copy the request and email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><p id="sell-review-status" aria-live="polite"></p></section>
+            <section class="sell-review-cta" aria-label="Compliance Review Services"><div><span>Recommended human review · ${escapeHtml(service.service)}</span><h2>${escapeHtml(service.title)}</h2><p>${escapeHtml(service.reason)}</p>${service.marketMessage ? `<p class="sell-review-market-message">${escapeHtml(service.marketMessage)}</p>` : ''}<p>Prepare a non-confidential request, then inspect and send it yourself in your email app. Nothing is uploaded or sent automatically. If the draft does not open, email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Prepare / Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><details class="sell-review-scope"><summary>What to provide and what the review covers</summary><div class="sell-review-service-options"><section><strong>Single Product Review</strong><p>One exact model and destination market.</p></section><section><strong>Supplier Document Review</strong><p>Model, manufacturer, report, declaration, battery, adaptor and wireless-module consistency.</p></section><section><strong>Product Range Review</strong><p>Several related SKUs or a planned purchase range.</p></section></div><div><section><strong>Prepare</strong><ul>${serviceInputs}</ul></section><section><strong>Review output</strong><ul>${serviceDeliverables}</ul></section></div><p>${escapeHtml(service.boundary)}</p>${service.marketMessage ? '<p><strong>Australia:</strong> RCM is a regulatory compliance marking framework, not a certificate issued by TraceWize.</p>' : ''}</details><p id="sell-review-status" aria-live="polite"></p></section>
             <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
                 <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}${freshness.degradedCount ? ` · ${escapeHtml(freshness.degradedCount)} source refresh unavailable; last-good retained${freshness.lastGoodThrough ? ` from ${escapeHtml(freshness.lastGoodThrough)}` : ''}` : ''}${freshness.futureCount ? ` · ${escapeHtml(freshness.futureCount)} future requirement` : ''}${freshness.pendingEffectiveDateCount ? ` · ${escapeHtml(freshness.pendingEffectiveDateCount)} effective date pending` : ''}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
                 ${economicsPanel}
@@ -636,7 +642,8 @@ function bootstrapCanISellItPage() {
         const reviewContact = engine.buildReviewContact({
             ...currentInput,
             productLabel: assessment.coverageStatus.supported ? assessment.product.label : currentInput.description,
-            resultLabel: sellerConclusion.label
+            resultLabel: sellerConclusion.label,
+            reviewService: service.service
         });
         const reviewEmailLink = document.getElementById('sell-open-review-email');
         if (reviewEmailLink) reviewEmailLink.href = reviewContact.mailto;

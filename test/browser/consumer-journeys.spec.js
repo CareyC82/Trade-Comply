@@ -52,6 +52,22 @@ test('unsupported product exits safely and prepares a manual review email', asyn
     const href = await page.locator('#sell-open-review-email').getAttribute('href');
     expect(href).toContain('mailto:carey@tracewize.com');
     expect(decodeURIComponent(href)).toContain('cotton summer dress');
+    await expect(page.locator('.sell-review-cta')).toContainText('Import Compliance Readiness Review');
+    await expect(page.locator('.sell-review-cta')).toContainText('not certification or legal advice');
+    await expect(page.locator('.sell-review-cta')).not.toContainText('RCM is a regulatory compliance marking framework');
+});
+
+test('Australia electrical result offers RCM and EESS readiness without certification claims', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await page.getByLabel('Product name or short description').fill('65W GaN wall charger with 100-240V AC input, no battery, for adults');
+    await page.getByLabel('Target market').selectOption('AU');
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    const review = page.locator('.sell-review-cta');
+    await expect(review).toContainText('RCM & EESS readiness review');
+    await expect(review).toContainText('RCM is a regulatory compliance marking framework');
+    await expect(review).not.toContainText('Get RCM certified by TraceWize');
+    const href = await page.locator('#sell-open-review-email').getAttribute('href');
+    expect(decodeURIComponent(href)).toContain('Single Product Review');
 });
 
 test('upload guard blocks too many files before any private transfer', async ({ page }) => {

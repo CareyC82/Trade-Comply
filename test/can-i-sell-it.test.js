@@ -156,20 +156,25 @@ test('non-electronic launch exclusions never inherit an electronics sellability 
     });
 });
 
-test('complimentary review CTA copies only a non-confidential local summary', () => {
+test('compliance readiness review CTA copies only a non-confidential local summary', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
-    assert.match(script, /Request a complimentary review/);
+    assert.match(script, /Import Compliance Readiness Review/);
+    assert.match(script, /Single Product Review/);
+    assert.match(script, /Supplier Document Review/);
+    assert.match(script, /Product Range Review/);
+    assert.match(script, /Prepare \/ Copy request/);
     assert.match(script, /Nothing is uploaded or sent automatically/);
     const library = fs.readFileSync(path.join(__dirname, '..', 'lib', 'can-i-sell-it.js'), 'utf8');
     assert.match(library, /intentionally excludes supplier identity, pricing and uploaded files/);
+    assert.match(library, /does not issue RCM approvals, certifications or registrations/);
     assert.match(script, /carey@tracewize\.com/);
     assert.match(script, /mailto:/);
     assert.match(script, /reviewContact\.mailto/);
-    assert.match(script, /review and send it yourself in your email app/i);
+    assert.match(script, /inspect and send it yourself in your email app/i);
     assert.doesNotMatch(script, /api\(['"]\/review/);
 });
 
-test('complimentary review contact is local, encoded and inspectable before sending', () => {
+test('compliance review contact is local, encoded and inspectable before sending', () => {
     const contact = engine.buildReviewContact({
         description: 'Bluetooth watch & charger', origin: 'CN', market: 'US',
         platform: 'Amazon', productLabel: 'Smart watch', resultLabel: 'Conditional — evidence required'
@@ -179,6 +184,31 @@ test('complimentary review contact is local, encoded and inspectable before send
     assert.match(contact.mailto, /&body=/);
     assert.equal(decodeURIComponent(contact.mailto.split('&body=')[1]), contact.text);
     assert.match(contact.text, /intentionally excludes supplier identity, pricing and uploaded files/);
+    assert.match(contact.text, /Nothing has been submitted automatically/);
+});
+
+test('human review recommendation changes by product range, evidence and ANZ electrical scope', () => {
+    const range = engine.assess({
+        description: 'Product range with three Bluetooth speaker SKUs and batteries', market: 'US', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    assert.equal(range.serviceRecommendation.code, 'product_range_review');
+    assert.equal(range.serviceRecommendation.service, 'Product Range Review');
+
+    const evidence = engine.assess({
+        description: 'Bluetooth speaker with rechargeable battery for adults', market: 'US', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: [],
+        supplierEvidence: { supplierModel: 'SPK-2', documentText: 'Model SPK-1' }
+    });
+    assert.equal(evidence.serviceRecommendation.code, 'supplier_document_review');
+    assert.match(evidence.serviceRecommendation.reason, /supplier reports|consistent/i);
+
+    const australia = engine.assess({
+        description: '65W GaN wall charger with 100-240V AC input and no battery', market: 'AU', platform: 'Amazon',
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    assert.match(australia.serviceRecommendation.marketMessage, /RCM & EESS readiness review/);
+    assert.match(australia.serviceRecommendation.boundary, /not certification or legal advice/i);
 });
 
 test('review CTA has a one-column mobile action layout without fixed-width overflow', () => {
@@ -647,7 +677,7 @@ test('seller action plan gives a purchase decision, supplier request and immedia
         assessmentMode: 'quick', blockingQuestionKeys: []
     });
     assert.match(unsupported.sellerActionPlan.purchase, /outside maintained coverage/i);
-    assert.match(unsupported.sellerActionPlan.next, /complimentary review/i);
+    assert.match(unsupported.sellerActionPlan.next, /compliance readiness review/i);
 });
 
 test('result page exposes the three actionable seller answers before technical details', () => {
