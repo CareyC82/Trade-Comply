@@ -14,6 +14,13 @@ function supplierRequestFilename(productLabel = 'product', market = '') {
     return `${safe || 'supplier-document-request'}.txt`;
 }
 
+function complianceReportId(input = {}) {
+    const value = [input.description, input.origin, input.market, input.platform].join('|');
+    let hash = 2166136261;
+    for (const char of value) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+    return `TW-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${(hash >>> 0).toString(16).toUpperCase().padStart(8, '0')}`;
+}
+
 function bootstrapCanISellItPage() {
     const engine = globalThis.TradeComplyCanISellIt;
     const form = document.getElementById('sell-check-form');
@@ -368,9 +375,15 @@ function bootstrapCanISellItPage() {
 
     function printAssessment() {
         if (!latestAssessment) return;
+        const details = document.querySelector('.sell-result-details');
+        const wasOpen = details?.open;
+        if (details) details.open = true;
         document.body.classList.add('sell-print-mode');
         window.print();
-        setTimeout(() => document.body.classList.remove('sell-print-mode'), 500);
+        setTimeout(() => {
+            document.body.classList.remove('sell-print-mode');
+            if (details) details.open = Boolean(wasOpen);
+        }, 500);
     }
 
     function postEntryHref(row, assessment) {
@@ -502,6 +515,8 @@ function bootstrapCanISellItPage() {
             supplier: guidance.supplier,
             next: assessment.nextActions[0]
         };
+        const reportId = complianceReportId(currentInput);
+        const reportGeneratedAt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date());
         const freshness = assessment.sourceFreshness || { status: 'no_linked_source', sourceCount: 0, staleCount: 0, reviewedThrough: null, confidenceLevels: [] };
         const freshnessLabel = {
             current: 'Current review metadata',
@@ -569,7 +584,7 @@ function bootstrapCanISellItPage() {
                 <p id="sell-copy-status" class="sell-copy-status" aria-live="polite"></p>
             </section>
             ${commercialPanel}
-            <section class="sell-result-panel sell-review-brief"><div class="sell-review-brief-head"><div><span>Preliminary compliance readiness report</span><h2>Current review status</h2><p>Screening output only — not a certification, approval or legal opinion.</p></div><strong class="sell-ragu sell-ragu--${escapeHtml(reviewBrief.overall.toLowerCase())}">${escapeHtml(reviewBrief.overall)}</strong></div><div class="sell-review-summary"><section><strong>Product scope · ${escapeHtml(reviewBrief.scope.status)}</strong><p>${escapeHtml(reviewBrief.scope.detail)}</p></section><section><strong>Regulatory path · ${escapeHtml(reviewBrief.path.status)}</strong><p>${escapeHtml(reviewBrief.path.detail)}</p></section></div><ul class="sell-evidence-matrix">${evidenceMatrix}</ul><div class="sell-review-brief-foot"><section><strong>Next actions</strong><ol>${reviewActions}</ol></section><section><strong>Professional confirmation</strong><ul>${professionalConfirmation}</ul></section><section><strong>Cost and timing · ${escapeHtml(reviewBrief.costTiming.status)}</strong><p>${escapeHtml(reviewBrief.costTiming.detail)}</p></section></div></section>
+            <section class="sell-result-panel sell-review-brief"><header class="sell-report-metadata"><strong>TraceWize</strong><span>Report ${escapeHtml(reportId)}</span><span>Generated ${escapeHtml(reportGeneratedAt)}</span><span>${escapeHtml(currentInput.origin)} → ${escapeHtml(currentInput.market)} · ${escapeHtml(currentInput.platform)}</span></header><div class="sell-review-brief-head"><div><span>Preliminary compliance readiness report</span><h2>Current review status</h2><p>Screening output only — not a certification, approval or legal opinion.</p></div><strong class="sell-ragu sell-ragu--${escapeHtml(reviewBrief.overall.toLowerCase())}">${escapeHtml(reviewBrief.overall)}</strong></div><div class="sell-review-summary"><section><strong>Product scope · ${escapeHtml(reviewBrief.scope.status)}</strong><p>${escapeHtml(reviewBrief.scope.detail)}</p></section><section><strong>Regulatory path · ${escapeHtml(reviewBrief.path.status)}</strong><p>${escapeHtml(reviewBrief.path.detail)}</p></section></div><ul class="sell-evidence-matrix">${evidenceMatrix}</ul><div class="sell-review-brief-foot"><section><strong>Next actions</strong><ol>${reviewActions}</ol></section><section><strong>Professional confirmation</strong><ul>${professionalConfirmation}</ul></section><section><strong>Cost and timing · ${escapeHtml(reviewBrief.costTiming.status)}</strong><p>${escapeHtml(reviewBrief.costTiming.detail)}</p></section></div></section>
             <section class="sell-review-cta" aria-label="Compliance Review Services"><div><span>Recommended human review · ${escapeHtml(service.service)}</span><h2>${escapeHtml(service.title)}</h2><p>${escapeHtml(service.reason)}</p>${service.marketMessage ? `<p class="sell-review-market-message">${escapeHtml(service.marketMessage)}</p>` : ''}<p>Prepare a non-confidential request, then inspect and send it yourself in your email app. Nothing is uploaded or sent automatically. If the draft does not open, email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Prepare / Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><details class="sell-review-preparation" open><summary>Prepare the review request</summary><p>Optional. Enter non-confidential technical facts only. Do not enter supplier identity, pricing or private document content.</p><div><label>Exact model<input id="sell-review-model" maxlength="80" placeholder="e.g. SPK-100"></label><label>Product or image notes<input id="sell-review-product-notes" maxlength="500" placeholder="Non-confidential description or public product link"></label><label>Power and adaptor<input id="sell-review-power" maxlength="200" placeholder="e.g. USB-C 5V; adaptor not included"></label><label>Wireless functions<input id="sell-review-wireless" maxlength="200" placeholder="e.g. Bluetooth 5.3; no Wi-Fi"></label><label>Battery<input id="sell-review-battery" maxlength="200" placeholder="e.g. Li-ion pack BAT-02, 18 Wh"></label><label>Available document types<input id="sell-review-documents" maxlength="300" placeholder="e.g. FCC report, UN38.3, DoC"></label><label>Number of SKUs<input id="sell-review-sku-count" type="number" min="1" max="500" inputmode="numeric"></label></div></details><details class="sell-review-scope"><summary>What the review covers</summary><div class="sell-review-service-options"><section><strong>Single Product Review</strong><p>One exact model and destination market.</p></section><section><strong>Supplier Document Review</strong><p>Model, manufacturer, report, declaration, battery, adaptor and wireless-module consistency.</p></section><section><strong>Product Range Review</strong><p>Several related SKUs or a planned purchase range.</p></section></div><div><section><strong>Prepare</strong><ul>${serviceInputs}</ul></section><section><strong>Review output</strong><ul>${serviceDeliverables}</ul></section></div><p>${escapeHtml(service.boundary)}</p>${service.marketMessage ? '<p><strong>Australia:</strong> RCM is a regulatory compliance marking framework, not a certificate issued by TraceWize.</p>' : ''}</details><p id="sell-review-status" aria-live="polite"></p></section>
             <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
                 <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}${freshness.degradedCount ? ` · ${escapeHtml(freshness.degradedCount)} source refresh unavailable; last-good retained${freshness.lastGoodThrough ? ` from ${escapeHtml(freshness.lastGoodThrough)}` : ''}` : ''}${freshness.futureCount ? ` · ${escapeHtml(freshness.futureCount)} future requirement` : ''}${freshness.pendingEffectiveDateCount ? ` · ${escapeHtml(freshness.pendingEffectiveDateCount)} effective date pending` : ''}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
@@ -655,13 +670,27 @@ function bootstrapCanISellItPage() {
             documents: document.getElementById('sell-review-documents')?.value || '',
             skuCount: document.getElementById('sell-review-sku-count')?.value || ''
         });
+        const reviewPreparation = document.querySelector('.sell-review-preparation');
+        reviewPreparation?.insertAdjacentHTML('beforeend', '<section class="sell-review-completeness" aria-live="polite"><strong id="sell-review-completeness-title">Preparation status</strong><p id="sell-review-completeness-message"></p><ul id="sell-review-missing"></ul></section>');
+        const refreshPreparationStatus = () => {
+            const status = engine.buildReviewPreparationStatus({ profile: assessment.profile, service: service.service, reviewDetails: reviewDetails() });
+            const title = document.getElementById('sell-review-completeness-title');
+            const message = document.getElementById('sell-review-completeness-message');
+            const missing = document.getElementById('sell-review-missing');
+            if (title) title.textContent = status.complete ? 'Ready to review' : 'Improve the request';
+            if (message) message.textContent = status.message;
+            if (missing) missing.innerHTML = status.missing.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+        };
         const reviewContact = () => engine.buildReviewContact({
             ...currentInput,
             productLabel: assessment.coverageStatus.supported ? assessment.product.label : currentInput.description,
             resultLabel: sellerConclusion.label, reviewService: service.service, reviewDetails: reviewDetails()
         });
         const reviewEmailLink = document.getElementById('sell-open-review-email');
-        const refreshReviewLink = () => { if (reviewEmailLink) reviewEmailLink.href = reviewContact().mailto; };
+        const refreshReviewLink = () => {
+            if (reviewEmailLink) reviewEmailLink.href = reviewContact().mailto;
+            refreshPreparationStatus();
+        };
         refreshReviewLink();
         document.querySelectorAll('.sell-review-preparation input').forEach((input) => input.addEventListener('input', refreshReviewLink));
         document.getElementById('sell-copy-review-request')?.addEventListener('click', async () => {

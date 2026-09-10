@@ -223,6 +223,44 @@ test('review brief distinguishes Match, Mismatch, Missing and Unverified without
     assert.equal(brief.costTiming.status, 'Unknown');
 });
 
+test('component consistency compares the same field across documents without spreading one mismatch to every row', () => {
+    const matrix = engine.buildEvidenceConsistencyMatrix({
+        profile: { battery: true, bundledAdapter: true, bluetooth: true },
+        supplierEvidence: [
+            { checks: { model: true, holder: true }, extracted: { model: 'SPK-100', manufacturer: 'Example Ltd', batteryModel: 'BAT-01', adapterModel: 'PA-65', radioModule: 'BT-M1', hardwareRevision: 'R2', standards: ['IEC 62368-1'] } },
+            { checks: { model: true, holder: true }, extracted: { model: 'SPK-100', manufacturer: 'Example Ltd', batteryModel: 'BAT-02', adapterModel: 'PA-65', radioModule: 'BT-M1', hardwareRevision: 'R2', standards: ['UN 38.3'] } }
+        ]
+    });
+    assert.equal(matrix.find((item) => item.key === 'battery').status, 'Mismatch');
+    assert.equal(matrix.find((item) => item.key === 'adapter').status, 'Match');
+    assert.equal(matrix.find((item) => item.key === 'radio_module').status, 'Match');
+    assert.equal(matrix.find((item) => item.key === 'standards').status, 'Unverified');
+});
+
+test('review preparation lists only details relevant to the detected product and service', () => {
+    const partial = engine.buildReviewPreparationStatus({
+        profile: { bluetooth: true, battery: true, mainsPowered: false }, service: 'Single Product Review',
+        reviewDetails: { exactModel: 'SPK-100', productNotes: 'Public product page', wireless: 'Bluetooth 5.3' }
+    });
+    assert.equal(partial.total, 5);
+    assert.deepEqual(partial.missing, ['battery details', 'available document types (or state that none are available)']);
+    const complete = engine.buildReviewPreparationStatus({
+        profile: { bluetooth: true, battery: true }, service: 'Single Product Review',
+        reviewDetails: { exactModel: 'SPK-100', productNotes: 'Public product page', wireless: 'Bluetooth 5.3', battery: 'BAT-02', documents: 'none available' }
+    });
+    assert.equal(complete.complete, true);
+});
+
+test('print report has stable metadata, A4 rules and excludes local preparation controls', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
+    assert.match(script, /sell-report-metadata/);
+    assert.match(script, /Report \$\{escapeHtml\(reportId\)\}/);
+    assert.match(script, /details\.open = true/);
+    assert.match(css, /@page\s*\{\s*size:\s*A4/);
+    assert.match(css, /\.sell-review-preparation[^}]*display:\s*none\s*!important/s);
+});
+
 test('human review recommendation changes by product range, evidence and ANZ electrical scope', () => {
     const range = engine.assess({
         description: 'Product range with three Bluetooth speaker SKUs and batteries', market: 'US', platform: 'Amazon',

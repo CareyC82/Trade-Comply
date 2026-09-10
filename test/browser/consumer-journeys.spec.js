@@ -85,6 +85,31 @@ test('Australia electrical result offers RCM and EESS readiness without certific
     expect(decodeURIComponent(href)).toContain('Single Product Review');
 });
 
+test('review request preparation updates completeness and the local email draft without sending data', async ({ page }) => {
+    await submitProduct(page, 'Bluetooth speaker with rechargeable lithium battery, for adults');
+    await expect(page.locator('#sell-review-completeness-message')).toContainText(/useful details prepared/i);
+    await page.locator('#sell-review-model').fill('SPK-100');
+    await page.locator('#sell-review-product-notes').fill('Public product page: https://example.com/spk-100');
+    await page.locator('#sell-review-wireless').fill('Bluetooth 5.3; no Wi-Fi');
+    await page.locator('#sell-review-battery').fill('BAT-02, 18 Wh');
+    await page.locator('#sell-review-documents').fill('UN38.3 and FCC report');
+    await expect(page.locator('#sell-review-completeness-title')).toHaveText('Ready to review');
+    const href = await page.locator('#sell-open-review-email').getAttribute('href');
+    const draft = decodeURIComponent(href);
+    expect(draft).toContain('Exact model: SPK-100');
+    expect(draft).toContain('Battery: BAT-02, 18 Wh');
+    expect(draft).toContain('Nothing has been submitted automatically');
+});
+
+test('print view exposes report metadata and technical sources while hiding preparation controls', async ({ page }) => {
+    await submitProduct(page, 'Wi-Fi smart plug for AC mains, no battery, for adults');
+    await expect(page.locator('.sell-report-metadata')).toContainText(/Report TW-/);
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('.sell-review-preparation')).toBeHidden();
+    await expect(page.locator('.sell-result-details')).toHaveCSS('display', 'block');
+    await expect(page.locator('.sell-report-metadata')).toBeVisible();
+});
+
 test('upload guard blocks too many files before any private transfer', async ({ page }) => {
     await submitProduct(page, 'Wi-Fi smart plug for AC mains, no battery, for adults');
     await page.locator('.sell-advanced-option').first().locator('summary').click();

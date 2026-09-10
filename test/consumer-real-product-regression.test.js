@@ -89,3 +89,23 @@ test('unsupported review requests use the described product instead of a fallbac
     assert.doesNotMatch(contact.subject, /wearable/i);
     assert.match(contact.mailto, /^mailto:carey@tracewize\.com/);
 });
+
+test('five representative electronics retain product and market-specific requirements across US EU AU and NZ', () => {
+    const scenarios = [
+        ['Bluetooth smart watch with rechargeable lithium battery for adults, no medical claims', 'smart_watch', { US: ['fcc', 'battery'], EU: ['red', 'battery'], AU: ['au_radio', 'battery'], NZ: ['nz_radio', 'battery'] }],
+        ['Bluetooth speaker with rechargeable lithium battery for adults', 'bluetooth_speaker', { US: ['fcc', 'battery'], EU: ['red', 'battery'], AU: ['au_radio', 'battery'], NZ: ['nz_radio', 'battery'] }],
+        ['65W GaN wall charger with 100-240V AC input, no battery, for adults', 'charger', { US: ['us_electrical'], EU: ['eu_electrical'], AU: ['au_eess'], NZ: ['nz_electrical'] }],
+        ['Power bank with rechargeable lithium battery, no wireless, for adults', 'power_bank', { US: ['battery'], EU: ['battery'], AU: ['battery'], NZ: ['battery'] }],
+        ['IP security camera with Wi-Fi and microphone, no battery, for adults', 'security_camera', { US: ['fcc', 'privacy_features'], EU: ['red', 'privacy_features'], AU: ['au_radio', 'privacy_features'], NZ: ['nz_radio', 'privacy_features'] }]
+    ];
+    scenarios.forEach(([description, productType, marketRules]) => {
+        Object.entries(marketRules).forEach(([market, expected]) => {
+            const result = engine.assess({ description, market, platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [] });
+            assert.equal(result.profile.productType, productType, `${market}: ${description}`);
+            assert.equal(result.sellerConclusion.code, 'conditional', `${market}: ${description}`);
+            const ids = new Set(result.requirements.map((item) => item.id));
+            expected.forEach((id) => assert.ok(ids.has(id), `${market}/${productType} missing ${id}`));
+            assert.ok(result.sourceFreshness.sourceCount > 0, `${market}/${productType} has no linked official source`);
+        });
+    });
+});

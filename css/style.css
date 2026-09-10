@@ -4078,6 +4078,7 @@ a.hub-core-card--link {
 #sell-review-status { grid-column: 1 / -1; min-height: 1em; }
 .sell-review-market-message { margin-top: 8px !important; padding: 8px 10px; border-left: 3px solid #f1c75b; background: rgba(255,255,255,.08); color: #fff !important; font-weight: 800; }
 .sell-review-brief-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.sell-report-metadata { display: flex; flex-wrap: wrap; gap: 5px 14px; margin: -4px 0 14px; padding-bottom: 9px; border-bottom: 1px solid #dce6ef; color: #627587; font-size: .7rem; }.sell-report-metadata strong { margin-right: auto; color: #173c64; font-size: .78rem; }.sell-report-metadata span { overflow-wrap: anywhere; }
 .sell-review-brief-head span { color: #6b7f91; font-size: .72rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
 .sell-review-brief-head h2 { margin: 3px 0 0; }
 .sell-review-brief-head p { margin: 4px 0 0; color: #627587; font-size: .76rem; }
@@ -4091,6 +4092,7 @@ a.hub-core-card--link {
 .sell-review-brief-foot { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }.sell-review-brief-foot section { padding: 10px; border-radius: 8px; background: #f6f9fc; }.sell-review-brief-foot strong { color: #294b69; font-size: .8rem; }.sell-review-brief-foot ol, .sell-review-brief-foot ul { margin: 6px 0 0; padding-left: 18px; color: #627587; font-size: .78rem; }.sell-review-brief-foot p { margin: 6px 0 0; color: #627587; font-size: .78rem; }
 .sell-review-preparation { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.28); padding-top: 10px; }
 .sell-review-preparation summary { cursor: pointer; color: #fff; font-size: .8rem; font-weight: 850; }.sell-review-preparation > p { margin: 7px 0; }.sell-review-preparation > div { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }.sell-review-preparation label { display: grid; gap: 4px; color: #dbe8f4; font-size: .74rem; font-weight: 800; }.sell-review-preparation input { width: 100%; min-height: 40px; box-sizing: border-box; border: 1px solid #b7c9dc; border-radius: 7px; padding: 8px 10px; font: inherit; color: #173c64; background: #fff; }
+.sell-review-completeness { margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(255,255,255,.1); }.sell-review-completeness strong { color: #fff; font-size: .78rem; }.sell-review-completeness p { margin: 4px 0 0; }.sell-review-completeness ul { margin: 5px 0 0; padding-left: 18px; color: #dbe8f4; font-size: .74rem; }
 .sell-review-scope { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.28); padding-top: 10px; }
 .sell-review-scope summary { cursor: pointer; color: #fff; font-size: .8rem; font-weight: 850; }
 .sell-review-scope > div { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
@@ -4155,12 +4157,18 @@ a.hub-core-card--link {
 .sell-advanced-update { margin-top: 14px; }
 
 @media print {
+    @page { size: A4; margin: 13mm; }
     .bottom-nav, .sell-check-hero, .sell-check-form, #sell-follow-up,
-    .sell-history-card, .sell-result-actions, .sell-assistant-result, .sell-review-preparation { display: none !important; }
+    .sell-history-card, .sell-result-actions, .sell-assistant-result, .sell-review-preparation, .sell-review-actions { display: none !important; }
     .sell-check-page-body { background: #fff; padding: 0; }
     .sell-check-page { width: 100%; padding: 0; }
     #sell-result { display: block !important; margin: 0; }
-    .sell-result-panel, .sell-verdict, .sell-procurement { break-inside: avoid; box-shadow: none; }
+    .sell-result-panel, .sell-verdict, .sell-procurement, .sell-evidence-matrix li { break-inside: avoid; box-shadow: none; }
+    .sell-result-details { display: block; }
+    .sell-result-details > summary { display: none; }
+    .sell-review-cta { grid-template-columns: 1fr; background: #fff; color: #173c64; border: 1px solid #dce6ef; }
+    .sell-review-cta p, .sell-review-cta span, .sell-review-scope ul { color: #465e74; }
+    .sell-review-scope { display: none; }
 }
 
 @media (max-width: 760px) {
