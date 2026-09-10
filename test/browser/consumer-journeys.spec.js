@@ -9,6 +9,21 @@ async function submitProduct(page, description) {
     await expect(page.locator('#sell-result')).toBeVisible();
 }
 
+test('national tariff fields follow the selected market without making the page look Australia-only', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await expect(page.locator('#sell-exact-hs-single-field')).toBeVisible();
+    await expect(page.locator('#sell-exact-hs-au-field')).toBeHidden();
+    await expect(page.locator('#sell-exact-hs-nz-field')).toBeHidden();
+    await page.getByLabel('Target market').selectOption('ANZ');
+    await expect(page.locator('#sell-exact-hs-single-field')).toBeHidden();
+    await expect(page.locator('#sell-exact-hs-au-field')).toBeVisible();
+    await expect(page.locator('#sell-exact-hs-nz-field')).toBeVisible();
+    await page.getByLabel('Target market').selectOption('US');
+    await expect(page.locator('#sell-exact-hs-single-field')).toBeVisible();
+    await expect(page.locator('#sell-exact-hs-au-field')).toBeHidden();
+    await expect(page.locator('#sell-exact-hs-nz-field')).toBeHidden();
+});
+
 test('supported product shows a preliminary result and channel-specific copy', async ({ page }) => {
     await submitProduct(page, 'Bluetooth smart watch with rechargeable lithium battery, no medical claims, for adults');
     await expect(page.locator('#sell-result')).toContainText('FCC authorization');

@@ -88,6 +88,11 @@ test('ANZ flow exposes separate exact tariff inputs and validates filing-code le
     assert.match(script, /reviewed/);
 });
 
+test('hidden destination tariff fields cannot be forced visible by the shared form layout', () => {
+    const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
+    assert.match(css, /\.sell-check-field\[hidden\]\s*\{\s*display:\s*none\s*!important;/);
+});
+
 test('quick-question priorities remove duplicate product facts before limiting the list', () => {
     const priorities = pageHelpers.dedupeQuestionKeys([
         ...models.getProduct('smart_watch').priorityQuestions,
