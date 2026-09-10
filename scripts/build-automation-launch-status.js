@@ -11,6 +11,7 @@ const DUTY_RATES_PATH = path.join(ROOT, 'data', 'duty-rates.json');
 const POST_ENTRY_RATE_PRIORITY_MATRIX_PATH = path.join(ROOT, 'data', 'post-entry-rate-priority-matrix.json');
 const GLOBAL_CRAWL_HEALTH_PATH = path.join(ROOT, 'data', 'global-crawl-source-health.json');
 const INBOX_MANIFEST_PATH = path.join(ROOT, 'data', 'inbox', 'manifest.json');
+const MANUAL_SOURCE_REVIEWS_PATH = path.join(ROOT, 'data', 'manual-source-reviews.json');
 const MAX_SOURCE_HEALTH_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 function readJson(filePath, fallback = {}) {
@@ -134,6 +135,7 @@ function sourceManifestKey(source) {
 function buildHealthLookup() {
     const healthPayload = readJson(GLOBAL_CRAWL_HEALTH_PATH, { sources: [] });
     const inboxPayload = readJson(INBOX_MANIFEST_PATH, { sources: {} });
+    const manualPayload = readJson(MANUAL_SOURCE_REVIEWS_PATH, { sources: {} });
     const healthById = new Map((healthPayload.sources || []).map(source => [source.id, source]));
     const inboxSources = inboxPayload.sources || {};
 
@@ -141,7 +143,8 @@ function buildHealthLookup() {
         health_updated_at: healthPayload.generated_at || null,
         inbox_updated_at: inboxPayload.updated_at || null,
         byId: healthById,
-        inboxSources
+        inboxSources,
+        manualSources: manualPayload.sources || {}
     };
 }
 
@@ -159,17 +162,27 @@ function sourceHealthStatus(source, lookup) {
     }
     const live = lookup.byId.get(source.id);
     const inbox = lookup.inboxSources[sourceManifestKey(source)];
+    const manual = lookup.manualSources?.[source.id] || {};
+    const manualIntervalDays = source.id === 'in-dgft' ? 7 : source.id === 'us-fcc' ? 30 : 0;
+    const manualReviewedMs = Date.parse(manual.reviewed_at || '');
+    const manualCurrent = manualIntervalDays > 0 && Number.isFinite(manualReviewedMs)
+        && manualReviewedMs + manualIntervalDays * 86400000 >= Date.now();
     if (live) {
         const fetchedAt = live.fetched_at || null;
         const stale = fetchedAt && Date.now() - Date.parse(fetchedAt) > MAX_SOURCE_HEALTH_AGE_MS;
         return {
-            health_status: stale ? 'stale' : live.ok ? 'fetch_ok' : (live.optional ? 'optional_issue' : 'fetch_issue'),
+            health_status: stale ? 'stale' : live.ok ? 'fetch_ok' : manualCurrent ? 'manual_review_current' : (live.optional ? 'optional_issue' : 'fetch_issue'),
             last_fetch_at: fetchedAt,
             byte_length: live.byte_length || 0,
             error: live.error || '',
             transport: live.transport || live.method || '',
             fetched_url: live.fetched_url || '',
-            monitor_only: Boolean(live.monitor_only)
+            monitor_only: Boolean(live.monitor_only),
+            manual_reviewed_at: manual.reviewed_at || null,
+            manual_review_due_at: Number.isFinite(manualReviewedMs) && manualIntervalDays > 0
+                ? new Date(manualReviewedMs + manualIntervalDays * 86400000).toISOString().slice(0, 10)
+                : null,
+            evidence_boundary: manual.evidence_boundary || ''
         };
     }
     if (inbox?.fetched_at) {
@@ -201,7 +214,7 @@ function summarizeRegulatoryHealth(sources) {
     }, {});
     const blockingIssueCount = counts.fetch_issue || 0;
     const okCount = (counts.fetch_ok || 0) + (counts.cached_ok || 0);
-    const monitorCount = counts.official_link_monitor || 0;
+    const monitorCount = (counts.official_link_monitor || 0) + (counts.manual_review_current || 0);
     const optionalIssueCount = counts.optional_issue || 0;
     const pendingCount = counts.pending_first_run || 0;
     const staleCount = counts.stale || 0;

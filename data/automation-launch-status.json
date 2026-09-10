@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-09T20:57:01.052Z",
+  "updated_at": "2026-09-10T03:20:51.224Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -243,7 +243,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://www.mofcom.gov.cn/zwgk/zcfb/",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         },
         {
           "id": "zh-gac",
@@ -257,7 +260,10 @@
           "error": "",
           "transport": "got-scraping",
           "fetched_url": "http://english.customs.gov.cn/newsroom/news",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
@@ -362,7 +368,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://policy.trade.ec.europa.eu/news_en",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
@@ -393,7 +402,10 @@
           "error": "HTTP 403 (site WAF may block bots; tried https://www.dgft.gov.in/CP/?opt=notification)",
           "transport": "fetch",
           "fetched_url": "",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
@@ -424,7 +436,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://www.meti.go.jp/english/press/",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
@@ -455,7 +470,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://www.customs.go.kr/english/main.do",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
@@ -610,7 +628,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://www.customs.gov.sg/news/",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
@@ -658,7 +679,7 @@
       "source_health_grade": "healthy",
       "source_health_counts": {
         "fetch_ok": 4,
-        "optional_issue": 1
+        "manual_review_current": 1
       },
       "sources": [
         {
@@ -673,7 +694,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://www.bis.doc.gov/index.php/about-bis/newsroom",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         },
         {
           "id": "us-cbp",
@@ -687,7 +711,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://www.cbp.gov/trade/automated",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         },
         {
           "id": "us-ustr",
@@ -701,7 +728,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://www.ustr.gov/issue-areas/enforcement/section-301-investigations",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         },
         {
           "id": "us-ofac",
@@ -715,7 +745,10 @@
           "error": "",
           "transport": "fetch",
           "fetched_url": "https://ofac.treasury.gov/recent-actions",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": null,
+          "manual_review_due_at": null,
+          "evidence_boundary": ""
         },
         {
           "id": "us-fcc",
@@ -723,13 +756,16 @@
           "type": "import",
           "method": "fetch",
           "url": "https://www.fcc.gov/news-events/headlines",
-          "health_status": "optional_issue",
+          "health_status": "manual_review_current",
           "last_fetch_at": null,
           "byte_length": 0,
           "error": "HTTP 403 (site WAF may block bots; tried https://apps.fcc.gov/oetcf/kdb/index.cfm)",
           "transport": "fetch",
           "fetched_url": "",
-          "monitor_only": false
+          "monitor_only": false,
+          "manual_reviewed_at": "2026-09-07",
+          "manual_review_due_at": "2026-10-07",
+          "evidence_boundary": "Manual review confirms the official guidance index was checked; it does not verify any product or FCC ID."
         }
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",

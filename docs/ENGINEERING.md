@@ -101,6 +101,12 @@ index review with `npm run record:source-review -- --source=us-fcc --reviewed-at
 The review expires after 30 days and confirms only that the official guidance index was checked; it
 does not verify a product, FCC ID, grant, RF report, or legal conclusion.
 
+When the DGFT notification index is blocked by its WAF, an operator must first open and inspect the
+official notification list, then record the review with
+`npm run record:source-review -- --source=in-dgft --reviewed-at=YYYY-MM-DD`. This fallback expires
+after 7 days and changes India to monitored coverage only; it never claims an automated fetch or
+confirms a product-specific licence or restriction.
+
 Each response must declare `complete: true`, identify an official HTTPS source, and provide 8- or
 10-digit rows with a base-duty field and optional effective dates. Heading-only rows, conflicting
 rates, invalid dates, and incomplete snapshots are rejected. Exact overrides apply only when the

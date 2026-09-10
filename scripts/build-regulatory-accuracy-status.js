@@ -57,7 +57,7 @@ function buildAccuracyStatus(now = new Date()) {
     const manualReviews = read('data/manual-source-reviews.json', { sources: {} });
     const degradedSources = (globalHealth.sources || []).filter((row) => !row.ok && !row.monitor_only).map((row) => {
         const manual = manualReviews.sources?.[row.id] || {};
-        const intervalDays = row.id === 'us-fcc' ? 30 : null;
+        const intervalDays = row.id === 'us-fcc' ? 30 : row.id === 'in-dgft' ? 7 : null;
         const reviewedMs = Date.parse(manual.reviewed_at || '');
         const reviewDueAt = Number.isFinite(reviewedMs) && intervalDays
             ? new Date(reviewedMs + intervalDays * 86400000).toISOString().slice(0, 10)
@@ -68,7 +68,7 @@ function buildAccuracyStatus(now = new Date()) {
         optional: Boolean(row.optional),
         error: row.error || 'Official source fetch failed',
         last_checked_at: globalHealth.generated_at || null,
-        official_url: row.id === 'us-fcc' ? 'https://apps.fcc.gov/oetcf/kdb/index.cfm' : row.url,
+        official_url: manual.official_url || (row.id === 'us-fcc' ? 'https://apps.fcc.gov/oetcf/kdb/index.cfm' : row.url),
         manual_reviewed_at: manual.reviewed_at || null,
         manual_review_due_at: reviewDueAt,
         manual_review_current: Boolean(reviewDueAt && Date.parse(reviewDueAt) >= now.getTime()),
@@ -79,6 +79,8 @@ function buildAccuracyStatus(now = new Date()) {
                 ? 'Retry the Section 301 page and its official investigations-index fallback; verify the content fingerprint before accepting it.'
                 : row.id === 'us-fcc'
                     ? 'Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access.'
+                    : row.id === 'in-dgft'
+                        ? 'Open the official DGFT notification list and record a dated manual source review; repeat every 7 days while automated access remains blocked.'
                     : 'Retry the official source and inspect its identity fingerprint before changing any rule.'
         });
     });

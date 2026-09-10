@@ -29,6 +29,34 @@ test('fresh regulatory health snapshots restore live source status', () => {
     assert.equal(status.health_status, 'fetch_ok');
     assert.equal(summarizeRegulatoryHealth([status]).grade, 'healthy');
 });
+
+test('current DGFT manual review provides a time-bounded monitor fallback', () => {
+    const reviewedAt = new Date(Date.now() - 2 * 86400000).toISOString().slice(0, 10);
+    const status = sourceHealthStatus({ id: 'in-dgft' }, {
+        byId: new Map([['in-dgft', { ok: false, fetched_at: new Date().toISOString(), error: 'HTTP 403' }]]),
+        inboxSources: {},
+        manualSources: {
+            'in-dgft': { reviewed_at: reviewedAt, evidence_boundary: 'Notification-list review only.' }
+        }
+    });
+    assert.equal(status.health_status, 'manual_review_current');
+    assert.equal(status.evidence_boundary, 'Notification-list review only.');
+    assert.match(status.manual_review_due_at, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(summarizeRegulatoryHealth([status]).grade, 'monitor');
+});
+
+test('expired DGFT manual review does not hide an automated fetch failure', () => {
+    const status = sourceHealthStatus({ id: 'in-dgft' }, {
+        byId: new Map([['in-dgft', { ok: false, fetched_at: new Date().toISOString(), error: 'HTTP 403' }]]),
+        inboxSources: {},
+        manualSources: {
+            'in-dgft': { reviewed_at: '2020-01-01' }
+        }
+    });
+    assert.equal(status.health_status, 'fetch_issue');
+    assert.equal(status.manual_review_due_at, '2020-01-08');
+    assert.equal(summarizeRegulatoryHealth([status]).grade, 'blocked');
+});
 const {
     buildDutyRateStatusPayload
 } = require('../scripts/admin-server');
