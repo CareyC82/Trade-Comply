@@ -1,6 +1,102 @@
 {
-  "pipeline_run": "2026-09-09T20:39:29.987981+00:00",
-  "passed_count": 7,
-  "intercepted_count": 0,
-  "intercepted": []
+  "pipeline_run": "2026-09-10T20:34:31.382761+00:00",
+  "passed_count": 5,
+  "intercepted_count": 2,
+  "intercepted": [
+    {
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9305.91 / 9305.99",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) has streamlined export controls for sound suppressors (silencers), moving certain models from stricter controls to more permissive licensing treatment under the Export Administration Regulations (EAR). While this reduces licensing friction for eligible items, exporters must still classify the correct ECCN, confirm the destination and end-user are not restricted, and align US HTS codes with Section 301 tariff exposure. Firearm parts and accessories remain sensitive; shipments to embargoed or sanctioned destinations, or to parties on the Entity List / Denied Persons List, are prohibited. Retain classification, license exception, and end-use/end-user documentation for at least five years.",
+        "content_zh": "美国商务部（BIS）已简化对消音器（抑制器）的出口管制，将部分型号从较严格管制调整为《出口管理条例》（EAR）下更宽松的许可待遇。虽然合规出口的许可摩擦降低，但出口商仍须正确归类ECCN、确认目的地和最终用户不受限制，并使美国HTS编码与301条款关税风险对齐。枪械零部件和附件仍属敏感物项；对禁运或受制裁目的地、或列入实体清单/被拒绝人员名单的当事方出口均被禁止。归类、许可例外及最终用途/最终用户文件须至少保存五年。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "ECCN classification of suppressor model",
+            "desc": "Determine the correct ECCN (e.g., 0A501 / 0A502 family) for the specific sound suppressor and confirm whether the streamlined treatment applies; document technical specs and rationale."
+          },
+          {
+            "phase": "技术核查",
+            "task": "BIS / Entity List screening",
+            "desc": "Screen the buyer, consignee, and end-user against the BIS Entity List, Denied Persons List, and SDN list; retain screening evidence and end-use/end-user statements."
+          },
+          {
+            "phase": "单证准备",
+            "task": "US HTS and Section 301 alignment",
+            "desc": "Map the 10-digit HTS line (e.g., 9305.91) against Section 301 lists and additional duties; document country of origin, value build-up, and any exclusion."
+          },
+          {
+            "phase": "单证准备",
+            "task": "License exception / authorization record",
+            "desc": "If shipping under a license exception or streamlined authorization, prepare the supporting statement, destination control statement, and AES/EEI filing where required."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Destination import and firearms compliance",
+            "desc": "Verify the importing country's firearms/parts import permit and any ATF or local law enforcement requirements; confirm no embargoed destination is involved."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-streamlines-export-controls-sound-suppressors",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-09-10T20:34:12.142062+00:00"
+      }
+    },
+    {
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms and ammunition. This reduces licensing burdens for certain semi-automatic firearms and related parts under the EAR, but does not eliminate all controls: items may still fall under USML Category I (ITAR) or EAR 0x5zz / 0A501 catch-all controls, and end-user/end-use restrictions, embargoed destinations, and Entity List screening remain mandatory. Exporters must re-verify ECCN classification, license exceptions, and destination-based prohibitions before shipment.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复对民用枪支弹药的原有出口管制待遇。此举降低了部分半自动枪支及相关零部件的许可负担，但并未取消全部管制：相关物项仍可能落入USML第一类（ITAR）或EAR 0x5zz / 0A501兜底管制，且最终用户/最终用途限制、禁运目的地及实体清单筛查仍为强制要求。出口商在发运前必须重新核实ECCN分类、许可例外及基于目的地的禁令。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "ECCN / USML re-classification",
+            "desc": "Re-confirm whether each firearm, part, or accessory is controlled under USML Category I (ITAR) or EAR ECCN 0A501/0x5zz; document the classification rationale and retain for 5 years."
+          },
+          {
+            "phase": "技术核查",
+            "task": "License exception eligibility",
+            "desc": "Assess whether the rescinded rule restores eligibility for License Exception RPL, TMP, or GOV for the specific destination; verify no new BIS general prohibition applies."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Restricted party & Entity List screening",
+            "desc": "Screen all consignees, intermediate consignees, and end users against BIS Entity List, Denied Persons List, and OFAC SDN; retain screening evidence."
+          },
+          {
+            "phase": "单证准备",
+            "task": "End-user / end-use statement",
+            "desc": "Obtain a signed non-transferable end-user certificate stating civilian use and no re-export to embargoed destinations (Cuba, Iran, North Korea, Syria, Russia/Belarus as applicable)."
+          },
+          {
+            "phase": "单证准备",
+            "task": "AES / EEI filing and HTS alignment",
+            "desc": "File Electronic Export Information in AES for shipments requiring a license or valued over USD 2,500; align Schedule B / HTS 9302.00, 9303.30, 9305.20 with the commercial invoice."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Destination import permit check",
+            "desc": "Confirm the importing country's firearms import license, proof of end use, and any transit-country authorization before booking freight."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-09-10T20:34:28.134535+00:00"
+      }
+    }
+  ]
 }
