@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-10T20:34:31.606Z",
+  "updated_at": "2026-09-11T20:39:46.043Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -105,6 +105,61 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-09-10T20:34:28.134535+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-09-11T20:39:46.043Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms-related components, optics, and accessories, this shifts licensing thresholds and classification practice for US-bound shipments. Exporters must still align 10-digit HTS lines, screen against the Entity List and restricted parties, and confirm whether items fall under USML (ITAR) versus CCL (EAR) jurisdiction. Section 301 tariff exposure on China-origin goods remains separate from export control status. Retain end-use/end-user statements and origin documentation to support US customs and BIS review.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国出口枪械相关零部件、光学器件及配件的中国出口商而言，许可门槛与归类实践将发生变化。出口商仍须对齐10位HTS编码，筛查实体清单及受限方，并确认物项属于USML（ITAR）还是CCL（EAR）管辖。中国原产货物的301关税风险与出口管制状态相互独立。应保留最终用途/最终用户声明及原产地文件，以应对美国海关与BIS审查。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "ITAR/EAR jurisdiction determination",
+            "desc": "Determine whether each firearm part, optic, or accessory falls under USML (ITAR) or CCL (EAR); document classification rationale and any license exceptions."
+          },
+          {
+            "phase": "技术核查",
+            "task": "Entity List & restricted party screening",
+            "desc": "Screen all US consignees, brokers, and end users against the BIS Entity List, SDN list, and denied persons lists; retain screening records."
+          },
+          {
+            "phase": "单证准备",
+            "task": "HTS & Section 301 tariff mapping",
+            "desc": "Map 10-digit HTS lines for firearms parts and optics; verify Section 301 list coverage and additional duty rates; document country of origin."
+          },
+          {
+            "phase": "单证准备",
+            "task": "End-use / end-user statement",
+            "desc": "Obtain and retain signed non-transferable end-use and end-user statements from US buyers for controlled firearm components."
+          },
+          {
+            "phase": "环保注册",
+            "task": "FCC Part 15/18 for optics electronics",
+            "desc": "For electronic sights, rangefinders, or RF accessories, confirm FCC Part 15/18 conformity and supplier FCC IDs before US entry."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Commercial invoice & origin declaration",
+            "desc": "Ensure invoices state full description, HTS code, origin, and value build-up; avoid vague terms like 'gun parts' that trigger CBP holds."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-09-11T20:39:41.938108+00:00"
       }
     }
   ]

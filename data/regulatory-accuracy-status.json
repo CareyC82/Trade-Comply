@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-10T20:35:09.377Z",
+  "generated_at": "2026-09-11T20:40:21.139Z",
   "ok": true,
   "source_control": {
     "source_count": 52,
@@ -14,7 +14,7 @@
         "country": "US",
         "optional": true,
         "error": "HTTP 403 (site WAF may block bots; tried https://apps.fcc.gov/oetcf/kdb/index.cfm)",
-        "last_checked_at": "2026-09-10T20:35:09.140Z",
+        "last_checked_at": "2026-09-11T20:40:20.862Z",
         "official_url": "https://apps.fcc.gov/oetcf/kdb/index.cfm",
         "manual_reviewed_at": "2026-09-07",
         "manual_review_due_at": "2026-10-07",
@@ -23,24 +23,11 @@
         "next_action": "Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access."
       },
       {
-        "id": "kr-kcs",
-        "country": "KR",
-        "optional": false,
-        "error": "fetch failed",
-        "last_checked_at": "2026-09-10T20:35:09.140Z",
-        "official_url": "https://www.customs.go.kr/english/main.do",
-        "manual_reviewed_at": null,
-        "manual_review_due_at": null,
-        "manual_review_current": false,
-        "evidence_boundary": "",
-        "next_action": "Retry the official source and inspect its identity fingerprint before changing any rule."
-      },
-      {
         "id": "in-dgft",
         "country": "IN",
         "optional": false,
         "error": "HTTP 403 (site WAF may block bots; tried https://www.dgft.gov.in/CP/?opt=notification)",
-        "last_checked_at": "2026-09-10T20:35:09.140Z",
+        "last_checked_at": "2026-09-11T20:40:20.862Z",
         "official_url": "https://www.dgft.gov.in/CP/?opt=notification",
         "manual_reviewed_at": null,
         "manual_review_due_at": null,
@@ -54,22 +41,22 @@
     ],
     "global_transport_health": {
       "freshness": {
-        "timestamp": "2026-09-10T20:35:09.140Z",
+        "timestamp": "2026-09-11T20:40:20.862Z",
         "age_days": 0,
         "current": true,
         "max_age_days": 2
       },
       "source_count": 22,
-      "ok_count": 19,
-      "error_count": 2,
+      "ok_count": 20,
+      "error_count": 1,
       "regulatory_market_grades": {
-        "healthy": 5,
+        "healthy": 6,
         "monitor": 7,
-        "blocked": 2
+        "blocked": 1
       }
     },
     "automation_launch_freshness": {
-      "timestamp": "2026-09-10T20:35:09.270Z",
+      "timestamp": "2026-09-11T20:40:21.019Z",
       "age_days": 0,
       "current": true,
       "max_age_days": 2
