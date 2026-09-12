@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-11T20:39:46.043Z",
+  "updated_at": "2026-09-12T20:19:47.252Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -160,6 +160,61 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-09-11T20:39:41.938108+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-09-12T20:19:47.252Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.00 / 9305.20 / 9305.91",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, ammunition, optics, and related components to the US market, this reduces some licensing friction but does not eliminate core obligations: items remain subject to the US export control regime, and US importers must still satisfy ATF, FCC (for electronic sights/optics with RF modules), and Section 301 tariff requirements. Exporters should re-verify HS classification under Chapter 93, confirm whether items fall under the rescinded rule's scope, and screen all parties against BIS Entity List, OFAC SDN, and denied party lists. Section 301 tariffs on Chinese-origin goods remain a major cost factor, and US HTS alignment at the 10-digit level is essential for customs clearance. Retain end-use/end-user documentation and monitor any future rulemaking that could re-impose controls.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、弹药、光学瞄具及相关部件的中国出口商而言，这减少了一定的许可摩擦，但并未消除核心义务：相关物项仍受美国出口管制体系约束，美国进口商仍须满足ATF、FCC（针对带射频模块的电子瞄具/光学设备）以及301条款关税要求。出口商应重新核实第93章HS归类，确认物项是否属于被撤销规则的适用范围，并对所有交易方进行BIS实体清单、OFAC SDN及被拒绝方名单筛查。针对中国原产商品的301条款关税仍是主要成本因素，按10位美国HTS编码对齐对清关至关重要。应保留最终用途/最终用户文件，并关注未来可能重新施加管制的规则制定动态。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "HS Chapter 93 classification review",
+            "desc": "Re-confirm 10-digit US HTS codes for firearms, ammunition, and parts (9302/9303/9305) and verify whether items fall within the rescinded rule's scope."
+          },
+          {
+            "phase": "技术核查",
+            "task": "FCC Part 15/18 for electronic optics",
+            "desc": "For electronic sights, rangefinders, or RF-enabled accessories, confirm FCC ID, modular approval, and Part 15/18 conformity before US entry."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Section 301 tariff exposure mapping",
+            "desc": "Map each HTS line against Section 301 lists, calculate additional duty exposure, and document country of origin and value build-up."
+          },
+          {
+            "phase": "单证准备",
+            "task": "BIS / Entity List / OFAC screening pack",
+            "desc": "Run restricted party and denied party screening; retain end-user and end-use statements and export control classification records."
+          },
+          {
+            "phase": "环保注册",
+            "task": "ATF import and state-law check",
+            "desc": "Coordinate with the US importer on ATF Form 6/6A requirements and any state-level firearms restrictions that may affect delivery."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Commercial invoice and origin documentation",
+            "desc": "Prepare invoices, packing lists, and origin declarations consistent with US CBP requirements; flag any transshipment risk."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-09-12T20:19:42.779625+00:00"
       }
     }
   ]

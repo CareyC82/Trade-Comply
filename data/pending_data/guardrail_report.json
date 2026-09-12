@@ -1,5 +1,5 @@
 {
-  "pipeline_run": "2026-09-11T20:39:45.771992+00:00",
+  "pipeline_run": "2026-09-12T20:19:47.005271+00:00",
   "passed_count": 6,
   "intercepted_count": 1,
   "intercepted": [
@@ -9,48 +9,48 @@
         "hs_code is missing or invalid"
       ],
       "raw": {
-        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "hs_code": "9302.00 / 9303.00 / 9305.20 / 9305.91",
         "direction": "export",
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms-related components, optics, and accessories, this shifts licensing thresholds and classification practice for US-bound shipments. Exporters must still align 10-digit HTS lines, screen against the Entity List and restricted parties, and confirm whether items fall under USML (ITAR) versus CCL (EAR) jurisdiction. Section 301 tariff exposure on China-origin goods remains separate from export control status. Retain end-use/end-user statements and origin documentation to support US customs and BIS review.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国出口枪械相关零部件、光学器件及配件的中国出口商而言，许可门槛与归类实践将发生变化。出口商仍须对齐10位HTS编码，筛查实体清单及受限方，并确认物项属于USML（ITAR）还是CCL（EAR）管辖。中国原产货物的301关税风险与出口管制状态相互独立。应保留最终用途/最终用户声明及原产地文件，以应对美国海关与BIS审查。",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, ammunition, optics, and related components to the US market, this reduces some licensing friction but does not eliminate core obligations: items remain subject to the US export control regime, and US importers must still satisfy ATF, FCC (for electronic sights/optics with RF modules), and Section 301 tariff requirements. Exporters should re-verify HS classification under Chapter 93, confirm whether items fall under the rescinded rule's scope, and screen all parties against BIS Entity List, OFAC SDN, and denied party lists. Section 301 tariffs on Chinese-origin goods remain a major cost factor, and US HTS alignment at the 10-digit level is essential for customs clearance. Retain end-use/end-user documentation and monitor any future rulemaking that could re-impose controls.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、弹药、光学瞄具及相关部件的中国出口商而言，这减少了一定的许可摩擦，但并未消除核心义务：相关物项仍受美国出口管制体系约束，美国进口商仍须满足ATF、FCC（针对带射频模块的电子瞄具/光学设备）以及301条款关税要求。出口商应重新核实第93章HS归类，确认物项是否属于被撤销规则的适用范围，并对所有交易方进行BIS实体清单、OFAC SDN及被拒绝方名单筛查。针对中国原产商品的301条款关税仍是主要成本因素，按10位美国HTS编码对齐对清关至关重要。应保留最终用途/最终用户文件，并关注未来可能重新施加管制的规则制定动态。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "ITAR/EAR jurisdiction determination",
-            "desc": "Determine whether each firearm part, optic, or accessory falls under USML (ITAR) or CCL (EAR); document classification rationale and any license exceptions."
+            "task": "HS Chapter 93 classification review",
+            "desc": "Re-confirm 10-digit US HTS codes for firearms, ammunition, and parts (9302/9303/9305) and verify whether items fall within the rescinded rule's scope."
           },
           {
             "phase": "技术核查",
-            "task": "Entity List & restricted party screening",
-            "desc": "Screen all US consignees, brokers, and end users against the BIS Entity List, SDN list, and denied persons lists; retain screening records."
+            "task": "FCC Part 15/18 for electronic optics",
+            "desc": "For electronic sights, rangefinders, or RF-enabled accessories, confirm FCC ID, modular approval, and Part 15/18 conformity before US entry."
           },
           {
             "phase": "单证准备",
-            "task": "HTS & Section 301 tariff mapping",
-            "desc": "Map 10-digit HTS lines for firearms parts and optics; verify Section 301 list coverage and additional duty rates; document country of origin."
+            "task": "Section 301 tariff exposure mapping",
+            "desc": "Map each HTS line against Section 301 lists, calculate additional duty exposure, and document country of origin and value build-up."
           },
           {
             "phase": "单证准备",
-            "task": "End-use / end-user statement",
-            "desc": "Obtain and retain signed non-transferable end-use and end-user statements from US buyers for controlled firearm components."
+            "task": "BIS / Entity List / OFAC screening pack",
+            "desc": "Run restricted party and denied party screening; retain end-user and end-use statements and export control classification records."
           },
           {
             "phase": "环保注册",
-            "task": "FCC Part 15/18 for optics electronics",
-            "desc": "For electronic sights, rangefinders, or RF accessories, confirm FCC Part 15/18 conformity and supplier FCC IDs before US entry."
+            "task": "ATF import and state-law check",
+            "desc": "Coordinate with the US importer on ATF Form 6/6A requirements and any state-level firearms restrictions that may affect delivery."
           },
           {
             "phase": "单证准备",
-            "task": "Commercial invoice & origin declaration",
-            "desc": "Ensure invoices state full description, HTS code, origin, and value build-up; avoid vague terms like 'gun parts' that trigger CBP holds."
+            "task": "Commercial invoice and origin documentation",
+            "desc": "Prepare invoices, packing lists, and origin declarations consistent with US CBP requirements; flag any transshipment risk."
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-09-11T20:39:41.938108+00:00"
+        "fetched_at": "2026-09-12T20:19:42.779625+00:00"
       }
     }
   ]
