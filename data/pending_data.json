@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-13T20:29:32.050Z",
+  "updated_at": "2026-09-14T21:37:58.720Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -270,6 +270,61 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-09-13T20:29:27.209987+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-09-14T21:37:58.720Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still classify goods under the correct USML or CCL category, verify EAR99 versus controlled status, and screen all parties against BIS Entity List, Denied Persons List, and OFAC sanctions. Section 301 tariffs and HTS alignment remain relevant for commercial shipments, and FCC Part 15/18 conformity applies to any wireless or electronic accessories. Retain end-use and end-user documentation, especially for destinations subject to enhanced scrutiny.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，其许可负担有所降低。出口商仍须按正确的USML或CCL类别进行归类，核实EAR99与受控状态，并对所有交易方进行BIS实体清单、被拒绝人员名单及OFAC制裁筛查。商业发货仍需关注301关税与HTS归类一致性，涉及无线或电子配件的还需符合FCC Part 15/18要求。应保留最终用途和最终用户文件，尤其是对受强化审查的目的地。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "USML/CCL classification review",
+            "desc": "Re-classify firearms, ammunition, and parts under the revised rule; confirm USML Category I/II versus CCL ECCN status and document the basis for EAR99 or license exception eligibility."
+          },
+          {
+            "phase": "技术核查",
+            "task": "FCC Part 15/18 accessory conformity",
+            "desc": "For electronic sights, wireless accessories, or RF modules, verify FCC ID, modular approvals, and Part 15/18 compliance before US export or re-export."
+          },
+          {
+            "phase": "单证准备",
+            "task": "BIS Entity List & OFAC screening",
+            "desc": "Screen all consignees, end users, and intermediaries against BIS Entity List, Denied Persons List, Unverified List, and OFAC SDN; retain screening records and end-user statements."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Section 301 & HTS tariff mapping",
+            "desc": "Map the 10-digit HTS line against Section 301 lists and additional duties; document country of origin, value build-up, and any exclusion or refund eligibility."
+          },
+          {
+            "phase": "单证准备",
+            "task": "License exception & destination check",
+            "desc": "Confirm whether a license exception (e.g., RPL, TMP, GOV) applies and verify destination-country restrictions; prepare DSP-5/DSP-73 or EAR license applications where required."
+          },
+          {
+            "phase": "环保注册",
+            "task": "RoHS/REACH & WEEE for electronics",
+            "desc": "For electronic components and accessories, confirm RoHS/REACH compliance and WEEE producer responsibility registration for EU-bound or re-exported goods."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-09-14T21:37:54.004547+00:00"
       }
     }
   ]

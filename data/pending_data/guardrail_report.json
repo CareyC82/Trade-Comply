@@ -1,5 +1,5 @@
 {
-  "pipeline_run": "2026-09-13T20:29:31.945143+00:00",
+  "pipeline_run": "2026-09-14T21:37:58.618253+00:00",
   "passed_count": 6,
   "intercepted_count": 1,
   "intercepted": [
@@ -9,48 +9,48 @@
         "hs_code is missing or invalid"
       ],
       "raw": {
-        "hs_code": "9302.00 / 9303.00 / 9305.00 / 9306.00",
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
         "direction": "export",
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still comply with the Arms Export Control Act (ITAR) where applicable, the Export Administration Regulations (EAR), and the US Munitions List (USML) boundary. Key actions: re-classify affected products under the correct ECCN or USML category, verify end-user/end-use, screen against the Entity List and denied party lists, and align commercial invoices with 10-digit HTS codes. Section 301 tariffs and FCC Part 15/18 requirements remain relevant for electronics-enabled firearms accessories. Note that state-level and international import restrictions (e.g., EU, ASEAN) may still apply.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。此举降低了此前被收紧管制的部分半自动枪支及相关部件的许可负担。出口商仍须遵守《武器出口管制法》（ITAR，如适用）、《出口管理条例》（EAR）以及美国军品清单（USML）的边界。关键行动：对受影响产品按正确的ECCN或USML类别重新分类，核实最终用户和最终用途，对照实体清单和被拒绝方名单进行筛查，并确保商业发票与10位HTS编码一致。对于带电子功能的枪支配件，Section 301关税及FCC Part 15/18要求仍然适用。注意州级及国际进口限制（如欧盟、东盟）可能依然存在。",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still classify goods under the correct USML or CCL category, verify EAR99 versus controlled status, and screen all parties against BIS Entity List, Denied Persons List, and OFAC sanctions. Section 301 tariffs and HTS alignment remain relevant for commercial shipments, and FCC Part 15/18 conformity applies to any wireless or electronic accessories. Retain end-use and end-user documentation, especially for destinations subject to enhanced scrutiny.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，其许可负担有所降低。出口商仍须按正确的USML或CCL类别进行归类，核实EAR99与受控状态，并对所有交易方进行BIS实体清单、被拒绝人员名单及OFAC制裁筛查。商业发货仍需关注301关税与HTS归类一致性，涉及无线或电子配件的还需符合FCC Part 15/18要求。应保留最终用途和最终用户文件，尤其是对受强化审查的目的地。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "重新分类ECCN/USML",
-            "desc": "根据撤销后的规则，确认民用枪支、弹药及零部件应归入的ECCN或USML类别，更新内部合规矩阵。"
+            "task": "USML/CCL classification review",
+            "desc": "Re-classify firearms, ammunition, and parts under the revised rule; confirm USML Category I/II versus CCL ECCN status and document the basis for EAR99 or license exception eligibility."
           },
           {
             "phase": "技术核查",
-            "task": "最终用户/最终用途核实",
-            "desc": "收集并保存最终用户声明和最终用途说明，确保不涉及受制裁方或军事最终用途。"
+            "task": "FCC Part 15/18 accessory conformity",
+            "desc": "For electronic sights, wireless accessories, or RF modules, verify FCC ID, modular approvals, and Part 15/18 compliance before US export or re-export."
           },
           {
             "phase": "单证准备",
-            "task": "实体清单与拒绝方筛查",
-            "desc": "对交易各方进行BIS实体清单、被拒绝方名单及OFAC制裁名单筛查，保留筛查记录。"
+            "task": "BIS Entity List & OFAC screening",
+            "desc": "Screen all consignees, end users, and intermediaries against BIS Entity List, Denied Persons List, Unverified List, and OFAC SDN; retain screening records and end-user statements."
           },
           {
             "phase": "单证准备",
-            "task": "HTS与Section 301关税核对",
-            "desc": "将产品映射至10位HTS编码，核查Section 301附加关税及原产地规则，准确申报货值。"
+            "task": "Section 301 & HTS tariff mapping",
+            "desc": "Map the 10-digit HTS line against Section 301 lists and additional duties; document country of origin, value build-up, and any exclusion or refund eligibility."
+          },
+          {
+            "phase": "单证准备",
+            "task": "License exception & destination check",
+            "desc": "Confirm whether a license exception (e.g., RPL, TMP, GOV) applies and verify destination-country restrictions; prepare DSP-5/DSP-73 or EAR license applications where required."
           },
           {
             "phase": "环保注册",
-            "task": "FCC Part 15/18合规（如适用）",
-            "desc": "对含无线或电子功能的枪支配件，确认FCC ID及模块认证，确保符合美国射频设备要求。"
-          },
-          {
-            "phase": "单证准备",
-            "task": "出口许可证申请（如需要）",
-            "desc": "若产品仍受EAR或ITAR管制，向BIS或DDTC提交许可证申请，并保留批准文件。"
+            "task": "RoHS/REACH & WEEE for electronics",
+            "desc": "For electronic components and accessories, confirm RoHS/REACH compliance and WEEE producer responsibility registration for EU-bound or re-exported goods."
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-09-13T20:29:27.209987+00:00"
+        "fetched_at": "2026-09-14T21:37:54.004547+00:00"
       }
     }
   ]
