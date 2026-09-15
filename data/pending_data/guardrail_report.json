@@ -1,5 +1,5 @@
 {
-  "pipeline_run": "2026-09-14T21:37:58.618253+00:00",
+  "pipeline_run": "2026-09-15T20:59:42.316609+00:00",
   "passed_count": 6,
   "intercepted_count": 1,
   "intercepted": [
@@ -14,43 +14,43 @@
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still classify goods under the correct USML or CCL category, verify EAR99 versus controlled status, and screen all parties against BIS Entity List, Denied Persons List, and OFAC sanctions. Section 301 tariffs and HTS alignment remain relevant for commercial shipments, and FCC Part 15/18 conformity applies to any wireless or electronic accessories. Retain end-use and end-user documentation, especially for destinations subject to enhanced scrutiny.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，其许可负担有所降低。出口商仍须按正确的USML或CCL类别进行归类，核实EAR99与受控状态，并对所有交易方进行BIS实体清单、被拒绝人员名单及OFAC制裁筛查。商业发货仍需关注301关税与HTS归类一致性，涉及无线或电子配件的还需符合FCC Part 15/18要求。应保留最终用途和最终用户文件，尤其是对受强化审查的目的地。",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China-origin exporters and re-exporters, this changes license requirements and classification for sporting and hunting firearms under ECCNs and USML Category I boundaries. Verify whether items fall under EAR99, ECCN 0A501/0A502/0A504, or ITAR USML Category I, and confirm the new license exception eligibility. Screen all parties against the BIS Entity List, Denied Persons List, and OFAC SDN. Align commercial invoices with 10-digit HTS codes and retain end-use/end-user statements. Note that Section 301 tariffs and FCC Part 15/18 requirements still apply to wireless-enabled accessories.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于中国原产出口商和再出口商而言，这改变了运动及狩猎枪支在ECCN和美国军品清单（USML）第一类边界下的许可要求和分类。需核实物品属于EAR99、ECCN 0A501/0A502/0A504还是ITAR USML第一类，并确认新的许可例外适用性。对所有交易方进行BIS实体清单、被拒绝人员名单及OFAC SDN筛查。商业发票需与10位HTS编码对齐，并保留最终用途/最终用户声明。注意：第301节关税及FCC Part 15/18要求仍适用于带无线的配件。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "USML/CCL classification review",
-            "desc": "Re-classify firearms, ammunition, and parts under the revised rule; confirm USML Category I/II versus CCL ECCN status and document the basis for EAR99 or license exception eligibility."
+            "task": "ECCN / USML classification review",
+            "desc": "Determine whether firearms, ammunition, and parts fall under EAR99, ECCN 0A501/0A502/0A504, or ITAR USML Category I; document classification rationale and license exception eligibility after the rule rescission."
           },
           {
             "phase": "技术核查",
-            "task": "FCC Part 15/18 accessory conformity",
-            "desc": "For electronic sights, wireless accessories, or RF modules, verify FCC ID, modular approvals, and Part 15/18 compliance before US export or re-export."
+            "task": "FCC Part 15 / Part 18 RF conformity",
+            "desc": "For wireless-enabled accessories (optics, tracking devices), confirm intentional radiator approvals, modular FCC IDs, and supplier declarations before US entry."
           },
           {
             "phase": "单证准备",
-            "task": "BIS Entity List & OFAC screening",
-            "desc": "Screen all consignees, end users, and intermediaries against BIS Entity List, Denied Persons List, Unverified List, and OFAC SDN; retain screening records and end-user statements."
+            "task": "Section 301 & HTS tariff alignment",
+            "desc": "Map each line to the 10-digit HTS code, check Section 301 lists and additional duty exposure, and document country of origin and value build-up on the commercial invoice."
           },
           {
             "phase": "单证准备",
-            "task": "Section 301 & HTS tariff mapping",
-            "desc": "Map the 10-digit HTS line against Section 301 lists and additional duties; document country of origin, value build-up, and any exclusion or refund eligibility."
-          },
-          {
-            "phase": "单证准备",
-            "task": "License exception & destination check",
-            "desc": "Confirm whether a license exception (e.g., RPL, TMP, GOV) applies and verify destination-country restrictions; prepare DSP-5/DSP-73 or EAR license applications where required."
+            "task": "BIS / Entity List screening pack",
+            "desc": "Run restricted party screening against BIS Entity List, Denied Persons List, and OFAC SDN; retain end-user and end-use statements for controlled firearms and parts."
           },
           {
             "phase": "环保注册",
-            "task": "RoHS/REACH & WEEE for electronics",
-            "desc": "For electronic components and accessories, confirm RoHS/REACH compliance and WEEE producer responsibility registration for EU-bound or re-exported goods."
+            "task": "RoHS / REACH and WEEE check for accessories",
+            "desc": "For electronic accessories, verify RoHS and REACH compliance and WEEE producer responsibility registration where EU-bound or transshipped."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Export license application or exception record",
+            "desc": "If a license is required, file with BIS SNAP-R and keep the license exception record; if no license is required, retain a written determination for audit."
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-09-14T21:37:54.004547+00:00"
+        "fetched_at": "2026-09-15T20:59:37.436992+00:00"
       }
     }
   ]
