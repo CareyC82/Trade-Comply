@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-16T21:01:55.812Z",
+  "generated_at": "2026-09-17T21:04:44.785Z",
   "ok": true,
   "source_control": {
     "source_count": 52,
@@ -10,11 +10,24 @@
     "failed_link_count": 0,
     "degraded_sources": [
       {
+        "id": "zh-mofcom",
+        "country": "CN",
+        "optional": false,
+        "error": "fetch failed",
+        "last_checked_at": "2026-09-17T21:04:44.510Z",
+        "official_url": "https://www.mofcom.gov.cn/zwgk/zcfb/",
+        "manual_reviewed_at": null,
+        "manual_review_due_at": null,
+        "manual_review_current": false,
+        "evidence_boundary": "",
+        "next_action": "Retry the official source and inspect its identity fingerprint before changing any rule."
+      },
+      {
         "id": "us-fcc",
         "country": "US",
         "optional": true,
         "error": "HTTP 403 (site WAF may block bots; tried https://apps.fcc.gov/oetcf/kdb/index.cfm)",
-        "last_checked_at": "2026-09-16T21:01:55.517Z",
+        "last_checked_at": "2026-09-17T21:04:44.510Z",
         "official_url": "https://apps.fcc.gov/oetcf/kdb/index.cfm",
         "manual_reviewed_at": "2026-09-07",
         "manual_review_due_at": "2026-10-07",
@@ -23,24 +36,11 @@
         "next_action": "Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access."
       },
       {
-        "id": "kr-kcs",
-        "country": "KR",
-        "optional": false,
-        "error": "fetch failed",
-        "last_checked_at": "2026-09-16T21:01:55.517Z",
-        "official_url": "https://www.customs.go.kr/english/main.do",
-        "manual_reviewed_at": null,
-        "manual_review_due_at": null,
-        "manual_review_current": false,
-        "evidence_boundary": "",
-        "next_action": "Retry the official source and inspect its identity fingerprint before changing any rule."
-      },
-      {
         "id": "in-dgft",
         "country": "IN",
         "optional": false,
         "error": "HTTP 403 (site WAF may block bots; tried https://www.dgft.gov.in/CP/?opt=notification)",
-        "last_checked_at": "2026-09-16T21:01:55.517Z",
+        "last_checked_at": "2026-09-17T21:04:44.510Z",
         "official_url": "https://www.dgft.gov.in/CP/?opt=notification",
         "manual_reviewed_at": null,
         "manual_review_due_at": null,
@@ -54,7 +54,7 @@
     ],
     "global_transport_health": {
       "freshness": {
-        "timestamp": "2026-09-16T21:01:55.517Z",
+        "timestamp": "2026-09-17T21:04:44.510Z",
         "age_days": 0,
         "current": true,
         "max_age_days": 2
@@ -63,13 +63,14 @@
       "ok_count": 19,
       "error_count": 2,
       "regulatory_market_grades": {
-        "healthy": 5,
+        "partial": 1,
         "monitor": 7,
-        "blocked": 2
+        "healthy": 5,
+        "blocked": 1
       }
     },
     "automation_launch_freshness": {
-      "timestamp": "2026-09-16T21:01:55.681Z",
+      "timestamp": "2026-09-17T21:04:44.665Z",
       "age_days": 0,
       "current": true,
       "max_age_days": 2
