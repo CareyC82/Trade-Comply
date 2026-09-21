@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-20T20:56:57.578Z",
+  "updated_at": "2026-09-21T21:49:18.335Z",
   "launch_policy": {
     "public_launch_means": "Feature can be exposed with its launch-mode label.",
     "filing_grade_auto_means": "Exact official machine-readable source can be used without a tariff-line parser warning.",
@@ -10,19 +10,19 @@
     "regulatory_sources": 14,
     "duty_rate_markets": 16,
     "regulatory_modes": {
-      "live_auto": 4,
+      "live_auto": 5,
       "live_monitor": 7,
-      "not_live": 3
+      "not_live": 2
     },
     "regulatory_health": {
-      "healthy": 4,
+      "healthy": 5,
       "monitor": 7,
-      "blocked": 3
+      "blocked": 2
     },
     "regulatory_marketing": {
-      "ready_to_market": 4,
+      "ready_to_market": 5,
       "source_caveat": 7,
-      "do_not_market": 3
+      "do_not_market": 2
     },
     "duty_rate_modes": {
       "live_auto": 10,
@@ -238,7 +238,7 @@
           "method": "fetch",
           "url": "https://www.mofcom.gov.cn/zwgk/zcfb/",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:30:24.568Z",
+          "last_fetch_at": "2026-09-21T21:48:53.474Z",
           "byte_length": 645,
           "error": "",
           "transport": "fetch",
@@ -255,11 +255,11 @@
           "method": "got-scraping",
           "url": "http://www.customs.gov.cn/customs/302249/302266/index.html",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:30:51.875Z",
-          "byte_length": 1944,
+          "last_fetch_at": "2026-09-21T21:49:13.530Z",
+          "byte_length": 4216,
           "error": "",
           "transport": "got-scraping",
-          "fetched_url": "http://english.customs.gov.cn/newsroom/news",
+          "fetched_url": "http://www.customs.gov.cn/",
           "monitor_only": false,
           "manual_reviewed_at": null,
           "manual_review_due_at": null,
@@ -268,7 +268,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
       "marketing_recommendation": "Ready to market",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -299,7 +299,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
       "marketing_recommendation": "Use with source caveat",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -376,7 +376,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
       "marketing_recommendation": "Do not market as automated yet",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -410,7 +410,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
       "marketing_recommendation": "Do not market as automated yet",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -431,7 +431,7 @@
           "method": "fetch",
           "url": "https://www.meti.go.jp/english/press/",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:30:53.251Z",
+          "last_fetch_at": "2026-09-21T21:49:15.074Z",
           "byte_length": 12038,
           "error": "",
           "transport": "fetch",
@@ -444,18 +444,18 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
       "marketing_recommendation": "Ready to market",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
       "country": "KR",
-      "launch_mode": "not_live",
-      "public_launch": false,
+      "launch_mode": "live_auto",
+      "public_launch": true,
       "filing_grade_auto": false,
       "source_count": 1,
-      "source_health_grade": "blocked",
+      "source_health_grade": "healthy",
       "source_health_counts": {
-        "fetch_issue": 1
+        "fetch_ok": 1
       },
       "sources": [
         {
@@ -464,21 +464,21 @@
           "type": "both",
           "method": "fetch",
           "url": "https://www.customs.go.kr/english/main.do",
-          "health_status": "fetch_issue",
-          "last_fetch_at": null,
-          "byte_length": 0,
-          "error": "fetch failed",
+          "health_status": "fetch_ok",
+          "last_fetch_at": "2026-09-21T21:49:16.946Z",
+          "byte_length": 4499,
+          "error": "",
           "transport": "fetch",
-          "fetched_url": "",
+          "fetched_url": "https://www.customs.go.kr/english/main.do",
           "monitor_only": false,
           "manual_reviewed_at": null,
           "manual_review_due_at": null,
           "evidence_boundary": ""
         }
       ],
-      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch is currently blocked; keep this market out of automated claims until a stable source is connected.",
-      "marketing_recommendation": "Do not market as automated yet",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
+      "marketing_recommendation": "Ready to market",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -509,7 +509,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
       "marketing_recommendation": "Use with source caveat",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -540,7 +540,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
       "marketing_recommendation": "Use with source caveat",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -571,7 +571,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
       "marketing_recommendation": "Use with source caveat",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -602,7 +602,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
       "marketing_recommendation": "Use with source caveat",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -623,7 +623,7 @@
           "method": "fetch",
           "url": "https://www.customs.gov.sg/news/",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:31:04.132Z",
+          "last_fetch_at": "2026-09-21T21:49:17.807Z",
           "byte_length": 1550,
           "error": "",
           "transport": "fetch",
@@ -636,7 +636,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
       "marketing_recommendation": "Ready to market",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -667,7 +667,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
       "marketing_recommendation": "Use with source caveat",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -689,7 +689,7 @@
           "method": "fetch",
           "url": "https://www.bis.doc.gov/index.php/about-bis/newsroom",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:30:52.007Z",
+          "last_fetch_at": "2026-09-21T21:49:13.664Z",
           "byte_length": 5089,
           "error": "",
           "transport": "fetch",
@@ -706,7 +706,7 @@
           "method": "fetch",
           "url": "https://www.cbp.gov/trade/automated/newsflash",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:30:52.404Z",
+          "last_fetch_at": "2026-09-21T21:49:14.126Z",
           "byte_length": 5137,
           "error": "",
           "transport": "fetch",
@@ -723,7 +723,7 @@
           "method": "fetch",
           "url": "https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:30:52.738Z",
+          "last_fetch_at": "2026-09-21T21:49:14.368Z",
           "byte_length": 5216,
           "error": "",
           "transport": "fetch",
@@ -740,7 +740,7 @@
           "method": "fetch",
           "url": "https://ofac.treasury.gov/recent-actions",
           "health_status": "fetch_ok",
-          "last_fetch_at": "2026-09-20T20:30:52.798Z",
+          "last_fetch_at": "2026-09-21T21:49:14.456Z",
           "byte_length": 4386,
           "error": "",
           "transport": "fetch",
@@ -770,7 +770,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Source fetch health is currently healthy.",
       "marketing_recommendation": "Ready to market",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     },
     {
@@ -801,7 +801,7 @@
       ],
       "note": "Daily official-source crawl is enabled; AI filtering and guardrails decide whether a signal is published. Official link monitoring is configured, but no stable automated text source is connected yet.",
       "marketing_recommendation": "Use with source caveat",
-      "health_updated_at": "2026-09-20T20:31:04.462Z",
+      "health_updated_at": "2026-09-21T21:49:18.141Z",
       "inbox_updated_at": "2026-05-30T02:46:51.592Z"
     }
   ],
