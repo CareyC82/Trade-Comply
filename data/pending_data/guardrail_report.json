@@ -1,5 +1,5 @@
 {
-  "pipeline_run": "2026-09-23T21:16:17.508579+00:00",
+  "pipeline_run": "2026-09-24T21:17:12.221659+00:00",
   "passed_count": 6,
   "intercepted_count": 1,
   "intercepted": [
@@ -9,43 +9,43 @@
         "hs_code is missing or invalid"
       ],
       "raw": {
-        "hs_code": "9302.00 / 9303.00 / 9305.20 / 9305.91",
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
         "direction": "export",
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, ammunition, optics, and related components to the US market, this reduces some licensing friction but does not eliminate US HTS classification, Section 301 tariff exposure, or BIS restricted party and end-use screening obligations. Exporters should re-verify ECCN classification, confirm whether items fall under USML/ITAR versus EAR jurisdiction, and maintain end-user documentation. Note that China-origin firearms and ammunition may face separate US import restrictions and ATF requirements; this announcement concerns US export controls, so China-origin goods moving to the US are primarily affected by US import rules, tariffs, and any reciprocal controls.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、弹药、光学器件及相关部件的中国出口商而言，这减少了一部分许可摩擦，但并未消除美国HTS归类、301条款关税风险，以及BIS受限方和最终用途筛查义务。出口商应重新核实ECCN归类，确认物项属于USML/ITAR还是EAR管辖，并保留最终用户文件。需注意，中国原产枪支弹药可能面临美国单独的进口限制和ATF要求；本公告针对的是美国出口管制，因此中国原产物项进入美国主要受美国进口规则、关税及任何对等措施影响。",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still classify goods under the Commerce Control List (ECCN 0A501, 0A502, 0A504, 0A505, etc.) and confirm destination-based license requirements. Section 301 tariffs and HTS alignment remain relevant for commercial shipments, and Entity List / restricted party screening is mandatory. Firearms exports to embargoed or sanctioned destinations remain prohibited.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口管制规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，许可负担有所降低。出口商仍须依据《商业管制清单》（ECCN 0A501、0A502、0A504、0A505 等）进行归类，并确认基于目的地的许可要求。商业发货仍需关注 301 关税与 HTS 归类一致性，且必须进行实体清单/受限方筛查。对禁运或受制裁目的地的枪支出口仍属禁止。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "ECCN与USML/ITAR管辖判定",
-            "desc": "重新核查枪支、弹药及零部件的ECCN归类，确认属于USML/ITAR还是EAR管辖，并评估撤销规则后适用的许可例外。"
+            "task": "ECCN 归类复核",
+            "desc": "依据撤销后的规则，重新确认枪支、弹药及零部件的 ECCN（0A501/0A502/0A504/0A505 等），核对是否仍属许可例外或需申请许可。"
           },
           {
             "phase": "技术核查",
-            "task": "BIS受限方与最终用途筛查",
-            "desc": "对交易方进行Entity List、DPL、UVL筛查，保留最终用户和最终用途声明，防范转口和规避风险。"
+            "task": "受限方与实体清单筛查",
+            "desc": "对买方、最终用户及货代进行 BIS Entity List、SDN、DPL 筛查，留存筛查记录与最终用途声明。"
           },
           {
             "phase": "单证准备",
-            "task": "HTS归类与301关税测算",
-            "desc": "按10位HTS编码核对9302/9303/9305等税号，评估301条款附加关税及原产地规则影响。"
+            "task": "HTS 与 301 关税对齐",
+            "desc": "将产品映射至 10 位 HTS 编码，核对 Section 301 附加关税清单，记录原产地与价值构成。"
           },
           {
             "phase": "单证准备",
-            "task": "ATF进口许可与FCC合规",
-            "desc": "确认美国ATF进口许可要求；如含无线或电子瞄具，核查FCC Part 15/18认证及供应商FCC ID。"
+            "task": "出口许可与报关单证",
+            "desc": "如仍需许可，准备 BIS-748P 申请及 AES/EEI 申报；商业发票、装箱单须与许可范围一致。"
           },
           {
             "phase": "环保注册",
-            "task": "RoHS/REACH及包装环保合规",
-            "desc": "针对含电子元件或光学镀膜的部件，核查RoHS、REACH及美国州级环保要求，准备合规声明。"
+            "task": "FCC 与运输合规",
+            "desc": "含无线模块的配件确认 FCC Part 15/18 认证；弹药类确认 DOT/ATF 运输与出口申报要求。"
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-09-23T21:16:13.485403+00:00"
+        "fetched_at": "2026-09-24T21:17:08.881996+00:00"
       }
     }
   ]

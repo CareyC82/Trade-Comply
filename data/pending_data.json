@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-23T21:16:17.634Z",
+  "updated_at": "2026-09-24T21:17:12.351Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -805,6 +805,56 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-09-23T21:16:13.485403+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-09-24T21:17:12.351Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still classify goods under the Commerce Control List (ECCN 0A501, 0A502, 0A504, 0A505, etc.) and confirm destination-based license requirements. Section 301 tariffs and HTS alignment remain relevant for commercial shipments, and Entity List / restricted party screening is mandatory. Firearms exports to embargoed or sanctioned destinations remain prohibited.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口管制规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，许可负担有所降低。出口商仍须依据《商业管制清单》（ECCN 0A501、0A502、0A504、0A505 等）进行归类，并确认基于目的地的许可要求。商业发货仍需关注 301 关税与 HTS 归类一致性，且必须进行实体清单/受限方筛查。对禁运或受制裁目的地的枪支出口仍属禁止。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "ECCN 归类复核",
+            "desc": "依据撤销后的规则，重新确认枪支、弹药及零部件的 ECCN（0A501/0A502/0A504/0A505 等），核对是否仍属许可例外或需申请许可。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "受限方与实体清单筛查",
+            "desc": "对买方、最终用户及货代进行 BIS Entity List、SDN、DPL 筛查，留存筛查记录与最终用途声明。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "HTS 与 301 关税对齐",
+            "desc": "将产品映射至 10 位 HTS 编码，核对 Section 301 附加关税清单，记录原产地与价值构成。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "出口许可与报关单证",
+            "desc": "如仍需许可，准备 BIS-748P 申请及 AES/EEI 申报；商业发票、装箱单须与许可范围一致。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "FCC 与运输合规",
+            "desc": "含无线模块的配件确认 FCC Part 15/18 认证；弹药类确认 DOT/ATF 运输与出口申报要求。"
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-09-24T21:17:08.881996+00:00"
       }
     }
   ]
