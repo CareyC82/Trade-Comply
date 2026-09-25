@@ -1,5 +1,5 @@
 {
-  "pipeline_run": "2026-09-24T21:17:12.221659+00:00",
+  "pipeline_run": "2026-09-25T21:14:41.804415+00:00",
   "passed_count": 6,
   "intercepted_count": 1,
   "intercepted": [
@@ -14,38 +14,43 @@
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still classify goods under the Commerce Control List (ECCN 0A501, 0A502, 0A504, 0A505, etc.) and confirm destination-based license requirements. Section 301 tariffs and HTS alignment remain relevant for commercial shipments, and Entity List / restricted party screening is mandatory. Firearms exports to embargoed or sanctioned destinations remain prohibited.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口管制规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，许可负担有所降低。出口商仍须依据《商业管制清单》（ECCN 0A501、0A502、0A504、0A505 等）进行归类，并确认基于目的地的许可要求。商业发货仍需关注 301 关税与 HTS 归类一致性，且必须进行实体清单/受限方筛查。对禁运或受制裁目的地的枪支出口仍属禁止。",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, optics, ammunition components, and related accessories to the US market, this reduces some licensing friction but does not remove core obligations: items remain subject to the US Munitions List (ITAR) or Commerce Control List (EAR) depending on classification, and the rescission mainly affects licensing policy for certain civilian shotguns, semi-automatic firearms, and parts. Exporters must still confirm ECCN/ITAR category, screen against the Entity List and denied parties, and align commercial documents with US HTS codes. Section 301 tariffs on many firearms-related goods remain in force, and FCC rules apply to any electronic sights, rangefinders, or wireless accessories. Retain end-use/end-user statements and monitor Federal Register updates for implementing guidance.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、光学瞄具、弹药部件及相关配件的中国出口商而言，这减少了部分许可摩擦，但并未免除核心义务：相关物项仍须依据分类受《美国军品清单》（ITAR）或《商业管制清单》（EAR）管辖，此次撤销主要影响部分民用霰弹枪、半自动枪支及零部件的许可政策。出口商仍须确认ECCN/ITAR类别，对照实体清单和被拒绝方名单进行筛查，并使商业单证与美国HTS编码保持一致。许多枪支相关商品的301关税仍然有效，任何电子瞄具、测距仪或无线配件均须符合FCC规则。应保留最终用途/最终用户声明，并关注《联邦公报》关于实施细则的更新。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "ECCN 归类复核",
-            "desc": "依据撤销后的规则，重新确认枪支、弹药及零部件的 ECCN（0A501/0A502/0A504/0A505 等），核对是否仍属许可例外或需申请许可。"
+            "task": "ITAR/EAR classification review",
+            "desc": "Determine whether each firearm, part, optic, or ammunition item falls under ITAR USML Category I/II/III or EAR ECCN 0A501/0A502/0A504; document the classification basis before shipment."
           },
           {
             "phase": "技术核查",
-            "task": "受限方与实体清单筛查",
-            "desc": "对买方、最终用户及货代进行 BIS Entity List、SDN、DPL 筛查，留存筛查记录与最终用途声明。"
+            "task": "FCC Part 15/18 check for electronics",
+            "desc": "For electronic sights, rangefinders, and wireless accessories, verify FCC ID, modular approval, and Part 15/18 conformity; keep test reports for US customs and market surveillance."
           },
           {
             "phase": "单证准备",
-            "task": "HTS 与 301 关税对齐",
-            "desc": "将产品映射至 10 位 HTS 编码，核对 Section 301 附加关税清单，记录原产地与价值构成。"
+            "task": "Entity List & denied party screening",
+            "desc": "Screen all US consignees, freight forwarders, and end users against the BIS Entity List, SDN list, and denied persons lists; retain screening records and end-user/end-use certificates."
           },
           {
             "phase": "单证准备",
-            "task": "出口许可与报关单证",
-            "desc": "如仍需许可，准备 BIS-748P 申请及 AES/EEI 申报；商业发票、装箱单须与许可范围一致。"
+            "task": "HTS & Section 301 tariff mapping",
+            "desc": "Map each product to the 10-digit US HTS line, check Section 301 List 1-4 exposure, and document country of origin and value build-up to support duty calculation and origin claims."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Export license determination",
+            "desc": "Confirm whether a BIS license exception or NLR applies after the rule rescission; if a license is required, file via SNAP-R and keep the license number on the commercial invoice and AES filing."
           },
           {
             "phase": "环保注册",
-            "task": "FCC 与运输合规",
-            "desc": "含无线模块的配件确认 FCC Part 15/18 认证；弹药类确认 DOT/ATF 运输与出口申报要求。"
+            "task": "State & EPA compliance for ammunition",
+            "desc": "Check EPA and state-level requirements for ammunition components, lead content, and hazardous materials labeling before US import; prepare SDS where applicable."
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-09-24T21:17:08.881996+00:00"
+        "fetched_at": "2026-09-25T21:14:37.532480+00:00"
       }
     }
   ]
