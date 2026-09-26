@@ -1,8 +1,58 @@
 {
-  "pipeline_run": "2026-09-25T21:14:41.804415+00:00",
+  "pipeline_run": "2026-09-26T20:47:43.120243+00:00",
   "passed_count": 6,
-  "intercepted_count": 1,
+  "intercepted_count": 2,
   "intercepted": [
+    {
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "7601.10 / 7616.99 / 8543.90",
+        "direction": "export",
+        "country": "EU",
+        "risk_level": "High",
+        "source": "Provincial Commerce Department trade remedy alert on EU CBAM reporting obligations for aluminum-bearing electronics enclosures and heat sinks",
+        "content_en": "EU Carbon Border Adjustment Mechanism (CBAM) reporting now covers aluminum-intensive electronics parts such as enclosures, heat sinks, and structural frames. Exporters must calculate embedded emissions for aluminum content above the threshold and submit verified data to EU importers. Non-compliance can trigger penalties, customs delays, and buyer rejection. Align HS codes with EU TARIC, confirm CBAM declarant status, and prepare supplier emissions data before shipment.",
+        "content_zh": "欧盟碳边境调节机制（CBAM）申报现已覆盖含铝量较高的电子部件，如机壳、散热器和结构框架。出口商须对超过阈值的铝含量计算隐含排放，并向欧盟进口商提交经核实的数据。不合规可能导致罚款、海关延误和买方拒收。应使HS编码与欧盟TARIC一致，确认CBAM申报人身份，并在发货前准备供应商排放数据。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "CBAM铝含量阈值判定",
+            "desc": "核算电子机壳、散热器及结构件的铝材重量占比，确认是否超过CBAM申报阈值，并留存计算底稿。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "隐含排放数据核算",
+            "desc": "按欧盟CBAM方法学收集铝材生产环节的直接与间接排放数据，优先采用实际值而非默认值。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "EU TARIC与CBAM注册",
+            "desc": "核对出口HS编码与欧盟TARIC一致性，确认欧盟进口商为授权CBAM申报人并完成CBAM过渡期登记。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "RoHS与REACH合规复核",
+            "desc": "同步核查铝制部件涂层、合金元素是否符合RoHS限制物质及REACH SVHC通报义务。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "供应商排放声明与核查报告",
+            "desc": "取得铝材供应商排放声明，必要时安排第三方核查，随商业发票、装箱单及合同一并归档。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "中国出口申报与双用途筛查",
+            "desc": "完成中国出口报关单证准备，并对含无线/加密功能的电子部件开展出口管制与密码筛查。"
+          }
+        ],
+        "source_url": "https://www.mofcom.gov.cn/",
+        "pipeline_source": "ccpit",
+        "fetched_at": "2026-09-26T20:47:20.247276+00:00"
+      }
+    },
     {
       "kind": "risk_signal",
       "reasons": [
@@ -14,43 +64,43 @@
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, optics, ammunition components, and related accessories to the US market, this reduces some licensing friction but does not remove core obligations: items remain subject to the US Munitions List (ITAR) or Commerce Control List (EAR) depending on classification, and the rescission mainly affects licensing policy for certain civilian shotguns, semi-automatic firearms, and parts. Exporters must still confirm ECCN/ITAR category, screen against the Entity List and denied parties, and align commercial documents with US HTS codes. Section 301 tariffs on many firearms-related goods remain in force, and FCC rules apply to any electronic sights, rangefinders, or wireless accessories. Retain end-use/end-user statements and monitor Federal Register updates for implementing guidance.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、光学瞄具、弹药部件及相关配件的中国出口商而言，这减少了部分许可摩擦，但并未免除核心义务：相关物项仍须依据分类受《美国军品清单》（ITAR）或《商业管制清单》（EAR）管辖，此次撤销主要影响部分民用霰弹枪、半自动枪支及零部件的许可政策。出口商仍须确认ECCN/ITAR类别，对照实体清单和被拒绝方名单进行筛查，并使商业单证与美国HTS编码保持一致。许多枪支相关商品的301关税仍然有效，任何电子瞄具、测距仪或无线配件均须符合FCC规则。应保留最终用途/最终用户声明，并关注《联邦公报》关于实施细则的更新。",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain shotguns, rifles, and related components previously captured by stricter controls. Exporters must still confirm current Commerce Control List (CCL) and US Munitions List (USML) jurisdiction, as ITAR-controlled items remain under State Department authority. Re-verify HTS classification, Section 301 exposure, and BIS Entity List screening before shipment. Retain end-user and end-use documentation for all controlled exports.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前受更严格管控的部分霰弹枪、步枪及相关部件将降低许可负担。出口商仍须确认当前商业管制清单（CCL）与《美国军品清单》（USML）的管辖归属，受ITAR管制的物项仍归国务院管辖。发运前应重新核实HTS归类、301条款关税风险及BIS实体清单筛查，并保留所有受控出口的最终用户和最终用途证明文件。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "ITAR/EAR classification review",
-            "desc": "Determine whether each firearm, part, optic, or ammunition item falls under ITAR USML Category I/II/III or EAR ECCN 0A501/0A502/0A504; document the classification basis before shipment."
+            "task": "CCL/USML jurisdiction review",
+            "desc": "Confirm whether firearms, ammunition, or parts fall under EAR (CCL) or ITAR (USML); ITAR items require State Department DDTC authorization, not BIS."
           },
           {
             "phase": "技术核查",
-            "task": "FCC Part 15/18 check for electronics",
-            "desc": "For electronic sights, rangefinders, and wireless accessories, verify FCC ID, modular approval, and Part 15/18 conformity; keep test reports for US customs and market surveillance."
-          },
-          {
-            "phase": "单证准备",
-            "task": "Entity List & denied party screening",
-            "desc": "Screen all US consignees, freight forwarders, and end users against the BIS Entity List, SDN list, and denied persons lists; retain screening records and end-user/end-use certificates."
+            "task": "ECCN classification update",
+            "desc": "Re-classify affected items (e.g., 0A501, 0A502, 0A504) under the rescinded rule and document the rationale for any classification change."
           },
           {
             "phase": "单证准备",
             "task": "HTS & Section 301 tariff mapping",
-            "desc": "Map each product to the 10-digit US HTS line, check Section 301 List 1-4 exposure, and document country of origin and value build-up to support duty calculation and origin claims."
+            "desc": "Map the 10-digit HTS line (e.g., 9302.00, 9303.30, 9305.20) against Section 301 lists and additional duties; document country of origin and value build-up."
           },
           {
             "phase": "单证准备",
-            "task": "Export license determination",
-            "desc": "Confirm whether a BIS license exception or NLR applies after the rule rescission; if a license is required, file via SNAP-R and keep the license number on the commercial invoice and AES filing."
+            "task": "BIS Entity List & restricted party screening",
+            "desc": "Run restricted party and export control screening; retain end-user and end-use statements for all controlled firearm exports."
           },
           {
             "phase": "环保注册",
-            "task": "State & EPA compliance for ammunition",
-            "desc": "Check EPA and state-level requirements for ammunition components, lead content, and hazardous materials labeling before US import; prepare SDS where applicable."
+            "task": "FCC Part 15 / Part 18 RF conformity",
+            "desc": "For any electronic sights, rangefinders, or wireless accessories, confirm FCC IDs and modular approvals before US entry."
+          },
+          {
+            "phase": "单证准备",
+            "task": "License exception / NLR determination",
+            "desc": "Determine whether shipments qualify for License Exception or No License Required (NLR); document the applicable EAR paragraph."
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-09-25T21:14:37.532480+00:00"
+        "fetched_at": "2026-09-26T20:47:39.723951+00:00"
       }
     }
   ]
