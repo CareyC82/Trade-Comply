@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-26T20:47:43.273Z",
+  "updated_at": "2026-09-27T21:03:48.262Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -1020,6 +1020,61 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-09-26T20:47:39.723951+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-09-27T21:03:48.262Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.20 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters of firearms, optics, and ammunition to the US market should re-verify HTS classification, Section 301 tariff exposure, and BIS licensing requirements under the revised rules. Note that the rescission does not eliminate all controls: ITAR (State Department) still governs military-grade firearms, and BIS retains controls on certain shotguns, suppressors, and 3D-printed firearm technology. Re-screen end users against the Entity List and denied party lists, and confirm FCC Part 15/18 conformity for any electronic sights or RF-enabled accessories.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口管制规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，其许可负担有所降低。向美国市场出口枪支、光学瞄具及弹药的出口商，应重新核实HS编码归类、301条款关税风险以及修订后的BIS许可要求。需注意，撤销并不意味着取消所有管制：军用级枪支仍受国务院ITAR管辖，BIS对部分霰弹枪、消音器及3D打印枪支技术仍保留管制。应重新对最终用户进行实体清单和被拒绝方名单筛查，并确认任何电子瞄具或射频配件符合FCC第15/18部分要求。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "HS编码与管制清单复核",
+            "desc": "依据撤销后的规则，重新确认枪支、弹药及零部件的HTSUS 10位编码，判断是否仍属BIS管制（ECCN 0A501等）或已回归EAR99/较低管制层级。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "ITAR与BIS管辖边界确认",
+            "desc": "区分军用级（ITAR/USML）与民用级（EAR/CCL）产品，确认消音器、3D打印枪支技术等仍受控项目的许可要求，避免误判导致违规。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "BIS许可与实体清单筛查",
+            "desc": "对最终用户、收货人及中间商进行Entity List、Denied Persons List及未核实清单筛查，留存最终用途/最终用户声明。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "Section 301关税与HTS对齐",
+            "desc": "核对10位HTS编码是否落入301条款加征清单，核算原产地与价值构成，评估关税成本并准备原产地证明。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "FCC Part 15/18合规确认",
+            "desc": "对带射频或电子瞄具的配件，确认FCC ID、模块化认证及供应商符合性声明，确保进入美国市场前完成认证。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "出口报关单证归档",
+            "desc": "准备商业发票、装箱单、出口许可证（如适用）、AES/EEI申报文件，并保留规则变更前后的合规评估记录以备审计。"
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-09-27T21:03:44.440337+00:00"
       }
     }
   ]
