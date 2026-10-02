@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-01T22:27:51.923Z",
+  "updated_at": "2026-10-02T21:57:07.176Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -1285,6 +1285,56 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-10-01T22:27:48.448032+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-10-02T21:57:07.176Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, ammunition, optics, and related components to the US market, this reduces licensing friction but does not remove core obligations: EAR classification, BIS restricted party and Entity List screening, US HTS alignment, and Section 301 tariff exposure on China-origin goods. Verify whether items fall under USML (ITAR) versus EAR/Commerce Control List, confirm end-user and end-use statements, and maintain documentation for US import clearance. Firearms and ammunition remain heavily regulated; state, local, and ATF import rules still apply.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、弹药、光学器件及相关部件的中国企业，此举降低了许可摩擦，但并未免除核心义务：EAR 分类、BIS 受限方与实体清单筛查、美国 HTS 归类对齐，以及中国原产货物面临的 301 条款关税风险。需核实物品属于 USML（ITAR）还是 EAR/商业管制清单，确认最终用户与最终用途声明，并保留美国进口清关文件。枪支弹药仍受严格监管，州、地方及 ATF 进口规则依然适用。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "EAR/USML 分类判定",
+            "desc": "确认枪支、弹药及部件属于 ITAR USML 还是 EAR 商业管制清单，明确 ECCN 或 USML 类别，避免错误申报导致扣货或处罚。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "BIS 受限方与实体清单筛查",
+            "desc": "对交易方、最终用户及收货人进行 BIS 实体清单、SDN 及拒绝人员名单筛查，留存筛查记录与最终用途声明。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "美国 HTS 与 301 关税对齐",
+            "desc": "将产品映射至 10 位 HTS 编码，核对 301 条款加征清单及税率，准备原产地与价值构成证明以应对美国海关审查。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "ATF 及进口许可文件",
+            "desc": "确认美国进口方持有 ATF 相应许可（如 Form 6/6A），准备商业发票、装箱单、原产地证及最终用户声明。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "光学与电子部件合规",
+            "desc": "对含无线或电子瞄具的产品核查 FCC Part 15/18 认证，确认供应商 FCC ID 与模块批准，避免清关受阻。"
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-10-02T21:57:03.524747+00:00"
       }
     }
   ]
