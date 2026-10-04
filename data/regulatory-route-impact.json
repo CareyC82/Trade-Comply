@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-27T21:28:44.052Z",
-  "source_change_count": 7,
+  "generated_at": "2026-10-04T21:41:05.654Z",
+  "source_change_count": 10,
   "impacts": [
     {
       "id": "fda",
@@ -18,81 +18,6 @@
         "status": "unchanged_pending_rule_review",
         "before": [],
         "after": [],
-        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
-      },
-      "auto_publish": false
-    },
-    {
-      "id": "sgIoTSecurity",
-      "type": "content_changed",
-      "detected_at": "2026-08-30T21:16:09.368Z",
-      "review_status": "pending_review",
-      "markets": [
-        "SG"
-      ],
-      "products": [
-        {
-          "id": "wifi_router",
-          "label": "Wi-Fi router",
-          "market": "SG",
-          "candidate_hs": [
-            "8517.62"
-          ],
-          "route": "Any maintained origin -> SG",
-          "requirement_ids": [
-            "sg_iot_security"
-          ],
-          "current_conclusion": "conditional",
-          "current_conclusion_label": "Conditional — evidence required"
-        },
-        {
-          "id": "tablet",
-          "label": "Tablet computer",
-          "market": "SG",
-          "candidate_hs": [
-            "8471.30"
-          ],
-          "route": "Any maintained origin -> SG",
-          "requirement_ids": [
-            "sg_iot_security"
-          ],
-          "current_conclusion": "conditional",
-          "current_conclusion_label": "Conditional — evidence required"
-        },
-        {
-          "id": "e_reader",
-          "label": "E-reader",
-          "market": "SG",
-          "candidate_hs": [
-            "8471.30",
-            "8543.70"
-          ],
-          "route": "Any maintained origin -> SG",
-          "requirement_ids": [
-            "sg_iot_security"
-          ],
-          "current_conclusion": "conditional",
-          "current_conclusion_label": "Conditional — evidence required"
-        }
-      ],
-      "candidate_hs": [
-        "8517.62",
-        "8471.30",
-        "8543.70"
-      ],
-      "affected_routes": [
-        "Any maintained origin -> SG"
-      ],
-      "effective_date": null,
-      "effective_timing": "Effective date requires official confirmation",
-      "conclusion_delta": {
-        "status": "unchanged_pending_rule_review",
-        "before": [
-          "conditional"
-        ],
-        "after": [
-          "conditional"
-        ],
         "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
       },
       "auto_publish": false
@@ -636,6 +561,831 @@
         "status": "unchanged_pending_rule_review",
         "before": [],
         "after": [],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "sgSafety",
+      "type": "content_changed",
+      "detected_at": "2026-10-04T21:41:05.654Z",
+      "review_status": "pending_review",
+      "markets": [
+        "SG"
+      ],
+      "products": [
+        {
+          "id": "kids_gps_watch",
+          "label": "Kids GPS watch",
+          "market": "SG",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "charger",
+          "label": "Charger / power adapter",
+          "market": "SG",
+          "candidate_hs": [
+            "8504.40"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "kids_electronics",
+          "label": "Children’s electronic product",
+          "market": "SG",
+          "candidate_hs": [
+            "9503.00",
+            "8525.89",
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "security_camera",
+          "label": "IP / security camera",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "wifi_router",
+          "label": "Wi-Fi router",
+          "market": "SG",
+          "candidate_hs": [
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_plug",
+          "label": "Smart plug",
+          "market": "SG",
+          "candidate_hs": [
+            "8536.69",
+            "8537.10"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_light",
+          "label": "Connected smart light / LED light",
+          "market": "SG",
+          "candidate_hs": [
+            "8539.52",
+            "9405.42"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "mini_projector",
+          "label": "Mini projector",
+          "market": "SG",
+          "candidate_hs": [
+            "8528.62",
+            "8528.69"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "portable_fan",
+          "label": "USB / rechargeable portable fan",
+          "market": "SG",
+          "candidate_hs": [
+            "8414.51"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "electric_shaver",
+          "label": "Electric shaver",
+          "market": "SG",
+          "candidate_hs": [
+            "8510.10"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "video_doorbell",
+          "label": "Video doorbell",
+          "market": "SG",
+          "candidate_hs": [
+            "8531.80",
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "baby_monitor",
+          "label": "Baby monitor",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety",
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "robot_vacuum",
+          "label": "Robot vacuum cleaner",
+          "market": "SG",
+          "candidate_hs": [
+            "8508.11",
+            "8508.19"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8517.13",
+        "8517.62",
+        "8504.40",
+        "9503.00",
+        "8525.89",
+        "8471.30",
+        "8536.69",
+        "8537.10",
+        "8539.52",
+        "9405.42",
+        "8528.62",
+        "8528.69",
+        "8414.51",
+        "8510.10",
+        "8531.80",
+        "8508.11",
+        "8508.19"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> SG"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "high_risk",
+          "conditional"
+        ],
+        "after": [
+          "high_risk",
+          "conditional"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "sgControlledGoods",
+      "type": "content_changed",
+      "detected_at": "2026-10-04T21:41:05.654Z",
+      "review_status": "pending_review",
+      "markets": [
+        "SG"
+      ],
+      "products": [
+        {
+          "id": "charger",
+          "label": "Charger / power adapter",
+          "market": "SG",
+          "candidate_hs": [
+            "8504.40"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "beauty_device",
+          "label": "Electronic beauty device",
+          "market": "SG",
+          "candidate_hs": [
+            "8543.70",
+            "9019.10"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "security_camera",
+          "label": "IP / security camera",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety",
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "wifi_router",
+          "label": "Wi-Fi router",
+          "market": "SG",
+          "candidate_hs": [
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_plug",
+          "label": "Smart plug",
+          "market": "SG",
+          "candidate_hs": [
+            "8536.69",
+            "8537.10"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_light",
+          "label": "Connected smart light / LED light",
+          "market": "SG",
+          "candidate_hs": [
+            "8539.52",
+            "9405.42"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety",
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "gaming_controller",
+          "label": "Gaming controller",
+          "market": "SG",
+          "candidate_hs": [
+            "9504.50",
+            "8471.60"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "mini_projector",
+          "label": "Mini projector",
+          "market": "SG",
+          "candidate_hs": [
+            "8528.62",
+            "8528.69"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety",
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "usb_hub",
+          "label": "USB hub / docking station",
+          "market": "SG",
+          "candidate_hs": [
+            "8471.80",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "portable_fan",
+          "label": "USB / rechargeable portable fan",
+          "market": "SG",
+          "candidate_hs": [
+            "8414.51"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety",
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "electric_shaver",
+          "label": "Electric shaver",
+          "market": "SG",
+          "candidate_hs": [
+            "8510.10"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety",
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "webcam",
+          "label": "Webcam / USB camera",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "dash_camera",
+          "label": "Dash camera",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "video_doorbell",
+          "label": "Video doorbell",
+          "market": "SG",
+          "candidate_hs": [
+            "8531.80",
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety",
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "baby_monitor",
+          "label": "Baby monitor",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety",
+            "sg_safety"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "robot_vacuum",
+          "label": "Robot vacuum cleaner",
+          "market": "SG",
+          "candidate_hs": [
+            "8508.11",
+            "8508.19"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8504.40",
+        "8543.70",
+        "9019.10",
+        "8525.89",
+        "8517.62",
+        "8536.69",
+        "8537.10",
+        "8539.52",
+        "9405.42",
+        "9504.50",
+        "8471.60",
+        "8528.62",
+        "8528.69",
+        "8471.80",
+        "8414.51",
+        "8510.10",
+        "8531.80",
+        "8508.11",
+        "8508.19"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> SG"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional",
+          "high_risk"
+        ],
+        "after": [
+          "conditional",
+          "high_risk"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "sgGeneralSafety",
+      "type": "content_changed",
+      "detected_at": "2026-10-04T21:41:05.654Z",
+      "review_status": "pending_review",
+      "markets": [
+        "SG"
+      ],
+      "products": [
+        {
+          "id": "beauty_device",
+          "label": "Electronic beauty device",
+          "market": "SG",
+          "candidate_hs": [
+            "8543.70",
+            "9019.10"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "security_camera",
+          "label": "IP / security camera",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_light",
+          "label": "Connected smart light / LED light",
+          "market": "SG",
+          "candidate_hs": [
+            "8539.52",
+            "9405.42"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "gaming_controller",
+          "label": "Gaming controller",
+          "market": "SG",
+          "candidate_hs": [
+            "9504.50",
+            "8471.60"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "mini_projector",
+          "label": "Mini projector",
+          "market": "SG",
+          "candidate_hs": [
+            "8528.62",
+            "8528.69"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "usb_hub",
+          "label": "USB hub / docking station",
+          "market": "SG",
+          "candidate_hs": [
+            "8471.80",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "portable_fan",
+          "label": "USB / rechargeable portable fan",
+          "market": "SG",
+          "candidate_hs": [
+            "8414.51"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "electric_shaver",
+          "label": "Electric shaver",
+          "market": "SG",
+          "candidate_hs": [
+            "8510.10"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "webcam",
+          "label": "Webcam / USB camera",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "dash_camera",
+          "label": "Dash camera",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "video_doorbell",
+          "label": "Video doorbell",
+          "market": "SG",
+          "candidate_hs": [
+            "8531.80",
+            "8525.89"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "baby_monitor",
+          "label": "Baby monitor",
+          "market": "SG",
+          "candidate_hs": [
+            "8525.89",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_general_safety"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        }
+      ],
+      "candidate_hs": [
+        "8543.70",
+        "9019.10",
+        "8525.89",
+        "8539.52",
+        "9405.42",
+        "9504.50",
+        "8471.60",
+        "8528.62",
+        "8528.69",
+        "8471.80",
+        "8517.62",
+        "8414.51",
+        "8510.10",
+        "8531.80"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> SG"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional",
+          "high_risk"
+        ],
+        "after": [
+          "conditional",
+          "high_risk"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "sgIoTSecurity",
+      "type": "content_changed",
+      "detected_at": "2026-10-04T21:41:05.654Z",
+      "review_status": "pending_review",
+      "markets": [
+        "SG"
+      ],
+      "products": [
+        {
+          "id": "wifi_router",
+          "label": "Wi-Fi router",
+          "market": "SG",
+          "candidate_hs": [
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "tablet",
+          "label": "Tablet computer",
+          "market": "SG",
+          "candidate_hs": [
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "e_reader",
+          "label": "E-reader",
+          "market": "SG",
+          "candidate_hs": [
+            "8471.30",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> SG",
+          "requirement_ids": [
+            "sg_iot_security"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8517.62",
+        "8471.30",
+        "8543.70"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> SG"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional"
+        ],
+        "after": [
+          "conditional"
+        ],
         "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
       },
       "auto_publish": false
