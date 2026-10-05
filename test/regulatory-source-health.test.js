@@ -23,6 +23,7 @@ test('regulatory source audit schedules reviews and flags pending effective date
     assert.ok(fcc.alerts.includes('effective_date_pending'));
     assert.equal(fcc.review_interval_days, 30);
     assert.equal(fcc.link.status, 'not_probed');
+    assert.equal(fcc.reviewed_at, '2026-10-05');
 });
 
 test('an unavailable probe environment is not reported as thirty-two broken official links', async () => {

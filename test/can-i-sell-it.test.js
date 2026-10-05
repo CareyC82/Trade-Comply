@@ -977,6 +977,21 @@ test('platform rules are separated from legal market-access requirements', () =>
     assert.ok(result.requirements.some((rule) => rule.id === 'fcc'));
 });
 
+test('FCC marketplace guidance uses the published effective and compliance dates', () => {
+    const result = engine.assess({
+        description: 'Bluetooth earbuds with lithium battery',
+        market: 'US', origin: 'CN', platform: 'Amazon',
+        attributes: { productType: 'earbuds', bluetooth: 'yes', wifi: 'no', battery: 'yes' },
+        documents: []
+    });
+    const rule = result.platformRules.find((item) => item.id === 'amazon-fcc-id-readiness');
+    assert.match(rule.action, /October 11, 2026/);
+    assert.match(rule.action, /March 1, 2027/);
+    assert.match(rule.action, /June 1, 2027/);
+    assert.equal(rule.source.lifecycle.effectiveAt, '2026-10-11');
+    assert.equal(rule.source.lifecycle.publishedAt, '2026-09-11');
+});
+
 test('sales channels produce distinct visible listing decisions', () => {
     const common = {
         description: 'Bluetooth earbuds with lithium battery',

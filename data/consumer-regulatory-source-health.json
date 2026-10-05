@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-31T13:36:12.300Z",
+  "generated_at": "2026-10-05T10:44:31.550Z",
   "live_links_probed": false,
   "probe_status": "not_run",
   "probe_alerts": [],
   "source_count": 52,
   "alert_count": 1,
   "failed_link_count": 0,
-  "automatic_monitoring_ready_count": 8,
-  "automatic_monitoring_blocked_count": 44,
+  "automatic_monitoring_ready_count": 11,
+  "automatic_monitoring_blocked_count": 41,
   "sources": [
     {
       "id": "fcc",
@@ -52,6 +52,7 @@
         "eligible_for_automatic_monitoring": false,
         "blockers": [
           "monitor_identity_terms_required",
+          "current_capture_required",
           "manual_fallback_still_required"
         ]
       },
@@ -61,11 +62,11 @@
       "id": "fccMarketplace2026",
       "authority": "U.S. Federal Communications Commission",
       "title": "FCC 26-50 — online marketplace equipment-authorization rules",
-      "url": "https://docs.fcc.gov/public/attachments/FCC-26-50A1.pdf",
+      "url": "https://www.federalregister.gov/d/2026-18535",
       "confidence": "official_pending_effective_date",
-      "reviewed_at": "2026-08-25",
+      "reviewed_at": "2026-10-05",
       "review_interval_days": 30,
-      "next_review_at": "2026-09-24",
+      "next_review_at": "2026-11-04",
       "link": {
         "status": "not_probed"
       },
@@ -101,6 +102,7 @@
         "eligible_for_automatic_monitoring": false,
         "blockers": [
           "monitor_identity_terms_required",
+          "current_capture_required",
           "manual_fallback_still_required"
         ]
       },
@@ -235,6 +237,7 @@
         "identity_verified": true,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
+          "current_capture_required",
           "manual_fallback_still_required"
         ]
       },
@@ -396,6 +399,7 @@
         "identity_verified": true,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
+          "current_capture_required",
           "manual_fallback_still_required"
         ]
       },
@@ -421,6 +425,7 @@
         "blockers": [
           "official_content_capture_required",
           "monitor_identity_terms_required",
+          "current_capture_required",
           "manual_fallback_still_required"
         ]
       },
@@ -599,10 +604,8 @@
         "policy_mode": "automatic",
         "structured_capture": true,
         "identity_verified": true,
-        "eligible_for_automatic_monitoring": false,
-        "blockers": [
-          "current_capture_required"
-        ]
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     },
@@ -706,10 +709,8 @@
         "policy_mode": "automatic",
         "structured_capture": true,
         "identity_verified": true,
-        "eligible_for_automatic_monitoring": false,
-        "blockers": [
-          "current_capture_required"
-        ]
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     },
@@ -729,10 +730,8 @@
         "policy_mode": "automatic",
         "structured_capture": true,
         "identity_verified": true,
-        "eligible_for_automatic_monitoring": false,
-        "blockers": [
-          "current_capture_required"
-        ]
+        "eligible_for_automatic_monitoring": true,
+        "blockers": []
       },
       "alerts": []
     },
@@ -825,13 +824,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -850,11 +847,10 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
           "monitor_identity_terms_required",
           "current_capture_required"
         ]
@@ -875,11 +871,10 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
           "monitor_identity_terms_required",
           "current_capture_required"
         ]
@@ -950,13 +945,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -975,13 +968,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1000,13 +991,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1025,13 +1014,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1050,13 +1037,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1075,13 +1060,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1100,13 +1083,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1125,13 +1106,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1150,13 +1129,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1175,13 +1152,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1200,13 +1175,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
@@ -1225,13 +1198,11 @@
       },
       "automation_readiness": {
         "policy_mode": "automatic",
-        "structured_capture": false,
+        "structured_capture": true,
         "identity_verified": false,
         "eligible_for_automatic_monitoring": false,
         "blockers": [
-          "official_content_capture_required",
-          "monitor_identity_terms_required",
-          "current_capture_required"
+          "monitor_identity_terms_required"
         ]
       },
       "alerts": []
