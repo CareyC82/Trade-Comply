@@ -461,7 +461,13 @@ function buildConsumerRegulatoryStatusPayload() {
         result[source.status || 'unknown_status'] = (result[source.status || 'unknown_status'] || 0) + 1;
         if (source.status === 'last_good_degraded') result.degraded = (result.degraded || 0) + 1;
         return result;
-    }, {});
+    }, {
+        current: 0,
+        manual_review_current: 0,
+        last_good_degraded: 0,
+        baseline_seed: 0,
+        degraded: 0
+    });
     const enriched = enrichChanges(changes);
     return { ok: snapshots.sources.every((source) => source.content_hash && source.last_good_at), generated_at: snapshots.generated_at, source_count: snapshots.source_count, counts, sources: snapshots.sources, lifecycle_audit: buildLifecycleAudit(models.sources), accuracy_status: readJsonFile(REGULATORY_ACCURACY_STATUS_PATH, null), pending_review_count: enriched.changes.filter((item) => item.review_status === 'pending_review').length, changes: enriched.changes, audit: readJsonFile(REGULATORY_REVIEW_AUDIT_PATH, { events: [] }) };
 }
