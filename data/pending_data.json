@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-05T23:52:01.372Z",
+  "updated_at": "2026-10-06T22:28:41.711Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -1500,6 +1500,56 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-10-05T23:51:57.471925+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-10-06T22:28:41.711Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. This reduces licensing burdens for certain semi-automatic firearms and related components previously moved to stricter controls. Exporters must still comply with the EAR, ITAR where applicable, and confirm the correct ECCN or USML category. Re-verify HTS classification, Section 301 tariff exposure, and restricted party screening before shipment. Firearms exports remain sensitive; end-use/end-user documentation and destination-based license requirements still apply.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口管制规则，恢复对民用枪支、弹药及零部件的原有出口管制待遇。此前被收紧管制的部分半自动枪支及相关部件，其许可负担有所降低。出口商仍须遵守《出口管理条例》（EAR）及适用的《国际武器贸易条例》（ITAR），并确认正确的ECCN或USML类别。发运前应重新核实HTS归类、301条款关税风险及受限方筛查。枪支出口仍属敏感领域，最终用途/最终用户文件及基于目的地的许可要求依然适用。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "ECCN / USML 归类复核",
+            "desc": "根据撤销后的规则重新确认枪支及零部件的ECCN或USML类别，判断是否仍需BIS或DDTC许可。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "受限方与最终用途筛查",
+            "desc": "对买方、中间商及最终用户进行Entity List、SDN及拒绝人员名单筛查，留存最终用途声明。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "HTS 与 301 关税核对",
+            "desc": "核对10位HTS编码及301条款加征关税清单，确认原产地与申报价值构成。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "出口许可与报关文件",
+            "desc": "准备商业发票、装箱单、许可例外或授权文件，确保报关信息与许可条件一致。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "FCC 及产品合规确认",
+            "desc": "如含无线或电子部件，确认FCC Part 15/18认证及供应商FCC ID，满足美国市场准入要求。"
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-10-06T22:28:37.336983+00:00"
       }
     }
   ]
