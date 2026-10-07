@@ -3,6 +3,22 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { auditSources, automationReadiness, cadenceDays, probeSource } = require('../scripts/audit-regulatory-source-health');
+const models = require('../lib/wearable-product-models');
+
+test('access-restricted official sources retain a current, time-bounded manual fallback', () => {
+    const ids = [
+        'fccExposure', 'usElectrical', 'redCyber', 'gdpr', 'battery',
+        'jpRadio', 'jpPse', 'jpOnlineSeller', 'jpPseProducts', 'jpProductSafety',
+        'auAcma', 'auResponsibleSupplier', 'auRcm', 'auProductSafety',
+        'auButtonBattery', 'auAbfTariff', 'auAbfGst'
+    ];
+    ids.forEach((id) => {
+        const source = models.sources[id];
+        assert.ok(['last_good_manual_review', 'automatic_with_manual_fallback'].includes(source.monitorPolicy?.mode), id);
+        assert.equal(source.monitorPolicy.reviewEveryDays, 30, id);
+        assert.equal(source.reviewedAt, '2026-10-07', id);
+    });
+});
 
 test('automatic source promotion requires structured current content and verified identity', () => {
     const source = { monitorRequiredTerms: ['authority', 'regulation'], monitorPolicy: { mode: 'automatic' } };

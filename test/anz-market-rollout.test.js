@@ -111,7 +111,7 @@ test('ANZ official sources carry authority, review date, confidence and verifica
         const source = models.sources[id];
         assert.match(source.url, /^https:\/\//, id);
         assert.ok(source.authority, id);
-        assert.equal(source.reviewedAt, '2026-08-31', id);
+        assert.ok(Date.parse(source.reviewedAt) >= Date.parse('2026-08-31'), id);
         assert.ok(source.confidence, id);
         assert.ok(source.scope, id);
     });
