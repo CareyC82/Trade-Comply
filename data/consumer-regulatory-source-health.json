@@ -1,12 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-05T10:44:31.550Z",
-  "live_links_probed": false,
-  "probe_status": "not_run",
+  "generated_at": "2026-10-07T03:08:50.850Z",
+  "live_links_probed": true,
+  "probe_status": "completed",
   "probe_alerts": [],
   "source_count": 52,
-  "alert_count": 1,
+  "alert_count": 4,
   "failed_link_count": 0,
+  "probe_degraded_count": 3,
   "automatic_monitoring_ready_count": 11,
   "automatic_monitoring_blocked_count": 41,
   "sources": [
@@ -20,7 +21,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.fcc.gov/general/equipment-authorization-procedures",
+        "monitored_url": "https://www.fcc.gov/general/equipment-authorization-procedures",
+        "attempts": [
+          {
+            "url": "https://www.fcc.gov/general/equipment-authorization-procedures",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.fcc.gov/general/equipment-authorization-procedures"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -43,7 +55,18 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://apps.fcc.gov/oetcf/kdb/forms/FTSSearchResultPage.cfm?id=20676&switch=P",
+        "monitored_url": "https://apps.fcc.gov/oetcf/kdb/forms/FTSSearchResultPage.cfm?id=20676&switch=P",
+        "attempts": [
+          {
+            "url": "https://apps.fcc.gov/oetcf/kdb/forms/FTSSearchResultPage.cfm?id=20676&switch=P",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://apps.fcc.gov/oetcf/kdb/forms/FTSSearchResultPage.cfm?id=20676&switch=P"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "last_good_manual_review",
@@ -68,7 +91,18 @@
       "review_interval_days": 30,
       "next_review_at": "2026-11-04",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://unblock.federalregister.gov/",
+        "monitored_url": "https://www.federalregister.gov/d/2026-18535",
+        "attempts": [
+          {
+            "url": "https://www.federalregister.gov/d/2026-18535",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://unblock.federalregister.gov/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -93,7 +127,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.osha.gov/nationally-recognized-testing-laboratory-program",
+        "monitored_url": "https://www.osha.gov/nationally-recognized-testing-laboratory-program",
+        "attempts": [
+          {
+            "url": "https://www.osha.gov/nationally-recognized-testing-laboratory-program",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.osha.gov/nationally-recognized-testing-laboratory-program"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -118,7 +163,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 404,
+        "final_url": "https://www.fda.gov/apology_objects/abuse-detection-apology.html",
+        "monitored_url": "https://www.fda.gov/medical-devices/classify-your-medical-device/how-determine-if-your-product-medical-device",
+        "attempts": [
+          {
+            "url": "https://www.fda.gov/medical-devices/classify-your-medical-device/how-determine-if-your-product-medical-device",
+            "status": "access_blocked",
+            "http_status": 404,
+            "final_url": "https://www.fda.gov/apology_objects/abuse-detection-apology.html"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -141,7 +197,18 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.ftc.gov/business-guidance/resources/careful-connections-keeping-internet-things-secure",
+        "monitored_url": "https://www.ftc.gov/business-guidance/resources/careful-connections-keeping-internet-things-secure",
+        "attempts": [
+          {
+            "url": "https://www.ftc.gov/business-guidance/resources/careful-connections-keeping-internet-things-secure",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.ftc.gov/business-guidance/resources/careful-connections-keeping-internet-things-secure"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -162,7 +229,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa",
+        "monitored_url": "https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa",
+        "attempts": [
+          {
+            "url": "https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -183,7 +261,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.cpsc.gov/Business--Manufacturing/Testing-Certification/Childrens-Product-Certificate",
+        "monitored_url": "https://www.cpsc.gov/Business--Manufacturing/Testing-Certification/Childrens-Product-Certificate",
+        "attempts": [
+          {
+            "url": "https://www.cpsc.gov/Business--Manufacturing/Testing-Certification/Childrens-Product-Certificate",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.cpsc.gov/Business--Manufacturing/Testing-Certification/Childrens-Product-Certificate"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -206,7 +295,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/radio-equipment-directive-red_en",
+        "monitored_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/radio-equipment-directive-red_en",
+        "attempts": [
+          {
+            "url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/radio-equipment-directive-red_en",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/radio-equipment-directive-red_en"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -229,7 +329,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://eur-lex.europa.eu/TodayOJ/index.html?uri=CELEX:32022R0030",
+        "monitored_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R0030",
+        "attempts": [
+          {
+            "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R0030",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://eur-lex.europa.eu/TodayOJ/index.html?uri=CELEX:32022R0030"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -253,7 +364,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/low-voltage-directive-lvd_en",
+        "monitored_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/low-voltage-directive-lvd_en",
+        "attempts": [
+          {
+            "url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/low-voltage-directive-lvd_en",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/low-voltage-directive-lvd_en"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -276,7 +398,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en",
+        "monitored_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en",
+        "attempts": [
+          {
+            "url": "https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -299,7 +432,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-22",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/batteries_en",
+        "monitored_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/batteries_en",
+        "attempts": [
+          {
+            "url": "https://environment.ec.europa.eu/topics/waste-and-recycling/batteries_en",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://environment.ec.europa.eu/topics/waste-and-recycling/batteries_en"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -322,7 +466,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://commission.europa.eu/document/download/a281b150-19fd-44f9-bef8-c6018f9c4792_en",
+        "monitored_url": "https://commission.europa.eu/document/download/a281b150-19fd-44f9-bef8-c6018f9c4792_en",
+        "attempts": [
+          {
+            "url": "https://commission.europa.eu/document/download/a281b150-19fd-44f9-bef8-c6018f9c4792_en",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://commission.europa.eu/document/download/a281b150-19fd-44f9-bef8-c6018f9c4792_en"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -345,7 +500,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://health.ec.europa.eu/medical-devices-new-regulations/overview_en",
+        "monitored_url": "https://health.ec.europa.eu/medical-devices-new-regulations/overview_en",
+        "attempts": [
+          {
+            "url": "https://health.ec.europa.eu/medical-devices-new-regulations/overview_en",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://health.ec.europa.eu/medical-devices-new-regulations/overview_en"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -368,7 +534,18 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.edpb.europa.eu/documents/guideline/guidelines-32019-on-processing-of-personal-data-through-video-devices_en",
+        "monitored_url": "https://www.edpb.europa.eu/documents/guideline/guidelines-32019-on-processing-of-personal-data-through-video-devices_en",
+        "attempts": [
+          {
+            "url": "https://www.edpb.europa.eu/documents/guideline/guidelines-32019-on-processing-of-personal-data-through-video-devices_en",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.edpb.europa.eu/documents/guideline/guidelines-32019-on-processing-of-personal-data-through-video-devices_en"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -391,7 +568,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 202,
+        "final_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "monitored_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "attempts": [
+          {
+            "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+            "status": "reachable",
+            "http_status": 202,
+            "final_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -415,7 +603,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://unece.org/transport/dangerous-goods/manual-tests-and-criteria-rev8",
+        "monitored_url": "https://unece.org/transport/dangerous-goods/manual-tests-and-criteria-rev8",
+        "attempts": [
+          {
+            "url": "https://unece.org/transport/dangerous-goods/manual-tests-and-criteria-rev8",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://unece.org/transport/dangerous-goods/manual-tests-and-criteria-rev8"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -441,7 +640,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.tele.soumu.go.jp/e/sys/equ/tech/",
+        "monitored_url": "https://www.tele.soumu.go.jp/e/sys/equ/tech/",
+        "attempts": [
+          {
+            "url": "https://www.tele.soumu.go.jp/e/sys/equ/tech/",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.tele.soumu.go.jp/e/sys/equ/tech/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "last_good_manual_review",
@@ -464,7 +674,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.meti.go.jp/policy/consumer/seian/denan/",
+        "monitored_url": "https://www.meti.go.jp/policy/consumer/seian/denan/",
+        "attempts": [
+          {
+            "url": "https://www.meti.go.jp/policy/consumer/seian/denan/",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.meti.go.jp/policy/consumer/seian/denan/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -487,7 +708,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.meti.go.jp/product_safety/consumer/system/06.html",
+        "monitored_url": "https://www.meti.go.jp/product_safety/consumer/system/06.html",
+        "attempts": [
+          {
+            "url": "https://www.meti.go.jp/product_safety/consumer/system/06.html",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.meti.go.jp/product_safety/consumer/system/06.html"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -510,7 +742,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.meti.go.jp/policy/consumer/seian/denan/non_specified_electrical.html",
+        "monitored_url": "https://www.meti.go.jp/policy/consumer/seian/denan/non_specified_electrical.html",
+        "attempts": [
+          {
+            "url": "https://www.meti.go.jp/policy/consumer/seian/denan/non_specified_electrical.html",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.meti.go.jp/policy/consumer/seian/denan/non_specified_electrical.html"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -533,7 +776,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.meti.go.jp/english/policy/economy/consumer/product_safety/pse_procedure/index.html",
+        "monitored_url": "https://www.meti.go.jp/english/policy/economy/consumer/product_safety/pse_procedure/index.html",
+        "attempts": [
+          {
+            "url": "https://www.meti.go.jp/english/policy/economy/consumer/product_safety/pse_procedure/index.html",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.meti.go.jp/english/policy/economy/consumer/product_safety/pse_procedure/index.html"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic_with_manual_fallback",
@@ -556,7 +810,18 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.ipa.go.jp/en/security/jc-star/index.html",
+        "monitored_url": "https://www.ipa.go.jp/en/security/jc-star/index.html",
+        "attempts": [
+          {
+            "url": "https://www.ipa.go.jp/en/security/jc-star/index.html",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.ipa.go.jp/en/security/jc-star/index.html"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -577,7 +842,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.ppc.go.jp/en/legal/",
+        "monitored_url": "https://www.ppc.go.jp/en/legal/",
+        "attempts": [
+          {
+            "url": "https://www.ppc.go.jp/en/legal/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.ppc.go.jp/en/legal/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -598,7 +874,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://iris.imda.gov.sg/application/general-equipment-registration-%28ger%29",
+        "monitored_url": "https://iris.imda.gov.sg/application/general-equipment-registration-%28ger%29",
+        "attempts": [
+          {
+            "url": "https://iris.imda.gov.sg/application/general-equipment-registration-%28ger%29",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://iris.imda.gov.sg/application/general-equipment-registration-%28ger%29"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -619,7 +906,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/overview-of-cpsr/",
+        "monitored_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/overview-of-cpsr/",
+        "attempts": [
+          {
+            "url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/overview-of-cpsr/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/overview-of-cpsr/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -640,7 +938,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/list-of-controlled-goods/",
+        "monitored_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/list-of-controlled-goods/",
+        "attempts": [
+          {
+            "url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/list-of-controlled-goods/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.consumerproductsafety.gov.sg/suppliers/cpsr/list-of-controlled-goods/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -661,7 +970,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.consumerproductsafety.gov.sg/suppliers/cgsr/",
+        "monitored_url": "https://www.consumerproductsafety.gov.sg/suppliers/cgsr/",
+        "attempts": [
+          {
+            "url": "https://www.consumerproductsafety.gov.sg/suppliers/cgsr/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.consumerproductsafety.gov.sg/suppliers/cgsr/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -682,7 +1002,18 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.csa.gov.sg/our-programmes/certification-and-labelling-schemes/cybersecurity-labelling-scheme/about/",
+        "monitored_url": "https://www.csa.gov.sg/our-programmes/certification-and-labelling-schemes/cybersecurity-labelling-scheme/about/",
+        "attempts": [
+          {
+            "url": "https://www.csa.gov.sg/our-programmes/certification-and-labelling-schemes/cybersecurity-labelling-scheme/about/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.csa.gov.sg/our-programmes/certification-and-labelling-schemes/cybersecurity-labelling-scheme/about/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -703,7 +1034,24 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Legislation-and-Guidelines/FINAL-Advisory-Guidelines-on-PDPA-for-Selected-Topics-31-August-2018.pdf",
+        "monitored_url": "https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Legislation-and-Guidelines/FINAL-Advisory-Guidelines-on-PDPA-for-Selected-Topics-31-August-2018.pdf",
+        "attempts": [
+          {
+            "url": "https://www.pdpc.gov.sg/guidelines-and-consultation/2020/02/advisory-guidelines-on-the-personal-data-protection-act-for-selected-topics",
+            "status": "http_error",
+            "http_status": 404,
+            "final_url": "https://www.pdpc.gov.sg/guidelines-and-consultation/2020/02/advisory-guidelines-on-the-personal-data-protection-act-for-selected-topics"
+          },
+          {
+            "url": "https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Legislation-and-Guidelines/FINAL-Advisory-Guidelines-on-PDPA-for-Selected-Topics-31-August-2018.pdf",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Legislation-and-Guidelines/FINAL-Advisory-Guidelines-on-PDPA-for-Selected-Topics-31-August-2018.pdf"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -724,7 +1072,24 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-on-the-pdpa-for-children%27s-personal-data-in-the-digital-environment_mar24.pdf",
+        "monitored_url": "https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-on-the-pdpa-for-children%27s-personal-data-in-the-digital-environment_mar24.pdf",
+        "attempts": [
+          {
+            "url": "https://www.pdpc.gov.sg/guidelines-and-consultation/2024/03/advisory-guidelines-on-the-pdpa-for-childrens-personal-data-in-the-digital-environment",
+            "status": "http_error",
+            "http_status": 404,
+            "final_url": "https://www.pdpc.gov.sg/guidelines-and-consultation/2024/03/advisory-guidelines-on-the-pdpa-for-childrens-personal-data-in-the-digital-environment"
+          },
+          {
+            "url": "https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-on-the-pdpa-for-children%27s-personal-data-in-the-digital-environment_mar24.pdf",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-on-the-pdpa-for-children%27s-personal-data-in-the-digital-environment_mar24.pdf"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -745,7 +1110,16 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "url": "https://www.acma.gov.au/step-1-check-rules-follow",
+        "status": "unreachable",
+        "error": "network_error",
+        "attempts": [
+          {
+            "url": "https://www.acma.gov.au/step-1-check-rules-follow",
+            "status": "unreachable",
+            "error": "network_error"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -758,7 +1132,9 @@
           "current_capture_required"
         ]
       },
-      "alerts": []
+      "alerts": [
+        "source_probe_degraded"
+      ]
     },
     {
       "id": "auResponsibleSupplier",
@@ -770,7 +1146,16 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "url": "https://www.acma.gov.au/step-4-register-responsible-supplier",
+        "status": "unreachable",
+        "error": "network_error",
+        "attempts": [
+          {
+            "url": "https://www.acma.gov.au/step-4-register-responsible-supplier",
+            "status": "unreachable",
+            "error": "network_error"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -783,7 +1168,9 @@
           "current_capture_required"
         ]
       },
-      "alerts": []
+      "alerts": [
+        "source_probe_degraded"
+      ]
     },
     {
       "id": "auRcm",
@@ -795,7 +1182,16 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "url": "https://www.acma.gov.au/step-5-label-your-product",
+        "status": "unreachable",
+        "error": "network_error",
+        "attempts": [
+          {
+            "url": "https://www.acma.gov.au/step-5-label-your-product",
+            "status": "unreachable",
+            "error": "network_error"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -808,7 +1204,9 @@
           "current_capture_required"
         ]
       },
-      "alerts": []
+      "alerts": [
+        "source_probe_degraded"
+      ]
     },
     {
       "id": "auEess",
@@ -820,7 +1218,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.eess.gov.au/equipment/selling-electrical-equipment-in-australia/steps-for-compliance-with-eess/",
+        "monitored_url": "https://www.eess.gov.au/equipment/selling-electrical-equipment-in-australia/steps-for-compliance-with-eess/",
+        "attempts": [
+          {
+            "url": "https://www.eess.gov.au/equipment/selling-electrical-equipment-in-australia/steps-for-compliance-with-eess/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.eess.gov.au/equipment/selling-electrical-equipment-in-australia/steps-for-compliance-with-eess/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -843,7 +1252,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.productsafety.gov.au/business/search-mandatory-standards",
+        "monitored_url": "https://www.productsafety.gov.au/business/search-mandatory-standards",
+        "attempts": [
+          {
+            "url": "https://www.productsafety.gov.au/business/search-mandatory-standards",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.productsafety.gov.au/business/search-mandatory-standards"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -867,7 +1287,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "access_blocked",
+        "http_status": 403,
+        "final_url": "https://www.productsafety.gov.au/business/search-mandatory-standards/button-and-coin-batteries-mandatory-standards/button-and-coin-batteries-mandatory-safety-standard",
+        "monitored_url": "https://www.productsafety.gov.au/business/search-mandatory-standards/button-and-coin-batteries-mandatory-standards/button-and-coin-batteries-mandatory-safety-standard",
+        "attempts": [
+          {
+            "url": "https://www.productsafety.gov.au/business/search-mandatory-standards/button-and-coin-batteries-mandatory-standards/button-and-coin-batteries-mandatory-safety-standard",
+            "status": "access_blocked",
+            "http_status": 403,
+            "final_url": "https://www.productsafety.gov.au/business/search-mandatory-standards/button-and-coin-batteries-mandatory-standards/button-and-coin-batteries-mandatory-safety-standard"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -891,7 +1322,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
+        "monitored_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
+        "attempts": [
+          {
+            "url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -916,7 +1358,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/importing/cost-of-importing-goods/gst-and-other-taxes",
+        "monitored_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/importing/cost-of-importing-goods/gst-and-other-taxes",
+        "attempts": [
+          {
+            "url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/importing/cost-of-importing-goods/gst-and-other-taxes",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.abf.gov.au/importing-exporting-and-manufacturing/importing/cost-of-importing-goods/gst-and-other-taxes"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -941,7 +1394,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step1-meet-standards",
+        "monitored_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step1-meet-standards",
+        "attempts": [
+          {
+            "url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step1-meet-standards",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step1-meet-standards"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -964,7 +1428,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step3-product-testing",
+        "monitored_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step3-product-testing",
+        "attempts": [
+          {
+            "url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step3-product-testing",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step3-product-testing"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -987,7 +1462,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-4",
+        "monitored_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-4",
+        "attempts": [
+          {
+            "url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-4",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-4"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1010,7 +1496,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-6",
+        "monitored_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-6",
+        "attempts": [
+          {
+            "url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-6",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-6"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1033,7 +1530,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-7",
+        "monitored_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-7",
+        "attempts": [
+          {
+            "url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-7",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.rsm.govt.nz/business-individuals/supplier-compliance/steps/step-7"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1056,7 +1564,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/",
+        "monitored_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/",
+        "attempts": [
+          {
+            "url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1079,7 +1598,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/high-and-medium-risk-products/",
+        "monitored_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/high-and-medium-risk-products/",
+        "attempts": [
+          {
+            "url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/high-and-medium-risk-products/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/high-and-medium-risk-products/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1102,7 +1632,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.consumerprotection.govt.nz/guidance-for-businesses/complying-with-consumer-laws/understanding-product-safety",
+        "monitored_url": "https://www.consumerprotection.govt.nz/guidance-for-businesses/complying-with-consumer-laws/understanding-product-safety",
+        "attempts": [
+          {
+            "url": "https://www.consumerprotection.govt.nz/guidance-for-businesses/complying-with-consumer-laws/understanding-product-safety",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.consumerprotection.govt.nz/guidance-for-businesses/complying-with-consumer-laws/understanding-product-safety"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1125,7 +1666,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.customs.govt.nz/business/tariffs/tariff-classifications-and-rates",
+        "monitored_url": "https://www.customs.govt.nz/business/tariffs/tariff-classifications-and-rates",
+        "attempts": [
+          {
+            "url": "https://www.customs.govt.nz/business/tariffs/tariff-classifications-and-rates",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.customs.govt.nz/business/tariffs/tariff-classifications-and-rates"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1148,7 +1700,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.customs.govt.nz/sending-and-receiving/duty-and-gst",
+        "monitored_url": "https://www.customs.govt.nz/sending-and-receiving/duty-and-gst",
+        "attempts": [
+          {
+            "url": "https://www.customs.govt.nz/sending-and-receiving/duty-and-gst",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.customs.govt.nz/sending-and-receiving/duty-and-gst"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1171,7 +1734,18 @@
       "review_interval_days": 180,
       "next_review_at": "2027-02-27",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/international-electrical-mras/",
+        "monitored_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/international-electrical-mras/",
+        "attempts": [
+          {
+            "url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/international-electrical-mras/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.worksafe.govt.nz/topic-and-industry/electricity/appliances-and-fittings/core-requirements/international-electrical-mras/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",
@@ -1194,7 +1768,18 @@
       "review_interval_days": 270,
       "next_review_at": "2027-05-28",
       "link": {
-        "status": "not_probed"
+        "status": "reachable",
+        "http_status": 200,
+        "final_url": "https://www.aviation.govt.nz/safety/safety-education-and-advice/transporting-dangerous-goods/",
+        "monitored_url": "https://www.aviation.govt.nz/safety/safety-education-and-advice/transporting-dangerous-goods/",
+        "attempts": [
+          {
+            "url": "https://www.aviation.govt.nz/safety/safety-education-and-advice/transporting-dangerous-goods/",
+            "status": "reachable",
+            "http_status": 200,
+            "final_url": "https://www.aviation.govt.nz/safety/safety-education-and-advice/transporting-dangerous-goods/"
+          }
+        ]
       },
       "automation_readiness": {
         "policy_mode": "automatic",

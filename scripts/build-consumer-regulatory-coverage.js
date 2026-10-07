@@ -34,6 +34,30 @@ function buildAttributeScenarioAudit(products) {
     return { scenario_count: ATTRIBUTE_SCENARIOS.length, matrix_cell_count: rows.length, issue_count: rows.reduce((sum, row) => sum + row.issues.length, 0), issues: rows.filter(row => row.issues.length) };
 }
 
+function buildRemediationQueue(cells) {
+    const grouped = new Map();
+    cells.forEach((cell) => cell.issues.forEach((issue) => {
+        const key = `${cell.market}:${issue}`;
+        const current = grouped.get(key) || {
+            market: cell.market,
+            issue,
+            product_ids: [],
+            affected_cell_count: 0,
+            next_action: issue.startsWith('unsourced_requirement:')
+                ? 'Add a maintained official source before deepening the conclusion.'
+                : issue.startsWith('last_good_source:')
+                    ? 'Restore automated official capture or complete the scheduled manual source review.'
+                    : 'Keep the result explicitly limited until product-specific official evidence is maintained.'
+        };
+        current.product_ids.push(cell.product_id);
+        current.affected_cell_count += 1;
+        grouped.set(key, current);
+    }));
+    return Array.from(grouped.values())
+        .map((row) => ({ ...row, product_ids: Array.from(new Set(row.product_ids)).sort() }))
+        .sort((a, b) => a.market.localeCompare(b.market) || a.issue.localeCompare(b.issue));
+}
+
 function buildReport() {
     const snapshotPayload = fs.existsSync(SNAPSHOTS) ? JSON.parse(fs.readFileSync(SNAPSHOTS, 'utf8')) : { sources: [] };
     const sourceStatus = Object.fromEntries((snapshotPayload.sources || []).map((source) => [source.id, source.status]));
@@ -105,12 +129,7 @@ function buildReport() {
                 limited_cells: rows.filter((cell) => cell.coverage === 'limited').length
             }];
         })),
-        remediation_queue: cells.filter((cell) => cell.issues.length).map((cell) => ({
-            product_id: cell.product_id, market: cell.market, issues: cell.issues,
-            next_action: cell.unsourced_requirements.length ? 'Add a maintained official source before deepening the conclusion.'
-                : cell.degraded_source_ids.length ? 'Restore automated official capture or complete the scheduled manual source review.'
-                    : 'Keep the result explicitly limited until product-specific official evidence is maintained.'
-        })),
+        remediation_queue: buildRemediationQueue(cells),
         attribute_scenario_audit: buildAttributeScenarioAudit(products),
         cells
     };
@@ -121,4 +140,4 @@ if (require.main === module) {
     console.log(`Wrote ${path.relative(ROOT, OUTPUT)}`);
 }
 
-module.exports = { ATTRIBUTE_SCENARIOS, buildAttributeScenarioAudit, buildReport };
+module.exports = { ATTRIBUTE_SCENARIOS, buildAttributeScenarioAudit, buildRemediationQueue, buildReport };

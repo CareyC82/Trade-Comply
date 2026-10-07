@@ -84,7 +84,10 @@ async function auditSources({ now = new Date(), probe = null, snapshots = null }
         else if (nextReviewMs < nowMs) alerts.push('review_overdue');
         if (!source.confidence) alerts.push('confidence_missing');
         if (/pending/i.test(source.confidence || '')) alerts.push('effective_date_pending');
-        if (['unreachable', 'http_error'].includes(link.status)) alerts.push('source_link_failed');
+        // A conclusive HTTP failure is different from a runner that cannot reach the
+        // authority. Network errors/timeouts must not be presented as broken links.
+        if (link.status === 'http_error') alerts.push('source_link_failed');
+        if (link.status === 'unreachable') alerts.push('source_probe_degraded');
         rows.push({
             id,
             authority: source.authority,
@@ -102,7 +105,7 @@ async function auditSources({ now = new Date(), probe = null, snapshots = null }
     const probeEnvironmentUnavailable = Boolean(probe) && rows.length > 0
         && rows.every((row) => row.link.status === 'unreachable' && ['network_error', 'timeout'].includes(row.link.error));
     if (probeEnvironmentUnavailable) rows.forEach((row) => {
-        row.alerts = row.alerts.filter((alert) => alert !== 'source_link_failed');
+        row.alerts = row.alerts.filter((alert) => alert !== 'source_probe_degraded');
         row.link.status = 'probe_unavailable';
     });
     return {
@@ -114,6 +117,7 @@ async function auditSources({ now = new Date(), probe = null, snapshots = null }
         source_count: rows.length,
         alert_count: rows.filter((row) => row.alerts.length).length,
         failed_link_count: rows.filter((row) => row.alerts.includes('source_link_failed')).length,
+        probe_degraded_count: rows.filter((row) => row.alerts.includes('source_probe_degraded')).length,
         automatic_monitoring_ready_count: rows.filter((row) => row.automation_readiness.eligible_for_automatic_monitoring).length,
         automatic_monitoring_blocked_count: rows.filter((row) => !row.automation_readiness.eligible_for_automatic_monitoring).length,
         sources: rows

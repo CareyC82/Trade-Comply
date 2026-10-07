@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-05T10:44:32.066Z",
+  "generated_at": "2026-10-07T03:09:44.971Z",
   "ok": true,
   "source_control": {
     "source_count": 52,
@@ -18,7 +18,7 @@
         "official_url": "https://apps.fcc.gov/oetcf/kdb/index.cfm",
         "manual_reviewed_at": "2026-09-07",
         "manual_review_due_at": "2026-10-07",
-        "manual_review_current": true,
+        "manual_review_current": false,
         "evidence_boundary": "Manual review confirms the official guidance index was checked; it does not verify any product or FCC ID.",
         "next_action": "Retry FCC headlines and the official OET KDB fallback; keep the source optional when FCC blocks automated access."
       },
@@ -42,8 +42,8 @@
     "global_transport_health": {
       "freshness": {
         "timestamp": "2026-10-04T21:01:16.895Z",
-        "age_days": 0.57,
-        "current": true,
+        "age_days": 2.26,
+        "current": false,
         "max_age_days": 2
       },
       "source_count": 22,
@@ -57,8 +57,8 @@
     },
     "automation_launch_freshness": {
       "timestamp": "2026-10-04T21:41:26.044Z",
-      "age_days": 0.54,
-      "current": true,
+      "age_days": 2.23,
+      "current": false,
       "max_age_days": 2
     }
   },
@@ -72,10 +72,11 @@
   },
   "reviewed_change_pipeline": {
     "status_counts": {
-      "superseded": 38,
+      "superseded": 41,
       "baseline_captured": 27,
-      "capture_recovered": 2,
-      "pending_review": 12
+      "capture_recovered": 1,
+      "pending_review": 10,
+      "rule_published": 1
     },
     "automatic_rule_publication": false,
     "required_release_states": [

@@ -37,11 +37,23 @@ test('an unavailable probe environment is not reported as thirty-two broken offi
     assert.ok(report.sources.every((source) => source.link.status === 'probe_unavailable'));
 });
 
-test('regulatory source audit exposes failed links without leaking network errors', async () => {
+test('regulatory source audit separates inconclusive network probes from failed links', async () => {
     const report = await auditSources({
         now: new Date('2026-08-21T00:00:00Z'),
         probe: async (url) => url.includes('fcc.gov')
             ? { status: 'unreachable', error: 'network_error' }
+            : { status: 'reachable', http_status: 200, final_url: url }
+    });
+    assert.equal(report.failed_link_count, 0);
+    assert.ok(report.probe_degraded_count > 0);
+    assert.ok(report.sources.filter((source) => source.url.includes('fcc.gov')).every((source) => source.alerts.includes('source_probe_degraded')));
+});
+
+test('regulatory source audit reports conclusive HTTP failures as failed links', async () => {
+    const report = await auditSources({
+        now: new Date('2026-08-21T00:00:00Z'),
+        probe: async (url) => url.includes('fcc.gov')
+            ? { status: 'http_error', http_status: 404, final_url: url }
             : { status: 'reachable', http_status: 200, final_url: url }
     });
     assert.ok(report.failed_link_count > 0);

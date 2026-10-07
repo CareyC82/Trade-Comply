@@ -73,3 +73,19 @@ test('rule publication requires approved evidence, passing test digest and revie
     assert.equal(published.change.auto_apply, false);
     assert.equal(JSON.parse(fs.readFileSync(auditFile)).events.length, 3);
 });
+
+test('review actions target the newest active occurrence instead of superseded history', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'reg-review-history-'));
+    const changesFile = path.join(dir, 'changes.json');
+    const auditFile = path.join(dir, 'audit.json');
+    const base = { id: 'jpRadio', type: 'content_changed', auto_apply: false };
+    const payload = { schema_version: 1, pending_review_count: 1, changes: [
+        { ...base, review_status: 'superseded', detected_at: '2026-08-22T00:00:00Z' },
+        { ...base, review_status: 'pending_review', detected_at: '2026-08-23T00:00:00Z' }
+    ] };
+    fs.writeFileSync(changesFile, JSON.stringify(payload));
+    const result = reviewChange({ changesFile, auditFile, id: 'jpRadio', type: 'content_changed', action: 'approve_evidence' });
+    assert.equal(result.payload.changes[0].review_status, 'superseded');
+    assert.equal(result.payload.changes[1].review_status, 'evidence_approved');
+    fs.rmSync(dir, { recursive: true, force: true });
+});

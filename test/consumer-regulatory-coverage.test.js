@@ -10,6 +10,8 @@ test('regulatory coverage report spans thirty products and six markets', () => {
     assert.equal(report.product_count, 30);
     assert.equal(report.matrix_cell_count, 180);
     assert.ok(Array.isArray(report.remediation_queue));
+    assert.equal(new Set(report.remediation_queue.map((row) => `${row.market}:${row.issue}`)).size, report.remediation_queue.length);
+    assert.ok(report.remediation_queue.every((row) => Array.isArray(row.product_ids) && row.product_ids.length === row.affected_cell_count));
     assert.ok(Object.values(report.market_summary).every((market) => Number.isInteger(market.cells_using_last_good_sources)));
     assert.ok(report.cells.every((cell) => Array.isArray(cell.material_attribute_gaps) && Array.isArray(cell.issues)));
     assert.deepEqual(report.markets, ['US', 'EU', 'JP', 'SG', 'AU', 'NZ']);
