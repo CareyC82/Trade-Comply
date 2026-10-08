@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-06T22:28:41.711Z",
+  "updated_at": "2026-10-07T22:52:47.028Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -1550,6 +1550,56 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-10-06T22:28:37.336983+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-10-07T22:52:47.028Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, optics, and related components to the US market, this reduces some licensing friction but does not remove core obligations: items remain subject to the US export control system, and re-export of US-origin firearms technology or parts to third countries still requires authorization. Exporters must align 10-digit HTS codes, screen against the Entity List and restricted party lists, and maintain end-user/end-use documentation. Section 301 tariffs on many firearms-related HTS lines remain in force, so landed-cost modeling must include additional duties. Note that China's own export controls on certain dual-use items and firearms-related technologies may also apply.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、光学器件及相关部件的中国出口商而言，这减少了一部分许可摩擦，但并未免除核心义务：相关物项仍受美国出口管制体系约束，向第三国再出口美国原产枪支技术或部件仍需授权。出口商必须对齐10位HTS编码，对照实体清单和受限方名单进行筛查，并保留最终用户/最终用途证明文件。许多枪支相关HTS税号仍受301关税约束，因此到岸成本测算必须计入附加关税。同时需注意，中国自身对部分两用物项及枪支相关技术的出口管制也可能适用。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "HTS 10位编码与ECCN归类",
+            "desc": "确认枪支、弹药、光学及零部件的10位HTS编码，并核对BIS出口管制分类号（ECCN），判断是否属于EAR99或受控类别，评估许可例外适用性。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "实体清单与受限方筛查",
+            "desc": "对美方进口商、最终用户及中间商进行BIS实体清单、SDN名单及拒绝人员名单筛查，留存筛查记录与最终用户声明。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "Section 301关税与到岸成本核算",
+            "desc": "将HTS编码对照301关税清单，计算附加关税及原产地规则影响，更新报价与合同中的关税承担条款。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "出口许可与再出口条款审查",
+            "desc": "核查美国原产部件或技术的再出口限制，在合同中加入再出口合规条款，避免违规转运至受制裁国家。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "中国出口管制合规自查",
+            "desc": "对照中国两用物项出口管制清单及枪支管理法规，确认是否需要办理出口许可或进行最终用户/最终用途申报。"
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-10-07T22:52:43.021079+00:00"
       }
     }
   ]
