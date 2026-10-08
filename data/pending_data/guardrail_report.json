@@ -1,5 +1,5 @@
 {
-  "pipeline_run": "2026-10-07T22:52:46.903256+00:00",
+  "pipeline_run": "2026-10-08T23:04:23.587105+00:00",
   "passed_count": 6,
   "intercepted_count": 1,
   "intercepted": [
@@ -14,38 +14,43 @@
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, optics, and related components to the US market, this reduces some licensing friction but does not remove core obligations: items remain subject to the US export control system, and re-export of US-origin firearms technology or parts to third countries still requires authorization. Exporters must align 10-digit HTS codes, screen against the Entity List and restricted party lists, and maintain end-user/end-use documentation. Section 301 tariffs on many firearms-related HTS lines remain in force, so landed-cost modeling must include additional duties. Note that China's own export controls on certain dual-use items and firearms-related technologies may also apply.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、光学器件及相关部件的中国出口商而言，这减少了一部分许可摩擦，但并未免除核心义务：相关物项仍受美国出口管制体系约束，向第三国再出口美国原产枪支技术或部件仍需授权。出口商必须对齐10位HTS编码，对照实体清单和受限方名单进行筛查，并保留最终用户/最终用途证明文件。许多枪支相关HTS税号仍受301关税约束，因此到岸成本测算必须计入附加关税。同时需注意，中国自身对部分两用物项及枪支相关技术的出口管制也可能适用。",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, optics, and related components to the US market, this reduces certain licensing burdens but does not remove core obligations: items remain subject to the US HTS alignment, Section 301 tariff exposure, and BIS export control screening. Exporters must still verify end-use/end-user, screen against the Entity List and denied party lists, and confirm whether items fall under ITAR (USML) versus EAR (CCL) jurisdiction. Civilian firearms and parts may still require a BIS license depending on destination, end-user, and item classification. China-side export controls on firearms and related technology also apply, and dual-use or military-end-use diversion is a red line. Maintain full documentation of classification, origin, and value build-up to manage tariff and control risk.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、光学器件及相关部件的中国出口商而言，这减少了部分许可负担，但并未免除核心义务：相关物项仍受美国HTS归类、301条款关税风险及BIS出口管制筛查约束。出口商仍须核实最终用途/最终用户，对照实体清单和被拒绝方名单进行筛查，并确认物项属于ITAR（USML）还是EAR（CCL）管辖。民用枪支及零部件仍可能因目的地、最终用户和物项分类而需要BIS许可。中国方面对枪支及相关技术的出口管制同样适用，军民两用或军事最终用途转移属于红线。应完整保存归类、原产地和价值构成文件，以管理关税和管制风险。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "HTS 10位编码与ECCN归类",
-            "desc": "确认枪支、弹药、光学及零部件的10位HTS编码，并核对BIS出口管制分类号（ECCN），判断是否属于EAR99或受控类别，评估许可例外适用性。"
+            "task": "物项归类与管辖判定",
+            "desc": "确认枪支、弹药、光学及零部件在USML（ITAR）与CCL（EAR）下的归类，核对ECCN及许可例外适用性，避免错误申报。"
           },
           {
             "phase": "技术核查",
-            "task": "实体清单与受限方筛查",
-            "desc": "对美方进口商、最终用户及中间商进行BIS实体清单、SDN名单及拒绝人员名单筛查，留存筛查记录与最终用户声明。"
+            "task": "BIS实体清单与最终用户筛查",
+            "desc": "对美方进口商、分销商及最终用户进行实体清单、被拒绝方和被制裁方筛查，留存最终用途/最终用户声明。"
           },
           {
             "phase": "单证准备",
-            "task": "Section 301关税与到岸成本核算",
-            "desc": "将HTS编码对照301关税清单，计算附加关税及原产地规则影响，更新报价与合同中的关税承担条款。"
+            "task": "HTS与301条款关税映射",
+            "desc": "将产品映射至10位HTS编码，核对301条款清单及附加关税，记录原产地和价值构成以应对关税核查。"
           },
           {
             "phase": "单证准备",
-            "task": "出口许可与再出口条款审查",
-            "desc": "核查美国原产部件或技术的再出口限制，在合同中加入再出口合规条款，避免违规转运至受制裁国家。"
+            "task": "出口许可与报关单证包",
+            "desc": "准备商业发票、装箱单、原产地证、许可或例外证明及报关委托书，确保单证与归类一致。"
           },
           {
             "phase": "环保注册",
-            "task": "中国出口管制合规自查",
-            "desc": "对照中国两用物项出口管制清单及枪支管理法规，确认是否需要办理出口许可或进行最终用户/最终用途申报。"
+            "task": "中国出口管制合规核查",
+            "desc": "核查中国两用物项出口管制清单及军品出口管理要求，确认是否需向商务部申请出口许可。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "FCC及产品合规确认",
+            "desc": "如含无线或电子部件，确认FCC Part 15/18认证及供应商FCC ID，避免美国市场准入障碍。"
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-10-07T22:52:43.021079+00:00"
+        "fetched_at": "2026-10-08T23:04:19.342970+00:00"
       }
     }
   ]
