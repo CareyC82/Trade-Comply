@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can I Pay / Get Paid? | TraceWize</title>
+    <link rel="stylesheet" href="css/style.css?v=20261009-payment-readiness">
+</head>
+<body class="payment-readiness-page-body">
+    <main class="payment-readiness-page view-container active">
+        <header class="payment-readiness-hero">
+            <span class="sell-check-eyebrow">Free structured pre-screen</span>
+            <h1 class="home-title sell-check-page-title">💳 Can I Pay / Get Paid?</h1>
+            <p>Check whether one cross-border transaction and payment route are ready for bank submission before money moves.</p>
+            <div class="payment-boundary"><strong>Preliminary screening only.</strong> TraceWize is not a payment provider, does not hold or transmit funds, and does not provide legal, banking or financial advice. This result does not replace bank KYC/AML, sanctions, export-control or professional review and does not guarantee payment processing. Entries remain in this browser page and are cleared on reload.</div>
+        </header>
+
+        <form id="payment-readiness-form" class="sell-check-form" novalidate>
+            <section class="sell-check-card">
+                <div class="sell-check-section-head"><span>1</span><div><h2>Transaction parties</h2><p>Use legal or account names. Do not enter identity-document numbers or bank-account numbers.</p></div></div>
+                <div class="payment-grid">
+                    <label class="sell-check-field"><span>Buyer legal name</span><input name="buyer" required autocomplete="organization"></label>
+                    <label class="sell-check-field"><span>Buyer country</span><input name="buyerCountry" required placeholder="e.g. United States"></label>
+                    <label class="sell-check-field"><span>Seller legal name</span><input name="seller" required autocomplete="organization"></label>
+                    <label class="sell-check-field"><span>Seller country</span><input name="sellerCountry" required placeholder="e.g. China"></label>
+                    <label class="sell-check-field"><span>Payer legal/account name</span><input name="payer" required></label>
+                    <label class="sell-check-field"><span>Payer country</span><input name="payerCountry" required></label>
+                    <label class="sell-check-field"><span>Payee legal/account name</span><input name="payee" required></label>
+                    <label class="sell-check-field"><span>Payee country</span><input name="payeeCountry" required></label>
+                </div>
+                <fieldset class="payment-options"><legend>Additional relationships</legend>
+                    <label><input type="checkbox" name="agent"> Agent or intermediary</label>
+                    <label><input type="checkbox" name="relatedParty"> Related company</label>
+                    <label><input type="checkbox" name="thirdPartyPayment"> Third-party payer or payee</label>
+                </fieldset>
+            </section>
+
+            <section class="sell-check-card">
+                <div class="sell-check-section-head"><span>2</span><div><h2>Goods, route and payment</h2><p>Specific descriptions support screening. Do not use “parts”, “samples” or “electronics” alone.</p></div></div>
+                <label class="sell-check-field sell-check-field--wide"><span>Goods description</span><textarea name="goods" required placeholder="e.g. 500 model TW-65W USB-C GaN chargers for retail sale"></textarea></label>
+                <label class="sell-check-field sell-check-field--wide"><span>End user and intended use</span><textarea name="use" required placeholder="Who will use the goods and for what purpose?"></textarea></label>
+                <div class="payment-grid">
+                    <label class="sell-check-field"><span>Origin country</span><input name="origin" required></label>
+                    <label class="sell-check-field"><span>Destination country</span><input name="destination" required></label>
+                    <label class="sell-check-field"><span>Transit country (optional)</span><input name="transit"></label>
+                    <label class="sell-check-field"><span>Incoterm</span><select name="incoterm" required><option value="">Select</option><option>EXW</option><option>FCA</option><option>FOB</option><option>CFR</option><option>CIF</option><option>CPT</option><option>CIP</option><option>DAP</option><option>DPU</option><option>DDP</option></select></label>
+                    <label class="sell-check-field"><span>Amount</span><input name="amount" type="number" min="0.01" step="0.01" required></label>
+                    <label class="sell-check-field"><span>Currency</span><select name="currency" required><option value="">Select</option><option>USD</option><option>EUR</option><option>CNY</option><option>GBP</option><option>AUD</option><option>NZD</option><option>JPY</option><option>SGD</option><option>Other</option></select></label>
+                    <label class="sell-check-field"><span>Payment method</span><select name="paymentMethod" required><option value="">Select</option><option>Bank transfer / T/T</option><option>Letter of credit</option><option>Documentary collection</option><option>Card / approved platform</option><option>Other</option></select></label>
+                </div>
+            </section>
+
+            <section class="sell-check-card">
+                <div class="sell-check-section-head"><span>3</span><div><h2>Document consistency</h2><p>No files are uploaded or stored. Compare the documents you hold and select the current status.</p></div></div>
+                <div id="payment-document-checks" class="payment-check-grid"></div>
+            </section>
+
+            <section class="sell-check-card">
+                <div class="sell-check-section-head"><span>4</span><div><h2>Payment and compliance signals</h2><p>Select only observed facts. A similar name is not a confirmed sanctions match.</p></div></div>
+                <div id="payment-red-flags" class="payment-flag-grid"></div>
+                <button class="sell-check-primary" type="submit">Show payment readiness result</button>
+                <div id="payment-readiness-error" class="post-entry-error" hidden role="alert"></div>
+            </section>
+        </form>
+
+        <section id="payment-readiness-result" class="sell-check-result" hidden aria-live="polite"></section>
+    </main>
+    <nav class="bottom-nav bottom-nav--dock" aria-label="Main navigation">
+        <a id="nav-home" class="nav-btn nav-btn-link" href="index.html">🏠 Home</a>
+        <a id="nav-can-i-sell-it" class="nav-btn nav-btn-link" href="can-i-sell-it.html">🛍️ Can I Sell It?</a>
+        <span id="nav-can-i-pay" class="nav-btn active" aria-current="page">💳 Can I Pay / Get Paid?</span>
+    </nav>
+    <script src="lib/payment-readiness.js?v=20261009"></script>
+    <script src="js/payment-readiness-page.js?v=20261009"></script>
+</body>
+</html>
