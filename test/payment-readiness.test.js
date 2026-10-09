@@ -52,6 +52,7 @@ test('payment page is local-only, accessible and explicit about boundaries', () 
     assert.match(html, /role="alert"/);
     assert.match(script, /mailto:carey@tracewize\.com/);
     assert.doesNotMatch(script, /fetch\s*\(/);
+    assert.doesNotMatch(script, /value === 'unknown' \? 'checked'/);
     assert.doesNotMatch(script, /`Goods:\s*\$\{facts\.goods/);
     assert.doesNotMatch(script, /`Amount:\s*\$\{facts\.currency/);
 });

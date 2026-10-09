@@ -24,7 +24,7 @@
         potentialRestrictedParty: 'A name resembles a restricted party and needs human confirmation',
         controlledGoodsConcern: 'Goods may require export-control or sanctions review'
     };
-    documentNode.innerHTML = Object.entries(documentChecks).map(([key, label]) => `<fieldset><legend>${escapeHtml(label)}</legend>${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="doc:${key}" value="${value}" ${value === 'unknown' ? 'checked' : ''}>${value === 'yes' ? 'Matches' : value === 'no' ? 'Mismatch' : 'Not checked'}</label>`).join('')}</fieldset>`).join('');
+    documentNode.innerHTML = Object.entries(documentChecks).map(([key, label]) => `<fieldset><legend>${escapeHtml(label)}</legend>${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="doc:${key}" value="${value}">${value === 'yes' ? 'Matches' : value === 'no' ? 'Mismatch' : 'Not checked'}</label>`).join('')}</fieldset>`).join('');
     flagsNode.innerHTML = Object.entries(redFlags).map(([key, label]) => `<label><input type="checkbox" name="flag:${key}"><span>${escapeHtml(label)}</span></label>`).join('');
 
     function data() {
