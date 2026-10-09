@@ -759,6 +759,7 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
         japanOfficialFetcher: failingOfficialFetcher,
         koreaOfficialFetcher: failingOfficialFetcher,
         indiaOfficialFetcher: failingOfficialFetcher,
+        staticOfficialFetcher: failingOfficialFetcher,
         skipStaticOfficialProbe: true
     });
     const japanRun = payload.runs.find(run => run.source === 'Japan Customs official-live');
