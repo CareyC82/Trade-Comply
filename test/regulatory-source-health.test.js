@@ -2,14 +2,14 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { auditSources, automationReadiness, cadenceDays, probeSource } = require('../scripts/audit-regulatory-source-health');
+const { auditSources, automationReadiness, cadenceDays, probeUrl, probeSource } = require('../scripts/audit-regulatory-source-health');
 const models = require('../lib/wearable-product-models');
 
 test('access-restricted official sources retain a current, time-bounded manual fallback', () => {
     const ids = [
         'fccExposure', 'usElectrical', 'redCyber', 'gdpr', 'battery',
         'jpRadio', 'jpPse', 'jpOnlineSeller', 'jpPseProducts', 'jpProductSafety',
-        'auAcma', 'auResponsibleSupplier', 'auRcm', 'auProductSafety',
+        'auAcma', 'auRcm', 'auProductSafety',
         'auButtonBattery', 'auAbfTariff', 'auAbfGst'
     ];
     ids.forEach((id) => {
@@ -17,6 +17,13 @@ test('access-restricted official sources retain a current, time-bounded manual f
         assert.ok(['last_good_manual_review', 'automatic_with_manual_fallback'].includes(source.monitorPolicy?.mode), id);
         assert.equal(source.monitorPolicy.reviewEveryDays, 30, id);
         assert.equal(source.reviewedAt, '2026-10-07', id);
+    });
+    ['auResponsibleSupplier', 'nzLithiumTransport'].forEach((id) => {
+        const source = models.sources[id];
+        assert.ok(['last_good_manual_review', 'automatic_with_manual_fallback'].includes(source.monitorPolicy?.mode), id);
+        assert.equal(source.monitorPolicy.reviewEveryDays, 30, id);
+        assert.equal(source.reviewedAt, '2026-10-09', id);
+        assert.ok(source.monitorUrls.length > 0, id);
     });
 });
 
@@ -90,4 +97,21 @@ test('source health accepts a reachable official fallback while retaining the pr
     assert.equal(link.status, 'reachable');
     assert.equal(link.monitored_url, 'https://authority.example/current.pdf');
     assert.equal(link.attempts.length, 2);
+});
+
+test('live probe retries with GET when an authority rejects HEAD at the network layer', async () => {
+    const originalFetch = global.fetch;
+    const methods = [];
+    global.fetch = async (_url, options) => {
+        methods.push(options.method);
+        if (options.method === 'HEAD') throw new TypeError('HEAD blocked');
+        return { ok: true, status: 200, url: 'https://authority.example/current' };
+    };
+    try {
+        const result = await probeUrl('https://authority.example/current');
+        assert.equal(result.status, 'reachable');
+        assert.deepEqual(methods, ['HEAD', 'GET']);
+    } finally {
+        global.fetch = originalFetch;
+    }
 });

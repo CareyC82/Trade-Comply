@@ -37,22 +37,42 @@ function automationReadiness(source, snapshot = {}) {
     };
 }
 
-async function probeUrl(url) {
+async function fetchWithTimeout(url, method) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
     try {
-        let response = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
-        if (response.status === 405) response = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
-        const abuseBlocked = /abuse-detection|apology_objects/i.test(response.url || '');
-        const status = response.ok ? 'reachable'
-            : abuseBlocked ? 'access_blocked'
-            : [401, 403, 429].includes(response.status) ? 'access_blocked'
-                : 'http_error';
-        return { status, http_status: response.status, final_url: response.url };
-    } catch (error) {
-        return { status: 'unreachable', error: error.name === 'AbortError' ? 'timeout' : 'network_error' };
+        return await fetch(url, { method, redirect: 'follow', signal: controller.signal });
     } finally {
         clearTimeout(timer);
+    }
+}
+
+function classifyProbeResponse(response) {
+    const abuseBlocked = /abuse-detection|apology_objects/i.test(response.url || '');
+    const status = response.ok ? 'reachable'
+        : abuseBlocked ? 'access_blocked'
+        : [401, 403, 429].includes(response.status) ? 'access_blocked'
+            : 'http_error';
+    return { status, http_status: response.status, final_url: response.url };
+}
+
+async function probeUrl(url) {
+    let headError = null;
+    try {
+        const response = await fetchWithTimeout(url, 'HEAD');
+        if (response.status !== 405) return classifyProbeResponse(response);
+    } catch (error) {
+        headError = error;
+    }
+
+    // A number of official sites reject or stall HEAD while serving ordinary GET
+    // requests. Give GET its own controller and full timeout before degrading the
+    // source; reusing the aborted HEAD signal would make the fallback ineffective.
+    try {
+        return classifyProbeResponse(await fetchWithTimeout(url, 'GET'));
+    } catch (error) {
+        const finalError = error || headError;
+        return { status: 'unreachable', error: finalError?.name === 'AbortError' ? 'timeout' : 'network_error' };
     }
 }
 

@@ -21,12 +21,12 @@ const PUBLIC_LIB_FILES = new Set([
     'actionable-checklist.js', 'can-i-sell-it.js', 'checklist-industry-segment.js', 'checklist.js',
     'country-registry.js', 'deep-link.js', 'enterprise-print-report.js', 'eu-us-special-program.js',
     'hscode-dual.js', 'industry-checklist-baseline.js', 'matched-results.js', 'post-entry-value.js',
-    'pre-screen-report.js', 'product-intelligence.js', 'tariff-watch.js', 'trade-country.js',
+    'payment-readiness.js', 'pre-screen-report.js', 'product-intelligence.js', 'tariff-watch.js', 'trade-country.js',
     'trade-flow.js', 'trade-opportunity.js', 'wearable-product-models.js'
 ]);
 const PUBLIC_ROOT_EXTENSIONS = new Set(['.svg', '.ico', '.png', '.jpg', '.jpeg', '.webp']);
 const PUBLIC_ROOT_FILES = new Set([
-    'can-i-sell-it.html', 'data-center.html', 'electronics.html', 'healthcare-lab.html',
+    'can-i-pay.html', 'can-i-sell-it.html', 'data-center.html', 'electronics.html', 'healthcare-lab.html',
     'hscode.html', 'index.html', 'industrial-automation.html', 'new-energy.html',
     'opportunity.html', 'post-entry-result.html', 'post-entry.html', 'semiconductor.html',
     'tariff-watch.html', 'trade-flow.html', 'us-market.html', 'compliance-feedback-codec.js'

@@ -193,3 +193,65 @@ test('private workspace failure leaves the anonymous assessment usable', async (
     await expect(page.locator('#sell-result')).toContainText(/Preliminary market-access result/i);
     await expect(page.locator('#sell-account-message')).toContainText('Private workspace server is unavailable');
 });
+
+async function completePaymentScreen(page) {
+    await page.goto('/can-i-pay.html');
+    const values = {
+        buyer: 'Example Buyer LLC', buyerCountry: 'US', seller: 'Example Seller Ltd', sellerCountry: 'CN',
+        payer: 'Example Buyer LLC', payerCountry: 'US', payee: 'Example Seller Ltd', payeeCountry: 'CN',
+        goods: '500 model TW-65W USB-C GaN chargers', use: 'Retail sale to general consumers',
+        origin: 'CN', destination: 'US', amount: '25000'
+    };
+    for (const [name, value] of Object.entries(values)) await page.locator(`[name="${name}"]`).fill(value);
+    await page.locator('[name="incoterm"]').selectOption('FOB');
+    await page.locator('[name="currency"]').selectOption('USD');
+    await page.locator('[name="paymentMethod"]').selectOption('Bank transfer / T/T');
+}
+
+test('payment readiness starts with no document answer selected and treats omissions as unknown', async ({ page }) => {
+    await completePaymentScreen(page);
+    await expect(page.locator('#payment-document-checks input:checked')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Show payment readiness result' }).click();
+    await expect(page.locator('#payment-readiness-result')).toContainText('Clarification Required');
+    await expect(page.locator('#payment-readiness-result')).toContainText('not yet checked');
+});
+
+test('payment readiness returns bounded Ready only after explicit consistency answers', async ({ page }) => {
+    await completePaymentScreen(page);
+    for (const key of ['parties', 'amountCurrency', 'goods', 'incoterm', 'route']) {
+        await page.locator(`[name="doc:${key}"][value="yes"]`).check();
+    }
+    await page.getByRole('button', { name: 'Show payment readiness result' }).click();
+    const result = page.locator('#payment-readiness-result');
+    await expect(result).toContainText('Ready');
+    await expect(result).toContainText('not KYC/AML clearance');
+    const href = await page.locator('#payment-open-email').getAttribute('href');
+    const draft = decodeURIComponent(href);
+    expect(draft).not.toContain('Example Buyer LLC');
+    expect(draft).not.toContain('Example Seller Ltd');
+    expect(draft).not.toContain('25000');
+    expect(draft).not.toContain('TW-65W');
+});
+
+test('payment red flags stop the transaction without a bypass recommendation', async ({ page }) => {
+    await completePaymentScreen(page);
+    await page.locator('[name="flag:personalAccount"]').check();
+    await page.getByRole('button', { name: 'Show payment readiness result' }).click();
+    const result = page.locator('#payment-readiness-result');
+    await expect(result).toContainText('Do Not Proceed Until Resolved');
+    await expect(result).toContainText('independently verify');
+    await expect(result).not.toContainText(/alternative account|third-country channel|split the payment/i);
+});
+
+test('payment readiness remains operable without mobile horizontal overflow', async ({ page }, testInfo) => {
+    test.skip(!testInfo.project.name.startsWith('mobile'), 'Mobile-only geometry assertion.');
+    await completePaymentScreen(page);
+    await page.getByRole('button', { name: 'Show payment readiness result' }).click();
+    const geometry = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+        buttonHeight: document.querySelector('.sell-check-primary')?.getBoundingClientRect().height || 0
+    }));
+    expect(geometry.scrollWidth).toBe(geometry.clientWidth);
+    expect(geometry.buttonHeight).toBeGreaterThanOrEqual(40);
+});
