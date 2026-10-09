@@ -7,7 +7,39 @@ const {
     selectExactTariffLine,
     applyExactTariffRows
 } = require('../lib/exact-tariff-lines');
-const { syncExactNationalTariffs } = require('../scripts/update-exact-national-tariffs');
+const {
+    fetchOfficialResponse,
+    syncExactNationalTariffs
+} = require('../scripts/update-exact-national-tariffs');
+
+test('official tariff requests retry transient failures before succeeding', async () => {
+    let calls = 0;
+    const response = await fetchOfficialResponse('https://official.example/tariff', {}, {
+        attempts: 3,
+        retryDelayMs: 0,
+        fetchImpl: async () => {
+            calls += 1;
+            if (calls < 3) throw new TypeError('temporary network failure');
+            return { ok: true, status: 200 };
+        }
+    });
+    assert.equal(response.ok, true);
+    assert.equal(calls, 3);
+});
+
+test('official tariff requests preserve a final HTTP response for source-specific diagnostics', async () => {
+    let calls = 0;
+    const response = await fetchOfficialResponse('https://official.example/tariff', {}, {
+        attempts: 3,
+        retryDelayMs: 0,
+        fetchImpl: async () => {
+            calls += 1;
+            return { ok: false, status: 503 };
+        }
+    });
+    assert.equal(response.status, 503);
+    assert.equal(calls, 3);
+});
 
 test('parses official EU, China, Singapore, Mexico, Australia and New Zealand exact tariff line fields', () => {
     const fixtures = [

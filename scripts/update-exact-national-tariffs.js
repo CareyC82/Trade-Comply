@@ -19,6 +19,40 @@ const FEEDS = {
     AU: 'AU_ABF_EXACT_TARIFF_URL',
     NZ: 'NZ_WORKING_TARIFF_EXACT_URL'
 };
+const REQUEST_TIMEOUT_MS = 90000;
+const REQUEST_ATTEMPTS = 3;
+
+function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchOfficialResponse(url, options = {}, {
+    fetchImpl = global.fetch,
+    timeoutMs = REQUEST_TIMEOUT_MS,
+    attempts = REQUEST_ATTEMPTS,
+    retryDelayMs = 1000
+} = {}) {
+    let lastError;
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+            const response = await fetchImpl(url, {
+                ...options,
+                signal: options.signal || AbortSignal.timeout(timeoutMs)
+            });
+            const retryableStatus = [408, 425, 429].includes(response.status) || response.status >= 500;
+            if (response.ok || !retryableStatus || attempt === attempts) return response;
+            lastError = new Error(`HTTP ${response.status} for ${url}`);
+        } catch (error) {
+            lastError = error;
+            if (attempt === attempts) break;
+        }
+        if (retryDelayMs > 0) await wait(retryDelayMs * attempt);
+    }
+    const detail = lastError?.name === 'TimeoutError'
+        ? `timed out after ${timeoutMs}ms`
+        : String(lastError?.message || lastError || 'request failed');
+    throw new Error(`Official tariff request failed after ${attempts} attempts for ${url}: ${detail}`);
+}
 
 function countExistingExactRows(dutyPayload, country) {
     return new Set((dutyPayload.rules || [])
@@ -39,7 +73,7 @@ function assertHealthyExactBatch(dutyPayload, country, rows) {
 }
 
 async function fetchOfficialPayload(url, fetchImpl = global.fetch) {
-    const response = await fetchImpl(url, { headers: { accept: 'application/json' } });
+    const response = await fetchOfficialResponse(url, { headers: { accept: 'application/json' } }, { fetchImpl });
     if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
     return response.json();
 }
@@ -52,8 +86,8 @@ async function fetchSingaporeOfficialPayload({ dutyPayload, fetchImpl, checkedAt
         buildSingaporeExactPayload
     } = require('../lib/singapore-stcced');
     const [pdfResponse, scopeResponse] = await Promise.all([
-        fetchImpl(SG_STCCED_PDF_URL),
-        fetchImpl(SG_DUTIABLE_GOODS_URL, { headers: { accept: 'text/html' } })
+        fetchOfficialResponse(SG_STCCED_PDF_URL, {}, { fetchImpl }),
+        fetchOfficialResponse(SG_DUTIABLE_GOODS_URL, { headers: { accept: 'text/html' } }, { fetchImpl })
     ]);
     if (!pdfResponse.ok) throw new Error(`HTTP ${pdfResponse.status} for Singapore STCCED PDF`);
     if (!scopeResponse.ok) throw new Error(`HTTP ${scopeResponse.status} for Singapore dutiable-goods scope`);
@@ -80,7 +114,7 @@ async function fetchMexicoOfficialPayload({ dutyPayload, fetchImpl, checkedAt })
         MX_TIGIE_NICO_URL,
         parseMexicoTigieWorkbook
     } = require('../lib/mexico-tigie-nico');
-    const response = await fetchImpl(MX_TIGIE_NICO_URL);
+    const response = await fetchOfficialResponse(MX_TIGIE_NICO_URL, {}, { fetchImpl });
     if (!response.ok) throw new Error(`HTTP ${response.status} for Mexico TIGIE/NICO workbook`);
     const prefixes = [...new Set((dutyPayload.rules || [])
         .filter((rule) => rule.import_country === 'MX')
@@ -93,7 +127,8 @@ async function fetchAustraliaOfficialPayload({ dutyPayload, fetchImpl, checkedAt
     const prefixes = [...new Set((dutyPayload.rules || [])
         .filter((rule) => rule.import_country === 'AU')
         .flatMap((rule) => rule.hs_prefixes || []))].sort();
-    return buildAustraliaExactPayload(prefixes, { fetchImpl, checkedAt });
+    const resilientFetch = (url, options = {}) => fetchOfficialResponse(url, options, { fetchImpl });
+    return buildAustraliaExactPayload(prefixes, { fetchImpl: resilientFetch, checkedAt });
 }
 
 async function fetchNewZealandOfficialPayload({ dutyPayload, fetchImpl, checkedAt, extractPdfTextImpl }) {
@@ -112,7 +147,7 @@ async function fetchNewZealandOfficialPayload({ dutyPayload, fetchImpl, checkedA
     const rows = [];
     for (const section of sections) {
         const url = NZ_SECTIONS[section];
-        const response = await fetchImpl(url);
+        const response = await fetchOfficialResponse(url, {}, { fetchImpl });
         if (!response.ok) throw new Error(`HTTP ${response.status} for NZ Working Tariff section ${section}`);
         const tempPath = path.join(os.tmpdir(), `tracewize-nz-${section}-${process.pid}-${Date.now()}.pdf`);
         try {
@@ -173,7 +208,8 @@ async function syncExactNationalTariffs({
                 const prefixes = [...new Set((dutyPayload.rules || [])
                     .filter((rule) => rule.import_country === 'CN')
                     .flatMap((rule) => rule.hs_prefixes || []))].sort();
-                raw = await buildChinaCustomsExactPayload(prefixes, { fetchImpl });
+                const resilientFetch = (targetUrl, options = {}) => fetchOfficialResponse(targetUrl, options, { fetchImpl });
+                raw = await buildChinaCustomsExactPayload(prefixes, { fetchImpl: resilientFetch });
             }
             const rows = parseExactTariffRows(raw, { country, checkedAt });
             const health = assertHealthyExactBatch(dutyPayload, country, rows);
@@ -215,6 +251,7 @@ if (require.main === module) {
 
 module.exports = {
     FEEDS,
+    fetchOfficialResponse,
     fetchOfficialPayload,
     fetchSingaporeOfficialPayload,
     fetchMexicoOfficialPayload,
