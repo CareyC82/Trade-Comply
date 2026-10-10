@@ -51,8 +51,24 @@ test('payment page is local-only, accessible and explicit about boundaries', () 
     assert.doesNotMatch(html, /type="file"/);
     assert.match(html, /role="alert"/);
     assert.match(script, /mailto:carey@tracewize\.com/);
+    assert.match(html, /Product and market pre-screen/);
+    assert.match(html, /Start with Can I Sell It/);
+    assert.match(script, /Copy supplier checklist/);
+    assert.match(script, /Download supplier checklist/);
+    assert.match(script, /Print \/ Save PDF/);
+    assert.match(script, /window\.print\(\)/);
+    assert.match(script, /supplierChecklistText/);
     assert.doesNotMatch(script, /fetch\s*\(/);
     assert.doesNotMatch(script, /value === 'unknown' \? 'checked'/);
     assert.doesNotMatch(script, /`Goods:\s*\$\{facts\.goods/);
     assert.doesNotMatch(script, /`Amount:\s*\$\{facts\.currency/);
+});
+
+test('product and payment pre-screens expose a two-way bounded workflow', () => {
+    const sellScript = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    const payHtml = fs.readFileSync(path.join(__dirname, '..', 'can-i-pay.html'), 'utf8');
+    assert.match(sellScript, /After product readiness/);
+    assert.match(sellScript, /Continue to Can I Pay \/ Get Paid/);
+    assert.match(payHtml, /Start with Can I Sell It/);
+    assert.match(payHtml, /Human review when needed/);
 });

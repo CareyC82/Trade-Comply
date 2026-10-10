@@ -47,23 +47,62 @@
             'Preliminary screening only; not legal, banking or financial advice and no guarantee of payment processing.'].join('\n');
     }
 
+    function supplierChecklistText(assessment) {
+        const facts = assessment.facts;
+        const route = `${facts.origin || 'unknown origin'} → ${facts.destination || 'unknown destination'}${facts.transit ? ` via ${facts.transit}` : ''}`;
+        const items = [
+            'Signed contract or purchase order showing the exact legal buyer and seller, payment terms and Incoterm.',
+            'Commercial invoice showing the exact goods, model, quantity, currency and contracting parties.',
+            'Packing list and transport document whose parties, goods and route match the commercial documents.',
+            'Evidence that the beneficiary account belongs to the invoicing seller, verified through an independent known channel.',
+            ...assessment.checklist
+        ];
+        if (facts.thirdPartyPayment) items.push('Written commercial rationale and authority for every third-party payer or payee.');
+        if (facts.agent) items.push('Agent or intermediary agreement showing authority, role and fee basis.');
+        if (assessment.issues.some((item) => item.category === 'Export controls / sanctions')) items.push('Applicable end-use, end-user, export-control and sanctions-review evidence confirmed by an appropriate professional.');
+        return ['TraceWize supplier evidence request', `Transaction route: ${route}`, '', ...[...new Set(items)].map((item) => `- ${item}`), '', 'Share authentic documents only. This checklist is preliminary and is not bank approval, sanctions clearance or legal advice.'].join('\n');
+    }
+
+    function downloadText(filename, content) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
     function render(assessment) {
         const tone = assessment.level === 'ready' ? 'ready' : assessment.level === 'clarification' ? 'clarification' : 'risk';
+        const generatedAt = new Date();
+        const reportId = `PAY-${generatedAt.toISOString().replace(/\D/g, '').slice(0, 14)}`;
         resultNode.innerHTML = `<article class="payment-result-card payment-result--${tone}">
+            <header class="payment-report-metadata"><strong>TraceWize</strong><span>Report ${escapeHtml(reportId)}</span><span>Generated ${escapeHtml(generatedAt.toLocaleString())}</span></header>
             <p class="sell-result-kicker">PRELIMINARY PAYMENT READINESS</p><h2>${escapeHtml(assessment.label)}</h2>
             <p>${assessment.level === 'ready' ? 'No selected red flag currently blocks preparation, but the bank and relevant professionals make the final decision.' : 'Resolve every listed issue before relying on the transaction package.'}</p>
             <div class="payment-result-boundary">This is a structured pre-screen, not KYC/AML clearance, sanctions clearance, legal advice or payment approval.</div>
             <dl class="payment-conclusion"><div><dt>Basis</dt><dd>${escapeHtml(assessment.conclusion.basis)}</dd></div><div><dt>Missing / unknown</dt><dd>${escapeHtml(assessment.conclusion.missing)}</dd></div><div><dt>Next</dt><dd>${escapeHtml(assessment.conclusion.next)}</dd></div></dl>
         </article>
         <article class="sell-check-card"><h2>Findings, basis and next action</h2><div class="payment-findings">${assessment.issues.length ? assessment.issues.map((item) => `<section><span>${escapeHtml(item.category)}</span><h3>${escapeHtml(item.title)}</h3><p><strong>Basis:</strong> ${escapeHtml(item.basis)}</p>${item.missing ? `<p><strong>Missing:</strong> ${escapeHtml(item.missing)}</p>` : ''}<p><strong>Next:</strong> ${escapeHtml(item.next)}</p></section>`).join('') : '<p>No inconsistency was reported in the structured answers. Unknown facts and independent verification may still change this result.</p>'}</div></article>
-        <article class="sell-check-card"><h2>Bank submission readiness checklist</h2><ul class="payment-checklist">${assessment.checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul><p class="sell-panel-note">Provide only authentic documents. Do not invent facts or alter documents to satisfy a checklist.</p></article>
+        <article class="sell-check-card"><h2>Bank submission readiness checklist</h2><ul class="payment-checklist">${assessment.checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul><p class="sell-panel-note">Provide only authentic documents. Do not invent facts or alter documents to satisfy a checklist.</p><div class="payment-actions payment-report-actions"><button id="payment-copy-supplier" type="button">Copy supplier checklist</button><button id="payment-download-supplier" type="button">Download supplier checklist</button><button id="payment-print-report" type="button">Print / Save PDF</button></div><p id="payment-report-status" role="status"></p></article>
+        <article class="sell-check-card payment-next-step"><span>Continue the workflow</span><h2>Product cleared for market access too?</h2><p>Payment readiness does not confirm whether the goods may be imported, shipped or sold. Run the product pre-screen if that question is still open.</p><a href="can-i-sell-it.html">Open Can I Sell It? →</a></article>
         <article class="sell-check-card payment-review-cta"><h2>Request a Trade Payment Readiness Review</h2><p>One transaction, one payment route, one structured readiness summary. A human review remains preliminary and does not guarantee bank processing.</p><div class="payment-actions"><button id="payment-copy-summary" type="button">Copy non-sensitive summary</button><a id="payment-open-email" href="#">Open email draft</a></div><p id="payment-action-status" role="status"></p></article>`;
         const summary = summaryText(assessment);
+        const supplierChecklist = supplierChecklistText(assessment);
         document.getElementById('payment-copy-summary').addEventListener('click', async () => {
             const status = document.getElementById('payment-action-status');
             try { await navigator.clipboard.writeText(summary); status.textContent = 'Summary copied. Review it before sharing.'; }
             catch { status.textContent = 'Copy was blocked by the browser. Select and copy the result manually.'; }
         });
+        document.getElementById('payment-copy-supplier').addEventListener('click', async () => {
+            const status = document.getElementById('payment-report-status');
+            try { await navigator.clipboard.writeText(supplierChecklist); status.textContent = 'Supplier checklist copied. Review it before sharing.'; }
+            catch { status.textContent = 'Copy was blocked by the browser. Use Download supplier checklist instead.'; }
+        });
+        document.getElementById('payment-download-supplier').addEventListener('click', () => {
+            downloadText(`tracewize-${reportId.toLowerCase()}-supplier-checklist.txt`, supplierChecklist);
+            document.getElementById('payment-report-status').textContent = 'Supplier checklist downloaded to this device.';
+        });
+        document.getElementById('payment-print-report').addEventListener('click', () => window.print());
         document.getElementById('payment-open-email').href = `mailto:carey@tracewize.com?subject=${encodeURIComponent('Trade Payment Readiness Review request')}&body=${encodeURIComponent(summary)}`;
         resultNode.hidden = false;
         resultNode.scrollIntoView({ behavior: 'smooth', block: 'start' });

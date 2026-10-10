@@ -233,6 +233,20 @@ test('payment readiness returns bounded Ready only after explicit consistency an
     expect(draft).not.toContain('TW-65W');
 });
 
+test('payment result can print and download a bounded supplier checklist', async ({ page }) => {
+    await completePaymentScreen(page);
+    await page.getByRole('button', { name: 'Show payment readiness result' }).click();
+    await expect(page.getByRole('button', { name: 'Print / Save PDF' })).toBeVisible();
+    await page.evaluate(() => { window.print = () => { document.body.dataset.printCalled = 'yes'; }; });
+    await page.getByRole('button', { name: 'Print / Save PDF' }).click();
+    await expect(page.locator('body')).toHaveAttribute('data-print-called', 'yes');
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download supplier checklist' }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/^tracewize-pay-\d+-supplier-checklist\.txt$/);
+    await expect(page.locator('#payment-readiness-result')).toContainText('Open Can I Sell It?');
+});
+
 test('payment red flags stop the transaction without a bypass recommendation', async ({ page }) => {
     await completePaymentScreen(page);
     await page.locator('[name="flag:personalAccount"]').check();
