@@ -1,7 +1,7 @@
 {
-  "pipeline_run": "2026-10-09T22:25:06.850715+00:00",
-  "passed_count": 6,
-  "intercepted_count": 1,
+  "pipeline_run": "2026-10-10T21:19:12.733236+00:00",
+  "passed_count": 5,
+  "intercepted_count": 2,
   "intercepted": [
     {
       "kind": "risk_signal",
@@ -9,48 +9,88 @@
         "hs_code is missing or invalid"
       ],
       "raw": {
-        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "hs_code": "9305.91 / 9305.99",
         "direction": "export",
         "country": "US",
         "risk_level": "Medium",
         "source": "US BIS",
-        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, ammunition, optics, and related components to the US market, this reduces certain licensing burdens but does not eliminate core obligations: items remain subject to the US export control regime, and US importers still face ATF, FCC (Part 15/18 for electronic sights and RF devices), and Section 301 tariff exposure. Exporters should re-verify ECCN classification, license exceptions, and end-user/end-use screening, and align commercial documents with US HTS codes. Note that China-origin firearms and ammunition may face separate US import restrictions and tariff actions; confirm current Federal Register notices before shipment.",
-        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、弹药、光学瞄具及相关部件的中国出口商而言，这减少了部分许可负担，但并未消除核心义务：相关物项仍受美国出口管制体系约束，美国进口商仍面临ATF、FCC（电子瞄具及射频设备适用Part 15/18）以及301关税风险。出口商应重新核实ECCN分类、许可例外及最终用户/最终用途筛查，并使商业单据与美国HTS编码保持一致。需注意，中国原产枪支弹药可能面临美国单独的进口限制和关税措施，发运前应确认最新的《联邦公报》公告。",
+        "content_en": "The US Department of Commerce (BIS) has streamlined export controls for sound suppressors (silencers), moving certain models from stricter controls to more permissive licensing or License Exception eligibility. For China-based exporters and traders, this signals a narrower but still controlled US market: sound suppressors remain ITAR-controlled under USML Category I for military use, while commercial/sporting models may fall under EAR ECCN 0A501 or 0A502 with reduced licensing friction. Key compliance points: (1) confirm the exact USML/EAR classification of the suppressor model; (2) verify end-user/end-use and screen against BIS Entity List, SDN, and denied party lists; (3) align US HTS 9305.91/9305.99 with Section 301 tariff exposure; (4) ensure no diversion to military or embargoed destinations. This is a US-origin export control change, so China importers of US-origin suppressors must verify re-export authorization and licensing conditions before resale or transfer.",
+        "content_zh": "美国商务部（BIS）已简化对消音器（sound suppressors）的出口管制，将部分型号从严格管制调整为更宽松的许可或可适用许可例外。对于中国出口商和贸易商而言，这意味着美国市场虽仍受管制但门槛有所降低：军用消音器仍属ITAR（USML第I类）管制，而商业/运动型型号可能归入EAR ECCN 0A501或0A502，许可阻力减小。关键合规要点：（1）确认消音器型号的USML/EAR准确分类；（2）核实最终用户/最终用途，并筛查BIS实体清单、SDN及被拒绝方名单；（3）将美国HTS 9305.91/9305.99与301关税风险对齐；（4）确保不流向军事或禁运目的地。这是美国原产出口管制变更，中国进口商在转售或转让美国原产消音器前，必须核实再出口授权和许可条件。",
         "checklist": [
           {
             "phase": "技术核查",
-            "task": "ECCN classification re-verification",
-            "desc": "Re-confirm ECCN for firearms, ammunition, and parts under the restored rule; check whether license exceptions (e.g., RPL, TMP) now apply and document the classification rationale."
+            "task": "USML/EAR classification",
+            "desc": "Determine whether the sound suppressor is ITAR USML Category I (military) or EAR ECCN 0A501/0A502 (commercial/sporting); obtain a written classification from the US supplier or BIS."
           },
           {
             "phase": "技术核查",
-            "task": "FCC Part 15/18 for electronic sights",
-            "desc": "For electronic optics, night vision, and RF-enabled accessories, verify FCC Part 15/18 conformity, supplier FCC IDs, and modular approval status before US entry."
+            "task": "End-user/end-use screening",
+            "desc": "Screen the US supplier and any intermediate parties against BIS Entity List, OFAC SDN, and denied party lists; obtain end-user and end-use statements."
           },
           {
             "phase": "单证准备",
-            "task": "US HTS & Section 301 mapping",
-            "desc": "Map each item to the 10-digit US HTS line, check Section 301 lists and additional duty rates, and document country of origin and value build-up."
+            "task": "HTS and Section 301 alignment",
+            "desc": "Map the 10-digit US HTS line (9305.91/9305.99) against Section 301 lists and additional duties; document country of origin and value build-up."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Re-export authorization check",
+            "desc": "For US-origin suppressors imported into China, verify BIS re-export authorization and license conditions before resale, transfer, or integration into other products."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Destination and diversion controls",
+            "desc": "Confirm the final destination is not an embargoed country or military end-user; maintain records of the streamlined licensing basis and any License Exception used."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-streamlines-export-controls-sound-suppressors",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-10-10T21:18:52.783625+00:00"
+      }
+    },
+    {
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.20 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms-related components, optics, and accessories into the US market, this reduces some licensing friction but does not remove core obligations: items may still fall under the USML (ITAR) or CCL (EAR) depending on classification, and the rescission does not waive end-user, end-use, or restricted-party screening. Exporters must confirm whether their product is a defense article, a 600-series EAR item, or a purely commercial good, and align US HTS classification with Section 301 tariff exposure. FCC Part 15/18 conformity remains mandatory for any wireless or RF-enabled accessories. Retain full chain-of-custody documentation and be prepared for increased scrutiny of China-origin firearms supply chains.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支出口规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支相关零部件、光学器件和配件的中国企业而言，这减少了一部分许可摩擦，但并未免除核心义务：相关物项仍可能根据分类落入USML（ITAR）或CCL（EAR）管辖，且撤销令不免除最终用户、最终用途及受限方筛查要求。出口商须确认其产品属于国防物品、EAR 600系列物项还是纯商业产品，并使美国HTS归类与301关税风险相匹配。任何无线或射频配件仍须符合FCC Part 15/18要求。应保留完整监管链文件，并准备应对对中国原产枪支供应链的更严格审查。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "ITAR/EAR classification review",
+            "desc": "Determine whether the firearm, part, or accessory is a USML defense article, an EAR 600-series item, or a commercial good; document the classification basis before shipment."
+          },
+          {
+            "phase": "技术核查",
+            "task": "FCC Part 15/18 RF conformity",
+            "desc": "For wireless optics, rangefinders, or smart accessories, verify FCC ID, modular approval, and supplier test reports for US market entry."
+          },
+          {
+            "phase": "单证准备",
+            "task": "HTS & Section 301 tariff mapping",
+            "desc": "Map the 10-digit US HTS line against Section 301 lists, record country of origin and value build-up, and quantify additional duty exposure."
           },
           {
             "phase": "单证准备",
             "task": "BIS / Entity List screening pack",
-            "desc": "Run restricted party and Entity List screening for all US consignees; retain end-user and end-use statements and license exception records."
+            "desc": "Run restricted-party and denied-person screening; retain end-user and end-use statements and chain-of-custody records for all controlled components."
           },
           {
             "phase": "环保注册",
-            "task": "ATF and state-law import check",
-            "desc": "Confirm ATF import permit requirements and any state-level firearms restrictions; coordinate with the US importer of record before booking."
-          },
-          {
-            "phase": "单证准备",
-            "task": "Commercial invoice & origin statement",
-            "desc": "Ensure invoices state full description, HTS code, origin, and value; prepare a non-manipulation/origin statement to support customs clearance and tariff assessment."
+            "task": "RoHS/REACH and state-level chemical checks",
+            "desc": "Confirm compliance with US state chemical restrictions and customer RoHS/REACH contractual clauses for coatings, batteries, and optics."
           }
         ],
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
-        "fetched_at": "2026-10-09T22:25:03.196511+00:00"
+        "fetched_at": "2026-10-10T21:19:09.142325+00:00"
       }
     }
   ]
