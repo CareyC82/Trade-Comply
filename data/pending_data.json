@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-10T21:19:12.849Z",
+  "updated_at": "2026-10-11T21:38:40.896Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -1810,6 +1810,61 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-10-10T21:19:09.142325+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-10-11T21:38:40.896Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) has rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms and ammunition. This reduces licensing burdens for certain semi-automatic firearms and related parts under the EAR, but does not eliminate all controls: items may still fall under the USML (ITAR) or catch-all/end-user restrictions. Exporters must re-verify ECCN classification, license exceptions, and country-specific prohibitions before shipment. Section 301 tariffs and HTS alignment remain relevant for customs valuation, and Entity List/restricted party screening is still mandatory. The change signals a more permissive posture for civilian firearms exports, but compliance documentation and end-use/end-user checks remain critical.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支和弹药的原有出口管制待遇。此举减轻了部分半自动枪支及相关部件在《出口管理条例》（EAR）下的许可负担，但并未取消所有管制：相关物项仍可能属于美国军品清单（USML/ITAR）或适用兜底/最终用户限制。出口商在发货前必须重新核实ECCN分类、许可例外及国别禁令。301关税和HTS归类对海关估价仍然重要，实体清单/受限方筛查仍为强制要求。该变化表明对民用枪支出口采取更宽松的立场，但合规单证和最终用途/最终用户核查依然关键。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "ECCN / USML reclassification",
+            "desc": "Re-verify whether the firearm, part, or ammunition is controlled under the EAR (ECCN) or the ITAR USML; document the classification basis and any license exception eligibility after the rule rescission."
+          },
+          {
+            "phase": "技术核查",
+            "task": "BIS Entity List & restricted party screening",
+            "desc": "Run denied party, Entity List, and end-user screening for all US-origin firearms exports; retain end-use/end-user statements and screen for diversion risk."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Section 301 & HTS tariff alignment",
+            "desc": "Map the 10-digit HTS line against Section 301 lists and additional duties; document country of origin, value build-up, and any exclusion eligibility for customs valuation."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Export license application pack",
+            "desc": "Prepare DSP-5/DSP-73 or BIS license application as applicable; include purchase order, end-user certificate, and non-transfer assurances for controlled firearms."
+          },
+          {
+            "phase": "环保注册",
+            "task": "FCC / product safety conformity",
+            "desc": "Confirm FCC Part 15/18 compliance for any electronic sights, rangefinders, or wireless accessories; retain supplier FCC IDs and test reports before US entry."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Recordkeeping & audit trail",
+            "desc": "Maintain AES filing, commercial invoice, packing list, and license records for 5 years; ensure consistency between EEI, invoice, and license conditions."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-10-11T21:38:35.992190+00:00"
       }
     }
   ]
