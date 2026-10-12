@@ -26,7 +26,7 @@
             min-height: 100vh;
         }
         .wrap {
-            max-width: 900px;
+            max-width: 1180px;
             margin: 0 auto;
             padding: 24px 16px 48px;
         }
@@ -40,6 +40,16 @@
             margin-bottom: 20px;
         }
         .panel h2 { font-size: 1rem; margin: 0 0 12px; }
+        .admin-nav { position: sticky; top: 0; z-index: 20; display: flex; gap: 8px; overflow-x: auto; padding: 10px; margin: 0 0 18px; background: rgba(15,20,25,.96); border: 1px solid var(--border); border-radius: 12px; }
+        .admin-nav button { flex: 0 0 auto; background: transparent; color: var(--muted); border: 1px solid transparent; }
+        .admin-nav button.active { color: #fff; background: #1e3a5f; border-color: #3b82f6; }
+        .admin-section[hidden] { display: none !important; }
+        .overview-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+        .overview-action { text-align: left; color: var(--text); background: rgba(0,0,0,.12); border: 1px solid var(--border); min-height: 92px; }
+        .overview-action strong, .overview-action span { display: block; }
+        .overview-action span { margin-top: 4px; color: var(--muted); font-weight: 400; font-size: .8rem; }
+        .advanced-tools { margin-top: 16px; }
+        .advanced-tools > summary { cursor: pointer; color: var(--muted); font-weight: 600; }
         label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
         input[type="password"], input[type="text"] {
             width: 100%;
@@ -64,6 +74,11 @@
         .btn-reject { background: transparent; color: var(--red); border: 1px solid var(--red); }
         .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
+        @media (max-width: 640px) {
+            .wrap { padding: 14px 10px 36px; }
+            .admin-nav { top: 0; border-radius: 0; margin-left: -10px; margin-right: -10px; }
+            .panel { padding: 14px; }
+        }
         .status-bar {
             font-size: 0.85rem;
             color: var(--muted);
@@ -437,7 +452,15 @@
         </div>
 
         <div id="review-panel" class="hidden">
-            <div class="panel">
+            <nav class="admin-nav" aria-label="Admin modules">
+                <button type="button" data-admin-target="overview">总览</button><button type="button" data-admin-target="regulations">国家法规</button><button type="button" data-admin-target="review">审核队列</button><button type="button" data-admin-target="sources">来源健康</button><button type="button" data-admin-target="tariffs">关税数据</button><button type="button" data-admin-target="coverage">覆盖范围</button><button type="button" data-admin-target="search">搜索缺口</button><button type="button" data-admin-target="system">系统工具</button>
+            </nav>
+            <section class="panel admin-section" data-admin-section="overview">
+                <h2>审核台总览</h2>
+                <p class="meta">这里只显示当前需要关注的事项；进入相应模块查看详情或执行操作。</p>
+                <div id="admin-overview" class="overview-actions"></div>
+            </section>
+            <div class="panel admin-section" data-admin-section="review" hidden>
                 <div class="crawl-section-title">
                     <div>
                         <h2 style="margin:0 0 4px">Consumer regulatory change review</h2>
@@ -447,7 +470,7 @@
                 </div>
                 <div id="consumer-regulatory-status">加载中…</div>
             </div>
-            <div class="panel" id="regulations-by-country-panel">
+            <div class="panel admin-section" data-admin-section="regulations" id="regulations-by-country-panel" hidden>
                 <div class="crawl-section-title">
                     <div><h2 style="margin:0 0 4px">Regulations by Country</h2><p class="meta" style="margin:0">只读法规索引：按国家、类别、状态和官方来源健康度查看当前维护规则。</p></div>
                     <button type="button" class="btn-ghost" id="btn-refresh-country-regulations">刷新法规列表</button>
@@ -456,6 +479,7 @@
                     <label>搜索<input id="regulation-search" type="search" placeholder="法规、机构、HS、产品关键词"></label>
                     <label>国家<select id="regulation-country"><option value="">全部国家</option></select></label>
                     <label>类别<select id="regulation-category"><option value="">全部类别</option></select></label>
+                    <label>记录类型<select id="regulation-record-type"><option value="">全部类型</option><option value="named_requirement">具名法规/要求</option><option value="official_guidance">官方指引</option><option value="enforcement_case">执法案例</option><option value="scope_baseline">内部范围基线</option></select></label>
                     <label>状态<select id="regulation-status"><option value="">全部状态</option></select></label>
                     <label>来源健康<select id="regulation-source-health"><option value="">全部来源状态</option><option value="current">Automatic current</option><option value="manual_current">Manual current</option><option value="last_good">Last-good</option><option value="country_caveat">Country caveat</option><option value="not_monitored">Not monitored</option></select></label>
                     <label>复核优先级<select id="regulation-review-state"><option value="">全部复核状态</option><option value="needs_review">待复核</option><option value="review_overdue">复核已逾期</option><option value="upcoming">即将生效（120天内）</option><option value="current">当前</option></select></label>
@@ -464,7 +488,7 @@
                 <div id="regulations-country-coverage"></div>
                 <div id="regulations-by-country">加载中…</div>
             </div>
-            <div class="panel">
+            <div class="panel admin-section" data-admin-section="system" hidden>
                 <div class="status-bar" id="status-bar">加载中…</div>
                 <div class="row">
                     <button type="button" class="btn-ghost" id="btn-refresh">刷新列表</button>
@@ -475,7 +499,7 @@
                 <pre id="crawl-test-log" class="hidden" style="margin-top:12px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;max-height:280px;overflow:auto;white-space:pre-wrap;"></pre>
                 <p class="meta" style="margin-top:10px">日常数据已由 02:00 流水线自动发布。此页仅用于 legacy 队列或紧急 override；手动发布后执行 <code>npm run publish:reviewed -- --dispatch</code></p>
             </div>
-            <div class="panel">
+            <div class="panel admin-section" data-admin-section="sources" hidden>
                 <div class="crawl-section-title">
                     <div>
                         <h2 style="margin:0 0 4px">每日抓取内容</h2>
@@ -485,7 +509,7 @@
                 </div>
                 <div id="crawl-summary">加载中…</div>
             </div>
-            <div class="panel">
+            <div class="panel admin-section" data-admin-section="tariffs" hidden>
                 <div class="crawl-section-title">
                     <div>
                         <h2 style="margin:0 0 4px">Duty-rate source status</h2>
@@ -512,7 +536,7 @@
                     <div id="artifact-history" style="margin-top:16px"></div>
                 </div>
             </div>
-            <div class="panel">
+            <div class="panel admin-section" data-admin-section="search" hidden>
                 <div class="crawl-section-title">
                     <div>
                         <h2 style="margin:0 0 4px">Unmet Search Workbench</h2>
@@ -522,7 +546,7 @@
                 </div>
                 <div id="unmet-search-status">加载中…</div>
             </div>
-            <div class="panel">
+            <div class="panel admin-section" data-admin-section="coverage" hidden>
                 <div class="crawl-section-title">
                     <div>
                         <h2 style="margin:0 0 4px">Quality Gate</h2>
@@ -532,7 +556,7 @@
                 </div>
                 <div id="quality-status">加载中…</div>
             </div>
-            <div class="panel">
+            <div class="panel admin-section" data-admin-section="coverage" hidden>
                 <div class="coverage-toolbar">
                     <div>
                         <h2 style="margin:0 0 4px">Coverage Matrix</h2>
@@ -550,7 +574,7 @@
                     <span class="coverage-note">维护源文件：<code>data/coverage-matrix.json</code>。保存后仍需提交到 GitHub 才会上线。</span>
                 </div>
             </div>
-            <div id="pending-list"></div>
+            <div id="pending-list" class="admin-section" data-admin-section="review" hidden></div>
         </div>
     </div>
 
@@ -578,7 +602,33 @@
         let currentCoveragePayload = null;
         let currentArtifactPreview = null;
         let currentArtifactUpload = null;
+        const adminOverviewState = { pendingChanges: '…', degradedSources: '…', legacyQueue: '…', tariffIssues: '…', qualityIssues: '…' };
         const artifactAuthorities = { MY: 'Royal Malaysian Customs', IN: 'Central Board of Indirect Taxes and Customs (CBIC)', KR: 'Korea Customs Service', VN: 'Vietnam Customs', TW: 'Customs Administration, Ministry of Finance Taiwan', RU: 'Eurasian Economic Commission' };
+
+        function selectAdminSection(section = 'overview') {
+            document.querySelectorAll('[data-admin-section]').forEach((element) => { element.hidden = element.dataset.adminSection !== section; });
+            document.querySelectorAll('[data-admin-target]').forEach((button) => {
+                const active = button.dataset.adminTarget === section;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-current', active ? 'page' : 'false');
+            });
+            sessionStorage.setItem('tc_admin_section', section);
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
+        function renderAdminOverview() {
+            const target = document.getElementById('admin-overview');
+            if (!target) return;
+            const cards = [
+                ['review', `${adminOverviewState.pendingChanges} 条法规变化待审核`, '只记录证据决定，不自动修改产品规则'],
+                ['sources', `${adminOverviewState.degradedSources} 个来源正在使用 last-good`, '检查官方来源抓取和人工复核期限'],
+                ['review', `${adminOverviewState.legacyQueue} 条 legacy 队列`, '仅处理旧版或紧急人工审核项'],
+                ['tariffs', `${adminOverviewState.tariffIssues} 个关税数据问题`, '检查同步、解析器和官方文件导入'],
+                ['coverage', `${adminOverviewState.qualityIssues} 个质量异常`, '检查路线、搜索结果与覆盖缺口'],
+                ['regulations', '查看国家法规', '按国家、类别、复核状态查询唯一法规']
+            ];
+            target.innerHTML = cards.map(([section, title, detail]) => `<button type="button" class="overview-action" data-open-admin-section="${section}"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(detail)}</span></button>`).join('');
+        }
 
         function getCurrentAdminOrigin() {
             if (/^(127\.0\.0\.1|localhost)$/.test(window.location.hostname) && window.location.port === '8787') {
@@ -1039,12 +1089,16 @@
         const regulationReviewLabels = {
             current: 'Current', needs_review: 'Needs review', review_overdue: 'Review overdue', upcoming: 'Effective within 120 days'
         };
+        const regulationRecordLabels = {
+            named_requirement: '具名法规/要求', official_guidance: '官方指引', enforcement_case: '执法案例', scope_baseline: '内部范围基线（非具名法规）'
+        };
 
         function currentRegulationFilters() {
             return {
                 query: document.getElementById('regulation-search').value,
                 country: document.getElementById('regulation-country').value,
                 category: document.getElementById('regulation-category').value,
+                recordType: document.getElementById('regulation-record-type').value,
                 status: document.getElementById('regulation-status').value,
                 sourceHealth: document.getElementById('regulation-source-health').value,
                 reviewState: document.getElementById('regulation-review-state').value
@@ -1076,7 +1130,7 @@
             countryRegulationsStatus.innerHTML = `
                 <div class="summary-grid"><div class="summary-card"><strong>${summary.total}</strong><span>Matching regulations</span></div><div class="summary-card"><strong>${summary.countries.size}</strong><span>Countries / regions</span></div><div class="summary-card"><strong>${summary.active}</strong><span>Active</span></div><div class="summary-card"><strong>${summary.future}</strong><span>Future / pending</span></div><div class="summary-card"><strong>${summary.caveat}</strong><span>Source caveat</span></div></div>
                 ${rows.length > visible.length ? `<p class="meta">显示前 ${visible.length} 条，共 ${rows.length} 条；请使用筛选缩小范围。</p>` : `<p class="meta">显示 ${rows.length} 条只读法规；相同法规在不同产品或路线中的记录已合并。</p>`}
-                <div class="regulation-list">${visible.length ? visible.map(row => { const productQuery = row.keywords.slice(0, 5).join(' '); const routeLink = `index.html?from=CN&to=${encodeURIComponent(row.country)}&focus=${row.direction === 'export' ? 'export' : 'import'}&product=${encodeURIComponent(productQuery)}`; return `<details class="regulation-card"><summary><h3>${escapeHtml(row.name)}</h3><span class="badge tag">${escapeHtml(row.countryLabel)}</span><span class="badge">${escapeHtml(row.categoryLabel)}</span><span class="badge ${['last_good', 'country_caveat'].includes(row.sourceHealth) ? 'benchmark' : 'auto_updatable'}">${escapeHtml(regulationHealthLabels[row.sourceHealth] || row.sourceHealth)}</span></summary><div class="regulation-detail"><p><strong>Rule IDs</strong><br>${escapeHtml(row.ids.slice(0, 8).join(', '))}${row.ids.length > 8 ? ` +${row.ids.length - 8} more` : ''}</p><p><strong>Merged occurrences</strong><br>${row.occurrenceCount}</p><p><strong>Status / direction</strong><br>${escapeHtml(row.status)} · ${escapeHtml(row.direction)}</p><p><strong>Review state</strong><br>${escapeHtml(regulationReviewLabels[row.reviewState] || row.reviewState)}</p><p><strong>Coverage</strong><br>${escapeHtml(regulationCoverageLabels[row.coverageLevel] || row.coverageLevel)}</p><p><strong>Effective / reviewed</strong><br>${escapeHtml(row.effectiveDate || 'Not recorded')} · ${escapeHtml(row.lastVerifiedAt || 'review date not recorded')}</p><p><strong>Authority</strong><br>${escapeHtml(row.authority)}</p><p><strong>Risk</strong><br>${escapeHtml(row.riskLevel)}</p><p><strong>HS scope</strong><br>${escapeHtml(row.hsCodes.join(', ') || 'Classification required')}</p><p><strong>Affected product terms</strong><br>${escapeHtml(row.keywords.slice(0, 12).join(', ') || 'Not mapped')}</p><p style="grid-column:1/-1"><strong>Description</strong><br>${escapeHtml(row.description || 'No summary')}</p><p style="grid-column:1/-1"><strong>Related assessment</strong><br><a href="${escapeHtml(routeLink)}" target="_blank" rel="noopener noreferrer">Open product and route pre-check</a></p><p style="grid-column:1/-1"><strong>Official source</strong><br>${row.sourceUrl ? `<a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.sourceUrl)}</a>` : 'Not recorded'}</p></div></details>`; }).join('') : '<div class="empty">没有符合当前筛选条件的法规。</div>'}</div>`;
+                <div class="regulation-list">${visible.length ? visible.map(row => { const productQuery = row.keywords.slice(0, 5).join(' '); const routeLink = `index.html?from=CN&to=${encodeURIComponent(row.country)}&focus=${row.direction === 'export' ? 'export' : 'import'}&product=${encodeURIComponent(productQuery)}`; const title = row.recordType === 'scope_baseline' ? `${row.countryLabel} · ${row.categoryLabel} 范围基线` : row.name; const meaning = row.recordType === 'scope_baseline' ? '这不是一项具名法规，而是 TraceWize 用于提示该产品和路线需要进一步核查的内部范围基线。必须通过下方官方来源确认具体适用法规。' : row.recordType === 'enforcement_case' ? '这是官方执法案例，用于说明风险，不等同于一项普遍适用的新法规。' : row.recordType === 'official_guidance' ? '这是主管机关发布的官方指引；应结合其依据的法律和产品事实判断适用性。' : '这是数据中记录的具名法规、监管要求或官方项目。'; return `<details class="regulation-card"><summary><h3>${escapeHtml(title)}</h3><span class="badge tag">${escapeHtml(row.countryLabel)}</span><span class="badge">${escapeHtml(regulationRecordLabels[row.recordType] || row.recordType)}</span><span class="badge">${escapeHtml(row.categoryLabel)}</span><span class="badge ${['last_good', 'country_caveat'].includes(row.sourceHealth) ? 'benchmark' : 'auto_updatable'}">${escapeHtml(regulationHealthLabels[row.sourceHealth] || row.sourceHealth)}</span></summary><div class="regulation-detail"><p style="grid-column:1/-1"><strong>这是什么</strong><br>${escapeHtml(meaning)}</p><p style="grid-column:1/-1"><strong>法规／项目名称</strong><br>${row.instrumentName ? escapeHtml(row.instrumentName) : '<span class="meta">未记录具体法名——当前记录仅是范围基线，不能当作一项法规引用。</span>'}</p><p><strong>主管机关</strong><br>${escapeHtml(row.authority)}</p><p><strong>状态／贸易方向</strong><br>${escapeHtml(row.status)} · ${escapeHtml(row.direction)}</p><p><strong>适用层级</strong><br>${escapeHtml(regulationCoverageLabels[row.coverageLevel] || row.coverageLevel)}</p><p><strong>生效／复核日期</strong><br>${escapeHtml(row.effectiveDate || '未记录')} · ${escapeHtml(row.lastVerifiedAt || '未记录复核日期')}</p><p><strong>HS 范围</strong><br>${escapeHtml(row.hsCodes.join(', ') || '需要进一步归类')}</p><p><strong>涉及产品</strong><br>${escapeHtml(row.keywords.slice(0, 12).join(', ') || '尚未映射')}</p><p style="grid-column:1/-1"><strong>内容摘要</strong><br>${escapeHtml(row.description || '暂无摘要')}</p><p style="grid-column:1/-1"><strong>下一步</strong><br><a href="${escapeHtml(routeLink)}" target="_blank" rel="noopener noreferrer">打开产品和贸易路线初筛</a></p><p style="grid-column:1/-1"><strong>官方来源</strong><br>${row.sourceUrl ? `<a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.sourceUrl)}</a>` : '未记录'}</p><details class="advanced-tools" style="grid-column:1/-1"><summary>技术字段</summary><p>Rule IDs: ${escapeHtml(row.ids.slice(0, 8).join(', '))}${row.ids.length > 8 ? ` +${row.ids.length - 8} more` : ''}</p><p>Merged occurrences: ${row.occurrenceCount} · Review state: ${escapeHtml(regulationReviewLabels[row.reviewState] || row.reviewState)} · Risk: ${escapeHtml(row.riskLevel)}</p></details></div></details>`; }).join('') : '<div class="empty">没有符合当前筛选条件的法规。</div>'}</div>`;
         }
 
         function downloadRegulationExport(format) {
@@ -1110,7 +1164,10 @@
                 setRegulationFilterOptions(countryRegulationRows);
                 renderCountryRegulationList();
             } catch (error) {
-                countryRegulationsStatus.innerHTML = `<div class="empty">国家法规列表加载失败：${escapeHtml(error.message)}</div>`;
+                const offline = /load failed|failed to fetch|networkerror/i.test(error.message || '');
+                countryRegulationsStatus.innerHTML = offline
+                    ? '<div class="empty"><strong>本地 Admin 服务未运行或已停止。</strong><br>请在项目目录运行 <code>npm run restart:admin</code>，然后点击“刷新法规列表”。法规数据本身没有因此被删除。</div>'
+                    : `<div class="empty">国家法规数据读取失败：${escapeHtml(error.message)}<br>请检查上方筛选条件或具体数据文件。</div>`;
             }
         }
 
@@ -2667,6 +2724,8 @@
             try {
                 const data = await apiFetch('/api/review/quality-status');
                 qualityStatus.innerHTML = renderQualityStatus(data);
+                adminOverviewState.qualityIssues = Number(data.search_quality?.failing_sample_count || 0) + Number(data.route_coverage?.failed_sample_count || 0);
+                renderAdminOverview();
             } catch (err) {
                 qualityStatus.innerHTML = `<div class="empty">质量检查加载失败：${escapeHtml(err.message)}</div>`;
             }
@@ -2686,6 +2745,8 @@
                 const statusCounts = roadmap.status_counts || {};
                 const sources = Array.isArray(data.sources) ? data.sources : [];
                 const failures = Array.isArray(data.failures) ? data.failures : [];
+                adminOverviewState.tariffIssues = failures.length;
+                renderAdminOverview();
                 const actionDetails = Array.isArray(data.action_details) ? data.action_details : [];
                 const syncStatus = data.duty_rate_sync_status || {};
                 const priorityMatrix = data.priority_rate_matrix || {};
@@ -2769,7 +2830,13 @@
         async function loadConsumerRegulatoryStatus() {
             if (!consumerRegulatoryStatus) return;
             consumerRegulatoryStatus.innerHTML = '<p class="meta">正在加载消费电子法规状态…</p>';
-            try { consumerRegulatoryStatus.innerHTML = renderConsumerRegulatoryStatus(await apiFetch('/api/review/consumer-regulations')); }
+            try {
+                const data = await apiFetch('/api/review/consumer-regulations');
+                consumerRegulatoryStatus.innerHTML = renderConsumerRegulatoryStatus(data);
+                adminOverviewState.pendingChanges = data.pending_review_count || 0;
+                adminOverviewState.degradedSources = data.counts?.degraded || data.counts?.last_good_degraded || 0;
+                renderAdminOverview();
+            }
             catch (err) { consumerRegulatoryStatus.innerHTML = `<div class="empty">法规状态加载失败：${escapeHtml(err.message)}</div>`; }
         }
 
@@ -2824,6 +2891,8 @@
             try {
                 const data = await apiFetch('/api/review/pending');
                 const items = data.items || [];
+                adminOverviewState.legacyQueue = items.length;
+                renderAdminOverview();
                 statusBar.textContent = items.length
                     ? `共 ${items.length} 条待审核 · 队列更新于 ${data.updated_at || '—'}`
                     : '暂无待审核数据';
@@ -2876,6 +2945,8 @@
         function showReview(skipInitialLoad = false) {
             loginPanel.classList.add('hidden');
             reviewPanel.classList.remove('hidden');
+            renderAdminOverview();
+            selectAdminSection(sessionStorage.getItem('tc_admin_section') || 'overview');
             loadCountryRegulations();
             loadCrawlSummary();
             loadDutyRateStatus();
@@ -3027,8 +3098,12 @@
             document.getElementById('artifact-file').focus();
         });
         document.getElementById('btn-refresh-consumer-regulations').addEventListener('click', loadConsumerRegulatoryStatus);
+        reviewPanel.addEventListener('click', (event) => {
+            const target = event.target.closest('[data-admin-target], [data-open-admin-section]');
+            if (target) selectAdminSection(target.dataset.adminTarget || target.dataset.openAdminSection);
+        });
         document.getElementById('btn-refresh-country-regulations').addEventListener('click', loadCountryRegulations);
-        ['regulation-search', 'regulation-country', 'regulation-category', 'regulation-status', 'regulation-source-health', 'regulation-review-state'].forEach((id) => {
+        ['regulation-search', 'regulation-country', 'regulation-category', 'regulation-record-type', 'regulation-status', 'regulation-source-health', 'regulation-review-state'].forEach((id) => {
             document.getElementById(id).addEventListener(id === 'regulation-search' ? 'input' : 'change', renderCountryRegulationList);
         });
         document.getElementById('btn-export-regulations-csv').addEventListener('click', () => downloadRegulationExport('csv'));

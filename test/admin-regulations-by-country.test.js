@@ -52,15 +52,33 @@ test('country summaries, review filters and exports use the visible merged rows'
     assert.match(exportedNz.rule_ids, /CL-NZ-1/);
 });
 
+test('country regulation records distinguish named requirements from internal baselines', () => {
+    const baseline = { ...tags[0], tag_id: 'CL-CN-BASE', country: 'CN', short_name: '[CN Export Baseline]', short_description: 'China export baseline review' };
+    const rows = model.buildRows([...tags, baseline], registry, {}, {});
+    assert.equal(rows.find((row) => row.id === 'CL-CN-BASE').recordType, 'scope_baseline');
+    assert.equal(rows.find((row) => row.id === 'CL-CN-BASE').instrumentName, '');
+    assert.deepEqual(model.filterRows(rows, { recordType: 'scope_baseline' }).map((row) => row.id), ['CL-CN-BASE']);
+    assert.equal(model.exportRows(model.filterRows(rows, { recordType: 'scope_baseline' }))[0].record_type, 'scope_baseline');
+});
+
 test('admin exposes a read-only regulations-by-country surface', () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
     assert.match(html, /Regulations by Country/);
     assert.match(html, /regulation-country/);
     assert.match(html, /regulation-source-health/);
     assert.match(html, /regulation-review-state/);
+    assert.match(html, /regulation-record-type/);
+    assert.match(html, /这不是一项具名法规/);
+    assert.match(html, /法规／项目名称/);
+    assert.match(html, /本地 Admin 服务未运行或已停止/);
     assert.match(html, /btn-export-regulations-csv/);
     assert.match(html, /Country coverage summary/);
-    assert.match(html, /Open product and route pre-check/);
+    assert.match(html, /打开产品和贸易路线初筛/);
+    assert.match(html, /data-admin-target="overview"/);
+    assert.match(html, /data-admin-section="regulations"/);
+    assert.match(html, /审核台总览/);
+    assert.match(html, /selectAdminSection/);
+    assert.match(html, /adminOverviewState/);
     assert.match(html, /Official-linked baseline/);
     assert.match(html, /loadCountryRegulations/);
     assert.doesNotMatch(html, /data-regulation-action="(?:save|delete|publish)"/);
