@@ -235,6 +235,18 @@
             font-size: 0.8rem;
             margin-top: 10px;
         }
+        .regulation-filters { display: grid; grid-template-columns: minmax(180px, 2fr) repeat(4, minmax(120px, 1fr)); gap: 10px; margin: 14px 0; }
+        .regulation-filters label { margin: 0; }
+        .regulation-filters input, .regulation-filters select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); }
+        .regulation-list { display: grid; gap: 10px; }
+        .regulation-card { border: 1px solid var(--border); border-radius: 10px; padding: 13px; background: rgba(0,0,0,.12); }
+        .regulation-card summary { cursor: pointer; list-style-position: outside; }
+        .regulation-card h3 { display: inline; margin: 0; font-size: .96rem; }
+        .regulation-card .badge { margin-left: 6px; }
+        .regulation-detail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; margin-top: 12px; }
+        .regulation-detail p { margin: 0; }
+        .regulation-detail a { color: #93c5fd; overflow-wrap: anywhere; }
+        @media (max-width: 760px) { .regulation-filters, .regulation-detail { grid-template-columns: 1fr; } }
         .duty-status-row {
             display: flex;
             gap: 8px;
@@ -435,6 +447,20 @@
                 </div>
                 <div id="consumer-regulatory-status">加载中…</div>
             </div>
+            <div class="panel" id="regulations-by-country-panel">
+                <div class="crawl-section-title">
+                    <div><h2 style="margin:0 0 4px">Regulations by Country</h2><p class="meta" style="margin:0">只读法规索引：按国家、类别、状态和官方来源健康度查看当前维护规则。</p></div>
+                    <button type="button" class="btn-ghost" id="btn-refresh-country-regulations">刷新法规列表</button>
+                </div>
+                <div class="regulation-filters">
+                    <label>搜索<input id="regulation-search" type="search" placeholder="法规、机构、HS、产品关键词"></label>
+                    <label>国家<select id="regulation-country"><option value="">全部国家</option></select></label>
+                    <label>类别<select id="regulation-category"><option value="">全部类别</option></select></label>
+                    <label>状态<select id="regulation-status"><option value="">全部状态</option></select></label>
+                    <label>来源健康<select id="regulation-source-health"><option value="">全部来源状态</option><option value="current">Automatic current</option><option value="manual_current">Manual current</option><option value="last_good">Last-good</option><option value="country_caveat">Country caveat</option><option value="not_monitored">Not monitored</option></select></label>
+                </div>
+                <div id="regulations-by-country">加载中…</div>
+            </div>
             <div class="panel">
                 <div class="status-bar" id="status-bar">加载中…</div>
                 <div class="row">
@@ -525,6 +551,7 @@
         </div>
     </div>
 
+    <script src="lib/admin-regulations-by-country.js?v=20261010"></script>
     <script>
         const STORAGE_KEY = 'tc_admin_token';
         const API_BASE_KEY = 'tc_admin_api_base';
@@ -536,6 +563,8 @@
         const crawlSummary = document.getElementById('crawl-summary');
         const dutyRateStatus = document.getElementById('duty-rate-status');
         const consumerRegulatoryStatus = document.getElementById('consumer-regulatory-status');
+        const countryRegulationsStatus = document.getElementById('regulations-by-country');
+        let countryRegulationRows = [];
         const unmetSearchStatus = document.getElementById('unmet-search-status');
         const qualityStatus = document.getElementById('quality-status');
         const coverageMatrixView = document.getElementById('coverage-matrix-view');
@@ -994,6 +1023,64 @@
                 throw new Error(`HTTP ${response.status}: ${path}`);
             }
             return response.json();
+        }
+
+        const regulationHealthLabels = {
+            current: 'Automatic current', manual_current: 'Manual review current', last_good: 'Last-good retained',
+            country_caveat: 'Country source caveat', not_monitored: 'Not individually monitored'
+        };
+        const regulationCoverageLabels = {
+            official_exact: 'Official exact requirement', official_linked: 'Official-linked baseline',
+            preliminary: 'Preliminary applicability signal', monitor: 'Monitor / professional confirmation'
+        };
+
+        function setRegulationFilterOptions(rows) {
+            const fill = (id, values, label) => {
+                const select = document.getElementById(id);
+                const current = select.value;
+                select.innerHTML = `<option value="">${label}</option>${values.map(([value, text]) => `<option value="${escapeHtml(value)}">${escapeHtml(text)}</option>`).join('')}`;
+                if ([...select.options].some(option => option.value === current)) select.value = current;
+            };
+            const countries = [...new Map(rows.map(row => [row.country, row.countryLabel])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+            const categories = [...new Map(rows.map(row => [row.category, row.categoryLabel])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+            const statuses = [...new Set(rows.map(row => row.status))].sort().map(value => [value, value]);
+            fill('regulation-country', countries, '全部国家');
+            fill('regulation-category', categories, '全部类别');
+            fill('regulation-status', statuses, '全部状态');
+        }
+
+        function renderCountryRegulationList() {
+            if (!countryRegulationsStatus || !globalThis.TraceWizeAdminRegulations) return;
+            const filters = {
+                query: document.getElementById('regulation-search').value,
+                country: document.getElementById('regulation-country').value,
+                category: document.getElementById('regulation-category').value,
+                status: document.getElementById('regulation-status').value,
+                sourceHealth: document.getElementById('regulation-source-health').value
+            };
+            const rows = globalThis.TraceWizeAdminRegulations.filterRows(countryRegulationRows, filters);
+            const summary = globalThis.TraceWizeAdminRegulations.summarize(rows);
+            const visible = rows.slice(0, 200);
+            countryRegulationsStatus.innerHTML = `
+                <div class="summary-grid"><div class="summary-card"><strong>${summary.total}</strong><span>Matching regulations</span></div><div class="summary-card"><strong>${summary.countries.size}</strong><span>Countries / regions</span></div><div class="summary-card"><strong>${summary.active}</strong><span>Active</span></div><div class="summary-card"><strong>${summary.future}</strong><span>Future / pending</span></div><div class="summary-card"><strong>${summary.caveat}</strong><span>Source caveat</span></div></div>
+                ${rows.length > visible.length ? `<p class="meta">显示前 ${visible.length} 条，共 ${rows.length} 条；请使用筛选缩小范围。</p>` : `<p class="meta">显示 ${rows.length} 条只读规则。相同法规在不同产品或路线规则中可能分别出现。</p>`}
+                <div class="regulation-list">${visible.length ? visible.map(row => `<details class="regulation-card"><summary><h3>${escapeHtml(row.name)}</h3><span class="badge tag">${escapeHtml(row.countryLabel)}</span><span class="badge">${escapeHtml(row.categoryLabel)}</span><span class="badge ${['last_good', 'country_caveat'].includes(row.sourceHealth) ? 'benchmark' : 'auto_updatable'}">${escapeHtml(regulationHealthLabels[row.sourceHealth] || row.sourceHealth)}</span></summary><div class="regulation-detail"><p><strong>ID</strong><br>${escapeHtml(row.id)}</p><p><strong>Status / direction</strong><br>${escapeHtml(row.status)} · ${escapeHtml(row.direction)}</p><p><strong>Coverage</strong><br>${escapeHtml(regulationCoverageLabels[row.coverageLevel] || row.coverageLevel)}</p><p><strong>Effective / reviewed</strong><br>${escapeHtml(row.effectiveDate || 'Not recorded')} · ${escapeHtml(row.lastVerifiedAt || 'review date not recorded')}</p><p><strong>Authority</strong><br>${escapeHtml(row.authority)}</p><p><strong>Risk</strong><br>${escapeHtml(row.riskLevel)}</p><p><strong>HS scope</strong><br>${escapeHtml(row.hsCodes.join(', ') || 'Classification required')}</p><p><strong>Affected product terms</strong><br>${escapeHtml(row.keywords.slice(0, 12).join(', ') || 'Not mapped')}</p><p style="grid-column:1/-1"><strong>Description</strong><br>${escapeHtml(row.description || 'No summary')}</p><p style="grid-column:1/-1"><strong>Official source</strong><br>${row.sourceUrl ? `<a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.sourceUrl)}</a>` : 'Not recorded'}</p></div></details>`).join('') : '<div class="empty">没有符合当前筛选条件的法规。</div>'}</div>`;
+        }
+
+        async function loadCountryRegulations() {
+            if (!countryRegulationsStatus || !globalThis.TraceWizeAdminRegulations) return;
+            countryRegulationsStatus.innerHTML = '<p class="meta">正在建立国家法规索引…</p>';
+            try {
+                const [tags, registry, snapshots, accuracy] = await Promise.all([
+                    fetchStaticJson('data/tags.json'), fetchStaticJson('data/country-registry.json'),
+                    fetchStaticJson('data/consumer-regulatory-snapshots.json'), fetchStaticJson('data/regulatory-accuracy-status.json')
+                ]);
+                countryRegulationRows = globalThis.TraceWizeAdminRegulations.buildRows(tags, registry, snapshots, accuracy);
+                setRegulationFilterOptions(countryRegulationRows);
+                renderCountryRegulationList();
+            } catch (error) {
+                countryRegulationsStatus.innerHTML = `<div class="empty">国家法规列表加载失败：${escapeHtml(error.message)}</div>`;
+            }
         }
 
         function getDefaultCoveragePayload() {
@@ -2758,6 +2845,7 @@
         function showReview(skipInitialLoad = false) {
             loginPanel.classList.add('hidden');
             reviewPanel.classList.remove('hidden');
+            loadCountryRegulations();
             loadCrawlSummary();
             loadDutyRateStatus();
             loadConsumerRegulatoryStatus();
@@ -2908,6 +2996,10 @@
             document.getElementById('artifact-file').focus();
         });
         document.getElementById('btn-refresh-consumer-regulations').addEventListener('click', loadConsumerRegulatoryStatus);
+        document.getElementById('btn-refresh-country-regulations').addEventListener('click', loadCountryRegulations);
+        ['regulation-search', 'regulation-country', 'regulation-category', 'regulation-status', 'regulation-source-health'].forEach((id) => {
+            document.getElementById(id).addEventListener(id === 'regulation-search' ? 'input' : 'change', renderCountryRegulationList);
+        });
         consumerRegulatoryStatus.addEventListener('click', (event) => {
             const button = event.target.closest('[data-regulatory-action]');
             if (button) handleRegulatoryReviewAction(button);
@@ -2950,7 +3042,7 @@
                 statusBar.textContent = `Connected · build ${health.build || 'unknown'} · engine ${health.engine || '—'}`;
                 showReview(true);
                 await loadPending();
-                await Promise.all([loadDutyRateStatus(), loadConsumerRegulatoryStatus(), loadUnmetSearches(), loadQualityStatus()]);
+                await Promise.all([loadDutyRateStatus(), loadConsumerRegulatoryStatus(), loadCountryRegulations(), loadUnmetSearches(), loadQualityStatus()]);
             } catch (err) {
                 setToken('');
                 showLogin();
