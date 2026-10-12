@@ -45,9 +45,23 @@
                 </div>
                 <div class="sell-check-grid">
                     <label class="sell-check-field"><span>Made in</span><select id="sell-origin"><option value="CN">China</option><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="AU">Australia</option><option value="NZ">New Zealand</option><option value="OTHER">Other</option></select></label>
+                    <label class="sell-check-field"><span>Assessment scope</span><select id="sell-market-mode"><option value="single">Single destination</option><option value="compare">Compare 2–4 markets</option></select></label>
                     <label class="sell-check-field"><span>Target market</span><select id="sell-market"><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="AU">Australia</option><option value="NZ">New Zealand</option><option value="ANZ">Australia + New Zealand comparison</option></select></label>
                     <label class="sell-check-field"><span>Sales channel</span><select id="sell-platform"><option>Amazon</option><option>TikTok Shop</option><option>Shopify / own store</option><option>Other marketplace</option></select></label>
                 </div>
+                <fieldset id="sell-market-comparison" class="sell-market-comparison" hidden>
+                    <legend>Markets to compare</legend>
+                    <p>Select 2–4 destinations. No market is selected automatically.</p>
+                    <div>
+                        <label><input type="checkbox" name="comparisonMarket" value="US"> United States</label>
+                        <label><input type="checkbox" name="comparisonMarket" value="EU"> European Union</label>
+                        <label><input type="checkbox" name="comparisonMarket" value="AU"> Australia</label>
+                        <label><input type="checkbox" name="comparisonMarket" value="NZ"> New Zealand</label>
+                        <label><input type="checkbox" name="comparisonMarket" value="JP"> Japan</label>
+                        <label><input type="checkbox" name="comparisonMarket" value="SG"> Singapore</label>
+                    </div>
+                    <small>Comparison shows shared evidence, destination-specific actions and evidence that cannot be transferred automatically. It does not rank legal approval or guarantee market entry.</small>
+                </fieldset>
                 <div class="sell-check-grid sell-exact-hs-fields">
                     <label id="sell-exact-hs-single-field" class="sell-check-field"><span>Exact national HS code (optional)</span><input id="sell-exact-hs" inputmode="numeric" maxlength="12" placeholder="8 or 10 digits"></label>
                     <label id="sell-exact-hs-au-field" class="sell-check-field" hidden><span>Australia tariff code (optional)</span><input id="sell-exact-hs-au" inputmode="numeric" maxlength="12" placeholder="8 digits"></label>

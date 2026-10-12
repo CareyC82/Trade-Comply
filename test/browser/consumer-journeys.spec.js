@@ -187,6 +187,28 @@ test('ANZ comparison keeps shared evidence and local obligations separate', asyn
     await expect(page.locator('[data-exact-tariff-select][data-market="NZ"]').first()).toBeVisible();
 });
 
+test('multi-market comparison requires explicit selection and separates local actions', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await page.getByLabel('Product name or short description').fill('Portable Bluetooth speaker with rechargeable lithium battery, for adults');
+    await page.getByLabel('Assessment scope').selectOption('compare');
+    await expect(page.getByLabel('Target market')).toBeHidden();
+    await expect(page.locator('#sell-market-comparison')).toBeVisible();
+    await expect(page.locator('input[name="comparisonMarket"]:checked')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    await expect(page.locator('#sell-check-error')).toContainText('Select between 2 and 4 markets');
+    await page.locator('input[name="comparisonMarket"][value="US"]').check();
+    await page.locator('input[name="comparisonMarket"][value="EU"]').check();
+    await page.locator('input[name="comparisonMarket"][value="AU"]').check();
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    const comparison = page.locator('.sell-market-comparison-result');
+    await expect(comparison).toBeVisible();
+    await expect(comparison).toContainText('United States-specific actions');
+    await expect(comparison).toContainText('European Union-specific actions');
+    await expect(comparison).toContainText('Australia-specific actions');
+    await expect(comparison).toContainText('Shared / reusable evidence');
+    await expect(comparison).toContainText('Not automatically transferable');
+});
+
 test('private workspace failure leaves the anonymous assessment usable', async ({ page }) => {
     await page.route('**/api/consumer/**', (route) => route.abort());
     await submitProduct(page, 'Bluetooth speaker with rechargeable lithium battery');

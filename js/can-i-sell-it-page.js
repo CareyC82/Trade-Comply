@@ -52,6 +52,8 @@ function bootstrapCanISellItPage() {
     const accountEmail = document.getElementById('sell-account-email');
     const accountMessage = document.getElementById('sell-account-message');
     const marketSelect = document.getElementById('sell-market');
+    const marketModeSelect = document.getElementById('sell-market-mode');
+    const marketComparison = document.getElementById('sell-market-comparison');
     const exactHsSingleField = document.getElementById('sell-exact-hs-single-field');
     const exactHsAuField = document.getElementById('sell-exact-hs-au-field');
     const exactHsNzField = document.getElementById('sell-exact-hs-nz-field');
@@ -72,13 +74,38 @@ function bootstrapCanISellItPage() {
     const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
     const ALLOWED_UPLOAD_TYPES = new Set(['application/pdf', 'image/png', 'image/jpeg', 'image/webp']);
 
+    const marketLabels = {
+        US: 'United States', EU: 'European Union', JP: 'Japan', SG: 'Singapore',
+        AU: 'Australia', NZ: 'New Zealand', ANZ: 'Australia + New Zealand'
+    };
+
+    function selectedComparisonMarkets() {
+        return Array.from(marketComparison.querySelectorAll('input[name="comparisonMarket"]:checked')).map((input) => input.value);
+    }
+
+    function marketDisplay(input = currentInput) {
+        if (input?.market === 'MULTI') return (input.markets || []).map((market) => marketLabels[market] || market).join(' + ');
+        return marketLabels[input?.market] || input?.market || '';
+    }
+
     function updateExactHsFields() {
+        const comparing = marketModeSelect.value === 'compare';
         const anz = marketSelect.value === 'ANZ';
-        exactHsSingleField.hidden = anz;
-        exactHsAuField.hidden = !anz;
-        exactHsNzField.hidden = !anz;
+        marketSelect.closest('.sell-check-field').hidden = comparing;
+        marketComparison.hidden = !comparing;
+        exactHsSingleField.hidden = comparing || anz;
+        exactHsAuField.hidden = comparing || !anz;
+        exactHsNzField.hidden = comparing || !anz;
     }
     marketSelect.addEventListener('change', updateExactHsFields);
+    marketModeSelect.addEventListener('change', updateExactHsFields);
+    marketComparison.addEventListener('change', (event) => {
+        if (!event.target.matches('input[name="comparisonMarket"]')) return;
+        const selected = selectedComparisonMarkets();
+        marketComparison.querySelectorAll('input[name="comparisonMarket"]:not(:checked)').forEach((input) => {
+            input.disabled = selected.length >= 4;
+        });
+    });
     updateExactHsFields();
 
     function normalizeExactHs(value) {
@@ -86,6 +113,7 @@ function bootstrapCanISellItPage() {
     }
 
     function validateExactHsInputs(market) {
+        if (market === 'MULTI') return '';
         const checks = market === 'ANZ'
             ? [
                 ['Australia tariff code', document.getElementById('sell-exact-hs-au').value],
@@ -125,7 +153,9 @@ function bootstrapCanISellItPage() {
         , bundledAdapter: 'AC adaptor included', ratedVoltage: 'Rated AC input voltage (V)', ratedPower: 'Rated input power (W)'
     };
 
-    const runAssessment = (input) => input.market === 'ANZ' ? engine.assessAnz(input) : engine.assess(input);
+    const runAssessment = (input) => input.market === 'MULTI'
+        ? engine.assessMarkets(input)
+        : input.market === 'ANZ' ? engine.assessAnz(input) : engine.assess(input);
 
     const regulatorySnapshotsReady = fetch('data/consumer-regulatory-snapshots.json', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null).then((payload) => {
         (payload?.sources || []).forEach((snapshot) => {
@@ -139,7 +169,9 @@ function bootstrapCanISellItPage() {
         const modelPriorities = models.getProduct(productType).priorityQuestions || [];
         const scope = currentInput?.market === 'ANZ'
             ? (models.marketScopeMappings?.AU?.[productType] || models.marketScopeMappings?.NZ?.[productType])
-            : models.marketScopeMappings?.[currentInput?.market]?.[productType];
+            : currentInput?.market === 'MULTI'
+                ? models.marketScopeMappings?.[currentInput.markets?.[0]]?.[productType]
+                : models.marketScopeMappings?.[currentInput?.market]?.[productType];
         const scopePriorities = scope
             ? (profile.mainsPowered === 'unknown' ? ['mainsPowered', 'bundledAdapter']
                 : profile.mainsPowered === true || profile.bundledAdapter === true
@@ -177,7 +209,7 @@ function bootstrapCanISellItPage() {
 
     function renderEvidenceQuestions(profile) {
         const platformQuestions = engine.platformEvidenceQuestions(currentInput.platform, profile);
-        const applicableRequirements = currentInput.market === 'ANZ'
+        const applicableRequirements = ['ANZ', 'MULTI'].includes(currentInput.market)
             ? runAssessment({ ...currentInput, attributes: profile, documents: [], assessmentMode: 'quick', blockingQuestionKeys: [] }).requirements
             : engine.marketRequirements(currentInput.market, profile);
         const marketQuestions = engine.evidenceQuestionsForRequirements(
@@ -425,6 +457,24 @@ function bootstrapCanISellItPage() {
 
     function renderAssessment(assessment) {
         const list = (items = []) => items.length ? items.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>None identified from the supplied facts.</li>';
+        const comparisonVerdictLabel = {
+            high_risk: 'Specialist review required', information_missing: 'More facts needed',
+            conditional: 'Conditional path', feasible_precheck: 'No blocking pre-check gap'
+        };
+        const multiMarketPanel = assessment.multiMarketComparison ? `
+            <section class="sell-result-panel sell-market-comparison-result" aria-label="Multi-market comparison">
+                <div class="sell-comparison-heading"><div><span>Multi-market comparison</span><h2>${assessment.multiMarketComparison.markets.map((market) => escapeHtml(marketLabels[market] || market)).join(' · ')}</h2></div><p>Each destination is assessed independently. A shared report may reduce duplicate testing, but it does not transfer a local approval, registration or responsible-party duty.</p></div>
+                <div class="sell-market-summary-grid">
+                    ${assessment.multiMarketComparison.marketSummaries.map((summary) => `<article class="sell-market-summary sell-market-summary--${escapeHtml(summary.verdict)}"><span>${escapeHtml(summary.label)}</span><strong>${escapeHtml(comparisonVerdictLabel[summary.verdict] || summary.verdictLabel)}</strong><p>${escapeHtml(summary.verdictDetail)}</p><small>${escapeHtml(summary.coverage.label)} · ${escapeHtml(summary.documentGapCount)} document gap${summary.documentGapCount === 1 ? '' : 's'} · ${escapeHtml(summary.unansweredCount)} unanswered fact${summary.unansweredCount === 1 ? '' : 's'}</small></article>`).join('')}
+                </div>
+                <div class="sell-requirement-grid sell-comparison-evidence-grid">
+                    <article class="sell-requirement"><span>Shared / reusable evidence</span><ul>${list(assessment.multiMarketComparison.sharedEvidence)}</ul></article>
+                    <article class="sell-requirement sell-requirement--scope_check"><span>Not automatically transferable</span><ul>${list(assessment.multiMarketComparison.notAutomaticallyTransferable)}</ul></article>
+                    ${assessment.multiMarketComparison.markets.map((market) => `<article class="sell-requirement"><span>${escapeHtml(marketLabels[market] || market)}-specific actions</span><ul>${list(assessment.multiMarketComparison.marketSpecificActions[market])}</ul></article>`).join('')}
+                    <article class="sell-requirement sell-requirement--scope_check"><span>Missing facts</span><ul>${list(assessment.multiMarketComparison.missingFacts)}</ul></article>
+                    <article class="sell-requirement sell-requirement--advisory"><span>Professional confirmation</span><ul>${list(assessment.multiMarketComparison.professionalConfirmation)}</ul></article>
+                </div>
+            </section>` : '';
         const anzPanel = assessment.anzComparison ? `
             <section class="sell-result-panel sell-anz-comparison" aria-label="Australia and New Zealand comparison">
                 <h2>Australia + New Zealand comparison</h2>
@@ -477,8 +527,8 @@ function bootstrapCanISellItPage() {
                     <article><span>Break-even sale price</span><strong>${money(value.breakEvenPrice, value.currency)}</strong></article>
                 </div><p class="sell-panel-note">${escapeHtml(value.caveat)}</p>
             </section>` : '';
-        const anzEconomics = assessment.economicsByMarket
-            ? `${economicsCard(assessment.economicsByMarket.AU, 'Australia landed cost estimate')}${economicsCard(assessment.economicsByMarket.NZ, 'New Zealand landed cost estimate')}`
+        const comparisonEconomics = assessment.economicsByMarket
+            ? Object.entries(assessment.economicsByMarket).map(([market, value]) => economicsCard(value, `${marketLabels[market] || market} landed cost estimate`)).join('')
             : '';
         const economicsPanel = economics ? `
             <section class="sell-result-panel"><h2>Landed cost and margin estimate</h2>
@@ -491,7 +541,7 @@ function bootstrapCanISellItPage() {
                     <article><span>Contribution margin</span><strong>${economics.marginRate === null ? 'Pending' : `${(economics.marginRate * 100).toFixed(1)}%`}</strong></article>
                     <article><span>Break-even sale price</span><strong>${money(economics.breakEvenPrice, economics.currency)}</strong></article>
                 </div><p class="sell-panel-note">${escapeHtml(economics.caveat)}</p>
-            </section>` : (anzEconomics || `<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">${escapeHtml(assessment.economicsNote || 'Add purchase price and expected selling price to calculate the commercial result.')}</p></section>`);
+            </section>` : (comparisonEconomics || `<section class="sell-result-panel"><h2>Landed cost and margin estimate</h2><p class="sell-panel-note">${escapeHtml(assessment.economicsNote || 'Add purchase price and expected selling price to calculate the commercial result.')}</p></section>`);
         const conclusion = assessment.consumerConclusion;
         const sellerConclusion = assessment.sellerConclusion;
         const commercial = assessment.commercialConclusion;
@@ -560,11 +610,12 @@ function bootstrapCanISellItPage() {
             </section>
             ${assessment.coverageStatus.supported && assessment.marketCoverage.level !== 'limited' ? '' : `<section class="sell-coverage-warning"><strong>${escapeHtml(assessment.marketCoverage.level === 'limited' ? assessment.marketCoverage.label : assessment.coverageStatus.label)}</strong><p>${escapeHtml(assessment.marketCoverage.level === 'limited' ? assessment.marketCoverage.detail : assessment.coverageStatus.detail)}</p></section>`}
             <div class="sell-answer-summary">
-                <article><span>Market</span><strong>${escapeHtml(currentInput.market)}</strong></article>
+                <article><span>Market${assessment.marketTargets?.length > 1 ? 's' : ''}</span><strong>${escapeHtml(marketDisplay())}</strong></article>
                 <article><span>Product</span><strong>${escapeHtml(assessment.product.label)}</strong></article>
                 <article><span>Sales channel</span><strong id="sell-summary-platform">${escapeHtml(currentInput.platform)}</strong></article>
                 <article><span>Can the battery be shipped?</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
+            ${multiMarketPanel}
             ${anzPanel}
             <section class="sell-result-panel sell-action-summary" aria-label="Your next three actions">
                 <h2>Your next three actions</h2>
@@ -585,7 +636,7 @@ function bootstrapCanISellItPage() {
             </section>
             ${commercialPanel}
             <section class="sell-payment-next"><div><span>After product readiness</span><h2>Check the transaction and payment route</h2><p>Market-access screening does not confirm whether the payer, payee, documents and payment route are ready for bank submission.</p></div><a href="can-i-pay.html">Continue to Can I Pay / Get Paid? →</a></section>
-            <section class="sell-result-panel sell-review-brief"><header class="sell-report-metadata"><strong>TraceWize</strong><span>Report ${escapeHtml(reportId)}</span><span>Generated ${escapeHtml(reportGeneratedAt)}</span><span>${escapeHtml(currentInput.origin)} → ${escapeHtml(currentInput.market)} · ${escapeHtml(currentInput.platform)}</span></header><div class="sell-review-brief-head"><div><span>Preliminary compliance readiness report</span><h2>Current review status</h2><p>Screening output only — not a certification, approval or legal opinion.</p></div><strong class="sell-ragu sell-ragu--${escapeHtml(reviewBrief.overall.toLowerCase())}">${escapeHtml(reviewBrief.overall)}</strong></div><div class="sell-review-summary"><section><strong>Product scope · ${escapeHtml(reviewBrief.scope.status)}</strong><p>${escapeHtml(reviewBrief.scope.detail)}</p></section><section><strong>Regulatory path · ${escapeHtml(reviewBrief.path.status)}</strong><p>${escapeHtml(reviewBrief.path.detail)}</p></section></div><ul class="sell-evidence-matrix">${evidenceMatrix}</ul><div class="sell-review-brief-foot"><section><strong>Next actions</strong><ol>${reviewActions}</ol></section><section><strong>Professional confirmation</strong><ul>${professionalConfirmation}</ul></section><section><strong>Cost and timing · ${escapeHtml(reviewBrief.costTiming.status)}</strong><p>${escapeHtml(reviewBrief.costTiming.detail)}</p></section></div></section>
+            <section class="sell-result-panel sell-review-brief"><header class="sell-report-metadata"><strong>TraceWize</strong><span>Report ${escapeHtml(reportId)}</span><span>Generated ${escapeHtml(reportGeneratedAt)}</span><span>${escapeHtml(currentInput.origin)} → ${escapeHtml(marketDisplay())} · ${escapeHtml(currentInput.platform)}</span></header><div class="sell-review-brief-head"><div><span>Preliminary compliance readiness report</span><h2>Current review status</h2><p>Screening output only — not a certification, approval or legal opinion.</p></div><strong class="sell-ragu sell-ragu--${escapeHtml(reviewBrief.overall.toLowerCase())}">${escapeHtml(reviewBrief.overall)}</strong></div><div class="sell-review-summary"><section><strong>Product scope · ${escapeHtml(reviewBrief.scope.status)}</strong><p>${escapeHtml(reviewBrief.scope.detail)}</p></section><section><strong>Regulatory path · ${escapeHtml(reviewBrief.path.status)}</strong><p>${escapeHtml(reviewBrief.path.detail)}</p></section></div><ul class="sell-evidence-matrix">${evidenceMatrix}</ul><div class="sell-review-brief-foot"><section><strong>Next actions</strong><ol>${reviewActions}</ol></section><section><strong>Professional confirmation</strong><ul>${professionalConfirmation}</ul></section><section><strong>Cost and timing · ${escapeHtml(reviewBrief.costTiming.status)}</strong><p>${escapeHtml(reviewBrief.costTiming.detail)}</p></section></div></section>
             <section class="sell-review-cta" aria-label="Compliance Review Services"><div><span>Recommended human review · ${escapeHtml(service.service)}</span><h2>${escapeHtml(service.title)}</h2><p>${escapeHtml(service.reason)}</p>${service.marketMessage ? `<p class="sell-review-market-message">${escapeHtml(service.marketMessage)}</p>` : ''}<p>Prepare a non-confidential request, then inspect and send it yourself in your email app. Nothing is uploaded or sent automatically. If the draft does not open, email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Prepare / Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><details class="sell-review-preparation" open><summary>Prepare the review request</summary><p>Optional. Enter non-confidential technical facts only. Do not enter supplier identity, pricing or private document content.</p><div><label>Exact model<input id="sell-review-model" maxlength="80" placeholder="e.g. SPK-100"></label><label>Product or image notes<input id="sell-review-product-notes" maxlength="500" placeholder="Non-confidential description or public product link"></label><label>Power and adaptor<input id="sell-review-power" maxlength="200" placeholder="e.g. USB-C 5V; adaptor not included"></label><label>Wireless functions<input id="sell-review-wireless" maxlength="200" placeholder="e.g. Bluetooth 5.3; no Wi-Fi"></label><label>Battery<input id="sell-review-battery" maxlength="200" placeholder="e.g. Li-ion pack BAT-02, 18 Wh"></label><label>Available document types<input id="sell-review-documents" maxlength="300" placeholder="e.g. FCC report, UN38.3, DoC"></label><label>Number of SKUs<input id="sell-review-sku-count" type="number" min="1" max="500" inputmode="numeric"></label></div></details><details class="sell-review-scope"><summary>What the review covers</summary><div class="sell-review-service-options"><section><strong>Single Product Review</strong><p>One exact model and destination market.</p></section><section><strong>Supplier Document Review</strong><p>Model, manufacturer, report, declaration, battery, adaptor and wireless-module consistency.</p></section><section><strong>Product Range Review</strong><p>Several related SKUs or a planned purchase range.</p></section></div><div><section><strong>Prepare</strong><ul>${serviceInputs}</ul></section><section><strong>Review output</strong><ul>${serviceDeliverables}</ul></section></div><p>${escapeHtml(service.boundary)}</p>${service.marketMessage ? '<p><strong>Australia:</strong> RCM is a regulatory compliance marking framework, not a certificate issued by TraceWize.</p>' : ''}</details><p id="sell-review-status" aria-live="polite"></p></section>
             <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
                 <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}${freshness.degradedCount ? ` · ${escapeHtml(freshness.degradedCount)} source refresh unavailable; last-good retained${freshness.lastGoodThrough ? ` from ${escapeHtml(freshness.lastGoodThrough)}` : ''}` : ''}${freshness.futureCount ? ` · ${escapeHtml(freshness.futureCount)} future requirement` : ''}${freshness.pendingEffectiveDateCount ? ` · ${escapeHtml(freshness.pendingEffectiveDateCount)} effective date pending` : ''}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
@@ -612,7 +663,7 @@ function bootstrapCanISellItPage() {
             }
             api('/assessments', { method: 'POST', body: JSON.stringify({
                 productLabel: assessment.product.label,
-                market: currentInput.market,
+                market: marketDisplay(),
                 platform: currentInput.platform,
                 input: { ...currentInput, dutyRates: undefined },
                 assessment
@@ -624,7 +675,9 @@ function bootstrapCanISellItPage() {
                 const code = normalizeExactHs(select.value);
                 if (!code) return;
                 const market = select.dataset.market;
-                if (currentInput.market === 'ANZ') {
+                if (currentInput.market === 'MULTI') {
+                    currentInput.exactHsCodes = { ...(currentInput.exactHsCodes || {}), [market]: code };
+                } else if (currentInput.market === 'ANZ') {
                     if (market === 'AU') {
                         currentInput.exactHsCodeAu = code;
                         document.getElementById('sell-exact-hs-au').value = code;
@@ -658,7 +711,7 @@ function bootstrapCanISellItPage() {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = supplierRequestFilename(assessment.product.label, currentInput.market);
+            link.download = supplierRequestFilename(assessment.product.label, marketDisplay());
             document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
             document.getElementById('sell-copy-status').textContent = 'Downloaded locally. No supplier or pricing data was uploaded.';
         });
@@ -749,7 +802,14 @@ function bootstrapCanISellItPage() {
             error.hidden = false;
             return;
         }
-        const market = document.getElementById('sell-market').value;
+        const comparing = marketModeSelect.value === 'compare';
+        const markets = comparing ? selectedComparisonMarkets() : [];
+        if (comparing && (markets.length < 2 || markets.length > 4)) {
+            error.textContent = 'Select between 2 and 4 markets to compare.';
+            error.hidden = false;
+            return;
+        }
+        const market = comparing ? 'MULTI' : document.getElementById('sell-market').value;
         const exactHsError = validateExactHsInputs(market);
         if (exactHsError) {
             error.textContent = exactHsError;
@@ -763,6 +823,7 @@ function bootstrapCanISellItPage() {
             description,
             origin: document.getElementById('sell-origin').value,
             market,
+            markets,
             platform: document.getElementById('sell-platform').value,
             exactHsCode: normalizeExactHs(document.getElementById('sell-exact-hs').value),
             exactHsCodeAu: normalizeExactHs(document.getElementById('sell-exact-hs-au').value),
