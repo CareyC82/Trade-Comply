@@ -33,7 +33,9 @@ test('admin exposes consumer regulatory lifecycle, last-good status and manual r
     assert.match(html, /Manual review current/);
     assert.match(html, /Current user conclusions/);
     assert.ok(payload.counts.manual_review_current > 0);
-    assert.equal(payload.counts.last_good_degraded, 0);
+    assert.equal(payload.counts.last_good_degraded, payload.sources.filter((source) => source.status === 'last_good_degraded').length);
+    assert.ok(payload.sources.filter((source) => source.status === 'last_good_degraded')
+        .every((source) => source.content_hash && source.last_good_at));
     assert.ok(['current', 'manual_review_current', 'last_good_degraded', 'baseline_seed']
         .every((status) => Number.isInteger(payload.counts[status])));
     assert.equal(payload.counts.current + payload.counts.manual_review_current + (payload.counts.last_good_degraded || 0) + (payload.counts.baseline_seed || 0), payload.source_count);
