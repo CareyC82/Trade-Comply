@@ -28,11 +28,39 @@ test('country regulation filters support country, category, status, health and t
     assert.deepEqual(model.filterRows(rows, { query: 'bluetooth' }).map((row) => row.id), ['CL-AU-1']);
 });
 
+test('country regulation index merges duplicate source records and preserves their scope', () => {
+    const duplicate = { ...tags[0], tag_id: 'CL-AU-2', related_hs_codes: ['8525'], related_keywords: ['camera'] };
+    const rows = model.buildRows([...tags, duplicate], registry, { sources: [{ id: 'acma', url: 'https://acma.example/radio', status: 'current' }] }, {});
+    const australia = rows.find((row) => row.country === 'AU');
+    assert.equal(rows.length, 2);
+    assert.equal(australia.occurrenceCount, 2);
+    assert.deepEqual(australia.ids, ['CL-AU-1', 'CL-AU-2']);
+    assert.deepEqual(australia.hsCodes, ['8517', '8525']);
+    assert.deepEqual(australia.keywords, ['bluetooth', 'camera']);
+});
+
+test('country summaries, review filters and exports use the visible merged rows', () => {
+    const rows = model.buildRows(tags, registry, {}, { source_control: { degraded_sources: [{ country: 'NZ' }] } });
+    const needsReview = model.filterRows(rows, { reviewState: 'needs_review' });
+    assert.deepEqual(needsReview.map((row) => row.country), ['AU', 'NZ']);
+    const summary = model.summarizeCountries(rows).find((row) => row.country === 'NZ');
+    assert.equal(summary.needsReview, 1);
+    const exported = model.exportRows(needsReview);
+    const exportedNz = exported.find((row) => row.country_code === 'NZ');
+    assert.equal(exportedNz.country, 'New Zealand');
+    assert.equal(exportedNz.review_state, 'needs_review');
+    assert.match(exportedNz.rule_ids, /CL-NZ-1/);
+});
+
 test('admin exposes a read-only regulations-by-country surface', () => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
     assert.match(html, /Regulations by Country/);
     assert.match(html, /regulation-country/);
     assert.match(html, /regulation-source-health/);
+    assert.match(html, /regulation-review-state/);
+    assert.match(html, /btn-export-regulations-csv/);
+    assert.match(html, /Country coverage summary/);
+    assert.match(html, /Open product and route pre-check/);
     assert.match(html, /Official-linked baseline/);
     assert.match(html, /loadCountryRegulations/);
     assert.doesNotMatch(html, /data-regulation-action="(?:save|delete|publish)"/);

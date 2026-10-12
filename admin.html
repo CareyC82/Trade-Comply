@@ -458,7 +458,10 @@
                     <label>类别<select id="regulation-category"><option value="">全部类别</option></select></label>
                     <label>状态<select id="regulation-status"><option value="">全部状态</option></select></label>
                     <label>来源健康<select id="regulation-source-health"><option value="">全部来源状态</option><option value="current">Automatic current</option><option value="manual_current">Manual current</option><option value="last_good">Last-good</option><option value="country_caveat">Country caveat</option><option value="not_monitored">Not monitored</option></select></label>
+                    <label>复核优先级<select id="regulation-review-state"><option value="">全部复核状态</option><option value="needs_review">待复核</option><option value="review_overdue">复核已逾期</option><option value="upcoming">即将生效（120天内）</option><option value="current">当前</option></select></label>
                 </div>
+                <div class="row"><button type="button" class="btn-ghost" id="btn-export-regulations-csv">导出当前列表 CSV</button><button type="button" class="btn-ghost" id="btn-export-regulations-json">导出当前列表 JSON</button><span class="meta">导出只包含当前筛选结果，不上传数据。</span></div>
+                <div id="regulations-country-coverage"></div>
                 <div id="regulations-by-country">加载中…</div>
             </div>
             <div class="panel">
@@ -1033,6 +1036,20 @@
             official_exact: 'Official exact requirement', official_linked: 'Official-linked baseline',
             preliminary: 'Preliminary applicability signal', monitor: 'Monitor / professional confirmation'
         };
+        const regulationReviewLabels = {
+            current: 'Current', needs_review: 'Needs review', review_overdue: 'Review overdue', upcoming: 'Effective within 120 days'
+        };
+
+        function currentRegulationFilters() {
+            return {
+                query: document.getElementById('regulation-search').value,
+                country: document.getElementById('regulation-country').value,
+                category: document.getElementById('regulation-category').value,
+                status: document.getElementById('regulation-status').value,
+                sourceHealth: document.getElementById('regulation-source-health').value,
+                reviewState: document.getElementById('regulation-review-state').value
+            };
+        }
 
         function setRegulationFilterOptions(rows) {
             const fill = (id, values, label) => {
@@ -1051,20 +1068,34 @@
 
         function renderCountryRegulationList() {
             if (!countryRegulationsStatus || !globalThis.TraceWizeAdminRegulations) return;
-            const filters = {
-                query: document.getElementById('regulation-search').value,
-                country: document.getElementById('regulation-country').value,
-                category: document.getElementById('regulation-category').value,
-                status: document.getElementById('regulation-status').value,
-                sourceHealth: document.getElementById('regulation-source-health').value
-            };
-            const rows = globalThis.TraceWizeAdminRegulations.filterRows(countryRegulationRows, filters);
+            const rows = globalThis.TraceWizeAdminRegulations.filterRows(countryRegulationRows, currentRegulationFilters());
             const summary = globalThis.TraceWizeAdminRegulations.summarize(rows);
             const visible = rows.slice(0, 200);
+            const coverage = globalThis.TraceWizeAdminRegulations.summarizeCountries(rows).slice(0, 30);
+            document.getElementById('regulations-country-coverage').innerHTML = coverage.length ? `<details><summary><strong>Country coverage summary</strong> · ${coverage.length} countries / regions in current result</summary><div class="table-wrap"><table><thead><tr><th>Country / region</th><th>Unique regulations</th><th>Active</th><th>Needs review</th><th>Upcoming</th><th>Categories</th></tr></thead><tbody>${coverage.map(row => `<tr><td>${escapeHtml(row.countryLabel)}</td><td>${row.total}</td><td>${row.active}</td><td>${row.needsReview}</td><td>${row.upcoming}</td><td>${escapeHtml(row.categories.join(', '))}</td></tr>`).join('')}</tbody></table></div></details>` : '';
             countryRegulationsStatus.innerHTML = `
                 <div class="summary-grid"><div class="summary-card"><strong>${summary.total}</strong><span>Matching regulations</span></div><div class="summary-card"><strong>${summary.countries.size}</strong><span>Countries / regions</span></div><div class="summary-card"><strong>${summary.active}</strong><span>Active</span></div><div class="summary-card"><strong>${summary.future}</strong><span>Future / pending</span></div><div class="summary-card"><strong>${summary.caveat}</strong><span>Source caveat</span></div></div>
-                ${rows.length > visible.length ? `<p class="meta">显示前 ${visible.length} 条，共 ${rows.length} 条；请使用筛选缩小范围。</p>` : `<p class="meta">显示 ${rows.length} 条只读规则。相同法规在不同产品或路线规则中可能分别出现。</p>`}
-                <div class="regulation-list">${visible.length ? visible.map(row => `<details class="regulation-card"><summary><h3>${escapeHtml(row.name)}</h3><span class="badge tag">${escapeHtml(row.countryLabel)}</span><span class="badge">${escapeHtml(row.categoryLabel)}</span><span class="badge ${['last_good', 'country_caveat'].includes(row.sourceHealth) ? 'benchmark' : 'auto_updatable'}">${escapeHtml(regulationHealthLabels[row.sourceHealth] || row.sourceHealth)}</span></summary><div class="regulation-detail"><p><strong>ID</strong><br>${escapeHtml(row.id)}</p><p><strong>Status / direction</strong><br>${escapeHtml(row.status)} · ${escapeHtml(row.direction)}</p><p><strong>Coverage</strong><br>${escapeHtml(regulationCoverageLabels[row.coverageLevel] || row.coverageLevel)}</p><p><strong>Effective / reviewed</strong><br>${escapeHtml(row.effectiveDate || 'Not recorded')} · ${escapeHtml(row.lastVerifiedAt || 'review date not recorded')}</p><p><strong>Authority</strong><br>${escapeHtml(row.authority)}</p><p><strong>Risk</strong><br>${escapeHtml(row.riskLevel)}</p><p><strong>HS scope</strong><br>${escapeHtml(row.hsCodes.join(', ') || 'Classification required')}</p><p><strong>Affected product terms</strong><br>${escapeHtml(row.keywords.slice(0, 12).join(', ') || 'Not mapped')}</p><p style="grid-column:1/-1"><strong>Description</strong><br>${escapeHtml(row.description || 'No summary')}</p><p style="grid-column:1/-1"><strong>Official source</strong><br>${row.sourceUrl ? `<a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.sourceUrl)}</a>` : 'Not recorded'}</p></div></details>`).join('') : '<div class="empty">没有符合当前筛选条件的法规。</div>'}</div>`;
+                ${rows.length > visible.length ? `<p class="meta">显示前 ${visible.length} 条，共 ${rows.length} 条；请使用筛选缩小范围。</p>` : `<p class="meta">显示 ${rows.length} 条只读法规；相同法规在不同产品或路线中的记录已合并。</p>`}
+                <div class="regulation-list">${visible.length ? visible.map(row => { const productQuery = row.keywords.slice(0, 5).join(' '); const routeLink = `index.html?from=CN&to=${encodeURIComponent(row.country)}&focus=${row.direction === 'export' ? 'export' : 'import'}&product=${encodeURIComponent(productQuery)}`; return `<details class="regulation-card"><summary><h3>${escapeHtml(row.name)}</h3><span class="badge tag">${escapeHtml(row.countryLabel)}</span><span class="badge">${escapeHtml(row.categoryLabel)}</span><span class="badge ${['last_good', 'country_caveat'].includes(row.sourceHealth) ? 'benchmark' : 'auto_updatable'}">${escapeHtml(regulationHealthLabels[row.sourceHealth] || row.sourceHealth)}</span></summary><div class="regulation-detail"><p><strong>Rule IDs</strong><br>${escapeHtml(row.ids.slice(0, 8).join(', '))}${row.ids.length > 8 ? ` +${row.ids.length - 8} more` : ''}</p><p><strong>Merged occurrences</strong><br>${row.occurrenceCount}</p><p><strong>Status / direction</strong><br>${escapeHtml(row.status)} · ${escapeHtml(row.direction)}</p><p><strong>Review state</strong><br>${escapeHtml(regulationReviewLabels[row.reviewState] || row.reviewState)}</p><p><strong>Coverage</strong><br>${escapeHtml(regulationCoverageLabels[row.coverageLevel] || row.coverageLevel)}</p><p><strong>Effective / reviewed</strong><br>${escapeHtml(row.effectiveDate || 'Not recorded')} · ${escapeHtml(row.lastVerifiedAt || 'review date not recorded')}</p><p><strong>Authority</strong><br>${escapeHtml(row.authority)}</p><p><strong>Risk</strong><br>${escapeHtml(row.riskLevel)}</p><p><strong>HS scope</strong><br>${escapeHtml(row.hsCodes.join(', ') || 'Classification required')}</p><p><strong>Affected product terms</strong><br>${escapeHtml(row.keywords.slice(0, 12).join(', ') || 'Not mapped')}</p><p style="grid-column:1/-1"><strong>Description</strong><br>${escapeHtml(row.description || 'No summary')}</p><p style="grid-column:1/-1"><strong>Related assessment</strong><br><a href="${escapeHtml(routeLink)}" target="_blank" rel="noopener noreferrer">Open product and route pre-check</a></p><p style="grid-column:1/-1"><strong>Official source</strong><br>${row.sourceUrl ? `<a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.sourceUrl)}</a>` : 'Not recorded'}</p></div></details>`; }).join('') : '<div class="empty">没有符合当前筛选条件的法规。</div>'}</div>`;
+        }
+
+        function downloadRegulationExport(format) {
+            const filtered = globalThis.TraceWizeAdminRegulations.filterRows(countryRegulationRows, currentRegulationFilters());
+            const rows = globalThis.TraceWizeAdminRegulations.exportRows(filtered);
+            const safeCsv = (value) => {
+                const text = String(value ?? '');
+                const safe = /^[=+\-@]/.test(text) ? `'${text}` : text;
+                return `"${safe.replace(/"/g, '""')}"`;
+            };
+            const body = format === 'json'
+                ? `${JSON.stringify(rows, null, 2)}\n`
+                : `${Object.keys(rows[0] || {}).map(safeCsv).join(',')}\n${rows.map(row => Object.values(row).map(safeCsv).join(',')).join('\n')}\n`;
+            const url = URL.createObjectURL(new Blob([body], { type: format === 'json' ? 'application/json' : 'text/csv;charset=utf-8' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `tracewize-regulations-${new Date().toISOString().slice(0, 10)}.${format}`;
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
         async function loadCountryRegulations() {
@@ -2997,9 +3028,11 @@
         });
         document.getElementById('btn-refresh-consumer-regulations').addEventListener('click', loadConsumerRegulatoryStatus);
         document.getElementById('btn-refresh-country-regulations').addEventListener('click', loadCountryRegulations);
-        ['regulation-search', 'regulation-country', 'regulation-category', 'regulation-status', 'regulation-source-health'].forEach((id) => {
+        ['regulation-search', 'regulation-country', 'regulation-category', 'regulation-status', 'regulation-source-health', 'regulation-review-state'].forEach((id) => {
             document.getElementById(id).addEventListener(id === 'regulation-search' ? 'input' : 'change', renderCountryRegulationList);
         });
+        document.getElementById('btn-export-regulations-csv').addEventListener('click', () => downloadRegulationExport('csv'));
+        document.getElementById('btn-export-regulations-json').addEventListener('click', () => downloadRegulationExport('json'));
         consumerRegulatoryStatus.addEventListener('click', (event) => {
             const button = event.target.closest('[data-regulatory-action]');
             if (button) handleRegulatoryReviewAction(button);
