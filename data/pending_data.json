@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-13T00:18:10.591Z",
+  "updated_at": "2026-10-13T22:24:46.302Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -1915,6 +1915,61 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-10-13T00:18:05.092785+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-10-13T22:24:46.302Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China-based exporters of firearms, optics, and related components to the US market, this reduces certain licensing burdens but does not eliminate core obligations: items remain subject to the US HTS classification, Section 301 tariff exposure, and BIS export control screening. Exporters must still verify whether goods fall under the rescinded rule's scope, confirm end-user/end-use legitimacy, and screen against the Entity List and denied party lists. Note that China-origin firearms and ammunition face separate US import restrictions (e.g., ATF and Section 301 measures), so the rescission primarily affects US-origin export licensing rather than China-to-US import flows. Companies should re-map their product scope, update internal compliance programs, and retain documentation for at least five years.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于面向美国市场的中国枪支、光学器件及相关零部件出口商而言，此举减轻了部分许可负担，但并未免除核心义务：相关物项仍受美国HTS归类、301关税风险及BIS出口管制筛查约束。出口商仍须核实货物是否属于被撤销规则的适用范围，确认最终用户/最终用途的合法性，并对照实体清单和被拒绝方名单进行筛查。需注意，中国原产枪支弹药还面临美国单独的进口限制（如ATF及301措施），因此该撤销主要影响美国原产出口许可，而非中国对美进口流程。企业应重新梳理产品范围，更新内部合规计划，并保留至少五年的单证记录。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "确认产品是否属于被撤销规则范围",
+            "desc": "对照BIS撤销规则原文，逐项核对枪支、弹药、光学及零部件的ECCN/管制分类，确认是否恢复至EAR99或较低管制层级，并留存分类依据。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "BIS出口管制与实体清单筛查",
+            "desc": "对交易各方（买方、中间商、最终用户）进行实体清单、被拒绝方及未经核实清单筛查，获取最终用户声明和最终用途说明，防范转口至受制裁地区。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "HTS归类与301关税评估",
+            "desc": "按10位HTS编码归类枪支及零部件，核对301条款加征清单及税率，计算关税成本，并在商业发票和报关单中准确申报原产地。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "FCC及ATF进口合规核查",
+            "desc": "确认含无线/射频功能的光学或电子配件符合FCC Part 15/18要求；如涉及对美进口，核查ATF进口许可及中国原产枪支弹药的单独限制。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "RoHS/REACH及包装环保合规",
+            "desc": "如产品含电子元件或出口至欧盟中转，核查RoHS有害物质限制及REACH注册义务，确保材料声明和检测报告齐全。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "内部合规计划更新与记录留存",
+            "desc": "更新ICP，明确撤销规则后的许可例外适用条件，保留分类、筛查、最终用户声明等记录至少五年，以备BIS审计。"
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-10-13T22:24:42.347567+00:00"
       }
     }
   ]
