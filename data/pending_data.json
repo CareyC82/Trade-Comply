@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-13T22:24:46.302Z",
+  "updated_at": "2026-10-14T21:22:54.784Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -1970,6 +1970,61 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-10-13T22:24:42.347567+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-10-14T21:22:54.784Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.30 / 9305.20",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS",
+        "content_en": "The US Department of Commerce (BIS) rescinded the Biden-era firearms rule, restoring prior export control treatment for civilian firearms, ammunition, and parts. For China exporters of firearms, ammunition, optics, and related components to the US market, this reduces certain licensing burdens but does not eliminate core obligations: items remain subject to the US export control regime, and re-export or in-country transfer of US-origin firearms technology still requires authorization. Exporters must align HS/HTS classification (9302, 9303, 9305), confirm whether items fall under the rescinded rule's scope, and screen all parties against BIS Entity List, Denied Persons List, and OFAC SDN. Section 301 tariffs on Chinese-origin goods and FCC Part 15/18 requirements for electronic sights and RF-enabled accessories remain applicable. Retain end-use/end-user statements and maintain a documented classification and screening trail.",
+        "content_zh": "美国商务部（BIS）撤销了拜登时期的枪支规则，恢复了对民用枪支、弹药及零部件的原有出口管制待遇。对于向美国市场出口枪支、弹药、光学器件及相关部件的中国出口商而言，这减少了部分许可负担，但并未消除核心义务：相关物项仍受美国出口管制制度约束，美国原产枪支技术的再出口或境内转移仍需授权。出口商必须对齐HS/HTS归类（9302、9303、9305），确认物项是否属于被撤销规则的适用范围，并对所有交易方进行BIS实体清单、被拒绝人员名单及OFAC SDN筛查。针对中国原产商品的301关税以及电子瞄准具和射频配件的FCC Part 15/18要求仍然适用。应保留最终用途/最终用户声明，并维护可追溯的归类与筛查记录。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "HS/HTS归类复核",
+            "desc": "按9302/9303/9305逐项核对枪支、弹药及零部件的10位HTS编码，确认是否落入被撤销规则范围及301关税清单。"
+          },
+          {
+            "phase": "技术核查",
+            "task": "BIS出口管制分类",
+            "desc": "核查物项是否属于USML或EAR管辖，确认ECCN及许可例外适用性，评估再出口与境内转移限制。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "受限方筛查包",
+            "desc": "对买方、收货人、最终用户进行BIS Entity List、Denied Persons List及OFAC SDN筛查，留存筛查截图与日期。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "最终用途/最终用户声明",
+            "desc": "取得并归档买方签署的最终用途与最终用户声明，明确不得用于未经授权的再出口或转让。"
+          },
+          {
+            "phase": "环保注册",
+            "task": "FCC Part 15/18合规",
+            "desc": "对带射频或电子瞄准功能的配件确认FCC ID、模块化认证及供应商符合性声明。"
+          },
+          {
+            "phase": "单证准备",
+            "task": "301关税与原产地证据",
+            "desc": "整理原产地证明、价值构成与生产流程文件，应对301关税加征及海关原产地核查。"
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-10-14T21:22:51.152657+00:00"
       }
     }
   ]
