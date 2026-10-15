@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-15T21:43:30.086Z",
+  "generated_at": "2026-10-15T21:42:24.553Z",
   "ok": true,
   "publish_policy": "complete_batch_only_last_good_retained",
   "summary": {
@@ -178,7 +178,7 @@
       "connector_name": "Japan Customs monthly trade statistics",
       "official_url": "https://www.customs.go.jp/toukei/shinbun/happyou_e.htm",
       "status": "official_feed_pending",
-      "latest_period": "2026-07",
+      "latest_period": "2026-08",
       "official_latest_period": "2099-08",
       "synchronized_through": "",
       "active_data_tier": "historical_fallback",
@@ -262,12 +262,12 @@
       ],
       "status_reason": "The latest official month is known, but no validated industry batch has been published.",
       "official_row_count": 0,
-      "fallback_row_count": 3326,
+      "fallback_row_count": 3344,
       "raw_data_capability": "commodity_country_feed",
       "raw_ingest_status": "production_ready",
       "raw_ingest_note": "Japan Customs 6/9-digit commodity-country rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly JPY-to-USD conversion evidence.",
       "probe_status": "official_probe_ok",
-      "last_checked_at": "2026-09-15T21:43:29.104Z",
+      "last_checked_at": "2026-10-15T21:42:23.682Z",
       "probe_note": ""
     },
     "KR": {
@@ -362,7 +362,7 @@
       "raw_ingest_status": "api_key_pending",
       "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available.",
       "probe_status": "api_key_pending",
-      "last_checked_at": "2026-09-15T21:43:29.106Z",
+      "last_checked_at": "2026-10-15T21:42:23.684Z",
       "probe_note": "KR_DATA_GO_KR_SERVICE_KEY is not configured; UN Comtrade historical fallback remains available."
     },
     "SG": {
@@ -371,7 +371,7 @@
       "connector_name": "Singapore official monthly merchandise trade statistics",
       "official_url": "https://tablebuilder.singstat.gov.sg/table/TR/T010001",
       "status": "un_comtrade_fallback",
-      "latest_period": "2025-12",
+      "latest_period": "2026-03",
       "official_latest_period": "",
       "synchronized_through": "",
       "active_data_tier": "historical_fallback",
@@ -452,12 +452,12 @@
       ],
       "status_reason": "No national official industry batch is active; historical UN Comtrade data is being used.",
       "official_row_count": 0,
-      "fallback_row_count": 2598,
+      "fallback_row_count": 2652,
       "raw_data_capability": "ahtn_commodity_market_feed",
       "raw_ingest_status": "production_ready",
       "raw_ingest_note": "SingStat T010001 AHTN commodity-market rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly SGD-to-USD conversion evidence.",
       "probe_status": "probe_degraded",
-      "last_checked_at": "2026-09-15T21:43:30.084Z",
+      "last_checked_at": "2026-10-15T21:42:24.552Z",
       "probe_note": "",
       "probe_error": "HTTP 400"
     }
