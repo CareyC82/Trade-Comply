@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-11T22:09:34.364Z",
+  "generated_at": "2026-10-18T20:55:03.896Z",
   "source_change_count": 13,
   "impacts": [
     {
@@ -1391,44 +1391,6 @@
       "auto_publish": false
     },
     {
-      "id": "nzLithiumTransport",
-      "type": "content_changed",
-      "detected_at": "2026-10-07T07:57:17.346Z",
-      "review_status": "pending_review",
-      "markets": [],
-      "products": [],
-      "candidate_hs": [],
-      "affected_routes": [],
-      "effective_date": null,
-      "effective_timing": "Effective date requires official confirmation",
-      "conclusion_delta": {
-        "status": "unchanged_pending_rule_review",
-        "before": [],
-        "after": [],
-        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
-      },
-      "auto_publish": false
-    },
-    {
-      "id": "fccMarketplace2026",
-      "type": "content_changed",
-      "detected_at": "2026-10-11T22:09:34.364Z",
-      "review_status": "pending_review",
-      "markets": [],
-      "products": [],
-      "candidate_hs": [],
-      "affected_routes": [],
-      "effective_date": "2026-10-11",
-      "effective_timing": "Effective today",
-      "conclusion_delta": {
-        "status": "unchanged_pending_rule_review",
-        "before": [],
-        "after": [],
-        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
-      },
-      "auto_publish": false
-    },
-    {
       "id": "fccMarketplace2026",
       "type": "lifecycle_changed",
       "detected_at": "2026-10-11T22:09:34.364Z",
@@ -1438,11 +1400,219 @@
       "candidate_hs": [],
       "affected_routes": [],
       "effective_date": "2026-10-11",
-      "effective_timing": "Effective today",
+      "effective_timing": "Effective for 7 day(s)",
       "conclusion_delta": {
         "status": "unchanged_pending_rule_review",
         "before": [],
         "after": [],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "fccMarketplace2026",
+      "type": "content_changed",
+      "detected_at": "2026-10-18T20:55:03.896Z",
+      "review_status": "pending_review",
+      "markets": [],
+      "products": [],
+      "candidate_hs": [],
+      "affected_routes": [],
+      "effective_date": "2026-10-11",
+      "effective_timing": "Effective for 7 day(s)",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [],
+        "after": [],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "euBattery",
+      "type": "content_changed",
+      "detected_at": "2026-10-18T20:55:03.896Z",
+      "review_status": "pending_review",
+      "markets": [
+        "EU"
+      ],
+      "products": [
+        {
+          "id": "smart_watch",
+          "label": "Smart watch",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_ring",
+          "label": "Smart ring",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "fitness_tracker",
+          "label": "Fitness band / tracker",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62",
+            "9029.10"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "kids_gps_watch",
+          "label": "Kids GPS watch",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "earbuds",
+          "label": "Bluetooth earbuds",
+          "market": "EU",
+          "candidate_hs": [
+            "8518.30"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_glasses",
+          "label": "Smart glasses",
+          "market": "EU",
+          "candidate_hs": [
+            "9004.90",
+            "8528.52"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "power_bank",
+          "label": "Power bank",
+          "market": "EU",
+          "candidate_hs": [
+            "8507.60"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "tablet",
+          "label": "Tablet computer",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "e_reader",
+          "label": "E-reader",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.30",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "robot_vacuum",
+          "label": "Robot vacuum cleaner",
+          "market": "EU",
+          "candidate_hs": [
+            "8508.11",
+            "8508.19"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "eu_battery_future"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8517.13",
+        "8517.62",
+        "8543.70",
+        "9029.10",
+        "8518.30",
+        "9004.90",
+        "8528.52",
+        "8507.60",
+        "8471.30",
+        "8508.11",
+        "8508.19"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> EU"
+      ],
+      "effective_date": "2027-02-18",
+      "effective_timing": "123 day(s) until effective",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional",
+          "high_risk"
+        ],
+        "after": [
+          "conditional",
+          "high_risk"
+        ],
         "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
       },
       "auto_publish": false
