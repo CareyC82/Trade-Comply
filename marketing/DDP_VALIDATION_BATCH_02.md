@@ -90,4 +90,8 @@ Draft public reply:
 
 ## Status log
 
-- 2026-10-18 — Five targets researched and verified from current public sources. Drafts prepared. No external messages or comments sent yet.
+- 2026-10-18 — Five targets researched and verified from current public sources. Drafts prepared.
+- 2026-10-18 — Posted a help-first reply to `u/Additional-Tap-5364` without a TraceWize link or solicitation. Public permalink: https://old.reddit.com/r/AmazonFBA/comments/1x79k8m/shipping_scam/phgw1rj/
+- 2026-10-18 — Did not post the prepared reply to `u/lebowskia`: `r/FulfillmentByAmazon` explicitly states that AI-generated content is not tolerated. A genuinely user-written comment or a replacement target is required.
+- 2026-10-18 — Sent Edward Soong a LinkedIn connection request with the approved personalized note. LinkedIn confirmed the invitation was sent; awaiting acceptance.
+- 2026-10-18 — Sent Jeanette Liranzo a LinkedIn connection request with the approved personalized note. LinkedIn confirmed the invitation was sent; awaiting acceptance.
