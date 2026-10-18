@@ -3875,6 +3875,10 @@ a.hub-core-card--link {
 .sell-market-comparison label { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 11px; border: 1px solid #d7e3ee; border-radius: 9px; background: #fff; color: #344f68; font-size: .86rem; font-weight: 700; }
 .sell-market-comparison input { width: 18px; height: 18px; }
 .sell-market-comparison > small { display: block; margin-top: 12px; color: #6c7f91; line-height: 1.5; }
+.sell-comparison-hs-fields[hidden] { display: none !important; }
+.sell-market-comparison > .sell-comparison-hs-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; padding-top: 16px; border-top: 1px solid #d7e3ee; }
+.sell-market-comparison .sell-comparison-hs-fields label { display: grid; min-width: 0; }
+.sell-market-comparison .sell-comparison-hs-fields input { width: 100%; height: auto; box-sizing: border-box; }
 .sell-check-field textarea:focus,
 .sell-check-field select:focus,
 .sell-check-field input:focus {

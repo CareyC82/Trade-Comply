@@ -40,6 +40,27 @@ test('multi-market comparison deduplicates selected destinations', () => {
     assert.equal(result.multiMarketComparison.marketSummaries.length, 2);
 });
 
+test('multi-market comparison applies each destination exact code and calculates costs independently', () => {
+    const result = engine.assessMarkets({
+        description: 'Portable Bluetooth speaker with rechargeable lithium battery.',
+        origin: 'CN', market: 'MULTI', markets: ['US', 'EU'], platform: 'Amazon',
+        exactHsCodes: { US: '8518210000', EU: '85182100' },
+        dutyRates: { rules: [
+            { import_country: 'US', origin_country: '*', hs_prefixes: ['8518'], base_rate: null, import_tax_benchmark_rate: 0,
+                exact_code_overrides: [{ hs_code: '8518210000', base_rate: 0.07, source_status: 'official_source_checked' }] },
+            { import_country: 'EU', origin_country: '*', hs_prefixes: ['8518'], base_rate: null, import_tax_benchmark_rate: 0.20,
+                exact_code_overrides: [{ hs_code: '85182100', base_rate: 0.03, source_status: 'official_source_checked' }] }
+        ] },
+        costs: { currency: 'USD', quantity: 10, purchaseUnit: 100, saleUnit: 180 },
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    assert.equal(result.jurisdictionResults.US.selectedTariff.exact, true);
+    assert.equal(result.jurisdictionResults.EU.selectedTariff.exact, true);
+    assert.equal(result.economicsByMarket.US.dutyRate, 0.07);
+    assert.equal(result.economicsByMarket.EU.dutyRate, 0.03);
+    assert.notEqual(result.economicsByMarket.US.duty, result.economicsByMarket.EU.duty);
+});
+
 test('consumer UI requires explicit comparison selection and exposes comparison sections', () => {
     const root = path.join(__dirname, '..');
     const html = fs.readFileSync(path.join(root, 'can-i-sell-it.html'), 'utf8');
@@ -51,5 +72,9 @@ test('consumer UI requires explicit comparison selection and exposes comparison 
     assert.match(script, /Select between 2 and 4 markets to compare/);
     assert.match(script, /Shared \/ reusable evidence/);
     assert.match(script, /Not automatically transferable/);
+    assert.match(html, /id="sell-comparison-hs-fields"/);
+    assert.match(script, /United States HTS code/);
+    assert.match(script, /European Union CN code/);
+    assert.match(script, /exactHsCodes: comparing \? comparisonExactHsValues\(\)/);
 });
 

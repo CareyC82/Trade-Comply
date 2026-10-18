@@ -199,6 +199,13 @@ test('multi-market comparison requires explicit selection and separates local ac
     await page.locator('input[name="comparisonMarket"][value="US"]').check();
     await page.locator('input[name="comparisonMarket"][value="EU"]').check();
     await page.locator('input[name="comparisonMarket"][value="AU"]').check();
+    await expect(page.locator('[data-comparison-hs]')).toHaveCount(3);
+    await page.locator('[data-comparison-hs][data-market="US"]').fill('85182100');
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    await expect(page.locator('#sell-check-error')).toContainText('United States HTS code must contain 10 digits');
+    await page.locator('[data-comparison-hs][data-market="US"]').fill('8518210000');
+    await page.locator('[data-comparison-hs][data-market="EU"]').fill('85182100');
+    await page.locator('[data-comparison-hs][data-market="AU"]').fill('85182100');
     await page.getByRole('button', { name: 'Show preliminary result' }).click();
     const comparison = page.locator('.sell-market-comparison-result');
     await expect(comparison).toBeVisible();
@@ -207,6 +214,27 @@ test('multi-market comparison requires explicit selection and separates local ac
     await expect(comparison).toContainText('Australia-specific actions');
     await expect(comparison).toContainText('Shared / reusable evidence');
     await expect(comparison).toContainText('Not automatically transferable');
+    await expect(page.locator('.sell-supplier-request')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Print / Save PDF' })).toBeVisible();
+});
+
+test('four-market comparison keeps exact tariff inputs and result cards separate', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await page.getByLabel('Product name or short description').fill('Portable Bluetooth speaker with rechargeable lithium battery, for adults');
+    await page.getByLabel('Assessment scope').selectOption('compare');
+    for (const market of ['US', 'EU', 'AU', 'NZ']) await page.locator(`input[name="comparisonMarket"][value="${market}"]`).check();
+    const codes = { US: '8518210000', EU: '85182100', AU: '85182100', NZ: '85182190' };
+    for (const [market, code] of Object.entries(codes)) await page.locator(`[data-comparison-hs][data-market="${market}"]`).fill(code);
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+    await expect(page.locator('.sell-market-summary')).toHaveCount(4);
+    await expect(page.locator('.sell-market-comparison-result')).toContainText('New Zealand-specific actions');
+    await page.locator('.sell-result-details').click();
+    await expect(page.locator('#sell-result')).toContainText('US · HS 8518210000');
+    await expect(page.locator('#sell-result')).toContainText('EU · HS 85182100');
+    await expect(page.locator('#sell-result')).toContainText('AU · HS 85182100');
+    await expect(page.locator('#sell-result')).toContainText('NZ · HS 85182190');
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
 });
 
 test('private workspace failure leaves the anonymous assessment usable', async ({ page }) => {

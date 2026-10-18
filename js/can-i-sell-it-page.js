@@ -54,6 +54,7 @@ function bootstrapCanISellItPage() {
     const marketSelect = document.getElementById('sell-market');
     const marketModeSelect = document.getElementById('sell-market-mode');
     const marketComparison = document.getElementById('sell-market-comparison');
+    const comparisonHsFields = document.getElementById('sell-comparison-hs-fields');
     const exactHsSingleField = document.getElementById('sell-exact-hs-single-field');
     const exactHsAuField = document.getElementById('sell-exact-hs-au-field');
     const exactHsNzField = document.getElementById('sell-exact-hs-nz-field');
@@ -78,9 +79,32 @@ function bootstrapCanISellItPage() {
         US: 'United States', EU: 'European Union', JP: 'Japan', SG: 'Singapore',
         AU: 'Australia', NZ: 'New Zealand', ANZ: 'Australia + New Zealand'
     };
+    const exactHsConfig = {
+        US: { label: 'United States HTS code', lengths: [10], placeholder: '10 digits' },
+        EU: { label: 'European Union CN code', lengths: [8], placeholder: '8 digits' },
+        AU: { label: 'Australia tariff code', lengths: [8], placeholder: '8 digits' },
+        NZ: { label: 'New Zealand tariff item', lengths: [8], placeholder: '8 digits' },
+        JP: { label: 'Japan tariff code', lengths: [9], placeholder: '9 digits' },
+        SG: { label: 'Singapore tariff code', lengths: [8], placeholder: '8 digits' }
+    };
 
     function selectedComparisonMarkets() {
         return Array.from(marketComparison.querySelectorAll('input[name="comparisonMarket"]:checked')).map((input) => input.value);
+    }
+
+    function comparisonExactHsValues() {
+        return Object.fromEntries(Array.from(comparisonHsFields.querySelectorAll('[data-comparison-hs]'))
+            .map((input) => [input.dataset.market, normalizeExactHs(input.value)]));
+    }
+
+    function renderComparisonHsFields() {
+        const previous = comparisonExactHsValues();
+        const markets = selectedComparisonMarkets();
+        comparisonHsFields.hidden = marketModeSelect.value !== 'compare' || markets.length === 0;
+        comparisonHsFields.innerHTML = markets.map((market) => {
+            const config = exactHsConfig[market];
+            return `<label class="sell-check-field"><span>${config.label} (optional)</span><input data-comparison-hs data-market="${market}" inputmode="numeric" maxlength="12" placeholder="${config.placeholder}" value="${previous[market] || ''}"></label>`;
+        }).join('');
     }
 
     function marketDisplay(input = currentInput) {
@@ -96,6 +120,7 @@ function bootstrapCanISellItPage() {
         exactHsSingleField.hidden = comparing || anz;
         exactHsAuField.hidden = comparing || !anz;
         exactHsNzField.hidden = comparing || !anz;
+        renderComparisonHsFields();
     }
     marketSelect.addEventListener('change', updateExactHsFields);
     marketModeSelect.addEventListener('change', updateExactHsFields);
@@ -105,6 +130,7 @@ function bootstrapCanISellItPage() {
         marketComparison.querySelectorAll('input[name="comparisonMarket"]:not(:checked)').forEach((input) => {
             input.disabled = selected.length >= 4;
         });
+        renderComparisonHsFields();
     });
     updateExactHsFields();
 
@@ -113,7 +139,16 @@ function bootstrapCanISellItPage() {
     }
 
     function validateExactHsInputs(market) {
-        if (market === 'MULTI') return '';
+        if (market === 'MULTI') {
+            for (const [selectedMarket, value] of Object.entries(comparisonExactHsValues())) {
+                if (!value) continue;
+                const config = exactHsConfig[selectedMarket];
+                if (!config.lengths.includes(value.length)) {
+                    return `${config.label} must contain ${config.lengths.join(' or ')} digits.`;
+                }
+            }
+            return '';
+        }
         const checks = market === 'ANZ'
             ? [
                 ['Australia tariff code', document.getElementById('sell-exact-hs-au').value],
@@ -677,6 +712,8 @@ function bootstrapCanISellItPage() {
                 const market = select.dataset.market;
                 if (currentInput.market === 'MULTI') {
                     currentInput.exactHsCodes = { ...(currentInput.exactHsCodes || {}), [market]: code };
+                    const field = comparisonHsFields.querySelector(`[data-comparison-hs][data-market="${market}"]`);
+                    if (field) field.value = code;
                 } else if (currentInput.market === 'ANZ') {
                     if (market === 'AU') {
                         currentInput.exactHsCodeAu = code;
@@ -828,6 +865,7 @@ function bootstrapCanISellItPage() {
             exactHsCode: normalizeExactHs(document.getElementById('sell-exact-hs').value),
             exactHsCodeAu: normalizeExactHs(document.getElementById('sell-exact-hs-au').value),
             exactHsCodeNz: normalizeExactHs(document.getElementById('sell-exact-hs-nz').value),
+            exactHsCodes: comparing ? comparisonExactHsValues() : {},
             dutyRates
         };
         const profile = engine.extractProfile(description);
