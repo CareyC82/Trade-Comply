@@ -101,6 +101,7 @@ test('high-value route matrix covers direct and two-leg opportunity paths', () =
 test('maintained duty rules cover US non-China imports and China AI compute imports', () => {
     const dutyRates = readJson('data/duty-rates.json');
     const usGeneral = dutyRates.rules.find((rule) => rule.id === 'US-NONCN-HIGHTECH-GENERAL-DUTY');
+    const usConsumer = dutyRates.rules.find((rule) => rule.id === 'US-GLOBAL-CONSUMER-ELECTRONICS-GENERAL-DUTY');
     const chinaImport = dutyRates.rules.find((rule) => (
         rule.import_country === 'CN'
         && rule.origin_country === '*'
@@ -110,8 +111,14 @@ test('maintained duty rules cover US non-China imports and China AI compute impo
 
     assert.ok(usGeneral, 'US non-China high-tech import baseline should be maintained');
     assert.equal(usGeneral.source_status, 'official_source_checked');
-    assert.ok(usGeneral.exact_code_overrides.some((row) => row.hs_code === '847950' && row.base_rate === 0.025));
-    assert.ok(usGeneral.exact_code_overrides.some((row) => row.hs_code === '854231' && row.base_rate === 0));
+    assert.ok(usGeneral.exact_code_overrides.some((row) => row.hs_code === '8479500000' && row.base_rate === 0.025));
+    assert.ok(usGeneral.exact_code_overrides.some((row) => row.hs_code.startsWith('854231') && row.hs_code.length === 10 && row.base_rate === 0));
+    assert.ok(usConsumer, 'US exact duty coverage should follow the maintained consumer-electronics catalog');
+    assert.equal(usConsumer.base_rate, null, 'the catalog rule must not apply one product rate as a generic fallback');
+    assert.ok(usConsumer.exact_code_overrides.some((row) => row.hs_code === '8518210000' && row.base_rate === 0));
+    assert.equal(usConsumer.exact_code_overrides.filter((row) => row.hs_code.length === 10).length, 140);
+    assert.ok(usConsumer.exact_code_overrides.filter((row) => row.hs_code.length < 10)
+        .every((row) => /planning signal/.test(row.confidence)));
     assert.ok(chinaImport, 'China import high-tech duty rule should cover AI compute HS 847150');
     assert.ok(chinaImport.exact_code_overrides.some((row) => row.hs_code === '847150'));
 });
