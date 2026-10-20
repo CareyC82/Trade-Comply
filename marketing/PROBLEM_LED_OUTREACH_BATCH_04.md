@@ -58,5 +58,54 @@ Objective: continue useful public participation without waiting for Batch 03 rep
 
 ## Status log
 
-- 2026-10-20 — Four additional high-intent public discussions selected and replies drafted. No Batch 04 comments posted yet.
+- 2026-10-20 — Target 3 published successfully: https://old.reddit.com/r/AmazonSeller/comments/1wj3xb7/help_new_us_seller_needs_suggestions_selling_to/phtna5w/
+- 2026-10-20 — Targets 1, 2 and 4 withdrawn before publication because `r/FulfillmentByAmazon` explicitly prohibits AI-generated content. No comments were posted there.
+
+## Replacement queue
+
+### A. U.S. equipment import — DDP provider refuses customs evidence
+
+- Community: `r/Alibaba`
+- Source: https://www.reddit.com/r/Alibaba/comments/1x1b0pa/ordering_about_75k_of_equipment_to_be_delivered/
+- Problem: the shipping provider says equipment will be consolidated with other goods “to save customs duties” and therefore no official customs documentation can be provided.
+- Recommended reply:
+
+> The phrase “alongside other products to save on customs duties” is the part I would stop on. Consolidation itself is normal; it does not remove the need for your equipment to be truthfully described, classified and valued on an entry. If the provider cannot identify the Importer of Record or produce any entry-level evidence, you cannot verify what was declared.
+>
+> Before paying the balance, request in writing: the legal name of the Importer of Record, the licensed broker, HTS classification, transaction value used for entry, country of origin, duty calculation, bond/entry arrangement, and whether you will receive a redacted CBP 7501 or another entry reference tying your shipment to the declaration. Also confirm who pays examinations, storage, demurrage and return/export costs if clearance fails.
+>
+> For $7,500 of equipment, compare that proposal with a quote from your own U.S. customs broker using DAP or another transparent structure. The key comparison is not merely the freight price; it is whether the lawful landed cost and document trail are knowable before shipment. I would not rely on “taxes included” when the provider simultaneously says it cannot provide customs evidence.
+
+### B. UAE import — new company without a VAT TRN
+
+- Community: `r/SmallBusinessUAE`
+- Source: https://www.reddit.com/r/SmallBusinessUAE/comments/1x1ee8i/importing_from_south_korea_to_uae_without_vat/
+- Problem: a new company wants to import from South Korea, but forwarders and IOR providers are asking for a VAT TRN.
+- Recommended reply:
+
+> Separate the customs-importer question from the VAT-registration question. A UAE company can have a customs importer code while not yet being VAT registered; the absence of a TRN does not by itself mean the goods cannot be imported. What changes is how the 5% import VAT is settled and whether or when it can be recovered.
+>
+> Ask each provider to state which exact model they require: (1) your company is the importer using its customs code and pays import VAT before release, or (2) a UAE IOR/agent imports under its own code/TRN and then supplies the goods or recharges costs to you. Request a sample document pack for that model: bill of entry/import declaration, importer field, VAT-payment evidence, agent agreement, invoice and delivery proof. Then have your accountant confirm how those documents will be treated before choosing a forwarder.
+>
+> For voluntary VAT registration, eligibility is based on the applicable taxable-supplies/imports and expenses tests, including relevant expected amounts—not simply on a forwarder asking for a TRN. Check the current FTA criteria and your actual figures with a UAE tax adviser. The important step is to decide the importer and VAT treatment before shipment, not after arrival.
+
+### C. JAFZA stock — small deliveries from a free zone to mainland customers
+
+- Community: `r/SmallBusinessUAE`
+- Source: https://www.reddit.com/r/SmallBusinessUAE/comments/1x4q44u/how_to_document_small_sales_from_a_jafza_free/
+- Problem: a JAFZA company is unsure how to document frequent low-value deliveries to mainland UAE customers.
+- Recommended reply:
+
+> Because you already have mainland-cleared stock for Amazon/Noon, first separate two inventory pools in your records: goods already imported into mainland and goods still under the JAFZA customs regime. A sales invoice may evidence the customer sale, but it does not prove that a free-zone item was lawfully imported into mainland. For every SKU, serial or lot, your stock ledger should show which customs declaration moved it out of the free zone before delivery.
+>
+> Operationally, use a three-way reconciliation: opening JAFZA stock plus receipts minus export/import declarations equals closing JAFZA stock; then match mainland stock movements to customer invoices and proof of delivery. If a courier or broker files declarations per order or under an approved batch process, retain the declaration reference and link it to each invoice. Before relying on consolidation, ask Dubai Customs or your broker to confirm the permitted e-commerce procedure for your licence and whether different customers or orders may be grouped.
+>
+> The decision is less about the AED 200 invoice and more about maintaining an unbroken chain from free-zone inventory, to mainland import entry, to the final sale.
+
+## Replacement status
+
+- 2026-10-20 — User approved all three replacement comments for publication.
+- 2026-10-20 — Replacement A published successfully under `Old-Ordinary-9168`; Reddit displayed the comment publicly as “just now.”
+- 2026-10-20 — Replacement B published successfully after the required cooldown: https://old.reddit.com/r/SmallBusinessUAE/comments/1x1ee8i/importing_from_south_korea_to_uae_without_vat/phtr1p8/
+- 2026-10-20 — Replacement C withheld after final on-page review. Two existing comments already cover the declaration, VAT and audit-linkage points in detail, so another similar answer would add little value and risk looking like repetitive participation. It should be replaced with a fresher unanswered problem rather than posted for volume alone.
 
