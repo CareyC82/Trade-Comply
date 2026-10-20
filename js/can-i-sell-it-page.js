@@ -81,7 +81,7 @@ function bootstrapCanISellItPage() {
     };
     const exactHsConfig = {
         US: { label: 'United States HTS code', lengths: [10], placeholder: '10 digits' },
-        EU: { label: 'European Union CN code', lengths: [8], placeholder: '8 digits' },
+        EU: { label: 'European Union CN / TARIC code', lengths: [8, 10], placeholder: '8 or 10 digits' },
         AU: { label: 'Australia tariff code', lengths: [8], placeholder: '8 digits' },
         NZ: { label: 'New Zealand tariff item', lengths: [8], placeholder: '8 digits' },
         JP: { label: 'Japan tariff code', lengths: [9], placeholder: '9 digits' },
@@ -532,7 +532,7 @@ function bootstrapCanISellItPage() {
             ? assessment.documentGaps.map((gap) => `<li><strong>${escapeHtml(gap.document)}</strong><span>${escapeHtml(gap.requirement)}</span></li>`).join('')
             : '<li><strong>No document gaps selected by this pre-check</strong><span>Still verify every file against the exact model and supplier.</span></li>';
         const tariffRows = assessment.tariffOptions.length
-            ? assessment.tariffOptions.map((row, rowIndex) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.classificationMismatch ? 'Entered code does not match this product model · ' : ''}${row.exactConflict ? 'Conflicting active official rates — professional confirmation required' : (row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`)} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.classificationRequired ? ' · candidate HS only, not filing-grade' : ''}${row.lastCheckedAt ? ` · checked ${escapeHtml(String(row.lastCheckedAt).slice(0, 10))}` : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''} · <a href="${escapeHtml(postEntryHref(row, assessment))}">Open in Post-Entry</a></span>${renderTariffRateLayers(row)}${renderTariffCandidateSelector(row, rowIndex)}${renderConditionalMeasures(row)}</li>`).join('')
+            ? assessment.tariffOptions.map((row, rowIndex) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.classificationMismatch ? 'Entered code does not match this product model · ' : ''}${row.exactConflict ? 'Conflicting active official rates — professional confirmation required' : (row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`)} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.exactRateMissing ? ' · entered code recorded, but no maintained official exact-line rate was matched' : ''}${row.classificationRequired ? ' · classification and filing rate require confirmation' : ''}${row.lastCheckedAt ? ` · checked ${escapeHtml(String(row.lastCheckedAt).slice(0, 10))}` : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''} · <a href="${escapeHtml(postEntryHref(row, assessment))}">Open in Post-Entry</a></span>${renderTariffRateLayers(row)}${renderTariffCandidateSelector(row, rowIndex)}${renderConditionalMeasures(row)}</li>`).join('')
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length

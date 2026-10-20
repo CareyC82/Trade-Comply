@@ -44,12 +44,12 @@ test('multi-market comparison applies each destination exact code and calculates
     const result = engine.assessMarkets({
         description: 'Portable Bluetooth speaker with rechargeable lithium battery.',
         origin: 'CN', market: 'MULTI', markets: ['US', 'EU'], platform: 'Amazon',
-        exactHsCodes: { US: '8518210000', EU: '85182100' },
+        exactHsCodes: { US: '8518210000', EU: '8518210000' },
         dutyRates: { rules: [
             { import_country: 'US', origin_country: '*', hs_prefixes: ['8518'], base_rate: null, import_tax_benchmark_rate: 0,
                 exact_code_overrides: [{ hs_code: '8518210000', base_rate: 0.07, source_status: 'official_source_checked' }] },
             { import_country: 'EU', origin_country: '*', hs_prefixes: ['8518'], base_rate: null, import_tax_benchmark_rate: 0.20,
-                exact_code_overrides: [{ hs_code: '85182100', base_rate: 0.03, source_status: 'official_source_checked' }] }
+                exact_code_overrides: [{ hs_code: '8518210000', base_rate: 0.03, source_status: 'official_source_checked' }] }
         ] },
         costs: { currency: 'USD', quantity: 10, purchaseUnit: 100, saleUnit: 180 },
         assessmentMode: 'quick', blockingQuestionKeys: []
@@ -59,6 +59,49 @@ test('multi-market comparison applies each destination exact code and calculates
     assert.equal(result.economicsByMarket.US.dutyRate, 0.07);
     assert.equal(result.economicsByMarket.EU.dutyRate, 0.03);
     assert.notEqual(result.economicsByMarket.US.duty, result.economicsByMarket.EU.duty);
+});
+
+test('shorter official headings never masquerade as exact national tariff lines', () => {
+    const result = engine.assessMarkets({
+        description: 'Portable Bluetooth speaker with rechargeable lithium battery.',
+        origin: 'CN', market: 'MULTI', markets: ['US', 'EU'], platform: 'Amazon',
+        exactHsCodes: { US: '8518210000', EU: '85182100' },
+        dutyRates: { rules: [
+            { import_country: 'US', origin_country: '*', hs_prefixes: ['8518'], base_rate: 0.07,
+                exact_code_overrides: [{ hs_code: '851821', base_rate: 0.07, source_status: 'official_source_checked' }] },
+            { import_country: 'EU', origin_country: '*', hs_prefixes: ['8518'], base_rate: 0.03,
+                exact_code_overrides: [{ hs_code: '8518210000', base_rate: 0.03, source_status: 'official_source_checked' }] }
+        ] },
+        assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    const us = result.jurisdictionResults.US.selectedTariff;
+    const eu = result.jurisdictionResults.EU.selectedTariff;
+    assert.equal(us.exact, false);
+    assert.equal(us.exactRateMissing, true);
+    assert.equal(us.classificationRequired, true);
+    assert.equal(eu.exact, false);
+    assert.equal(eu.exactRateMissing, true);
+    assert.equal(eu.classificationRequired, true);
+});
+
+test('each maintained market uses its own filing-grade exact-code length', () => {
+    const cases = [
+        ['US', '8518210000'], ['EU', '8518210000'], ['AU', '85182100'],
+        ['NZ', '85182190'], ['JP', '851821000'], ['SG', '85182100']
+    ];
+    for (const [market, code] of cases) {
+        const result = engine.assess({
+            description: 'Portable Bluetooth speaker with rechargeable lithium battery.',
+            origin: 'CN', market, platform: 'Amazon', exactHsCode: code,
+            dutyRates: { rules: [{
+                import_country: market, origin_country: '*', hs_prefixes: ['8518'], base_rate: null,
+                exact_code_overrides: [{ hs_code: code, base_rate: 0.04, source_status: 'official_source_checked' }]
+            }] },
+            assessmentMode: 'quick', blockingQuestionKeys: []
+        });
+        assert.equal(result.selectedTariff.exact, true, `${market} should accept ${code} as filing-grade`);
+        assert.equal(result.selectedTariff.classificationRequired, false);
+    }
 });
 
 test('consumer UI requires explicit comparison selection and exposes comparison sections', () => {
@@ -74,7 +117,8 @@ test('consumer UI requires explicit comparison selection and exposes comparison 
     assert.match(script, /Not automatically transferable/);
     assert.match(html, /id="sell-comparison-hs-fields"/);
     assert.match(script, /United States HTS code/);
-    assert.match(script, /European Union CN code/);
+    assert.match(script, /European Union CN \/ TARIC code/);
+    assert.match(script, /EU: \{ label: 'European Union CN \/ TARIC code', lengths: \[8, 10\]/);
     assert.match(script, /exactHsCodes: comparing \? comparisonExactHsValues\(\)/);
 });
 
