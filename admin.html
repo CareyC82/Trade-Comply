@@ -762,17 +762,17 @@
         function renderExactTariffFeeds(feedStatus = {}) {
             const markets = Array.isArray(feedStatus.markets) ? feedStatus.markets : [];
             return `
-                <div class="crawl-section-title"><h3>Official exact tariff feeds</h3><span class="meta">${markets.filter(row => row.status === 'current').length}/${markets.length} current</span></div>
+                <div class="crawl-section-title"><h3>Official exact tariff feeds</h3><span class="meta">${markets.filter(row => row.status === 'current').length}/${markets.length} current · refresh within 7 days</span></div>
                 <div class="coverage-table-wrap">
                     <table class="coverage-table">
-                        <thead><tr><th>Feed</th><th>Targets</th><th>Configured</th><th>Status</th><th>Rows</th><th>Changed rules</th><th>Last check / error</th></tr></thead>
+                        <thead><tr><th>Feed</th><th>Targets</th><th>Status</th><th>Exact coverage</th><th>Age / expiry</th><th>Changed rules</th><th>Last check / error</th></tr></thead>
                         <tbody>${markets.map((row) => `
                             <tr>
                                 <td><strong>${escapeHtml(row.country)}</strong><br><span class="meta">${escapeHtml(row.env_name)}</span></td>
                                 <td>${escapeHtml((row.target_markets || []).join(', '))}</td>
-                                <td><span class="badge ${row.configured ? 'auto_updatable' : 'benchmark'}">${row.configured ? 'YES' : 'NO'}</span></td>
-                                <td><span class="badge ${row.status === 'current' ? 'auto_updatable' : row.status === 'failed' ? 'benchmark' : 'official_link'}">${escapeHtml(row.status)}</span></td>
-                                <td>${row.row_count || 0}</td>
+                                <td><span class="badge ${row.status === 'current' ? 'auto_updatable' : row.status === 'failed' || row.status === 'stale' ? 'benchmark' : 'official_link'}">${escapeHtml(row.status)}</span><br><span class="meta">${row.configured ? 'connector ready' : 'not configured'}</span></td>
+                                <td><strong>${row.unique_exact_codes || 0}</strong> unique codes<br><span class="meta">${row.covered_prefix_count || 0}/${row.maintained_prefix_count || 0} maintained prefixes · ${row.retained_exact_rows || 0} retained rows${(row.missing_prefixes || []).length ? ` · missing ${escapeHtml(row.missing_prefixes.join(', '))}` : ''}</span></td>
+                                <td><strong>${row.age_days === null ? 'unknown' : `${row.age_days}d`}</strong><br><span class="meta">${row.expires_at ? `refresh due ${escapeHtml(String(row.expires_at).slice(0, 10))}` : 'no verified refresh date'}</span></td>
                                 <td>${row.changed_rule_count || 0}</td>
                                 <td><span class="meta">${escapeHtml(row.error || formatDateTime(row.last_checked_at))}</span></td>
                             </tr>

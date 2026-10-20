@@ -94,24 +94,53 @@ test('admin page explains parser drift and official access barriers', () => {
 
 test('admin exact tariff feed status covers all six exact connector groups without exposing URLs', () => {
     const payload = buildExactTariffFeedStatus({
-        rules: [],
+        rules: [{
+            import_country: 'EU',
+            hs_prefixes: ['851821', '850440'],
+            exact_code_overrides: [{
+                hs_code: '85182100',
+                confidence: 'Official exact tariff line'
+            }]
+        }],
         last_exact_national_tariff_sync: {
             checked_at: '2026-07-25T00:00:00.000Z',
             ok: true,
             results: [{ country: 'EU', ok: true, row_count: 12, changed_rules: ['rule-1'] }]
         }
-    });
+    }, { now: new Date('2026-07-27T00:00:00.000Z') });
 
     assert.deepEqual(payload.markets.map((row) => row.country), ['EU', 'CN', 'SG', 'MX', 'AU', 'NZ']);
     assert.deepEqual(payload.markets[0].target_markets, ['EU', 'DE', 'NL']);
     assert.equal(payload.markets[0].status, 'current');
     assert.equal(payload.markets[0].row_count, 12);
+    assert.equal(payload.markets[0].retained_exact_rows, 1);
+    assert.equal(payload.markets[0].unique_exact_codes, 1);
+    assert.equal(payload.markets[0].covered_prefix_count, 1);
+    assert.equal(payload.markets[0].maintained_prefix_count, 2);
+    assert.deepEqual(payload.markets[0].missing_prefixes, ['850440']);
+    assert.equal(payload.markets[0].age_days, 2);
+    assert.equal(payload.markets[0].stale, false);
+    assert.equal(payload.markets[0].expires_at, '2026-08-01T00:00:00.000Z');
     assert.equal(payload.markets[0].changed_rule_count, 1);
     assert.ok(payload.markets.every((row) => !Object.hasOwn(row, 'url')));
     assert.equal(payload.markets[0].connector_type, 'direct_official');
     assert.equal(payload.markets[1].connector_type, 'direct_official');
     assert.equal(payload.markets[4].connector_type, 'direct_official');
     assert.equal(payload.markets[5].connector_type, 'direct_official');
+});
+
+test('admin exact tariff feed marks an otherwise successful source stale after seven days', () => {
+    const payload = buildExactTariffFeedStatus({
+        rules: [],
+        last_exact_national_tariff_sync: {
+            checked_at: '2026-07-01T00:00:00.000Z',
+            results: [{ country: 'AU', ok: true, row_count: 152 }]
+        }
+    }, { now: new Date('2026-07-10T00:00:00.000Z') });
+    const australia = payload.markets.find((row) => row.country === 'AU');
+    assert.equal(australia.status, 'stale');
+    assert.equal(australia.age_days, 9);
+    assert.equal(australia.stale, true);
 });
 
 test('admin unmet-search payload has an honest empty Top 10 state', () => {

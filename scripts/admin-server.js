@@ -358,7 +358,7 @@ function buildDutyRateStatusPayload() {
     };
 }
 
-function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, { rules: [] })) {
+function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, { rules: [] }), { now = new Date(), staleAfterDays = 7 } = {}) {
     const feedEnv = {
         EU: 'EU_TARIC_EXACT_LINES_URL',
         CN: 'CN_CUSTOMS_EXACT_TARIFF_URL',
@@ -376,32 +376,63 @@ function buildExactTariffFeedStatus(dutyPayload = readJsonFile(DUTY_RATES_PATH, 
         markets: Object.entries(feedEnv).map(([country, envName]) => {
             const result = country === 'EU' && Object.keys(euSync).length
                 ? {
-                    ok: euSync.ok && euSync.official_fetch?.ok,
+                    ok: euSync.ok === true && euSync.official_fetch?.ok !== false,
                     row_count: euSync.official_candidate_rows || 0,
                     changed_rules: (euSync.changes || []).map((row) => row.rule),
                     error: euSync.errors?.[0]?.error || euSync.official_fetch_degraded_detail || ''
                 }
                 : results.get(country) || {};
             const targetMarkets = country === 'EU' ? ['EU', 'DE', 'NL'] : [country];
-            const officialExactRows = (dutyPayload.rules || [])
-                .filter((rule) => targetMarkets.includes(rule.import_country))
+            const targetRules = (dutyPayload.rules || [])
+                .filter((rule) => targetMarkets.includes(rule.import_country));
+            const officialExactRows = targetRules
                 .flatMap((rule) => rule.exact_code_overrides || [])
                 .filter((row) => String(row.confidence || '').toLowerCase().includes('official exact tariff line'));
+            const uniqueExactCodes = new Set(officialExactRows
+                .map((row) => String(row.hs_code || '').replace(/\D/g, ''))
+                .filter((code) => code.length === 8 || code.length === 10));
+            const maintainedPrefixes = new Set(targetRules
+                .flatMap((rule) => rule.hs_prefixes || [])
+                .map((prefix) => String(prefix || '').replace(/\D/g, ''))
+                .filter(Boolean));
+            const coveredPrefixes = [...maintainedPrefixes]
+                .filter((prefix) => [...uniqueExactCodes].some((code) => code.startsWith(prefix) || prefix.startsWith(code)));
+            const lastCheckedAt = country === 'EU'
+                ? euSync.official_fetch?.checked_at || sync.checked_at || targetRules.map((rule) => rule.last_checked_at).find(Boolean) || null
+                : sync.checked_at || targetRules.map((rule) => rule.last_checked_at).find(Boolean) || null;
+            const checkedDate = new Date(lastCheckedAt || '');
+            const ageDays = Number.isNaN(checkedDate.getTime())
+                ? null
+                : Math.max(0, Math.floor((now.getTime() - checkedDate.getTime()) / 86400000));
+            const stale = ageDays === null || ageDays > staleAfterDays;
+            const expiresAt = Number.isNaN(checkedDate.getTime())
+                ? null
+                : new Date(checkedDate.getTime() + (staleAfterDays * 86400000)).toISOString();
+            const baseStatus = result.ok === false ? 'failed'
+                : result.skipped ? 'not_configured'
+                    : result.ok ? 'current'
+                        : 'not_run';
             return {
                 country,
                 target_markets: targetMarkets,
                 env_name: envName,
                 configured: ['EU', 'CN', 'SG', 'MX', 'AU', 'NZ'].includes(country) || Boolean(String(process.env[envName] || '').trim()),
                 connector_type: ['EU', 'CN', 'SG', 'MX', 'AU', 'NZ'].includes(country) ? 'direct_official' : 'normalized_feed',
-                status: result.ok === false ? 'failed'
-                    : result.skipped ? 'not_configured'
-                        : result.ok ? 'current'
-                            : 'not_run',
+                status: baseStatus === 'current' && stale ? 'stale' : baseStatus,
                 row_count: result.row_count || officialExactRows.length,
+                retained_exact_rows: officialExactRows.length,
+                unique_exact_codes: uniqueExactCodes.size,
+                maintained_prefix_count: maintainedPrefixes.size,
+                covered_prefix_count: coveredPrefixes.length,
+                missing_prefixes: [...maintainedPrefixes].filter((prefix) => !coveredPrefixes.includes(prefix)),
                 changed_rule_count: (result.changed_rules || []).length,
                 changed_rules: result.changed_rules || [],
                 error: result.error || '',
-                last_checked_at: country === 'EU' ? euSync.official_fetch?.checked_at || null : sync.checked_at || null
+                last_checked_at: lastCheckedAt,
+                age_days: ageDays,
+                stale_after_days: staleAfterDays,
+                expires_at: expiresAt,
+                stale
             };
         })
     };
