@@ -44,4 +44,7 @@ Official references checked:
 
 ## Status log
 
-- 2026-10-20 — Two current, decision-stage problems selected. Tailored replies prepared. No comments posted yet.
+- 2026-10-20 — Two decision-stage problems selected and tailored replies prepared.
+- 2026-10-20 — Published the U.S. DDP “grey scheme” reply from `Old-Ordinary-9168`: https://old.reddit.com/r/Alibaba/comments/1x7e3j9/cheap_ddp_shipping_from_china_to_the_us_can_the/phtia2f/
+- 2026-10-20 — Published the UAE LCL/DDP documentation and import-VAT reply from `Old-Ordinary-9168`: https://old.reddit.com/r/SmallBusinessUAE/comments/1wxapqi/suggestions_regarding_ddp_sea_cargo_forwarders/phtkv25/
+- Posting note: Reddit imposed a seven-minute account-level comment interval after the first reply. The second reply was retained as a draft and posted successfully after the interval; no duplicate comment was created.
