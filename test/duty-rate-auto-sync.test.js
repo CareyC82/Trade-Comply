@@ -49,6 +49,24 @@ test('user material tariff changes exclude parser metadata but include rate, dat
     assert.equal(classifyMaterialTariffChange({ changes: [{ field: 'source_note', old: 'a', new: 'b' }] }), null);
 });
 
+test('admin exceptions contain only user-material tariff changes', () => {
+    const run = buildRunSummary('official source', {
+        ok: true,
+        changes: [
+            { rule: 'rate', old_base_rate: 0.01, new_base_rate: 0.011 },
+            { rule: 'date', changes: [{ field: 'effective_from', old: '2026-01-01', new: '2026-02-01' }] },
+            { rule: 'measure', changes: [{ field: 'measure_type', old: 'duty', new: 'quota' }] },
+            { rule: 'metadata', changes: [{ field: 'source_note', old: 'old text', new: 'new text' }] }
+        ],
+        errors: []
+    });
+    const exceptions = buildExceptionsForRun(run);
+    assert.equal(run.material_change_count, 3);
+    assert.equal(exceptions.length, 3);
+    assert.deepEqual(exceptions.map((row) => row.material_change_kind), ['rate', 'effective_date', 'measure_scope']);
+    assert.equal(exceptions.some((row) => row.details.rule === 'metadata'), false);
+});
+
 test('degraded source history records duration and resets after recovery', () => {
     const previous = {
         source_run_plan: [{

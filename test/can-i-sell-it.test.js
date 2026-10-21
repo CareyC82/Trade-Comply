@@ -1170,3 +1170,21 @@ test('uses maintained candidate duty evidence but preserves classification warni
     assert.equal(result.procurement.code, 'market_not_ready');
     assert.ok(result.contractConditions.some((line) => /exact ordered model/.test(line)));
 });
+
+test('EU battery routes from US and Vietnam require an exact TARIC choice when official rates differ', () => {
+    const dutyRates = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data/duty-rates.json'), 'utf8'));
+    ['US', 'VN'].forEach((origin) => {
+        const result = engine.assess({
+            description: 'Lithium-ion power bank battery pack', origin, market: 'EU', platform: 'Other', dutyRates,
+            attributes: { battery: 'yes', bluetooth: 'no', wifi: 'no', cellular: 'no' }, documents: []
+        });
+        const tariff = result.tariffOptions.find((row) => String(row.hsCode).replace(/\D/g, '').startsWith('850760'));
+        assert.ok(tariff, `${origin}->EU battery route should have a tariff option`);
+        assert.equal(tariff.rate, null);
+        assert.equal(tariff.candidateRateConflict, true);
+        assert.equal(tariff.classificationRequired, true);
+        assert.ok(tariff.candidateExactLines.length > 1);
+        assert.deepEqual([...new Set(tariff.candidateExactLines.map((row) => row.baseRate))].sort(), [0, 0.027]);
+        assert.match(tariff.classificationReason, /different base-duty rates/i);
+    });
+});
