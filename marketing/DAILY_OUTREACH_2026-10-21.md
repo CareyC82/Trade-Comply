@@ -76,5 +76,9 @@ Objective: run expert validation, buyer problem engagement, and Australia/New Ze
 - Prepared on 2026-10-21.
 - Edward reply removed from execution at the user's request because the user had already replied independently.
 - Reddit buyer reply published successfully: https://old.reddit.com/r/AlibabaImport/comments/1x6jip1/ddp_and_tariffs_question/phyyiu7/
-- LinkedIn displayed “You're out of free custom notes” when preparing Paul's invitation. No invitation was sent. Paul, Vinutha, Ryan and Brent remain queued because sending without the approved personalized notes would materially reduce targeting quality; Premium was not purchased or activated.
+- LinkedIn displayed “You're out of free custom notes” when preparing Paul's invitation. No invitations were sent and Premium was not purchased or activated. With the user's approval, the four targets were followed instead.
+- Paul Robinson followed. A substantive comment was published on his post about AS/NZS 62368.1:2026: https://www.linkedin.com/feed/update/urn:li:activity:7435812603479621632/
+- Vinutha Vaze followed. Her profile showed no recent posts, so no low-context comment was added.
+- Ryan Owens followed. A substantive BMSB pre-shipment intake question was published on his 2026–27 season post: https://www.linkedin.com/pulse/bmsb-season-here-what-importers-need-know-2026-27-ryan-owens-g1fcc/
+- Brent Claypool followed. His visible recent activity consisted of short comments on other people's posts rather than a suitable original post, so no forced promotional comment was added.
 - Edward sent a new LinkedIn response asking for more information about the business so he can calibrate his input. No response was sent, consistent with the user's instruction not to reply to Edward in this batch.
