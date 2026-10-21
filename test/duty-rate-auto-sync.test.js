@@ -6,6 +6,7 @@ const path = require('node:path');
 const {
     MATERIAL_RATE_CHANGE_THRESHOLD,
     isMaterialRateChange,
+    classifyMaterialTariffChange,
     buildRunSummary,
     downgradeOfficialTransportFailure,
     shouldRunOfficialWritePass,
@@ -39,6 +40,13 @@ test('material duty-rate changes are detected by percentage-point threshold', ()
         new_base_rate: 0.035
     }), false);
     assert.equal(MATERIAL_RATE_CHANGE_THRESHOLD, 0.03);
+});
+
+test('user material tariff changes exclude parser metadata but include rate, date and measure changes', () => {
+    assert.equal(classifyMaterialTariffChange({ old_base_rate: 0.02, new_base_rate: 0.021 }), 'rate');
+    assert.equal(classifyMaterialTariffChange({ changes: [{ field: 'effective_from', old: '2026-01-01', new: '2026-02-01' }] }), 'effective_date');
+    assert.equal(classifyMaterialTariffChange({ changes: [{ field: 'measure_type', old: 'duty', new: 'quota' }] }), 'measure_scope');
+    assert.equal(classifyMaterialTariffChange({ changes: [{ field: 'source_note', old: 'a', new: 'b' }] }), null);
 });
 
 test('degraded source history records duration and resets after recovery', () => {

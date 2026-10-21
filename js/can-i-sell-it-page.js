@@ -483,10 +483,11 @@ function bootstrapCanISellItPage() {
     function renderTariffRateLayers(row) {
         const layers = row.rateLayers || {};
         const entries = [];
-        if (layers.baseDuty !== null && layers.baseDuty !== undefined) entries.push(`Base duty ${(layers.baseDuty * 100).toFixed(2)}%`);
+        if (layers.baseDuty !== null && layers.baseDuty !== undefined) entries.push(`Base customs duty ${(layers.baseDuty * 100).toFixed(2)}%`);
         if (layers.sws !== null && layers.sws !== undefined) entries.push(`SWS ${(layers.sws * 100).toFixed(2)}% (separate)`);
         if (layers.igst !== null && layers.igst !== undefined) entries.push(`IGST ${(layers.igst * 100).toFixed(2)}% (separate import tax)`);
         if (layers.preferenceRateText) entries.push(`FTA preference ${layers.preferenceRateText} — origin eligibility not yet verified`);
+        if (layers.baseDuty === 0) entries.push('Free applies to base customs duty only; VAT/GST and other measures remain separate');
         return entries.length ? `<small class="sell-tariff-layers">${escapeHtml(entries.join(' · '))}</small>` : '';
     }
 
@@ -532,7 +533,7 @@ function bootstrapCanISellItPage() {
             ? assessment.documentGaps.map((gap) => `<li><strong>${escapeHtml(gap.document)}</strong><span>${escapeHtml(gap.requirement)}</span></li>`).join('')
             : '<li><strong>No document gaps selected by this pre-check</strong><span>Still verify every file against the exact model and supplier.</span></li>';
         const tariffRows = assessment.tariffOptions.length
-            ? assessment.tariffOptions.map((row, rowIndex) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.classificationMismatch ? 'Entered code does not match this product model · ' : ''}${row.exactConflict ? 'Conflicting active official rates — professional confirmation required' : (row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line rate' : 'planning signal'}`)} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.exactRateMissing ? ' · entered code recorded, but no maintained official exact-line rate was matched' : ''}${row.classificationRequired ? ' · classification and filing rate require confirmation' : ''}${row.lastCheckedAt ? ` · checked ${escapeHtml(String(row.lastCheckedAt).slice(0, 10))}` : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">source</a>` : ''} · <a href="${escapeHtml(postEntryHref(row, assessment))}">Open in Post-Entry</a></span>${renderTariffRateLayers(row)}${renderTariffCandidateSelector(row, rowIndex)}${renderConditionalMeasures(row)}</li>`).join('')
+            ? assessment.tariffOptions.map((row, rowIndex) => `<li><strong>${row.market ? `${escapeHtml(row.market)} · ` : ''}HS ${escapeHtml(row.hsCode)}</strong><span>${row.classificationMismatch ? 'Entered code does not match this product model · ' : ''}${row.exactConflict ? 'Conflicting active official rates — professional confirmation required' : (row.rate === null ? 'Exact national tariff line required' : `${(row.rate * 100).toFixed(2)}% ${row.exact ? 'exact-line base customs duty' : 'planning signal'}`)} · ${escapeHtml(row.exact ? 'official exact-line match' : row.sourceStatus)}${row.exactRateMissing ? ' · entered code recorded, but no maintained official exact-line rate was matched' : ''}${row.classificationRequired ? ' · classification and filing rate require confirmation' : ''}${row.lastCheckedAt ? ` · source checked ${escapeHtml(String(row.lastCheckedAt).slice(0, 10))}` : ''}${row.sourceUrl ? ` · <a href="${escapeHtml(row.sourceUrl)}" target="_blank" rel="noopener">official source</a>` : ''} · <a href="${escapeHtml(postEntryHref(row, assessment))}">Open in Post-Entry</a></span>${renderTariffRateLayers(row)}${renderTariffCandidateSelector(row, rowIndex)}${renderConditionalMeasures(row)}</li>`).join('')
             : '<li><strong>No candidate HS yet</strong><span>Product-specific classification is required.</span></li>';
         const economics = assessment.economics;
         const evidenceRows = assessment.supplierEvidence.length

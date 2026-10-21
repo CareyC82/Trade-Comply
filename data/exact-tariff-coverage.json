@@ -1,0 +1,1128 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-21T06:37:09.870Z",
+  "stale_after_days": 7,
+  "ok": true,
+  "summary": {
+    "market_count": 4,
+    "maintained_prefix_count": 85,
+    "covered_prefix_count": 85,
+    "exact_code_count": 969,
+    "product_route_count": 99,
+    "product_route_gap_count": 2
+  },
+  "markets": [
+    {
+      "market": "EU",
+      "label": "European Union",
+      "rule_count": 12,
+      "maintained_prefix_count": 14,
+      "covered_prefix_count": 14,
+      "exact_code_count": 239,
+      "missing_prefixes": [],
+      "mixed_rate_prefixes": [
+        "8479",
+        "850760",
+        "8528",
+        "8543"
+      ],
+      "product_route_count": 18,
+      "exact_product_route_count": 16,
+      "product_route_gap_count": 2,
+      "scope_review_route_count": 18,
+      "last_checked_at": "2026-10-21T03:08:31.231Z",
+      "age_days": 0,
+      "stale": false,
+      "status": "exact_with_scope_gates",
+      "next_action": "Require an exact TARIC line whenever a maintained prefix contains mixed rates."
+    },
+    {
+      "market": "US",
+      "label": "United States",
+      "rule_count": 14,
+      "maintained_prefix_count": 43,
+      "covered_prefix_count": 43,
+      "exact_code_count": 453,
+      "missing_prefixes": [],
+      "mixed_rate_prefixes": [
+        "8479",
+        "8528",
+        "852869",
+        "853180",
+        "853669",
+        "853710",
+        "8543",
+        "854370",
+        "9027",
+        "902910",
+        "940542"
+      ],
+      "product_route_count": 61,
+      "exact_product_route_count": 61,
+      "product_route_gap_count": 0,
+      "scope_review_route_count": 7,
+      "last_checked_at": "2026-10-20T21:33:22.879Z",
+      "age_days": 0,
+      "stale": false,
+      "status": "exact_with_scope_gates",
+      "next_action": "Keep HTS10 base duty separate from Section 301, AD/CVD, exclusions, and effective periods."
+    },
+    {
+      "market": "SG",
+      "label": "Singapore",
+      "rule_count": 2,
+      "maintained_prefix_count": 14,
+      "covered_prefix_count": 14,
+      "exact_code_count": 186,
+      "missing_prefixes": [],
+      "mixed_rate_prefixes": [],
+      "product_route_count": 12,
+      "exact_product_route_count": 12,
+      "product_route_gap_count": 0,
+      "scope_review_route_count": 12,
+      "last_checked_at": "2026-10-20T21:33:59.229Z",
+      "age_days": 0,
+      "stale": false,
+      "status": "exact_with_scope_gates",
+      "next_action": "Monitor current Singapore 8-digit AHTN lines and retain GST as a separate import-tax layer."
+    },
+    {
+      "market": "JP",
+      "label": "Japan",
+      "rule_count": 2,
+      "maintained_prefix_count": 14,
+      "covered_prefix_count": 14,
+      "exact_code_count": 91,
+      "missing_prefixes": [],
+      "mixed_rate_prefixes": [],
+      "product_route_count": 8,
+      "exact_product_route_count": 8,
+      "product_route_gap_count": 0,
+      "scope_review_route_count": 8,
+      "last_checked_at": "2026-10-20T21:34:02.518Z",
+      "age_days": 0,
+      "stale": false,
+      "status": "exact_with_scope_gates",
+      "next_action": "Monitor current Japan 9-digit statistical lines and keep preferential origin outside the base-rate result."
+    }
+  ],
+  "product_rows": [
+    {
+      "product_id": "tablet",
+      "market": "US",
+      "route": "CN->US",
+      "hs_code": "847130",
+      "source_trust": "mixed_official_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period."
+    },
+    {
+      "product_id": "tablet",
+      "market": "EU",
+      "route": "CN->EU",
+      "hs_code": "8471300000",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "tablet",
+      "market": "SG",
+      "route": "CN->SG",
+      "hs_code": "847130",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "tablet",
+      "market": "JP",
+      "route": "CN->JP",
+      "hs_code": "847130",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "US",
+      "route": "CN->US",
+      "hs_code": "851713",
+      "source_trust": "mixed_official_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "851713",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "851713",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "JP",
+      "route": "US->JP",
+      "hs_code": "851713",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "US",
+      "route": "CN->US",
+      "hs_code": "851762",
+      "source_trust": "mixed_official_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period."
+    },
+    {
+      "product_id": "router",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "851762",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "851762",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "JP",
+      "route": "US->JP",
+      "hs_code": "851762",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "US",
+      "route": "CN->US",
+      "hs_code": "850440",
+      "source_trust": "mixed_official_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "EU",
+      "route": "CN->EU",
+      "hs_code": "8504409990",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "850440",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "JP",
+      "route": "US->JP",
+      "hs_code": "850440",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "US",
+      "route": "CN->US",
+      "hs_code": "850760",
+      "source_trust": "mixed_official_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Add-on duty and trade-remedy scope parser",
+      "next_action": "Separate official base duty from trade-remedy or add-on scope and confirm active filing period."
+    },
+    {
+      "product_id": "battery",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "exact_base_rate_covered": false,
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate."
+    },
+    {
+      "product_id": "battery",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "850760",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "JP",
+      "route": "US->JP",
+      "hs_code": "850760",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "US",
+      "route": "CN->US",
+      "hs_code": "854143",
+      "source_trust": "official_heading_only",
+      "exact_base_rate_covered": true,
+      "parser_target": "Add-on duty / case-scope resolver",
+      "next_action": "Keep the official base duty; resolve Chapter 99, trade-remedy, exclusion, or case-scope layers before filing-grade use."
+    },
+    {
+      "product_id": "solar",
+      "market": "EU",
+      "route": "CN->EU",
+      "hs_code": "854143",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "SG",
+      "route": "CN->SG",
+      "hs_code": "854143",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "JP",
+      "route": "CN->JP",
+      "hs_code": "854143",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "8542310000",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "854231",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "JP",
+      "route": "US->JP",
+      "hs_code": "854231",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "8528521000",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "852852",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "JP",
+      "route": "US->JP",
+      "hs_code": "852852",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "EU",
+      "route": "SG->EU",
+      "hs_code": "851762",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "EU",
+      "route": "VN->EU",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "exact_base_rate_covered": false,
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "EU",
+      "route": "MY->EU",
+      "hs_code": "854231",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ai_compute",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "8471500000",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "drone",
+      "market": "US",
+      "route": "CN->US",
+      "hs_code": "880622",
+      "source_trust": "official_heading_only",
+      "exact_base_rate_covered": true,
+      "parser_target": "Add-on duty / case-scope resolver",
+      "next_action": "Keep the official base duty; resolve Chapter 99, trade-remedy, exclusion, or case-scope layers before filing-grade use."
+    },
+    {
+      "product_id": "industrial_automation",
+      "market": "US",
+      "route": "DE->US",
+      "hs_code": "847950",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "tablet",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "847130",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "851713",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "851762",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "850440",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "850760",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "854143",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "852852",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "854231",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "industrial_automation",
+      "market": "US",
+      "route": "JP->US",
+      "hs_code": "847950",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "tablet",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "847130",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "851713",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "851762",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "850440",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "850760",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "854143",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "852852",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "854231",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "industrial_automation",
+      "market": "US",
+      "route": "KR->US",
+      "hs_code": "847950",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "tablet",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "847130",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "851713",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "851762",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "850440",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "850760",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "854143",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "852852",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "854231",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "industrial_automation",
+      "market": "US",
+      "route": "SG->US",
+      "hs_code": "847950",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "tablet",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "847130",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "851713",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "851762",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "850440",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "850760",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "854143",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "852852",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "854231",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "industrial_automation",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "847950",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "tablet",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "847130",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "smartphone",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "851713",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "router",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "851762",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "ev_charger",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "850440",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "battery",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "850760",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "solar",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "854143",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "monitor",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "852852",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "semiconductor",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "854231",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "industrial_automation",
+      "market": "US",
+      "route": "MX->US",
+      "hs_code": "847950",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_hbm",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "854232",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_dram",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "854232",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_nand",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "854232",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_ssd_controller",
+      "market": "SG",
+      "route": "US->SG",
+      "hs_code": "854239",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_hbm",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "854232",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_hbm",
+      "market": "US",
+      "route": "EU->US",
+      "hs_code": "854232",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_hbm",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "854232",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_dram",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "854232",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_dram",
+      "market": "US",
+      "route": "EU->US",
+      "hs_code": "854232",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_dram",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "854232",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_nand",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "854232",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_nand",
+      "market": "US",
+      "route": "EU->US",
+      "hs_code": "854232",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_nand",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "854232",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_ssd_controller",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "854239",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_ssd_controller",
+      "market": "US",
+      "route": "EU->US",
+      "hs_code": "854239",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "memory_ssd_controller",
+      "market": "US",
+      "route": "IN->US",
+      "hs_code": "854239",
+      "source_trust": "official_exact",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "optical_module",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "851770",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    },
+    {
+      "product_id": "data_center_infrastructure",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "850440",
+      "source_trust": "official_duty_tax_estimate",
+      "exact_base_rate_covered": true,
+      "parser_target": "Official source mapping",
+      "next_action": "Find official source or parser before using this route beyond screening."
+    }
+  ],
+  "gaps": [
+    {
+      "product_id": "battery",
+      "market": "EU",
+      "route": "US->EU",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "exact_base_rate_covered": false,
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate."
+    },
+    {
+      "product_id": "battery",
+      "market": "EU",
+      "route": "VN->EU",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "exact_base_rate_covered": false,
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate."
+    }
+  ],
+  "rollout_order": [
+    "US scope/add-on layers",
+    "Singapore exact-line monitoring",
+    "Japan exact-line monitoring"
+  ]
+}

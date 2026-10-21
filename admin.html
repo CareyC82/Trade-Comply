@@ -782,6 +782,28 @@
             `;
         }
 
+        function renderExactTariffCoverage(report = {}) {
+            const rows = Array.isArray(report.markets) ? report.markets : [];
+            const summary = report.summary || {};
+            const statusLabel = {
+                exact_ready: 'Exact ready',
+                exact_with_scope_gates: 'Exact + scope gates',
+                coverage_gap: 'Coverage gap'
+            };
+            return `
+                <div class="crawl-section-title"><div><h3>Exact tariff coverage by market</h3><p class="meta">Product routes, official exact lines, mixed-rate prefixes and freshness are shown separately.</p></div><span class="badge ${report.ok ? 'auto_updatable' : 'benchmark'}">${report.ok ? 'HEALTHY' : 'ACTION REQUIRED'}</span></div>
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>${summary.covered_prefix_count || 0}/${summary.maintained_prefix_count || 0}</strong><span>Maintained HS prefixes</span></div>
+                    <div class="summary-card"><strong>${summary.exact_code_count || 0}</strong><span>Official exact codes</span></div>
+                    <div class="summary-card"><strong>${summary.product_route_count || 0}</strong><span>Catalog product routes</span></div>
+                    <div class="summary-card"><strong>${summary.product_route_gap_count || 0}</strong><span>Exact-rate route gaps</span></div>
+                </div>
+                <div class="coverage-table-wrap"><table class="coverage-table"><thead><tr><th>Market</th><th>Status</th><th>HS prefixes</th><th>Exact codes</th><th>Product routes</th><th>Scope gates</th><th>Freshness</th><th>Next action</th></tr></thead><tbody>
+                    ${rows.map((row) => `<tr><td><strong>${escapeHtml(row.label || row.market)}</strong><br><span class="meta">${escapeHtml(row.market)}</span></td><td><span class="badge ${row.status === 'coverage_gap' ? 'benchmark' : 'auto_updatable'}">${escapeHtml(statusLabel[row.status] || row.status)}</span></td><td>${row.covered_prefix_count}/${row.maintained_prefix_count}${row.missing_prefixes?.length ? `<br><span class="error">Missing: ${escapeHtml(row.missing_prefixes.join(', '))}</span>` : ''}</td><td>${row.exact_code_count}</td><td>${row.exact_product_route_count}/${row.product_route_count}</td><td>${row.mixed_rate_prefixes?.length ? `Mixed rates: ${escapeHtml(row.mixed_rate_prefixes.join(', '))}` : 'No mixed-rate prefix'}<br><span class="meta">${row.scope_review_route_count || 0} route(s) require scope review</span></td><td>${row.stale ? '<span class="error">Stale</span>' : `${row.age_days} day(s)`}<br><span class="meta">${escapeHtml(row.last_checked_at || 'not recorded')}</span></td><td>${escapeHtml(row.next_action || '')}</td></tr>`).join('') || '<tr><td colspan="8">No exact tariff coverage report.</td></tr>'}
+                </tbody></table></div>
+                <p class="meta"><strong>Rollout order:</strong> ${escapeHtml((report.rollout_order || []).join(' → '))}. A zero base-duty result does not remove VAT/GST, trade remedies, quotas, licences or product controls.</p>`;
+        }
+
         function renderMalaysiaArtifactImport(status = {}) {
             const passed = status.ok === true;
             const blocked = status.ok === false;
@@ -2756,6 +2778,7 @@
                 dutyRateStatus.innerHTML = `
                     ${renderAutomationLaunchStatus(automationLaunchStatus, chinaCustomsStatus, nationalTradeFlowStatus)}
                     ${renderExactTariffFeeds(data.exact_tariff_feeds || {})}
+                    ${renderExactTariffCoverage(data.exact_tariff_coverage || {})}
                     ${renderMalaysiaArtifactImport(data.my_official_artifact_import || {})}
                     ${renderP2ArtifactImports(data.p2_official_artifact_imports || {})}
                     ${renderHybridPromotionQueue(data.hybrid_promotion_queue || [])}

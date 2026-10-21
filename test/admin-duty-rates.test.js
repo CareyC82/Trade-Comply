@@ -66,6 +66,8 @@ test('admin page includes duty-rate automation health queue', () => {
     assert.match(html, /Priority:/);
     assert.match(html, /<strong>Run:<\/strong>/);
     assert.match(html, /Official exact tariff feeds/);
+    assert.match(html, /Exact tariff coverage by market/);
+    assert.match(html, /A zero base-duty result does not remove VAT\/GST/);
     assert.match(html, /Official tariff artifact workbench/);
     assert.match(html, /Preview import/);
     assert.match(html, /Confirm import/);
@@ -157,6 +159,8 @@ test('admin duty-rate payload exposes source roadmap status', () => {
     assert.equal(payload.ok, true, JSON.stringify(payload.failures, null, 2));
     assert.equal(payload.duty_rate_summary.rule_count > 0, true);
     assert.equal(payload.duty_rate_summary.country_count > 0, true);
+    assert.equal(payload.exact_tariff_coverage.ok, true);
+    assert.ok(payload.exact_tariff_coverage.markets.some(row => row.market === 'US' && row.exact_code_count > 0));
     assert.equal(Array.isArray(payload.sources), true);
     assert.equal(payload.post_entry_tax_coverage.ok, true, JSON.stringify(payload.post_entry_tax_coverage.failures, null, 2));
     assert.equal(payload.post_entry_tax_coverage.export_tax.missing_total, 0);

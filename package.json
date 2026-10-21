@@ -79,6 +79,8 @@
     "check:duty-rates:anz:health": "node scripts/check-exact-tariff-sync-health.js",
     "check:duty-rates:anz:families": "node scripts/check-exact-tariff-sync-health.js",
     "check:duty-rates:eu:health": "node scripts/check-eu-exact-tariff-coverage.js",
+    "build:exact-tariff-coverage": "node scripts/build-exact-tariff-coverage.js",
+    "check:exact-tariff-coverage": "node scripts/build-exact-tariff-coverage.js --check",
     "check:duty-rates": "node scripts/check-duty-rates.js",
     "verify:duty-rate-sync": "node scripts/verify-duty-rate-sync-output.js",
     "check:filing-grade": "node scripts/check-filing-grade-regression.js",

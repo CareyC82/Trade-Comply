@@ -53,6 +53,18 @@ function isMaterialRateChange(change, threshold = MATERIAL_RATE_CHANGE_THRESHOLD
     return Math.abs(newRate - oldRate) >= threshold;
 }
 
+function classifyMaterialTariffChange(change = {}) {
+    const oldRate = Number(change.old_base_rate);
+    const newRate = Number(change.new_base_rate);
+    if (Number.isFinite(oldRate) && Number.isFinite(newRate) && oldRate !== newRate) return 'rate';
+    const changedFields = new Set((change.changes || []).map((row) => row.field));
+    if (changedFields.has('base_rate')) return 'rate';
+    if (['effective_from', 'effective_to'].some((field) => changedFields.has(field) || Object.hasOwn(change, `old_${field}`) || Object.hasOwn(change, `new_${field}`))) return 'effective_date';
+    if (['measure_type', 'origin_scope'].some((field) => changedFields.has(field) || Object.hasOwn(change, `old_${field}`) || Object.hasOwn(change, `new_${field}`))) return 'measure_scope';
+    if (['special_program_annex_change', 'special_program_origin_procedure_change', 'special_program_quota_change'].includes(change.change_type)) return 'special_program';
+    return null;
+}
+
 function countRateChanges(changes = []) {
     return changes.filter(change => (
         Object.prototype.hasOwnProperty.call(change, 'old_base_rate')
@@ -73,6 +85,9 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         degradedDetail,
         parserDiagnostics?.schema_drift_reason
     ].filter(Boolean).join(' '));
+    const materialChanges = changes
+        .map((change) => ({ ...change, material_change_kind: classifyMaterialTariffChange(change) }))
+        .filter((change) => change.material_change_kind);
     return {
         source,
         ok: result.ok !== false && errors.length === 0,
@@ -80,6 +95,8 @@ function buildRunSummary(source, result = {}, { applied = true, mode = 'official
         mode,
         change_count: changes.length,
         rate_change_count: countRateChanges(changes),
+        material_change_count: materialChanges.length,
+        material_changes: materialChanges,
         error_count: errors.length,
         countries: Array.isArray(result.countries) ? result.countries : [],
         writes_official_machine_rates: Boolean(result.writes_official_machine_rates),
@@ -293,14 +310,18 @@ function buildExceptionsForRun(run, { threshold = MATERIAL_RATE_CHANGE_THRESHOLD
     }
 
     (run.changes || [])
-        .filter(change => isMaterialRateChange(change, threshold))
+        .filter(change => classifyMaterialTariffChange(change))
         .forEach(change => {
+            const kind = classifyMaterialTariffChange(change);
             exceptions.push({
                 source: run.source,
-                severity: 'medium',
-                type: 'material_rate_change',
-                reason: `${run.source} base duty changed by at least ${(threshold * 100).toFixed(1)} percentage points.`,
-                details: change,
+                severity: kind === 'rate' && isMaterialRateChange(change, threshold) ? 'medium' : 'low',
+                type: kind === 'rate' ? 'material_rate_change' : 'material_tariff_change',
+                material_change_kind: kind,
+                reason: kind === 'rate'
+                    ? `${run.source} published a base-duty rate change.`
+                    : `${run.source} published a material ${kind.replace('_', ' ')} change.`,
+                details: { ...change, material_change_kind: kind },
                 auto_applied: Boolean(run.applied)
             });
         });
@@ -755,6 +776,7 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             sources_auto_applied: autoApplied.length,
             total_changes: runs.reduce((sum, run) => sum + Number(run.change_count || 0), 0),
             total_rate_changes: runs.reduce((sum, run) => sum + Number(run.rate_change_count || 0), 0),
+            total_material_changes: runs.reduce((sum, run) => sum + Number(run.material_change_count || 0), 0),
             exceptions: exceptions.length,
             filing_grade_auto_sources: sourceRunPlan.filter(row => row.rate_automation_stage === 'official_machine_sync').length,
             parser_gap_sources: sourceRunPlan.filter(row => row.parser_gap).length,
@@ -778,7 +800,8 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
             source: run.source,
             mode: run.mode,
             change_count: run.change_count,
-            rate_change_count: run.rate_change_count
+            rate_change_count: run.rate_change_count,
+            material_change_count: run.material_change_count || 0
         })),
         exceptions,
         runs,
@@ -1091,6 +1114,7 @@ if (require.main === module) {
 module.exports = {
     MATERIAL_RATE_CHANGE_THRESHOLD,
     isMaterialRateChange,
+    classifyMaterialTariffChange,
     buildRunSummary,
     downgradeOfficialTransportFailure,
     shouldRunOfficialWritePass,

@@ -8,6 +8,14 @@ const engine = require('../lib/can-i-sell-it');
 const models = require('../lib/wearable-product-models');
 const pageHelpers = require('../js/can-i-sell-it-page');
 
+test('tariff result labels exact source evidence and keeps zero duty separate from tax and measures', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(script, /exact-line base customs duty/);
+    assert.match(script, /Free applies to base customs duty only; VAT\/GST and other measures remain separate/);
+    assert.match(script, /source checked/);
+    assert.match(script, /official source/);
+});
+
 test('extracts material smart-wearable facts without inventing unknown answers', () => {
     const profile = engine.extractProfile('Bluetooth smart ring with a rechargeable lithium battery and sleep tracking. No medical claims.');
     assert.equal(profile.productType, 'smart_ring');

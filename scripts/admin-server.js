@@ -297,6 +297,7 @@ function buildDutyRateStatusPayload() {
     const { buildFilingGradeRegression } = require('../lib/filing-grade-regression');
     const sourcesPayload = readJsonFile(DUTY_RATE_SOURCES_PATH, { sources: [] });
     const dutyPayload = readJsonFile(DUTY_RATES_PATH, { rules: [] });
+    const { buildExactTariffCoverageReport } = require('../lib/exact-tariff-coverage');
     const exportTaxPayload = readJsonFile(EXPORT_TAX_RATES_PATH, { rules: [] });
     const automationLaunchStatus = readJsonFile(AUTOMATION_LAUNCH_STATUS_PATH, {
         summary: {},
@@ -342,6 +343,10 @@ function buildDutyRateStatusPayload() {
         automation_launch_status: automationLaunchStatus,
         sources: Array.isArray(sourcesPayload.sources) ? sourcesPayload.sources : [],
         exact_tariff_feeds: buildExactTariffFeedStatus(dutyPayload),
+        exact_tariff_coverage: buildExactTariffCoverageReport({
+            dutyPayload,
+            priorityMatrix: health.priority_rate_matrix || {}
+        }),
         my_official_artifact_import: readJsonFile(MY_DUTY_RATE_IMPORT_STATUS_PATH, {
             ok: null,
             trust_gate: 'not_run',

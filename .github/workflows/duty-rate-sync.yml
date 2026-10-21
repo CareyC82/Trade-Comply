@@ -51,6 +51,12 @@ jobs:
       - name: Enforce Australia and New Zealand exact tariff health
         run: npm run check:duty-rates:anz:health
 
+      - name: Enforce EU, US, Singapore and Japan exact tariff coverage
+        run: npm run check:exact-tariff-coverage
+
+      - name: Refresh exact tariff coverage report
+        run: npm run build:exact-tariff-coverage
+
       - name: Refresh automation launch status
         run: npm run build:automation-launch-status
 
@@ -79,6 +85,7 @@ jobs:
             data/duty-rate-sync-status.json
             data/automation-launch-status.json
             data/exact-tariff-parser-priorities.json
+            data/exact-tariff-coverage.json
           if-no-files-found: ignore
 
       - name: Commit duty-rate sync data
@@ -92,6 +99,7 @@ jobs:
             data/duty-rate-sync-status.json \
             data/automation-launch-status.json \
             data/exact-tariff-parser-priorities.json
+            data/exact-tariff-coverage.json
 
           if git diff --staged --quiet; then
             echo "No duty-rate sync changes."
