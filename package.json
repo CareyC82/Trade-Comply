@@ -78,6 +78,7 @@
     "update:duty-rates:anz:official:dry-run": "node --use-system-ca scripts/update-exact-national-tariffs.js --countries=AU,NZ --dry-run",
     "check:duty-rates:anz:health": "node scripts/check-exact-tariff-sync-health.js",
     "check:duty-rates:anz:families": "node scripts/check-exact-tariff-sync-health.js",
+    "check:duty-rates:eu:health": "node scripts/check-eu-exact-tariff-coverage.js",
     "check:duty-rates": "node scripts/check-duty-rates.js",
     "verify:duty-rate-sync": "node scripts/verify-duty-rate-sync-output.js",
     "check:filing-grade": "node scripts/check-filing-grade-regression.js",

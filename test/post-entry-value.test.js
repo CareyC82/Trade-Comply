@@ -500,8 +500,8 @@ test('builds direct import decision for official and benchmark rate sources', ()
         declaredDuty: 0
     });
     const euDecision = buildImportPostEntryDecision(valueResult, euDuty, { currency: 'EUR' });
-    assert.equal(euDecision.trust.level, 'official_duty_tax_estimate');
-    assert.match(euDecision.coreConclusion, /Official duty \+ tax estimate/);
+    assert.equal(euDecision.trust.level, 'official_heading_only');
+    assert.match(euDecision.coreConclusion, /Official heading only/);
 });
 
 test('loads duty rules from maintainable data file', () => {

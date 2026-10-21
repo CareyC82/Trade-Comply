@@ -441,7 +441,9 @@ test('European Union aggregate rules cover common electronics HS prefixes', () =
     ['847130', '850440', '850760', '8517', '8528', '8541', '8542'].forEach((prefix) => {
         assert.ok(prefixes.has(prefix), `EU ${prefix} duty rule should exist`);
     });
-    assert.equal(prefixes.get('850760').source_status, 'official_source_checked');
+    assert.equal(prefixes.get('850760').source_status, 'scope_check_required');
+    assert.ok(prefixes.get('850760').exact_code_overrides.length > 1);
+    assert.match(prefixes.get('850760').source_rate_text, /exact TARIC/i);
     assert.equal(prefixes.get('8528').source_status, 'scope_check_required');
 });
 

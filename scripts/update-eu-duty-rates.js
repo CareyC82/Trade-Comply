@@ -190,6 +190,12 @@ function pickTaricImportDutiesFile(items) {
         .find(item => /^Duties Import 01-99\.xlsx$/i.test(String(item.name || ''))) || null;
 }
 
+function pickTaricNomenclatureFile(items) {
+    return getCircabcItems({ data: items })
+        .filter(item => item?.type && /content/i.test(item.type))
+        .find(item => /^Nomenclature EN\.xlsx$/i.test(String(item.name || ''))) || null;
+}
+
 function buildCircabcDirectDownloadUrl(file) {
     if (!file?.id || !file?.name) return '';
     return `${CIRCABC_DIRECT_DOWNLOAD_BASE}/${encodeURIComponent(file.id)}/${encodeURIComponent(file.name)}`;
@@ -209,9 +215,14 @@ async function probeEuTaricFullDatabase({ fetcher = fetchText } = {}) {
             throw new Error(`No month folder found under TARIC year ${latestYear.name}.`);
         }
         const files = await fetchJson(buildCircabcChildrenUrl(latestMonth.id), { fetcher });
-        const importDutiesFile = pickTaricImportDutiesFile(getCircabcItems(files));
+        const monthFiles = getCircabcItems(files);
+        const importDutiesFile = pickTaricImportDutiesFile(monthFiles);
+        const nomenclatureFile = pickTaricNomenclatureFile(monthFiles);
         if (!importDutiesFile?.id) {
             throw new Error(`Duties Import 01-99.xlsx not found under ${latestYear.name}/${latestMonth.name}.`);
+        }
+        if (!nomenclatureFile?.id) {
+            throw new Error(`Nomenclature EN.xlsx not found under ${latestYear.name}/${latestMonth.name}.`);
         }
         return {
             checked: true,
@@ -235,6 +246,14 @@ async function probeEuTaricFullDatabase({ fetcher = fetchText } = {}) {
                 modified: importDutiesFile.properties?.modified || '',
                 mimetype: importDutiesFile.properties?.mimetype || '',
                 download_url: buildCircabcDirectDownloadUrl(importDutiesFile)
+            },
+            nomenclature_file: {
+                id: nomenclatureFile.id,
+                name: nomenclatureFile.name,
+                size: Number(nomenclatureFile.properties?.size || 0),
+                modified: nomenclatureFile.properties?.modified || '',
+                mimetype: nomenclatureFile.properties?.mimetype || '',
+                download_url: buildCircabcDirectDownloadUrl(nomenclatureFile)
             },
             parser_candidate: true,
             reason: 'Official CIRCABC folder is reachable and the latest Duties Import 01-99.xlsx file can be located anonymously.'
@@ -514,6 +533,80 @@ function parseTaricRowXml(rowXml, prefixes = []) {
     };
 }
 
+function parseTaricNomenclatureRowXml(rowXml, prefixes = []) {
+    const wanted = prefixes.map(prefix => String(prefix || ''));
+    const values = {};
+    const cellRegex = /<c\b[^>]*r="([A-Z]+)\d+"[^>]*(?:>([\s\S]*?)<\/c>|\/>)/g;
+    let cellMatch;
+    while ((cellMatch = cellRegex.exec(rowXml))) {
+        const textMatch = String(cellMatch[2] || '').match(/<t[^>]*>([\s\S]*?)<\/t>/);
+        values[cellMatch[1]] = decodeXmlText(textMatch ? textMatch[1] : '').trim();
+    }
+    const codeMatch = String(values.A || '').match(/^(\d{10})\s+(\d{2})$/);
+    if (!codeMatch || codeMatch[2] !== '80') return null;
+    const goodsCode = codeMatch[1];
+    if (wanted.length && !wanted.some(prefix => goodsCode.startsWith(prefix))) return null;
+    return {
+        goods_code: goodsCode,
+        product_line_suffix: codeMatch[2],
+        start_date: values.B || '',
+        end_date: values.C || '',
+        description: values.G || ''
+    };
+}
+
+function parseTaricNomenclatureRowsStreaming(workbookPath, { prefixes = [] } = {}) {
+    return new Promise((resolve, reject) => {
+        const child = spawn('unzip', ['-p', workbookPath, 'xl/worksheets/sheet1.xml']);
+        const rows = [];
+        let buffer = '';
+        let stderr = '';
+        child.stdout.setEncoding('utf8');
+        child.stderr.setEncoding('utf8');
+        child.stdout.on('data', (chunk) => {
+            buffer += chunk;
+            let end;
+            while ((end = buffer.indexOf('</row>')) >= 0) {
+                const start = buffer.lastIndexOf('<row', end);
+                if (start >= 0) {
+                    const row = parseTaricNomenclatureRowXml(buffer.slice(start, end + 6), prefixes);
+                    if (row) rows.push(row);
+                }
+                buffer = buffer.slice(end + 6);
+            }
+        });
+        child.stderr.on('data', chunk => { stderr += chunk; });
+        child.on('error', reject);
+        child.on('close', (code) => code === 0
+            ? resolve(rows)
+            : reject(new Error(`Could not stream TARIC nomenclature workbook: ${stderr.trim() || `unzip exited ${code}`}`)));
+    });
+}
+
+function completeTaricDutyRowsWithFreeNomenclature(dutyRows = [], nomenclatureRows = []) {
+    const thirdCountryCodes = new Set(dutyRows
+        .filter((row) => row.origin_code === '1011'
+            && row.measure_type_code === '103'
+            && /third country duty/i.test(row.measure_type || ''))
+        .map((row) => normalizeTaricGoodsCode(row.goods_code)));
+    const completed = [...dutyRows];
+    for (const row of nomenclatureRows) {
+        const goodsCode = normalizeTaricGoodsCode(row.goods_code);
+        if (goodsCode.length !== 10 || thirdCountryCodes.has(goodsCode)) continue;
+        completed.push({
+            goods_code: goodsCode,
+            origin: 'ERGA OMNES',
+            origin_code: '1011',
+            measure_type: 'Third country duty',
+            measure_type_code: '103',
+            duty: '0 %',
+            description: row.description || '',
+            rate_derivation: 'official_nomenclature_no_third_country_duty_measure'
+        });
+    }
+    return completed;
+}
+
 function parseTaricWorkbookRowsStreaming(workbookPath, { prefixes = [] } = {}) {
     return new Promise((resolve, reject) => {
         const child = spawn('unzip', ['-p', workbookPath, 'xl/worksheets/sheet1.xml']);
@@ -645,17 +738,18 @@ function buildEuExactOverridesForRule(rule, taricRows = [], checkedAt = new Date
         const hsCode = normalizeTaricGoodsCode(row.goods_code);
         const baseRate = parseTaricPercentDuty(row.duty);
         if (hsCode.length !== 10 || baseRate === null) return;
-        const rates = grouped.get(hsCode) || new Set();
-        rates.add(baseRate);
-        grouped.set(hsCode, rates);
+        const entry = grouped.get(hsCode) || { rates: new Set(), inferredFree: false };
+        entry.rates.add(baseRate);
+        entry.inferredFree ||= row.rate_derivation === 'official_nomenclature_no_third_country_duty_measure';
+        grouped.set(hsCode, entry);
     });
     const maintainedCandidates = (rule.exact_code_overrides || []).filter((row) => (
         String(row.confidence || '').toLowerCase() !== 'official exact tariff line'
     ));
     const officialExact = [...grouped.entries()]
-        .filter(([, rates]) => rates.size === 1)
-        .map(([hsCode, rates]) => {
-            const baseRate = [...rates][0];
+        .filter(([, entry]) => entry.rates.size === 1)
+        .map(([hsCode, entry]) => {
+            const baseRate = [...entry.rates][0];
             return {
                 hs_code: hsCode,
                 base_rate: baseRate,
@@ -669,7 +763,12 @@ function buildEuExactOverridesForRule(rule, taricRows = [], checkedAt = new Date
                 source_name: 'European Commission TARIC',
                 source_hts: `${hsCode} (EU TARIC official exact tariff line)`,
                 source_rate_text: `${(baseRate * 100).toFixed(3)}% third-country duty`,
-                source_note: 'Official 10-digit TARIC ERGA OMNES third-country duty. VAT, preferences, trade remedies, quotas, licensing, and product controls remain separate layers.',
+                source_note: entry.inferredFree
+                    ? 'Official TARIC nomenclature confirms this declarable 10-digit line and the same official monthly import-duty dataset contains no ERGA OMNES third-country-duty measure for it; base customs duty is therefore Free. VAT, preferences, trade remedies, quotas, licensing, and product controls remain separate layers.'
+                    : 'Official 10-digit TARIC ERGA OMNES third-country duty. VAT, preferences, trade remedies, quotas, licensing, and product controls remain separate layers.',
+                rate_derivation: entry.inferredFree
+                    ? 'official_nomenclature_no_third_country_duty_measure'
+                    : 'official_third_country_duty_measure',
                 last_checked_at: checkedAt
             };
         })
@@ -847,7 +946,7 @@ async function updateEuRulesFromOfficialSource({
     binaryFetcher = fetchBuffer
 } = {}) {
     const probe = await probeEuTaricFullDatabase({ fetcher });
-    if (!probe.ok || !probe.import_duties_file?.download_url) {
+    if (!probe.ok || !probe.import_duties_file?.download_url || !probe.nomenclature_file?.download_url) {
         const fallback = updateEuRules({ dryRun });
         return {
             ...fallback,
@@ -861,21 +960,34 @@ async function updateEuRulesFromOfficialSource({
     }
 
     const tempPath = path.join(os.tmpdir(), `tracewize-taric-${process.pid}-${Date.now()}.xlsx`);
+    const nomenclatureTempPath = path.join(os.tmpdir(), `tracewize-taric-nomenclature-${process.pid}-${Date.now()}.xlsx`);
     try {
-        const response = await binaryFetcher(probe.import_duties_file.download_url);
+        const [response, nomenclatureResponse] = await Promise.all([
+            binaryFetcher(probe.import_duties_file.download_url),
+            binaryFetcher(probe.nomenclature_file.download_url)
+        ]);
         const workbook = Buffer.isBuffer(response) ? response : response?.body;
-        if (!Buffer.isBuffer(workbook) || workbook.length === 0) {
+        const nomenclatureWorkbook = Buffer.isBuffer(nomenclatureResponse) ? nomenclatureResponse : nomenclatureResponse?.body;
+        if (!Buffer.isBuffer(workbook) || workbook.length === 0 || !Buffer.isBuffer(nomenclatureWorkbook) || nomenclatureWorkbook.length === 0) {
             throw new Error('Official TARIC workbook download returned no binary content.');
         }
         fs.writeFileSync(tempPath, workbook);
+        fs.writeFileSync(nomenclatureTempPath, nomenclatureWorkbook);
         const prefixes = Array.from(new Set(getEuDutyRules().flatMap(rule => rule.hs_prefixes || []))).sort();
-        const taricRows = await parseTaricWorkbookRowsStreaming(tempPath, { prefixes });
+        const [dutyRows, nomenclatureRows] = await Promise.all([
+            parseTaricWorkbookRowsStreaming(tempPath, { prefixes }),
+            parseTaricNomenclatureRowsStreaming(nomenclatureTempPath, { prefixes })
+        ]);
+        const taricRows = completeTaricDutyRowsWithFreeNomenclature(dutyRows, nomenclatureRows);
         const result = updateEuRules({ dryRun, taricRows });
         return {
             ...result,
             official_fetch: {
                 ...probe,
-                downloaded_bytes: workbook.length,
+                downloaded_bytes: workbook.length + nomenclatureWorkbook.length,
+                duty_row_count: dutyRows.length,
+                nomenclature_row_count: nomenclatureRows.length,
+                inferred_free_row_count: taricRows.length - dutyRows.length,
                 machine_parser_ready: true
             }
         };
@@ -897,6 +1009,9 @@ async function updateEuRulesFromOfficialSource({
     } finally {
         if (fs.existsSync(tempPath)) {
             fs.unlinkSync(tempPath);
+        }
+        if (fs.existsSync(nomenclatureTempPath)) {
+            fs.unlinkSync(nomenclatureTempPath);
         }
     }
 }
@@ -933,6 +1048,7 @@ module.exports = {
     buildCircabcChildrenUrl,
     pickLatestNumberedFolder,
     pickTaricImportDutiesFile,
+    pickTaricNomenclatureFile,
     buildCircabcDirectDownloadUrl,
     parseEuTaricConsultationHtml,
     parseTaricSheetRows,
@@ -943,6 +1059,9 @@ module.exports = {
     buildEuOfficialRateCandidate,
     parseTaricWorkbookRows,
     parseTaricWorkbookRowsStreaming,
+    parseTaricNomenclatureRowXml,
+    parseTaricNomenclatureRowsStreaming,
+    completeTaricDutyRowsWithFreeNomenclature,
     buildEuOfficialCandidateForRule,
     buildEuExactOverridesForRule,
     applyOfficialCandidateToRule,

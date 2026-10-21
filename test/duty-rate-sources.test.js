@@ -15,6 +15,7 @@ const {
     buildCircabcDirectDownloadUrl,
     pickLatestNumberedFolder,
     pickTaricImportDutiesFile,
+    pickTaricNomenclatureFile,
     parseEuTaricConsultationHtml,
     parseTaricSheetRows,
     normalizeTaricGoodsCode,
@@ -23,6 +24,8 @@ const {
     buildEuOfficialRateCandidate,
     buildEuOfficialCandidateForRule,
     buildEuExactOverridesForRule,
+    parseTaricNomenclatureRowXml,
+    completeTaricDutyRowsWithFreeNomenclature,
     applyOfficialCandidateToRule,
     updateEuRules,
     probeEuTaricOfficialSource,
@@ -852,11 +855,46 @@ test('EU TARIC full database probe can locate latest import duties workbook', ()
 
     const files = [
         { id: 'x', name: 'Footnotes descriptions.xlsx', type: '{content}', properties: { size: '1' } },
-        { id: 'duties', name: 'Duties Import 01-99.xlsx', type: '{content}', properties: { size: '7661294' } }
+        { id: 'duties', name: 'Duties Import 01-99.xlsx', type: '{content}', properties: { size: '7661294' } },
+        { id: 'nomenclature', name: 'Nomenclature EN.xlsx', type: '{content}', properties: { size: '1200000' } }
     ];
     const duties = pickTaricImportDutiesFile(files);
     assert.equal(duties.id, 'duties');
+    assert.equal(pickTaricNomenclatureFile(files).id, 'nomenclature');
     assert.match(buildCircabcDirectDownloadUrl(duties), /Duties%20Import%2001-99\.xlsx$/);
+});
+
+test('EU TARIC nomenclature parser keeps declarable 10-digit product lines only', () => {
+    const declarable = parseTaricNomenclatureRowXml(`
+        <row r="2"><c r="A2" t="inlineStr"><is><t>8471300000 80</t></is></c>
+        <c r="G2" t="inlineStr"><is><t>Portable automatic data-processing machines</t></is></c></row>
+    `, ['847130']);
+    const nonDeclarable = parseTaricNomenclatureRowXml(`
+        <row r="3"><c r="A3" t="inlineStr"><is><t>8471300000 10</t></is></c></row>
+    `, ['847130']);
+    assert.equal(declarable.goods_code, '8471300000');
+    assert.match(declarable.description, /Portable/);
+    assert.equal(nonDeclarable, null);
+});
+
+test('EU TARIC completion treats an official declarable line as Free only when no third-country measure exists', () => {
+    const dutyRows = [{
+        goods_code: '8471500000', duty: '2.5 %', origin_code: '1011',
+        measure_type_code: '103', measure_type: 'Third country duty'
+    }];
+    const rows = completeTaricDutyRowsWithFreeNomenclature(dutyRows, [
+        { goods_code: '8471300000', description: 'Portable computers' },
+        { goods_code: '8471500000', description: 'Processing units' }
+    ]);
+    assert.equal(rows.filter((row) => row.goods_code === '8471300000').length, 1);
+    assert.equal(rows.find((row) => row.goods_code === '8471300000').duty, '0 %');
+    assert.equal(rows.find((row) => row.goods_code === '8471300000').rate_derivation, 'official_nomenclature_no_third_country_duty_measure');
+    assert.equal(rows.filter((row) => row.goods_code === '8471500000').length, 1);
+
+    const overrides = buildEuExactOverridesForRule({ hs_prefixes: ['847130'] }, rows, '2026-10-21T00:00:00.000Z');
+    assert.equal(overrides[0].hs_code, '8471300000');
+    assert.equal(overrides[0].base_rate, 0);
+    assert.match(overrides[0].source_note, /nomenclature confirms.*no ERGA OMNES/is);
 });
 
 test('EU TARIC parser extracts third-country duty rates from worksheet XML', () => {

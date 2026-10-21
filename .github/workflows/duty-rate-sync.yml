@@ -42,6 +42,9 @@ jobs:
       - name: Sync official EU TARIC workbook
         run: npm run update:duty-rates:eu:official
 
+      - name: Enforce EU exact TARIC coverage health
+        run: npm run check:duty-rates:eu:health
+
       - name: Sync official exact tariff lines
         run: npm run sync:duty-rates:exact
 
