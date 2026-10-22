@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-20",
-  "generated_at": "2026-10-20T21:39:44.333Z",
+  "version": "2026-10-22",
+  "generated_at": "2026-10-22T21:36:14.051Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -647,6 +647,66 @@
         "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
       ],
       "parser_scope": "Resolve exact HTS 854143 line, AD/CVD case scope, origin-route evidence, and Section 301 Chapter 99/exclusion before using the rate for filing."
+    },
+    {
+      "id": "battery-us-eu",
+      "route": "US->EU",
+      "product_id": "battery",
+      "import_country": "EU",
+      "origin_country": "US",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "US->EU battery has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
+      ],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "battery-vn-eu",
+      "route": "VN->EU",
+      "product_id": "battery",
+      "import_country": "EU",
+      "origin_country": "VN",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "VN->EU battery has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
+      ],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
       "id": "ai-compute-my-cn",
@@ -3640,6 +3700,39 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
+      "id": "rule-EU-GLOBAL-850760-BATTERY-IMPORT-OFFICIAL",
+      "rule_id": "EU-GLOBAL-850760-BATTERY-IMPORT-OFFICIAL",
+      "route": "*->EU",
+      "product_id": "EU import lithium-ion battery equipment signal",
+      "import_country": "EU",
+      "origin_country": "*",
+      "hs_code": "850760",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "EU exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->EU 850760 remains a rule-level exact-rate gap: EU import lithium-ion battery equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
       "id": "rule-EU-GLOBAL-8528-DISPLAY-IMPORT-SCOPE",
       "rule_id": "EU-GLOBAL-8528-DISPLAY-IMPORT-SCOPE",
       "route": "*->EU",
@@ -3836,6 +3929,39 @@
       "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
     },
     {
+      "id": "rule-DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+      "rule_id": "DE-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+      "route": "*->DE",
+      "product_id": "Germany import lithium-ion battery equipment signal",
+      "import_country": "DE",
+      "origin_country": "*",
+      "hs_code": "850760",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "DE exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2170,
+      "why_priority": "*->DE 850760 remains a rule-level exact-rate gap: Germany import lithium-ion battery equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
       "id": "rule-DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
       "rule_id": "DE-GLOBAL-8528-DISPLAY-IMPORT-INDICATIVE",
       "route": "*->DE",
@@ -4020,6 +4146,39 @@
       ],
       "scope_components": [
         "portable_adp_scope",
+        "taric_exact_code_scope",
+        "active_exclusion_or_case_period",
+        "tariff_exact_code_scope"
+      ],
+      "parser_subtasks": [
+        "Map the broad HS prefix to exact official tariff-line candidates.",
+        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
+        "Backfill remaining exact-code overrides that are still missing parser coverage."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "rule-NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+      "rule_id": "NL-GLOBAL-850760-BATTERY-IMPORT-INDICATIVE",
+      "route": "*->NL",
+      "product_id": "Netherlands import lithium-ion battery equipment signal",
+      "import_country": "NL",
+      "origin_country": "*",
+      "hs_code": "850760",
+      "source_status": "scope_check_required",
+      "source_trust": "official_heading_only",
+      "parser_target": "NL exact tariff-line scope resolver",
+      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
+      "priority_band": "P2",
+      "impact_score": 2370,
+      "why_priority": "*->NL 850760 remains a rule-level exact-rate gap: Netherlands import lithium-ion battery equipment signal is scope_check_required.",
+      "rate_change_drivers": [
+        "Broad HS prefix has multiple possible official tariff lines.",
+        "Some exact-code overrides already exist; remaining product scopes still need parser coverage.",
+        "TARIC exact 10-digit goods-code scope can change the final duty rate."
+      ],
+      "scope_components": [
+        "battery_chemistry_scope",
         "taric_exact_code_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
