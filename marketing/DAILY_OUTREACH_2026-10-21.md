@@ -73,6 +73,18 @@ Objective: run expert validation, buyer problem engagement, and Australia/New Ze
 
 ## Execution status
 
+### Chrome native-control execution — 2026-10-21
+
+- In-app Reddit and Zoho tab binding timed out. Chrome native accessibility control succeeded; account confirmed as carey@tracewize.com.
+- Sent and verified in Zoho Sent: austest@austest.com.au; info@eessconformity.com; service@nzrcm.co.nz; customerservice@reliablecompliancesolutions.com.au; ecommerce@livingstonintl.com. Subject: “Possible pre-screening referral fit for small electronics importers”. UI showed five new sent messages at 7:12–7:14 PM. Sent status does not establish recipient delivery or reply.
+- Published new EU documentation reply: https://old.reddit.com/r/CustomsBroker/comments/1vapp74/ddp_vs_dap_for_eu_imports_customs_documentation/19rfjmx29j5j5/
+- Published new Philippines customs-charge reply: https://old.reddit.com/r/BusinessPH/comments/1wua5bk/60k_customs_fees_on_140k_alibaba_order_is_this/19rfjnp6vdrj8/
+- Skipped duplicate publication on US grey-DDP and UAE LCL-document threads: current logged-in Reddit account Old-Ordinary-9168 already had substantive replies dated one day ago on both.
+- Skipped India thread after reading actual post: poster already imports regularly and primarily requests cheaper all-in freight. Original draft framed them as a first-time importer and was a poor fit.
+- Followed Travis Smith and published approved comment on DDP visibility. Verified visible comment under Carey Chen. Post: https://www.linkedin.com/posts/travis-smith-18227327_us-importers-trade-enforcement-is-entering-share-7487992175268478977-Js2q/
+- Followed Ralph Mueller and published approved comment on identifying the legal import structure before quoting. Verified visible comment under Carey Chen. Post: https://www.linkedin.com/posts/connect2ralph_ddp-often-looks-like-the-easiest-option-in-share-7439911285233709056-Okf9/
+- Remaining partner emails and eight LinkedIn connection requests remain pending. Do not repeat the five sent emails or founder post.
+
 - Prepared on 2026-10-21.
 - Edward reply removed from execution at the user's request because the user had already replied independently.
 - Reddit buyer reply published successfully: https://old.reddit.com/r/AlibabaImport/comments/1x6jip1/ddp_and_tariffs_question/phyyiu7/
@@ -82,5 +94,6 @@ Objective: run expert validation, buyer problem engagement, and Australia/New Ze
 - Ryan Owens followed. A substantive BMSB pre-shipment intake question was published on his 2026–27 season post: https://www.linkedin.com/pulse/bmsb-season-here-what-importers-need-know-2026-27-ryan-owens-g1fcc/
 - Brent Claypool followed. His visible recent activity consisted of short comments on other people's posts rather than a suitable original post, so no forced promotional comment was added.
 - Edward sent a new LinkedIn response asking for more information about the business so he can calibrate his input. No response was sent, consistent with the user's instruction not to reply to Edward in this batch.
+- LinkedIn founder post “A cheap DDP quote is not yet a landed-cost answer” was published manually by Carey on 2026-10-21. Post URL is still to be recorded.
 - Reddit problem-site round 2: published a documentation-focused reply to a French small business asking how to ensure China-origin goods are imported in its own company name: https://old.reddit.com/r/internationalbusiness/comments/1xaop1s/how_do_you_handle_imports_from_china_alibaba_1688/19rf6u9p21gjk/
 - Reddit problem-site round 2: published an evidence-and-deadline checklist for an Australian buyer whose US$4,000 DDP shipment had allegedly been held by customs for three weeks: https://old.reddit.com/r/Alibaba/comments/1xbcglf/4000_alibaba_shipment_stuck_at_australian_customs/19rf6wj4s3v40/
