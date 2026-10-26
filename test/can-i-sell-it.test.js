@@ -993,10 +993,10 @@ test('FCC marketplace guidance uses the published effective and compliance dates
         documents: []
     });
     const rule = result.platformRules.find((item) => item.id === 'amazon-fcc-id-readiness');
-    assert.match(rule.action, /October 11, 2026/);
+    assert.match(rule.action, /October 13, 2026/);
     assert.match(rule.action, /March 1, 2027/);
     assert.match(rule.action, /June 1, 2027/);
-    assert.equal(rule.source.lifecycle.effectiveAt, '2026-10-11');
+    assert.equal(rule.source.lifecycle.effectiveAt, '2026-10-13');
     assert.equal(rule.source.lifecycle.publishedAt, '2026-09-11');
 });
 

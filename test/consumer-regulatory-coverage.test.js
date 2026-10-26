@@ -102,7 +102,7 @@ test('FCC marketplace change is disclosed as pending and does not become a legal
     });
     const readiness = result.platformRules.find((rule) => rule.id === 'amazon-fcc-id-readiness');
     assert.equal(readiness.source.confidence, 'official_pending_effective_date');
-    assert.match(readiness.action, /October 11, 2026/i);
+    assert.match(readiness.action, /October 13, 2026/i);
     assert.match(readiness.action, /March 1, 2027|June 1, 2027/i);
     assert.ok(!result.requirements.some((item) => item.id === 'fcc_marketplace_2026'));
     const eu = engine.assess({
