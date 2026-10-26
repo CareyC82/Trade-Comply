@@ -75,6 +75,16 @@ test('consumer page is reachable from the primary navigation and declares the de
     });
 });
 
+test('home page declares stable self-service social metadata', () => {
+    const page = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+    assert.match(page, /<title>TraceWize \| Self-Service Global Trade Compliance Pre-Screening<\/title>/);
+    assert.match(page, /<link rel="canonical" href="https:\/\/tracewize\.com\/">/);
+    assert.match(page, /property="og:url" content="https:\/\/tracewize\.com\/"/);
+    assert.match(page, /property="og:title" content="TraceWize \| Self-Service Global Trade Compliance Pre-Screening"/);
+    assert.match(page, /property="og:description" content="Self-service product and trade-route pre-screening/);
+    assert.doesNotMatch(page.match(/<head>[\s\S]*?<\/head>/i)?.[0] || '', /New Energy &amp; Clean Tech/);
+});
+
 test('quick questions do not preselect Not sure', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
     assert.doesNotMatch(script, /profile\[key\]\s*===\s*['"]unknown['"][\s\S]{0,80}checked/);
@@ -998,6 +1008,37 @@ test('FCC marketplace guidance uses the published effective and compliance dates
     assert.match(rule.action, /June 1, 2027/);
     assert.equal(rule.source.lifecycle.effectiveAt, '2026-10-13');
     assert.equal(rule.source.lifecycle.publishedAt, '2026-09-11');
+});
+
+test('Amazon rechargeable-lithium TIC guidance is scoped, channel-specific and does not imply blanket retesting', () => {
+    const common = {
+        description: 'Portable Bluetooth speaker with a rechargeable Li-ion battery and USB-C charging.',
+        market: 'US', origin: 'CN', platform: 'Amazon', documents: []
+    };
+    const result = engine.assess(common);
+    const rule = result.platformRules.find((item) => item.id === 'amazon-rechargeable-lithium-tic-readiness');
+    assert.ok(rule);
+    assert.match(rule.action, /September 30 through November 16, 2026/);
+    assert.match(rule.action, /Amazon-authorized TIC provider/);
+    assert.match(rule.action, /Existing test documents may first be submitted/);
+    assert.match(rule.action, /new testing is needed only if the provider determines/i);
+    assert.match(rule.action, /excludes NiMH, NiCd/);
+    assert.match(rule.action, /does not determine TIC approval, insurance applicability or badge status/);
+    assert.ok(!result.requirements.some((item) => item.id === rule.id));
+    assert.ok(!engine.assess({ ...common, platform: 'Shopify / own store' }).platformRules.some((item) => item.id === rule.id));
+});
+
+test('Amazon rechargeable-lithium TIC guidance respects explicit policy exclusions', () => {
+    const excludedDescriptions = [
+        'AC-only Bluetooth speaker with no battery.',
+        'Bluetooth speaker powered by a rechargeable NiMH battery.',
+        'Bluetooth headset using a cylindrical lithium battery.',
+        'Bluetooth speaker that is a medical device with a rechargeable Li-ion battery.'
+    ];
+    excludedDescriptions.forEach((description) => {
+        const result = engine.assess({ description, market: 'US', origin: 'CN', platform: 'Amazon', documents: [] });
+        assert.ok(!result.platformRules.some((item) => item.id === 'amazon-rechargeable-lithium-tic-readiness'), description);
+    });
 });
 
 test('sales channels produce distinct visible listing decisions', () => {
