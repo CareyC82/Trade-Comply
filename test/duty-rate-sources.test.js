@@ -65,6 +65,7 @@ const {
     KR_TARIFF_DB_URL,
     KR_TARIFF_LOOKUP_URL,
     KR_UNIPASS_TARIFF_URL,
+    KR_UNIPASS_QUERY_URL,
     parseKoreaAdValoremRate,
     parseKoreaOfficialJsonRows,
     inspectKoreaOfficialResponse,
@@ -87,6 +88,7 @@ const {
     parseGenericTariffRows,
     parseIndiaTariffRows,
     parseIndiaOfficialJsonRows,
+    parseIndiaDutyCalculatorJson,
     inspectOfficialResponse,
     parseMalaysiaTariffRows,
     parseTaiwanTariffRows,
@@ -716,8 +718,8 @@ test('Korea official lookup JSON rows are parsed into guarded candidates', async
     assert.equal(rows.length, 1);
     assert.equal(rows[0].parsed_base_rate, 0);
     assert.equal(official.ok, true);
-    assert.equal(official.query_attempts.length, 1);
-    assert.equal(official.query_attempts[0].row_count, 1);
+    assert.ok(official.query_attempts.length >= 1);
+    assert.ok(official.query_attempts.some(attempt => attempt.row_count === 1));
 });
 
 test('Korea official lookup HTML rows are parsed into guarded candidates', async () => {
@@ -734,7 +736,7 @@ test('Korea official lookup HTML rows are parsed into guarded candidates', async
     assert.equal(official.ok, true);
     assert.equal(official.rows.length, 1);
     assert.equal(official.rows[0].hs_code, '9027500000');
-    assert.equal(official.query_attempts[0].row_count, 1);
+    assert.ok(official.query_attempts.some(attempt => attempt.row_count === 1));
 });
 
 test('Korea official fetch falls back from KCS to UNI-PASS and records source attempts', async () => {
@@ -1918,4 +1920,55 @@ test('Korea official parser accepts tariff API field aliases from a source fixtu
     assert.equal(rows[0].hs_code, '8517130000');
     assert.equal(rows[0].parsed_base_rate, 0);
     assert.equal(rows[0].item_name, 'Smartphones');
+});
+
+test('Korea UNI-PASS fixture composes split HSK columns and reads the basic tax rate', () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'korea-unipass-tariff-table.html'), 'utf8');
+    const rows = parseKoreaTariffRateRows(fixture);
+    assert.deepEqual(rows, [{
+        hs_code: '8517130000', hs_prefix: '851713', item_name: 'Smartphones',
+        base_rate_text: '8%', parsed_base_rate: 0.08
+    }]);
+    assert.match(KR_UNIPASS_QUERY_URL, /openULS0201005Q\.do/);
+});
+
+test('Korea readiness probe reports machine rows from the UNI-PASS query path', async () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'korea-unipass-tariff-table.html'), 'utf8');
+    const readiness = await probeKoreaReadiness({
+        live: true,
+        fetcher: async (url) => ({
+            status_code: 200,
+            body: url === KR_UNIPASS_QUERY_URL ? fixture : '<h1>KCS Tariff D/B(Inquiry)</h1><p>HS Code 10 digits</p>'
+        })
+    });
+    assert.equal(readiness.live_row_count > 0, true);
+    assert.equal(readiness.official_probe.machine_parser_ready, true);
+    assert.ok(readiness.official_probe.query_attempts.some(attempt => attempt.lookup_url === KR_UNIPASS_QUERY_URL && attempt.row_count > 0));
+});
+
+test('India ICEGATE duty calculator fixture maps numeric BCD SWS and IGST fields', () => {
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'india-icegate-duty-calculator.json'), 'utf8');
+    const rows = parseIndiaDutyCalculatorJson(fixture, '85171300', 'Smartphones');
+    assert.deepEqual(rows, [{
+        hs_code: '85171300', hs_prefix: '851713', item_name: 'Smartphones',
+        bcd_rate_text: '20%', sws_rate_text: '10%', igst_rate_text: '18%',
+        bcd_rate: 0.2, sws_rate: 0.1, igst_rate: 0.18
+    }]);
+});
+
+test('India official fetch follows the duty calculator JSON request used by the official page', async () => {
+    const official = await fetchIndiaOfficialRows({
+        queryHsCodes: ['85171300'],
+        maxQueryCount: 1,
+        source: { official_url: 'https://example.invalid/landing', official_probe_urls: ['https://example.invalid/landing'] },
+        fetcher: async (url) => {
+            if (url.includes('DueFee111')) return { status_code: 200, body: '{"bcd_rate":20,"scd_rate":10,"igst_rate":18}' };
+            if (url.includes('cdc_duty_details.jsp')) return { status_code: 200, body: '<html>official duty calculator shell</html>' };
+            return { status_code: 200, body: '<html>official landing shell</html>' };
+        }
+    });
+    assert.equal(official.ok, true);
+    assert.equal(official.rows[0].hs_code, '85171300');
+    assert.equal(official.rows[0].bcd_rate, 0.2);
+    assert.match(official.query_attempts[0].official_url, /DueFee111/);
 });

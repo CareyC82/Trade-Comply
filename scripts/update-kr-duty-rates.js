@@ -16,6 +16,7 @@ const KR_CUSTOMS_URL = 'https://www.customs.go.kr/english/main.do';
 const KR_TARIFF_DB_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do?mi=8037';
 const KR_TARIFF_LOOKUP_URL = 'https://www.customs.go.kr/english/ad/ct/CustomsTariffView.do';
 const KR_UNIPASS_TARIFF_URL = 'https://tunipass.customs.go.kr/clip/hsinfosrch/openULS0201002Q.do';
+const KR_UNIPASS_QUERY_URL = 'https://unipass.customs.go.kr/clip/hsinfosrch/openULS0201005Q.do';
 const REQUEST_TIMEOUT_MS = 30000;
 
 const KR_BENCHMARK = {
@@ -215,15 +216,20 @@ function parseKoreaTariffRateRows(html = '') {
             };
             return null;
         }
-        const hsCell = headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => String(cell).replace(/\D/g, '').length === 10);
+        const splitHsk = /^\d{4}$/.test(cells[0] || '') && /^\d{2}$/.test(cells[1] || '') && /^\d{4}$/.test(cells[2] || '')
+            ? `${cells[0]}${cells[1]}${cells[2]}`
+            : '';
+        const hsCell = splitHsk || (headerMap?.hs >= 0 ? cells[headerMap.hs] : cells.find(cell => String(cell).replace(/\D/g, '').length === 10));
         const hsCode = String(hsCell || '').replace(/\D/g, '').slice(0, 10);
-        const rateCell = (headerMap?.rate >= 0 ? cells[headerMap.rate] : '') || cells.find(cell => /free|면세|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
+        const namedRateCell = headerMap?.rate >= 0 ? cells[headerMap.rate] : '';
+        const rateCell = (/free|면세|무세|免税|\d+(?:\.\d+)?\s*%/i.test(namedRateCell) ? namedRateCell : '')
+            || cells.find(cell => /free|면세|무세|免税|\d+(?:\.\d+)?\s*%/i.test(cell)) || '';
         const parsedRate = parseKoreaAdValoremRate(rateCell);
-        if (!hsCode || parsedRate === null) return null;
+        if (!/^\d{10}$/.test(hsCode) || parsedRate === null) return null;
         return {
             hs_code: hsCode,
             hs_prefix: hsCode.slice(0, 6),
-            item_name: (headerMap?.description >= 0 ? cells[headerMap.description] : '') || cells.find(cell => cell !== hsCell && cell !== rateCell) || '',
+            item_name: splitHsk ? (cells[3] || '') : (headerMap?.description >= 0 ? cells[headerMap.description] : '') || cells.find(cell => cell !== hsCell && cell !== rateCell) || '',
             base_rate_text: rateCell,
             parsed_base_rate: parsedRate
         };
@@ -373,6 +379,30 @@ async function fetchKoreaOfficialRows({
     }
     const queryAttempts = [];
     if (!rows.length && Array.isArray(queryHsCodes) && queryHsCodes.length) {
+        const queryPrefixes = Array.from(new Set(queryHsCodes.map(value => String(value).replace(/\D/g, '').slice(0, 6)).filter(value => /^\d{6}$/.test(value))));
+        for (const hsPrefix of queryPrefixes) try {
+            const lookup = await fetcher(KR_UNIPASS_QUERY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `aplyYy=${new Date().getUTCFullYear()}&cntyCd=KR&hsSgn=&searchVal=${encodeURIComponent(hsPrefix)}&engl=Y`
+            });
+            const lookupRows = parseKoreaTariffRateRows(lookup.body || '')
+                .filter((row, index, allRows) => index === allRows.findIndex(candidate => (
+                    candidate.hs_code === row.hs_code && candidate.parsed_base_rate === row.parsed_base_rate
+                )));
+            queryAttempts.push({
+                hs_code: hsPrefix,
+                lookup_url: KR_UNIPASS_QUERY_URL,
+                status_code: lookup.status_code,
+                row_count: lookupRows.length,
+                parser_diagnostics: inspectKoreaOfficialResponse(lookup.body || '', lookupRows)
+            });
+            rows = rows.concat(lookupRows);
+        } catch (error) {
+            queryAttempts.push({ hs_code: hsPrefix, lookup_url: KR_UNIPASS_QUERY_URL, status_code: null, row_count: 0, error: error.message });
+        }
+    }
+    if (!rows.length && Array.isArray(queryHsCodes) && queryHsCodes.length) {
         for (const hsCode of queryHsCodes.map(normalizeKoreaHs10).filter(Boolean)) {
             for (const endpoint of [lookupUrl, KR_TARIFF_DB_URL]) try {
                 const lookup = await fetcher(endpoint, {
@@ -412,6 +442,7 @@ async function fetchKoreaOfficialRows({
         ok: response.status_code >= 200 && response.status_code < 400 && rows.length > 0,
         status_code: response.status_code,
         official_url: selectedUrl,
+        row_source_url: queryAttempts.find(attempt => attempt.row_count > 0)?.lookup_url || selectedUrl,
         lookup_url: lookupUrl,
         source_attempts: sourceAttempts,
         query_attempts: queryAttempts,
@@ -528,9 +559,25 @@ async function probeKoreaReadiness({ live = false, fetcher = fetchText } = {}) {
     const source = getSource('KR');
     const rules = getKoreaDutyRules();
     const prefixes = Array.from(new Set(rules.flatMap(rule => rule.hs_prefixes || []))).sort();
-    const officialProbe = live
+    const landingProbe = live
         ? await probeKoreaOfficialSource({ fetcher })
         : { checked: false, ok: null, machine_parser_ready: false };
+    const officialRows = live
+        ? await fetchKoreaOfficialRows({ fetcher }).catch(error => ({ ok: false, rows: [], row_count: 0, error: error.message }))
+        : { ok: null, rows: [], row_count: 0, source_attempts: [], query_attempts: [] };
+    const officialProbe = {
+        ...landingProbe,
+        machine_parser_ready: Boolean(officialRows.row_count),
+        parsed_rate_rows: officialRows.row_count || 0,
+        row_source_url: officialRows.row_source_url || officialRows.official_url || '',
+        parser_note: officialRows.row_count
+            ? 'Korea UNI-PASS tariff rows were parsed into guarded 10-digit HSK candidates; mixed-rate prefixes still require exact-line confirmation.'
+            : landingProbe.parser_note,
+        source_attempts: officialRows.source_attempts || [],
+        query_attempts: officialRows.query_attempts || [],
+        parser_diagnostics: officialRows.parser_diagnostics || landingProbe.parser_diagnostics || null,
+        row_fetch_error: officialRows.error || ''
+    };
     return {
         ok: Boolean(source) && rules.length > 0 && prefixes.length > 0,
         country: 'KR',
@@ -792,6 +839,7 @@ module.exports = {
     KR_TARIFF_DB_URL,
     KR_TARIFF_LOOKUP_URL,
     KR_UNIPASS_TARIFF_URL,
+    KR_UNIPASS_QUERY_URL,
     KR_EXACT_CODE_CANDIDATES,
     parseKoreaTariffDbHtml,
     fetchTextWithCurl,

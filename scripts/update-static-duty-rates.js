@@ -447,6 +447,40 @@ function parseIndiaOfficialJsonRows(value = '') {
     )));
 }
 
+function parseIndiaDutyCalculatorJson(value = '', hsCode = '', itemName = '') {
+    let row;
+    try {
+        row = typeof value === 'string' ? JSON.parse(value) : value;
+    } catch (_error) {
+        return [];
+    }
+    if (!row || typeof row !== 'object' || Array.isArray(row)) return [];
+    const normalizedHs = String(hsCode || '').replace(/\D/g, '').slice(0, 8);
+    if (!/^\d{8}$/.test(normalizedHs)) return [];
+    const normalizeCalculatorRate = (raw) => {
+        if (raw === null || raw === undefined || raw === '') return null;
+        if (typeof raw === 'number' && Number.isFinite(raw)) return raw / 100;
+        const text = String(raw).trim();
+        if (/^\d+(?:\.\d+)?$/.test(text)) return Number(text) / 100;
+        return parsePercent(text);
+    };
+    const bcdRate = normalizeCalculatorRate(row.bcd_rate);
+    if (bcdRate === null) return [];
+    const swsRate = normalizeCalculatorRate(row.scd_rate ?? row.sws_rate ?? row.swc_rate);
+    const igstRate = normalizeCalculatorRate(row.igst_rate);
+    return [{
+        hs_code: normalizedHs,
+        hs_prefix: normalizedHs.slice(0, 6),
+        item_name: String(itemName || row.description || row.item_name || ''),
+        bcd_rate_text: `${Number((bcdRate * 100).toFixed(6))}%`,
+        sws_rate_text: swsRate === null ? '' : `${Number((swsRate * 100).toFixed(6))}%`,
+        igst_rate_text: igstRate === null ? '' : `${Number((igstRate * 100).toFixed(6))}%`,
+        bcd_rate: bcdRate,
+        sws_rate: swsRate,
+        igst_rate: igstRate
+    }];
+}
+
 function normalizeGenericRateText(value = '') {
     const text = stripHtml(value);
     const match = text.match(/(free|nil|exempt|\d+(?:\.\d+)?\s*%)/i);
@@ -808,10 +842,19 @@ async function fetchIndiaOfficialRows({
                 const queryUrl = `https://www.icegate.gov.in/Webappl/cdc_duty_details.jsp?cntrycd=&cth_duty_nw=${encodeURIComponent(hsCode)}`;
                 try {
                     const response = await fetcher(queryUrl, { timeoutMs: 10000 });
-                    const rows = [...parseIndiaOfficialJsonRows(response.body || ''), ...parseIndiaTariffRows(response.body || '')]
+                    let rows = [...parseIndiaOfficialJsonRows(response.body || ''), ...parseIndiaTariffRows(response.body || '')]
                         .filter((row) => row.hs_code === hsCode);
-                    return { attempt: { hs_code: hsCode, official_url: queryUrl, status_code: response.status_code, row_count: rows.length,
-                        parser_diagnostics: inspectOfficialResponse(response.body || '', rows) }, rows };
+                    let rateUrl = '';
+                    let rateStatusCode = null;
+                    if (!rows.length && response.status_code >= 200 && response.status_code < 400) {
+                        rateUrl = `https://www.icegate.gov.in/Webappl/DueFee111?cth_val=${encodeURIComponent(hsCode)}&cntrycd=`;
+                        const rateResponse = await fetcher(rateUrl, { timeoutMs: 10000 });
+                        rateStatusCode = rateResponse.status_code;
+                        rows = parseIndiaDutyCalculatorJson(rateResponse.body || '', hsCode);
+                    }
+                    return { attempt: { hs_code: hsCode, official_url: rateUrl || queryUrl, landing_url: queryUrl,
+                        status_code: rateStatusCode || response.status_code, row_count: rows.length,
+                        parser_diagnostics: inspectOfficialResponse(rows.length ? JSON.stringify(rows) : response.body || '', rows) }, rows };
                 } catch (error) {
                     return { attempt: { hs_code: hsCode, official_url: queryUrl, status_code: null, row_count: 0, error: error.message }, rows: [] };
                 }
@@ -1623,6 +1666,7 @@ module.exports = {
     parseGenericTariffRows,
     parseIndiaTariffRows,
     parseIndiaOfficialJsonRows,
+    parseIndiaDutyCalculatorJson,
     parseMalaysiaTariffRows,
     parseOfficialTariffRows,
     parseTaiwanTariffRows,
