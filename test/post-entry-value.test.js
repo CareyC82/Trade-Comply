@@ -287,6 +287,59 @@ test('calculates indicative duty impact for US imports from China', () => {
     assert.ok(duty.sourceBreakdown.some(source => /Section 301/.test(source.label) && source.status === 'indicative'));
 });
 
+test('India SWS uses the BCD amount and stays zero when BCD is zero', () => {
+    const valueResult = calculatePostEntryValue({
+        incoterm: 'CIF',
+        declaredAmount: 10000
+    });
+    const duty = calculateDutyImpact(valueResult, {
+        importCountryCode: 'IN',
+        originCountryCode: 'CN',
+        hsCode: '84715000',
+        entryDate: '2026-10-26'
+    });
+
+    const sws = duty.addOnLayers.find(layer => layer.type === 'social_welfare_surcharge');
+    const igst = duty.addOnLayers.find(layer => layer.type === 'import_igst');
+    assert.equal(duty.baseDuty, 0);
+    assert.equal(sws.basis, 'basic_customs_duty');
+    assert.equal(sws.basisAmount, 0);
+    assert.equal(sws.amount, 0);
+    assert.equal(igst.basisAmount, 10000);
+    assert.equal(igst.amount, 1800);
+    assert.equal(duty.addOnDuty, 1800);
+    assert.equal(duty.estimatedDuty, 1800);
+    assert.equal(duty.totalRate, 0.18);
+    assert.ok(duty.sourceBreakdown.some(row => row.component === 'social_welfare_surcharge' && /basis: BCD amount/.test(row.detail)));
+});
+
+test('India nonzero BCD produces SWS from BCD instead of customs value', () => {
+    setDutyRulesForTest([{
+        id: 'IN-TEST-CASCADE',
+        import_country: 'IN',
+        origin_country: '*',
+        hs_prefixes: ['901890'],
+        base_rate: 0.075,
+        add_on_layers: [
+            { type: 'social_welfare_surcharge', rate: 0.1, basis: 'basic_customs_duty' },
+            { type: 'import_igst', rate: 0.18, basis: 'customs_value_plus_duty' }
+        ]
+    }]);
+    try {
+        const valueResult = calculatePostEntryValue({ incoterm: 'CIF', declaredAmount: 10000 });
+        const duty = calculateDutyImpact(valueResult, {
+            importCountryCode: 'IN', originCountryCode: 'CN', hsCode: '90189000'
+        });
+        assert.equal(duty.baseDuty, 750);
+        assert.equal(duty.addOnLayers[0].amount, 75);
+        assert.equal(duty.addOnLayers[1].basisAmount, 10000);
+        assert.equal(duty.addOnLayers[1].amount, 1800);
+        assert.equal(duty.estimatedDuty, 2625);
+    } finally {
+        setDutyRulesForTest(null);
+    }
+});
+
 test('keeps AD/CVD as a flag-only add-on layer', () => {
     const valueResult = calculatePostEntryValue({
         incoterm: 'FOB',
