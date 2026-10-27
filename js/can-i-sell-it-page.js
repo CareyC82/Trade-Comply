@@ -869,6 +869,11 @@ function bootstrapCanISellItPage() {
             exactHsCodes: comparing ? comparisonExactHsValues() : {},
             dutyRates
         };
+        globalThis.TradeComplyUsageMetrics?.record('can_i_sell_check_started', {
+            page: 'can-i-sell-it',
+            mode: comparing ? 'compare' : 'single',
+            marketCount: comparing ? markets.length : (market === 'ANZ' ? 2 : 1)
+        });
         const profile = engine.extractProfile(description);
         currentProfile = profile;
         productTypeSelect.innerHTML = models.listProducts().map((product) => `<option value="${escapeHtml(product.id)}" ${product.id === profile.productType ? 'selected' : ''}>${escapeHtml(product.label)}</option>`).join('');
@@ -887,6 +892,11 @@ function bootstrapCanISellItPage() {
         const preliminary = runAssessment(latestAssessmentInput);
         renderEvidenceQuestions(preliminary.profile);
         renderAssessment(preliminary);
+        globalThis.TradeComplyUsageMetrics?.record('can_i_sell_result_generated', {
+            page: 'can-i-sell-it',
+            mode: comparing ? 'compare' : 'single',
+            marketCount: comparing ? markets.length : (market === 'ANZ' ? 2 : 1)
+        });
         followUp.hidden = factKeys.length === 0;
     });
 

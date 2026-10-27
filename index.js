@@ -7,6 +7,14 @@ const { buildScopeCatalog, queryMatchesScope } = globalThis.Catalog;
 const { handleFeedbackRequest, getFeedbackStorageStatus } = require('./feedback-store');
 const { handleComplianceFeedbackRequest } = require('./supabase-feedback');
 const {
+    handleUsageMetricRequest,
+    getUsageMetricsStatus,
+    getUsageMetricsConfig,
+    enforceUsageMetricsRetention,
+    loadUsageMetricRecords,
+    summarizeUsageEvents
+} = require('./usage-metrics');
+const {
     extractComplianceFeedbackPayload,
     isComplianceFeedbackQuery
 } = require('./compliance-feedback-codec');
@@ -801,6 +809,46 @@ function isApiFeedbackPath(path) {
     return normalizePath(path) === '/api/feedback';
 }
 
+function isUsageMetricsPath(path) {
+    return normalizePath(path) === '/api/usage-metrics';
+}
+
+function isAllowedUsageMetricsOrigin(event) {
+    const origin = getHeaderValue(event?.headers, 'origin');
+    return Boolean(origin && ALLOWED_ORIGINS.has(origin));
+}
+
+async function executeUsageMetricsAdminRequest(path, queryParams, headers) {
+    const status = getUsageMetricsStatus();
+    if (!status.configured) {
+        return { statusCode: 503, headers, body: JSON.stringify({ ok: false, error: 'Usage metrics storage is not configured.', status }) };
+    }
+    try {
+        const config = getUsageMetricsConfig();
+        const retention = await enforceUsageMetricsRetention(config);
+        if (normalizePath(path) === '/api/admin/usage-metrics/cleanup') {
+            return { statusCode: 200, headers, body: JSON.stringify({ ok: true, retention }) };
+        }
+        const includeTest = queryParams.include_test === '1' || queryParams.include_test === 'true';
+        const records = await loadUsageMetricRecords(config);
+        const summary = summarizeUsageEvents(records, { includeTest });
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                ok: true,
+                generated_at: new Date().toISOString(),
+                retention_days: config.retentionDays,
+                test_events_included: includeTest,
+                ...summary
+            })
+        };
+    } catch (error) {
+        console.error('Usage metrics admin error:', error.message);
+        return { statusCode: 503, headers, body: JSON.stringify({ ok: false, error: 'Usage metrics are temporarily unavailable.' }) };
+    }
+}
+
 function extractBearerTokenFromEvent(event) {
     const authHeader = getHeaderValue(event.headers, 'authorization');
     const match = authHeader.match(/^Bearer\s+(.+)$/i);
@@ -1152,7 +1200,7 @@ exports.handler = async (rawEvent) => {
     if (method === 'GET') {
         const health = queryParamsEarly.health;
         if (health === 'feedback') {
-            const features = ['compliance_feedback', 'feedback', 'ai', 'hscode_classify'];
+            const features = ['compliance_feedback', 'feedback', 'ai', 'hscode_classify', 'usage_metrics'];
             if (areAdminRoutesEnabled()) {
                 features.push('test_crawl');
             }
@@ -1163,7 +1211,8 @@ exports.handler = async (rawEvent) => {
                     ok: true,
                     build: FC_BUILD_ID,
                     features,
-                    feedback_storage: getFeedbackStorageStatus()
+                    feedback_storage: getFeedbackStorageStatus(),
+                    usage_metrics: getUsageMetricsStatus()
                 })
             };
         }
@@ -1173,6 +1222,9 @@ exports.handler = async (rawEvent) => {
         const denied = enforceAdminRouteGate(event, headers);
         if (denied) {
             return denied;
+        }
+        if (path === '/api/admin/usage-metrics' || path === '/api/admin/usage-metrics/cleanup') {
+            return executeUsageMetricsAdminRequest(path, queryParamsEarly, headers);
         }
         if (isTestCrawlPath(path, method, queryParamsEarly)) {
             return executeTestCrawlRequest(event, headers);
@@ -1218,6 +1270,9 @@ exports.handler = async (rawEvent) => {
         if (denied) {
             return denied;
         }
+        if (path === '/api/admin/usage-metrics' || path === '/api/admin/usage-metrics/cleanup') {
+            return executeUsageMetricsAdminRequest(path, queryParams, headers);
+        }
         if (isTestCrawlPath(path, method, queryParams)) {
             return executeTestCrawlRequest(event, headers);
         }
@@ -1234,6 +1289,14 @@ exports.handler = async (rawEvent) => {
 
     if (body.action === 'pre_screen_report') {
         return handlePreScreenReportRequest(body, headers);
+    }
+
+    if (method === 'POST' && isUsageMetricsPath(path)) {
+        if (!isAllowedUsageMetricsOrigin(event)) {
+            return { statusCode: 403, headers, body: JSON.stringify({ ok: false, error: 'Origin is not allowed.' }) };
+        }
+        const result = await handleUsageMetricRequest(body, event);
+        return { statusCode: result.statusCode, headers, body: JSON.stringify(result.body) };
     }
 
     if (isHsCodeClassifyRequest(body, event) || (method === 'POST' && isHsCodeClassifyPath(path))) {
