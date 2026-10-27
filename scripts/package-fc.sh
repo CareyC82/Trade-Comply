@@ -20,7 +20,6 @@ cp "$ROOT/data/country-registry.json" "$PKG_DIR/data/"
 cp "$ROOT/data/coverage-matrix.json" "$PKG_DIR/data/"
 cp "$ROOT/compliance-feedback-codec.js" "$PKG_DIR/"
 cp "$ROOT/feedback-store.js" "$PKG_DIR/"
-cp "$ROOT/usage-metrics.js" "$PKG_DIR/"
 cp "$ROOT/supabase-feedback.js" "$PKG_DIR/"
 cp "$ROOT/js/catalog.js" "$PKG_DIR/js/"
 cp "$ROOT/data/tags.json" "$PKG_DIR/data/"
@@ -38,7 +37,6 @@ cp "$ROOT/data/catalog.json" "$PKG_DIR/data/"
     data/policy-sources.json \
     compliance-feedback-codec.js \
     feedback-store.js \
-    usage-metrics.js \
     supabase-feedback.js \
     js/catalog.js \
     data/tags.json \
@@ -52,7 +50,7 @@ cp "$ROOT/data/catalog.json" "$PKG_DIR/data/"
 )
 
 ZIP_LIST="$(unzip -l "$ZIP")"
-for required in compliance-feedback-codec.js usage-metrics.js lib/fc-deps.js lib/global-crawl-engine.js lib/global-compliance-crawler.js lib/admin-route-security.js lib/pre-screen-report.js lib/policy-crawl.js lib/hscode-dual.js lib/industry-checklist-baseline.js lib/checklist.js lib/country-registry.js data/country-registry.json data/coverage-matrix.json data/policy-sources.json; do
+for required in compliance-feedback-codec.js lib/fc-deps.js lib/global-crawl-engine.js lib/global-compliance-crawler.js lib/admin-route-security.js lib/pre-screen-report.js lib/policy-crawl.js lib/hscode-dual.js lib/industry-checklist-baseline.js lib/checklist.js lib/country-registry.js data/country-registry.json data/coverage-matrix.json data/policy-sources.json; do
   if ! printf '%s\n' "$ZIP_LIST" | grep -Fq "$required"; then
     echo "ERROR: fc-deploy.zip is missing $required" >&2
     exit 1

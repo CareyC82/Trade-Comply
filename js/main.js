@@ -4,7 +4,7 @@
  * The consumer pre-check uses the same entry with data-app="can-i-sell-it".
  */
 (function () {
-    const BUILD = '20261027-usage-metrics-v1';
+    const BUILD = '20260818-evidence-v1';
     globalThis.TradeComplyBuild = BUILD;
     const entryScript = document.currentScript;
     const path = window.location.pathname.toLowerCase();
@@ -251,7 +251,6 @@
             } else if (app === 'category') {
                 modules = CATEGORY_MODULES;
             }
-            modules = ['js/usage-metrics.js', ...modules];
             await loadModules(modules);
             if (app !== 'category') {
                 await primeChecklistBaselines();

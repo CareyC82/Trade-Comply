@@ -22,8 +22,6 @@ OSS_REGION="$(trim_secret "${OSS_REGION:-cn-shenzhen}")"
 OSS_ACCESS_KEY_ID="$(trim_secret "${OSS_ACCESS_KEY_ID:-}")"
 OSS_ACCESS_KEY_SECRET="$(trim_secret "${OSS_ACCESS_KEY_SECRET:-}")"
 OSS_FEEDBACK_PREFIX="$(trim_secret "${OSS_FEEDBACK_PREFIX:-feedback}")"
-OSS_USAGE_METRICS_PREFIX="$(trim_secret "${OSS_USAGE_METRICS_PREFIX:-usage-metrics}")"
-USAGE_METRICS_RETENTION_DAYS="$(trim_secret "${USAGE_METRICS_RETENTION_DAYS:-30}")"
 SUPABASE_URL="$(trim_secret "${SUPABASE_URL:-}")"
 SUPABASE_KEY="$(trim_secret "${SUPABASE_KEY:-}")"
 
@@ -33,8 +31,6 @@ export OSS_REGION
 export OSS_ACCESS_KEY_ID
 export OSS_ACCESS_KEY_SECRET
 export OSS_FEEDBACK_PREFIX
-export OSS_USAGE_METRICS_PREFIX
-export USAGE_METRICS_RETENTION_DAYS
 export SUPABASE_URL
 export SUPABASE_KEY
 
@@ -43,9 +39,6 @@ preflight() {
   if [ -z "$ACCESS_KEY_ID" ]; then missing+=("ALIBABA_CLOUD_ACCESS_KEY_ID or OSS_ACCESS_KEY_ID"); fi
   if [ -z "$ACCESS_KEY_SECRET" ]; then missing+=("ALIBABA_CLOUD_ACCESS_KEY_SECRET or OSS_ACCESS_KEY_SECRET"); fi
   if [ -z "$DEEPSEEK_API_KEY" ]; then missing+=("DEEPSEEK_API_KEY"); fi
-  if [ -z "$OSS_BUCKET" ]; then missing+=("OSS_BUCKET (required for usage metrics)"); fi
-  if [ -z "$OSS_ACCESS_KEY_ID" ]; then missing+=("OSS_ACCESS_KEY_ID (scoped OSS access required for usage metrics)"); fi
-  if [ -z "$OSS_ACCESS_KEY_SECRET" ]; then missing+=("OSS_ACCESS_KEY_SECRET (scoped OSS access required for usage metrics)"); fi
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "ERROR: Missing required GitHub secrets:" >&2

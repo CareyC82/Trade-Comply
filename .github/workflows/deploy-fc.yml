@@ -10,7 +10,6 @@ on:
       - "data/country-registry.json"
       - "compliance-feedback-codec.js"
       - "feedback-store.js"
-      - "usage-metrics.js"
       - "supabase-feedback.js"
       - "js/catalog.js"
       - "data/tags.json"
@@ -50,7 +49,6 @@ jobs:
           ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
           OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
           OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
-          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: bash scripts/deploy-fc-ci.sh preflight
 
@@ -78,8 +76,6 @@ jobs:
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_REGION: ${{ secrets.OSS_REGION }}
           OSS_FEEDBACK_PREFIX: ${{ secrets.OSS_FEEDBACK_PREFIX }}
-          OSS_USAGE_METRICS_PREFIX: usage-metrics
-          USAGE_METRICS_RETENTION_DAYS: "30"
         run: |
           bash scripts/deploy-fc-ci.sh configure
           bash scripts/deploy-fc-ci.sh deploy
