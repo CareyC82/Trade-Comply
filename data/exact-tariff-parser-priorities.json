@@ -1,617 +1,9 @@
 {
-  "version": "2026-10-25",
-  "generated_at": "2026-10-25T20:52:20.724Z",
+  "version": "2026-10-28",
+  "generated_at": "2026-10-28T02:48:26.695Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
-    {
-      "id": "semiconductor-global-in",
-      "route": "*->IN",
-      "product_id": "semiconductor",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "854231",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN semiconductor has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Semiconductor scope can depend on exact HS line, end-use, and technology classification."
-      ],
-      "scope_components": [
-        "technology_end_use_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "optical-module-cn-in",
-      "route": "CN->IN",
-      "product_id": "optical_module",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "851770",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN optical_module has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "router-global-in",
-      "route": "*->IN",
-      "product_id": "router",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "851762",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN router has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
-      ],
-      "scope_components": [
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "router-cn-in",
-      "route": "CN->IN",
-      "product_id": "router",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "851762",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN router has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
-      ],
-      "scope_components": [
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "smartphone-global-in",
-      "route": "*->IN",
-      "product_id": "smartphone",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "851713",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN smartphone has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
-      ],
-      "scope_components": [
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "smartphone-cn-in",
-      "route": "CN->IN",
-      "product_id": "smartphone",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "851713",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN smartphone has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
-      ],
-      "scope_components": [
-        "telecom_subheading_scope",
-        "wireless_module_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "battery-global-in",
-      "route": "*->IN",
-      "product_id": "battery",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "850760",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN battery has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
-      ],
-      "scope_components": [
-        "battery_chemistry_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "battery-cn-in",
-      "route": "CN->IN",
-      "product_id": "battery",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "850760",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN battery has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
-      ],
-      "scope_components": [
-        "battery_chemistry_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "ev-charger-global-in",
-      "route": "*->IN",
-      "product_id": "ev_charger",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "850440",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN ev_charger has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "power_conversion_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "ev-charger-cn-in",
-      "route": "CN->IN",
-      "product_id": "ev_charger",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "850440",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN ev_charger has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "power_conversion_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "solar-global-in",
-      "route": "*->IN",
-      "product_id": "solar",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "854143",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN solar has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
-      ],
-      "scope_components": [
-        "ad_cvd_scope",
-        "origin_route_evidence",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "solar-cn-in",
-      "route": "CN->IN",
-      "product_id": "solar",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "854143",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN solar has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
-      ],
-      "scope_components": [
-        "ad_cvd_scope",
-        "origin_route_evidence",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "thermal-camera-us-in",
-      "route": "US->IN",
-      "product_id": "surveillance_imaging",
-      "import_country": "IN",
-      "origin_country": "US",
-      "hs_code": "852589",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "US->IN surveillance_imaging has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "camera_transmission_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "tablet-global-in",
-      "route": "*->IN",
-      "product_id": "tablet",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "847130",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN tablet has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "portable_adp_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "tablet-cn-in",
-      "route": "CN->IN",
-      "product_id": "tablet",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "847130",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN tablet has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "portable_adp_scope",
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "monitor-global-in",
-      "route": "*->IN",
-      "product_id": "monitor",
-      "import_country": "IN",
-      "origin_country": "*",
-      "hs_code": "852852",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "*->IN monitor has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "monitor-cn-in",
-      "route": "CN->IN",
-      "product_id": "monitor",
-      "import_country": "IN",
-      "origin_country": "CN",
-      "hs_code": "852852",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "CN->IN monitor has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "memory_dram-us-in",
-      "route": "US->IN",
-      "product_id": "memory_dram",
-      "import_country": "IN",
-      "origin_country": "US",
-      "hs_code": "854232",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "US->IN memory_dram has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "memory_hbm-us-in",
-      "route": "US->IN",
-      "product_id": "memory_hbm",
-      "import_country": "IN",
-      "origin_country": "US",
-      "hs_code": "854232",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "US->IN memory_hbm has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "memory_nand-us-in",
-      "route": "US->IN",
-      "product_id": "memory_nand",
-      "import_country": "IN",
-      "origin_country": "US",
-      "hs_code": "854232",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "US->IN memory_nand has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "memory_ssd_controller-us-in",
-      "route": "US->IN",
-      "product_id": "memory_ssd_controller",
-      "import_country": "IN",
-      "origin_country": "US",
-      "hs_code": "854239",
-      "source_trust": "official_heading_only",
-      "parser_target": "Exact HS / tariff-line scope resolver",
-      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
-      "priority_band": "P2",
-      "impact_score": 2800,
-      "why_priority": "US->IN memory_ssd_controller has official heading support, but exact tariff-line scope is still the blocker.",
-      "rate_change_drivers": [
-        "Exact tariff-line scope can change the final payable rate.",
-        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
-      ],
-      "scope_components": [
-        "active_exclusion_or_case_period"
-      ],
-      "parser_subtasks": [
-        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
-        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
-        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
-        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
     {
       "id": "solar-cn-us",
       "route": "CN->US",
@@ -698,6 +90,614 @@
       "scope_components": [
         "battery_chemistry_scope",
         "taric_exact_code_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "semiconductor-global-in",
+      "route": "*->IN",
+      "product_id": "semiconductor",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "854231",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN semiconductor has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Semiconductor scope can depend on exact HS line, end-use, and technology classification."
+      ],
+      "scope_components": [
+        "technology_end_use_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "optical-module-cn-in",
+      "route": "CN->IN",
+      "product_id": "optical_module",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "851770",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN optical_module has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "router-global-in",
+      "route": "*->IN",
+      "product_id": "router",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "851762",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN router has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+      ],
+      "scope_components": [
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "router-cn-in",
+      "route": "CN->IN",
+      "product_id": "router",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "851762",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN router has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+      ],
+      "scope_components": [
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "smartphone-global-in",
+      "route": "*->IN",
+      "product_id": "smartphone",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "851713",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN smartphone has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+      ],
+      "scope_components": [
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "smartphone-cn-in",
+      "route": "CN->IN",
+      "product_id": "smartphone",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "851713",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN smartphone has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Telecom electronics may need exact subheading, wireless module scope, and local tax treatment."
+      ],
+      "scope_components": [
+        "telecom_subheading_scope",
+        "wireless_module_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "battery-global-in",
+      "route": "*->IN",
+      "product_id": "battery",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN battery has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
+      ],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "battery-cn-in",
+      "route": "CN->IN",
+      "product_id": "battery",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "850760",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN battery has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Battery chemistry, capacity, and origin can change duty, tax, or trade-remedy treatment."
+      ],
+      "scope_components": [
+        "battery_chemistry_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "ev-charger-global-in",
+      "route": "*->IN",
+      "product_id": "ev_charger",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "850440",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN ev_charger has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "power_conversion_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "ev-charger-cn-in",
+      "route": "CN->IN",
+      "product_id": "ev_charger",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "850440",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN ev_charger has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "power_conversion_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "solar-global-in",
+      "route": "*->IN",
+      "product_id": "solar",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "854143",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN solar has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
+      ],
+      "scope_components": [
+        "ad_cvd_scope",
+        "origin_route_evidence",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "solar-cn-in",
+      "route": "CN->IN",
+      "product_id": "solar",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "854143",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN solar has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Solar AD/CVD scope, origin evidence, and deposit period can change the duty exposure."
+      ],
+      "scope_components": [
+        "ad_cvd_scope",
+        "origin_route_evidence",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "thermal-camera-us-in",
+      "route": "US->IN",
+      "product_id": "surveillance_imaging",
+      "import_country": "IN",
+      "origin_country": "US",
+      "hs_code": "852589",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "US->IN surveillance_imaging has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "camera_transmission_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "tablet-global-in",
+      "route": "*->IN",
+      "product_id": "tablet",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "847130",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN tablet has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "portable_adp_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "tablet-cn-in",
+      "route": "CN->IN",
+      "product_id": "tablet",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "847130",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN tablet has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "portable_adp_scope",
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "monitor-global-in",
+      "route": "*->IN",
+      "product_id": "monitor",
+      "import_country": "IN",
+      "origin_country": "*",
+      "hs_code": "852852",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "*->IN monitor has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "monitor-cn-in",
+      "route": "CN->IN",
+      "product_id": "monitor",
+      "import_country": "IN",
+      "origin_country": "CN",
+      "hs_code": "852852",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "CN->IN monitor has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "memory_dram-us-in",
+      "route": "US->IN",
+      "product_id": "memory_dram",
+      "import_country": "IN",
+      "origin_country": "US",
+      "hs_code": "854232",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "US->IN memory_dram has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "memory_hbm-us-in",
+      "route": "US->IN",
+      "product_id": "memory_hbm",
+      "import_country": "IN",
+      "origin_country": "US",
+      "hs_code": "854232",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "US->IN memory_hbm has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "memory_nand-us-in",
+      "route": "US->IN",
+      "product_id": "memory_nand",
+      "import_country": "IN",
+      "origin_country": "US",
+      "hs_code": "854232",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "US->IN memory_nand has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
+        "active_exclusion_or_case_period"
+      ],
+      "parser_subtasks": [
+        "Resolve the exact national tariff / statistical line and retain the returned filing code.",
+        "Attach effective-dated official base-duty evidence for the resolved tariff line.",
+        "Keep heading-level evidence separate; confirm the exact base duty before filing-grade use.",
+        "Resolve add-on duty, case, exclusion, and local tax scope separately from the base duty."
+      ],
+      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
+    },
+    {
+      "id": "memory_ssd_controller-us-in",
+      "route": "US->IN",
+      "product_id": "memory_ssd_controller",
+      "import_country": "IN",
+      "origin_country": "US",
+      "hs_code": "854239",
+      "source_trust": "official_heading_only",
+      "parser_target": "Exact HS / tariff-line scope resolver",
+      "next_action": "Require exact tariff line / scope before promoting to official exact rate.",
+      "priority_band": "P2",
+      "impact_score": 1800,
+      "why_priority": "US->IN memory_ssd_controller has official heading support, but exact tariff-line scope is still the blocker.",
+      "rate_change_drivers": [
+        "Exact tariff-line scope can change the final payable rate.",
+        "Effective date, tariff-schedule revisions, and active tax or add-on periods can change the payable amount."
+      ],
+      "scope_components": [
         "active_exclusion_or_case_period"
       ],
       "parser_subtasks": [
