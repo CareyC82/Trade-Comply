@@ -970,6 +970,33 @@ test('supplier request names missing and failed exact-model evidence', () => {
     assert.match(result.supplierRequest.message, /EB-10/);
 });
 
+test('seller platform tasks stay out of the supplier document request', () => {
+    const charger = engine.assess({
+        description: '65W GaN USB-C wall charger with 100-240V AC input and no battery.',
+        origin: 'CN', market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { productType: 'charger', mainsPowered: 'yes', battery: 'no', bluetooth: 'no', wifi: 'no' },
+        documents: []
+    });
+    assert.ok(charger.supplierRequest.items.some((item) => /Electrical safety/.test(item.document)));
+    assert.ok(!charger.supplierRequest.items.some((item) => /Amazon|ASIN|platform/i.test(item.document)));
+    assert.doesNotMatch(charger.supplierRequest.message, /Amazon category|ASIN approval/);
+    assert.match(charger.supplierRequest.message, /verified separately by the seller/i);
+    assert.equal(charger.platformGateDecision.code, 'evidence_needed');
+    assert.equal(charger.platformTasks[0].status, 'not_confirmed');
+    assert.equal(charger.platformTasks[0].owner, 'Seller / account administrator');
+    assert.match(charger.platformTasks[0].action, /Seller Central \/ Account Health/);
+    assert.match(charger.platformTasks[0].action, /supplier reports or certificates/i);
+
+    const batteryProduct = engine.assess({
+        description: 'Bluetooth earbuds with rechargeable lithium battery',
+        origin: 'CN', market: 'US', platform: 'Amazon', assessmentMode: 'quick', blockingQuestionKeys: [],
+        attributes: { productType: 'earbuds', bluetooth: 'yes', wifi: 'no', battery: 'yes' },
+        documents: []
+    });
+    assert.ok(batteryProduct.platformTasks.some((item) => item.key === 'amazonDangerousGoods'));
+    assert.ok(!batteryProduct.supplierRequest.items.some((item) => /Amazon|FBA|ASIN/i.test(item.document)));
+});
+
 test('supplier request is complete only when all reviewable files pass', () => {
     const requirements = engine.marketRequirements('US', { productType: 'earbuds', bluetooth: true, wifi: false, cellular: false, battery: true });
     const evidenceAnswers = Object.fromEntries(engine.evidenceQuestionsForRequirements(requirements).map((question) => [question.key, { value: 'yes' }]));

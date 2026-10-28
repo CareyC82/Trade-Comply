@@ -85,6 +85,24 @@ test('Australia electrical result offers RCM and EESS readiness without certific
     expect(decodeURIComponent(href)).toContain('Single Product Review');
 });
 
+test('Amazon seller tasks remain separate from the GaN charger supplier request', async ({ page }) => {
+    await page.goto('/can-i-sell-it.html');
+    await page.getByLabel('Product name or short description').fill('65W GaN USB-C wall charger with 100-240V AC input and no battery.');
+    await page.getByLabel('Target market').selectOption('US');
+    await page.getByLabel('Sales channel').selectOption('Amazon');
+    await page.getByRole('button', { name: 'Show preliminary result' }).click();
+
+    const supplierRequest = page.locator('.sell-supplier-request');
+    await expect(supplierRequest).toContainText('Electrical safety test report');
+    await expect(supplierRequest).not.toContainText(/Amazon category|ASIN approval/);
+    const channelDecision = page.locator('#sell-channel-decision');
+    await expect(channelDecision).toContainText('Seller / account administrator');
+    await expect(channelDecision).toContainText('Seller Central / Account Health');
+    await expect(channelDecision).toContainText('MORE EVIDENCE NEEDED');
+    await expect(page.locator('#sell-advanced-tools')).toContainText('Product / supplier evidence claims');
+    await expect(page.locator('#sell-advanced-tools')).toContainText('Seller platform status');
+});
+
 test('review request preparation updates completeness and the local email draft without sending data', async ({ page }) => {
     await submitProduct(page, 'Bluetooth speaker with rechargeable lithium battery, for adults');
     await expect(page.locator('#sell-review-completeness-message')).toContainText(/useful details prepared/i);

@@ -32,6 +32,7 @@ function bootstrapCanISellItPage() {
     const followUpSubmit = document.getElementById('sell-follow-up-submit');
     const documentOptions = document.getElementById('sell-document-options');
     const improveQuestions = document.getElementById('sell-improve-questions');
+    const platformQuestions = document.getElementById('sell-platform-questions');
     const result = document.getElementById('sell-result');
     const error = document.getElementById('sell-check-error');
     const productTypeSelect = document.getElementById('sell-product-type');
@@ -243,7 +244,7 @@ function bootstrapCanISellItPage() {
     }
 
     function renderEvidenceQuestions(profile) {
-        const platformQuestions = engine.platformEvidenceQuestions(currentInput.platform, profile);
+        const channelQuestions = engine.platformEvidenceQuestions(currentInput.platform, profile);
         const applicableRequirements = ['ANZ', 'MULTI'].includes(currentInput.market)
             ? runAssessment({ ...currentInput, attributes: profile, documents: [], assessmentMode: 'quick', blockingQuestionKeys: [] }).requirements
             : engine.marketRequirements(currentInput.market, profile);
@@ -251,18 +252,22 @@ function bootstrapCanISellItPage() {
             applicableRequirements
         );
         currentEvidenceQuestions = [
-            ...platformQuestions,
-            ...marketQuestions.slice(0, Math.max(0, 5 - platformQuestions.length))
+            ...channelQuestions,
+            ...marketQuestions.slice(0, Math.max(0, 5 - channelQuestions.length))
         ];
-        improveQuestions.innerHTML = currentEvidenceQuestions.map((item) => `
+        const renderQuestions = (items) => items.map((item) => `
             <fieldset class="sell-question sell-question--evidence">
                 <legend>${escapeHtml(item.label)}</legend>
                 <small>${item.scope === 'platform'
-                    ? 'Platform status — Yes means this exact product or listing received the stated platform approval.'
+                    ? 'Seller platform status — verify this in your own seller account for the exact listing. Supplier files do not establish platform approval.'
                     : 'Supplier claim — Yes means the supplier says this exact-model document is available; upload it for a model-match check.'}</small>
                 ${['yes', 'no', 'unknown'].map((value) => `<label><input type="radio" name="evidence:${item.key}" value="${value}" ${currentEvidenceAnswers[item.key]?.value === value ? 'checked' : ''}> ${value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'Not sure'}</label>`).join('')}
             </fieldset>`).join('');
-        improveQuestions.parentElement.hidden = currentEvidenceQuestions.length === 0;
+        const supplierQuestions = currentEvidenceQuestions.filter((item) => item.scope !== 'platform');
+        improveQuestions.innerHTML = renderQuestions(supplierQuestions);
+        improveQuestions.parentElement.hidden = supplierQuestions.length === 0;
+        platformQuestions.innerHTML = renderQuestions(channelQuestions);
+        platformQuestions.parentElement.hidden = channelQuestions.length === 0;
         return currentEvidenceQuestions;
     }
 
@@ -310,7 +315,8 @@ function bootstrapCanISellItPage() {
     }
 
     function platformChecklistItems(assessment) {
-        const items = assessment.platformRules.map((rule) => rule.action);
+        const sellerTasks = (assessment.platformTasks || []).map((task) => `${task.owner}: ${task.action}`);
+        const items = [...sellerTasks, ...assessment.platformRules.map((rule) => rule.action)];
         if (items.length) return items;
         return ['Identify the marketplace and confirm its category restrictions, document requests and approval process before listing.'];
     }
@@ -912,7 +918,7 @@ function bootstrapCanISellItPage() {
 
     function confirmedDocuments(data) {
         return currentEvidenceQuestions
-            .filter((item) => data.get(`evidence:${item.key}`) === 'yes')
+            .filter((item) => item.scope !== 'platform' && data.get(`evidence:${item.key}`) === 'yes')
             .flatMap((item) => item.docs);
     }
 
@@ -1007,6 +1013,15 @@ function bootstrapCanISellItPage() {
     });
 
     improveQuestions.addEventListener('change', (event) => {
+        if (!event.target.matches('input[name^="evidence:"]') || !latestAssessmentInput || !latestAssessment) return;
+        captureVisibleEvidenceAnswers();
+        latestAssessmentInput = { ...latestAssessmentInput, evidenceAnswers: currentEvidenceAnswers };
+        const nextAssessment = runAssessment(latestAssessmentInput);
+        latestAssessment = nextAssessment;
+        updateChannelView(nextAssessment);
+    });
+
+    platformQuestions.addEventListener('change', (event) => {
         if (!event.target.matches('input[name^="evidence:"]') || !latestAssessmentInput || !latestAssessment) return;
         captureVisibleEvidenceAnswers();
         latestAssessmentInput = { ...latestAssessmentInput, evidenceAnswers: currentEvidenceAnswers };
