@@ -1,5 +1,17 @@
 # TraceWize Marketing 27 October 2026
 
+## Non Reddit outreach after channel stop
+
+Carey reported an eBaySellerAdvice permanent community ban for Rule 2, then explicitly instructed no further Reddit marketing. Stop all Reddit outreach, not just the banned community; no alternate account, ban appeal, comment or post made in this round. Existing earlier posts are historical records, not new exposure.
+
+- ACEFAST: krystal@acefast.com, subject Krystal：给澳新电子产品经销商的一项自助初筛测试. Sent verified 16:26 Beijing. Exact name, email and AU/NZ sales territory from official https://acefast.com/contact-us/ ; charging/audio product fit on same site. Chinese tailored invitation to one SKU test or suitable colleague, no testing/endorsement/distributor-signup request. Only this ACEFAST contact used; not multiple territories or its NZ reseller.
+- PITAKA: distributor@ipitaka.com, subject A first-pass destination resource for smaller charging-accessory resellers? Original Sent 16:26, then permanent failure received 16:27: 550 5.7.0 DT:SPM. Exact business-cooperation address from official https://www.ipitaka.com/pages/contact-us . This is a spam-policy rejection, NOT a nonexistent-user diagnosis or proof the whole sender domain is blocked. Not delivered; no retry/alternate-address bypass. Original and failure verified in same conversation.
+- SHARGE: info@sharge.com, subject For your product team: one portable charger, one useful next question. Sent verified 16:27. General question/contact address and current portable power-bank/charger range from official https://sharge.com/pages/contact-us . Did not use distributor application, PR, regulatory filing or paid influencer route. Sent is not delivery/open/tool-use evidence.
+- LinkedIn: Andrew G. / Andrew Green, Twelve South co-founder and Chief Creative Officer, https://www.linkedin.com/in/andrewbg/ . Current role verified live; standard no-note invitation sent, toast Invitation sent to Andrew and Pending verified. No regulatory-file email used, no personal email guessed, no paid InMail or DM.
+- LinkedIn: Emil Lucas Degn Mortensen, Wavell co-founder, https://www.linkedin.com/in/emil-lucas-degn-mortensen-a55a35197/ . Current role verified live; standard no-note invitation sent, toast Invitation sent to Emil Lucas and Pending verified. Danish audio-brand fit corroborated official https://wavell.dk/pages/kontakt-os . No cold email to finance/privacy contact and no message to additional Wavell staff.
+
+This round: three new email attempts, one known permanent rejection, two other Sent records without delivery evidence; two standard connection invitations, not customer signups. No new human response or real-seller trial confirmed. No Reddit interaction, paid service, tracking deployment or app code modification in this round.
+
 ## Replies and existing relationships
 
 - ACB: Shelley Grandy replied with product intake questions and a paid technical-evaluation scope (USD 400/hour, typical four-hour minimum). This is a business response, not a partnership, endorsement or seller signup. Carey approved a clarification; reply to shelleyg@acbcert.com is verified in Zoho Sent at 13:56 today. It asks whether looking at an illustrative intake template is appropriate or chargeable, explicitly does not request a paid assessment, and has no attachment.
