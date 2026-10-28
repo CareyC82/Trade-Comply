@@ -782,6 +782,12 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
         dryRun: true,
         skipOfficialUs: true,
         skipEuUsSpecialProgram: true,
+        healthChecker: () => ({
+            ok: true,
+            sample_count: 0,
+            failed_sample_count: 0,
+            failures: []
+        }),
         japanOfficialFetcher: failingOfficialFetcher,
         koreaOfficialFetcher: failingOfficialFetcher,
         indiaOfficialFetcher: failingOfficialFetcher,

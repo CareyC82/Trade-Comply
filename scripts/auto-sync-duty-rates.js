@@ -828,6 +828,7 @@ function buildSyncStatusPayload({ runs = [], health = null, startedAt, finishedA
 async function runAutoDutyRateSync({
     dryRun = false,
     skipOfficialUs = false,
+    healthChecker = runDutyRateHealthCheck,
     japanOfficialFetcher = null,
     koreaOfficialFetcher = null,
     indiaOfficialFetcher = null,
@@ -1066,7 +1067,7 @@ async function runAutoDutyRateSync({
 
     let health = null;
     try {
-        health = runDutyRateHealthCheck();
+        health = healthChecker();
     } catch (error) {
         health = {
             ok: false,
