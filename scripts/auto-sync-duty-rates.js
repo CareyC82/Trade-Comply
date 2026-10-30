@@ -270,23 +270,31 @@ function downgradeOfficialTransportFailure(run, {
     reason = 'official_fetch_failed'
 } = {}) {
     const errors = Array.isArray(run?.errors) ? run.errors : [];
-    if (!errors.length || !errors.every(isOfficialTransportError)) {
+    const alreadyDegraded = Boolean(run?.official_fetch_degraded);
+    if (!alreadyDegraded && (!errors.length || !errors.every(isOfficialTransportError))) {
         return run;
     }
-    const detail = errors
+    const errorDetail = errors
         .slice(0, 5)
         .map(error => [error.rule, error.prefix, error.error || error.message].filter(Boolean).join(': '))
         .join(' | ');
+    const detail = errorDetail || run?.official_fetch_degraded_detail || run?.official_fetch?.error || '';
     const diagnosis = classifyOfficialFetchDegradation(detail);
+    const discardedChangeCount = Array.isArray(run?.changes) ? run.changes.length : 0;
     return {
         ...run,
         ok: true,
         applied: false,
         error_count: 0,
         errors: [],
+        changes: [],
+        change_count: 0,
+        rate_change_count: 0,
+        material_change_count: 0,
+        discarded_change_count: discardedChangeCount,
         writes_official_machine_rates: false,
         official_fetch_degraded: true,
-        official_fetch_degraded_reason: reason,
+        official_fetch_degraded_reason: run?.official_fetch_degraded_reason || reason,
         official_fetch_degraded_detail: detail,
         official_fetch_degraded_category: diagnosis.category,
         official_fetch_degraded_action: diagnosis.action
@@ -921,10 +929,10 @@ async function runAutoDutyRateSync({
         ];
         jpResult.ok = false;
     }
-    runs.push(buildRunSummary('Japan Customs official-live', jpResult, {
+    runs.push(downgradeOfficialTransportFailure(buildRunSummary('Japan Customs official-live', jpResult, {
         applied: !dryRun,
         mode: jpResult.writes_official_machine_rates ? 'official-live' : 'benchmark'
-    }));
+    })));
 
     let krResult;
     try {
@@ -940,10 +948,10 @@ async function runAutoDutyRateSync({
         ];
         krResult.ok = false;
     }
-    runs.push(buildRunSummary('Korea Customs official-live', krResult, {
+    runs.push(downgradeOfficialTransportFailure(buildRunSummary('Korea Customs official-live', krResult, {
         applied: !dryRun,
         mode: 'official-live'
-    }));
+    })));
 
     let indiaResult;
     try {
@@ -959,10 +967,10 @@ async function runAutoDutyRateSync({
         ];
         indiaResult.ok = false;
     }
-    runs.push(buildRunSummary('India Customs official-live', indiaResult, {
+    runs.push(downgradeOfficialTransportFailure(buildRunSummary('India Customs official-live', indiaResult, {
         applied: !dryRun,
         mode: 'official-live'
-    }));
+    })));
 
     const staticCountries = STATIC_BENCHMARK_COUNTRIES.filter(country => country !== 'IN');
     const officialStaticCountries = staticCountries.filter(country => STATIC_OFFICIAL_UPDATE_COUNTRIES.includes(country));

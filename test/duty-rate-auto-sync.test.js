@@ -815,6 +815,12 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.equal(japanRun.errors.length, 0);
     assert.equal(koreaRun.errors.length, 0);
     assert.equal(indiaRun.errors.length, 0);
+    assert.deepEqual(japanRun.changes, []);
+    assert.deepEqual(koreaRun.changes, []);
+    assert.deepEqual(indiaRun.changes, []);
+    assert.equal(japanRun.change_count, 0);
+    assert.equal(koreaRun.change_count, 0);
+    assert.equal(indiaRun.change_count, 0);
     assert.equal(payload.status, 'ok');
     assert.equal(payload.exceptions.length, 0);
     assert.equal(payload.source_run_plan.find(row => row.country === 'JP').run_status, 'degraded');
@@ -855,4 +861,30 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
         && /Retry/.test(row.action)
     )));
     assert.ok(payload.ci_diagnostics.parser_gap_details.some(row => row.country === 'KR'));
+});
+
+test('official transport degradation discards fallback changes and preserves their diagnostic count', () => {
+    const run = downgradeOfficialTransportFailure({
+        source: 'Test Customs official-live',
+        ok: false,
+        applied: true,
+        error_count: 1,
+        errors: [{ error: 'fetch failed' }],
+        changes: [
+            { type: 'rate', old_rate: 0.05, new_rate: 0.1 },
+            { type: 'effective_date', old_value: '2026-01-01', new_value: '2026-02-01' }
+        ],
+        change_count: 2,
+        rate_change_count: 1,
+        material_change_count: 2
+    });
+
+    assert.equal(run.ok, true);
+    assert.equal(run.applied, false);
+    assert.deepEqual(run.changes, []);
+    assert.equal(run.change_count, 0);
+    assert.equal(run.rate_change_count, 0);
+    assert.equal(run.material_change_count, 0);
+    assert.equal(run.discarded_change_count, 2);
+    assert.deepEqual(buildExceptionsForRun(run), []);
 });
