@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-28",
-  "generated_at": "2026-10-28T22:38:59.223Z",
+  "version": "2026-10-30",
+  "generated_at": "2026-10-30T22:19:13.712Z",
   "scope": "Exact tariff parser backlog for routes where official source coverage still needs tariff-line, add-on duty, trade-remedy, exclusion, or case-scope resolution.",
   "generated_from": "scripts/check-duty-rates.js priority_rate_matrix.priority_upgrade_queue + exact_rate_progress.rule_scope_backlog_rows + exact_rate_progress.exact_route_scope_rows",
   "priorities": [
@@ -4482,37 +4482,6 @@
         "telecom_subheading_scope",
         "wireless_module_scope",
         "technology_end_use_scope",
-        "active_exclusion_or_case_period",
-        "tariff_exact_code_scope"
-      ],
-      "parser_subtasks": [
-        "Map the broad HS prefix to exact official tariff-line candidates.",
-        "Separate base duty, local tax, add-on duty, trade-remedy, and exclusion-period layers.",
-        "Backfill remaining exact-code overrides that are still missing parser coverage."
-      ],
-      "parser_scope": "Resolve the exact tariff line and product scope before promoting this route to official exact rate."
-    },
-    {
-      "id": "rule-KR-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
-      "rule_id": "KR-GLOBAL-950450-GAMING-IMPORT-PRECHECK",
-      "route": "*->KR",
-      "product_id": "South Korea import gaming device / console tariff pre-check signal",
-      "import_country": "KR",
-      "origin_country": "*",
-      "hs_code": "950450",
-      "source_status": "scope_check_required",
-      "source_trust": "official_heading_only",
-      "parser_target": "KR exact tariff-line scope resolver",
-      "next_action": "Add exact-code overrides or parser support for the maintained HS prefix before promoting this rule.",
-      "priority_band": "P2",
-      "impact_score": 1000,
-      "why_priority": "*->KR 950450 remains a rule-level exact-rate gap: South Korea import gaming device / console tariff pre-check signal is scope_check_required.",
-      "rate_change_drivers": [
-        "Broad HS prefix has multiple possible official tariff lines.",
-        "Some exact-code overrides already exist; remaining product scopes still need parser coverage."
-      ],
-      "scope_components": [
-        "power_conversion_scope",
         "active_exclusion_or_case_period",
         "tariff_exact_code_scope"
       ],
