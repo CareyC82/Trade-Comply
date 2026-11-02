@@ -4,13 +4,52 @@
 
 Start 02:25:52 UTC / 10:25:52 Beijing. Requested continuous-hour cutoff 03:25:52 UTC / 11:25:52 Beijing. Previous campaigns are excluded from today's new-send totals. No Reddit, Edward contact, paid services, subscriptions, new accounts/agreements, expanded permissions, code or DNS changes.
 
+## Window result ledger
+
+| Market/channel | New verified work in this window | What is NOT established |
+|---|---|---|
+| US-located charging/audio businesses | 4 first emails: Deejays, iPhoenix, uPlus, AMPSOS; Sent verified | Delivery, reading, replies, trials |
+| Global charging brands / China-based supply-chain channel | 4 first emails: AUKEY, Reflying, Benks, INIU; Sent verified | Recipient country from website locale alone; any partner acceptance |
+| AU / UK / NL professional network | 5 ordinary invitations: Ethan (AU), David/Mariana (UK), Erik/Nick (NL) | Acceptance, demand or trial |
+| Previously accepted connections | 3 first DMs: Jolyon (UK), Remco (NL), Michael (AU) | New-window acceptance or incoming reply |
+| Public content | 1 LinkedIn post + 1 Facebook group post, fixed pages verified | Group-member count is not reach; publication is not conversion |
+| Professional discussion | 2 verified LinkedIn comments, one public AI group and one existing private trade group | Endorsement, lead or buyer intent |
+
+No new NZ contact in this hour; earlier MacGear/Desmond work is not counted again. New-post analytics at the recorded check: 13 impressions / 7 members reached / 0 engagement. Facebook new fixed post refreshed and still No comments yet. Latest LI connection count 28, unchanged from opening. No confirmed new human reply, seller trial or paid conversion. One clearly identified INTERNAL QA result excluded from usage and campaign results.
+
+## Follow-through rules (not scheduled sends)
+
+Treat a relevance answer such as already covered as actual feedback, not a sales lead. If someone voluntarily tries a public scenario, first address the one unclear output they report; do not demand reports, supplier/customer details or a meeting. Do not offer unsupported manual review/certification or repeat messages because a person read or accepted an invitation. Two email approaches today are exploratory with different recipients/languages, NOT a controlled A/B experiment or evidence of relative conversion performance.
+
+Project Development coordination was dispatched as a read-only request; no relevant root-cause assessment or fix verified here. Keep code changes and deployment behind Carey's approval. The public-search sample is only a discovery clue, not a confirmed indexing diagnosis. Do not solve source-site verification challenges or pay to expand distribution without authority.
+
+Final-check evidence: LinkedIn Unread filter explicitly No unread messages, then ordinary view restored; latest conversation previews still outgoing. Facebook new fixed page refreshed, author/body retained and No comments yet. Suppression list re-read to confirm explicit Adam/Trash Amps opt-out plus failed addresses, Edward and Reddit restrictions remain active. No suppressed recipient contacted. Email footer used the full approved address/reply-opt-out, without an account subscription or hidden customer-data request.
+
+The hour's direct outreach consists of 8 first emails, 5 ordinary invitations and 3 first introductions to previously accepted connections; public content and comments are recorded separately, not counted as additional named leads. Most email recipients are established brands/distributors, so their response or silence cannot by itself establish individual cross-border sellers' willingness to pay. No seller demand, pricing validation or paid conversion inferred from the work count.
+
+Only this marketing log has a local tracked diff at the final review; git diff --check passes. Marketing performed no commit, push or deployment. Another task/user may manage repository state independently; do not attribute those actions to this campaign.
+
+Project Development follow-up clarified the four read-only display questions and separation from tax-rate/log commits. Latest returned reply still concerns unrelated commit housekeeping, not the requested assessment. Therefore no technical review completion, proposed fix, test pass or deployment is claimed; this handoff remains outstanding.
+
+## One-hour window closed
+
+Closing clock 2026-11-02 03:26:00 UTC / 11:26:00 Beijing, versus start 02:25:52 UTC: 1 hour 8 seconds elapsed. No new outbound contact after the cutoff. Verified totals: 8 first emails, 5 ordinary invitations, 3 first DMs, 2 new posts, 2 professional comments. No confirmed new incoming human reply, seller signup/trial, paid conversion or independent recipient delivery. One earlier opt-out and prior failed delivery handled separately. No future work queued or continuous/background activity promised.
+
 ## Opening reply and failure audit
+
+Later-window audit: Inbox browser-refreshed and newest remains November 1 CaseZ final bounce, then October 30 Adam opt-out; no new-window human reply, acknowledgement or bounce visible. Spam only October 5 Zoho CPaaS announcement. Outbox explicitly No emails in queue. Sent lists exactly today's eight first-contact subjects/times (10:31, 10:33, 10:46, 10:47, 10:51, 10:52, 10:56, 10:57). No retry, delete, archive, spam/security setting or new scheduling action.
+
+Public discovery check with tool queries site:tracewize.com Can I Sell It / Can I Pay and brand Bluetooth Australia returned the homepage only in this sample. This is NOT proof either tool page is unindexed or a Google ranking report; Search Console/indexing status and real search traffic remain unverified. No SEO code, Search Console account/permission or paid-search action taken.
 
 Adam Wegener / Trash Amps replied to the October 30 first-contact email at October 30 23:35 Beijing. Actual reply body is “Unsubscribe”. This is an opt-out, not positive feedback or a trial. Stop marketing to adam@trashamps.com and Trash Amps across channels; no confirmation reply, alternative-mailbox approach or LinkedIn invitation sent. This reply arrived before today's window and is counted as a newly reviewed prior-campaign result, not a reply generated by today's work.
 
 CaseZ sales@casez.com.au: November 1 15:30 Beijing final delivery-failure notification refers to the October 28 email, after the earlier temporary delay. Action failed; diagnostic 421 Host not reachable; last attempt November 1 07:30:09 GMT. Do not resend or use another mailbox. This is a failed prior delivery, not a new outbound attempt or customer reply today. No claim that the domain/mailbox is permanently nonexistent.
 
 ## Accepted connections and first introduction
+
+Michael Poulos / Pulse Charge, https://www.linkedin.com/in/michael-poulos-619572163/ : existing October 26 invitation now accepted before this window's opening count. Live connection list identifies Owner/Director; empty new conversation checked. One first thank-you/introduction verified sent 11:16 Beijing, no link/question/meeting/purchase request, no claim to assess complex combined jump-starter/tracker products. Did not approach Jay or another employee. This is a welcome to an existing accepted connection, not today's new invitation acceptance or a response/trial. Other newly listed connection headlines were screened; no indiscriminate multi-recipient welcome blast or assumption they are electronics sellers.
+
+Remco Van der Haak https://www.linkedin.com/in/remcovanderhaak/ : live 1st connection, Fresh 'n Rebel Key accountmanager (account Mediamarkt Benelux), NOT Grixx/Remco Smit. First conversation initially empty; one introductory DM verified sent 11:02 Beijing, asking whether new resellers usually state exact charger model/destination clearly (usually clear/often needs clarification). No files, call, link or other brand employee contact. Existing October 31 acceptance excluded from today's new-acceptance count. Primary https://freshnrebel.com/ confirms charger/power-bank/small-speaker fit, not broader party-microphone coverage. No reply at sending check.
 
 Opening LinkedIn Connections shows 28, versus the prior October 30 close of 22. Listed dates include Jolyon October 30, Remco October 31, and four other people November 2. These six pre-existing additions are not new invitations or acceptances caused by this window; no assumption they all came from Marketing outreach.
 
@@ -19,6 +58,10 @@ Jolyon Bennett / UK Juice had no prior conversation visible. One concise first t
 Created marketing/SUPPRESSION_LIST.md consolidating the explicit opt-out and previously verified failed recipients, so subsequent company/person deduplication also respects suppression. No email platform or security setting changed.
 
 ## First new contacts
+
+AMPSOS / Suneu LLC, San Diego US: ask.sarah@ampsos.tech, Sarah — one first-pass brief for portable-power retail partners, verified Sent 10:51. Sources https://ampsos.tech/pages/partners and https://ampsos.tech/pages/contact-us publish partnership email and US business location. Domain/mailbox and log dedup clean. Asked whether exact finished-model/battery-Wh/destination-channel brief helps retailer onboarding; not a purchase/distribution application, report assessment or air-travel approval.
+
+Reflying, Shenzhen China global supplier: sales@reflying.com, 给 Reflying 业务团队：海外新卖家询证前的产品资料整理, verified Sent 10:52. Sources https://www.reflying.com/pages/contact-info and https://www.reflying.com/collections/qi2-wireless-charger establish business contact and wireless charging range. Domain/mailbox and log dedup clean. Chinese self-introduction, concise specific onboarding relevance question; not an OEM quote, other employee email, private evidence request or certification service. Both full authorized footer checked. Recipient delivery unconfirmed.
 
 | Business | Verified public source | Email and subject | Sent Beijing |
 |---|---|---|---|
@@ -31,6 +74,18 @@ Australian Small Business Network still shows participation pending approval. Cu
 
 ## New public LinkedIn post
 
+Later-window analytics of TODAY'S new post, not October 30's post: 13 cumulative impressions, 7 members reached, 0 social engagements/reactions/comments/reposts/saves/sends, 0 attributed profile viewers/followers. Small platform-reported reach is not site visits or real trials; no demographic inference or paid Boost. Latest Messaging previews for Michael, Remco and Jolyon remain outgoing introductions, no incoming reply visible. Connections still 28 versus opening 28; five invitations remain unconfirmed acceptances.
+
+Second professional comment verified in existing private Global Trade Compliance Management group, under a current EU-market-entry discussion. Group About describes knowledge sharing; no separate restriction displayed. Comment only proposes separating exact product/model, proposed EU role/product scope, and location of product/contact information; warehouse address not treated as approval. Discloses early-stage pre-screen development; no own URL, lead-generation DM request, client assessment or endorsement of every claim in the source post. Official EUR-Lex and Commission Q&A retrieval encountered verification/temporary-unavailable responses; no CAPTCHA solved, no article-by-article legal explanation posted or claim of full official text review. Internal record of OUR comment only; do not republish private group content. Permalink https://www.linkedin.com/feed/update/urn:li:groupPost:1930085-7522707954278600704?commentUrn=urn%3Ali%3Acomment%3A%28groupPost%3A1930085-7522707954278600704%2C7522858328696430592%29 . Carey author/body and empty composer verified, no reply at initial publication.
+
+Internal promotion-path QA at 11:07, NOT a real seller trial: TW-20261102-B0DEB5DB. Generic adult-use small Bluetooth speaker, rechargeable lithium battery, USB-C 5V, already held inventory, unknown finished-model and Wh, available report has different model code; explicitly INTERNAL QA in description, no uploaded documents. CN→AU, Shopify/own store, AC mains unanswered. Output Conditional—evidence required, unknown exact model and incomplete facts retained. Did not click review mailto/copy/save/upload/download/purchase; no new service offered.
+
+Observed presentation issues sent to existing Project Development for READ-ONLY review under Carey's standing coordination authorization: channel card PLATFORM CHECK READY TO LIST alongside overall NOT READY TO LIST; Shopify-specific next steps still say identify marketplace; already-held stock still gets DO NOT PURCHASE YET/before-paying emphasis; single-product/mismatched-report wording triggers Product Range Review. These are observations, not proved regulatory errors. Explicit instructions: no shared Chrome, no file/code change, commit/push/deploy or added service/coverage before Carey's specific approval. No implementation approved or claimed in Marketing.
+
+Additional professional public comment verified under Felice Laird's one-week-old AAEI guide post in existing AI for Trade Compliance group (joined July 2026). Group description/rules allow sharing AI application experiences/opportunities; members' new posts require approval, so no new group post or approval bypass submitted. Source https://aaei.org/press-release-aaei-releases-new-guide-on-artificial-intelligence-in-trade-compliance/ dated October 20 read; linked PDF inaccessible to web retrieval, no claim to have read it. Comment distinguishes user facts, dated-source questions and qualified human judgment; unconfirmed model/configuration remains unresolved. Discloses developing an early-stage pre-screen, no product URL, DM funnel, endorsement or fabricated experience. Carey comment visibly published, empty composer and count 1 to 2 comments; copied permalink https://www.linkedin.com/feed/update/urn:li:groupPost:13003988-7518806218333917184?commentUrn=urn%3Ali%3Acomment%3A%28groupPost%3A13003988-7518806218333917184%2C7522856423748173825%29 . No paid conference, member registration, mailing-list signup or contact to AAEI media address.
+
+New Facebook group post published and fixed-page body/author verified: https://www.facebook.com/groups/1907440476023898/posts/28170751015932819 . Opening Already holding stock of a small Bluetooth speaker, charger or power bank? Adapted illustrative Model A/Model B inventory scenario, three information buckets, free public-scenario trial and one unclear/unnecessary output question. Full commercial identity and no-account/private-report/approval disclaimers; no client case or blanket retesting conclusion. Existing group membership, About says manufacturers/suppliers may boost their business; no additional rules shown. Group About shows 176 new posts today and 49,177 members: not treated as actual reach. No anonymous posting, extra groups, member tagging, repeat application or subscription. At initial fixed-page verification No comments yet. Old October 30 post remains separate, not counted again.
+
 Published with Post successful confirmation and View post URL https://www.linkedin.com/feed/update/urn:li:activity:7522849715051343872/ . Opening: Inventory already bought? Start with the stock you actually have. Explicit illustrative, not client, scenario of 300 Bluetooth speakers and a mismatched model code. Proposes stock facts / existing evidence / unresolved destination-channel questions before discussing further work with the laboratory or specialist. Does not equate a code mismatch with automatic retesting/replacement or continued-sales permission. Identifies Carey/TraceWize, free initial link/no account or private files, excludes report authentication/certification/selling approval. Anyone audience checked in composer.
 
 Official Australian source https://www.acma.gov.au/step-3-sign-and-keep-records read in full relevant sections, updated September 28, 2026: records depend on product/rules; test reports identify type/model/batch, tester, method, results and standards. The post identifies this as one Australian reference, not a universal all-country rule. No draft legislation or third-party legal claim used. Production free entry loaded in Chrome and states No account required; web retrieval cache miss is not a website-outage finding. No product test generated in this opening check. Full fixed-page verification pending.
@@ -40,6 +95,14 @@ Old October 30 Facebook discussion remains No comments yet; no bump or repeat gr
 New LinkedIn post fixed page revisited: Carey author and exact inventory/mismatch example visible, confirming persistent publication. No real client case, stock assessment or engagement inferred.
 
 ## New professional invitations
+
+Nick van Ommeren, live Founder Artizta, Greater Enschede NL, https://www.linkedin.com/in/nick-van-ommeren-ab3632185/ : ordinary no-note invitation verified Invitation sent/Pending. Primary https://artizta.audio/en/pages/about-us and brand's own public LinkedIn/profile posts establish finished Ferro Bluetooth/hi-fi speaker and founder. No claim to assess high-end acoustics, certify it or cover every configuration; no email or other employee invitation. This is an audio-founder connection, not confirmed small-seller trial interest. Screened Orbitkey/Oakywood/Rolling Square but historical business invites already exist; no extra founders contacted.
+
+Mariana Cardenas, live Co-Founder POCA audio / Marketing & Brand, Bath UK, https://www.linkedin.com/in/marianace/ : ordinary no-note invitation verified Invitation sent/Pending. Primary https://pocaaudio.co.uk/ confirms PINE Beat portable Bluetooth speaker and founders; no invitation/message to co-founder Aaron, no second channel. No buying intent inferred.
+
+Benks: Karen@benks.com, Karen 您好：给磁吸充电宝新卖家的免费初筛入口, verified Sent 10:56. Primary https://www.benks.com/pages/contact-us explicitly business cooperation and https://www.benks.com/collections/benks-power-bank confirms ArmorGo product line. Individual product URL returned 404, not treated as live verified details. Historical log/domain mailbox search clean; only Karen, not eva/cathy/support/media. No purchasing/application/subscription. Invitation to try one public scenario and identify one confusing question, no account/private files.
+
+INIU: catherine.su@iniu.tech, Catherine — a free first-pass resource for smaller charging-product sellers, verified Sent 10:57. https://iniushop.com/pages/contact-us publishes Brand Partnerships address, Shenzhen brand ownership and US office; current charging ranges visible. Log and broad mailbox search iniu clean. No wholesale/MOQ form or influencer/support contact. Resource introduction only, not assessment of INIU products, no recall marketing claim. Both full footer checked, delivery unconfirmed.
 
 Erik Plasmans / Zens Wireless Charging, Eindhoven NL, https://www.linkedin.com/in/erik-plasmans-71720821/ : ordinary no-note invitation verified Invitation sent/Pending. Live headline does not establish CEO/founder title. Official https://zens.tech/ establishes wireless chargers and magnetic power banks; no workspace-sensor or furniture scope claim, other employee or email contacted.
 
