@@ -1055,11 +1055,11 @@ function buildIndiaOfficialRateCandidate(rows = [], hsPrefix = '') {
     if (!matched.length) {
         return {
             ok: false,
-            source_status: 'official_link_checked',
+            source_status: 'scope_check_required',
             status: 'no_matching_rows',
             hs_prefix: prefix,
             matched_rows: 0,
-            reason: `No India official tariff row matched ${prefix}.`
+            reason: `No India official tariff row matched ${prefix}; exact tariff-line verification is required.`
         };
     }
     if (bcdRates.length === 1 && swsRates.length <= 1 && igstRates.length <= 1) {
@@ -1122,10 +1122,10 @@ function buildIndiaOfficialCandidateForRule(rule, rows = []) {
     }
     return {
         ok: false,
-        source_status: 'official_link_checked',
+        source_status: 'scope_check_required',
         status: 'no_matching_rows',
         candidates,
-        reason: `${rule.id || 'rule'} has no matched India tariff rows.`
+        reason: `${rule.id || 'rule'} has no matched India tariff rows and needs exact tariff-line verification.`
     };
 }
 

@@ -1825,6 +1825,21 @@ test('India official candidate keeps mixed tariff rows exact-line gated', () => 
     assert.equal(candidate.source_status, 'scope_check_required');
 });
 
+test('India official candidate keeps unmatched tariff prefixes exact-line gated', () => {
+    const candidate = buildIndiaOfficialCandidateForRule({
+        id: 'TEST-IN-UNMATCHED',
+        hs_prefixes: ['950450']
+    }, [
+        { hs_code: '85044010', bcd_rate: 0, sws_rate: 0.1, igst_rate: 0.18 }
+    ]);
+
+    assert.equal(candidate.ok, false);
+    assert.equal(candidate.status, 'exact_hs_required');
+    assert.equal(candidate.source_status, 'scope_check_required');
+    assert.equal(candidate.candidates[0].status, 'no_matching_rows');
+    assert.equal(candidate.candidates[0].source_status, 'scope_check_required');
+});
+
 test('Malaysia JKDM parser composes split AHTN columns into exact 10-digit rows', () => {
     const html = `
         <table>
