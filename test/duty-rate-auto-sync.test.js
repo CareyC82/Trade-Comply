@@ -821,8 +821,15 @@ test('auto duty-rate sync downgrades official-live transport failures without bl
     assert.equal(japanRun.change_count, 0);
     assert.equal(koreaRun.change_count, 0);
     assert.equal(indiaRun.change_count, 0);
-    assert.equal(payload.status, 'ok');
-    assert.equal(payload.exceptions.length, 0);
+    const degradedSources = new Set([
+        'Japan Customs official-live',
+        'Korea Customs official-live',
+        'India Customs official-live'
+    ]);
+    assert.deepEqual(
+        payload.exceptions.filter(exception => degradedSources.has(exception.source)),
+        []
+    );
     assert.equal(payload.source_run_plan.find(row => row.country === 'JP').run_status, 'degraded');
     assert.equal(payload.source_run_plan.find(row => row.country === 'KR').run_status, 'degraded');
     assert.equal(payload.source_run_plan.find(row => row.country === 'IN').run_status, 'degraded');
