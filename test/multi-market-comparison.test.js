@@ -30,6 +30,7 @@ test('multi-market comparison keeps jurisdiction results and local actions separ
     assert.ok(result.multiMarketComparison.marketSpecificActions.EU.some((item) => /CE|RED/.test(item)));
     assert.ok(result.multiMarketComparison.marketSpecificActions.AU.some((item) => /ACMA|RCM/.test(item)));
     assert.ok(result.multiMarketComparison.notAutomaticallyTransferable.some((item) => /registration|responsible-party/i.test(item)));
+    assert.ok(result.multiMarketComparison.sharedEvidence.some((item) => /production batch\/lot where applicable/i.test(item)));
     assert.equal(result.selectedTariff, null);
     assert.match(result.disclaimer, /separate jurisdictions/i);
 });

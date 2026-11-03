@@ -222,7 +222,7 @@ test('prepared review contact adds only the entered non-confidential technical f
     assert.doesNotMatch(contact.text, /supplier name|purchase price/i);
 });
 
-test('review brief distinguishes Match, Mismatch, Missing and Unverified without treating presence as authenticity', () => {
+test('review brief distinguishes Match, Mismatch, Not provided and Provided — not verified without treating presence as authenticity', () => {
     const matrix = engine.buildEvidenceConsistencyMatrix({
         profile: { battery: true, bundledAdapter: true, bluetooth: true },
         supplierEvidence: [
@@ -232,13 +232,29 @@ test('review brief distinguishes Match, Mismatch, Missing and Unverified without
     assert.equal(matrix.find((item) => item.key === 'product_model').status, 'Match');
     assert.equal(matrix.find((item) => item.key === 'manufacturer').status, 'Mismatch');
     assert.equal(matrix.find((item) => item.key === 'standards').status, 'Unverified');
-    assert.equal(matrix.find((item) => item.key === 'adapter').status, 'Missing');
+    assert.equal(matrix.find((item) => item.key === 'adapter').status, 'Provided — not verified');
+    assert.equal(matrix.find((item) => item.key === 'hardware').status, 'Provided — not verified');
+    const notProvided = engine.buildEvidenceConsistencyMatrix({
+        profile: { battery: true, bundledAdapter: true }, supplierEvidence: []
+    });
+    assert.equal(notProvided.find((item) => item.key === 'adapter').status, 'Not provided');
+    assert.equal(notProvided.find((item) => item.key === 'battery').status, 'Not provided');
     const brief = engine.buildComplianceReviewBrief({
         profile: { battery: true }, coverage: { supported: true }, verdict: 'conditional', requirements: [],
         supplierEvidence: [], documentGaps: [{ document: 'UN38.3' }], nextActions: ['Verify exact model']
     });
     assert.equal(brief.overall, 'Amber');
     assert.equal(brief.costTiming.status, 'Unknown');
+});
+
+test('review output explains that supplied files still need current product configuration and batch linkage', () => {
+    const page = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    assert.match(page, /Not provided means no supplier file was supplied/);
+    assert.match(page, /current finished product, configuration or production batch/);
+    const matrix = engine.buildEvidenceConsistencyMatrix({
+        profile: {}, supplierEvidence: [{ checks: {}, extracted: { hardwareRevision: '' } }]
+    });
+    assert.match(matrix.find((item) => item.key === 'hardware').note, /production batch\/lot/i);
 });
 
 test('component consistency compares the same field across documents without spreading one mismatch to every row', () => {
