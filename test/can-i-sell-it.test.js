@@ -319,6 +319,40 @@ test('human review recommendation changes by product range, evidence and ANZ ele
     assert.match(australia.serviceRecommendation.boundary, /not certification or legal advice/i);
 });
 
+test('unknown singular model wording does not trigger a product range review', () => {
+    const singleProductDescriptions = [
+        'Adult-use portable Bluetooth speaker with a rechargeable lithium-ion battery and USB-C charging. Inventory is already held. Exact finished model is unconfirmed.',
+        'Bluetooth speaker with rechargeable battery. Model number is unknown.',
+        'One Bluetooth speaker model with a lithium-ion battery.',
+        'Bluetooth speaker; exact model not yet provided; USB-C charging.'
+    ];
+    singleProductDescriptions.forEach((description) => {
+        const result = engine.assess({
+            description, market: 'US', origin: 'CN', platform: 'Amazon',
+            assessmentMode: 'quick', blockingQuestionKeys: []
+        });
+        assert.equal(result.serviceRecommendation.code, 'single_product_review', description);
+        assert.equal(result.serviceRecommendation.service, 'Single Product Review', description);
+    });
+});
+
+test('explicit multiple product or model intent still triggers a product range review', () => {
+    const rangeDescriptions = [
+        'Three Bluetooth speaker models with rechargeable batteries.',
+        'Multiple products in a portable audio launch.',
+        'Bluetooth speaker assortment for Amazon.',
+        'Product range with three Bluetooth speaker SKUs and batteries'
+    ];
+    rangeDescriptions.forEach((description) => {
+        const result = engine.assess({
+            description, market: 'US', origin: 'CN', platform: 'Amazon',
+            assessmentMode: 'quick', blockingQuestionKeys: []
+        });
+        assert.equal(result.serviceRecommendation.code, 'product_range_review', description);
+        assert.equal(result.serviceRecommendation.service, 'Product Range Review', description);
+    });
+});
+
 test('review CTA has a one-column mobile action layout without fixed-width overflow', () => {
     const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'style.css'), 'utf8');
     assert.match(css, /\.sell-review-actions\s*\{[^}]*display:\s*flex[^}]*flex-wrap:\s*wrap/s);
