@@ -12,5 +12,6 @@ Check this list and outreach history before every new contact. Never use an alte
 | Signeo | sales@signeo.net; no alternate-mailbox bypass | Permanent 550 5.4.1 access denied | October 26 |
 | Sourcify | sales@sourcify.com | 550 5.2.1 inactive account; do not guess another mailbox | October 26 |
 | Cellstream | hello@cellstream.shop | User supplied 550 5.1.1 recipient unknown bounce | August 18 |
+| The Ecom Cooperative / TECO | info@theecomcooperative.com; no alternate staff/mailbox/channel bypass | Google Delivery Status Notification, Action failed, Status 5.1.3, account does not exist; supersedes Zoho server-accepted label | November 5 15:41 Beijing, reviewed November 5 16:35 |
 
 Edward is handled by Carey: no proactive Marketing message. No Reddit promotion or ban circumvention. Unaccepted invitations and unanswered messages elsewhere are not permission to contact more staff at the same business; check company-level history as well as personal names.
