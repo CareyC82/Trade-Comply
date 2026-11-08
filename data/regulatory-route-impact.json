@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-01T22:13:26.145Z",
+  "generated_at": "2026-11-08T22:17:49.596Z",
   "source_change_count": 17,
   "impacts": [
     {
@@ -1057,25 +1057,6 @@
       "auto_publish": false
     },
     {
-      "id": "auButtonBattery",
-      "type": "content_changed",
-      "detected_at": "2026-10-07T07:55:04.108Z",
-      "review_status": "pending_review",
-      "markets": [],
-      "products": [],
-      "candidate_hs": [],
-      "affected_routes": [],
-      "effective_date": null,
-      "effective_timing": "Effective date requires official confirmation",
-      "conclusion_delta": {
-        "status": "unchanged_pending_rule_review",
-        "before": [],
-        "after": [],
-        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
-      },
-      "auto_publish": false
-    },
-    {
       "id": "fccMarketplace2026",
       "type": "lifecycle_changed",
       "detected_at": "2026-10-11T22:09:34.364Z",
@@ -1085,7 +1066,7 @@
       "candidate_hs": [],
       "affected_routes": [],
       "effective_date": "2026-10-13",
-      "effective_timing": "Effective for 19 day(s)",
+      "effective_timing": "Effective for 26 day(s)",
       "conclusion_delta": {
         "status": "unchanged_pending_rule_review",
         "before": [],
@@ -1268,7 +1249,7 @@
         "Any maintained origin -> EU"
       ],
       "effective_date": "2027-02-18",
-      "effective_timing": "109 day(s) until effective",
+      "effective_timing": "102 day(s) until effective",
       "conclusion_delta": {
         "status": "unchanged_pending_rule_review",
         "before": [
@@ -1505,25 +1486,6 @@
       "affected_routes": [],
       "effective_date": null,
       "effective_timing": "Effective date requires official confirmation",
-      "conclusion_delta": {
-        "status": "unchanged_pending_rule_review",
-        "before": [],
-        "after": [],
-        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
-      },
-      "auto_publish": false
-    },
-    {
-      "id": "fccMarketplace2026",
-      "type": "content_changed",
-      "detected_at": "2026-11-01T22:13:26.145Z",
-      "review_status": "pending_review",
-      "markets": [],
-      "products": [],
-      "candidate_hs": [],
-      "affected_routes": [],
-      "effective_date": "2026-10-13",
-      "effective_timing": "Effective for 19 day(s)",
       "conclusion_delta": {
         "status": "unchanged_pending_rule_review",
         "before": [],
@@ -1773,16 +1735,16 @@
       "auto_publish": false
     },
     {
-      "id": "auEess",
+      "id": "fccMarketplace2026",
       "type": "content_changed",
-      "detected_at": "2026-11-01T22:13:26.145Z",
+      "detected_at": "2026-11-08T22:17:49.596Z",
       "review_status": "pending_review",
       "markets": [],
       "products": [],
       "candidate_hs": [],
       "affected_routes": [],
-      "effective_date": null,
-      "effective_timing": "Effective date requires official confirmation",
+      "effective_date": "2026-10-13",
+      "effective_timing": "Effective for 26 day(s)",
       "conclusion_delta": {
         "status": "unchanged_pending_rule_review",
         "before": [],
@@ -1792,9 +1754,261 @@
       "auto_publish": false
     },
     {
-      "id": "nzLithiumTransport",
+      "id": "redCyber",
       "type": "content_changed",
-      "detected_at": "2026-11-01T22:13:26.145Z",
+      "detected_at": "2026-11-08T22:17:49.596Z",
+      "review_status": "pending_review",
+      "markets": [
+        "EU"
+      ],
+      "products": [
+        {
+          "id": "smart_watch",
+          "label": "Smart watch",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "smart_ring",
+          "label": "Smart ring",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "fitness_tracker",
+          "label": "Fitness band / tracker",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62",
+            "9029.10"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "kids_gps_watch",
+          "label": "Kids GPS watch",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "earbuds",
+          "label": "Bluetooth earbuds",
+          "market": "EU",
+          "candidate_hs": [
+            "8518.30"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "wifi_router",
+          "label": "Wi-Fi router",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "tablet",
+          "label": "Tablet computer",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "e_reader",
+          "label": "E-reader",
+          "market": "EU",
+          "candidate_hs": [
+            "8471.30",
+            "8543.70"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "red_cybersecurity"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        }
+      ],
+      "candidate_hs": [
+        "8517.13",
+        "8517.62",
+        "8543.70",
+        "9029.10",
+        "8518.30",
+        "8471.30"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> EU"
+      ],
+      "effective_date": "2025-08-01",
+      "effective_timing": "Effective for 464 day(s)",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional",
+          "high_risk"
+        ],
+        "after": [
+          "conditional",
+          "high_risk"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "gdpr",
+      "type": "content_changed",
+      "detected_at": "2026-11-08T22:17:49.596Z",
+      "review_status": "pending_review",
+      "markets": [
+        "EU"
+      ],
+      "products": [
+        {
+          "id": "fitness_tracker",
+          "label": "Fitness band / tracker",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.62",
+            "9029.10"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "privacy"
+          ],
+          "current_conclusion": "conditional",
+          "current_conclusion_label": "Conditional — evidence required"
+        },
+        {
+          "id": "kids_gps_watch",
+          "label": "Kids GPS watch",
+          "market": "EU",
+          "candidate_hs": [
+            "8517.13",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "kids_electronics",
+          "label": "Children’s electronic product",
+          "market": "EU",
+          "candidate_hs": [
+            "9503.00",
+            "8525.89",
+            "8471.30"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        },
+        {
+          "id": "baby_monitor",
+          "label": "Baby monitor",
+          "market": "EU",
+          "candidate_hs": [
+            "8525.89",
+            "8517.62"
+          ],
+          "route": "Any maintained origin -> EU",
+          "requirement_ids": [
+            "children"
+          ],
+          "current_conclusion": "high_risk",
+          "current_conclusion_label": "High risk — specialist review"
+        }
+      ],
+      "candidate_hs": [
+        "8517.62",
+        "9029.10",
+        "8517.13",
+        "9503.00",
+        "8525.89",
+        "8471.30"
+      ],
+      "affected_routes": [
+        "Any maintained origin -> EU"
+      ],
+      "effective_date": null,
+      "effective_timing": "Effective date requires official confirmation",
+      "conclusion_delta": {
+        "status": "unchanged_pending_rule_review",
+        "before": [
+          "conditional",
+          "high_risk"
+        ],
+        "after": [
+          "conditional",
+          "high_risk"
+        ],
+        "explanation": "Evidence capture alone does not change user conclusions. A separate reviewed rule update and regression run is required."
+      },
+      "auto_publish": false
+    },
+    {
+      "id": "auButtonBattery",
+      "type": "content_changed",
+      "detected_at": "2026-11-08T22:17:49.596Z",
       "review_status": "pending_review",
       "markets": [],
       "products": [],
