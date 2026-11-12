@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-11-10T01:17:38.950Z",
+  "updated_at": "2026-11-12T00:13:25.343Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -3535,6 +3535,116 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-11-10T01:17:32.703751+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-11-10T22:57:53.566Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.20 / 9303.30",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS - Department of Commerce Rescinds Biden-Era Firearms Rule, Restoring Common Sense to Export Controls on Civilian Firearms",
+        "content_en": "BIS has rescinded the Biden-era firearms export rule, easing licensing and classification treatment for civilian firearms and ammunition under the Export Administration Regulations. Exporters of sporting shotguns, rifles, pistols and related parts should re-verify ECCN classification (many civilian firearms move to EAR99 or lower-control ECCNs), confirm license exception eligibility, and re-screen end users and destinations. Despite the relaxation, Section 301 tariffs, HTS alignment, and Entity List / restricted party screening remain mandatory. Reassess pending licenses, provisos, and recordkeeping obligations before shipping.",
+        "content_zh": "美国商务部工业与安全局（BIS）撤销了拜登时期的枪支出口规则，放宽了《出口管理条例》下民用枪支弹药的许可与分类处理。出口运动霰弹枪、步枪、手枪及相关零部件的企业应重新核实ECCN分类（多数民用枪支可能归入EAR99或较低管制类别），确认许可例外适用性，并重新筛查最终用户与目的地。尽管管制放宽，第301条关税、HTS归类一致性以及实体清单/受限方筛查仍为强制要求。发运前应重新评估在审许可、附加条件及记录保存义务。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "Re-verify ECCN classification",
+            "desc": "Re-classify civilian firearms, parts and ammunition under the rescinded rule; confirm EAR99 or reduced ECCN status and document the basis."
+          },
+          {
+            "phase": "技术核查",
+            "task": "License exception eligibility",
+            "desc": "Confirm whether shipments now qualify for license exceptions (e.g., ENC, TMP, RPL) and update internal authorization matrices."
+          },
+          {
+            "phase": "单证准备",
+            "task": "HTS & Section 301 alignment",
+            "desc": "Map 10-digit HTS lines for firearms (e.g., 9302, 9303) against Section 301 lists and additional duties; document country of origin."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Restricted party & Entity List screening",
+            "desc": "Run BIS Entity List, SDN and denied-party screening for all consignees, end users and intermediate consignees; retain records."
+          },
+          {
+            "phase": "单证准备",
+            "task": "End-user / end-use statements",
+            "desc": "Obtain and retain non-transfer and end-use certificates for firearms shipments, especially to high-risk destinations."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Recordkeeping & license reconciliation",
+            "desc": "Update EAR recordkeeping (5-year retention), reconcile pending licenses and provisos, and close or amend licenses affected by the rescission."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-11-10T22:57:48.767017+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-11-12T00:13:25.343Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.20 / 9303.30 (civilian firearms & parts; verify 10-digit HTS)",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS — Department of Commerce Rescinds Biden-Era Firearms Rule, Restoring Common Sense to Export Controls on Civilian Firearms",
+        "content_en": "BIS has rescinded the Biden-era firearms export rule, easing licensing and classification treatment for civilian firearms and related parts. For China-origin or China-routed shipments into the US market, exporters should re-verify the current USML/CCL classification (EAR Category 0 vs. ITAR), confirm whether a BIS license or license exception now applies, and re-map the 10-digit HTS line against Section 301 lists and any firearms-specific tariff actions. Screen all parties against the Entity List, SDN, and denied-party lists, and retain end-use/end-user statements. Note that the rescission affects US export controls, not US import rules (ATF Form 6/5330.3, 27 CFR 478/479) — import permits and marking requirements remain in force.",
+        "content_zh": "美国商务部工业与安全局（BIS）撤销了拜登时期的枪支出口规则，放宽了民用枪支及相关零部件的许可与分类处理。对于输美或经中国转运的货物，出口商应重新核实当前的 USML/CCL 分类（EAR 第 0 类与 ITAR 的区分），确认是否适用 BIS 许可或许可例外，并将 10 位 HTS 编码重新对照 301 条款清单及枪支专项关税措施。须对交易各方进行实体清单、SDN 及被拒绝人员名单筛查，并留存最终用途/最终用户声明。注意：本次撤销仅影响美国出口管制，不影响美国进口规则（ATF Form 6/5330.3、27 CFR 478/479）——进口许可与标识要求仍然有效。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "Re-classify under USML/CCL",
+            "desc": "Confirm whether the firearm or part falls under ITAR USML Category I/II or EAR CCL Category 0, and document the classification rationale after the rule rescission."
+          },
+          {
+            "phase": "技术核查",
+            "task": "License / exception determination",
+            "desc": "Determine whether a BIS export license or a license exception (e.g., ENC, RPL, or firearms-specific exception) now applies; record the basis in the export file."
+          },
+          {
+            "phase": "单证准备",
+            "task": "HTS & Section 301 mapping",
+            "desc": "Map the 10-digit HTS line for the firearm/part, check Section 301 lists and firearms-specific tariff actions, and document country of origin and value build-up."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Restricted party screening",
+            "desc": "Screen consignee, end-user, and intermediaries against the BIS Entity List, OFAC SDN, and denied-party lists; retain end-use/end-user statements."
+          },
+          {
+            "phase": "单证准备",
+            "task": "US import permit check",
+            "desc": "Confirm ATF Form 6 / 5330.3 import permit, marking, and 27 CFR 478/479 requirements remain satisfied for US-bound firearms."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Lead/ammunition environmental limits",
+            "desc": "Verify lead-content, ammunition, and hazardous-material restrictions applicable to firearm components under US federal and state environmental rules."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-11-12T00:13:20.741078+00:00"
       }
     }
   ]
