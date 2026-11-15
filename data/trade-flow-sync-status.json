@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-15T21:42:24.583Z",
-  "ok": true,
+  "generated_at": "2026-11-15T23:09:56.950Z",
+  "ok": false,
   "publish_policy": "complete_batch_only_last_good_retained",
   "connectors": {
     "comtrade": {
       "ok": true,
       "skipped": false,
-      "row_count": 22119,
-      "partner_row_count": 12705,
+      "row_count": 22131,
+      "partner_row_count": 12897,
       "partner_markets": [
         "CN",
         "EU",
@@ -48,29 +48,9 @@
           "error": "No usable partner rows"
         },
         {
-          "market": "EU",
-          "period": "202506",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "SG",
-          "period": "202506",
-          "error": "HTTP 403"
-        },
-        {
           "market": "CN",
           "period": "202507",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "US",
-          "period": "202507",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "EU",
-          "period": "202507",
-          "error": "HTTP 403"
+          "error": "No usable partner rows"
         },
         {
           "market": "JP",
@@ -78,22 +58,12 @@
           "error": "HTTP 403"
         },
         {
-          "market": "SG",
-          "period": "202507",
-          "error": "HTTP 403"
-        },
-        {
           "market": "CN",
           "period": "202508",
           "error": "HTTP 403"
         },
         {
           "market": "US",
-          "period": "202508",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "EU",
           "period": "202508",
           "error": "HTTP 403"
         },
@@ -405,14 +375,40 @@
         {
           "market": "SG",
           "period": "202608",
+          "error": "HTTP 403"
+        },
+        {
+          "market": "CN",
+          "period": "202609",
+          "error": "HTTP 403"
+        },
+        {
+          "market": "US",
+          "period": "202609",
+          "error": "HTTP 403"
+        },
+        {
+          "market": "EU",
+          "period": "202609",
+          "error": "HTTP 403"
+        },
+        {
+          "market": "JP",
+          "period": "202609",
+          "error": "HTTP 403"
+        },
+        {
+          "market": "SG",
+          "period": "202609",
           "error": "HTTP 403"
         }
       ]
     },
     "census": {
-      "ok": true,
+      "ok": false,
       "skipped": false,
-      "row_count": 234
+      "row_count": 0,
+      "error": "This operation was aborted"
     },
     "official_batches": {
       "ok": true,
@@ -520,7 +516,7 @@
           "raw_ingest_status": "production_ready",
           "raw_ingest_note": "Japan Customs 6/9-digit commodity-country rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly JPY-to-USD conversion evidence.",
           "probe_status": "official_probe_ok",
-          "last_checked_at": "2026-10-15T21:42:23.682Z",
+          "last_checked_at": "2026-11-15T23:09:56.035Z",
           "probe_note": ""
         },
         "KR": {
@@ -615,7 +611,7 @@
           "raw_ingest_status": "api_key_pending",
           "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available.",
           "probe_status": "api_key_pending",
-          "last_checked_at": "2026-10-15T21:42:23.684Z",
+          "last_checked_at": "2026-11-15T23:09:56.037Z",
           "probe_note": "KR_DATA_GO_KR_SERVICE_KEY is not configured; UN Comtrade historical fallback remains available."
         },
         "SG": {
@@ -710,7 +706,7 @@
           "raw_ingest_status": "production_ready",
           "raw_ingest_note": "SingStat T010001 AHTN commodity-market rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly SGD-to-USD conversion evidence.",
           "probe_status": "probe_degraded",
-          "last_checked_at": "2026-10-15T21:42:24.552Z",
+          "last_checked_at": "2026-11-15T23:09:56.899Z",
           "probe_note": "",
           "probe_error": "HTTP 400"
         }
