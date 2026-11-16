@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-15T23:09:56.950Z",
-  "ok": false,
+  "generated_at": "2026-11-16T01:47:46.136Z",
+  "ok": true,
   "publish_policy": "complete_batch_only_last_good_retained",
   "connectors": {
     "comtrade": {
       "ok": true,
       "skipped": false,
-      "row_count": 22131,
-      "partner_row_count": 12897,
+      "row_count": 26175,
+      "partner_row_count": 16941,
       "partner_markets": [
         "CN",
         "EU",
@@ -53,149 +53,34 @@
           "error": "No usable partner rows"
         },
         {
-          "market": "JP",
-          "period": "202507",
-          "error": "HTTP 403"
-        },
-        {
           "market": "CN",
           "period": "202508",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "US",
-          "period": "202508",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "JP",
-          "period": "202508",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "SG",
-          "period": "202508",
-          "error": "HTTP 403"
+          "error": "No usable partner rows"
         },
         {
           "market": "CN",
           "period": "202509",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "US",
-          "period": "202509",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "EU",
-          "period": "202509",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "JP",
-          "period": "202509",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "SG",
-          "period": "202509",
-          "error": "HTTP 403"
+          "error": "No usable partner rows"
         },
         {
           "market": "CN",
           "period": "202510",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "US",
-          "period": "202510",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "EU",
-          "period": "202510",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "JP",
-          "period": "202510",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "SG",
-          "period": "202510",
-          "error": "HTTP 403"
+          "error": "No usable partner rows"
         },
         {
           "market": "CN",
           "period": "202511",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "US",
-          "period": "202511",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "EU",
-          "period": "202511",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "JP",
-          "period": "202511",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "SG",
-          "period": "202511",
-          "error": "HTTP 403"
+          "error": "No usable partner rows"
         },
         {
           "market": "CN",
           "period": "202512",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "US",
-          "period": "202512",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "EU",
-          "period": "202512",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "JP",
-          "period": "202512",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "SG",
-          "period": "202512",
-          "error": "HTTP 403"
+          "error": "No usable partner rows"
         },
         {
           "market": "CN",
           "period": "202601",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "US",
-          "period": "202601",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "EU",
-          "period": "202601",
-          "error": "HTTP 403"
-        },
-        {
-          "market": "JP",
-          "period": "202601",
-          "error": "HTTP 403"
+          "error": "No usable partner rows"
         },
         {
           "market": "SG",
@@ -405,10 +290,9 @@
       ]
     },
     "census": {
-      "ok": false,
+      "ok": true,
       "skipped": false,
-      "row_count": 0,
-      "error": "This operation was aborted"
+      "row_count": 234
     },
     "official_batches": {
       "ok": true,
@@ -516,7 +400,7 @@
           "raw_ingest_status": "production_ready",
           "raw_ingest_note": "Japan Customs 6/9-digit commodity-country rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly JPY-to-USD conversion evidence.",
           "probe_status": "official_probe_ok",
-          "last_checked_at": "2026-11-15T23:09:56.035Z",
+          "last_checked_at": "2026-11-16T01:47:45.121Z",
           "probe_note": ""
         },
         "KR": {
@@ -611,7 +495,7 @@
           "raw_ingest_status": "api_key_pending",
           "raw_ingest_note": "The official API connector remains disabled until a data.go.kr key is configured; UN Comtrade history remains available.",
           "probe_status": "api_key_pending",
-          "last_checked_at": "2026-11-15T23:09:56.037Z",
+          "last_checked_at": "2026-11-16T01:47:45.123Z",
           "probe_note": "KR_DATA_GO_KR_SERVICE_KEY is not configured; UN Comtrade historical fallback remains available."
         },
         "SG": {
@@ -706,7 +590,7 @@
           "raw_ingest_status": "production_ready",
           "raw_ingest_note": "SingStat T010001 AHTN commodity-market rows can be normalized into maintained industries. Publication requires both flows, all required partners and industries, and explicit monthly SGD-to-USD conversion evidence.",
           "probe_status": "probe_degraded",
-          "last_checked_at": "2026-11-15T23:09:56.899Z",
+          "last_checked_at": "2026-11-16T01:47:46.071Z",
           "probe_note": "",
           "probe_error": "HTTP 400"
         }
