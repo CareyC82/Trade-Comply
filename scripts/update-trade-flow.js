@@ -398,10 +398,23 @@ function buildNationalRawManifest(connector, payload = {}) {
     };
 }
 
-async function fetchJson(url, fetchImpl = global.fetch, { retries = 0 } = {}) {
+function isTransientFetchError(error) {
+    const status = Number(error?.status || 0);
+    return error?.name === 'AbortError'
+        || error?.code === 'ABORT_ERR'
+        || error instanceof TypeError
+        || (status >= 500 && status < 600);
+}
+
+async function fetchJson(url, fetchImpl = global.fetch, {
+    retries = 0,
+    retryTransient = false,
+    retryDelayMs = 1000,
+    timeoutMs = 30000
+} = {}) {
     for (let attempt = 0; attempt <= retries; attempt += 1) {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000);
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
         try {
             const response = await fetchImpl(url, { signal: controller.signal, headers: { accept: 'application/json' } });
             if (response.ok) return response.json();
@@ -413,7 +426,16 @@ async function fetchJson(url, fetchImpl = global.fetch, { retries = 0 } = {}) {
                 await new Promise((resolve) => setTimeout(resolve, waitMs));
                 continue;
             }
-            throw new Error(`HTTP ${response.status}`);
+            const error = new Error(`HTTP ${response.status}`);
+            error.status = response.status;
+            throw error;
+        } catch (error) {
+            if (retryTransient && attempt < retries && isTransientFetchError(error)) {
+                const waitMs = Math.max(0, retryDelayMs * (attempt + 1));
+                if (waitMs) await new Promise((resolve) => setTimeout(resolve, waitMs));
+                continue;
+            }
+            throw error;
         } finally {
             clearTimeout(timeout);
         }
@@ -514,7 +536,11 @@ function mergeSeries(existing, incoming, sourceId) {
     return replaceSourceScope(existing, incoming, sourceId);
 }
 
-async function syncCensus(payload, { apiKey = process.env.CENSUS_API_KEY, fetchImpl = global.fetch } = {}) {
+async function syncCensus(payload, {
+    apiKey = process.env.CENSUS_API_KEY,
+    fetchImpl = global.fetch,
+    requestOptions = {}
+} = {}) {
     const sources = Array.isArray(payload.sources) ? payload.sources : [];
     const source = sources.find((row) => row.id === CENSUS_SOURCE_ID);
     if (!apiKey) {
@@ -533,7 +559,11 @@ async function syncCensus(payload, { apiKey = process.env.CENSUS_API_KEY, fetchI
                 const requestId = `${industry.id}:${flow}`;
                 requestedIds.push(requestId);
                 const url = buildCensusUrl({ flow, hsCode, apiKey, range });
-                const rows = await fetchJson(url, fetchImpl);
+                const rows = await fetchJson(url, fetchImpl, {
+                    retries: 2,
+                    retryTransient: true,
+                    ...requestOptions
+                });
                 const parsed = parseCensusRows(rows, { flow, industryId: industry.id, hsCode });
                 if (parsed.length) completedIds.push(requestId);
                 incoming.push(...parsed);

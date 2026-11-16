@@ -12,6 +12,7 @@ const {
     latestPeriodFromText,
     mergeSeries,
     monthList,
+    monthRange,
     nationalConnectorState,
     parseCensusRows,
     parseComtradeRows,
@@ -159,6 +160,105 @@ test('missing Census key leaves prior official series intact', async () => {
     assert.equal(result.skipped, true);
     assert.equal(payload.series.length, 1);
     assert.equal(payload.sources[0].status, 'key_required');
+});
+
+test('Census retries a transient timeout and publishes only after the complete batch succeeds', async () => {
+    const payload = {
+        sources: [{ id: 'us-census-international-trade', status: 'official_current' }],
+        series: []
+    };
+    const latestMonth = monthRange().to;
+    let attempts = 0;
+    const result = await syncCensus(payload, {
+        apiKey: 'test-key',
+        requestOptions: { retryDelayMs: 0 },
+        fetchImpl: async (url) => {
+            attempts += 1;
+            if (attempts === 1) {
+                const error = new Error('temporary timeout');
+                error.name = 'AbortError';
+                throw error;
+            }
+            const exportFlow = String(url).includes('/exports/');
+            const valueField = exportFlow ? 'ALL_VAL_MO' : 'GEN_VAL_MO';
+            return {
+                ok: true,
+                json: async () => [
+                    [valueField, 'time'],
+                    ['100', latestMonth]
+                ]
+            };
+        }
+    });
+    assert.equal(result.ok, true);
+    assert.equal(attempts, 19);
+    assert.equal(result.rows.length, 18);
+    assert.equal(payload.sources[0].status, 'official_current');
+});
+
+test('Census retry exhaustion preserves last-good rows and reports a degraded attempt', async () => {
+    const lastGood = {
+        source_id: 'us-census-international-trade',
+        market: 'US',
+        partner: 'WORLD',
+        industry_id: 'memory',
+        hs_code: '8542',
+        month: '2026-01',
+        imports_value_usd: 10,
+        exports_value_usd: 5,
+        status: 'official'
+    };
+    const payload = {
+        sources: [{ id: 'us-census-international-trade', status: 'official_current' }],
+        series: [lastGood]
+    };
+    let attempts = 0;
+    const result = await syncCensus(payload, {
+        apiKey: 'test-key',
+        requestOptions: { retries: 1, retryDelayMs: 0 },
+        fetchImpl: async () => {
+            attempts += 1;
+            const error = new Error('temporary timeout');
+            error.name = 'AbortError';
+            throw error;
+        }
+    });
+    assert.equal(result.ok, false);
+    assert.equal(attempts, 2);
+    assert.deepEqual(payload.series, [lastGood]);
+    assert.equal(payload.sources[0].status, 'degraded');
+    assert.match(result.error, /temporary timeout/);
+});
+
+test('Census does not retry a permanent HTTP error or replace last-good rows', async () => {
+    const lastGood = {
+        source_id: 'us-census-international-trade',
+        market: 'US',
+        partner: 'WORLD',
+        industry_id: 'memory',
+        hs_code: '8542',
+        month: '2026-01',
+        imports_value_usd: 10,
+        exports_value_usd: 5,
+        status: 'official'
+    };
+    const payload = {
+        sources: [{ id: 'us-census-international-trade', status: 'official_current' }],
+        series: [lastGood]
+    };
+    let attempts = 0;
+    const result = await syncCensus(payload, {
+        apiKey: 'test-key',
+        requestOptions: { retryDelayMs: 0 },
+        fetchImpl: async () => {
+            attempts += 1;
+            return { ok: false, status: 400 };
+        }
+    });
+    assert.equal(result.ok, false);
+    assert.equal(attempts, 1);
+    assert.deepEqual(payload.series, [lastGood]);
+    assert.match(result.error, /HTTP 400/);
 });
 
 test('buildComtradeUrl batches reporters, partners, exact HS codes, and both trade flows', () => {
