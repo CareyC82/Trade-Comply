@@ -1095,14 +1095,54 @@ test('Amazon rechargeable-lithium TIC guidance is scoped, channel-specific and d
     const result = engine.assess(common);
     const rule = result.platformRules.find((item) => item.id === 'amazon-rechargeable-lithium-tic-readiness');
     assert.ok(rule);
-    assert.match(rule.action, /September 30 through November 16, 2026/);
+    assert.match(rule.action, /rollout would be completed by November 16, 2026/);
+    assert.match(rule.action, /Check the exact ASIN in Account Health/);
     assert.match(rule.action, /Amazon-authorized TIC provider/);
     assert.match(rule.action, /Existing test documents may first be submitted/);
     assert.match(rule.action, /new testing is needed only if the provider determines/i);
     assert.match(rule.action, /excludes NiMH, NiCd/);
     assert.match(rule.action, /does not determine TIC approval, insurance applicability or badge status/);
+    assert.equal(rule.source.reviewedAt, '2026-11-16');
     assert.ok(!result.requirements.some((item) => item.id === rule.id));
     assert.ok(!engine.assess({ ...common, platform: 'Shopify / own store' }).platformRules.some((item) => item.id === rule.id));
+});
+
+test('Amazon rechargeable-lithium TIC guidance covers maintained listed categories without treating controllers as consoles', () => {
+    const covered = [
+        'Rechargeable Li-ion Wi-Fi security camera.',
+        'Rechargeable LiPo video doorbell.',
+        'Tablet computer with a rechargeable Li-ion battery.',
+        'Bluetooth headset with a rechargeable Li-ion pouch battery.'
+    ];
+    covered.forEach((description) => {
+        const result = engine.assess({ description, market: 'US', origin: 'CN', platform: 'Amazon', documents: [] });
+        assert.ok(result.platformRules.some((item) => item.id === 'amazon-rechargeable-lithium-tic-readiness'), description);
+    });
+
+    const controller = engine.assess({
+        description: 'Wireless gaming controller with a rechargeable Li-ion pouch battery.',
+        market: 'US', origin: 'CN', platform: 'Amazon', documents: []
+    });
+    assert.ok(!controller.platformRules.some((item) => item.id === 'amazon-rechargeable-lithium-tic-readiness'));
+});
+
+test('TikTok Shop electronics guidance distinguishes seller-role evidence and exact radio model', () => {
+    const result = engine.assess({
+        description: 'Bluetooth earbuds with rechargeable lithium battery',
+        market: 'US', origin: 'CN', platform: 'TikTok Shop', documents: []
+    });
+    const rule = result.platformRules.find((item) => item.id === 'tiktok-electronics');
+    assert.ok(rule);
+    assert.match(rule.action, /Qualification Center/);
+    assert.match(rule.action, /Manufacturers, importers and repackers/);
+    assert.match(rule.action, /Certificate of Conformity/);
+    assert.match(rule.action, /two-year window/);
+    assert.match(rule.action, /Resellers/);
+    assert.match(rule.action, /365-day window/);
+    assert.match(rule.action, /FCC ID correspond to the exact listed model/);
+    assert.match(rule.action, /does not establish legal approval or guarantee listing acceptance/);
+    assert.equal(rule.source.reviewedAt, '2026-11-16');
+    assert.ok(!result.requirements.some((item) => item.id === rule.id));
 });
 
 test('Amazon rechargeable-lithium TIC guidance respects explicit policy exclusions', () => {
