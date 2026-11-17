@@ -24,7 +24,7 @@ test('official artifact promotion queue follows the approved filing-grade order'
 test('admin exposes consumer regulatory lifecycle, last-good status and manual review queue', () => {
     const payload = buildConsumerRegulatoryStatusPayload();
     const html = fs.readFileSync(path.join(__dirname, '..', 'admin.html'), 'utf8');
-    assert.equal(payload.source_count, 52);
+    assert.equal(payload.source_count, 60);
     assert.ok(payload.sources.every((source) => source.content_hash && source.last_good_at));
     assert.match(html, /Consumer regulatory change review/);
     assert.match(html, /No automatic rule changes/);

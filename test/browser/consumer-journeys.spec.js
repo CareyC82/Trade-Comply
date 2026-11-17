@@ -60,29 +60,24 @@ test('child-directed electronics remain specialist-gated in the actionable summa
     await expect(page.locator('.sell-action-summary')).toContainText(/children|specialist/i);
 });
 
-test('unsupported product exits safely and prepares a manual review email', async ({ page }) => {
+test('unsupported product exits safely without creating a manual-review sales funnel', async ({ page }) => {
     await submitProduct(page, 'cotton summer dress');
     await expect(page.locator('#sell-result')).toContainText('Not enough information');
     await expect(page.locator('#sell-result')).toContainText('outside the current electronics');
-    const href = await page.locator('#sell-open-review-email').getAttribute('href');
-    expect(href).toContain('mailto:carey@tracewize.com');
-    expect(decodeURIComponent(href)).toContain('cotton summer dress');
-    await expect(page.locator('.sell-review-cta')).toContainText('Import Compliance Readiness Review');
-    await expect(page.locator('.sell-review-cta')).toContainText('not certification or legal advice');
-    await expect(page.locator('.sell-review-cta')).not.toContainText('RCM is a regulatory compliance marking framework');
+    await expect(page.locator('#sell-open-review-email')).toHaveCount(0);
+    await expect(page.locator('.sell-review-cta')).toContainText('Self-service handoff');
+    await expect(page.locator('.sell-review-cta')).toContainText('does not certify the product');
 });
 
-test('Australia electrical result offers RCM and EESS readiness without certification claims', async ({ page }) => {
+test('Australia electrical result keeps RCM and EESS evidence in the self-service workflow', async ({ page }) => {
     await page.goto('/can-i-sell-it.html');
     await page.getByLabel('Product name or short description').fill('65W GaN wall charger with 100-240V AC input, no battery, for adults');
     await page.getByLabel('Target market').selectOption('AU');
     await page.getByRole('button', { name: 'Show preliminary result' }).click();
-    const review = page.locator('.sell-review-cta');
-    await expect(review).toContainText('RCM & EESS readiness review');
-    await expect(review).toContainText('RCM is a regulatory compliance marking framework');
-    await expect(review).not.toContainText('Get RCM certified by TraceWize');
-    const href = await page.locator('#sell-open-review-email').getAttribute('href');
-    expect(decodeURIComponent(href)).toContain('Single Product Review');
+    await expect(page.locator('#sell-result')).toContainText(/RCM|EESS/);
+    await expect(page.locator('.sell-review-cta')).toContainText('Self-service handoff');
+    await expect(page.locator('.sell-review-cta')).not.toContainText('Get RCM certified by TraceWize');
+    await expect(page.locator('#sell-open-review-email')).toHaveCount(0);
 });
 
 test('Amazon seller tasks remain separate from the GaN charger supplier request', async ({ page }) => {
@@ -103,20 +98,12 @@ test('Amazon seller tasks remain separate from the GaN charger supplier request'
     await expect(page.locator('#sell-advanced-tools')).toContainText('Seller platform status');
 });
 
-test('review request preparation updates completeness and the local email draft without sending data', async ({ page }) => {
+test('declarant handoff stays separate from the supplier request and is locally downloadable', async ({ page }) => {
     await submitProduct(page, 'Bluetooth speaker with rechargeable lithium battery, for adults');
-    await expect(page.locator('#sell-review-completeness-message')).toContainText(/useful details prepared/i);
-    await page.locator('#sell-review-model').fill('SPK-100');
-    await page.locator('#sell-review-product-notes').fill('Public product page: https://example.com/spk-100');
-    await page.locator('#sell-review-wireless').fill('Bluetooth 5.3; no Wi-Fi');
-    await page.locator('#sell-review-battery').fill('BAT-02, 18 Wh');
-    await page.locator('#sell-review-documents').fill('UN38.3 and FCC report');
-    await expect(page.locator('#sell-review-completeness-title')).toHaveText('Ready to review');
-    const href = await page.locator('#sell-open-review-email').getAttribute('href');
-    const draft = decodeURIComponent(href);
-    expect(draft).toContain('Exact model: SPK-100');
-    expect(draft).toContain('Battery: BAT-02, 18 Wh');
-    expect(draft).toContain('Nothing has been submitted automatically');
+    await expect(page.locator('.sell-supplier-request')).toHaveCount(1);
+    await expect(page.locator('.sell-declarant-handoff')).toHaveCount(1);
+    await expect(page.locator('.sell-declarant-handoff')).toContainText('importer, broker or declarant');
+    await expect(page.getByRole('button', { name: 'Download declarant handoff' })).toBeVisible();
 });
 
 test('print view exposes report metadata and technical sources while hiding preparation controls', async ({ page }) => {

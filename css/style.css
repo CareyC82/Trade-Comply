@@ -3851,6 +3851,11 @@ a.hub-core-card--link {
 .sell-check-section-head p { margin: 0; color: var(--color-text-secondary); font-size: .85rem; }
 
 .sell-check-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+.sell-transaction-details { margin-top: 16px; padding: 12px 14px; border: 1px solid #d7e3ee; border-radius: 10px; background: #f8fbfe; }
+.sell-transaction-details summary { display: flex; justify-content: space-between; gap: 12px; cursor: pointer; color: #173c64; }
+.sell-transaction-details summary span { color: #657b8f; font-size: .76rem; font-weight: 600; text-align: right; }
+.sell-transaction-result > h3 { margin: 18px 0 8px; color: #294b69; font-size: .95rem; }
+.sell-self-service-handoff { grid-template-columns: 1fr; background: #173c64; }
 .sell-check-field { display: grid; gap: 7px; color: #344a60; font-size: .83rem; font-weight: 800; }
 .sell-check-field[hidden] { display: none !important; }
 .sell-check-field textarea,
@@ -4072,15 +4077,25 @@ a.hub-core-card--link {
 .sell-product-guidance p, .sell-source-freshness p { margin: 7px 0 0; font-size: .86rem; line-height: 1.5; }
 .sell-source-freshness strong { font-size: .95rem; }
 .sell-source-freshness--review_overdue, .sell-source-freshness--review_metadata_missing, .sell-source-freshness--no_linked_source { border-color: #d7c69f; background: #fffaf0; color: #73520e; }
-.sell-answer-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
-.sell-answer-summary article { display: grid; gap: 5px; padding: 13px 15px; border: 1px solid #dce5ed; border-radius: 10px; background: #fff; }
-.sell-answer-summary span { color: #71808e; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
-.sell-answer-summary strong { color: #173c64; font-size: .88rem; line-height: 1.35; }
+.sell-answer-summary, .sell-transaction-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.sell-answer-summary article, .sell-transaction-summary article { display: grid; gap: 5px; padding: 13px 15px; border: 1px solid #dce5ed; border-radius: 10px; background: #fff; }
+.sell-answer-summary span, .sell-transaction-summary span { color: #71808e; font-size: .7rem; font-weight: 900; text-transform: uppercase; }
+.sell-answer-summary strong, .sell-transaction-summary strong { color: #173c64; font-size: .88rem; line-height: 1.35; }
 .sell-decision-trace { margin-top: 12px; padding: 14px 16px; border: 1px solid #dce5ed; border-radius: 10px; background: #f8fafc; }
 .sell-decision-trace > span { color: #657789; font-size: .72rem; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
 .sell-decision-trace ol { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 19px; }
 .sell-decision-trace li { color: #40566b; font-size: .8rem; line-height: 1.45; }
 .sell-supplier-request { display: grid; gap: 12px; margin-top: 14px; padding: 18px 20px; border: 1px solid #e2c884; border-left: 6px solid #bd7b08; border-radius: 12px; background: #fffaf0; }
+.sell-declarant-handoff { display: grid; gap: 12px; margin-top: 14px; padding: 18px 20px; border: 1px solid #b9d1e7; border-left: 6px solid #256a9d; border-radius: 12px; background: #f5faff; }
+.sell-declarant-handoff--complete { border-color: #abd8c2; border-left-color: #27845a; background: #f6fcf8; }
+.sell-declarant-handoff > div > span { color: #256a9d; font-size: .7rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.sell-declarant-handoff h2 { margin: 4px 0; color: #173c64; font-size: 1.08rem; }
+.sell-declarant-handoff p { margin: 0; color: #667789; font-size: .82rem; line-height: 1.45; }
+.sell-declarant-handoff ul { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.sell-declarant-handoff li { display: grid; grid-template-columns: minmax(150px, .7fr) 1.3fr; gap: 12px; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,.8); }
+.sell-declarant-handoff li strong { color: #294b69; font-size: .82rem; }
+.sell-declarant-handoff li span { color: #6d7c8a; font-size: .78rem; line-height: 1.4; }
+.sell-declarant-handoff button { justify-self: start; border: 0; border-radius: 8px; background: #173c64; color: #fff; padding: 10px 15px; font-weight: 800; cursor: pointer; }
 .sell-supplier-request--complete { border-color: #abd8c2; border-left-color: #27845a; background: #f6fcf8; }
 .sell-supplier-request > div > span { color: #84671f; font-size: .7rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
 .sell-supplier-request h2 { margin: 4px 0; color: #173c64; font-size: 1.08rem; }
@@ -4215,7 +4230,7 @@ a.hub-core-card--link {
     .sell-check-card, .sell-result-panel { padding: 16px; }
     .sell-tariff-selector select { font-size: 16px; }
     .sell-check-grid, .sell-question-grid, .sell-documents > div, .sell-cost-grid, .sell-market-comparison > div,
-    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-core-decisions,
+    .sell-readiness-grid, .sell-requirement-grid, .sell-economics-grid, .sell-answer-summary, .sell-transaction-summary, .sell-core-decisions,
     .sell-commercial-answer, .sell-commercial-metrics { grid-template-columns: 1fr; }
     .sell-review-cta { grid-template-columns: 1fr; }
     .sell-review-scope > div, .sell-review-scope > .sell-review-service-options, .sell-review-preparation > div, .sell-evidence-matrix, .sell-review-summary, .sell-review-brief-foot { grid-template-columns: 1fr; }
@@ -4223,7 +4238,7 @@ a.hub-core-card--link {
     .sell-review-actions button, .sell-review-actions a { width: 100%; box-sizing: border-box; }
     .sell-verdict, .sell-gap-list li { align-items: flex-start; flex-direction: column; }
     .sell-comparison-heading { flex-direction: column; }
-    .sell-supplier-request li { grid-template-columns: 1fr; }
+    .sell-supplier-request li, .sell-declarant-handoff li { grid-template-columns: 1fr; }
     .sell-gap-list span { text-align: left; }
     .sell-history-list article { align-items: flex-start; flex-direction: column; }
     .sell-account-form { grid-template-columns: 1fr; }

@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Can I Sell It? | TraceWize</title>
+    <title>Can I Sell It? Product, Customs & Market Readiness | TraceWize</title>
+    <meta name="description" content="Compare product compliance, customs routes, importer responsibilities, supplier evidence and landed-cost signals for the US, EU, Australia, New Zealand, Japan and Singapore.">
+    <link rel="canonical" href="https://tracewize.com/can-i-sell-it.html">
+    <meta property="og:title" content="Can I Sell It? | TraceWize">
+    <meta property="og:description" content="A self-service product, customs-route and evidence readiness check for cross-border sellers.">
+    <meta property="og:url" content="https://tracewize.com/can-i-sell-it.html">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="css/style.css?v=20260817-electronics-batch1">
 </head>
 <body class="sell-check-page-body">
@@ -16,7 +22,7 @@
                 <div class="sell-check-scope"><strong>For consumer electronics, connected devices, powered products and battery-containing products.</strong> Maintained market coverage includes the United States, European Union, Australia and New Zealand. Japan and Singapore results identify product-level coverage limits.</div>
                 <div class="sell-check-scope"><strong>No account required.</strong> Small Parcel Check, supplier files and commercial figures stay optional.</div>
             </div>
-            <div class="sell-review-path" aria-label="Can I Sell It service path"><strong>Start free, then review only when needed.</strong><span>Free Product Pre-Screen → Import Compliance Readiness Review → Product Range Review</span></div>
+            <div class="sell-review-path" aria-label="Can I Sell It self-service path"><strong>Prepare before goods move.</strong><span>Product facts → transaction route → evidence gaps → declarant handoff</span></div>
             <a class="payment-service-link" href="can-i-pay.html"><strong>Preparing a cross-border payment?</strong><span>Continue to Can I Pay / Get Paid? →</span></a>
         </header>
 
@@ -45,9 +51,15 @@
                 </div>
                 <div class="sell-check-grid">
                     <label class="sell-check-field"><span>Made in</span><select id="sell-origin"><option value="CN">China</option><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="AU">Australia</option><option value="NZ">New Zealand</option><option value="OTHER">Other</option></select></label>
+                    <label class="sell-check-field"><span>Ships from</span><select id="sell-ships-from"><option value="CN">China</option><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="AU">Australia</option><option value="NZ">New Zealand</option><option value="OTHER">Other</option></select></label>
                     <label class="sell-check-field"><span>Assessment scope</span><select id="sell-market-mode"><option value="single">Single destination</option><option value="compare">Compare 2–4 markets</option></select></label>
                     <label class="sell-check-field"><span>Target market</span><select id="sell-market"><option value="US">United States</option><option value="EU">European Union</option><option value="JP">Japan</option><option value="SG">Singapore</option><option value="AU">Australia</option><option value="NZ">New Zealand</option><option value="ANZ">Australia + New Zealand comparison</option></select></label>
                     <label class="sell-check-field"><span>Sales channel</span><select id="sell-platform"><option>Amazon</option><option>TikTok Shop</option><option>Shopify / own store</option><option>Other marketplace</option></select></label>
+                    <label class="sell-check-field"><span>Customer type</span><select id="sell-customer-type"><option value="B2C">Consumer (B2C)</option><option value="B2B">Business (B2B)</option><option value="unknown">Not confirmed</option></select></label>
+                    <label class="sell-check-field"><span>Fulfilment route</span><select id="sell-fulfilment"><option value="direct">Direct cross-border shipment</option><option value="local_warehouse">Own / third-party local warehouse</option><option value="platform_warehouse">Marketplace fulfilment warehouse</option><option value="distributor">Local distributor / wholesaler</option><option value="unknown">Not confirmed</option></select></label>
+                    <label class="sell-check-field"><span>Order / consignment value</span><input id="sell-consignment-value" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Declared value"></label>
+                    <label class="sell-check-field"><span>Value currency</span><select id="sell-consignment-currency"><option>USD</option><option>EUR</option><option>AUD</option><option>NZD</option><option>JPY</option><option>SGD</option><option>CNY</option></select></label>
+                    <label class="sell-check-field"><span>Importer / declarant route</span><select id="sell-importer-route"><option value="unknown">Not confirmed</option><option value="seller">Seller / foreign business</option><option value="buyer">Customer / buyer</option><option value="broker">Customs broker / representative</option><option value="platform">Marketplace / IOSS intermediary</option><option value="distributor">Local distributor</option></select></label>
                 </div>
                 <fieldset id="sell-market-comparison" class="sell-market-comparison" hidden>
                     <legend>Markets to compare</legend>
@@ -69,6 +81,18 @@
                     <label id="sell-exact-hs-nz-field" class="sell-check-field" hidden><span>New Zealand tariff item (optional)</span><input id="sell-exact-hs-nz" inputmode="numeric" maxlength="12" placeholder="8 digits"></label>
                 </div>
                 <p class="sell-panel-note">Use the destination’s exact tariff code only when already confirmed. A product-family candidate is not treated as filing-grade.</p>
+                <details class="sell-transaction-details">
+                    <summary><strong>Shipment and filing facts</strong><span>Needed for EU PID, US entry, Australian smart-device and declarant handoff checks</span></summary>
+                    <div class="sell-check-grid">
+                        <label class="sell-check-field"><span>Merchant SKU / M-PID</span><input id="sell-merchant-pid" maxlength="80" placeholder="Your listing or SKU reference"></label>
+                        <label class="sell-check-field"><span>Manufacturer model / NS-PID</span><input id="sell-manufacturer-pid" maxlength="80" placeholder="Factory model or part number"></label>
+                        <label class="sell-check-field"><span>EAN / UPC / ISBN / S-PID</span><input id="sell-standard-pid" maxlength="40" placeholder="Leave blank only if none exists"></label>
+                        <label class="sell-check-field"><span>Product manufactured on</span><input id="sell-manufactured-on" type="date"></label>
+                        <label class="sell-check-field"><span>US CPSC filing route</span><select id="sell-cpsc-route"><option value="unknown">Not confirmed</option><option value="full">Full PGA Message Set</option><option value="reference">Reference PGA Message Set</option><option value="disclaim">Valid Disclaim expected</option><option value="not_applicable">Product not subject to certification</option></select></label>
+                        <label class="sell-check-field"><span>Number of product lines / PID items</span><input id="sell-line-items" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+                    </div>
+                    <p class="sell-panel-note">Do not invent placeholder identifiers. Confirm exact values with the manufacturer and the party transmitting the customs declaration.</p>
+                </details>
                 <button class="sell-check-primary" type="submit">Show preliminary result</button>
                 <div id="sell-check-error" class="post-entry-error" hidden role="alert"></div>
             </section>

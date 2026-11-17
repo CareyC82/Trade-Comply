@@ -179,21 +179,15 @@ test('non-electronic launch exclusions never inherit an electronics sellability 
     });
 });
 
-test('compliance readiness review CTA copies only a non-confidential local summary', () => {
+test('result uses a self-service declarant handoff instead of a manual-review CTA', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
-    assert.match(script, /Import Compliance Readiness Review/);
-    assert.match(script, /Single Product Review/);
-    assert.match(script, /Supplier Document Review/);
-    assert.match(script, /Product Range Review/);
-    assert.match(script, /Prepare \/ Copy request/);
-    assert.match(script, /Nothing is uploaded or sent automatically/);
+    assert.match(script, /Self-service handoff/);
+    assert.match(script, /Transaction and declarant route/);
+    assert.match(script, /does not certify the product/);
+    assert.doesNotMatch(script, /Prepare \/ Copy request/);
     const library = fs.readFileSync(path.join(__dirname, '..', 'lib', 'can-i-sell-it.js'), 'utf8');
     assert.match(library, /intentionally excludes supplier identity, pricing and uploaded files/);
     assert.match(library, /does not issue RCM approvals, certifications or registrations/);
-    assert.match(script, /carey@tracewize\.com/);
-    assert.match(script, /mailto:/);
-    assert.match(script, /reviewContact\(\)\.mailto/);
-    assert.match(script, /inspect and send it yourself in your email app/i);
     assert.doesNotMatch(script, /api\(['"]\/review/);
 });
 
@@ -426,6 +420,63 @@ test('ANZ landed-cost calculations use separate GST, valuation and NZ levy treat
     assert.equal(nz.customsValue, 1500);
     assert.equal(nz.borderFeeBeforeTax, 51.81);
     assert.equal(nz.importTax, (1500 + 100 + 20 + 51.81) * 0.15);
+});
+
+test('transaction route triggers EU low-value PID handoff and item-based fees', () => {
+    const input = {
+        description: 'Bluetooth speaker with rechargeable lithium battery',
+        origin: 'CN', shipsFrom: 'CN', market: 'EU', platform: 'Shopify / own store',
+        customerType: 'B2C', fulfilment: 'direct', consignmentValue: 120, consignmentCurrency: 'EUR',
+        importerRoute: 'platform', merchantPid: 'SKU-1', manufacturerPid: 'SPK-1', standardPid: '1234567890123', lineItems: 2,
+        assessmentMode: 'quick', blockingQuestionKeys: [],
+        costs: { currency: 'EUR', quantity: 1, purchaseUnit: 100, saleUnit: 180, dutyRate: 0, importTaxRate: 20 }
+    };
+    const result = engine.assess(input);
+    assert.ok(result.routeRequirements.some((item) => item.id === 'eu_pid'));
+    assert.ok(result.routeRequirements.some((item) => item.id === 'eu_low_value_route'));
+    assert.equal(result.economics.feeBreakdown.euTemporaryDuty, 6);
+    assert.equal(result.economics.feeBreakdown.euHandlingFee, 4);
+    assert.equal(result.transactionSummary.manufacturerPid, 'SPK-1');
+    assert.ok(result.supplierRequest.items.some((item) => /C128|manufacturer model/i.test(item.document)));
+});
+
+test('US route separates current CPSC filing from future foreign IOR transition', () => {
+    const result = engine.assess({
+        description: "Children's electronic camera with Wi-Fi and rechargeable battery",
+        origin: 'CN', shipsFrom: 'CN', market: 'US', platform: 'Amazon',
+        customerType: 'B2C', fulfilment: 'direct', consignmentValue: 300, consignmentCurrency: 'USD',
+        importerRoute: 'seller', cpscRoute: 'reference', assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    const cpsc = result.routeRequirements.find((item) => item.id === 'us_cpsc_efiling');
+    const ior = result.routeRequirements.find((item) => item.id === 'us_foreign_ior');
+    assert.equal(cpsc.requirementClass, 'mandatory');
+    assert.equal(ior.requirementClass, 'future');
+    assert.match(ior.reason, /5 January 2027/);
+});
+
+test('Australia smart-device screen uses manufacture date and NZ calculates low-value levy', () => {
+    const au = engine.assess({
+        description: 'Wi-Fi security camera with microphone', origin: 'CN', shipsFrom: 'CN', market: 'AU', platform: 'Amazon',
+        customerType: 'B2C', fulfilment: 'direct', manufacturedOn: '2026-03-04', assessmentMode: 'quick', blockingQuestionKeys: []
+    });
+    assert.match(au.routeRequirements.find((item) => item.id === 'au_smart_device').reason, /on or after/);
+    const nz = engine.estimateEconomics({
+        currency: 'NZD', quantity: 1, purchaseUnit: 500, saleUnit: 800, shippingMode: 'air', consignmentValue: 500
+    }, { rate: 0, importTaxBenchmarkRate: 0.15 }, 'NZ');
+    assert.equal(nz.borderFeeBeforeTax, 2.21);
+    assert.match(nz.borderFeeStatus, /low-value air/);
+});
+
+test('consumer form exposes transaction facts and self-service handoff', () => {
+    const page = fs.readFileSync(path.join(__dirname, '..', 'can-i-sell-it.html'), 'utf8');
+    const script = fs.readFileSync(path.join(__dirname, '..', 'js', 'can-i-sell-it-page.js'), 'utf8');
+    for (const id of ['sell-ships-from', 'sell-customer-type', 'sell-fulfilment', 'sell-consignment-value', 'sell-importer-route', 'sell-merchant-pid', 'sell-manufacturer-pid', 'sell-manufactured-on', 'sell-cpsc-route']) {
+        assert.match(page, new RegExp(`id="${id}"`));
+        assert.match(script, new RegExp(id));
+    }
+    assert.match(script, /Transaction and declarant route/);
+    assert.match(script, /Self-service handoff/);
+    assert.doesNotMatch(page, /Import Compliance Readiness Review → Product Range Review/);
 });
 
 test('Australia plus New Zealand returns two independent commercial estimates', () => {

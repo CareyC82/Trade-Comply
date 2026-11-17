@@ -14,6 +14,16 @@ function supplierRequestFilename(productLabel = 'product', market = '') {
     return `${safe || 'supplier-document-request'}.txt`;
 }
 
+function declarantHandoffText(handoff = {}) {
+    return `${handoff.subject || 'Declarant handoff'}\n\n${handoff.message || ''}`.trim();
+}
+
+function declarantHandoffFilename(productLabel = 'product', market = '') {
+    const safe = `${productLabel}-${market || 'market'}-declarant-handoff`
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return `${safe || 'declarant-handoff'}.txt`;
+}
+
 function complianceReportId(input = {}) {
     const value = [input.description, input.origin, input.market, input.platform].join('|');
     let hash = 2166136261;
@@ -503,6 +513,32 @@ function bootstrapCanISellItPage() {
             high_risk: 'Specialist review required', information_missing: 'More facts needed',
             conditional: 'Conditional path', feasible_precheck: 'No blocking pre-check gap'
         };
+        const transaction = assessment.transactionSummary || {};
+        const routeRequirements = assessment.routeRequirements || [];
+        const routeStatus = routeRequirements.length
+            ? routeRequirements.map((item) => `<article class="sell-requirement sell-requirement--${escapeHtml(item.requirementClass || 'mandatory')}"><span>${escapeHtml(requirementLabel(item))}</span><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.reason)}</p>${renderSources(item)}</article>`).join('')
+            : '<article class="sell-requirement"><span>No additional route rule triggered</span><p>Keep the shipment facts with the assessment and re-check them if the fulfilment route, customer type, value or declarant changes.</p></article>';
+        const identifierRows = [
+            ['Merchant SKU / M-PID', transaction.merchantPid],
+            ['Manufacturer model / NS-PID', transaction.manufacturerPid],
+            ['Standard identifier / S-PID', transaction.standardPid]
+        ].map(([label, value]) => `<li><strong>${escapeHtml(label)}</strong><span>${value ? escapeHtml(value) : 'Not provided — confirm before a route requires it'}</span></li>`).join('');
+        const transactionPanel = `
+            <section class="sell-result-panel sell-transaction-result" aria-label="Transaction and declarant route">
+                <h2>Transaction and declarant route</h2>
+                <div class="sell-transaction-summary">
+                    <article><span>Ships from</span><strong>${escapeHtml(transaction.shipsFrom || 'Not confirmed')}</strong></article>
+                    <article><span>Customer</span><strong>${escapeHtml(transaction.customerType || 'Not confirmed')}</strong></article>
+                    <article><span>Fulfilment</span><strong>${escapeHtml(String(transaction.fulfilment || 'Not confirmed').replaceAll('_', ' '))}</strong></article>
+                    <article><span>Consignment value</span><strong>${transaction.consignmentValue === null ? 'Not provided' : `${escapeHtml(transaction.consignmentCurrency)} ${escapeHtml(transaction.consignmentValue)}`}</strong></article>
+                    <article><span>Importer / declarant</span><strong>${escapeHtml(String(transaction.importerRoute || 'Not confirmed').replaceAll('_', ' '))}</strong></article>
+                    <article><span>Product lines</span><strong>${escapeHtml(transaction.lineItems || 1)}</strong></article>
+                </div>
+                <div class="sell-requirement-grid">${routeStatus}</div>
+                <h3>Product identifiers and handoff facts</h3>
+                <ul class="sell-gap-list">${identifierRows}</ul>
+                <p class="sell-panel-note">These fields describe this transaction, not permanent approval. Re-run the check when the route, customer, value, importer, declarant or product identifiers change.</p>
+            </section>`;
         const multiMarketPanel = assessment.multiMarketComparison ? `
             <section class="sell-result-panel sell-market-comparison-result" aria-label="Multi-market comparison">
                 <div class="sell-comparison-heading"><div><span>Multi-market comparison</span><h2>${assessment.multiMarketComparison.markets.map((market) => escapeHtml(marketLabels[market] || market)).join(' · ')}</h2></div><p>Each destination is assessed independently. A shared report may reduce duplicate testing, but it does not transfer a local approval, registration or responsible-party duty.</p></div>
@@ -554,6 +590,10 @@ function bootstrapCanISellItPage() {
         const supplierRequestItems = supplierRequest.items.length
             ? `<ul>${supplierRequest.items.map((item) => `<li><strong>${escapeHtml(item.document)}</strong><span>${escapeHtml(item.reason)}</span></li>`).join('')}</ul>`
             : '<p>All applicable uploaded evidence passed the automated reference and completeness checks.</p>';
+        const declarantHandoff = assessment.declarantHandoff || { items: [], complete: true, message: '' };
+        const declarantHandoffItems = declarantHandoff.items.length
+            ? `<ul>${declarantHandoff.items.map((item) => `<li><strong>${escapeHtml(item.document)}</strong><span>${escapeHtml(item.route)}</span></li>`).join('')}</ul>`
+            : '<p>No additional route-specific document was triggered. Re-check when transaction facts change.</p>';
         const platformCards = renderPlatformCards(assessment);
         const economicsCard = (value, title = 'Landed cost and margin estimate') => value ? `
             <section class="sell-result-panel"><h2>${escapeHtml(title)}</h2>
@@ -657,6 +697,7 @@ function bootstrapCanISellItPage() {
                 <article><span>Sales channel</span><strong id="sell-summary-platform">${escapeHtml(currentInput.platform)}</strong></article>
                 <article><span>Can the battery be shipped?</span><strong>${escapeHtml(assessment.shipping)}</strong></article>
             </div>
+            ${transactionPanel}
             ${multiMarketPanel}
             ${anzPanel}
             <section class="sell-result-panel sell-action-summary" aria-label="Your next three actions">
@@ -676,10 +717,17 @@ function bootstrapCanISellItPage() {
                 <button type="button" id="sell-download-supplier-request">Download supplier request</button>
                 <p id="sell-copy-status" class="sell-copy-status" aria-live="polite"></p>
             </section>
+            <section class="sell-declarant-handoff ${declarantHandoff.complete ? 'sell-declarant-handoff--complete' : ''}">
+                <div><span>What should I hand to the importer, broker or declarant?</span><h2>${declarantHandoff.complete ? 'No additional route pack triggered' : `${declarantHandoff.items.length} filing fact${declarantHandoff.items.length === 1 ? '' : 's'} or document${declarantHandoff.items.length === 1 ? '' : 's'} to confirm`}</h2><p>This pack is separate from the supplier request. The filing party must confirm it before submission.</p></div>
+                ${declarantHandoffItems}
+                <button type="button" id="sell-copy-declarant-handoff">Copy declarant handoff</button>
+                <button type="button" id="sell-download-declarant-handoff">Download declarant handoff</button>
+                <p id="sell-declarant-status" class="sell-copy-status" aria-live="polite"></p>
+            </section>
             ${commercialPanel}
             <section class="sell-payment-next"><div><span>After product readiness</span><h2>Check the transaction and payment route</h2><p>Market-access screening does not confirm whether the payer, payee, documents and payment route are ready for bank submission.</p></div><a href="can-i-pay.html">Continue to Can I Pay / Get Paid? →</a></section>
             <section class="sell-result-panel sell-review-brief"><header class="sell-report-metadata"><strong>TraceWize</strong><span>Report ${escapeHtml(reportId)}</span><span>Generated ${escapeHtml(reportGeneratedAt)}</span><span>${escapeHtml(currentInput.origin)} → ${escapeHtml(marketDisplay())} · ${escapeHtml(currentInput.platform)}</span></header><div class="sell-review-brief-head"><div><span>Preliminary compliance readiness report</span><h2>Current review status</h2><p>Screening output only — not a certification, approval or legal opinion.</p></div><strong class="sell-ragu sell-ragu--${escapeHtml(reviewBrief.overall.toLowerCase())}">${escapeHtml(reviewBrief.overall)}</strong></div><div class="sell-review-summary"><section><strong>Product scope · ${escapeHtml(reviewBrief.scope.status)}</strong><p>${escapeHtml(reviewBrief.scope.detail)}</p></section><section><strong>Regulatory path · ${escapeHtml(reviewBrief.path.status)}</strong><p>${escapeHtml(reviewBrief.path.detail)}</p></section></div><p class="sell-panel-note">Not provided means no supplier file was supplied. Provided — not verified means a file exists, but it was not linked to the current finished product, configuration or production batch.</p><ul class="sell-evidence-matrix">${evidenceMatrix}</ul><div class="sell-review-brief-foot"><section><strong>Next actions</strong><ol>${reviewActions}</ol></section><section><strong>Professional confirmation</strong><ul>${professionalConfirmation}</ul></section><section><strong>Cost and timing · ${escapeHtml(reviewBrief.costTiming.status)}</strong><p>${escapeHtml(reviewBrief.costTiming.detail)}</p></section></div></section>
-            <section class="sell-review-cta" aria-label="Compliance Review Services"><div><span>Recommended human review · ${escapeHtml(service.service)}</span><h2>${escapeHtml(service.title)}</h2><p>${escapeHtml(service.reason)}</p>${service.marketMessage ? `<p class="sell-review-market-message">${escapeHtml(service.marketMessage)}</p>` : ''}<p>Prepare a non-confidential request, then inspect and send it yourself in your email app. Nothing is uploaded or sent automatically. If the draft does not open, email <a href="mailto:carey@tracewize.com">carey@tracewize.com</a>.</p></div><div class="sell-review-actions"><button type="button" id="sell-copy-review-request">Prepare / Copy request</button><a id="sell-open-review-email" href="#">Open email draft</a></div><details class="sell-review-preparation" open><summary>Prepare the review request</summary><p>Optional. Enter non-confidential technical facts only. Do not enter supplier identity, pricing or private document content.</p><div><label>Exact model<input id="sell-review-model" maxlength="80" placeholder="e.g. SPK-100"></label><label>Product or image notes<input id="sell-review-product-notes" maxlength="500" placeholder="Non-confidential description or public product link"></label><label>Power and adaptor<input id="sell-review-power" maxlength="200" placeholder="e.g. USB-C 5V; adaptor not included"></label><label>Wireless functions<input id="sell-review-wireless" maxlength="200" placeholder="e.g. Bluetooth 5.3; no Wi-Fi"></label><label>Battery<input id="sell-review-battery" maxlength="200" placeholder="e.g. Li-ion pack BAT-02, 18 Wh"></label><label>Available document types<input id="sell-review-documents" maxlength="300" placeholder="e.g. FCC report, UN38.3, DoC"></label><label>Number of SKUs<input id="sell-review-sku-count" type="number" min="1" max="500" inputmode="numeric"></label></div></details><details class="sell-review-scope"><summary>What the review covers</summary><div class="sell-review-service-options"><section><strong>Single Product Review</strong><p>One exact model and destination market.</p></section><section><strong>Supplier Document Review</strong><p>Model, manufacturer, report, declaration, battery, adaptor and wireless-module consistency.</p></section><section><strong>Product Range Review</strong><p>Several related SKUs or a planned purchase range.</p></section></div><div><section><strong>Prepare</strong><ul>${serviceInputs}</ul></section><section><strong>Review output</strong><ul>${serviceDeliverables}</ul></section></div><p>${escapeHtml(service.boundary)}</p>${service.marketMessage ? '<p><strong>Australia:</strong> RCM is a regulatory compliance marking framework, not a certificate issued by TraceWize.</p>' : ''}</details><p id="sell-review-status" aria-live="polite"></p></section>
+            <section class="sell-review-cta sell-self-service-handoff" aria-label="Self-service handoff"><div><span>Self-service handoff</span><h2>Prepare the evidence, then confirm with the party filing or placing the product on the market</h2><p>Use the route requirements, supplier request and printable report above. TraceWize does not certify the product, file the entry, appoint a responsible party or guarantee clearance.</p></div></section>
             <details class="sell-result-details"><summary>Technical details, official sources and document checklist</summary>
                 <section class="sell-source-freshness sell-source-freshness--${escapeHtml(freshness.status)}"><span>Official-source maintenance</span><strong>${escapeHtml(freshnessLabel)}</strong><p>${freshness.sourceCount ? `${escapeHtml(freshness.sourceCount)} linked source${freshness.sourceCount === 1 ? '' : 's'} · reviewed through ${escapeHtml(freshness.reviewedThrough || 'date missing')} · confidence ${escapeHtml(freshness.confidenceLevels.join(', ') || 'missing')}${freshness.degradedCount ? ` · ${escapeHtml(freshness.degradedCount)} source refresh unavailable; last-good retained${freshness.lastGoodThrough ? ` from ${escapeHtml(freshness.lastGoodThrough)}` : ''}` : ''}${freshness.futureCount ? ` · ${escapeHtml(freshness.futureCount)} future requirement` : ''}${freshness.pendingEffectiveDateCount ? ` · ${escapeHtml(freshness.pendingEffectiveDateCount)} effective date pending` : ''}` : 'No official source is linked to the selected requirements. Treat this result as a checklist and request specialist review.'}</p></section>
                 ${economicsPanel}
@@ -758,6 +806,27 @@ function bootstrapCanISellItPage() {
             link.download = supplierRequestFilename(assessment.product.label, marketDisplay());
             document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
             document.getElementById('sell-copy-status').textContent = 'Downloaded locally. No supplier or pricing data was uploaded.';
+        });
+        document.getElementById('sell-copy-declarant-handoff')?.addEventListener('click', async () => {
+            const status = document.getElementById('sell-declarant-status');
+            const text = declarantHandoffText(declarantHandoff);
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch {
+                const textarea = document.createElement('textarea');
+                textarea.value = text; document.body.appendChild(textarea); textarea.select();
+                document.execCommand('copy'); textarea.remove();
+            }
+            status.textContent = 'Copied. Send it to the importer, broker or declarant for confirmation.';
+        });
+        document.getElementById('sell-download-declarant-handoff')?.addEventListener('click', () => {
+            const blob = new Blob([declarantHandoffText(declarantHandoff)], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = declarantHandoffFilename(assessment.product.label, marketDisplay());
+            document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+            document.getElementById('sell-declarant-status').textContent = 'Downloaded locally.';
         });
         const reviewDetails = () => ({
             exactModel: document.getElementById('sell-review-model')?.value || '',
@@ -866,9 +935,21 @@ function bootstrapCanISellItPage() {
         currentInput = {
             description,
             origin: document.getElementById('sell-origin').value,
+            shipsFrom: document.getElementById('sell-ships-from').value,
             market,
             markets,
             platform: document.getElementById('sell-platform').value,
+            customerType: document.getElementById('sell-customer-type').value,
+            fulfilment: document.getElementById('sell-fulfilment').value,
+            consignmentValue: document.getElementById('sell-consignment-value').value,
+            consignmentCurrency: document.getElementById('sell-consignment-currency').value,
+            importerRoute: document.getElementById('sell-importer-route').value,
+            merchantPid: document.getElementById('sell-merchant-pid').value.trim(),
+            manufacturerPid: document.getElementById('sell-manufacturer-pid').value.trim(),
+            standardPid: document.getElementById('sell-standard-pid').value.trim(),
+            manufacturedOn: document.getElementById('sell-manufactured-on').value,
+            cpscRoute: document.getElementById('sell-cpsc-route').value,
+            lineItems: document.getElementById('sell-line-items').value,
             exactHsCode: normalizeExactHs(document.getElementById('sell-exact-hs').value),
             exactHsCodeAu: normalizeExactHs(document.getElementById('sell-exact-hs-au').value),
             exactHsCodeNz: normalizeExactHs(document.getElementById('sell-exact-hs-nz').value),
@@ -1124,5 +1205,5 @@ function bootstrapCanISellItPage() {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { dedupeQuestionKeys, supplierRequestText, supplierRequestFilename };
+    module.exports = { dedupeQuestionKeys, supplierRequestText, supplierRequestFilename, declarantHandoffText, declarantHandoffFilename };
 }
