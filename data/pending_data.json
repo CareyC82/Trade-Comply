@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-11-15T22:36:33.144Z",
+  "updated_at": "2026-11-17T01:43:43.320Z",
   "items": [
     {
       "intercepted_at": "2026-09-10T20:34:31.606Z",
@@ -3910,6 +3910,121 @@
         "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
         "pipeline_source": "bis",
         "fetched_at": "2026-11-15T22:36:28.513385+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-11-17T01:43:43.320Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "7606.12 / 7616.99 (aluminum enclosures, heat sinks); 7326.90 (steel-aluminum assemblies)",
+        "direction": "export",
+        "country": "EU",
+        "risk_level": "High",
+        "source": "Provincial Commerce Department fair-trade early warning on EU CBAM reporting obligations for aluminum-containing electronics enclosures and heat sinks",
+        "content_en": "A provincial fair-trade bureau has issued an early warning that EU Carbon Border Adjustment Mechanism (CBAM) reporting obligations may apply to China-origin electronics enclosures and heat sinks whose aluminum content exceeds the applicable threshold. Exporters of aluminum and steel-aluminum assemblies should confirm CN/TARIC classification, calculate embedded emissions, and verify whether the EU importer is a registered CBAM declarant. Non-reporting or inaccurate embedded-emission data can trigger penalties at the EU border and disrupt customs clearance. Coordinate with EU buyers on default vs. actual emission values and retain supplier-level emissions evidence.",
+        "content_zh": "某省公平贸易机构发布预警：含铝量超过适用阈值的中国原产电子机壳及散热器，可能适用欧盟碳边境调节机制（CBAM）申报义务。铝制品及钢铝组合件出口商应确认CN/TARIC归类、核算隐含排放，并核实欧盟进口商是否为已登记的CBAM申报人。未申报或隐含排放数据不实可能在欧盟边境引发处罚并影响清关。应与欧盟买方就默认值与实际排放值进行协调，并保留供应商层面的排放证据。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "Confirm CN/TARIC classification",
+            "desc": "Verify HS/CN and EU TARIC codes for aluminum enclosures and heat sinks; confirm whether the goods fall within CBAM-covered CN codes and the aluminum content threshold."
+          },
+          {
+            "phase": "技术核查",
+            "task": "Calculate embedded emissions",
+            "desc": "Compute embedded emissions per tonne of aluminum/steel content using actual or default values; document electricity and precursor inputs from upstream smelters."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Verify EU importer CBAM status",
+            "desc": "Confirm the EU buyer is a registered CBAM declarant and agree on data-sharing for quarterly/annual reports; align on default versus actual emission values."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Assemble emissions evidence pack",
+            "desc": "Retain supplier-level emissions declarations, production route data, and verification records to support CBAM reporting and potential audits."
+          },
+          {
+            "phase": "单证准备",
+            "task": "China export declaration baseline",
+            "desc": "Prepare commercial invoice, packing list, contract, and export license slots; ensure declared aluminum content matches CBAM data."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Dual-use & encryption screening",
+            "desc": "Run China export control and cryptography reviews for wireless/secure computing features in the enclosures."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Monitor CBAM transitional rules",
+            "desc": "Track EU CBAM transitional reporting deadlines and any threshold changes; brief EU buyers and adjust contracts for carbon-cost pass-through."
+          }
+        ],
+        "source_url": "https://www.mofcom.gov.cn/",
+        "pipeline_source": "ccpit",
+        "fetched_at": "2026-11-17T01:43:13.208811+00:00"
+      }
+    },
+    {
+      "intercepted_at": "2026-11-17T01:43:43.320Z",
+      "source": "global-compliance-pipeline",
+      "meta": {
+        "from": "python-guardrail-report"
+      },
+      "kind": "risk_signal",
+      "reasons": [
+        "hs_code is missing or invalid"
+      ],
+      "raw": {
+        "hs_code": "9302.00 / 9303.20 / 9303.30",
+        "direction": "export",
+        "country": "US",
+        "risk_level": "Medium",
+        "source": "US BIS - Department of Commerce Rescinds Biden-Era Firearms Rule, Restoring Common Sense to Export Controls on Civilian Firearms",
+        "content_en": "BIS has rescinded the Biden-era firearms export rule, easing licensing and classification treatment for civilian firearms and ammunition under the Export Administration Regulations. Exporters of sporting shotguns, rifles, pistols and related parts should re-verify ECCN/Commerce Control List classification, license exception eligibility, and country-based restrictions before shipment. US HTS alignment (Chapter 93), Section 301 tariff exposure, and BIS Entity List / restricted party screening remain mandatory. Reassess end-user and end-use statements, and confirm that no destination or consignee triggers sanctions or embargo red lines.",
+        "content_zh": "美国商务部工业与安全局（BIS）撤销了拜登时期的民用枪械出口规则，放宽了《出口管理条例》下民用枪械及弹药的许可与分类处理。出口运动霰弹枪、步枪、手枪及相关零部件的企业，应在发货前重新核实ECCN/商业管制清单分类、许可例外适用性及国别限制。美国HTS归类（第93章）、301关税风险以及BIS实体清单/受限方筛查仍为强制要求。需重新评估最终用户和最终用途声明，并确认目的地或收货人不触发制裁或禁运红线。",
+        "checklist": [
+          {
+            "phase": "技术核查",
+            "task": "Re-verify ECCN / CCL classification",
+            "desc": "Confirm post-rescission ECCN and license exception eligibility for each firearm, part and ammunition line under the revised EAR treatment."
+          },
+          {
+            "phase": "技术核查",
+            "task": "BIS Entity List & restricted party screening",
+            "desc": "Screen consignees, intermediaries and end users against the BIS Entity List, OFAC SDN and denied party lists; retain screening records."
+          },
+          {
+            "phase": "单证准备",
+            "task": "US HTS Chapter 93 alignment",
+            "desc": "Map each item to the correct 10-digit HTS line (9302, 9303.20, 9303.30) and document country of origin and value build-up."
+          },
+          {
+            "phase": "单证准备",
+            "task": "Section 301 tariff exposure review",
+            "desc": "Check the HTS line against Section 301 lists and additional duties; quantify landed-cost impact before quoting US-bound shipments."
+          },
+          {
+            "phase": "单证准备",
+            "task": "End-user / end-use statements",
+            "desc": "Obtain and retain non-transferable end-user and end-use certificates; confirm no diversion to embargoed or sanctioned destinations."
+          },
+          {
+            "phase": "环保注册",
+            "task": "Destination market import permits",
+            "desc": "Verify importing-country firearms licensing and registration requirements before export, as BIS relief does not waive foreign import controls."
+          }
+        ],
+        "source_url": "https://www.bis.gov/press-release/department-commerce-rescinds-biden-era-firearms-rule-restoring-common-sense-export-controls-civilian",
+        "pipeline_source": "bis",
+        "fetched_at": "2026-11-17T01:43:37.638199+00:00"
       }
     }
   ]
