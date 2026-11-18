@@ -189,12 +189,17 @@ test('keeps Annex II specific duty and Annex III quota availability as explicit 
     const dutyRateData = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
     const unavailableQuotaPrograms = structuredClone(dutyRateData.special_programs);
     unavailableQuotaPrograms.forEach((program) => {
-        (program.quota_status?.rows || []).forEach((row) => {
-            if (row.order_number !== '09.9001') return;
-            row.available = false;
-            row.exhausted = true;
-            row.status = 'exhausted';
-        });
+        if (program.id !== 'EU-US-2026-1455') return;
+        program.quota_status ||= {};
+        program.quota_status.rows = [
+            ...(program.quota_status.rows || []).filter((row) => row.order_number !== '09.9001'),
+            {
+                order_number: '09.9001',
+                available: false,
+                exhausted: true,
+                status: 'exhausted'
+            }
+        ];
     });
     setDutyRulesForTest(dutyRateData.rules, unavailableQuotaPrograms);
     t.after(() => setDutyRulesForTest(null, dutyRateData.special_programs));
