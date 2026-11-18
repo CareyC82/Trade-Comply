@@ -185,7 +185,20 @@ test('does not apply Regulation 2026/1455 before its effective date', () => {
     assert.equal(duty.specialProgramAdjustment.adjustedEstimatedDuty, null);
 });
 
-test('keeps Annex II specific duty and Annex III quota availability as explicit gates', () => {
+test('keeps Annex II specific duty and Annex III quota availability as explicit gates', (t) => {
+    const dutyRateData = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'duty-rates.json'), 'utf8'));
+    const unavailableQuotaPrograms = structuredClone(dutyRateData.special_programs);
+    unavailableQuotaPrograms.forEach((program) => {
+        (program.quota_status?.rows || []).forEach((row) => {
+            if (row.order_number !== '09.9001') return;
+            row.available = false;
+            row.exhausted = true;
+            row.status = 'exhausted';
+        });
+    });
+    setDutyRulesForTest(dutyRateData.rules, unavailableQuotaPrograms);
+    t.after(() => setDutyRulesForTest(null, dutyRateData.special_programs));
+
     const value = calculatePostEntryValue({ incoterm: 'FOB', declaredAmount: 10000 });
     const annexII = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.088 }, {
         importCountryCode: 'EU',
@@ -235,12 +248,16 @@ test('keeps Annex II specific duty and Annex III quota availability as explicit 
         hsCode: '02032219',
         entryDate: '2026-07-10'
     }, 0);
+    const syncedQuotaAvailable = quotaPending.quotaStatus.some(
+        (row) => row.order_number === '09.9001' && row.available === true
+    );
     assert.equal(quotaPending.annex, 'III');
-    assert.equal(quotaPending.calculationComplete, true);
-    assert.equal(quotaPending.adjustedEstimatedDuty, 0);
+    assert.equal(syncedQuotaAvailable, false);
+    assert.equal(quotaPending.calculationComplete, false);
+    assert.equal(quotaPending.adjustedEstimatedDuty, null);
     assert.equal(quotaPending.eligibility.status, 'potentially_eligible');
-    assert.ok(quotaPending.quotaStatus.some((row) => row.order_number === '09.9001' && row.available));
-    assert.match(quotaPending.summary, /first-come, first-served/i);
+    assert.ok(quotaPending.quotaStatus.some((row) => row.order_number === '09.9001'));
+    assert.match(quotaPending.summary, /only after live quota availability/i);
 
     const quotaConfirmed = buildSpecialProgramDutyAdjustment(value, { baseRate: 0.12 }, {
         importCountryCode: 'EU',
