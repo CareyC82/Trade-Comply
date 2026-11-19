@@ -159,6 +159,20 @@ test('resolves synchronized TARIC specific-duty rows by CN code and entry date',
 });
 
 test('keeps committed Annex II exact, Annex III quota, and conditional-duty paths distinct', () => {
+    const fixturePrograms = structuredClone(dutyRates.special_programs);
+    const fixtureProgram = fixturePrograms.find((row) => row.id === 'EU-US-2026-1455');
+    assert.ok(fixtureProgram);
+    fixtureProgram.quota_status ||= {};
+    fixtureProgram.quota_status.rows = [
+        ...(fixtureProgram.quota_status.rows || []).filter((row) => row.order_number !== '09.9001'),
+        {
+            order_number: '09.9001',
+            available: true,
+            exhausted: false,
+            status: 'available'
+        }
+    ];
+
     const commonEvidence = {
         importCountry: 'EU',
         originCountry: 'US',
@@ -170,7 +184,7 @@ test('keeps committed Annex II exact, Annex III quota, and conditional-duty path
     };
 
     const exactAnnexIi = resolveProgramTreatment({
-        programs: dutyRates.special_programs,
+        programs: fixturePrograms,
         ...commonEvidence,
         hsCode: '0806101005'
     });
@@ -179,7 +193,7 @@ test('keeps committed Annex II exact, Annex III quota, and conditional-duty path
     assert.equal(exactAnnexIi.eligibility.status, 'eligible');
 
     const quotaAnnexIii = resolveProgramTreatment({
-        programs: dutyRates.special_programs,
+        programs: fixturePrograms,
         ...commonEvidence,
         hsCode: '02032219',
         quotaAvailable: true
@@ -189,7 +203,7 @@ test('keeps committed Annex II exact, Annex III quota, and conditional-duty path
     assert.equal(quotaAnnexIii.eligibility.status, 'eligible');
 
     const conditionalAnnexIi = resolveProgramTreatment({
-        programs: dutyRates.special_programs,
+        programs: fixturePrograms,
         ...commonEvidence,
         hsCode: '07020000'
     });
