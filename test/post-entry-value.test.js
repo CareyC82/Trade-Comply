@@ -660,3 +660,12 @@ test('Post-Entry accepts pending regulatory context and ISO effective-date deep 
     assert.match(pageScript, /Prefilled from pending regulatory review/);
     assert.match(pageScript, /year\.slice\(-2\)/);
 });
+
+test('Post-Entry provides a bounded customs-hold correction evidence path', () => {
+    const formHtml = fs.readFileSync(path.join(__dirname, '..', 'post-entry.html'), 'utf8');
+    assert.match(formHtml, /post-entry-customs-hold-recovery/);
+    assert.match(formHtml, /Ask the carrier or customs broker for the entry, duty assessment, hold reason, deadline/i);
+    assert.match(formHtml, /precise plain-language description, material or composition, intended use, country of origin/i);
+    assert.match(formHtml, /does not file an entry, choose the final tariff classification/i);
+    assert.match(formHtml, /CBP precise cargo descriptions/);
+});

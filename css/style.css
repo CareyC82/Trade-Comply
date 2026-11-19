@@ -7679,6 +7679,66 @@ button.feedback-link:hover {
     margin-top: 6px;
 }
 
+.post-entry-recovery-card {
+    margin: 0 0 18px;
+    border: 1px solid #b9cee5;
+    border-left: 5px solid #1859a9;
+    border-radius: 14px;
+    background: #f7fbff;
+    box-shadow: 0 8px 24px rgba(24, 73, 121, 0.08);
+}
+
+.post-entry-recovery-card summary {
+    padding: 16px 18px;
+    color: #174979;
+    font-size: 0.98rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.post-entry-recovery-card[open],
+.post-entry-recovery-card details[open] {
+    background: #fff;
+}
+
+.post-entry-recovery-content {
+    padding: 0 18px 18px;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    line-height: 1.58;
+}
+
+.post-entry-recovery-content p {
+    margin: 0 0 12px;
+}
+
+.post-entry-recovery-content ol {
+    margin: 0 0 14px;
+    padding-left: 21px;
+}
+
+.post-entry-recovery-content li + li {
+    margin-top: 8px;
+}
+
+.post-entry-recovery-boundary {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fff5dc;
+    color: #554318;
+}
+
+.post-entry-recovery-sources {
+    display: flex;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+}
+
+.post-entry-recovery-sources a {
+    color: #1859a9;
+    font-weight: 750;
+}
+
 @media (max-width: 620px) {
     .post-entry-confidence-card,
     .post-entry-source-header,
