@@ -2,7 +2,7 @@
 
 ## LinkedIn daily post
 
-- Status: **Draft only; not published.** The in-app browser control timed out before I could inspect the authenticated feed, confirm there was no post today, or publish and verify success. Do not count this as a published post.
+- Status: **Draft only; not published.** The in-app browser control timed out before I could inspect the authenticated feed, confirm there was no post today, or publish and verify success. Carey confirmed LinkedIn was logged in and asked me to retry; the retry also timed out before the feed could be read. Do not count this as a published post.
 - Public profile snapshot: search results showed a recent post (about one week ago) on exact supplier-document matching. No current-day activity, replies, impressions, or trial signups could be verified. Avoided repeating that topic.
 - Theme selected: Amazon U.S. direct product validation workflow and the distinction between existing-document review and guaranteed approval.
 - Primary source checked today: Amazon Seller Central, “Direct product validation: Third-party testing, inspection, and certification services.” It says existing documents may be submitted to an Amazon-authorized TIC for review; a TRF can only be initiated after Amazon issues a document-request notification in Account Health. The authorized provider decides whether the documents meet its policy; approval or avoiding new testing is not guaranteed.
