@@ -2,7 +2,7 @@
 
 ## LinkedIn daily post
 
-- Status: **Draft only; not published.** The in-app browser control timed out before I could inspect the authenticated feed, confirm there was no post today, or publish and verify success. Carey confirmed LinkedIn was logged in and asked me to retry; the retry also timed out before the feed could be read. Do not count this as a published post.
+- Status: **Published by Carey (confirmed the following morning).** On Nov. 25, LinkedIn showed a “Post successful” notification with a View post link: https://www.linkedin.com/feed/update/urn:li:activity:7530898065436594176/ . The exact publication timestamp was not visible, but Carey had said he would publish the supplied Nov. 24 draft. Do not count this as a Nov. 25 post.
 - Public profile snapshot: search results showed a recent post (about one week ago) on exact supplier-document matching. No current-day activity, replies, impressions, or trial signups could be verified. Avoided repeating that topic.
 - Theme selected: Amazon U.S. direct product validation workflow and the distinction between existing-document review and guaranteed approval.
 - Primary source checked today: Amazon Seller Central, “Direct product validation: Third-party testing, inspection, and certification services.” It says existing documents may be submitted to an Amazon-authorized TIC for review; a TRF can only be initiated after Amazon issues a document-request notification in Account Health. The authorized provider decides whether the documents meet its policy; approval or avoiding new testing is not guaranteed.
@@ -25,7 +25,7 @@
 
 ## Actual activity and outcome
 
-- New LinkedIn posts/comments/messages sent: 0 (browser control unavailable; no send attempt represented as successful).
+- New LinkedIn posts/comments/messages sent during the automation attempt: 0; Carey subsequently posted the prepared draft himself, as confirmed by the LinkedIn success notification reviewed Nov. 25.
 - Emails/forms/event RSVPs: 0.
 - Human replies verified today: 0.
 - Seller trial signups or completed tests verified today: 0.
