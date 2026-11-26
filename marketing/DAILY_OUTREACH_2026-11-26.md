@@ -2,9 +2,11 @@
 
 Time zone: Asia/Shanghai. Requested work window: one hour. This record distinguishes research/drafts from anything actually published or sent.
 
-## LinkedIn post — draft supplied to Carey, publication not verified
+## LinkedIn post — draft supplied to Carey, publication pending
 
-The authenticated in-app LinkedIn feed was visible in the app, but reading its accessibility tree timed out. No LinkedIn post, comment, connection, or message was sent by Codex. Whether a post was already published today remains unverified; do not publish a second post if one already exists.
+The authenticated in-app LinkedIn feed was visible in the app, but reading its accessibility tree timed out. Carey confirmed in chat that today's CPSC eFiling post had not yet been published (as of about 11:27 a.m. Beijing). Codex did not post it. The draft was supplied for Carey to publish manually; after publishing, record the URL and do not post a duplicate.
+
+Scheduled daily check (Nov. 26, about 11:42 a.m. Beijing): the local log still showed the CPSC post as pending manual publication. Two attempts to read browser/tab state timed out, so the live feed, new comments, replies, and publication status could not be verified. No post or message was sent by Codex; do not count this as a successful post. Carey’s previously stated preference is to publish the LinkedIn copy manually.
 
 ### Recommended LinkedIn post for today (CPSC eFiling handoff; source-checked)
 
@@ -80,7 +82,7 @@ Amazon’s U.S. lithium-battery workflow has a new handoff for some sellers of r
 14. **AAEI industry article — good audience, pitch-first, terms not fully stated.** AAEI accepts practical articles on customs, operations, technology and data, recommends 800–1,500 words, and says accepted articles may appear on AAEI.org and in member communications/social channels. Its guidance says to contact the team with a proposed topic before preparing a full draft. No submission fee or publishing license details are stated on the reviewed page; ask before agreeing to terms. No pitch sent. Sources: https://aaei.org/industry-articles/ and https://aaei.org/aaei-industry-article-submission-guidelines/
 15. **The Manifest — emerging global-trade editorial outlet, fit plausible but terms and audience reach unclear.** Its current contributor page explicitly welcomes experts, practitioners, researchers and thought leaders writing about customs, global trade, logistics, technology and trade facilitation; recent pieces include data/interoperability and customs topics. The page does not state submission fees, rights, or audience size. Do not send a full article or accept terms until those are confirmed. This is a secondary topic-pitch candidate if Carey wants to diversify beyond ICPA. No pitch sent. Source: https://themanifestmag.com/write-for-us/
 16. **eBay Regulatory Compliance Support directory — directly relevant audience, but not an open self-serve listing route.** eBay's official guide currently lists nine reviewed independent providers across areas including EU EPR/GPSR, UK product safety, US CPSC certificates, and US tariffs/de minimis. The public directory explains how sellers find providers but gives no provider application/submission path. The separate 2027 eBay Partner Program is accepting applications until Dec. 31, 2026, but its baseline requires core account/listing/inventory/auction and order/fulfillment/shipping API capabilities plus at least 99% API success and 99.9% uptime. TraceWize's current pre-screen product does not meet that integration profile, so this is not a near-term channel; do not apply or imply eBay affiliation. Revisit only if eBay publishes a specific provider intake path or TraceWize develops a compatible seller-workflow integration and meets requirements. Sources: https://pages.ebay.com/regulatory/regulatory-compliance-support/ and https://www.developer.ebay.com/grow/ebay-partner-program
-17. **Amazon Service Provider Network (SPN) — potentially strong seller-discovery channel, but confirm category fit and operating model before applying.** Amazon says SPN listings are currently free; service providers set their own service fees directly with sellers, and Compliance is a listed category with a self-service path. The public provider description highlights testing, certification, inspection, audits and quality assurance, while TraceWize is an early-stage web pre-screen and does not offer those services. SPN is a catalogue for on-demand assistance: sellers may submit service requests and then contract directly with the provider. So it is not merely a web-app ad/listing; before considering it, TraceWize would need a clear eligible service, deliverables, pricing, response capacity and accurate qualifications. First ask Amazon in writing whether a source-backed preliminary product/market screening tool is eligible under Compliance, without claiming certification, testing, audits or final compliance advice. Amazon's published application requirements include a website clearly describing services to Amazon sellers, a registered legal entity/business document, government ID for the owner or legal representative, service-category selection and requested Seller Central roles. Do not register, upload Carey/company identity documents, request seller-account permissions, or accept portal terms without Carey's separate approval; no application/contact was made. Sources: https://sell.amazon.com/tools/service-provider-network, https://spcentral.amazon.com/nlp/register-in, https://developer.amazonservices.com/amazon-service-provider-network/how-to-join-the-amazon-service-provider-network, and https://developer-docs.amazon/sp-api/docs/list-your-service
+17. **Amazon Service Provider Network (SPN) — potentially strong seller-discovery channel, but confirm category fit and operating model before applying.** Amazon says SPN listings are currently free; service providers set their own service fees directly with sellers, and Compliance is a listed category with a self-service path. The public provider description highlights testing, certification, inspection, audits and quality assurance, while TraceWize is an early-stage web pre-screen and does not offer those services. SPN is a catalogue for on-demand assistance: sellers may submit service requests and then contract directly with the provider. So it is not merely a web-app ad/listing; before considering it, TraceWize would need a clear eligible service, deliverables, pricing, response capacity and accurate qualifications. First ask Amazon in writing whether a source-backed preliminary product/market screening tool is eligible under Compliance, without claiming certification, testing, audits or final compliance advice. Amazon says a professional seller account is helpful but not required to begin applying; its published requirements include a website clearly describing services to Amazon sellers, a registered legal entity/business document, government ID for the owner or legal representative, service-category selection and requested Seller Central roles. Do not register, upload Carey/company identity documents, request seller-account permissions, or accept portal terms without Carey's separate approval; no application/contact was made. Sources: https://sell.amazon.com/tools/service-provider-network, https://spcentral.amazon.com/nlp/register-in, https://developer.amazonservices.com/amazon-service-provider-network/how-to-join-the-amazon-service-provider-network, and https://developer-docs.amazon/sp-api/docs/list-your-service
    - **Do not confuse SPN with the Selling Partner Appstore.** A public app listing requires a public SP-API developer profile, OAuth authorization workflow, policy/security information, and an application actually serving seller workflows; TraceWize does not currently integrate with Seller Central. That would be a separate product-development project requiring Carey's advance approval. Source: https://developer-docs.amazon/sp-api/lang-en_us/docs/list-your-app-on-the-selling-partner-appstore and https://developer-docs.amazon/sp-api/lang-en_en/docs/register-as-a-public-developer
 
 ### Amazon SPN eligibility inquiry — draft only, not sent
@@ -148,10 +150,32 @@ This queue spreads the current U.S.-focused topics and avoids posting multiple v
 |---|---|---|
 | Nov. 26 | CPSC eFiling data handoff | Draft above; CPSC importer guidance: https://www.cpsc.gov/efiling/importers |
 | Nov. 27 | Old U.S. lithium battery mark transition ending Dec. 31 | Draft above; current eCFR §173.185(c)(3)(ii): https://www.ecfr.gov/current/title-49/subtitle-B/chapter-I/subchapter-C/part-173/subpart-E/section-173.185 |
-| Nov. 28 | Foreign IOR / CTPAT-validated broker rule effective Jan. 5, 2027 | Existing campaign post in `marketing/US_IOR_CAMPAIGN_PACK_2026-11-23.md`; refresh for amendments/comments before publication: https://www.govinfo.gov/content/pkg/FR-2026-11-06/html/2026-22735.htm |
+| Nov. 28 | Foreign IOR / CTPAT-validated broker rule effective Jan. 5, 2027 | Draft below is checked against the Nov. 6 interim final rule. Recheck for CBP changes or court action on the publication date: https://www.govinfo.gov/content/pkg/FR-2026-11-06/html/2026-22735.htm |
 | Nov. 29–30 | CPSC eFiling for international mail using Entry Type 13 begins Jan. 20, 2027 | Needs a final CBP/CPSC status check before posting. CPSC October 2026 guidance: https://www.cpsc.gov/s3fs-public/CPSC-Guidance-for-Mail-Shipments-6B-Cleared-October-2026.pdf |
 | Next open day | Evidence matching: exact model, battery/configuration, report revision, and platform request | Avoid publishing another Amazon TIC post immediately after recent Nov. 24–25 coverage; use the worksheet as a practical example instead. |
 | Next available slot after the time-sensitive posts | Choosing a third-party compliance provider | Draft below; eBay says its listed providers are independent and not endorsed/overseen by eBay: https://pages.ebay.com/regulatory/regulatory-compliance-support/ |
+
+### Foreign importer-of-record post (future LinkedIn post; fact-checked, recheck before publishing)
+
+If a company outside the U.S. will act as importer of record for U.S.-bound goods, confirm the customs-broker arrangement before the next entry.
+
+CBP’s interim final rule takes effect January 5, 2027. It applies to consumption entries where formal entry is filed and to specified informal entries (operationally, entry types 11, 12, and 13)—not to every seller or shipment.
+
+Under the rule, a foreign IOR that is not CTPAT-validated must designate a licensed customs broker that is CTPAT-validated to make the entry or act as IOR, subject to the rule’s specific conditions. A broker may request delayed compliance with its new client-verification requirement; if CBP approves a request, full broker compliance is still expected by May 6, 2027. The delay is not automatic.
+
+Before shipping, confirm:
+• Which entity will be the IOR?
+• What entry type will be filed?
+• Is the foreign IOR CTPAT-validated, or will a CTPAT-validated broker handle the entry?
+• Has the broker clarified its own compliance timeline?
+
+The rule is an interim final rule, with comments due January 5, 2027. Recheck current CBP guidance and the Federal Register before relying on it for a specific shipment.
+
+Source: https://www.govinfo.gov/content/pkg/FR-2026-11-06/html/2026-22735.htm
+
+TraceWize is a preliminary product-market screen, not customs brokerage or legal advice.
+
+#ImportCompliance #CustomsBroker #CrossBorderTrade
 
 ### Third-party compliance provider checklist (future LinkedIn post; not published)
 
@@ -176,7 +200,7 @@ What would you want to confirm before hiring a compliance provider?
 
 ### Three-seller pilot invitation (future LinkedIn post; not published)
 
-I’m looking for **three small electronics sellers exploring the U.S. market**—especially sellers of chargers, battery-powered products, wireless accessories, or connected devices—to try TraceWize’s preliminary product-market screen and share candid feedback. No account is needed for the initial screen.
+I’m looking for **three small electronics sellers exploring the U.S. market**—especially sellers of chargers, battery-powered products, wireless accessories, or connected devices—to try TraceWize’s preliminary product-market screen and share candid feedback. No account is needed for the initial screen; the product page says a product name and one-sentence description are enough to start, while supplier files and commercial figures stay optional.
 
 I’m especially interested in consumer-electronics sellers who are checking a new product or destination and can tell me:
 
@@ -296,7 +320,7 @@ This draft is not sent. Carey should confirm whether the “recurring handoff pr
 
 ## Verified outcomes so far
 
-- LinkedIn post/comment/DM sent by Codex: **0**.
+- LinkedIn post/comment/DM sent by Codex: **0** (Carey confirmed today's proposed post is not yet published manually).
 - Emails, forms, RSVPs, memberships, paid placements, or subscriptions: **0**.
 - Human replies or seller sign-ups verified during this work window: **0**.
 - Marketing deliverables: source-checked LinkedIn post and comment-response drafts; channel screening; eCommerce Insiders pitch/article and ICPA Trade Insights article drafts; and a product-gap recommendation from Project Development. No external posts, submissions or RSVPs were made by Codex. Separately approved CPSC card code changes remain local and undeployed.
@@ -320,7 +344,7 @@ These are not posted. Re-check facts against CPSC guidance if the regulatory sco
 
 ## Next actions
 
-- Carey: if no LinkedIn post exists today, publish the CPSC eFiling handoff draft above manually and share the post URL so it can be logged as confirmed.
+- Carey: the regular 10:55 a.m. Beijing posting time has passed. Since you confirmed the CPSC post is still unpublished, you can publish it later today manually if you wish; share the public URL afterward so the record can be updated. Do not publish another LinkedIn post today after this one.
 - SGS has a complimentary electronics chemical-compliance webinar today, Nov. 26, 5:00–6:00 p.m. Beijing time. It is relevant for learning/networking, not a TraceWize pitch; decide whether to register here: https://www.sgs.com/en-us/webinars/2026/11/meeting-global-chemical-compliance-challenges-in-electronics
 - If Carey joins the SGS webinar and has a natural chance to ask a practical question, keep it narrow: “For a small electronics seller requesting an initial chemical-compliance review, which detail most often has to be clarified first: exact model/material scope, supplier-document scope, or destination-market scope?” Do not pitch TraceWize during the session.
 - The 1,267-word ICPA article draft is not submission-ready until Carey verifies it reflects his experience and explicitly approves ICPA's permission to edit, publish under his name, and distribute it.
