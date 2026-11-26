@@ -449,7 +449,12 @@ test('US route separates current CPSC filing from future foreign IOR transition'
     });
     const cpsc = result.routeRequirements.find((item) => item.id === 'us_cpsc_efiling');
     const ior = result.routeRequirements.find((item) => item.id === 'us_foreign_ior');
-    assert.equal(cpsc.requirementClass, 'mandatory');
+    assert.equal(cpsc.requirementClass, 'scope_check');
+    assert.match(cpsc.reason, /reference.*user-provided; not verified/);
+    assert.match(cpsc.reason, /Disclaim only if applicable/);
+    assert.match(cpsc.reason, /importer is responsible/);
+    assert.match(cpsc.reason, /does not itself require retesting/);
+    assert.match(cpsc.reason, /July 8, 2026.*January 8, 2027.*Foreign Trade Zone.*January 20, 2027.*Entry Type 13/);
     assert.equal(ior.requirementClass, 'future');
     assert.match(ior.reason, /5 January 2027/);
 });
