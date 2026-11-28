@@ -59,6 +59,11 @@ test('medical claims and child-directed use cannot receive a simple feasible ver
     assert.ok(result.requirements.some((item) => item.id === 'mdr' && item.severity === 'high'));
 });
 
+test('preliminary result button is preceded by route assumptions and optional-details guidance', () => {
+    const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '../can-i-sell-it.html'), 'utf8');
+    assert.match(html, /The preliminary result uses the selected market and route\. Review any preselected values.*optional commercial and shipment details later\.<\/p>\s*<button[^>]*>Show preliminary result/);
+});
+
 test('consumer page is reachable from the primary navigation and declares the dedicated app', () => {
     const root = path.join(__dirname, '..');
     const page = fs.readFileSync(path.join(root, 'can-i-sell-it.html'), 'utf8');
@@ -432,7 +437,10 @@ test('transaction route triggers EU low-value PID handoff and item-based fees', 
         costs: { currency: 'EUR', quantity: 1, purchaseUnit: 100, saleUnit: 180, dutyRate: 0, importTaxRate: 20 }
     };
     const result = engine.assess(input);
-    assert.ok(result.routeRequirements.some((item) => item.id === 'eu_pid'));
+    const pid = result.routeRequirements.find((item) => item.id === 'eu_pid');
+    assert.ok(pid);
+    assert.match(pid.reason, /each model or variant actually shipped against the listing identifiers and supplier packaging or invoice/);
+    assert.match(pid.reason, /declarant.*each entry line.*code applies if no standardised identifier exists/);
     assert.ok(result.routeRequirements.some((item) => item.id === 'eu_low_value_route'));
     assert.equal(result.economics.feeBreakdown.euTemporaryDuty, 6);
     assert.equal(result.economics.feeBreakdown.euHandlingFee, 4);
@@ -453,8 +461,13 @@ test('US route separates current CPSC filing from future foreign IOR transition'
     assert.match(cpsc.reason, /reference.*user-provided; not verified/);
     assert.match(cpsc.reason, /Disclaim only if applicable/);
     assert.match(cpsc.reason, /importer is responsible/);
+    assert.match(cpsc.reason, /marketplace or fulfilment selection does not determine who is the importer of record or who sends CPSC or other PGA data through ACE/);
+    assert.match(cpsc.reason, /Confirm both roles.*customs broker or carrier.*marketplace/);
     assert.match(cpsc.reason, /does not itself require retesting/);
-    assert.match(cpsc.reason, /July 8, 2026.*January 8, 2027.*Foreign Trade Zone.*January 20, 2027.*Entry Type 13/);
+    assert.match(cpsc.reason, /July 8, 2026.*January 8, 2027.*Foreign Trade Zone.*January 20, 2027.*Full or Reference PGA.*international mail that requires a certificate/);
+    assert.match(cpsc.reason, /Do not assume the mail date applies to commercial express shipments/);
+    assert.match(cpsc.reason, /International mail does not automatically qualify for Entry Type 13, even below the value ceiling/);
+    assert.match(cpsc.reason, /Ask your customs broker or carrier.*requires formal entry or qualifies for the optional Entry Type 13 test/);
     assert.equal(ior.requirementClass, 'future');
     assert.match(ior.reason, /5 January 2027/);
 });
